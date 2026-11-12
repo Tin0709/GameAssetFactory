@@ -16,6 +16,10 @@ const MAX_POISE := 28.0
 const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
 const DEFAULT_DEATH_IMPULSE := Vector2(285.0, 190.0)
+const DEATH_TRAVEL_SCALE := 1.35
+const DEATH_LIFT_IMPULSE := 140.0
+const DEATH_LIFT_SCALE := 0.65
+const DEATH_PITCH_SPEED := 6.3
 const HEIGHT := 1.95
 const HIT_RADIUS := 0.48
 const CHASE_SPEED := 3.1
@@ -192,15 +196,32 @@ func _update_death(delta: float) -> void:
 			body.collision_layer = 2
 			body.collision_mask = 1
 		var launch := _death_profile.duplicate() as DeathProfile
-		launch.linear_impulse = _death_impulse.x
-		launch.upward_impulse = _death_impulse.y
-		ragdoll.begin(launch, _death_direction, "Chest", 0.0, 13.0)
+		# The lethal hit has a separate lift and turnover. Normal stagger still
+		# uses the strike's original impulse and stays on the ground.
+		launch.linear_impulse = _death_impulse.x * DEATH_TRAVEL_SCALE
+		launch.upward_impulse = DEATH_LIFT_IMPULSE + _death_impulse.y * DEATH_LIFT_SCALE
+		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
+		if ragdoll.begin(launch, direction, "Chest", 0.0, 13.0):
+			_apply_death_tumble(Vector3.UP.cross(direction) * DEATH_PITCH_SPEED)
 		return
 	var remaining := CORPSE_LIFETIME - _corpse_age
 	if remaining <= 0.00001:
 		queue_free()
 	elif _corpse_age >= CORPSE_DESATURATION_START:
 		_update_corpse_material(remaining)
+
+func _apply_death_tumble(spin: Vector3) -> void:
+	var centre := Vector3.ZERO
+	var mass := 0.0
+	for body: PhysicalBone3D in ragdoll.bodies.values():
+		centre += body.global_position * body.mass
+		mass += body.mass
+	centre /= mass
+	# Start a shared rotation about the mass centre. Its tangential impulses
+	# sum to zero, so this does not add another push along the strike.
+	for body: PhysicalBone3D in ragdoll.bodies.values():
+		body.apply_central_impulse(spin.cross(body.global_position - centre) * body.mass)
+		body.angular_velocity += spin
 
 func _update_corpse_material(remaining: float) -> void:
 	if _mesh.material_override == null:

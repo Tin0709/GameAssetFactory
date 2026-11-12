@@ -47,8 +47,6 @@ func set_enabled(value: bool, preview_point: Vector3) -> void:
 		return
 	if _voices.is_empty():
 		_load_audio()
-	if _groups.is_empty():
-		return
 	# The project starts with Master muted for quiet tests.
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
