@@ -21,6 +21,7 @@ func ticks(count: int) -> void:
 func run() -> void:
 	var lab = load("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
+	current_scene = lab
 	var group = lab.get_node("Zombies")
 	lab.get_node("HUD/BaseZombieToggle").button_pressed = true
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
@@ -54,9 +55,18 @@ func run() -> void:
 	check(twirls >= 70 and twirls <= 130 and left_twirls > 0 and left_twirls < twirls,
 		"Seeded death variants produce occasional twirls in both directions")
 	await ticks(56)
-	var strike: Dictionary = group.SABRE_STRIKES[0]
-	group._apply_contact(zombie, zombie.global_position + Vector3.UP, "Attack1", 0, 1, strike,
-		lab.player.visual.global_basis.z, false)
+	var attack := InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	attack.pressed = true
+	root.push_input(attack, true)
+	await ticks(2)
+	var release := InputEventKey.new()
+	release.physical_keycode = KEY_E
+	root.push_input(release, true)
+	for i in 60:
+		if zombie.health == 0:
+			break
+		await physics_frame
 	await ticks(4)
 	check(zombie.ragdoll.running and zombie.health == 0, "Lethal contact transfers the live pose to physics")
 	var impulse: Vector3 = zombie.ragdoll.total_applied_impulse
