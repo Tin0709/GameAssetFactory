@@ -262,7 +262,7 @@ func _drag_resize(event: InputEvent) -> void:
 		_moved = true
 		_preferred_position = panel.position
 		var available := _shield.get_viewport_rect().size - panel.position - TRAILING_INSET
-		var wanted := event.global_position + _resize_offset - panel.get_global_rect().position
+		var wanted: Vector2 = event.global_position + _resize_offset - panel.get_global_rect().position
 		_preferred_size = wanted.clamp(MIN_MENU_SIZE.min(available), available)
 		_resize()
 
