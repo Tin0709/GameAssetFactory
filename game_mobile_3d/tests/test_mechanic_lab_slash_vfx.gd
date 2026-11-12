@@ -51,6 +51,9 @@ func run() -> void:
 		attack(false)
 		check(found and age_span > 0.03, "A real %s swing carries temporal UVs in its ribbon" % weapons[slot])
 		check(not lab.get_node("CombatImpactLight").visible, "A missed %s swing has no hit light" % weapons[slot])
+		var sparks := lab.get_node_or_null("ContactSparks/Streaks") as MultiMeshInstance3D
+		check(sparks != null and sparks.multimesh.visible_instance_count == 0,
+			"A missed %s swing has no contact streaks" % weapons[slot])
 	lab.reset_player()
 	await physics_frame
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
