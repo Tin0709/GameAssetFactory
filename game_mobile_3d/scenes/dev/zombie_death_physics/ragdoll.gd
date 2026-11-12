@@ -399,7 +399,7 @@ func _project_terrain_contact() -> void:
 				lift = step_lift
 				deepest = body
 	if deepest != null:
-		_translate_clear_of_terrain(Vector3.UP * lift, deepest)
+		_try_terrain_translation(Vector3.UP * lift, deepest)
 	if has_deep_contact:
 		_project_deep_terrain_contact()
 
@@ -437,9 +437,9 @@ func _project_deep_terrain_contact() -> void:
 			deepest = body
 			motion = direction * minf(separation, TERRAIN_MAX_RECOVERY_SHIFT)
 	if deepest != null:
-		_translate_clear_of_terrain(motion, deepest)
+		_try_terrain_translation(motion, deepest)
 
-func _translate_clear_of_terrain(motion: Vector3, deepest: PhysicalBone3D) -> void:
+func _try_terrain_translation(motion: Vector3, deepest: PhysicalBone3D) -> void:
 	for body: PhysicalBone3D in bodies.values():
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if state == null:
