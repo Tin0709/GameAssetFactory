@@ -106,7 +106,7 @@ func run() -> void:
 			continue
 		fastest_descent = maxf(fastest_descent, -velocity.y)
 	check(fastest_descent > 5.0, "The corpse falls faster than 5 m/s before head or chest contact")
-	check(landing_time > 0.40 and landing_time < 0.64, "The torso reaches the floor in the calibrated window")
+	check(landing_time > 0.38 and landing_time < 0.55, "A grounded Sabre strike brings the torso down within 550 ms")
 	check(landing_speed > 0.0 and follow_through_speed > landing_speed * 0.55,
 		"The corpse retains forward momentum through its first 100 ms on the floor")
 	check(zombie._corpse_landed and zombie.ragdoll.max_anchor_error() < 0.10, "The corpse settles with connected joints")
@@ -133,7 +133,42 @@ func run() -> void:
 		check(pose_preserved, "Releasing physics retains the last rendered pose, including utility bones")
 	await ticks(6)
 	check(not is_instance_valid(zombie), "Corpse is released after its breakup")
+	await check_sword_finisher(lab, group)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_sword_finisher(lab, group) -> void:
+	lab.reset_player()
+	lab._select_weapon(1)
+	lab.get_node("HUD/BaseZombieToggle").button_pressed = false
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	var lethal_clips: Array[String] = []
+	group.sabre_contact.connect(func(_point, _direction, clip, _index, _serial, lethal):
+		if lethal:
+			lethal_clips.append(clip))
+	await ticks(56)
+	var attack := InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	attack.pressed = true
+	root.push_input(attack, true)
+	for i in 130:
+		if zombie.health == 0:
+			break
+		await physics_frame
+	var release := InputEventKey.new()
+	release.physical_keycode = KEY_E
+	root.push_input(release, true)
+	check(group.sword_equipped and lethal_clips == ["Attack3"], "Sword's third strike produces a lethal ragdoll")
+	var landing_time := INF
+	var lowest_corner := 0.0
+	for i in 70:
+		await physics_frame
+		if zombie._corpse_landed:
+			landing_time = minf(landing_time, zombie._corpse_age)
+		if zombie.ragdoll.running:
+			lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
+	check(landing_time > 0.38 and landing_time < 0.57, "Sword's finisher makes core contact within 570 ms")
+	check(lowest_corner > -0.17, "Sword's finisher avoids deep floor overlap")
 
