@@ -230,6 +230,7 @@ func setup(world:Node3D)->void:
 	level=world;process_priority=-10
 	if not private_primary:return
 	_point_kernel_owner=weakref(self)
+	RenderingServer.frame_pre_draw.connect(_sync_point_camera)
 	projected_sun.setup()
 	RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
@@ -511,6 +512,8 @@ func _update_hdr_air()->void:
 		viewport.use_hdr_2d=_hdr_saved;_hdr_owned=false
 
 func _exit_tree()->void:
+	if RenderingServer.frame_pre_draw.is_connected(_sync_point_camera):
+		RenderingServer.frame_pre_draw.disconnect(_sync_point_camera)
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
 		projected_sun.release()
 		RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
@@ -687,9 +690,16 @@ func _publish_point_cutoff()->void:
 		RenderingServer.global_shader_parameter_set("gaf_path_beam",beam)
 	point_soft_state=point_response.soft_settings if eligible and player_soft_source and point_response.soft_available()else Vector2.ZERO
 	RenderingServer.global_shader_parameter_set("gaf_point_soft",point_soft_state)
-	if level!=null:
-		_point_kernel_camera=level.get_node("Camera3D").global_position
-		RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera",_point_kernel_camera)
+
+func _sync_point_camera() -> void:
+	if _point_kernel_owner == null or _point_kernel_owner.get_ref() != self:
+		return
+	# The gameplay camera follows the rendered actor after the light update.
+	# Publish its final position so the shader's camera guard also passes while moving.
+	var camera_position: Vector3 = level.get_node("Camera3D").global_position
+	if camera_position != _point_kernel_camera:
+		_point_kernel_camera = camera_position
+		RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera", camera_position)
 
 func set_lantern_overhead(value: bool) -> void:
 	if lantern_overhead == value:
