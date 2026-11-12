@@ -101,8 +101,9 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	zombie.free()
 	await ticks(2)
 
-func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.DeathStrike) -> void:
-	var zombie = await launch(world, group, effects, Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT, strike)
+func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.DeathStrike,
+		frames: int, start := Vector3(-33.5, 9.0, -39.5), direction := Vector3.RIGHT) -> void:
+	var zombie = await launch(world, group, effects, start, direction, strike)
 	if zombie == null:
 		return
 	var first_landing := -1
@@ -111,7 +112,7 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	var worst_overlap := 0.0
 	var ledge_contact := false
 	var parked_frame := -1
-	for frame in (200 if strike == Zombie.DeathStrike.GROUND else 72):
+	for frame in frames:
 		await physics_frame
 		if zombie._corpse_parked:
 			parked_frame = frame
@@ -155,13 +156,17 @@ func run() -> void:
 		world.add_child(effects)
 		world.add_child(group)
 		await cliff_case(world, group, effects)
-		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER)
-		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER)
+		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER, 72)
+		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER, 72)
 		# Curved Greatsword and Sword use the same forward ground death response.
-		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND)
+		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND, 200)
 		# Reproduce the first spawn's tumble variant, whose head and feet rest at different heights.
 		group._spawn_serial = 0
-		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND)
+		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND, 200)
+		# Offset the launch toward the next cell so the head and arm strike at an angle.
+		group._spawn_serial = 2
+		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER, 190,
+			Vector3(-33.5, 9.0, -39.15), Vector3.RIGHT.rotated(Vector3.UP, -0.10))
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
