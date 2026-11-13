@@ -62,8 +62,10 @@ func set_bar_health(slot: int, health: float, delayed: float) -> void:
 	multimesh.set_instance_custom_data(slot, fill)
 
 func _process(_delta: float) -> void:
+	var local_from_world := global_transform.affine_inverse()
+	var head := Vector3.UP * BAR_HEIGHT
 	for slot in _owners.size():
-		var point := _bar_position(_owners[slot])
+		var point := local_from_world * (_owners[slot].global_transform * head)
 		if point != _positions[slot]:
 			_positions[slot] = point
 			multimesh.set_instance_transform(slot, Transform3D(Basis.IDENTITY, point))
