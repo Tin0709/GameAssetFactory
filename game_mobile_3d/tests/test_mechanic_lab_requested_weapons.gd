@@ -319,7 +319,8 @@ func check_crossbow_trail(lab: Node3D) -> void:
 	check(ribbon.visible and crossbow._trails.size() == 1 and crossbow._bolts.size() == 1,
 		"A travelling bolt draws a ribbon in the shared renderer")
 	await ticks(8)
-	check(ribbon.visible and crossbow._bolts.is_empty() and crossbow._trails.size() == 1,
+	check(ribbon.visible and ribbon.mesh.get_surface_count() == 1
+		and crossbow._bolts.is_empty() and crossbow._trails.size() == 1,
 		"The already-laid ribbon decays after impact")
 	if crossbow._trails.size() == 1:
 		check(absf(float(crossbow._trails[0].distance) - 3.95) < 0.03,
@@ -327,7 +328,10 @@ func check_crossbow_trail(lab: Node3D) -> void:
 	await ticks(18)
 	check(not ribbon.visible and crossbow._trails.is_empty(), "The last ribbon sample expires after 0.30 seconds")
 	crossbow.fire(origin, Vector3.BACK, -202, origin)
+	crossbow.fire(origin + Vector3.RIGHT * 0.3, Vector3.BACK, -203, origin + Vector3.RIGHT * 0.3)
 	await ticks(3)
+	check(crossbow._trails.size() == 2 and ribbon.mesh.get_surface_count() == 1,
+		"Two arrows share one ribbon draw surface")
 	crossbow.reset()
 	check(not ribbon.visible and crossbow._trails.is_empty(), "Reset clears the flying ribbon immediately")
 	wall.queue_free()
