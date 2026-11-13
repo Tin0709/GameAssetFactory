@@ -5,6 +5,10 @@ const SHA="699d7c368d3adebef14733af55172e8f1a8e74e2e645a876a3db308dd8afd740"
 const HOURS:=[0.,5.5,6.5,7.,8.,9.,10.,12.]
 const EVENING_FILE := "graphics_vfx/forest_pix_capture_20261112/forest_evening_key/evening_key.private.json"
 const EVENING_SHA := "be941bfefe0c28784cd737c0e940b437ea590799c9298802ee6bc39f1e0eb4bd"
+const SUNRISE_FILE := "graphics_vfx/forest_pix_capture_20261112/forest_twilight_fixed_lights/sunrise_key_profile.private.json"
+const SUNRISE_SHA := "ef9c20acb4c6f6319c551b7c7d2bd0f699045465fd4c246489ef4469fec61a2e"
+var _sunrise_hours := PackedFloat32Array()
+var _sunrise_ratios := PackedVector3Array()
 var anchors:Array=[]
 var verified:=false
 var evening_anchors: Array = []
@@ -26,6 +30,7 @@ func _init()->void:
  if rows[-1].rgb_ratio!=[1.,1.,1.]:return
  anchors=rows;verified=true
  _load_evening(root.path_join(EVENING_FILE))
+ _load_sunrise(root.path_join(SUNRISE_FILE))
 func available()->bool:return verified and anchors.size()==HOURS.size()
 func sample(hour:float)->Vector3:
  if not available()or not is_finite(hour):return Vector3.ONE
@@ -63,3 +68,29 @@ func sample_evening(hour: float, strength: float) -> Vector3:
    var measured := Vector3(a[0], a[1], a[2]).lerp(Vector3(b[0], b[1], b[2]), blend)
    return baseline.lerp(measured, weight)
  return baseline
+
+
+func _load_sunrise(path: String) -> void:
+ if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != SUNRISE_SHA:
+  return
+ var profile: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+ if not profile is Dictionary or profile.get("schema") != "private-sunrise-key/1" or not profile.get("anchors") is Array:
+  return
+ var hours := PackedFloat32Array()
+ var ratios := PackedVector3Array()
+ for row: Dictionary in profile.anchors:
+  var rgb: Array = row.relative_rgb
+  hours.append(float(row.hour))
+  ratios.append(Vector3(rgb[0], rgb[1], rgb[2]))
+ _sunrise_hours = hours
+ _sunrise_ratios = ratios
+
+func sunrise_available() -> bool:
+ return available() and _sunrise_hours.size() >= 2
+
+func sample_sunrise(hour: float) -> Vector3:
+ for i in range(1, _sunrise_hours.size()):
+  if hour <= _sunrise_hours[i]:
+   var weight := clampf(inverse_lerp(_sunrise_hours[i - 1], _sunrise_hours[i], hour), 0.0, 1.0)
+   return _sunrise_ratios[i - 1].lerp(_sunrise_ratios[i], weight)
+ return _sunrise_ratios[-1]

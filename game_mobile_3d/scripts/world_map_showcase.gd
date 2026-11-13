@@ -137,6 +137,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"dawn_mist_source": ["Ánh sáng sương rạng sáng", 1.],
 	&"evening_mist_profile": ["Sương hoàng hôn", 1.],
 	&"evening_key_response": ["Ánh trực tiếp lúc chạng vạng", 1.],
+	&"sunrise_key_response": ["Nắng chuyển lúc bình minh", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"sculk_surface": ["Sculk phát sáng", 1.],
@@ -171,7 +172,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 91
+const LIGHTING_MIX_VERSION := 92
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -596,6 +597,22 @@ func _apply_key_mix(sun:DirectionalLight3D)->void:
 	if direction_mix>0.:
 		direction=sun.basis.z.normalized().slerp(direction,direction_mix).normalized()
 		sun.rotation=Basis.looking_at(-direction,Vector3.UP).get_euler(sun.rotation_order)
+
+func _apply_sunrise_key(sun: DirectionalLight3D) -> void:
+	if _balanced_preview or atmosphere_review != "combined" or not captured_key_response or not key_response.sunrise_available():
+		return
+	var weight := .65 * _lighting_scale(&"sunrise_key_response") * smoothstep(3.5, 4.0, hour) * (1.0 - smoothstep(7.0, 9.0, hour))
+	if weight <= 0.0:
+		return
+	var color := sun.light_color.srgb_to_linear()
+	var current := Vector3(color.r, color.g, color.b) * sun.light_energy
+	var reference := _captured_key_rgb(12.0) * _lighting_scale(&"sun")
+	# The WorldMap clock placement and partial blend are art calibration.
+	var rgb := current.lerp(reference * key_response.sample_sunrise(hour), weight)
+	var peak := maxf(rgb.x, maxf(rgb.y, rgb.z))
+	if peak > 0.0:
+		sun.light_color = Color(rgb.x / peak, rgb.y / peak, rgb.z / peak).linear_to_srgb()
+		sun.light_energy = peak
 
 func set_source_bloom_shape(value:bool)->void:
 	source_bloom_shape=value;set_coupled_bloom(coupled_bloom)
@@ -1606,6 +1623,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 91 and effect == &"dawn_stone_sky_color":
 			missing_value = 0.
+		if version < 92 and effect == &"sunrise_key_response":
+			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
 		if version < 84 and effect == &"night_stone_blue_softness":
@@ -1659,6 +1678,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and not phase_air.anchors.is_empty()
 		if effect in [&"evening_mist_profile", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical"]:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
+		if effect == &"sunrise_key_response":
+			slider.editable = slider.editable and key_response.sunrise_available()
 		if effect == &"evening_key_response":
 			slider.editable = slider.editable and key_response.evening_available()
 		if effect == &"evening_lantern":
@@ -1872,6 +1893,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		if sky_response_active:
 			env.ambient_light_energy *= lerpf(1.0, .75, _lighting_scale(&"twilight_ambient") * twilight_finish_weight())
 		_apply_key_mix(sun)
+		_apply_sunrise_key(sun)
 		# In full shade, block the direct beam and leave ambient fill to its own path.
 		_apply_direct_shadow_opacity(sun)
 		if _player_light!=null:
