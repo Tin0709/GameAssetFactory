@@ -4644,7 +4644,7 @@
       "source_rig": "Showcase_Player_Rig",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBShowcase_Player_Rig",
-      "action_sha256": "426fbe4d97d36297087a4be71134722576d252efc032ccfe47ada4ec3a346bbd",
+      "action_sha256": "2e383a3debac68b3c734fb6b95f3a9ca78ea7f0bee44238d22d17b694b537585",
       "action_frame_range": [
         1.0,
         64.0
@@ -4681,16 +4681,16 @@
       ],
       "in_place": true,
       "preview_floor_z_m": 0.0,
-      "approval_note": "Third-person, unarmed standard player on the Showcase rig.",
-      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_sneak_113\\AS_Sneak_1.13.blend",
-      "source_sha256": "5215a94a5a3c7418ef04c2b6744fbdf7eead4730f093758baf5a00162ce8c0b6"
+      "approval_note": "Third-person, unarmed standard player. Showcase head pitch is compensated to keep the gaze level.",
+      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_sneak_113\\look_forward\\AS_Sneak_1.13.blend",
+      "source_sha256": "87d89fd938ca19ff5b5f5a5675ef10a0d48522d864c704206272e5783bd90add"
     },
     {
       "action": "Sneak_Walk_ActionsStuff_113_Source_RESEARCH",
       "source_rig": "Showcase_Player_Rig",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBShowcase_Player_Rig",
-      "action_sha256": "5a35d27a92118e8fa67c5e2bddd2b91de5b73658c4f66549146aa8158af7e7d7",
+      "action_sha256": "bd8e67d17345a0f53e84b60751b3aafc250fe999ba756ca75e56778f9e2f0548",
       "action_frame_range": [
         1.0,
         481.0
@@ -4729,18 +4729,18 @@
       ],
       "in_place": true,
       "preview_floor_z_m": 0.0,
-      "approval_note": "Third-person, unarmed standard player on the Showcase rig.",
+      "approval_note": "Third-person, unarmed standard player. Showcase head pitch is compensated to keep the gaze level.",
       "closing_key": 481,
       "period_s": 8.0,
-      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_sneak_113\\AS_Sneak_1.13.blend",
-      "source_sha256": "5215a94a5a3c7418ef04c2b6744fbdf7eead4730f093758baf5a00162ce8c0b6"
+      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_sneak_113\\look_forward\\AS_Sneak_1.13.blend",
+      "source_sha256": "87d89fd938ca19ff5b5f5a5675ef10a0d48522d864c704206272e5783bd90add"
     },
     {
       "action": "Sneak_Exit_ActionsStuff_113_Source_RESEARCH",
       "source_rig": "Showcase_Player_Rig",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBShowcase_Player_Rig",
-      "action_sha256": "cb6c14dc7dcec74a8f632c43eaa7b9ae1a3656719153dfc72c38499eb8f4cf72",
+      "action_sha256": "1064954b8124bb174256b9fb4297765aa3f132be70eeba02a12f847229b2dba6",
       "action_frame_range": [
         1.0,
         59.0
@@ -4777,9 +4777,9 @@
       ],
       "in_place": true,
       "preview_floor_z_m": 0.0,
-      "approval_note": "Third-person, unarmed standard player on the Showcase rig.",
-      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_sneak_113\\AS_Sneak_1.13.blend",
-      "source_sha256": "5215a94a5a3c7418ef04c2b6744fbdf7eead4730f093758baf5a00162ce8c0b6"
+      "approval_note": "Third-person, unarmed standard player. Showcase head pitch is compensated to keep the gaze level.",
+      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_sneak_113\\look_forward\\AS_Sneak_1.13.blend",
+      "source_sha256": "87d89fd938ca19ff5b5f5a5675ef10a0d48522d864c704206272e5783bd90add"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
