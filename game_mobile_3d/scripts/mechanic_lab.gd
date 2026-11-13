@@ -886,6 +886,7 @@ func _on_player_hit(amount: int) -> void:
 	_combat_audio.player_hurt()
 	_show_player_hit(lost)
 	if player_health == 0:
+		_combat_audio.player_defeated()
 		_stop_crowd_spawn()
 		player.enter_lab_defeat()
 		# The popup captures keyboard input while it is open, including R.

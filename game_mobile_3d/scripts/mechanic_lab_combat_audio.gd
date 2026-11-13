@@ -78,6 +78,8 @@ const ZOMBIE_ATTACK := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%sAtt
 # Zombie.Step names the adult event. The exported generic candidate is under BabyZombie.
 const ZOMBIE_STEP := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombieStepGeneric-%03d_soundWave.ogg"
 const PLAYER_HURT := "Player/Hurt/sfx_multi_hit-%03d_soundWave.ogg"
+const PLAYER_DEFEAT := "Player/Death/sfx_playerDeath.ogg"
+const PLAYER_DEFEAT_HASH := "3c15d66e2b2ce0bc571a8bfa3cadc7d532d2f559ecd45e894a0e44d7c2e0882c"
 const VOICES_PER_POOL := 3
 const REACTION_POOL := 1
 const ATTACK_POOL := 2
@@ -94,6 +96,7 @@ const DEATH_GAIN_DB := -14.0
 const ZOMBIE_WINDUP_GAIN_DB := -16.0
 const ZOMBIE_HIT_GAIN_DB := -14.0
 const PLAYER_HURT_GAIN_DB := -14.0
+const PLAYER_DEFEAT_GAIN_DB := -16.0
 const ZOMBIE_STEP_GAIN_DB := -21.0
 const ZOMBIE_STEP_DISTANCE := 12.0
 
@@ -186,6 +189,7 @@ var zombie_listener: AudioListener3D
 var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _player_hurt_voice: AudioStreamPlayer
+var _player_defeat_voice: AudioStreamPlayer
 var _next_choice: Dictionary[StringName, int] = {}
 var _next_voice: Array[int] = [0, 0, 0, 0, 0]
 var _flight_targets: Dictionary[AudioStreamPlayer3D, Node3D]
@@ -362,6 +366,14 @@ func player_hurt() -> void:
 		_player_hurt_voice.stream = stream
 		_player_hurt_voice.play()
 
+func player_defeated() -> void:
+	if not enabled or _player_defeat_voice == null:
+		return
+	var stream := _next_stream(&"player_defeat")
+	if stream != null:
+		_player_defeat_voice.stream = stream
+		_player_defeat_voice.play()
+
 func zombie_attack(point: Vector3, contact: bool) -> void:
 	var group := &"zombie_hit" if contact else &"zombie_windup"
 	if enabled:
@@ -454,6 +466,9 @@ func reset() -> void:
 	if _player_hurt_voice != null:
 		_player_hurt_voice.stop()
 		_player_hurt_voice.stream = null
+	if _player_defeat_voice != null:
+		_player_defeat_voice.stop()
+		_player_defeat_voice.stream = null
 
 static func _research_root() -> String:
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
@@ -470,6 +485,10 @@ func _load_audio() -> void:
 	_player_hurt_voice.name = "PlayerHurt"
 	_player_hurt_voice.volume_db = PLAYER_HURT_GAIN_DB
 	add_child(_player_hurt_voice)
+	_player_defeat_voice = AudioStreamPlayer.new()
+	_player_defeat_voice.name = "PlayerDefeat"
+	_player_defeat_voice.volume_db = PLAYER_DEFEAT_GAIN_DB
+	add_child(_player_defeat_voice)
 	_create_voices(FLIGHT_POOL * VOICES_PER_POOL)
 	for i in HIT_HASHES.size():
 		_load_sample(root, &"hit", SABRE % (i + 1), HIT_HASHES[i])
@@ -486,6 +505,7 @@ func _load_audio() -> void:
 	_load_surface_landing(root, "Grass", &"slam_grass", GRASS_LANDING_HASHES)
 	for i in PLAYER_HURT_HASHES.size():
 		_load_sample(root, &"player_hurt", PLAYER_HURT % (i + 1), PLAYER_HURT_HASHES[i])
+	_load_sample(root, &"player_defeat", PLAYER_DEFEAT, PLAYER_DEFEAT_HASH)
 	for i in ZOMBIE_WINDUP_HASHES.size():
 		_load_sample(root, &"zombie_windup", ZOMBIE_ATTACK % ["Pre", i + 1], ZOMBIE_WINDUP_HASHES[i])
 	for i in ZOMBIE_HIT_HASHES.size():
