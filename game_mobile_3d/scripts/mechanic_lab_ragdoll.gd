@@ -356,20 +356,31 @@ func _project_source_anchors() -> void:
 			motion = shift
 	if motion.is_zero_approx():
 		return
-	if _can_shift_wall_chest(chest, chest_state, gaps, largest_gap, motion):
-		chest_state.transform = chest_state.transform.translated(motion)
-	elif motion.length_squared() > WALL_CHEST_MAX_SHIFT * WALL_CHEST_MAX_SHIFT + 0.000001:
+	var extended_arm_shift := motion.length_squared() > WALL_CHEST_MAX_SHIFT * WALL_CHEST_MAX_SHIFT + 0.000001
+	if _wall_chest_shift_preserves_joints(gaps, largest_gap, motion):
+		if not _test_projection_motion(chest, chest_state.transform, motion):
+			chest_state.transform = chest_state.transform.translated(motion)
+			return
+		if extended_arm_shift:
+			# The forward sweep reports the torso's existing wall overlap.
+			# The shared escape test checks clearance at the other end and
+			# sweeps back to rule out an intervening obstacle.
+			var start := chest_state.transform
+			_project_contacting_anchor(chest, chest_state, motion, true)
+			if not chest_state.transform.is_equal_approx(start):
+				return
+	if extended_arm_shift:
 		# A braced torso or another joint may still allow the ordinary shift.
 		var fallback := motion.limit_length(WALL_CHEST_MAX_SHIFT)
-		if _can_shift_wall_chest(chest, chest_state, gaps, largest_gap, fallback):
+		if _wall_chest_shift_preserves_joints(gaps, largest_gap, fallback) \
+				and not _test_projection_motion(chest, chest_state.transform, fallback):
 			chest_state.transform = chest_state.transform.translated(fallback)
 
-func _can_shift_wall_chest(chest: PhysicalBone3D, state: PhysicsDirectBodyState3D,
-		gaps: Array[Vector3], largest_gap: float, motion: Vector3) -> bool:
+func _wall_chest_shift_preserves_joints(gaps: Array[Vector3], largest_gap: float, motion: Vector3) -> bool:
 	for gap: Vector3 in gaps:
 		if (gap + motion).length() > largest_gap:
 			return false
-	return not _test_projection_motion(chest, state.transform, motion)
+	return true
 
 func _wall_anchor_motion(state: PhysicsDirectBodyState3D, gap: Vector3, require_rebound: bool,
 		allow_extra_arm_shift := false) -> Vector3:
