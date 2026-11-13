@@ -139,6 +139,16 @@ func run() -> void:
 	check(target.health <= 65, "Gauntlet combo applies its own 10/11/14 damage")
 	lab.reset_player()
 	await ticks(12)
+	var sound := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	sound.button_pressed = true
+	var combat_audio = lab.get_node("CombatAudio")
+	var mauler_samples: Array = combat_audio._groups.get(&"mauler_dive", [])
+	check(mauler_samples.size() == 3, "All three verified MD2 Mauler Dive samples load")
+	lab.get_node("HUD/DropMedium").pressed.emit()
+	await ticks(65)
+	check(not combat_audio._next_choice.has(&"mauler_dive"), "An ordinary landing does not play Mauler Dive")
+	lab.reset_player()
+	await ticks(12)
 	target.position = Vector3(0.0, 0.0, 1.6)
 	target.health = 100
 	lab.get_node("HUD/DropMedium").pressed.emit()
@@ -146,8 +156,10 @@ func run() -> void:
 	attack(true)
 	await ticks(2)
 	attack(false)
+	check(not combat_audio._next_choice.has(&"mauler_dive"), "Mauler Dive audio waits for contact")
 	await ticks(95)
 	check(target.health < 100 and contacts.has("AirAttack"), "Gauntlets can hit with their jump slam")
+	check(combat_audio._next_choice.get(&"mauler_dive", 0) == 1, "The first slam plays one Mauler Dive cue")
 	check(lab.player.clips.AirAttack.source_name == "Player_Jump_Gauntlet-Attack_Heavy", "The slam uses the source gauntlet pose")
 	equip(menu, 0)
 	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
