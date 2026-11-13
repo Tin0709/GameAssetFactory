@@ -50,22 +50,22 @@ func run() -> void:
 		check(world.player.drop_for_lab(5.0), "The fixture can repeat an ordinary drop")
 		await ticks(110)
 		check(audio._next_choice == before, "Ordinary landing posts no heavy attack cue")
-		for surface in ["dirt", "stone"]:
-			var found := false
-			for cell: Vector3i in world.geometry.cells:
-				var tile: Dictionary = world.runtime.palette[world.geometry.cells[cell]]
-				if tile.category != "terrain" or not tile.kind.begins_with(surface):
-					continue
-				var at: Vector3 = world.source_to_world(cell)
-				at.y += float(tile.base_y_offset) + float(tile.height)
-				if not is_equal_approx(at.y, world.surface_height(at.x, at.z)):
-					continue
-				world.player.heavy_jump_landed.emit(at + Vector3.UP * 0.02, Vector3.FORWARD, 41, 5.0)
-				check(audio._next_choice.get(StringName("slam_" + surface), 0) == 1,
-					"The authored %s collision selects its own source family" % surface)
-				found = true
-				break
-			check(found, "WorldMap has an exposed %s fixture" % surface)
+		var landings := {
+			&"slam_dirt": Vector3(0.5, 3.0, -6.5),
+			&"slam_stone": Vector3(-22.5, 3.5, -39.5),
+		}
+		for cue: StringName in landings:
+			world.player.global_position = landings[cue] + Vector3.UP * 0.02
+			world.player.cancel_jump()
+			await ticks(12)
+			check(world.player.drop_for_lab(5.0), "The %s fixture starts over terrain" % cue)
+			await ticks(5)
+			attack(true)
+			await ticks(2)
+			attack(false)
+			await ticks(105)
+			check(audio._next_choice.get(cue, 0) == 1, "A real dive plays exactly one %s sample" % cue)
+		check(audio._next_choice.size() == 3, "Grass, dirt and stone are independent playback groups")
 		world.showcase.set_audio_enabled(false)
 		check(AudioServer.is_bus_mute(0) and audio._voices.all(func(v): return not v.playing and v.stream == null),
 			"Audio off stops landing tails and restores silence")
