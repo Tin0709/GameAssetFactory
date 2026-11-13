@@ -179,6 +179,7 @@ func run() -> void:
 		await check_combo_finisher(lab, group, slot)
 	await check_sabre_landing_reversal(lab, group)
 	await check_sabre_landing_reversal(lab, group, true)
+	await check_sabre_first_contact_anchors(lab, group)
 	await check_sabre_head_and_arm_brace(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
@@ -387,18 +388,31 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 		" upward_step_m=", peak_supported_rise, " age=", zombie._corpse_age)
 	zombie.free()
 
-func check_sabre_head_and_arm_brace(lab, group) -> void:
+func check_sabre_first_contact_anchors(lab, group) -> void:
+	var zombie = await replay_offset_sabre_finisher(lab, group, 415)
+	var peak_gap := 0.0
+	for i in 48:
+		await physics_frame
+		if zombie._corpse_landed:
+			break
+		if zombie.ragdoll.running:
+			peak_gap = maxf(peak_gap, zombie.ragdoll.max_anchor_error())
+	check(zombie._corpse_landed and peak_gap < 0.094,
+		"Sabre first-contact floor recovery keeps the joint gap below 9.4 cm")
+	print("SABRE_FIRST_CONTACT peak_gap_m=", peak_gap)
+	zombie.free()
+
+func replay_offset_sabre_finisher(lab, group, spawn_serial: int):
 	lab.reset_player()
 	var selector := lab.get_node("HUD/Weapon") as OptionButton
 	selector.select(0)
 	selector.item_selected.emit(0)
 	lab.get_node("HUD/BaseZombieToggle").button_pressed = false
-	const SPAWN_SERIAL := 464
-	group._spawn_serial = SPAWN_SERIAL
+	group._spawn_serial = spawn_serial
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 120011 + SPAWN_SERIAL
+	rng.seed = 120011 + spawn_serial
 	zombie.global_position += Vector3(rng.randf_range(-0.42, 0.42), 0.0, rng.randf_range(-0.37, 0.35))
 	zombie.reset_physics_interpolation()
 	await ticks(rng.randi_range(44, 69))
@@ -412,6 +426,10 @@ func check_sabre_head_and_arm_brace(lab, group) -> void:
 		await physics_frame
 	attack.pressed = false
 	root.push_input(attack, true)
+	return zombie
+
+func check_sabre_head_and_arm_brace(lab, group) -> void:
+	var zombie = await replay_offset_sabre_finisher(lab, group, 464)
 	var braced := false
 	var leg_supported_after_brace := false
 	for i in 130:
