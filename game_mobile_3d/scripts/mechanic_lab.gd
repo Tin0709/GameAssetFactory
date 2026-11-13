@@ -441,14 +441,33 @@ func _clear_camera_shake() -> void:
 	camera.h_offset = 0.0
 	camera.v_offset = 0.0
 
-func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_height: float) -> void:
-	# The capsule can stop slightly above support after a fast landing.
-	# Use the actual floor surface when evaluating the height thresholds.
+func _landing_floor_height(point: Vector3) -> float:
+	var min_normal_y := cos(player.floor_max_angle)
 	var probe := Vector3.UP * 0.08
 	var ray := PhysicsRayQueryParameters3D.create(point + probe, point - probe, player.collision_mask, [player.get_rid()])
 	var support := get_world_3d().direct_space_state.intersect_ray(ray)
-	if not support.is_empty() and support.normal.y >= cos(player.floor_max_angle):
-		fall_height = maxf(0.0, fall_height + point.y - float(support.position.y))
+	if not support.is_empty() and support.normal.y >= min_normal_y:
+		return support.position.y
+
+	# The capsule can land on the edge with its centre beyond the floor.
+	# Reuse the upward contact reported by the same move_and_slide call.
+	var height := point.y
+	for i in player.get_slide_collision_count():
+		var collision := player.get_slide_collision(i)
+		for index in collision.get_collision_count():
+			var normal_y := collision.get_normal(index).y
+			if normal_y < min_normal_y:
+				continue
+			var collider := collision.get_collider(index) as CollisionObject3D
+			if collider == null or (collider.collision_layer & 1) == 0:
+				continue
+			height = collision.get_position(index).y
+			min_normal_y = normal_y
+	return height
+
+func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_height: float) -> void:
+	# Evaluate the height tiers against the support rather than the capsule origin.
+	fall_height = maxf(0.0, fall_height + point.y - _landing_floor_height(point))
 	$Zombies.land_sabre(point, facing, serial, fall_height)
 	if not _combat_audio.enabled:
 		return
