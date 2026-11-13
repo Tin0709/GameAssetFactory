@@ -57,6 +57,7 @@ var _step_index:=0
 var _rustle_index:=0
 var _nature_index:=0
 var _heavy_landing_frame := -1
+var landing_contact: Callable
 
 func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted, terrain_contact: Callable = Callable())->void:
 	actor=body;meadow=field;reader=bundle;config=reader.data.get("audio_config",{});_random.seed=281027
@@ -177,7 +178,8 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		return
 	var key := "grass"
 	if _terrain_contact.is_valid():
-		var contact: Dictionary = _terrain_contact.call(point)
+		var resolver := landing_contact if landed and landing_contact.is_valid() else _terrain_contact
+		var contact: Dictionary = resolver.call(point)
 		if contact.is_empty():
 			return
 		point = contact.position

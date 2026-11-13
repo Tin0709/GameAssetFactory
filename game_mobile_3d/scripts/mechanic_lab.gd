@@ -158,7 +158,7 @@ func _ready() -> void:
 		_setup_movement_audio()
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
-		if dust.setup(player, null, _grass_contact_at, _heavy_debris_delay):
+		if dust.setup(player, null, _grass_contact_at, _heavy_debris_delay, _grass_landing_contact_at):
 			add_child(dust)
 		else:
 			dust.free()
@@ -397,6 +397,7 @@ func _setup_movement_audio() -> void:
 	_movement_audio.name = "MovementAudio"
 	add_child(_movement_audio)
 	_movement_audio.setup(player, null, bundle, _grass_contact_at)
+	_movement_audio.landing_contact = _grass_landing_contact_at
 
 func _grass_contact_at(sole: Vector3) -> Dictionary:
 	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * 0.08, sole - Vector3.UP * 0.30, 1)
@@ -404,6 +405,25 @@ func _grass_contact_at(sole: Vector3) -> Dictionary:
 	if hit.is_empty() or hit.collider != $Ground or hit.normal.y < cos(player.floor_max_angle):
 		return {}
 	return {"position": hit.position, "surface": "grass"}
+
+func _grass_landing_contact_at(point: Vector3) -> Dictionary:
+	var contact := _grass_contact_at(point)
+	if not contact.is_empty():
+		return contact
+	var min_normal_y := cos(player.floor_max_angle)
+	var closest := INF
+	var nearest := Vector3.ZERO
+	for i in player.get_slide_collision_count():
+		var collision := player.get_slide_collision(i)
+		for index in collision.get_collision_count():
+			if collision.get_collider(index) != $Ground or collision.get_normal(index).y < min_normal_y:
+				continue
+			var position := collision.get_position(index)
+			var distance := position.distance_squared_to(point)
+			if distance < closest:
+				closest = distance
+				nearest = position
+	return {"position": nearest, "surface": "grass"} if closest < INF else {}
 
 func _on_zombie_step(sole: Vector3) -> void:
 	if not _combat_audio.can_play_zombie_step(sole, player.global_position):
@@ -503,7 +523,7 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	if _equipped_weapon == Weapon.SABRE:
 		_slam_swing_serial = serial
 		_slam_swing_frame = Engine.get_physics_frames() + ceili(SABRE_LANDING_SWING_DELAY * Engine.physics_ticks_per_second)
-	var contact := _grass_contact_at(point)
+	var contact := _grass_landing_contact_at(point)
 	if contact.is_empty():
 		return
 	var delay_ticks := ceili(_heavy_debris_delay() * Engine.physics_ticks_per_second)

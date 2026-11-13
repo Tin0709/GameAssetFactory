@@ -25,6 +25,7 @@ class Particle:
 var _actor: CharacterBody3D
 var _ground: CollisionShape3D
 var _terrain_contact: Callable
+var _landing_contact: Callable
 var _heavy_delay: Callable
 var _particles: Array[Particle] = []
 var _next := 0
@@ -38,13 +39,15 @@ var _random := RandomNumberGenerator.new()
 func _ready() -> void:
 	set_physics_process(false)
 
-func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable(), heavy_delay := Callable()) -> bool:
+func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable(),
+		heavy_delay := Callable(), landing_contact := Callable()) -> bool:
 	var texture := _load_mask()
 	if texture == null:
 		return false
 	_actor = actor
 	_ground = ground
 	_terrain_contact = terrain_contact
+	_landing_contact = landing_contact
 	_heavy_delay = heavy_delay
 	_random.seed = 27381
 	for i in CAPACITY:
@@ -91,7 +94,8 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	var ground_point: Vector3
 	var surface := "grass"
 	if _terrain_contact.is_valid():
-		var contact: Dictionary = _terrain_contact.call(point)
+		var resolver := _landing_contact if landed and _landing_contact.is_valid() else _terrain_contact
+		var contact: Dictionary = resolver.call(point)
 		if contact.is_empty():
 			return
 		ground_point = contact.position
