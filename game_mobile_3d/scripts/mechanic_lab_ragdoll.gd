@@ -6,6 +6,7 @@ const DEEP_CONTACT_SHARED_LIFT := 0.065
 
 var _sample_bone_ids: Dictionary[String, int]
 var _sample_body_offsets: Dictionary[String, Transform3D]
+var _sampled_skeleton_transform: Transform3D
 var _source_joint_biases: Dictionary[RID, float]
 
 static var _handoff_bounds_shape: BoxShape3D
@@ -33,11 +34,20 @@ func sample(delta: float) -> void:
 	previous = current
 	current = next
 	sample_delta = delta
-	var skeleton_transform := skeleton.global_transform
+	_sampled_skeleton_transform = skeleton.global_transform
 	for name: String in _sample_bone_ids:
-		current[name] = (skeleton_transform * skeleton.get_bone_global_pose(_sample_bone_ids[name])
+		current[name] = (_sampled_skeleton_transform * skeleton.get_bone_global_pose(_sample_bone_ids[name])
 			* _sample_body_offsets[name])
 	sample_count += 1
+
+func prepare_handoff_samples(delta: float, verify_transform: bool) -> void:
+	# A Lab fixture can reposition a zombie between its last living sample
+	# and the hit. The clearance query and the physics rig need the same pose.
+	if sample_count >= 2 and (not verify_transform \
+			or _sampled_skeleton_transform.is_equal_approx(skeleton.global_transform)):
+		return
+	sample(delta)
+	sample(delta)
 
 func _handoff_wall_clearance() -> Vector3:
 	if not is_instance_valid(_flat_floor):
