@@ -10,7 +10,6 @@ func apply(actor, key: String, delta: float) -> void:
 	if actor.review_clip.is_empty() and key in WALKS:
 		phase_advanced = 0.0
 		phase_hz = 0.0
-		run_weight = move_toward(run_weight, 0.0, delta / 0.22)
 		owns_pose = false
 		last_kind = "MD2Walk"
 		_last_stage = actor._jump_stage
@@ -33,6 +32,7 @@ func apply(actor, key: String, delta: float) -> void:
 		return
 	if last_kind == "MD2Walk" and key in RUNS:
 		phase = fposmod(actor.animation_player.current_animation_position / float(actor.clips[key].duration), 1.0)
+		run_weight = 1.0
 	super.apply(actor, key, delta)
 
 func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transform3D]:

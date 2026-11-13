@@ -58,8 +58,23 @@ func _combat_stride_pose(phase: float, speed: float) -> Array[Transform3D]:
 func _restart_combat_stride() -> bool:
 	return not crossbow_equipped and super._restart_combat_stride()
 
+func _use_composed_gait(key: String) -> bool:
+	return key not in LabLocomotion.WALKS and super._use_composed_gait(key)
+
+func _select_clip() -> String:
+	var key := super._select_clip()
+	if key in LabLocomotion.WALKS and weapon_source_locomotion and review_clip.is_empty():
+		# These profiles have a dedicated armed Walk, shared across directions.
+		return "Walk"
+	return key
+
 func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
-	if key not in GAITS or (key not in LabLocomotion.WALKS and not weapon_source_locomotion):
+	if key in LabLocomotion.WALKS:
+		# SourceTransition already holds the exact outgoing pose. The shared
+		# speed blend would reintroduce Idle or Run while fading out a Walk.
+		_outgoing_locomotion_state.clear()
+		return Callable()
+	if key not in GAITS or not weapon_source_locomotion:
 		return super._outgoing_locomotion_sampler(key, phase)
 	var crossbow_run := crossbow_equipped and key in LabLocomotion.RUNS
 	var cursor := {"clip": key, "phase": phase}

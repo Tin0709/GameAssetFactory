@@ -608,6 +608,9 @@ func _combat_stride_pose(phase: float, speed: float) -> Array[Transform3D]:
 func _restart_combat_stride() -> bool:
 	return bool(runtime_locomotion_profile.combat.get("leg_restart_on_resume", false))
 
+func _use_composed_gait(key: String) -> bool:
+	return source_gait != null and native_gait_enabled and review_clip.is_empty() and key in GAITS and _grounded
+
 func _animate(delta:float)->void:
 	if foot_placement!=null:foot_placement.restore()
 	var permission_before:bool=combo.movement_allowed()
@@ -628,7 +631,7 @@ func _animate(delta:float)->void:
 	if review_clip.is_empty() and selected in GAITS:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
 		_playback_speed=maxf(0.,motion_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
-	var composed_gait:bool=source_gait!=null and native_gait_enabled and review_clip.is_empty() and selected in GAITS and _grounded
+	var composed_gait := _use_composed_gait(selected)
 	var gait_state:Dictionary=source_gait.state(motion_speed) if composed_gait else {}
 	if composed_gait:_playback_speed=float(clips[selected].duration)/float(gait_state.period) if motion_speed>.001 else 0.
 	if source_transition!=null:source_transition.restore()

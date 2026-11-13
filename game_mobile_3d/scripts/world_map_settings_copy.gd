@@ -27,7 +27,7 @@ const ITEMS := {
 	"sun_pockets": ["Vệt nắng qua tán cây", "Sunlight pockets", "Làm các khoảng nắng và bóng dưới tán cây tách nhau rõ hơn.", "So sánh 0% và 100% lúc 07:00 hoặc 16:30, khi F3 đang bật trong Godot."],
 	"sun_opening": ["Sunlit openings", "Sunlit openings", "Nâng ánh sáng tại các khoảng trống có nắng trên đất, cỏ và nhân vật.", "Ở Sáng hoặc Chiều, thử 75% và quan sát một khoảng đất trống giữa hai tán cây. Cần F3."],
 	"projected_sun_position": ["Vị trí vệt nắng", "Projected sunlight placement", "Dịch vệt nắng Forest trên đường và địa hình. Dùng chung với thanh cường độ nắng chiếu.", "Thử 100% lúc 07:00 hoặc 16:30 ở lối rừng phía tây. 0% dùng vị trí cũ."],
-	"projected_sun_softness": ["Mềm viền vệt nắng", "Projected sunlight softness", "Làm mềm vùng chuyển của vệt nắng chiếu lên đá và cỏ.", "Thử 50–100% lúc 07:00 hoặc 16:30. Cần bật vệt nắng chiếu. Bóng tiếp xúc có thanh riêng."],
+	"projected_sun_softness": ["Mềm viền vệt nắng", "Projected sunlight softness", "Làm mềm vùng chuyển của vệt nắng chiếu lên đá và cỏ.", "Mặc định 75%. Thử 0% để so với bản trước lúc 07:00 hoặc 16:30. Cần bật vệt nắng chiếu."],
 	"projected_sun": ["Projected sunlight", "Projected sunlight", "Điều chỉnh mức dùng mẫu nắng Forest để tạo những vệt sáng và tối trên mặt đất.", "Thử 65% lúc 07:00 hoặc 16:30. Cần F3 và dữ liệu Forest trong bản Godot nội bộ."],
 	"moon": ["Ánh trăng", "Moonlight", "Chỉnh độ mạnh của ánh trăng xanh chiếu vào cảnh ban đêm.", "Chọn Đêm rồi giảm xuống 50% để so ánh sáng trên đá với vùng sáng ấm từ đèn hông."],
 	"sky": ["Ánh sáng môi trường", "Ambient sky", "Chỉnh ánh sáng nền từ bầu trời, giúp đọc được mặt khuất và bóng râm.", "Giảm từng chút khi bóng râm trông quá phẳng. Nhìn vào một mặt đá quay lưng với mặt trời."],
