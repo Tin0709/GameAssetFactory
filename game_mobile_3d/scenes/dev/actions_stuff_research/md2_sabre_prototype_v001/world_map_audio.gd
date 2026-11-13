@@ -23,21 +23,8 @@ func setup(world:Node3D,research:String)->void:
 			var at:Vector3=level.source_to_world(cell)
 			_plants[Vector2i(floori(at.x),floori(at.z))]=true
 	audio=AUDIO.new();audio.name="PrivateOverworldAudio";add_child(audio)
-	audio.setup(level.player,self,reader)
+	audio.setup(level.player, self, reader, level.terrain_contact_at)
 	if audio.rejected_count>0:error="Some private ambience samples unavailable: %d"%audio.rejected_count
-
-func surface_at(point:Vector3)->String:
-	var offset:Array=level.runtime.offset
-	var column:=Vector2i(floori(point.x-float(offset[0])),floori(point.z-float(offset[2])))
-	var height:float=level.columns.get(column,NAN)
-	if not is_finite(height):return "grass"
-	for y:int in [floori(height-.01),floori(height-.51)]:
-		var key:=Vector3i(column.x,y,column.y)
-		if level.geometry.cells.has(key):
-			var kind:String=level.runtime.palette[level.geometry.cells[key]].kind
-			if "stone" in kind or "rock" in kind:return "stone"
-			if "dirt" in kind:return "dirt"
-	return "grass"
 
 func has_foliage(point:Vector3)->bool:
 	var planting=level.showcase.get("plants")

@@ -33,6 +33,7 @@ var footsteps_enabled:=true
 var rustle_enabled:=true
 var actor:CharacterBody3D
 var meadow:Node3D
+var _terrain_contact: Callable
 var reader:RefCounted
 var config:Dictionary={}
 var ambience_gain_db:=0.
@@ -57,8 +58,9 @@ var _rustle_index:=0
 var _nature_index:=0
 var _heavy_landing_frame := -1
 
-func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted)->void:
+func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted, terrain_contact: Callable = Callable())->void:
 	actor=body;meadow=field;reader=bundle;config=reader.data.get("audio_config",{});_random.seed=281027
+	_terrain_contact = terrain_contact
 	for key:String in reader.data.audio:
 		var rows:Array=[]
 		for row:Dictionary in reader.data.audio[key]:
@@ -168,8 +170,20 @@ func _play(key:String,voice:AudioStreamPlayer3D,point:Vector3,db:float,pitch:flo
 	if events.size()>256:events.pop_front()
 
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
-	var key: String = meadow.surface_at(point) if meadow != null else "grass"
+	if not footsteps_enabled and not rustle_enabled:
+		return
 	var heavy := landed and _heavy_landing_frame == Engine.get_physics_frames()
+	if heavy and not rustle_enabled:
+		return
+	var key := "grass"
+	if _terrain_contact.is_valid():
+		var contact: Dictionary = _terrain_contact.call(point)
+		if contact.is_empty():
+			return
+		point = contact.position
+		key = contact.surface
+	elif meadow != null:
+		key = meadow.surface_at(point)
 	if footsteps_enabled and not heavy:
 		var db := float(config.get("landing_db", -9.0)) if landed else float(config.get("footsteps_db", -14.0))
 		var cue := "land_" + key if landed and not groups.get("land_" + key, []).is_empty() else key
