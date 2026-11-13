@@ -195,6 +195,76 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	toggle.button_pressed = false
 	lab.free()
 
+func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var audio = lab.get_node("CombatAudio")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	var reactions: Array[AudioStreamPlayer3D] = audio._voices.slice(COMBAT_AUDIO.VOICES_PER_POOL,
+		2 * COMBAT_AUDIO.VOICES_PER_POOL)
+	for voice in reactions:
+		voice.bus = AudioServer.get_bus_name(bus)
+	var hit_choice: int = audio._next_choice[&"hit"]
+	var forward: Vector3 = lab.player.visual.global_basis.z
+	var centre: Vector3 = lab.player.global_position + forward * 1.5
+	var right := Vector3.UP.cross(forward)
+	var health := [100, 8, 8, 8, 100, 100, 8]
+	var group := lab.get_node("Zombies")
+	for i in health.size():
+		lab.get_node("HUD/SpawnZombie").pressed.emit()
+		var zombie = group.get_child(i)
+		zombie.set_physics_process(false)
+		zombie.collision_layer = 0
+		zombie.global_position = centre + right * (i - 3) * 0.35
+		zombie.health = health[i]
+	var deaths: Array[Vector3] = []
+	var hits: Array[int] = []
+	group.sabre_contact.connect(func(point, _direction, clip, _index, _serial, lethal):
+		if clip == "AirAttack":
+			hits.append(Engine.get_physics_frames())
+			if lethal:
+				deaths.append(point))
+	lab.get_node("HUD/DropMedium").pressed.emit()
+	for i in 2:
+		await physics_frame
+	var attack := InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	attack.pressed = true
+	root.push_input(attack, true)
+	for i in 2:
+		await physics_frame
+	attack = InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	root.push_input(attack, true)
+	capture.clear_buffer()
+	for i in Engine.physics_ticks_per_second:
+		await physics_frame
+		if not hits.is_empty():
+			break
+	check(hits.size() == health.size() and hits.all(func(frame): return frame == hits[0])
+		and deaths.size() == 4 and group.get_children().map(func(zombie): return zombie.health)
+			== [60, 0, 0, 0, 60, 60, 0],
+		"A real Sabre dive applies all seven hits on the same physics frame")
+	check(audio._next_choice.get(&"hit", 0) == (hit_choice + 1) % 5,
+		"A crowd dive still plays one weapon hit")
+	var audible_deaths: Array[Vector3] = []
+	for voice in reactions:
+		if voice.playing and voice.stream in audio._groups[&"death"]:
+			audible_deaths.append(voice.global_position)
+	check(audible_deaths.size() == 3 and audible_deaths.all(func(point): return point in deaths.slice(0, 3)),
+		"The first three death cues keep their spatial voices through same-frame overflow")
+	check(audio._next_choice.get(&"death", -1) == 0 and audio._next_choice.get(&"hurt", -1) == 1,
+		"Suppressed zombie reactions do not advance sample rotation")
+	await create_timer(0.2).timeout
+	var peak := 0.0
+	for sample in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+	check(peak > 0.001 and peak < 0.9, "The isolated zombie reaction pool reaches the mixer with headroom")
+	toggle.button_pressed = false
+	lab.free()
+
 func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -331,6 +401,7 @@ func run() -> void:
 	await check_local_hurt(bus, capture)
 	await check_movement_audio(bus, capture)
 	await check_sabre_debris_audio(bus, capture)
+	await check_sabre_crowd_audio(bus, capture)
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
