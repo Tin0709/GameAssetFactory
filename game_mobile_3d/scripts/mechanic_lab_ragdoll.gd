@@ -416,8 +416,9 @@ func _project_source_anchors() -> void:
 			return
 		if neck_wall.is_valid() and _reduce_chest_wall_overlap(chest, chest_state, motion, neck_wall):
 			return
-		if extended_arm_shift and recent_handoff:
-			# The forward sweep reports the torso's existing wall overlap.
+		if extended_arm_shift and (recent_handoff or chest_state.get_contact_count() == 0):
+			# A rebounding arm can expose a chest overlap before the solver
+			# reports chest contact. The forward sweep stops at that overlap.
 			# The shared escape test checks clearance at the other end and
 			# sweeps back to rule out an intervening obstacle.
 			var start := chest_state.transform
