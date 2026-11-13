@@ -162,6 +162,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_replay_surface_bounce": ["Ánh hắt theo mặt đá", 1.],
 	&"forest_replay_placement": ["Vị trí bệ đá", 1.],
 	&"canopy_player_cue": ["Dáng nhân vật sau tán", 1.],
+	&"canopy_cue_day_tone": ["Dịu sắc dáng sau tán ban ngày", 1.],
 	&"player_sun_shoulder": ["Dịu nắng trên nhân vật", .4],
 	&"player_sun_specular": ["Dịu phản sáng nắng trên Valorie", 1.],
 	&"player_canopy_color": ["Sắc ánh trời trên nhân vật", 1.],
@@ -191,7 +192,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 118
+const LIGHTING_MIX_VERSION := 119
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1377,6 +1378,11 @@ func player_sun_shoulder_weight() -> float:
 		return 0.
 	return _lighting_scale(&"player_sun_shoulder") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 
+func canopy_cue_day_tone_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not forest_active():
+		return 0.
+	return _lighting_scale(&"canopy_cue_day_tone") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+
 func player_sun_specular_weight() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() or not level.look.player_effects_available():
 		return 0.
@@ -1746,6 +1752,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 72 and effect == &"evening_lantern":
 			missing_value = 0.
+		if version < 119 and effect == &"canopy_cue_day_tone":
+			missing_value = 0.
 		if version < 118 and effect == &"player_sun_specular":
 			missing_value = 0.
 		if version < 117 and effect == &"pre_twilight_midair":
@@ -1897,7 +1905,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and forest_replay.available(level) and forest_replay.has_step_site(level)
 		if effect == &"forest_replay_surface_bounce":
 			slider.editable = slider.editable and forest_replay.surface_available(level)
-		if effect == &"canopy_player_cue":
+		if effect in [&"canopy_player_cue", &"canopy_cue_day_tone"]:
 			slider.editable = slider.editable and level.canopy_player_cue.available(level)
 		if effect == &"forest_path_placement":
 			slider.editable = slider.editable and level.forest_path_light_offset.is_finite() \
@@ -1998,7 +2006,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce", &"forest_replay_placement", &"forest_replay_surface_bounce", &"forest_replay_halo"]:
 		_sync_forest_night_lights()
 		return
-	if changed_effect == &"canopy_player_cue":
+	if changed_effect in [&"canopy_player_cue", &"canopy_cue_day_tone"]:
 		level.sync_canopy_player_cue()
 		return
 	if changed_effect == &"dawn_turf_color":
@@ -2509,7 +2517,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		var slider := HSlider.new()
 		slider.accessibility_name = label.text
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
-		if effect == &"canopy_player_cue":
+		if effect in [&"canopy_player_cue", &"canopy_cue_day_tone"]:
 			slider.editable = level.canopy_player_cue.available(level)
 		if effect == &"crown_ambient_depth":
 			slider.editable = is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
