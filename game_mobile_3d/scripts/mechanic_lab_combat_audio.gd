@@ -380,9 +380,9 @@ func zombie_attack(point: Vector3, contact: bool) -> void:
 
 func flush_zombie_attacks() -> void:
 	for cue: Dictionary in _attack_contacts:
-		_play(&"zombie_hit", cue.point, ZOMBIE_HIT_GAIN_DB)
+		_play(&"zombie_hit", cue.point, ZOMBIE_HIT_GAIN_DB, _zombie_attack_frame)
 	for cue: Dictionary in _attack_windups:
-		_play(&"zombie_windup", cue.point, ZOMBIE_WINDUP_GAIN_DB)
+		_play(&"zombie_windup", cue.point, ZOMBIE_WINDUP_GAIN_DB, _zombie_attack_frame)
 	_attack_contacts.clear()
 	_attack_windups.clear()
 
@@ -513,7 +513,7 @@ func _next_stream(group: StringName) -> AudioStream:
 	_next_choice[group] = (choice + 1) % choices.size()
 	return choices[choice]
 
-func _play(group: StringName, point: Vector3, gain: float) -> AudioStreamPlayer3D:
+func _play(group: StringName, point: Vector3, gain: float, event_frame := -1) -> AudioStreamPlayer3D:
 	if not _groups.has(group):
 		return null
 	# Separate enemy attack and reaction budgets keep the weapon tails audible.
@@ -537,7 +537,7 @@ func _play(group: StringName, point: Vector3, gain: float) -> AudioStreamPlayer3
 		if not _voices[first + candidate].playing:
 			slot = candidate
 			break
-	var frame := Engine.get_physics_frames()
+	var frame := Engine.get_physics_frames() if event_frame < 0 else event_frame
 	if slot == -1:
 		match pool:
 			REACTION_POOL:
