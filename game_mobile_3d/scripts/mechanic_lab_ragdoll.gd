@@ -325,13 +325,15 @@ func _recover_early_floor_arm_gap() -> void:
 			_slide_supported_anchor(arm, state, gap, gap.length(), floor_body.get_rid())
 
 func _project_source_anchors() -> void:
+	var sabre_flight := _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0 \
+		and is_instance_valid(_flat_floor) and not _flat_floor.disabled
+	if sabre_flight:
+		_recover_leading_head_wall_overlap()
 	super._project_source_anchors()
 	_recover_early_floor_arm_gap()
 	_recover_floor_blocked_hip()
 	var recent_handoff := _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _wall_handoff_frame \
 		<= roundi(WALL_HANDOFF_RECOVERY_SECONDS * Engine.physics_ticks_per_second)
-	var sabre_flight := _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0 \
-		and is_instance_valid(_flat_floor) and not _flat_floor.disabled
 	if not recent_handoff and not sabre_flight:
 		return
 
@@ -428,6 +430,40 @@ func _project_source_anchors() -> void:
 		if _wall_chest_shift_preserves_joints(gaps, largest_gap, fallback) \
 				and not _test_projection_motion(chest, chest_state.transform, fallback):
 			chest_state.transform = chest_state.transform.translated(fallback)
+
+func _recover_leading_head_wall_overlap() -> void:
+	var head: PhysicalBone3D = bodies.Head
+	var state := PhysicsServer3D.body_get_direct_state(head.get_rid())
+	if state == null or state.linear_velocity.y >= 0.0 or state.get_contact_count() > 0:
+		return
+	var velocity := state.linear_velocity
+	var travel := Vector2(velocity.x, velocity.z) * state.step
+	if travel.length_squared() <= TERRAIN_DEEP_OVERLAP ** 2:
+		return
+	var chest: PhysicalBone3D = bodies.Chest
+	var core := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if core == null or core.get_contact_count() > 0:
+		return
+
+	# A fast, rotating head can already overlap the wall before the solver
+	# reports contact. Move the rig together and leave the rebound to the solver.
+	var points := _terrain_contact_points(head, state, Vector3.ZERO)
+	var deepest := TERRAIN_DEEP_RESIDUAL
+	var correction := Vector3.ZERO
+	for i in range(0, points.size(), 2):
+		var offset := points[i + 1] - points[i]
+		var depth := offset.length()
+		if depth <= deepest or absf(offset.y) >= MAX_WALL_NORMAL_Y * depth:
+			continue
+		var normal := offset / depth
+		var closing_speed := -velocity.dot(normal)
+		if closing_speed <= 0.0 or (state.transform.origin - core.transform.origin).dot(normal) >= 0.0:
+			continue
+		deepest = depth
+		var recovery := minf(depth - TERRAIN_RESIDUAL_OVERLAP, closing_speed * state.step * 0.5)
+		correction = normal * minf(recovery, TERRAIN_MAX_RECOVERY_SHIFT)
+	if not correction.is_zero_approx():
+		_try_terrain_translation(correction, head)
 
 func _wall_chest_shift_preserves_joints(gaps: Array[Vector3], largest_gap: float, motion: Vector3) -> bool:
 	for gap: Vector3 in gaps:
