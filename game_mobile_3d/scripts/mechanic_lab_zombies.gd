@@ -204,7 +204,7 @@ func aim_sabre(index: int, serial: int, movement: Vector3) -> Vector3:
 	direction.y = 0.0
 	return direction
 
-func _find_melee_target(reach: float, movement: Vector3) -> Zombie:
+func _find_melee_target(reach: float, movement: Vector3, ranged := false) -> Zombie:
 	var origin := _attacker.global_position
 	var space := get_world_3d().direct_space_state
 	var ray := _melee_ray(origin)
@@ -214,10 +214,10 @@ func _find_melee_target(reach: float, movement: Vector3) -> Zombie:
 		if zombie.health <= 0 or zombie.is_queued_for_deletion():
 			continue
 		var offset := zombie.global_position - origin
-		if absf(offset.y) > GROUND_HEIGHT_LIMIT:
+		if not ranged and absf(offset.y) > GROUND_HEIGHT_LIMIT:
 			continue
+		var distance_squared := offset.length_squared() if ranged else Vector2(offset.x, offset.z).length_squared()
 		offset.y = 0.0
-		var distance_squared := offset.length_squared()
 		if distance_squared > reach * reach or distance_squared >= nearest_squared or offset.dot(movement) < 0.0:
 			continue
 		ray.to = zombie.global_position + MELEE_CONTACT_HEIGHT
@@ -243,7 +243,7 @@ func bolt_direction(muzzle: Vector3, forward: Vector3, serial: int) -> Vector3:
 	if serial == _aim_serial and is_instance_valid(_aim_target) and _aim_target.health > 0:
 		target = _aim_target
 	else:
-		target = _find_melee_target(CrossPollinator.AIM_RANGE, forward)
+		target = _find_melee_target(CrossPollinator.AIM_RANGE, forward, true)
 	if target == null:
 		return forward
 	return (target.global_position + MELEE_CONTACT_HEIGHT - muzzle).normalized()

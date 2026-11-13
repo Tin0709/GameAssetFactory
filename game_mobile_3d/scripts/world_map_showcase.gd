@@ -1142,6 +1142,9 @@ func set_source_terrain(enabled: bool) -> bool:
 	var stone_detail: HSlider = _lighting_sliders.get(&"stone_detail_softness")
 	if stone_detail != null:
 		stone_detail.editable = _stone_detail_editable()
+	var stone_sky: HSlider = _lighting_sliders.get(&"stone_day_sky")
+	if stone_sky != null:
+		stone_sky.editable = _stone_day_sky_editable()
 	return enabled
 
 func forest_active()->bool:
@@ -1814,7 +1817,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if effect == &"stone_detail_softness":
 			slider.editable = _stone_detail_editable()
 		if effect == &"stone_day_sky":
-			slider.editable = _stone_detail_editable() and level.terrain_light != null and level.terrain_light.installed
+			slider.editable = _stone_day_sky_editable()
 		if effect in [&"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
 			slider.editable = _night_sky_editable()
 		if effect == &"cliff_mist":
@@ -2233,6 +2236,9 @@ func _stone_diffuse_editable() -> bool:
 func _stone_detail_editable() -> bool:
 	return not _balanced_preview and _source_terrain_toggle != null and _source_terrain_toggle.button_pressed
 
+func _stone_day_sky_editable() -> bool:
+	return _stone_detail_editable() and level != null and level.terrain_light != null and level.terrain_light.installed
+
 func _process(delta:float)->void:
 	if _flat_lab:
 		_update_mist()
@@ -2248,6 +2254,9 @@ func _process(delta:float)->void:
 	var stone_diffuse_slider: HSlider = _lighting_sliders.get(&"stone_diffuse_contrast")
 	if stone_diffuse_slider != null:
 		stone_diffuse_slider.editable = _stone_diffuse_editable()
+	var stone_sky: HSlider = _lighting_sliders.get(&"stone_day_sky")
+	if stone_sky != null:
+		stone_sky.editable = _stone_day_sky_editable()
 	var night_editable := _night_sky_editable()
 	for effect in [&"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
 		var slider: HSlider = _lighting_sliders.get(effect)
