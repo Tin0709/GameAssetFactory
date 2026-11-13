@@ -12,6 +12,7 @@ uniform float stone_diffuse_strength = 0.0;
 uniform float night_stone_top_cool = 0.0;
 uniform float night_stone_blue_softness = 0.0;
 uniform float dawn_stone_sky_color = 0.0;
+uniform float stone_day_sky = 0.0;
 
 float gaf_stone_diffuse_sample(int receiver, vec3 world_normal) {
 	if (stone_diffuse_strength <= 0.0 || ground_grade != 3 || abs(world_normal.y) >= 0.1) return 0.0;
@@ -48,6 +49,14 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 #endif
 	vec3 sky_fill = sky * terrain_ambient_scale * terrain_ambient_tint * visibility;
 	sky_fill = gaf_canopy_diffuse_color(sky_fill, terrain_canopy_sky, gaf_canopy_sky_color);
+#ifdef GAF_TERRAIN_NIGHT_SKY
+	if (ground_grade == 3 && stone_day_sky > 0.0) {
+		// Soften excess blue in the diffuse sky term at fixed incident luminance.
+		float excess_blue = smoothstep(1.30, 1.70, sky_fill.b / max(sky_fill.g, .000001));
+		float energy = dot(sky_fill, vec3(.2126, .7152, .0722));
+		sky_fill = mix(sky_fill, vec3(energy), stone_day_sky * excess_blue);
+	}
+#endif
 	if (turf_ambient_color != vec3(1.0) && (ground_grade == 1 || ground_grade == 2) && face_y > 0.998) {
 		// The authored path shares the terrain shader. Ease out the effect as the albedo crosses into soil.
 		float turf = smoothstep(1.04, 1.18, color.g / max(color.r, 0.0001)) *
