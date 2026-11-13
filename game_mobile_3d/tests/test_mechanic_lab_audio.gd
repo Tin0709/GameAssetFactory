@@ -567,17 +567,17 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 	group.zombie_attack_audio.emit(lab.player.global_position + Vector3.RIGHT * 40.0, false)
 	await process_frame
 	await process_frame
-	check(audio._next_choice.get(&"zombie_windup", 0) == 0 and voices.all(func(voice): return not voice.playing),
+	check(not audio._next_choice.has(&"zombie_windup") and voices.all(func(voice): return voice.stream == null),
 		"An out-of-range telegraph does not reserve a voice or advance the sample")
 	group.zombie_attack_audio.emit(points[-1], false)
 	audio.reset()
 	await process_frame
 	await process_frame
-	check(voices.all(func(voice): return not voice.playing), "Reset clears queued zombie attacks")
+	check(voices.all(func(voice): return voice.stream == null), "Reset clears queued zombie attacks")
 	group.zombie_attack_audio.emit(points[-1], true)
 	toggle.button_pressed = false
 	await create_timer(0.08).timeout
-	check(audio._next_choice.get(&"zombie_hit", 0) == 0 and voices.all(func(voice): return not voice.playing),
+	check(voices.all(func(voice): return voice.stream == null),
 		"Muting clears queued contact cues")
 	print("MECHANIC_LAB_ZOMBIE_ATTACK_OVERFLOW peak=", peak)
 	lab.free()
