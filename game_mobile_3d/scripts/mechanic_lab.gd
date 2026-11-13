@@ -15,11 +15,7 @@ const Sword := preload("res://scripts/mechanic_lab_sword.gd")
 const CurvedGreatsword := preload("res://scripts/mechanic_lab_curved_greatsword.gd")
 const DamageFeedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const PLAYER_HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_player_hit_flash.gdshader")
-const SABRE_RIBBON_SHADER := preload("res://materials/mechanic_lab_sabre_ribbon.gdshader")
-const EffectSource := preload("res://scripts/mechanic_lab_effect_source.gd")
 const ContactSparks := preload("res://scripts/mechanic_lab_contact_sparks.gd")
-const SLASH_TEXTURE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Combat/Materials/T_Slash_Grayscale.png"
-const SLASH_TEXTURE_SHA256 := "bd5d52c41304562f1f4108aa5fc564f09d0e23766fd489a2d45ae8c30a7e11a5"
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
 const SPAWN := Vector3(0.0, 0.03, 0.0)
 const MIN_CAMERA_SIZE := 4.5
@@ -164,13 +160,6 @@ func _ready() -> void:
 		_player_damage_numbers.name = "PlayerDamageNumbers"
 		$CombatEffects.add_child(_player_damage_numbers)
 		_set_combat_audio(false)
-		var ribbon_material := ShaderMaterial.new()
-		ribbon_material.shader = SABRE_RIBBON_SHADER
-		var slash := EffectSource.load_image(SLASH_TEXTURE, SLASH_TEXTURE_SHA256, Vector2i(128, 128))
-		if slash != null:
-			ribbon_material.set_shader_parameter(&"source_slash", ImageTexture.create_from_image(slash))
-			ribbon_material.set_shader_parameter(&"use_source_slash", true)
-		player.effects.ribbon.material_override = ribbon_material
 		player.combo.native_tap_buffer_seconds = SABRE_TAP_BUFFER
 		$Zombies.setup_combat(player)
 		player.grounded_melee_aim = $Zombies.aim_sabre

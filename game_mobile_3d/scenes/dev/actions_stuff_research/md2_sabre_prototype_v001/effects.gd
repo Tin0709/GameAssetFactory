@@ -1,6 +1,10 @@
 extends Node3D
 ## A bounded ribbon follows the actual exported blade markers. These authored
 ## gates describe fast motion only; whiffs do not spawn fake damage or hitstop.
+const EffectSource := preload("res://scripts/mechanic_lab_effect_source.gd")
+const RIBBON_SHADER := preload("res://materials/mechanic_lab_sabre_ribbon.gdshader")
+const SLASH_TEXTURE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Combat/Materials/T_Slash_Grayscale.png"
+const SLASH_TEXTURE_SHA256 := "bd5d52c41304562f1f4108aa5fc564f09d0e23766fd489a2d45ae8c30a7e11a5"
 const MAX_SAMPLES:=28
 const PARTICLE_CAPACITY:=48
 const MAX_PARTICLE_HISTORY:=16
@@ -35,6 +39,16 @@ func _ready()->void:
 	sparks=MultiMeshInstance3D.new();sparks.name="BoundedArcSparks";sparks.multimesh=mm;sparks.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;add_child(sparks)
 	for i in PARTICLE_CAPACITY:particles.append({"life":0.,"position":Vector3.ZERO,"velocity":Vector3.ZERO,"duration":.3,"born":-INF,"history":[]})
 	reset()
+
+func use_private_slash_material() -> void:
+	var material := ShaderMaterial.new()
+	material.shader = RIBBON_SHADER
+	var slash := EffectSource.load_image(SLASH_TEXTURE, SLASH_TEXTURE_SHA256, Vector2i(128, 128))
+	if slash != null:
+		material.set_shader_parameter(&"source_slash", ImageTexture.create_from_image(slash))
+		material.set_shader_parameter(&"use_source_slash", true)
+	ribbon.material_override = material
+
 func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int)->void:
 	clock+=delta
 	if not enabled:active=false

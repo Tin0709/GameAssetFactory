@@ -49,6 +49,7 @@ func _ready()->void:
 			if not alias.is_empty():reference_audio.clip_aliases[key]=alias
 		reference_audio.is_event_valid=func(serial:int)->bool:return combo.serial==serial and combo.active() and review_clip.is_empty()
 	if primary_ready:
+		effects.use_private_slash_material()
 		lantern=preload("res://scripts/world_map_player_lantern.gd").new();lantern.name="PrivateHipLantern"
 		model.add_child(lantern);lantern.setup(self)
 		presentation_reset.connect(func():_idle_wait=0.;_inspect_age=0.;_inspecting=false)
