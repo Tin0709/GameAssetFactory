@@ -163,8 +163,9 @@ func check_health_bars(group: Node) -> void:
 	var centre := batch.to_global(position)
 	if centre.distance_to(first.global_position + Vector3.UP * 2.16) > 0.15:
 		failures.append("Expected the bar to follow the zombie: got %s above %s" % [centre, first.global_position])
-	for i in 20:
-		await process_frame
+	# The delayed fill runs on elapsed time, so a high render rate must
+	# get the same time to settle as a 60 Hz run.
+	await create_timer(0.30).timeout
 	first_bar = batch._fills[first_slot] if headless else batch.multimesh.get_instance_custom_data(first_slot)
 	if not is_equal_approx(first_bar.g, expected):
 		failures.append("The delayed fill catches up to the target's current health")
