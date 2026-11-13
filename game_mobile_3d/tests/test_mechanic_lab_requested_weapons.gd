@@ -168,6 +168,7 @@ func run() -> void:
 	sound.button_pressed = true
 	var mauler_samples: Array = combat_audio._groups.get(&"mauler_dive", [])
 	check(mauler_samples.size() == 3, "All three verified MD2 Mauler Dive samples load")
+	check(combat_audio._groups.get(&"gauntlet_slam", []).size() == 4, "The four source gauntlet slam samples load")
 	lab.get_node("HUD/DropMedium").pressed.emit()
 	await ticks(65)
 	check(not combat_audio._next_choice.has(&"mauler_dive"), "An ordinary landing does not play Mauler Dive")
@@ -181,9 +182,12 @@ func run() -> void:
 	await ticks(2)
 	attack(false)
 	check(not combat_audio._next_choice.has(&"mauler_dive"), "Mauler Dive audio waits for contact")
+	check(not combat_audio._next_choice.has(&"gauntlet_slam"), "The gauntlet impact cue waits for contact")
 	await ticks(95)
 	check(target.health < 100 and contacts.has("AirAttack"), "Gauntlets can hit with their jump slam")
 	check(combat_audio._next_choice.get(&"mauler_dive", 0) == 1, "The first slam plays one Mauler Dive cue")
+	check(combat_audio._next_choice.get(&"gauntlet_slam", 0) == 1 and
+		not combat_audio._next_choice.has(&"gauntlet_hit"), "A jump hit uses the slam cue without doubling it with a punch hit")
 	check(lab.player.clips.AirAttack.source_name == "Player_Jump_Gauntlet-Attack_Heavy", "The slam uses the source gauntlet pose")
 	target.position = Vector3(12.0, 0.0, 0.0)
 	lab.get_node("HUD/DropMedium").pressed.emit()
@@ -193,6 +197,7 @@ func run() -> void:
 	attack(false)
 	await ticks(95)
 	check(combat_audio._next_choice.get(&"mauler_dive", 0) == 2, "A missed slam advances to the next sample")
+	check(combat_audio._next_choice.get(&"gauntlet_slam", 0) == 2, "An empty landing still plays the slam impact")
 	sound.button_pressed = false
 	lab.get_node("HUD/DropMedium").pressed.emit()
 	await ticks(5)
@@ -201,6 +206,7 @@ func run() -> void:
 	attack(false)
 	await ticks(95)
 	check(combat_audio._next_choice.get(&"mauler_dive", 0) == 2, "The combat mute suppresses Mauler Dive")
+	check(combat_audio._next_choice.get(&"gauntlet_slam", 0) == 2, "The combat mute suppresses the slam impact")
 	equip(menu, 0)
 	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
 		"Switching back restores the original Sabre")
