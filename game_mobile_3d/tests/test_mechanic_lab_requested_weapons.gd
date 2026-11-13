@@ -73,7 +73,6 @@ func run() -> void:
 		muzzle_errors.append(projectile.global_position.distance_to(lab._crossbow_mount.to_global(CrossPollinator.MUZZLE))))
 	check(fire_samples.size() == 3 and impact_samples.size() == 3, "All verified crossbow firing and impact samples load")
 	check(flight_samples.size() == 4, "All verified arrow flight samples load")
-	await check_crossbow_trail(lab)
 	check(menu.selected == 3 and ammo.visible and ammo.text.contains("25 / 25"), "Crossbow equips with full ammo")
 	attack(true)
 	await ticks(2)
@@ -165,6 +164,7 @@ func run() -> void:
 	check(embedded != null and embedded.multimesh.visible_instance_count == 0,
 		"Reset clears an embedded arrow immediately")
 	await check_crossbow_collision_radius(lab)
+	await check_crossbow_trail(lab)
 	await ticks(12)
 	target.position = Vector3(2.5, 0.0, 3.0)
 	lab.player._q = true
