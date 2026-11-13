@@ -93,6 +93,7 @@ const SLAM_GAIN_DB := -10.0
 const SURFACE_LANDING_GAIN_DB := -16.0
 const HURT_GAIN_DB := -20.0
 const DEATH_GAIN_DB := -14.0
+const DEATH_ONSET_SECONDS := 0.05
 const ZOMBIE_WINDUP_GAIN_DB := -16.0
 const ZOMBIE_HIT_GAIN_DB := -14.0
 const PLAYER_HURT_GAIN_DB := -14.0
@@ -575,7 +576,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1) ->
 	if slot == -1:
 		match pool:
 			REACTION_POOL:
-				slot = _replace_priority_slot(first, start, &"death", group, frame)
+				slot = _replace_priority_slot(first, start, &"death", group, frame, point)
 			ATTACK_POOL:
 				slot = _replace_priority_slot(first, start, &"zombie_hit", group, frame)
 			0:
@@ -596,10 +597,17 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1) ->
 	voice.play()
 	return voice
 
-func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName, frame: int) -> int:
-	# Preserve leading cues in a burst. Only a higher priority can interrupt one.
+func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName,
+		frame: int, point := Vector3.ZERO) -> int:
+	# Same-tick cues already arrive nearest first. Preserve nearby death onsets
+	# across short gaps between ticks, too, while the mixer starts the samples.
 	var priority_streams: Array = _groups.get(priority_group, [])
 	var priority := group == priority_group
+	var compare_onsets := priority and group == &"death" and is_instance_valid(zombie_listener)
+	var listener := zombie_listener.global_position if compare_onsets else Vector3.ZERO
+	var onset_ticks := ceili(DEATH_ONSET_SECONDS * Engine.physics_ticks_per_second)
+	var farthest := point.distance_squared_to(listener)
+	var farther_onset := -1
 	var older_slot := -1
 	for offset in VOICES_PER_POOL:
 		var slot := (start + offset) % VOICES_PER_POOL
@@ -607,6 +615,14 @@ func _replace_priority_slot(first: int, start: int, priority_group: StringName, 
 		var playing_priority := _voices[voice_index].stream in priority_streams
 		if priority and not playing_priority:
 			return slot
-		if priority == playing_priority and older_slot == -1 and _started_frames[voice_index] != frame:
+		var age := frame - _started_frames[voice_index]
+		if priority != playing_priority or age <= 0:
+			continue
+		if compare_onsets and age <= onset_ticks:
+			var distance := _voices[voice_index].global_position.distance_squared_to(listener)
+			if distance > farthest:
+				farthest = distance
+				farther_onset = slot
+		elif older_slot == -1:
 			older_slot = slot
-	return older_slot
+	return older_slot if older_slot >= 0 else farther_onset
