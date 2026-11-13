@@ -156,6 +156,7 @@ var _corpse_age := 0.0
 var _corpse_landed := false
 var _limb_support_age := 0.0
 var _corpse_parked := false
+var _corpse_color_finished := false
 var _settled_seconds := 0.0
 var _landing_age := INF
 var _roll_damping_weight := 0.0
@@ -494,7 +495,7 @@ func _update_death(delta: float) -> void:
 	if _corpse_age >= CORPSE_LIFETIME - 0.00001:
 		queue_free()
 		return
-	if _corpse_age >= CORPSE_DESATURATION_START:
+	if not _corpse_color_finished and _corpse_age >= CORPSE_DESATURATION_START:
 		_update_corpse_material()
 	if _corpse_parked:
 		return
@@ -778,6 +779,7 @@ func _update_corpse_material() -> void:
 		_mesh.material_override = _corpse_base_material
 	var gray := smoothstep(CORPSE_DESATURATION_START, CORPSE_DESATURATION_END, _corpse_age) * 0.80
 	_mesh.set_instance_shader_parameter("desaturation", gray)
+	_corpse_color_finished = is_instance_valid(_corpse_floor) and _corpse_age >= CORPSE_DESATURATION_END
 
 func _exit_tree() -> void:
 	if is_instance_valid(ragdoll):
