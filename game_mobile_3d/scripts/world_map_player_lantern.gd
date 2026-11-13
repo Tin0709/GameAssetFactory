@@ -162,7 +162,7 @@ func _step_swing() -> void:
   return
  previous_angle = swing_angle
  var velocity := (pivot - previous) / delta
- var basis := actor.visual.global_basis.orthonormalized()
+ var basis: Basis = actor.visual.global_basis.orthonormalized()
  var force := basis.inverse() * ((velocity - previous_velocity) / delta).limit_length(30.)
  var limit := deg_to_rad(float(profile.swing_limit_degrees))
  var left := minf(delta, .1)
