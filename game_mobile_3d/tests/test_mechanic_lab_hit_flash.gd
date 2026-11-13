@@ -91,38 +91,25 @@ func check_crowd_sparks() -> void:
 	var group := lab.get_node("Zombies")
 	var origin: Vector3 = lab.player.global_position + Vector3.UP
 	var nearest: Array[Vector3] = []
-	# Feed the normal contact signal in near-first order, then flood it with distant contacts.
-	for i in 100:
-		var point := origin + Vector3.RIGHT * (0.8 * (i + 1))
-		if i < 5:
-			nearest.append(point)
-		group.sabre_contact.emit(point, Vector3.RIGHT, "Attack3", 2, 1700, false)
-	await process_frame
-	await process_frame
-	var counts := [0, 0, 0, 0, 0]
-	for particle in sparks._particles:
-		if particle.age >= particle.lifetime:
-			continue
-		for i in nearest.size():
-			if particle.origin.distance_squared_to(nearest[i]) < 0.22 ** 2:
-				counts[i] += 1
-	check(counts == [9, 9, 9, 9, 9] and renderer.multimesh.visible_instance_count == 45,
-		"A 100-contact burst shows five complete groups of streaks at the nearest hits")
-	lab.reset_player()
-	for i in 100:
-		group.sabre_contact.emit(origin + Vector3.RIGHT * (100 - i) * 0.8,
-			Vector3.RIGHT, "Attack3", 2, 1701, false)
-	await process_frame
-	await process_frame
-	counts.fill(0)
-	for particle in sparks._particles:
-		if particle.age >= particle.lifetime:
-			continue
-		for i in nearest.size():
-			if particle.origin.distance_squared_to(nearest[i]) < 0.22 ** 2:
-				counts[i] += 1
-	check(counts == [9, 9, 9, 9, 9] and renderer.multimesh.visible_instance_count == 45,
-		"Nearest streak groups are independent of contact order")
+	for i in 5:
+		nearest.append(origin + Vector3.RIGHT * (0.8 * (i + 1)))
+	for reversed in [false, true]:
+		lab.reset_player()
+		for i in 100:
+			var rank := 100 - i if reversed else i + 1
+			group.sabre_contact.emit(origin + Vector3.RIGHT * (0.8 * rank),
+				Vector3.RIGHT, "Attack3", 2, 1700, false)
+		await process_frame
+		await process_frame
+		var counts := [0, 0, 0, 0, 0]
+		for particle in sparks._particles:
+			if particle.age >= particle.lifetime:
+				continue
+			for i in nearest.size():
+				if particle.origin.distance_squared_to(nearest[i]) < 0.22 ** 2:
+					counts[i] += 1
+		check(counts == [9, 9, 9, 9, 9] and renderer.multimesh.visible_instance_count == 45,
+			"A 100-contact burst shows five complete groups at the nearest hits (far first: %s)" % reversed)
 	group.sabre_contact.emit(origin, Vector3.RIGHT, "Attack3", 2, 1702, false)
 	lab.reset_player()
 	await process_frame
