@@ -146,6 +146,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"twilight_far_optical": ["Mật độ lớp sương xa", 1.],
 	&"dawn_mist_source": ["Ánh sáng sương rạng sáng", 1.],
 	&"evening_mist_profile": ["Sương hoàng hôn", 1.],
+	&"pre_twilight_air": ["Ánh sương xa trước chạng vạng", 1.],
 	&"evening_key_response": ["Ánh trực tiếp lúc chạng vạng", 1.],
 	&"sunrise_key_response": ["Nắng chuyển lúc bình minh", 1.],
 	&"sunrise_elevation": ["Góc nắng rạng sáng", 1.],
@@ -186,7 +187,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 113
+const LIGHTING_MIX_VERSION := 114
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -802,6 +803,13 @@ func _update_mist()->void:
 		sample.depth_scatter = _mist_depth_scatter(night_weight, distant_night)
 		sample.depth_scatter_color = _mist_depth_scatter_color(linear, distant_night)
 		sample.depth_optical = _mist_depth_optical()
+		var evening := _pre_twilight_air_weight()
+		if evening > 0.0:
+			# Existing volume: change only the illumination of distant air.
+			sample.depth_scatter = 5.6 * evening
+			sample.depth_scatter_offset = 30.0 - NEAR_HAZE_ENTRY_M
+			var cooler := linear * Vector3(.76, .85, 1.44)
+			sample.depth_scatter_color = (cooler * (linear.dot(luma) / maxf(cooler.dot(luma), .000001)) - linear) * evening
 		var morning := _morning_depth_weight()
 		sample.morning_optical = morning * _lighting_scale(&"morning_depth_optical")
 		morning *= _lighting_scale(&"morning_depth_scatter")
@@ -828,6 +836,15 @@ func _update_mist()->void:
 		_position_lantern_light(origin)
 		emitter=origin-Vector3.UP*1.4
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
+
+func _pre_twilight_air_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not captured_mist_source \
+			or not measured_atmosphere or phase_air.evening_anchors.is_empty() \
+			or level.view_mode != "gameplay" or not near_haze_enabled:
+		return 0.0
+	# WorldMap review hours. The observed MD2 captures establish phase order.
+	var phase := smoothstep(17.0, 18.25, hour) * (1.0 - smoothstep(18.5, 19.0, hour))
+	return phase * _lighting_scale(&"pre_twilight_air") * _lighting_scale(&"evening_mist_profile")
 
 func _night_far_air_weight(night_weight: float) -> float:
 	if not captured_mist_source or atmosphere_review != "combined" or _balanced_preview:
@@ -1710,6 +1727,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 72 and effect == &"evening_lantern":
 			missing_value = 0.
+		if version < 114 and effect == &"pre_twilight_air":
+			missing_value = 0.
 		if version < 113 and effect == &"afternoon_lantern":
 			missing_value = 0.
 		if version < 73 and effect == &"twilight_crown":
@@ -1815,7 +1834,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.available()
 		if effect in [&"dawn_mist_source", &"morning_depth_scatter", &"morning_depth_optical"]:
 			slider.editable = slider.editable and not phase_air.anchors.is_empty()
-		if effect in [&"evening_mist_profile", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical"]:
+		if effect in [&"evening_mist_profile", &"pre_twilight_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical"]:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
 		if effect == &"sunrise_key_response":
 			slider.editable = slider.editable and key_response.sunrise_available()
@@ -1978,7 +1997,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile", &"pre_twilight_air"]:
 		_update_mist()
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"tree_shade"]:
