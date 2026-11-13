@@ -7,6 +7,8 @@ const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
+const EARLY_ARM_SLIDE_RESIDUAL := 0.125
+const EARLY_ARM_SLIDE_EXTRA := 0.02
 
 var _sample_bone_ids: Dictionary[String, int]
 var _sample_body_offsets: Dictionary[String, Transform3D]
@@ -306,6 +308,14 @@ func _recover_early_floor_arm_gap() -> void:
 		var tangent := gap.slide(Vector3.UP).length()
 		if tangent > 2.0 * SOURCE_ANCHOR_TOLERANCE and absf(gap.y) <= tangent * 0.75 \
 				and _body_supported_by(arm, floor_body):
+			var remaining_tangent := sqrt(maxf(EARLY_ARM_SLIDE_RESIDUAL ** 2 - gap.y * gap.y, 0.0))
+			var slide_limit := FIRST_CONTACT_ANCHOR_MAX_SLIDE + EARLY_ARM_SLIDE_EXTRA
+			var slide_distance := minf(slide_limit, tangent - remaining_tangent)
+			if slide_distance > FIRST_CONTACT_ANCHOR_MAX_SLIDE:
+				var motion := gap.slide(Vector3.UP) * (slide_distance / tangent)
+				if not _test_projection_motion(arm, state.transform, motion, floor_body.get_rid()):
+					state.transform = state.transform.translated(motion)
+					continue
 			_slide_supported_anchor(arm, state, gap, gap.length(), floor_body.get_rid())
 
 func _project_source_anchors() -> void:
