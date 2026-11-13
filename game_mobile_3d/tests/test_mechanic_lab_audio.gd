@@ -487,15 +487,16 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 		var point: Vector3 = lab.player.global_position + Vector3(2.0, 1.0, i * 0.01)
 		points.append(point)
 		group.zombie_attack_audio.emit(point, false)
+	var leading_points := points.slice(0, 3)
 	check(audio._next_choice.get(&"zombie_windup", 0) == 3
-		and voices.all(func(voice): return voice.global_position in points.slice(0, 3)),
+		and voices.all(func(voice): return voice.global_position in leading_points),
 		"A same-tick attack burst preserves the first three telegraphs")
 	capture.clear_buffer()
 	for point in points:
 		group.zombie_attack_audio.emit(point, true)
-	check(audio._next_choice.get(&"zombie_hit", 0) == 3
-		and voices.all(func(voice): return voice.stream in audio._groups[&"zombie_hit"]
-			and voice.global_position in points.slice(0, 3)),
+	var hit_voices := voices.filter(func(voice): return voice.stream in audio._groups[&"zombie_hit"])
+	check(audio._next_choice.get(&"zombie_hit", 0) == 3 and hit_voices.size() == voices.size()
+		and hit_voices.all(func(voice): return voice.global_position in leading_points),
 		"Confirmed contacts replace windups and preserve the first three contact cues")
 	var hit_streams := voices.map(func(voice): return voice.stream)
 	for point in points:
