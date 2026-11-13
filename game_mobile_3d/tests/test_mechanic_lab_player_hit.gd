@@ -63,6 +63,7 @@ func run() -> void:
 	for zombie in lab.get_node("Zombies").get_children():
 		zombie.free()
 	await check_turned_zombie(lab)
+	await check_simultaneous_damage(lab, numbers)
 	lab.free()
 	print("MECHANIC_LAB_PLAYER_HIT failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -89,3 +90,37 @@ func check_turned_zombie(lab) -> void:
 	print("MECHANIC_LAB_ZOMBIE_FACING first_dot=", openings.front() if not openings.is_empty() else "none",
 		" attacks=", openings.size(), " hp=", lab.player_health)
 	zombie.free()
+
+func check_simultaneous_damage(lab, numbers: Node) -> void:
+	lab.reset_player()
+	await ticks(3)
+	var group := lab.get_node("Zombies")
+	for i in 4:
+		group.player_hit.emit(ZOMBIE.MELEE_DAMAGE)
+	check(lab.player_health == 76, "Four same-tick hits each apply damage immediately")
+	await process_frame
+	await process_frame
+	check(numbers.get_child_count() == 1 and numbers.get_child(0).get_meta("amount") == 24,
+		"Same-tick hits display one readable red total")
+	await physics_frame
+	group.player_hit.emit(ZOMBIE.MELEE_DAMAGE)
+	await process_frame
+	await process_frame
+	check(numbers.get_child_count() == 2 and numbers.get_child(1).get_meta("amount") == 6,
+		"A separate physics tick produces its own floating number")
+	lab.reset_player()
+	await ticks(3)
+	lab.player_health = 9
+	group.player_hit.emit(6)
+	group.player_hit.emit(6)
+	group.player_hit.emit(6)
+	await process_frame
+	await process_frame
+	check(lab.player.is_dead and lab.player_health == 0 and numbers.get_child_count() == 1
+		and numbers.get_child(0).get_meta("amount") == 9, "The lethal total includes only the HP actually lost")
+	lab.reset_player()
+	group.player_hit.emit(6)
+	lab.reset_player()
+	await process_frame
+	await process_frame
+	check(lab.player_health == 100 and numbers.get_child_count() == 0, "Reset discards a pending damage total")
