@@ -5,6 +5,7 @@ const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Smoke/T_SmokePi
 const SOURCE_SHA256 := "78d326787c4065d70e227ec386a7330f53621c8733ad114bc80eaea7f7f1b5fc"
 const FRAMES := [0, 9, 10, 16, 24, 25]
 const CAPACITY := 16
+const HEAVY_PARTICLE_COUNT := 10
 # Keep the lab grass tint. The dirt and stone tints lift the source tile
 # medians toward a lighter, less saturated dust color.
 const SURFACE_DUST := {
@@ -26,6 +27,7 @@ var _ground: CollisionShape3D
 var _terrain_contact: Callable
 var _particles: Array[Particle] = []
 var _next := 0
+var _heavy_landing_point := Vector3.INF
 var _random := RandomNumberGenerator.new()
 
 func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable()) -> bool:
@@ -49,6 +51,7 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 		add_child(particle.sprite)
 		_particles.append(particle)
 	actor.surface_contact.connect(_on_surface_contact)
+	actor.heavy_jump_landed.connect(_on_heavy_jump_landed)
 	actor.presentation_reset.connect(clear)
 	set_process(false)
 	return true
@@ -66,7 +69,15 @@ static func _load_mask() -> Texture2D:
 		pixels[i + 2] = 255
 	return ImageTexture.create_from_image(Image.create_from_data(128, 64, false, Image.FORMAT_RGBA8, pixels))
 
+func _on_heavy_jump_landed(point: Vector3, _forward: Vector3, _serial: int, _fall_height: float) -> void:
+	# The player posts this immediately before the ordinary surface event.
+	_heavy_landing_point = point
+
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
+	var heavy := landed and _heavy_landing_point.is_finite()
+	if heavy:
+		point = _heavy_landing_point
+	_heavy_landing_point = Vector3.INF
 	var ground_point: Vector3
 	var surface := "grass"
 	if _terrain_contact.is_valid():
@@ -92,6 +103,9 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		ground_point -= motion.normalized() * (0.12 if running else 0.06)
 	var count := 5 if landed else (3 if running else 2)
 	var spread := 0.24 if landed else 0.11
+	if heavy:
+		count = HEAVY_PARTICLE_COUNT
+		spread = 0.42
 	for i in count:
 		var particle := _particles[_next]
 		_next = (_next + 1) % _particles.size()
@@ -104,6 +118,11 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		particle.opacity = 0.58 if landed else (0.44 if running else 0.36)
 		particle.sprite.frame = FRAMES[_random.randi_range(0, FRAMES.size() - 1)]
 		particle.sprite.pixel_size = _random.randf_range(0.010, 0.016) if landed else _random.randf_range(0.007, 0.013)
+		if heavy:
+			particle.velocity = radial * _random.randf_range(0.65, 1.45) + Vector3.UP * _random.randf_range(0.45, 0.85)
+			particle.duration = _random.randf_range(0.28, 0.40)
+			particle.opacity = 0.72
+			particle.sprite.pixel_size *= 1.45
 		particle.sprite.scale = Vector3.ONE
 		particle.sprite.global_position = particle.origin
 		particle.sprite.modulate = Color(tint, particle.opacity)
@@ -127,6 +146,7 @@ func _process(delta: float) -> void:
 	set_process(active)
 
 func clear() -> void:
+	_heavy_landing_point = Vector3.INF
 	for particle in _particles:
 		particle.sprite.hide()
 	set_process(false)
