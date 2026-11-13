@@ -195,6 +195,7 @@ func run() -> void:
 	await check_sabre_fixed_pose_anchor(lab, group, 415, 0.10, "arm rebound")
 	await check_sabre_fixed_pose_anchor(lab, group, 419, 0.101, "head impact at the start of the roll")
 	await check_sabre_fixed_pose_anchor(lab, group, 652, 0.095, "leg contact after the landing blend")
+	await check_sabre_fixed_pose_anchor(lab, group, 655, 0.105, "arm after the landing blend", 0.013)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	await check_fresh_spawn_handoff(lab, group, 0)
@@ -678,7 +679,8 @@ func check_flat_rest_after_tumble(lab, group) -> void:
 		"The flat-floor tumble stops vibrating and releases its rigid bodies within 1.85 seconds")
 	zombie.free()
 
-func check_sabre_fixed_pose_anchor(lab, group, serial: int, gap_limit: float, impact: String) -> void:
+func check_sabre_fixed_pose_anchor(lab, group, serial: int, gap_limit: float, impact: String,
+		overlap_limit := INF) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 120011 + serial
 	group._spawn_serial = serial
@@ -697,13 +699,16 @@ func check_sabre_fixed_pose_anchor(lab, group, serial: int, gap_limit: float, im
 	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
 	zombie.set_physics_process(true)
 	var peak := 0.0
+	var overlap := 0.0
 	while not zombie._corpse_parked and zombie._corpse_age < 1.55:
 		await physics_frame
 		if zombie.ragdoll.running:
 			peak = maxf(peak, zombie.ragdoll.max_anchor_error())
-	check(peak > 0.0 and peak < gap_limit and zombie._corpse_parked,
-		"Fixed-pose Sabre %s keeps the joint connected and settles" % impact)
-	print("SABRE_FIXED_IMPACT serial=", serial, " peak_gap_m=", peak, " release_s=", zombie._corpse_age)
+			overlap = maxf(overlap, -zombie.ragdoll.minimum_corner_y())
+	check(peak > 0.0 and peak < gap_limit and overlap <= overlap_limit and zombie._corpse_parked,
+		"Fixed-pose Sabre %s keeps the joint connected, clears the floor and settles" % impact)
+	print("SABRE_FIXED_IMPACT serial=", serial, " peak_gap_m=", peak,
+		" overlap_m=", overlap, " release_s=", zombie._corpse_age)
 	zombie.free()
 
 func check_flat_contact_jitter(lab, group, serial: int, pose_time: float, direction_angle: float,
