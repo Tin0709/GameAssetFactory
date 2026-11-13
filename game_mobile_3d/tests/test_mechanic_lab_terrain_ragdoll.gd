@@ -81,8 +81,41 @@ func run_case(wall_case: bool) -> void:
 		" landing=", first_landing, " side_gravity=", side_gravity)
 	lab.free()
 
+func check_wall_handoff() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var wall := terrain(lab, Vector3(0, 1.0, -0.655), Vector3(6.0, 3.0, 0.4), 0.0)
+	var group := lab.get_node("Zombies")
+	var spawned: bool = group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"))
+	check(spawned, "A source zombie is available for the wall handoff")
+	if not spawned:
+		lab.free()
+		return
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(0.0, 0.02, 0.0)
+	zombie.rotation.y = 5.0 * PI / 4.0
+	zombie.animation.play(zombie.IDLE, 0.0)
+	zombie.animation.advance(0.40)
+	await ticks(2)
+	for i in 2:
+		zombie.ragdoll.sample(1.0 / 60.0)
+	var arm: PhysicalBone3D = zombie.ragdoll.bodies["Arm.R"]
+	var captured_arm: Transform3D = zombie.ragdoll.current["Arm.R"]
+	zombie.take_hit(100, Vector3.RIGHT)
+	zombie._update_death(1.0 / 60.0)
+	var shift := arm.global_position - captured_arm.origin
+	check(absf(shift.y) < 0.001 and shift.z > 0.06 and shift.length() <= 0.12,
+		"The arm near the wall retains the bounded horizontal handoff correction")
+	check(zombie.ragdoll.handoff_error < 0.005, "Wall clearance translates the whole pose without a handoff snap")
+	print("LAB_WALL_HANDOFF shift=", shift, " error=", zombie.ragdoll.handoff_error)
+	wall.free()
+	lab.free()
+
 func run() -> void:
 	await run_case(true)
 	await run_case(false)
+	await check_wall_handoff()
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
