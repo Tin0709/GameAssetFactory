@@ -191,7 +191,7 @@ void fragment(){
 #ifdef GAF_GRASS_EDGE_SAMPLING
 	// Filter coverage from the same atlas, separately from the nearest color.
 	// Retain the original binary shape for the shadow-map pass.
-	ALPHA_ANTIALIASING_EDGE=0.0;
+	ALPHA_ANTIALIASING_EDGE=-1.0;
 	if(!IN_SHADOW_PASS){
 		ALPHA=texture(edge_atlas,UV).a;
 		ALPHA_SCISSOR_THRESHOLD=min(cutoff,0.02);
