@@ -89,6 +89,7 @@ func run() -> void:
 	await check_sabre_landing_damage(lab, group)
 	await check_coincident_sabre_landing(lab, group)
 	await check_crowd(lab, group)
+	await check_sabre_height_thresholds(lab, group)
 	lab.free()
 	print("MECHANIC_LAB_KNOCKBACK first_chase_step=", first_chase_step,
 		" travel=", furthest - at_contact, " failures=", failures)
@@ -233,6 +234,37 @@ func check_coincident_sabre_landing(lab, group) -> void:
 		"A coincident zombie is launched in the saved facing direction")
 	print("SABRE_COINCIDENT_LANDING impulse=", impulse)
 	zombie.free()
+
+func check_sabre_height_thresholds(lab, group) -> void:
+	var original_rate := Engine.physics_ticks_per_second
+	for hz in [30, 60, 120]:
+		Engine.physics_ticks_per_second = hz
+		var damage: Array[int] = []
+		for height: float in [3.99, 4.0, 4.01, 6.49, 6.5, 6.51]:
+			lab.reset_player()
+			await ticks(8)
+			lab.get_node("HUD/SpawnZombie").pressed.emit()
+			var zombie = group.get_child(0)
+			zombie.set_physics_process(false)
+			zombie.global_position = Vector3(0.0, 0.0, 1.5)
+			zombie.health = 100
+			zombie.max_health = 100
+			check(lab.player.drop_for_lab(height), "Sabre threshold fixture starts a real drop")
+			# Delay the attack so the measured apex precedes its input.
+			await ticks(ceili(0.12 * hz))
+			attack(true)
+			await ticks(1)
+			attack(false)
+			for i in hz:
+				await physics_frame
+				if zombie.health < 100:
+					break
+			damage.append(100 - int(zombie.health))
+			zombie.free()
+		check(damage == [20, 40, 40, 40, 60, 60],
+			"The 4 m and 6.5 m thresholds include exact heights at %d Hz" % hz)
+		print("SABRE_HEIGHT_THRESHOLDS hz=", hz, " damage=", damage)
+	Engine.physics_ticks_per_second = original_rate
 
 func check_crowd(lab, group) -> void:
 	lab.reset_player()
