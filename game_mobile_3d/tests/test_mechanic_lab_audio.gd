@@ -243,6 +243,8 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		await physics_frame
 		if not hits.is_empty():
 			break
+	print("MECHANIC_LAB_SABRE_CROWD hits=", hits, " deaths=", deaths.size(),
+		" health=", group.get_children().map(func(zombie): return zombie.health))
 	check(hits.size() == health.size() and hits.all(func(frame): return frame == hits[0])
 		and deaths.size() == 4 and group.get_children().map(func(zombie): return zombie.health)
 			== [60, 0, 0, 0, 60, 60, 0],
