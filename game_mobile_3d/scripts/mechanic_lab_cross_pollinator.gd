@@ -61,7 +61,8 @@ static func grip_transform(socket: Basis) -> Transform3D:
 	# using the wrist's measured pitch; the authored shot is already raised.
 	var dip := atan2(socket.z.normalized().y, -socket.y.normalized().y)
 	var pitch := clampf(dip * 0.85, 0.0, 0.64)
-	var basis := Basis(Vector3.RIGHT, PI - pitch)
+	# The mesh's rail sits diagonally across the exported right-hand grip.
+	var basis := Basis(Vector3.RIGHT, PI - pitch) * Basis(Vector3.UP, -0.32)
 	return Transform3D(basis, -(basis * GRIP))
 
 static func combat_profile(root: String) -> Dictionary:
