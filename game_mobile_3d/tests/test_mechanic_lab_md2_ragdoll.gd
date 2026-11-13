@@ -186,6 +186,7 @@ func run() -> void:
 	await check_sabre_landing_reversal(lab, group, true)
 	await check_sabre_first_contact_anchors(lab, group)
 	await check_sabre_floor_lift(lab, group, 505, 0.022)
+	await check_sabre_floor_lift(lab, group, 510, 0.041)
 	await check_sabre_floor_lift(lab, group, 514, 0.036)
 	await check_sabre_head_and_arm_brace(lab, group)
 	await check_sabre_late_roll(lab, group)
