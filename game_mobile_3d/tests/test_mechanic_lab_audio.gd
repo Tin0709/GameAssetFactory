@@ -564,10 +564,12 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
 	check(peak > 0.005 and peak < 0.9, "The contact pool produces PCM with headroom")
 	audio.reset()
+	var windup_choice: int = audio._next_choice.get(&"zombie_windup", 0)
 	group.zombie_attack_audio.emit(lab.player.global_position + Vector3.RIGHT * 40.0, false)
 	await process_frame
 	await process_frame
-	check(not audio._next_choice.has(&"zombie_windup") and voices.all(func(voice): return voice.stream == null),
+	check(audio._next_choice.get(&"zombie_windup", 0) == windup_choice
+		and voices.all(func(voice): return voice.stream == null),
 		"An out-of-range telegraph does not reserve a voice or advance the sample")
 	group.zombie_attack_audio.emit(points[-1], false)
 	audio.reset()
