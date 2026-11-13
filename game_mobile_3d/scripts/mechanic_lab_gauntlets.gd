@@ -41,6 +41,13 @@ const AIR_CONTACT := 24.0 / 30.0
 const LEFT_GLOW := Color("#a9f4e6")
 const RIGHT_GLOW := Color("#faf474")
 
+static func mount_transform(left: bool) -> Transform3D:
+	# In this rig the visible fist is the end of J_*_Arm, weighted to that
+	# bone. J_*_Hand and J_*_Weapon are independently animated prop helpers.
+	var outside := 1.0 if left else -1.0
+	var basis := Basis.IDENTITY if left else Basis(Vector3.BACK, PI)
+	return Transform3D(basis, Vector3(outside * 0.065, 0.0, 0.68))
+
 static func icon() -> Texture2D:
 	return Source.icon(DIRECTORY, "T_UI_Gauntlets_Unique_Icon", ICON_HASH)
 

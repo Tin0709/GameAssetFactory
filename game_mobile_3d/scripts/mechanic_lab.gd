@@ -68,7 +68,6 @@ var _slam_audio_point: Vector3
 var _contact_sparks: ContactSparks
 var _movement_audio: MovementAudio
 var _weapon_mesh: MeshInstance3D
-var _requested_weapon_mesh: MeshInstance3D
 var _equipped_weapon := Weapon.SABRE
 var _sabre_mesh: Mesh
 var _sword_mesh: Mesh
@@ -80,10 +79,10 @@ var _sword_profile: Dictionary
 var _curved_profile: Dictionary
 var _curved_locomotion: Dictionary
 var _crossbow: CrossPollinator
-var _crossbow_mesh: Mesh
+var _crossbow_mount: MeshInstance3D
 var _crossbow_profile: Dictionary
 var _crossbow_locomotion: Dictionary
-var _gauntlet_mesh: Mesh
+var _right_gauntlet: MeshInstance3D
 var _left_gauntlet: MeshInstance3D
 var _gauntlet_profile: Dictionary
 var _sabre_air_clip: Dictionary
@@ -252,11 +251,6 @@ func _setup_weapon_selector() -> void:
 		return
 	_sabre_mesh = _weapon_mesh.mesh
 	# The light rig stores surface overrides for the original Sabre mesh.
-	# Give these weapons a separate instance so each keeps its source material.
-	_requested_weapon_mesh = MeshInstance3D.new()
-	_requested_weapon_mesh.name = "LabRightWeapon"
-	_requested_weapon_mesh.hide()
-	_weapon_mesh.get_parent().add_child(_requested_weapon_mesh)
 	_sabre_blade_base = player.marker_base.position
 	_sabre_blade_tip = player.marker_tip.position
 	_sabre_profile = player.runtime_locomotion_profile.combat
@@ -295,7 +289,6 @@ func _select_weapon(index: int) -> void:
 	var blade_tip := _sabre_blade_tip
 	var aliases := _sabre_audio_aliases
 	var rates := _sabre_audio_rates
-	var rotation_y := 0.0
 	var locomotion := {}
 	match index:
 		Weapon.SWORD:
@@ -315,27 +308,22 @@ func _select_weapon(index: int) -> void:
 				"NativeCurvedAttack2": CurvedGreatsword.PLAYBACK_RATE,
 				"NativeCurvedAttack3": CurvedGreatsword.PLAYBACK_RATE}
 		Weapon.CROSS_POLLINATOR:
-			mesh = _crossbow_mesh
 			locomotion = _crossbow_locomotion
-			rotation_y = PI
 			blade_tip = blade_base
 			aliases = {}
 			rates = {}
 		Weapon.GAUNTLETS:
-			mesh = _gauntlet_mesh
 			blade_tip = blade_base
 			aliases = {}
 			rates = {}
-	var use_requested_mesh := index in [Weapon.CROSS_POLLINATOR, Weapon.GAUNTLETS]
-	_weapon_mesh.visible = not use_requested_mesh
-	_requested_weapon_mesh.visible = use_requested_mesh
-	if use_requested_mesh:
-		_requested_weapon_mesh.mesh = mesh
-		_requested_weapon_mesh.rotation.y = rotation_y
-	else:
+	_weapon_mesh.visible = index not in [Weapon.CROSS_POLLINATOR, Weapon.GAUNTLETS]
+	if _weapon_mesh.visible:
 		_weapon_mesh.mesh = mesh
+	if _crossbow_mount != null:
+		_crossbow_mount.visible = index == Weapon.CROSS_POLLINATOR
 	if _left_gauntlet != null:
 		_left_gauntlet.visible = index == Weapon.GAUNTLETS
+		_right_gauntlet.visible = index == Weapon.GAUNTLETS
 	player.marker_base.position = blade_base
 	player.marker_tip.position = blade_tip
 	player.reference_audio.reset()
@@ -431,7 +419,9 @@ func _load_crossbow(root: String) -> bool:
 	_crossbow_locomotion = CrossPollinator.load_locomotion(player, root)
 	if _crossbow_locomotion.is_empty():
 		return false
-	_crossbow_mesh = mesh
+	var socket := player._weapon_attachment as BoneAttachment3D
+	_crossbow_mount = _mount_weapon(mesh, socket, "LabCrossbow", CrossPollinator.grip_transform(socket.basis))
+	player.crossbow_mount = _crossbow_mount
 	_crossbow_profile = profile
 	_crossbow = CrossPollinator.new()
 	_crossbow.name = "CrossPollinator"
@@ -452,25 +442,36 @@ func _load_gauntlets(root: String) -> bool:
 	if _left_gauntlet != null:
 		return true
 	var mesh := Gauntlets.load_mesh(player, root)
-	if mesh == null or player.skeleton.find_bone("J_L_Weapon") < 0:
+	if mesh == null:
 		return false
 	var profile := Gauntlets.combat_profile(root)
 	player._load_private_combat_clips(profile, Gauntlets.LIBRARY)
 	if not player.animation_player.has_animation_library(Gauntlets.LIBRARY):
 		return false
-	var socket := BoneAttachment3D.new()
-	socket.name = "LabLeftGauntletSocket"
-	socket.bone_name = "J_L_Weapon"
-	player.skeleton.add_child(socket)
-	_left_gauntlet = MeshInstance3D.new()
-	_left_gauntlet.name = "LabLeftGauntlet"
-	_left_gauntlet.mesh = Gauntlets.with_edge_color(mesh, Gauntlets.LEFT_GLOW)
-	_left_gauntlet.hide()
-	socket.add_child(_left_gauntlet)
-	_gauntlet_mesh = Gauntlets.with_edge_color(mesh, Gauntlets.RIGHT_GLOW)
+	_left_gauntlet = _mount_gauntlet(mesh, true)
+	_right_gauntlet = _mount_gauntlet(mesh, false)
 	_gauntlet_profile = profile
 	_combat_audio.load_gauntlets(root)
 	return true
+
+func _mount_gauntlet(mesh: Mesh, left: bool) -> MeshInstance3D:
+	var socket := BoneAttachment3D.new()
+	socket.name = "LabLeftGauntletSocket" if left else "LabRightGauntletSocket"
+	socket.bone_name = "J_L_Arm" if left else "J_R_Arm"
+	player.skeleton.add_child(socket)
+	var color := Gauntlets.LEFT_GLOW if left else Gauntlets.RIGHT_GLOW
+	var mesh_name := "LabLeftGauntlet" if left else "LabRightGauntlet"
+	return _mount_weapon(Gauntlets.with_edge_color(mesh, color), socket, mesh_name, Gauntlets.mount_transform(left))
+
+func _mount_weapon(mesh: Mesh, socket: BoneAttachment3D, mesh_name: String, offset: Transform3D) -> MeshInstance3D:
+	var mount := MeshInstance3D.new()
+	mount.name = mesh_name
+	mount.mesh = mesh
+	mount.transform = offset
+	mount.hide()
+	socket.add_child(mount)
+	player.render_presenter.track_bone_mesh(mount, socket)
+	return mount
 
 func _set_crossbow_ammo(amount: int) -> void:
 	$HUD/CrossbowAmmo.text = "Đạn nỏ  %d / %d" % [amount, CrossPollinator.AMMO_MAX]
@@ -480,8 +481,7 @@ func _on_grounded_attack(index: int, clip: String, serial: int) -> void:
 		$Zombies.strike_sabre(index, clip, serial)
 		return
 	var forward: Vector3 = player.visual.global_basis.z.normalized()
-	# The exported model and local shot use the same right-hand origin.
-	var muzzle: Vector3 = player._weapon_attachment.global_position + player.visual.global_basis * Vector3(-0.05, 0.25, 0.25)
+	var muzzle := _crossbow_mount.to_global(CrossPollinator.MUZZLE)
 	var direction := forward
 	if player.combat_requested:
 		if player.has_aim_point:

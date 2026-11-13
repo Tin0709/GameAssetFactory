@@ -24,6 +24,9 @@ const BOLT_LIFETIME := 5.0
 const BOLT_MASK := 1 | 4
 const STRIKE := {"damage": 8, "strength": 400.0, "angle": 25.0, "stagger": 8.1}
 const ACTION_HASH := "09471c7fa549624245482513aefd2e2f8fa35a18152dfb9b23b04baabd4e65d0"
+# Points on SM_RapidCrossbow_Unique_F0, in imported mesh coordinates.
+const GRIP := Vector3(0.0, -0.055, -0.06)
+const MUZZLE := Vector3(0.0, 0.075, 0.65)
 const LOCOMOTION := {
 	"Idle": ["Player_Crossbow_Idle", 80, "5efd6e1c0d15066ab98c1bd31262b499435e125512a75a972ee87f1a74bd222a"],
 	"Walk": ["Player_Crossbow_Walk", 26, "a291db024a4b3d10ec01ecc66b068c364fb8bc22d8a245150cbd69dce1af2e9c"],
@@ -51,6 +54,14 @@ static func load_bolt(actor: CharacterBody3D, root: String) -> Mesh:
 	return Source.load_mesh(actor, root, Source.SOURCE + "Actors/Equipment/RangedWeapons/Projectiles/",
 		"SM_Arrow", "b68f888b24264d7db5b1fc1fe48852f33761cccc44e71ba7a65820f148cb33c3",
 		"T_Arrow", "f0bf1ee4c8f45d2361fc73d0635bd8ac5ff9a10d0f63e5759959bef5e77bbd5d")
+
+static func grip_transform(socket: Basis) -> Transform3D:
+	# The stock pivots on the source right grip. Correct the steep carry angle
+	# using the wrist's measured pitch; the authored shot is already raised.
+	var dip := atan2(socket.z.normalized().y, -socket.y.normalized().y)
+	var pitch := clampf(dip * 0.85, 0.0, 0.64)
+	var basis := Basis(Vector3.RIGHT, PI - pitch)
+	return Transform3D(basis, -(basis * GRIP))
 
 static func combat_profile(root: String) -> Dictionary:
 	var result := Source.profile()
