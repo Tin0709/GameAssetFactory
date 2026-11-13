@@ -328,17 +328,19 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 			farthest = maxf(farthest, body.global_position.x)
 		var body: PhysicalBone3D = ragdoll.bodies[part]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		var flight_gravity := is_equal_approx(state.total_gravity.y, -50.0)
+		if first_contact and reached_wall and state.linear_velocity.x < -1.0 and flight_gravity:
+			rebounded = true
 		for contact in state.get_contact_count():
 			if state.get_contact_collider_object(contact) != wall:
 				continue
 			if state.linear_velocity.x > 1.0:
-				reached_wall = reached_wall or is_equal_approx(state.total_gravity.y, -50.0)
+				reached_wall = reached_wall or flight_gravity
 			if state.linear_velocity.x < -1.0:
-				rebounded = rebounded or is_equal_approx(state.total_gravity.y, -50.0)
+				rebounded = rebounded or flight_gravity
 	if first_contact:
 		check(reached_wall, "%s reaches the side wall while moving inward under flight gravity" % part)
-	else:
-		check(rebounded, "%s rebounds from the side wall under flight gravity" % part)
+	check(rebounded, "%s rebounds from the side wall under flight gravity" % part)
 	check(peak > 0.0 and peak < peak_limit, "The %s joint stays attached through the side impact (%s)" % [part, serial])
 	check(farthest < 4.65, "The ragdoll stays on the near side of the rebound fixture wall")
 	print("LAB_WALL_REBOUND serial=", serial, " part=", part, " peak=", peak,
