@@ -96,6 +96,7 @@ func refresh(force:bool=false)->void:
     phase_bounce_active=true
  var skin_verified:bool=level.look.player_effects_available()
  var sun_shoulder:float=level.showcase.player_sun_shoulder_weight()
+ var sun_specular:float=level.showcase.player_sun_specular_weight()
  var canopy_color:float=level.showcase.player_canopy_color_weight() if active and level.look.player_local_light_enabled else 0.
  var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if phase_bounce_active else null,sun_shoulder,sun_specular,canopy_color]
  if not force and bind_key==_last_bind_key:
@@ -108,6 +109,7 @@ func refresh(force:bool=false)->void:
   m.set_shader_parameter("player_rough_reflection",active and level.look.player_reflection_enabled)
   var verified_valorie:bool=m.get_meta("verified_valorie",false)
   m.set_shader_parameter("player_sun_shoulder",sun_shoulder if verified_valorie else 0.)
+  m.set_shader_parameter("player_sun_specular_normalization",sun_specular if verified_valorie else 0.)
   m.set_shader_parameter("actor_canopy_color_mix",canopy_color if verified_valorie else 0.)
   m.set_shader_parameter("skin_wrap_enabled",active and skin_verified and level.look.player_skin_enabled and m.get_meta("has_profile_mask",false))
   if active:

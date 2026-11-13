@@ -163,6 +163,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_replay_placement": ["Vị trí bệ đá", 1.],
 	&"canopy_player_cue": ["Dáng nhân vật sau tán", 1.],
 	&"player_sun_shoulder": ["Dịu nắng trên nhân vật", .4],
+	&"player_sun_specular": ["Dịu phản sáng nắng trên Valorie", 1.],
 	&"player_canopy_color": ["Sắc ánh trời trên nhân vật", 1.],
 	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
@@ -190,7 +191,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 117
+const LIGHTING_MIX_VERSION := 118
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1376,6 +1377,11 @@ func player_sun_shoulder_weight() -> float:
 		return 0.
 	return _lighting_scale(&"player_sun_shoulder") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 
+func player_sun_specular_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() or not level.look.player_effects_available():
+		return 0.
+	return _lighting_scale(&"player_sun_specular") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+
 func pre_twilight_receiver_weight() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() \
 			or not captured_sky_response or not sky_response.available() or phase_air.evening_anchors.is_empty() \
@@ -1740,6 +1746,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 72 and effect == &"evening_lantern":
 			missing_value = 0.
+		if version < 118 and effect == &"player_sun_specular":
+			missing_value = 0.
 		if version < 117 and effect == &"pre_twilight_midair":
 			missing_value = 0.
 		if version < 116 and effect == &"stone_twilight_sky":
@@ -1869,7 +1877,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"crown_ambient_depth":
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
-		if effect in [&"player_sun_shoulder", &"player_canopy_color"]:
+		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color"]:
 			slider.editable = slider.editable and level.look.player_material.available()
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
 			slider.editable = slider.editable and sky_response.available() and plants != null and plants.grass_light.active
@@ -2030,7 +2038,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"tree_shade"]:
 		return
-	if changed_effect in [&"player_sky", &"player_bounce", &"player_sun_shoulder", &"player_canopy_color"]:
+	if changed_effect in [&"player_sky", &"player_bounce", &"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color"]:
 		if level.player_light != null:
 			level.player_light.refresh()
 		return
