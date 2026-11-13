@@ -191,6 +191,7 @@ func run() -> void:
 	await check_sabre_first_support_lift(lab, group)
 	await check_sabre_head_and_arm_brace(lab, group)
 	await check_sabre_late_roll(lab, group)
+	await check_sabre_grounded_slide(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
 	await check_sabre_fixed_pose_anchor(lab, group, 415, 0.10, "arm rebound")
 	await check_sabre_fixed_pose_anchor(lab, group, 419, 0.101, "head impact at the start of the roll")
@@ -659,6 +660,30 @@ func check_sabre_late_roll(lab, group) -> void:
 	print("SABRE_LATE_ROLL first_damp=", first_support_damping, " peak_damp=", peak_damping,
 		" release_s=", zombie._corpse_age, " overlap_m=", overlap)
 	zombie.free()
+
+func check_sabre_grounded_slide(lab, group) -> void:
+	for serial in [457, 1317]:
+		var zombie = await replay_offset_sabre_finisher(lab, group, serial)
+		var first_support := INF
+		var peak_overlap := 0.0
+		var peak_anchor := 0.0
+		for i in 125:
+			await physics_frame
+			if zombie._corpse_parked:
+				break
+			if not zombie.ragdoll.running:
+				continue
+			var contact: Dictionary = zombie.ragdoll.contact_motion()
+			if contact.supports > 0:
+				first_support = minf(first_support, zombie._corpse_age)
+			peak_overlap = maxf(peak_overlap, -zombie.ragdoll.minimum_corner_y())
+			peak_anchor = maxf(peak_anchor, zombie.ragdoll.max_anchor_error())
+		check(first_support < 0.65 and zombie._corpse_parked and zombie._corpse_age < 1.45
+			and peak_overlap <= 0.013 and peak_anchor < 0.10,
+			"The Sabre grounded slide releases without a late drag or separation (seed %d)" % serial)
+		print("SABRE_GROUNDED_SLIDE seed=", serial, " support_s=", first_support,
+			" release_s=", zombie._corpse_age, " overlap_m=", peak_overlap, " anchor_m=", peak_anchor)
+		zombie.free()
 
 func check_flat_rest_after_tumble(lab, group) -> void:
 	group._spawn_serial = 35
