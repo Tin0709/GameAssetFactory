@@ -332,10 +332,13 @@ func _select_weapon(index: int) -> void:
 	player.effects.reset()
 	_cancel_slam_audio()
 	_combat_audio.reset()
+	var was_crossbow := _equipped_weapon == Weapon.CROSS_POLLINATOR
 	_equipped_weapon = index as Weapon
 	var sword_equipped := index == Weapon.SWORD
 	var curved_equipped := index == Weapon.CURVED_GREATSWORD
 	var crossbow_equipped := index == Weapon.CROSS_POLLINATOR
+	if crossbow_equipped != was_crossbow:
+		_combat_audio.crossbow_switched(crossbow_equipped, player.global_position + Vector3.UP)
 	var gauntlets_equipped := index == Weapon.GAUNTLETS
 	player.active_clip = ""
 	# Switching out of a special locomotion profile restores the source slots first.

@@ -8,6 +8,8 @@ const SABRE := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_sabre_
 const SWORD := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_sword_%02d.ogg"
 const CURVED := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_hitmarker_curvedGreatsword-%03d.ogg"
 const CROSSBOW := "Items/Weapons/Weapon_Ranged/RapidCrossbow/RapidCrossbowUnique/sfx_item_rapidCrossbowUnique_"
+const CROSSBOW_EQUIP_HASH := "838f1ed2b28a92389ccc78d6d68cd09bcbee73d2498f6f9dcb7a0f94a485d285"
+const CROSSBOW_UNEQUIP_HASH := "9aac5b929e76b962d96cad6331d2a3e368df77e00202e41e673e93b06d3c3102"
 const CROSSBOW_FIRE_HASHES := [
 	"500b59e16faf185c10a4ef8b7a22b4f6f40c21a1884aafbf3e328e4e1b169157",
 	"0a90dec3091bbcd16f181c16f214e8a928e9b50488d132d26b5440ae0590b06c",
@@ -25,7 +27,12 @@ const CROSSBOW_FLIGHT_HASHES := [
 	"505c42c4c85efa8ddf0fc8b4220797110dd76f4d4a8d9418036549b5ca4fae15",
 ]
 const GAUNTLET_COMBO := "Items/Weapons/Weapon_Melee/6_weapons_melee_basicCombo/Attack%d/sfx_gauntlets_unique_attack_%s_%02d.ogg"
-const GAUNTLET_HIT := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_gauntlets_01.ogg"
+const GAUNTLET_HIT := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_gauntlets_%02d.ogg"
+const GAUNTLET_HIT_HASHES := [
+	"b5dd3f6184aec5dbaea52ae9e4b9b139487515f0b019004cc7523221ac1fa883",
+	"a8071778b3ab4d2207f8a0185e66c8b1f3014020ce9e48581d017a457c10f402",
+	"5c479488c4660c732c3de2902f4b98b28e154c8cb6c84b88a606127c3942fb4a",
+]
 const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_%02d.ogg"
 const GAUNTLET_SLAM := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_attack_%02d.ogg"
 const GAUNTLET_SWING_HASHES := {
@@ -78,6 +85,7 @@ const STEP_POOL := 3
 const FLIGHT_POOL := 4
 const FLIGHT_GAIN_DB := -17.0
 const HIT_GAIN_DB := -9.0
+const EQUIP_GAIN_DB := -15.0
 const SLAM_GAIN_DB := -10.0
 const SURFACE_LANDING_GAIN_DB := -16.0
 const HURT_GAIN_DB := -20.0
@@ -246,6 +254,9 @@ func _weapon_hit_group() -> StringName:
 	return &"sword_hit" if sword_equipped else &"hit"
 
 func load_crossbow(root: String) -> void:
+	# RapidCrossbow_Unique1's OnEquipped and OnUnequipped Wwise events.
+	_load_sample(root, &"crossbow_equip", CROSSBOW + "equip.ogg", CROSSBOW_EQUIP_HASH)
+	_load_sample(root, &"crossbow_unequip", CROSSBOW + "unequip.ogg", CROSSBOW_UNEQUIP_HASH)
 	for i in CROSSBOW_FIRE_HASHES.size():
 		_load_sample(root, &"crossbow_fire", CROSSBOW + ("fire_%02d.ogg" % (i + 1)), CROSSBOW_FIRE_HASHES[i])
 	for i in CROSSBOW_IMPACT_HASHES.size():
@@ -261,14 +272,18 @@ func load_gauntlets(root: String) -> void:
 		var group := StringName("gauntlet_swing_%d" % i)
 		for sample in hashes.size():
 			_load_sample(root, group, GAUNTLET_COMBO % [i + 1, weight, sample + 1], hashes[sample])
-	_load_sample(root, &"gauntlet_hit", GAUNTLET_HIT,
-		"b5dd3f6184aec5dbaea52ae9e4b9b139487515f0b019004cc7523221ac1fa883")
+	for i in GAUNTLET_HIT_HASHES.size():
+		_load_sample(root, &"gauntlet_hit", GAUNTLET_HIT % (i + 1), GAUNTLET_HIT_HASHES[i])
 	for i in GAUNTLET_JUMP_HASHES.size():
 		_load_sample(root, &"gauntlet_jump", GAUNTLET_JUMP % (i + 1), GAUNTLET_JUMP_HASHES[i])
 	for i in GAUNTLET_SLAM_HASHES.size():
 		_load_sample(root, &"gauntlet_slam", GAUNTLET_SLAM % (i + 1), GAUNTLET_SLAM_HASHES[i])
 	for i in MAULER_DIVE_HASHES.size():
 		_load_sample(root, &"mauler_dive", MAULER_DIVE % (i + 1), MAULER_DIVE_HASHES[i])
+
+func crossbow_switched(equipped: bool, point: Vector3) -> void:
+	if enabled:
+		_play(&"crossbow_equip" if equipped else &"crossbow_unequip", point, EQUIP_GAIN_DB)
 
 func crossbow_fired(point: Vector3) -> void:
 	if enabled:
