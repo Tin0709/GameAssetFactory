@@ -81,7 +81,7 @@ func run_case(wall_case: bool) -> void:
 		" landing=", first_landing, " side_gravity=", side_gravity)
 	lab.free()
 
-func check_wall_handoff() -> void:
+func check_wall_handoff(repositioned: bool = false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -98,18 +98,29 @@ func check_wall_handoff() -> void:
 	zombie.rotation.y = 5.0 * PI / 4.0
 	zombie.animation.play(zombie.IDLE, 0.0)
 	zombie.animation.advance(0.40)
+	if repositioned:
+		zombie.global_position.x += 24.0
 	await ticks(2)
 	for i in 2:
 		zombie.ragdoll.sample(1.0 / 60.0)
+	if repositioned:
+		zombie.global_position.x -= 24.0
+		zombie.reset_physics_interpolation()
 	var arm: PhysicalBone3D = zombie.ragdoll.bodies["Arm.R"]
-	var captured_arm: Transform3D = zombie.ragdoll.current["Arm.R"]
+	var rig: Skeleton3D = zombie.ragdoll.skeleton
+	var pose := rig.global_transform * rig.get_bone_global_pose(arm.get_bone_id()) * arm.body_offset
 	zombie.take_hit(100, Vector3.RIGHT)
 	zombie._update_death(1.0 / 60.0)
-	var shift := arm.global_position - captured_arm.origin
+	var shift := arm.global_position - pose.origin
 	check(absf(shift.y) < 0.001 and shift.z > 0.06 and shift.length() <= 0.12,
 		"The arm near the wall retains the bounded horizontal handoff correction")
 	check(zombie.ragdoll.handoff_error < 0.005, "Wall clearance translates the whole pose without a handoff snap")
-	print("LAB_WALL_HANDOFF shift=", shift, " error=", zombie.ragdoll.handoff_error)
+	if repositioned:
+		var inherited: Dictionary = zombie.ragdoll.inherited["Arm.R"]
+		check(Vector3(inherited.linear).is_zero_approx() and Vector3(inherited.angular).is_zero_approx(),
+			"Repositioning does not supply motion to the ragdoll")
+	print("LAB_WALL_HANDOFF repositioned=", repositioned, " shift=", shift,
+		" error=", zombie.ragdoll.handoff_error)
 	wall.free()
 	lab.free()
 
@@ -154,6 +165,7 @@ func run() -> void:
 	await run_case(true)
 	await run_case(false)
 	await check_wall_handoff()
+	await check_wall_handoff(true)
 	await check_edge_landing_gravity()
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
