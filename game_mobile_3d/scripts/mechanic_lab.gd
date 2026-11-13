@@ -212,6 +212,7 @@ func _ready() -> void:
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
 		$Zombies.zombie_attack_audio.connect(_combat_audio.zombie_attack)
+		$Zombies.zombie_step_audio.connect(_on_zombie_step)
 		_setup_weapon_selector()
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
@@ -403,6 +404,13 @@ func _grass_contact_at(sole: Vector3) -> Dictionary:
 	if hit.is_empty() or hit.collider != $Ground or hit.normal.y < cos(player.floor_max_angle):
 		return {}
 	return {"position": hit.position, "surface": "grass"}
+
+func _on_zombie_step(sole: Vector3) -> void:
+	if not _combat_audio.can_play_zombie_step(sole, player.global_position):
+		return
+	var contact := _grass_contact_at(sole)
+	if not contact.is_empty():
+		_combat_audio.zombie_step(contact.position)
 
 func _heavy_debris_delay() -> float:
 	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0

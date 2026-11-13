@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 signal melee_hit(amount: int)
+signal step_audio(point: Vector3)
 
 enum DeathStrike { GROUND, AIR, SABRE_FINISHER, SABRE_GROUND }
 signal melee_audio(point: Vector3, contact: bool)
@@ -14,6 +15,13 @@ const CORPSE_SHADER := preload("res://materials/mechanic_lab_zombie_corpse.gdsha
 const HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_zombie_hit_flash.gdshader")
 const IDLE := &"Zombie_Idle"
 const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Variant2"]
+# Forward sole-height minima in the pinned 30 Hz walk GLBs. The exports have no notify track.
+const WALK_STEP_FRAMES := {
+	&"Zombie_Walk": [Vector2(10, 0.095), Vector2(34, 0.127)],
+	&"Zombie_Walk_Variant1": [Vector2(22, 0.112), Vector2(45, 0.193)],
+	&"Zombie_Walk_Variant2": [Vector2(22, 0.112), Vector2(45, 0.193)],
+}
+const STEP_MIN_SPEED_SQUARED := 0.15 * 0.15
 const SPAWN := &"Zombie_Spawn"
 const ATTACK := &"Zombie_BasicAttack"
 const STAGGER := &"Zombie_Staggered"
@@ -324,8 +332,13 @@ func _integrate_knockback(delta: float) -> Vector3:
 	return direction * ((speed + end_speed) * 0.5 * moving_time / delta)
 
 func _advance_animation(delta: float) -> void:
-	if animation.current_animation != ATTACK:
+	var clip := animation.current_animation
+	if clip != ATTACK:
+		var play_steps := step_audio.has_connections() and clip in WALK_STEP_FRAMES and is_on_floor() +			and not _skipped_blocked_step and get_real_velocity().slide(Vector3.UP).length_squared() >= STEP_MIN_SPEED_SQUARED
+		var previous_phase := animation.current_animation_position if play_steps else 0.0
 		animation.advance(delta)
+		if play_steps:
+			_emit_walk_step(clip, previous_phase)
 		return
 	var before := animation.current_animation_position
 	var telegraph_seconds := clampf((TELEGRAPH_END - before) / TELEGRAPH_RATE, 0.0, delta)
@@ -333,6 +346,16 @@ func _advance_animation(delta: float) -> void:
 	animation.advance(advance_seconds)
 	if before < MELEE_CONTACT_TIME and before + advance_seconds >= MELEE_CONTACT_TIME:
 		_check_melee_contact()
+
+func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
+	var phase := animation.current_animation_position
+	var wrapped := phase < previous_phase
+	for i in 2:
+		var contact: Vector2 = WALK_STEP_FRAMES[clip][i]
+		var at := contact.x / 30.0
+		if (at > previous_phase or wrapped) and (at <= phase or (wrapped and at > previous_phase)):
+			var side := 0.125 if i == 0 else -0.130
+			step_audio.emit(to_global(Vector3(side, 0.0, contact.y)))
 
 func _check_melee_contact() -> void:
 	if target.get("is_dead") == true:
