@@ -338,16 +338,16 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 	await process_frame
 	await process_frame
 	var nearest := points.slice(-3)
-	check(reactions.all(func(voice): return voice.stream in audio._groups[&"hurt"]
-		and voice.global_position in nearest), "A far-first hurt burst plays the three nearest reactions")
+	check(reactions.all(func(voice): return voice.stream in audio._groups[&"hurt"] and voice.global_position in nearest),
+		"A far-first hurt burst plays the three nearest reactions")
 	var hurt_choice: int = audio._next_choice.get(&"hurt", 0)
 	for point in points:
 		audio.contact(point, 1002, false)
 		audio.contact(point, 1002, true)
 	await process_frame
 	await process_frame
-	check(reactions.all(func(voice): return voice.stream in audio._groups[&"death"]
-		and voice.global_position in nearest) and audio._next_choice.get(&"hurt", 0) == hurt_choice,
+	check(reactions.all(func(voice): return voice.stream in audio._groups[&"death"] and voice.global_position in nearest)
+		and audio._next_choice.get(&"hurt", 0) == hurt_choice,
 		"The nearest deaths replace active hurts without selecting suppressed hurt samples")
 	audio.reset()
 	var death_choice: int = audio._next_choice.get(&"death", 0)
