@@ -47,7 +47,8 @@ void light(){
 			float visibility=0.5/max(mix(2.0*nl*nv,nl+nv,a),0.0000001);
 			vec3 f0=mix(vec3(0.16*native_specular*native_specular),ALBEDO,METALLIC);
 			float f90=clamp(dot(f0,vec3(16.5)),METALLIC,1.0);
-			SPECULAR_LIGHT+=key_color*incident*k*k*visibility*(f0+(f90-f0)*player_fresnel(lh))*SPECULAR_AMOUNT;
+			float normalization = LIGHT_IS_DIRECTIONAL ? mix(1.0, 1.0 / PI, player_sun_specular_normalization) : 1.0;
+			SPECULAR_LIGHT+=key_color*incident*k*k*visibility*(f0+(f90-f0)*player_fresnel(lh))*SPECULAR_AMOUNT*normalization;
 		}
 	}
 }

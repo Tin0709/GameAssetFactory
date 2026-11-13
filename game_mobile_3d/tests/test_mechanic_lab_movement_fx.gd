@@ -341,6 +341,16 @@ func check_non_grass_steps(lab, dust, wind) -> void:
 			" grass_audio=", grass_steps, " dust_changed=", dust._next != before_dust,
 			" wind_changed=", wind._next != before_wind)
 	lab.player.surface_contact.disconnect(record)
+	var before_audio: int = movement.event_count.grass
+	var before_dust: int = dust._next
+	var before_wind: int = wind._next
+	for i in 105:
+		await physics_frame
+		if movement.event_count.grass > before_audio:
+			break
+	check(lab.player.is_on_floor() and absf(lab.player.global_position.y) < 0.05
+		and movement.event_count.grass == before_audio + 1 and dust._next != before_dust and wind._next != before_wind,
+		"The next supported running step on grass resumes sound, dust and wake together")
 	lab.player.requested_direction = Vector2.ZERO
 	lab.player.requested_run = false
 	lab.player.scripted_input = false
