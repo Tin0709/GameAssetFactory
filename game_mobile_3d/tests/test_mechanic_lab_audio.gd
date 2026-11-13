@@ -132,7 +132,7 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	current_scene = lab
 	var audio = lab.get_node("CombatAudio")
 	var movement = lab.get_node("MovementAudio")
-	var dust := lab.get_node("MovementDust")
+	var dust: Node3D = lab.get_node("MovementDust")
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
 	toggle.button_pressed = true
 	for voice: AudioStreamPlayer3D in audio._voices:

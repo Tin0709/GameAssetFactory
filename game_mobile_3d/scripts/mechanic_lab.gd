@@ -138,7 +138,7 @@ func _ready() -> void:
 		_setup_movement_audio()
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
-		if dust.setup(player, $Ground/Collision, Callable(), _heavy_dust_delay):
+		if dust.setup(player, $Ground/Collision, Callable(), _heavy_debris_delay):
 			add_child(dust)
 		else:
 			dust.free()
@@ -240,6 +240,7 @@ func _select_weapon(index: int) -> void:
 	player.reference_audio.clip_aliases = aliases
 	player.reference_audio.clip_play_rates = rates
 	player.effects.reset()
+	_cancel_slam_audio()
 	_combat_audio.reset()
 	_equipped_weapon = index as Weapon
 	var sword_equipped := index == Weapon.SWORD
@@ -357,7 +358,7 @@ func _setup_movement_audio() -> void:
 	add_child(_movement_audio)
 	_movement_audio.setup(player, null, bundle)
 
-func _heavy_dust_delay() -> float:
+func _heavy_debris_delay() -> float:
 	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
 
 func _cancel_slam_audio() -> void:
@@ -402,9 +403,10 @@ func _on_sabre_landing(point: Vector3, serial: int) -> void:
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
 	if not _combat_audio.enabled:
 		return
-	if _equipped_weapon == Weapon.SABRE:
+	var delay_ticks := ceili(_heavy_debris_delay() * Engine.physics_ticks_per_second)
+	if delay_ticks > 0:
 		_slam_audio_point = point
-		_slam_audio_frame = Engine.get_physics_frames() + ceili(SABRE_LANDING_DEBRIS_DELAY * Engine.physics_ticks_per_second)
+		_slam_audio_frame = Engine.get_physics_frames() + delay_ticks
 	else:
 		_combat_audio.slam_landed(point)
 
