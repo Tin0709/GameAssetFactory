@@ -86,6 +86,13 @@ void fragment() {
 		ALBEDO = shade_world_surface(color.rgb, surface_world, surface_top);
 		ALBEDO = grade_stone_twilight(grade_night_path(ALBEDO, surface_top));
 	}
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+	float dawn_turf = 0.0;
+	if (gaf_dawn_turf_color > 0.0 && use_source_terrain && (ground_grade == 1 || ground_grade == 2) && surface_top > .998) {
+		dawn_turf = gaf_dawn_turf_weight(surface_world, CAMERA_POSITION_WORLD) * gaf_dawn_turf_coverage(ALBEDO);
+		ALBEDO = gaf_dawn_turf_chroma(ALBEDO, vec3(1.68, 1.0, 2.37), 0.68 * dawn_turf);
+	}
+#endif
 	vec3 outline_ray = PROJECTION_MATRIX[3][3] > 0.5 ? -INV_VIEW_MATRIX[2].xyz : normalize(surface_world - CAMERA_POSITION_WORLD);
 	ALBEDO *= terrain_outline(surface_world, surface_normal, outline_ray);
 #ifdef GAF_WORLD_DIRECT_CLOUD
@@ -105,7 +112,8 @@ void fragment() {
 	if (gaf_diffuse_opening.w > 0.0) {
 		terrain_opening_incident = terrain_opening_fill(ALBEDO, receiver_contact, sole);
 	}
-	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top)*sole;
+	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top)*sole;
+	EMISSION += gaf_dawn_turf_chroma(diffuse_fill, vec3(1.42, 1.0, .65), .55 * dawn_turf);
 	EMISSION+=ALBEDO*(1.0-METALLIC)*gaf_replay_incident(surface_world,surface_normal)*receiver_contact*sole;
 	if(terrain_rough_reflection)EMISSION+=terrain_reflected(normalize(NORMAL),normalize(VIEW),ROUGHNESS,AO,cloud_transmission,receiver_contact,native_specular);
 #else

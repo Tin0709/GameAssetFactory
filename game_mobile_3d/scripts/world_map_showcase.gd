@@ -86,6 +86,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"turf_ambient_color": ["Sắc ánh hắt trên cỏ lúc tối", 1.],
 	&"dawn_turf_ambient": ["Ánh hắt trên cỏ rạng sáng", 1.],
+	&"dawn_turf_color": ["Sắc cỏ trong bóng rạng sáng", 1.],
 	&"grass_shade_color": ["Grass shade color", 1.],
 	&"diffuse_openings": ["Sunlit diffuse fill", 1.],
 	&"regional_sky": ["Local cliff skylight (preview)", 1.],
@@ -169,7 +170,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 89
+const LIGHTING_MIX_VERSION := 90
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -226,6 +227,7 @@ var _point_kernel_camera := Vector3.INF
 var _point_lights:Dictionary={}
 var point_kernel_state:=Vector4.ZERO
 var _lantern_grass_tone := 0.0
+var _dawn_turf_color := 0.0
 var path_beam_state := Vector4.ZERO
 var point_soft_state:=Vector2.ZERO
 var player_soft_source:=false
@@ -675,6 +677,8 @@ func _exit_tree()->void:
 		RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_lantern_grass_tone",0.0)
 		_lantern_grass_tone = 0.0
+		RenderingServer.global_shader_parameter_set("gaf_dawn_turf_color", 0.0)
+		_dawn_turf_color = 0.0
 	if grade_review!=null:grade_review.release()
 	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
 
@@ -1259,6 +1263,19 @@ func night_stone_blue_softness() -> float:
 		return 0.0
 	return moonlight_weight(hour) * _lighting_scale(&"night_stone_blue_softness")
 
+func _publish_dawn_turf_color() -> void:
+	if _point_kernel_owner == null or _point_kernel_owner.get_ref() != self:
+		return
+	var strength := 0.0
+	if not _balanced_preview and atmosphere_review == "combined" and forest_spatial_sky_context() \
+			and captured_sky_response and sky_response.available() and moonlight_enabled \
+			and plants != null and plants.grass_light.active and is_instance_valid(_player_light):
+		var dawn := smoothstep(0.0, 2.5, hour) * (1.0 - smoothstep(2.5, 4.5, hour))
+		strength = dawn * _lighting_scale(&"dawn_turf_color")
+	if strength != _dawn_turf_color:
+		_dawn_turf_color = strength
+		RenderingServer.global_shader_parameter_set("gaf_dawn_turf_color", strength)
+
 func turf_ambient_color() -> Vector3:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() \
 			or not captured_sky_response or not sky_response.available() or plants == null or not plants.grass_light.active:
@@ -1574,6 +1591,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 89 and effect == &"night_far_air":
 			missing_value = 0.
+		if version < 90 and effect == &"dawn_turf_color":
+			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
 		if version < 84 and effect == &"night_stone_blue_softness":
@@ -1635,7 +1654,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"crown_ambient_depth":
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
-		if effect == &"dawn_turf_ambient":
+		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
 			slider.editable = slider.editable and sky_response.available() and plants != null and plants.grass_light.active
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
@@ -1738,6 +1757,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"canopy_player_cue":
 		level.sync_canopy_player_cue()
+		return
+	if changed_effect == &"dawn_turf_color":
+		_publish_dawn_turf_color()
 		return
 	if changed_effect in [&"twilight_ground_ambient", &"turf_ambient_color", &"dawn_turf_ambient"]:
 		level.terrain_light.bind()
@@ -1968,6 +1990,7 @@ func apply_time()->void:
 		_publish_stone_twilight_color()
 		_sync_twilight_crown()
 		_sync_forest_night_lights()
+		_publish_dawn_turf_color()
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
 		key_response_active=false

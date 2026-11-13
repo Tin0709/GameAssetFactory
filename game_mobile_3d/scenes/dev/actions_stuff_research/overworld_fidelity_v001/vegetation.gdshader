@@ -174,6 +174,10 @@ void fragment(){
 		}
 #endif
 	}
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+	float dawn_turf = tinted_grass ? gaf_dawn_turf_weight(foliage_world, CAMERA_POSITION_WORLD) : 0.0;
+	color = gaf_dawn_turf_chroma(color, vec3(1.21, 1.0, 1.08), 0.68 * dawn_turf);
+#endif
 	ALBEDO=color;ALPHA=texel.a;ALPHA_SCISSOR_THRESHOLD=cutoff;
 	if(ground_mask_enabled){
 		vec2 mask_uv=(floor(foliage_world.xz)-ground_coverage_origin+vec2(0.5))/ground_coverage_extent;
@@ -205,6 +209,7 @@ void fragment(){
 	EMISSION *= study_twilight_ground_ambient;
 	if (tinted_grass && turf_ambient_color != vec3(1.0)) {
 		EMISSION = gaf_turf_ambient(EMISSION);
+		EMISSION = gaf_dawn_turf_chroma(EMISSION, vec3(1.65, 1.0, .81), .55 * dawn_turf);
 	}
 	EMISSION += color * (1.0 - METALLIC) * study_day_bounce_at_root;
 	EMISSION *= sole;
