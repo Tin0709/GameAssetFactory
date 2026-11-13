@@ -3,7 +3,9 @@ extends Node3D
 const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
 const PlayerPresentation := preload("res://scripts/world_map_presentation.gd")
 const SourceTerrain := preload("res://scripts/world_map_source_terrain.gd")
-const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
+const WorldLook := preload("res://scripts/world_map_look.gd")
+const WorldShowcase := preload("res://scripts/world_map_showcase.gd")
+const WorldAmbient := preload("res://scripts/world_map_ambient.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const MovementAudio := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/environment_audio.gd")
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
@@ -20,7 +22,6 @@ const SLASH_TEXTURE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Combat/M
 const SLASH_TEXTURE_SHA256 := "bd5d52c41304562f1f4108aa5fc564f09d0e23766fd489a2d45ae8c30a7e11a5"
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
 const SPAWN := Vector3(0.0, 0.03, 0.0)
-const WORLD_MAP_NOON_EXPOSURE := 0.12
 const MIN_CAMERA_SIZE := 4.5
 const MAX_CAMERA_SIZE := 30.0
 const ZOOM_STEP := 1.15
@@ -38,10 +39,12 @@ const PRIVATE_CONTROLS := "WASD di chuyển · Shift đi bộ · Space nhảy ·
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD }
 
 var presentation: Node
+var look: WorldLook
+var showcase: WorldShowcase
+var view_mode := "gameplay"
+var spawn_position := SPAWN
 var player_health := MAX_PLAYER_HEALTH
-var _exposure: CompositorEffect
 var _previous_msaa: Viewport.MSAA
-var _previous_hdr: bool
 var _combat_audio: CombatAudio
 var _contact_sparks: ContactSparks
 var _movement_audio: MovementAudio
@@ -89,12 +92,12 @@ func _enter_tree() -> void:
 	$Actors.add_child(actor)
 
 func _ready() -> void:
-	_apply_daylight_render_settings()
+	_setup_world_look()
 	var material := $Ground/Mesh.material_override as ShaderMaterial
 	var tiles := SourceTerrain.load_tiles()
 	if tiles != null:
-		material.set_shader_parameter("tiles", tiles)
-		material.set_shader_parameter("use_source_tiles", true)
+		material.set_shader_parameter("source_terrain_tiles", tiles)
+		material.set_shader_parameter("use_source_terrain", true)
 
 	presentation.setup()
 	reset_player()
@@ -290,32 +293,34 @@ func _load_weapon(index: int) -> bool:
 	player.reference_audio.add_manifest(research_root, CurvedGreatsword.MEDIA_MANIFEST)
 	return true
 
-func _apply_daylight_render_settings() -> void:
-	if RenderingServer.get_rendering_device() == null:
-		return
+func _setup_world_look() -> void:
 	var viewport := get_viewport()
 	_previous_msaa = viewport.msaa_3d
-	_previous_hdr = viewport.use_hdr_2d
 	viewport.msaa_3d = Viewport.MSAA_2X
-	viewport.use_hdr_2d = true
-	_exposure = LocalExposure.new()
-	_exposure.set_review_strength(WORLD_MAP_NOON_EXPOSURE)
-	_exposure.set_air_bloom(true)
-	var compositor := Compositor.new()
-	compositor.compositor_effects = [_exposure]
-	camera.compositor = compositor
+	showcase = WorldShowcase.new()
+	showcase.name = "WorldTime"
+	showcase.private_primary = PlayerFactory.uses_private_player()
+	add_child(showcase)
+	look = WorldLook.new()
+	look.name = "WorldLook"
+	add_child(look)
+	var ground := ShaderMaterial.new()
+	$Ground/Mesh.material_override = ground
+	look.setup_flat_lab(self, ground)
+	ground.set_shader_parameter("albedo_tint", Color(0.4366, 0.5745, 0.2828))
+	var ambient := WorldAmbient.new()
+	ambient.name = "DirectionalAmbient"
+	add_child(ambient)
+	ambient.setup(self)
+	showcase.setup_flat_lab(self)
+	_update_time_label()
 
 func _exit_tree() -> void:
-	if _exposure == null:
-		return
-	_exposure.enabled = false
-	camera.compositor = null
-	var effect := _exposure
-	_exposure = null
-	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
-	var viewport := get_viewport()
-	viewport.msaa_3d = _previous_msaa
-	viewport.use_hdr_2d = _previous_hdr
+	get_viewport().msaa_3d = _previous_msaa
+
+func _update_time_label() -> void:
+	var minutes := roundi(showcase.hour * 60.0)
+	$HUD/TimeOfDay.text = "%02d:%02d  ·  T đổi giờ" % [floori(minutes / 60.0), minutes % 60]
 
 func _process(delta: float) -> void:
 	var focus: Vector3 = presentation.player_position()
@@ -408,6 +413,11 @@ func _physics_process(_delta: float) -> void:
 		reset_player()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.physical_keycode == KEY_T and event.pressed and not event.echo:
+		showcase.set_hour(showcase.next_shortcut_hour())
+		_update_time_label()
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("reset_test"):
 		reset_player()
 	if event is InputEventMouseButton and event.pressed:

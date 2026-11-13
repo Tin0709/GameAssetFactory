@@ -1964,7 +1964,6 @@ func apply_time()->void:
 	if _time_applied:_restore_day()
 	if is_day_anchor():
 		if use_forest:_apply_forest(env,sun);_time_applied=true
-		elif _flat_lab:_forest_hour=hour
 		return
 	var p:Dictionary=palette.sample(hour);var noon:Dictionary=palette.sample(12.)
 	sun.rotation_degrees=Vector3(_day.sun_rotation)+Vector3(p.pitch-noon.pitch,p.yaw-noon.yaw,0)
@@ -1978,7 +1977,6 @@ func apply_time()->void:
 	env.fog_light_color=p.fog
 	env.fog_density=float(_day.fog_density)*float(p.fog_amount)/float(noon.fog_amount)
 	if use_forest:_apply_forest(env,sun)
-	elif _flat_lab:_forest_hour=hour
 	_time_applied=true
 
 func compare_baseline()->void:
@@ -2602,10 +2600,7 @@ func _build_ui()->void:
 	_hint.text="WASD di chuyển · Space nhảy · Chuột trái / E đánh · L ẩn / hiện HUD"
 	if not unavailable_reason.is_empty():_hint.text=unavailable_reason;_hint.modulate=Color(1.,.6,.35)
 	hud.add_child(_hint)
-	_vignette=ColorRect.new();_vignette.name="AtmosphereVignette";_vignette.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	_vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_vignette.z_index=-20
-	var material:=ShaderMaterial.new();material.shader=preload("res://materials/world_map_atmosphere_vignette.gdshader");_vignette.material=material
-	# The vignette is part of the image, so it stays visible with the HUD hidden.
+	_create_atmosphere_overlay(hud)
 	_settings.setup(hud, panel, box, _lighting_sliders, status, true)
 	panel.visibility_changed.connect(func():
 		if not panel.is_visible_in_tree():
