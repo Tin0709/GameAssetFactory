@@ -20,6 +20,13 @@ var enabled:=true
 var presented_frames:=0
 var last_uploaded_actor:=Vector3.ZERO
 var mesh_followers: Dictionary[int, RID] = {}
+var attached_meshes: Dictionary[int, int] = {}
+
+func track_bone_mesh(mesh: MeshInstance3D, socket: BoneAttachment3D) -> void:
+	attached_meshes[meshes.size()] = socket.bone_idx
+	meshes.append(mesh)
+	bindings.append({"skin": null, "bone": socket.bone_idx, "offset": mesh.transform})
+	reset_history()
 
 func add_mesh_follower(source: MeshInstance3D, follower: MeshInstance3D) -> void:
 	var index := meshes.find(source)
@@ -58,8 +65,11 @@ func capture()->void:
 	for bone in rig.get_bone_count():
 		poses.append(rig.get_bone_pose(bone));world.append(rig.global_transform*rig.get_bone_global_pose(bone))
 	for mesh:MeshInstance3D in meshes:transforms.append(mesh.global_transform)
+	var offsets: Dictionary[int, Transform3D] = {}
+	for index: int in attached_meshes:
+		offsets[index] = meshes[index].transform
 	previous=current
-	current={"poses":poses,"world":world,"rig":rig.global_transform,"meshes":transforms,"actor":actor.global_position,"clock":actor.effects.clock if actor.effects!=null else actor.simulation_clock}
+	current={"poses":poses,"world":world,"rig":rig.global_transform,"meshes":transforms,"offsets":offsets,"actor":actor.global_position,"clock":actor.effects.clock if actor.effects!=null else actor.simulation_clock}
 	if previous.is_empty():previous=current
 
 func reset_history()->void:
@@ -96,7 +106,10 @@ func prepare(alpha:float)->void:
 	display_clock=lerpf(previous.clock,current.clock,render_alpha)
 	if render_alpha<=0. or render_alpha>=1.:
 		var source:Dictionary=previous if render_alpha<=0. else current
-		display_world=source.world.duplicate();display_meshes.assign(source.meshes);return
+		display_world=source.world.duplicate();display_meshes.assign(source.meshes)
+		for index: int in attached_meshes:
+			display_meshes[index] = Transform3D(display_world[attached_meshes[index]]) * Transform3D(source.offsets[index])
+		return
 	var locals:Array=[];var globals:Array=[];globals.resize(rig.get_bone_count())
 	for bone in rig.get_bone_count():locals.append(Transform3D(previous.poses[bone]).interpolate_with(current.poses[bone],render_alpha))
 	var rig_transform:=Transform3D(previous.rig).interpolate_with(current.rig,render_alpha)
@@ -106,7 +119,11 @@ func prepare(alpha:float)->void:
 	display_meshes.clear()
 	for index in meshes.size():
 		var record:Dictionary=bindings[index]
-		display_meshes.append(display_world[record.bone]*Transform3D(record.offset) if record.bone>=0 else Transform3D(previous.meshes[index]).interpolate_with(current.meshes[index],render_alpha))
+		if attached_meshes.has(index):
+			var offset: Transform3D = previous.offsets[index]
+			display_meshes.append(Transform3D(display_world[record.bone]) * offset.interpolate_with(current.offsets[index], render_alpha))
+		else:
+			display_meshes.append(display_world[record.bone]*Transform3D(record.offset) if record.bone>=0 else Transform3D(previous.meshes[index]).interpolate_with(current.meshes[index],render_alpha))
 
 func display_marker(marker:Node3D)->Transform3D:
 	var anchor:BoneAttachment3D=actor._weapon_attachment

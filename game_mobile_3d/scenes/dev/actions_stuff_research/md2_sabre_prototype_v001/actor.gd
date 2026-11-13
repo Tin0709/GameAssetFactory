@@ -238,7 +238,7 @@ func _ready()->void:
 	if using_original_source and hybrid_motion_enabled and OS.get_environment("MD2_HYBRID_MOTION")!="0":
 		var research_root:=OS.get_environment("MD2_RESEARCH_ROOT")
 		if research_root.is_empty():research_root="C:/Users/ADMIN/Desktop/MD2 Research"
-		var hybrid:=HybridMotion.new()
+		var hybrid:=_create_hybrid_motion()
 		if hybrid.setup(skeleton,research_root.path_join("blender/hybrid_godot_v001/hybrid_motion.json"),private_model_path()):
 			hybrid_motion=hybrid;cadence_label="A&S Walk / Run · v004 attached landing\nDistance-synchronized source gait · MD2 combat / physics"
 	if using_original_source and OS.get_environment("MD2_MEASURED_JUMP")!="0":
@@ -253,6 +253,9 @@ func _ready()->void:
 		if research_root.is_empty():research_root="C:/Users/ADMIN/Desktop/MD2 Research"
 		var novelty:=NoveltyJump.new()
 		if novelty.setup(self,research_root.path_join("reports/prototype_sabre/jump_flip_20261028/jump_flip.private.json")):novelty_jump=novelty
+
+func _create_hybrid_motion()->RefCounted:
+	return HybridMotion.new()
 
 func set_measured_jump(value:bool)->void:
 	measured_jump_requested=value;_apply_jump_settings()

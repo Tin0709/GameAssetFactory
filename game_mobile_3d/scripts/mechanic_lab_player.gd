@@ -1,12 +1,17 @@
 extends "res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/world_map_actor.gd"
-## MechanicLab-only routing for ranged input and the gauntlet jump pose.
+## MechanicLab-only weapon input, locomotion and attachments.
 
 const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd")
 const Gauntlets := preload("res://scripts/mechanic_lab_gauntlets.gd")
+const LabLocomotion := preload("res://scripts/mechanic_lab_locomotion.gd")
 
 var crossbow_equipped := false
 var gauntlets_equipped := false
+var crossbow_mount: MeshInstance3D
 var _crossbow_pose_serial := -1
+
+func _create_hybrid_motion() -> RefCounted:
+	return LabLocomotion.new()
 
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
@@ -39,15 +44,22 @@ func _play(key: String, blend: float = 0.04) -> void:
 	super._play(key, blend)
 
 func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
-	if not crossbow_equipped or not weapon_source_locomotion or key not in GAITS:
+	if key not in GAITS or (key not in LabLocomotion.WALKS and not weapon_source_locomotion):
 		return super._outgoing_locomotion_sampler(key, phase)
+	var crossbow_run := crossbow_equipped and key in LabLocomotion.RUNS
 	var cursor := {"clip": key, "phase": phase}
 	_outgoing_locomotion_state = cursor
 	return func(delta: float) -> Array[Transform3D]:
 		var speed := _animation_motion_speed if _combat_plan_active else current_speed
 		var gait_state: Dictionary = source_gait.state(speed)
 		cursor.phase = fposmod(float(cursor.phase) + delta / float(gait_state.period), 1.0)
-		return source_gait.compose(float(cursor.phase), speed)
+		var pose: Array[Transform3D] = source_gait.compose(float(cursor.phase), speed)
+		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
+
+func _refresh_markers() -> void:
+	super._refresh_markers()
+	if crossbow_equipped and crossbow_mount != null:
+		crossbow_mount.transform = CrossPollinator.grip_transform(_weapon_attachment.basis)
 
 func begin_gauntlet_landing() -> void:
 	combo.air_landing_started = true
