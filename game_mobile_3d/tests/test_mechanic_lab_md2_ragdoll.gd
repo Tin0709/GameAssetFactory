@@ -149,34 +149,23 @@ func run() -> void:
 	for bone in skeleton.get_bone_count():
 		held_still = held_still and skeleton.get_bone_global_pose(bone).is_equal_approx(resting_pose[bone])
 	check(held_still, "The parked corpse holds every bone still across later physics frames")
-	var pre_breakup: Variant = zombie._mesh.get_instance_shader_parameter("fragment_travel")
-	check(pre_breakup == null or is_zero_approx(float(pre_breakup)),
-		"The parked corpse does not separate before the dissolve")
-	while is_instance_valid(zombie) and zombie._corpse_age < 4.74:
-		await physics_frame
-	var travel: Variant = zombie._mesh.get_instance_shader_parameter("fragment_travel")
-	check(travel != null and float(travel) > 0.0,
-		"The source body parts move during the dissolve")
-	var directions: Variant = zombie._mesh.material_override.get_shader_parameter("fragment_directions")
-	check(directions is PackedVector3Array and directions.size() == zombie._mesh.skin.get_bind_count()
-		and directions[2].distance_to(directions[15]) > 0.05
-		and directions[15].is_equal_approx(directions[18]),
-		"Source head and legs separate while the mouth follows the head")
 	while is_instance_valid(zombie) and zombie._corpse_age < 4.96:
 		await physics_frame
 	check(is_instance_valid(zombie), "Corpse remains until the table's five-second lifespan")
 	if is_instance_valid(zombie):
 		check(not zombie.ragdoll.running and zombie.ragdoll.bodies.is_empty() and zombie.ragdoll.source_joint_rids.is_empty(),
 			"A grounded, settled corpse releases its physics bodies and joints before despawn")
-		var dissolve: float = zombie._mesh.get_instance_shader_parameter("dissolve")
-		check(zombie._mesh.is_visible_in_tree() and dissolve > 0.0 and dissolve < 1.0,
-			"The retained corpse mesh still dissolves after physics is released")
+		var travel: Variant = zombie._mesh.get_instance_shader_parameter("fragment_travel")
+		var dissolve: Variant = zombie._mesh.get_instance_shader_parameter("dissolve")
+		check(zombie._mesh.is_visible_in_tree() and (travel == null or is_zero_approx(float(travel)))
+			and (dissolve == null or is_zero_approx(float(dissolve))),
+			"The settled corpse stays whole and solid until cleanup")
 		var pose_preserved := last_physical_pose.size() == skeleton.get_bone_count()
 		for bone in last_physical_pose.size():
 			pose_preserved = pose_preserved and skeleton.get_bone_global_pose(bone).is_equal_approx(last_physical_pose[bone])
 		check(pose_preserved, "Releasing physics retains the last rendered pose, including utility bones")
 	await ticks(6)
-	check(not is_instance_valid(zombie), "Corpse is released after its breakup")
+	check(not is_instance_valid(zombie), "The intact corpse is released at the end of its lifetime")
 	for slot in 3:
 		await check_combo_finisher(lab, group, slot)
 	await check_sabre_landing_reversal(lab, group)
@@ -191,7 +180,6 @@ func run() -> void:
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	await check_fresh_spawn_handoff(lab, group, 0)
 	await check_fresh_spawn_handoff(lab, group, 1)
-	await check_independent_corpse_breakup(lab, group)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
@@ -216,35 +204,6 @@ func check_fresh_spawn_handoff(lab, group, living_ticks: int) -> void:
 	print("FRESH_ZOMBIE_HANDOFF samples=", living_ticks, " active=", zombie.ragdoll.running,
 		" age=", zombie._corpse_age, " pose_gap_m=", zombie.ragdoll.handoff_error)
 	zombie.free()
-
-func check_independent_corpse_breakup(lab, group) -> void:
-	lab.reset_player()
-	lab.get_node("HUD/SpawnZombie").pressed.emit()
-	var first = group.get_child(0)
-	first.take_hit(100, Vector3.RIGHT)
-	await ticks(12)
-	lab.get_node("HUD/SpawnZombie").pressed.emit()
-	var second = group.get_child(1)
-	second.rotation.y += PI * 0.5
-	second.take_hit(100, Vector3.FORWARD)
-	while first._corpse_age < 4.65:
-		await physics_frame
-	var first_material := first._mesh.material_override as ShaderMaterial
-	var first_directions: Variant = first_material.get_shader_parameter("fragment_directions")
-	while second._corpse_age < 4.63:
-		await physics_frame
-	var second_material := second._mesh.material_override as ShaderMaterial
-	var second_directions: Variant = second_material.get_shader_parameter("fragment_directions")
-	check(first._corpse_parked and second._corpse_parked and first._corpse_fragment_directions_ready
-		and second._corpse_fragment_directions_ready and first_directions is PackedVector3Array
-		and second_directions is PackedVector3Array and first_directions != second_directions,
-		"Two settled corpses compute different breakup directions from their own poses")
-	check(first_material.get_shader_parameter("fragment_directions") == first_directions,
-		"A second corpse starting to dissolve does not change the first corpse's fragment directions")
-	print("CORPSE_BREAKUP_ISOLATION same_material=", first_material == second_material,
-		" first_retained=", first_material.get_shader_parameter("fragment_directions") == first_directions)
-	first.free()
-	second.free()
 
 func check_combo_finisher(lab, group, slot: int) -> void:
 	lab.reset_player()
