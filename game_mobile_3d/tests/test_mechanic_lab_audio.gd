@@ -468,6 +468,25 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	lab._on_zombie_step(near)
 	check(audio._next_choice.get(&"zombie_step", -1) == (before_overflow + 3) % step_samples.size(),
 		"A muted foot contact starts no sample")
+	toggle.button_pressed = true
+	audio.reset()
+	var origin: Vector3 = lab.player.global_position
+	var selected_distances: Array[float] = [2.0, 4.0, 6.0]
+	for distance: float in [10.0, 8.0, 6.0, 4.0, 2.0]:
+		lab._on_zombie_step(origin + Vector3.FORWARD * distance)
+	# A closer contact on another collider must not crowd out grass steps.
+	lab._on_zombie_step(origin + Vector3.UP * 2.0)
+	await process_frame
+	await process_frame
+	var played_distances: Array[float] = []
+	for voice in voices:
+		if voice.stream in step_samples:
+			played_distances.append(absf(voice.global_position.z - origin.z))
+	played_distances.sort()
+	check(played_distances == selected_distances,
+		"Same-tick step overflow selects the nearest supported contacts")
+	toggle.button_pressed = false
+	await create_timer(0.1).timeout
 	print("MECHANIC_LAB_ZOMBIE_STEP_AUDIO phases=", phases, " peak=", peak)
 	lab.free()
 
