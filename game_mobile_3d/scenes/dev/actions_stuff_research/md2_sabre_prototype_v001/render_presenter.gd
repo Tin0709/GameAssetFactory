@@ -22,10 +22,10 @@ var last_uploaded_actor:=Vector3.ZERO
 var mesh_followers: Dictionary[int, RID] = {}
 var attached_meshes: Dictionary[int, int] = {}
 
-func track_bone_mesh(mesh: MeshInstance3D, socket: BoneAttachment3D) -> void:
+func track_bone_mesh(mesh: MeshInstance3D, socket: BoneAttachment3D, pivot := Vector3.ZERO) -> void:
 	attached_meshes[meshes.size()] = socket.bone_idx
 	meshes.append(mesh)
-	bindings.append({"skin": null, "bone": socket.bone_idx, "offset": mesh.transform})
+	bindings.append({"skin": null, "bone": socket.bone_idx, "pivot": pivot})
 	reset_history()
 
 func add_mesh_follower(source: MeshInstance3D, follower: MeshInstance3D) -> void:
@@ -120,8 +120,12 @@ func prepare(alpha:float)->void:
 	for index in meshes.size():
 		var record:Dictionary=bindings[index]
 		if attached_meshes.has(index):
-			var offset: Transform3D = previous.offsets[index]
-			display_meshes.append(Transform3D(display_world[record.bone]) * offset.interpolate_with(current.offsets[index], render_alpha))
+			var before: Transform3D = previous.offsets[index]
+			var after: Transform3D = current.offsets[index]
+			var offset := before.interpolate_with(after, render_alpha)
+			var pivot: Vector3 = record.pivot
+			offset.origin = (before * pivot).lerp(after * pivot, render_alpha) - offset.basis * pivot
+			display_meshes.append(Transform3D(display_world[record.bone]) * offset)
 		else:
 			display_meshes.append(display_world[record.bone]*Transform3D(record.offset) if record.bone>=0 else Transform3D(previous.meshes[index]).interpolate_with(current.meshes[index],render_alpha))
 

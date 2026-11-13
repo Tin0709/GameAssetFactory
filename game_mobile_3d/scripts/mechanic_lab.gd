@@ -420,7 +420,7 @@ func _load_crossbow(root: String) -> bool:
 	if _crossbow_locomotion.is_empty():
 		return false
 	var socket := player._weapon_attachment as BoneAttachment3D
-	_crossbow_mount = _mount_weapon(mesh, socket, "LabCrossbow", CrossPollinator.grip_transform(socket.basis))
+	_crossbow_mount = _mount_weapon(mesh, socket, "LabCrossbow", CrossPollinator.grip_transform(socket.basis), CrossPollinator.GRIP)
 	player.crossbow_mount = _crossbow_mount
 	_crossbow_profile = profile
 	_crossbow = CrossPollinator.new()
@@ -463,14 +463,14 @@ func _mount_gauntlet(mesh: Mesh, left: bool) -> MeshInstance3D:
 	var mesh_name := "LabLeftGauntlet" if left else "LabRightGauntlet"
 	return _mount_weapon(Gauntlets.with_edge_color(mesh, color), socket, mesh_name, Gauntlets.mount_transform(left))
 
-func _mount_weapon(mesh: Mesh, socket: BoneAttachment3D, mesh_name: String, offset: Transform3D) -> MeshInstance3D:
+func _mount_weapon(mesh: Mesh, socket: BoneAttachment3D, mesh_name: String, offset: Transform3D, pivot := Vector3.ZERO) -> MeshInstance3D:
 	var mount := MeshInstance3D.new()
 	mount.name = mesh_name
 	mount.mesh = mesh
 	mount.transform = offset
 	mount.hide()
 	socket.add_child(mount)
-	player.render_presenter.track_bone_mesh(mount, socket)
+	player.render_presenter.track_bone_mesh(mount, socket, pivot)
 	return mount
 
 func _set_crossbow_ammo(amount: int) -> void:
