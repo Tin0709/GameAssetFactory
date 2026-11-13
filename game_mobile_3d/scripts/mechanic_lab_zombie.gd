@@ -172,6 +172,7 @@ var _corpse_floor: CollisionShape3D
 static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
 static var _corpse_base_material: ShaderMaterial
+static var _live_capsule: CapsuleShape3D
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D],
 		serial: int, ragdoll_layout: Dictionary = {}, corpse_floor: CollisionShape3D = null,
@@ -192,12 +193,13 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 	_feedback.health_bars = health_bars
 	_feedback.damage_numbers = damage_numbers
 	add_child(_feedback)
-	var capsule := CapsuleShape3D.new()
-	capsule.radius = 0.43
-	capsule.height = HEIGHT
+	if _live_capsule == null:
+		_live_capsule = CapsuleShape3D.new()
+		_live_capsule.radius = 0.43
+		_live_capsule.height = HEIGHT
 	var collision := CollisionShape3D.new()
 	collision.position.y = HEIGHT * 0.5
-	collision.shape = capsule
+	collision.shape = _live_capsule
 	add_child(collision)
 	collision_layer = 4
 	collision_mask = 1 | 2 | 4

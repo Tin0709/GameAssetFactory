@@ -6,6 +6,12 @@ var _source_joint_biases: Dictionary[RID, float]
 
 static var _handoff_bounds_shape: BoxShape3D
 static var _handoff_bounds_query: PhysicsShapeQueryParameters3D
+static var _body_shapes: Dictionary[Vector3, BoxShape3D]
+
+func _make_body_shape(size: Vector3) -> BoxShape3D:
+	if not _body_shapes.has(size):
+		_body_shapes[size] = super._make_body_shape(size)
+	return _body_shapes[size]
 
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
 		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}) -> void:

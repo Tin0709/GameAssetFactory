@@ -117,10 +117,7 @@ func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionar
 		body.linear_damp_mode = PhysicalBone3D.DAMP_MODE_REPLACE
 		body.angular_damp_mode = PhysicalBone3D.DAMP_MODE_REPLACE
 		var collider := CollisionShape3D.new()
-		var shape := BoxShape3D.new()
-		shape.size = part[2]
-		shape.custom_solver_bias = 0.6 # Stronger contact recovery for the new fast launches.
-		collider.shape = shape
+		collider.shape = _make_body_shape(part[2])
 		body.add_child(collider)
 		simulator.add_child(body)
 		PhysicsServer3D.body_set_enable_continuous_collision_detection(body.get_rid(), true)
@@ -129,6 +126,12 @@ func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionar
 			# Utility carrier supports the torso: use finite torso-like inertia, not a tiny hinge.
 			PhysicsServer3D.body_set_param(body.get_rid(), PhysicsServer3D.BODY_PARAM_INERTIA, Vector3(0.6, 0.4, 0.6))
 		bodies[part[0]] = body
+
+func _make_body_shape(size: Vector3) -> BoxShape3D:
+	var shape := BoxShape3D.new()
+	shape.size = size
+	shape.custom_solver_bias = 0.6 # Stronger contact recovery for the new fast launches.
+	return shape
 
 func sample(delta: float) -> void:
 	previous = current.duplicate()
