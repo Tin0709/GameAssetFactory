@@ -16,7 +16,7 @@ var _position := Vector3.INF
 var _slots := Vector3.INF
 var _samples: PackedVector3Array
 
-func setup(level: Node3D, base_path: String) -> void:
+func setup(level: Node3D, base_path: String, warm_cache: bool = false) -> void:
 	var air = level.showcase.directional_air
 	if not air.available():
 		return
@@ -33,6 +33,9 @@ func setup(level: Node3D, base_path: String) -> void:
 	_decode = proof.decode_scale
 	_folder = folder
 	_proof = proof
+	# Default-on maps validate and read the field while loading, before movement.
+	if warm_cache:
+		_load()
 
 func available() -> bool:
 	return not _proof.is_empty()

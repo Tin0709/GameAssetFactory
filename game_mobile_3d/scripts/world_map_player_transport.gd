@@ -30,7 +30,7 @@ func setup(world:Node3D)->void:
   cache=load(PATH)
   cache_ready=cache.get_meta("scope","")=="Original GAF actor incident field; not MD2 radiance" and cache.get_meta("source_runtime_sha256","")==FileAccess.get_sha256(level.DATA) and context_matches() and field.initialize(cache)
   if cache_ready:source_field.prepare(field)
-  if cache_ready:phase_bounce.setup(level,PATH)
+  if cache_ready:phase_bounce.setup(level,PATH,level.showcase._lighting_scale(&"player_bounce")>0.)
  refresh(true)
 func context_matches()->bool:
  if cache==null or level.get("terrain_light")==null or not level.terrain_light.installed:return false
