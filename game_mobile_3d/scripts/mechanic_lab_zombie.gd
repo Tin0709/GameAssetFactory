@@ -691,7 +691,8 @@ func _set_corpse_fragment_directions() -> void:
 		return
 	var skeleton := ragdoll.skeleton
 	var core := skeleton.find_bone(&"J_Shoulders")
-	if core < 0:
+	var head := skeleton.find_bone(&"J_Head")
+	if core < 0 or head < 0:
 		return
 	var centre := skeleton.global_transform * skeleton.get_bone_global_pose(core).origin
 	var world_to_mesh := _mesh.global_basis.inverse()
@@ -706,6 +707,9 @@ func _set_corpse_fragment_directions() -> void:
 			continue
 		# The eyes and mouth share the head's displacement.
 		while bone != core and skeleton.get_bone_name(bone) not in RAGDOLL_BONES.values():
+			if skeleton.get_bone_name(bone) == &"J_Neck":
+				bone = head
+				break
 			bone = skeleton.get_bone_parent(bone)
 			if bone < 0:
 				break
