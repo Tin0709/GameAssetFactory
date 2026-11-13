@@ -206,7 +206,8 @@ func _refresh_stone_diffuse() -> void:
 	if stone_diffuse_available() and is_active() and review.forest_active() \
 			and not review._balanced_preview and review.atmosphere_review == "combined" \
 			and level.view_mode == "gameplay" and level.look.terrain_review == "combined":
-		strength = review._lighting_scale(&"stone_diffuse_contrast")
+		# Both controls address the same irradiance term. Keep the stronger setting.
+		strength = maxf(review._lighting_scale(&"stone_diffuse_contrast"), review.stone_day_face_fill_weight())
 		if strength > 0.0 and stone_diffuse_texture == null:
 			stone_diffuse_texture = _regional_sky.load_stone_diffuse_texture()
 			if stone_diffuse_texture == null:
