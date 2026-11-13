@@ -31,7 +31,7 @@ const BOLT_MESH_SCALE := 0.7
 const TRAIL_SHADER := preload("res://materials/mechanic_lab_polaris_trail.gdshader")
 const TRAIL_LIFETIME := 0.30
 const TRAIL_WIDTH := 0.08
-const TRAIL_WIDTH_END_AGE := 0.60 * TRAIL_LIFETIME
+const TRAIL_FADE_END_AGE := 0.60 * TRAIL_LIFETIME
 const TRAIL_SAMPLE_SECONDS := 1.0 / 60.0
 # BP_ArrowProp uses the same source mesh, scaled to 0.6 with a -6 cm offset.
 const EMBEDDED_SCALE := 0.6
@@ -266,7 +266,7 @@ func _update_trails() -> void:
 		if age >= TRAIL_LIFETIME:
 			_trails.remove_at(index)
 			continue
-		var duration := minf(float(trail.distance) / BOLT_SPEED, TRAIL_WIDTH_END_AGE - age)
+		var duration := minf(float(trail.distance) / BOLT_SPEED, TRAIL_FADE_END_AGE - age)
 		if camera == null or duration <= 0.00001:
 			continue
 		var direction: Vector3 = trail.direction
@@ -280,13 +280,13 @@ func _update_trails() -> void:
 			has_surface = true
 		var previous_point := to_local_space * head
 		var lateral := to_local_space.basis * sideways
-		var previous_width := _trail_half_width(age / TRAIL_LIFETIME)
-		var previous_alpha := 1.0 - 0.5 * age / TRAIL_LIFETIME
+		var previous_width := TRAIL_WIDTH * 0.5 * (1.0 - 0.5 * age / TRAIL_LIFETIME)
+		var previous_alpha := _trail_opacity(age / TRAIL_LIFETIME)
 		for sample in range(1, segments + 1):
 			var seconds_back := duration * float(sample) / segments
 			var normalized_age := (age + seconds_back) / TRAIL_LIFETIME
-			var width := _trail_half_width(normalized_age)
-			var opacity := 1.0 - 0.5 * normalized_age
+			var width := TRAIL_WIDTH * 0.5 * (1.0 - 0.5 * normalized_age)
+			var opacity := _trail_opacity(normalized_age)
 			var point := to_local_space * (head - direction * BOLT_SPEED * seconds_back)
 			var near_left := previous_point - lateral * previous_width
 			var near_right := previous_point + lateral * previous_width
@@ -309,9 +309,9 @@ func _add_trail_vertex(point: Vector3, opacity: float) -> void:
 	_trail_mesh.surface_set_color(Color(1.0, 1.0, 1.0, opacity))
 	_trail_mesh.surface_add_vertex(point)
 
-static func _trail_half_width(normalized_age: float) -> float:
-	# The two line segments reproduce the cooked width LUT.
-	return TRAIL_WIDTH * 0.5 * maxf(0.0, maxf(1.0 - 4.0 * normalized_age, 0.3 - 0.5 * normalized_age))
+static func _trail_opacity(normalized_age: float) -> float:
+	# The two line segments reproduce the cooked opacity LUT.
+	return maxf(0.0, maxf(1.0 - 4.0 * normalized_age, 0.3 - 0.5 * normalized_age))
 
 func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
 	var collider := hit.collider as StaticBody3D
