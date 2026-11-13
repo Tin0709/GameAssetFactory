@@ -113,9 +113,47 @@ func check_wall_handoff() -> void:
 	wall.free()
 	lab.free()
 
+func check_edge_landing_gravity() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var group := lab.get_node("Zombies")
+	check(group.get_child_count() == 1, "A source zombie is available for the floor-edge replay")
+	if group.get_child_count() != 1:
+		lab.free()
+		return
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(45.0, 0.02, 0.0)
+	zombie.animation.play(zombie.IDLE, 0.0)
+	zombie.animation.advance(0.0)
+	await ticks(2)
+	zombie.take_hit(100, Vector3.RIGHT)
+	zombie._update_death(1.0 / 60.0)
+	# Hold a captured pose close enough to the floor for the no-contact
+	# fallback, then translate every rigid part past the platform edge.
+	var y_offset: float = 0.008 - zombie.ragdoll.minimum_corner_y()
+	for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
+		body.global_position.y += y_offset
+	var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
+	var motion: Dictionary = zombie.ragdoll.contact_motion()
+	motion.supports = 0
+	zombie._landing_age = 0.0
+	zombie._update_landing_forces(0.2, false, false, motion)
+	check(is_equal_approx(head.gravity_scale, 1.0), "A near-floor pose above the platform retains landing gravity")
+	for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
+		body.global_position.x += 8.0
+	zombie._update_landing_forces(1.0 / 60.0, false, false, motion)
+	check(is_equal_approx(head.gravity_scale, zombie._gravity_scale(zombie.ZOMBIE_GRAVITY)),
+		"A corpse entirely beyond the floor edge returns to flight gravity")
+	print("LAB_EDGE_GRAVITY scale=", head.gravity_scale)
+	lab.free()
+
 func run() -> void:
 	await run_case(true)
 	await run_case(false)
 	await check_wall_handoff()
+	await check_edge_landing_gravity()
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)

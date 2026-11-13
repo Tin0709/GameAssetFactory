@@ -567,10 +567,7 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var flat_floor := is_instance_valid(_corpse_floor) and not _corpse_floor.disabled
 	if not supported and flat_floor:
 		# The solver can omit contact for a frame while rolling close to the floor.
-		var box := _corpse_floor.shape as BoxShape3D
-		if box != null:
-			var floor_top := (_corpse_floor.global_transform * (Vector3.UP * box.size.y * 0.5)).y
-			supported = absf(ragdoll.minimum_corner_y() - floor_top) <= DEATH_FLOOR_CONTACT_MARGIN
+		supported = ragdoll.is_near_flat_floor(DEATH_FLOOR_CONTACT_MARGIN)
 	var flat_sabre_finisher := flat_floor and sabre_finisher
 	# The flat floor can support the roll immediately. Keep the extra
 	# gravity hold for the finisher's bank and ledge contacts.
