@@ -247,8 +247,10 @@ func crossbow_impact(point: Vector3) -> void:
 		_play(&"crossbow_hit", point, HIT_GAIN_DB)
 
 func crossbow_flight(bolt: Node3D) -> void:
-	if not enabled:
+	if not enabled or not _groups.has(&"crossbow_flight"):
 		return
+	if _voices.size() == FLIGHT_POOL * VOICES_PER_POOL:
+		_create_voices(VOICES_PER_POOL)
 	var voice := _play(&"crossbow_flight", bolt.global_position, FLIGHT_GAIN_DB)
 	if voice != null:
 		_flight_targets[voice] = bolt
@@ -256,7 +258,7 @@ func crossbow_flight(bolt: Node3D) -> void:
 
 func _process(_delta: float) -> void:
 	for voice: AudioStreamPlayer3D in _flight_targets.keys():
-		var bolt := _flight_targets[voice]
+		var bolt: Variant = _flight_targets[voice]
 		if not is_instance_valid(bolt) or bolt.is_queued_for_deletion() or not voice.playing:
 			voice.stop()
 			_flight_targets.erase(voice)
@@ -364,7 +366,7 @@ func _load_audio() -> void:
 	_player_hurt_voice.name = "PlayerHurt"
 	_player_hurt_voice.volume_db = PLAYER_HURT_GAIN_DB
 	add_child(_player_hurt_voice)
-	_create_voices(_next_voice.size() * VOICES_PER_POOL)
+	_create_voices(FLIGHT_POOL * VOICES_PER_POOL)
 	for i in HIT_HASHES.size():
 		_load_sample(root, &"hit", SABRE % (i + 1), HIT_HASHES[i])
 	for i in SWORD_HIT_HASHES.size():
