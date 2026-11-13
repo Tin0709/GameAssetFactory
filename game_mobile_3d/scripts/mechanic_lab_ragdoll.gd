@@ -349,7 +349,7 @@ func _project_source_anchors() -> void:
 			var shift := _wall_anchor_motion(state, gap, not is_arm or not first_contact, is_arm)
 			if not is_arm and shift.is_zero_approx():
 				# The head can still be moving inward while the wall pins its
-				# anchor. Confirm the block before moving the free torso.
+				# anchor. Confirm the block and follow the torso's retreat.
 				shift = _wall_anchor_motion(state, gap, false)
 				if not shift.is_zero_approx() and chest_state.linear_velocity.dot(shift) > 0.0:
 					var toward_anchor := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
