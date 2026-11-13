@@ -136,7 +136,7 @@ func refresh() -> void:
 	if receiver != applied_pre_twilight:
 		applied_pre_twilight = receiver
 		RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", receiver)
-	if strength > 0. and _published_camera != _camera.global_position:
+	if (strength > 0. or receiver > 0.) and _published_camera != _camera.global_position:
 		_published_camera = _camera.global_position
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_camera", _published_camera)
 

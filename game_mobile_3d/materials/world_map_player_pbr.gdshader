@@ -81,7 +81,7 @@ void fragment(){
 				// Retint only the diffuse sky contribution. The probe's sun bounce and reflection are separate.
 				vec3 sky = player_cube_sky(wn, height, actor_canopy_sky);
 				vec3 diffuse_sky = gaf_canopy_diffuse_color(sky, actor_canopy_sky, actor_canopy_color_mix);
-				incident += gaf_pre_twilight_diffuse(diffuse_sky) - sky;
+				incident += gaf_pre_twilight_diffuse(diffuse_sky, CAMERA_POSITION_WORLD) - sky;
 			}
 			EMISSION+=ALBEDO*(1.-METALLIC)*incident*visible_sky;
 			AO=0.; // Replace engine diffuse sky instead of stacking two ambient terms.

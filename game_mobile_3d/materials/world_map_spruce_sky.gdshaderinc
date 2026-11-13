@@ -28,8 +28,8 @@ float gaf_ground_canopy_sky(float current) {
 	return mix(current, 1.0, gaf_canopy_edge_fill * (1.0 - smoothstep(0.18, 0.60, cover)));
 }
 
-vec3 gaf_pre_twilight_diffuse(vec3 rgb) {
-	if (gaf_pre_twilight_receiver <= 0.0) return rgb;
+vec3 gaf_pre_twilight_diffuse(vec3 rgb, vec3 camera_position) {
+	if (gaf_pre_twilight_receiver <= 0.0 || distance(camera_position, gaf_spruce_sky_camera) > .01) return rgb;
 	const vec3 luma = vec3(.2126, .7152, .0722);
 	// Original chroma adjustment at fixed incident luminance.
 	vec3 target = rgb * vec3(1.15, 1.0, 1.20);
