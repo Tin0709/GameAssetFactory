@@ -44,7 +44,8 @@ func _build(surfaces: Array[Array], presenter: Node) -> void:
 		counts[row[0]] = counts.get(row[0], 0) + 1
 	for row: Array in surfaces:
 		var source: MeshInstance3D = row[0]
-		if counts[source] != source.mesh.get_surface_count():
+		# Only reproduce meshes covered by the same render-pose snapshots.
+		if counts[source] != source.mesh.get_surface_count() or not presenter.meshes.has(source):
 			continue
 		var proxy: MeshInstance3D = copies.get(source)
 		if proxy == null:
