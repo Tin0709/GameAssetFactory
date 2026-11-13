@@ -56,13 +56,12 @@ func _process(delta: float) -> void:
 			_numbers.remove_at(i)
 		else:
 			glyph_count += number.text.length()
-	multimesh.visible_instance_count = mini(glyph_count, multimesh.instance_count)
 	if glyph_count == 0:
+		multimesh.visible_instance_count = 0
 		set_process(false)
 		return
 	if glyph_count > multimesh.instance_count:
 		multimesh.instance_count = nearest_po2(glyph_count)
-		multimesh.visible_instance_count = glyph_count
 	var camera := get_viewport().get_camera_3d()
 	var camera_side := camera.global_basis.x if camera != null else Vector3.RIGHT
 	var slot := 0
@@ -79,3 +78,4 @@ func _process(delta: float) -> void:
 			multimesh.set_instance_transform(slot, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * scale), to_local(origin)))
 			multimesh.set_instance_custom_data(slot, Color(number.text.unicode_at(i) - 48, alpha, 0.0, 0.0))
 			slot += 1
+	multimesh.visible_instance_count = glyph_count
