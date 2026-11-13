@@ -299,16 +299,20 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 	var previous := mount.to_global(CrossPollinator.GRIP)
 	var largest_step := 0.0
 	var idle_frames := 0
+	var idle_start := -1
 	for frame in 90:
 		await physics_frame
 		var grip := mount.to_global(CrossPollinator.GRIP)
 		if player.active_clip == "Idle":
+			if idle_start < 0:
+				idle_start = frame
 			largest_step = maxf(largest_step, previous.distance_to(grip))
 			idle_frames += 1
 			if idle_frames == 18:
 				break
 		previous = grip
-	check(idle_frames == 18 and largest_step < 0.095 and player.source_transition.incoming_weight == 1.0,
+	check(idle_start >= 0 and idle_start < 40 and idle_frames == 18
+		and largest_step < 0.095 and player.source_transition.incoming_weight == 1.0,
 		"The crossbow settles back to idle without snapping the grip")
 	equip(menu, 0)
 	lab.reset_player()

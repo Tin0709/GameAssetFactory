@@ -17,6 +17,8 @@ const AMMO_MAX := 25
 const AIM_RANGE := 7.5
 # RapidCrossbow_Unique1 base period, with HairtriggerUnique's +40% attack speed.
 const ATTACK_PERIOD := 0.2 / 1.4
+# At 18/30 s the source recoil has returned to its raised aim pose.
+const RECOIL_END := 18.0 / 30.0
 const RECHARGE_DELAY := 1.0
 const RECHARGE_PERIOD := 0.8
 const BOLT_SPEED := 35.0
@@ -58,7 +60,7 @@ static func load_bolt(actor: CharacterBody3D, root: String) -> Mesh:
 
 static func grip_transform() -> Transform3D:
 	# Fit the imported stock to the MD2 wrist once so the authored idle,
-	# carry and shot can each control the angle of the nỏ.
+	# carry and shot can each control the angle of the crossbow.
 	var basis := Basis(Vector3.RIGHT, PI) * Basis(Vector3.UP, -0.32)
 	return Transform3D(basis, -(basis * GRIP))
 
@@ -69,7 +71,7 @@ static func combat_profile(root: String) -> Dictionary:
 	result.additional_clips.append_array([attack, recovery])
 	var shot := Source.window(attack, recovery, 1.0, 1.0 / 120.0, 1.0 / 60.0, ATTACK_PERIOD)
 	shot.attack_duration = ATTACK_PERIOD
-	shot.recovery_duration = float(attack.duration) - ATTACK_PERIOD
+	shot.recovery_duration = RECOIL_END - ATTACK_PERIOD
 	# The source has one shot animation. Combo reuses that slot for every round.
 	result.windows = [shot, shot, shot]
 	return result
