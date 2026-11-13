@@ -11,7 +11,6 @@ render_mode diffuse_burley, depth_draw_always, cull_disabled;
 #include "res://materials/world_map_clouds.gdshaderinc"
 #include "res://materials/world_map_terrain_pbr.gdshaderinc"
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
-#include "res://materials/world_map_spruce_sky.gdshaderinc"
 #include "res://materials/world_map_regional_sky.gdshaderinc"
 #define GAF_TERRAIN_NIGHT_SKY
 #include "res://materials/world_map_terrain_transport.gdshaderinc"

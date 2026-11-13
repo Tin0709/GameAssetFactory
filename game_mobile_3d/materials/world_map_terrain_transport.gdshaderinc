@@ -1,5 +1,6 @@
 // Original baked GAF irradiance, terrain-only. No native source coefficients.
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
+#include "res://materials/world_map_spruce_sky.gdshaderinc"
 varying vec3 terrain_sky_light;
 varying float terrain_canopy_sky;
 #ifdef GAF_TERRAIN_NIGHT_SKY

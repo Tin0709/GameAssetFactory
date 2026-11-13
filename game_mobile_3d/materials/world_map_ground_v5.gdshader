@@ -13,7 +13,6 @@ render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
 #endif
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
-#include "res://materials/world_map_spruce_sky.gdshaderinc"
 #include "res://materials/world_map_regional_sky.gdshaderinc"
 #define GAF_TERRAIN_NIGHT_SKY
 #include "res://materials/world_map_terrain_transport.gdshaderinc"
