@@ -5,6 +5,7 @@ const DEEP_CONTACT_LIFT_FULL := 0.112
 const DEEP_CONTACT_SHARED_LIFT := 0.065
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_HANDOFF_CHEST_MAX_SHIFT := 0.03
+const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 
 var _sample_bone_ids: Dictionary[String, int]
 var _sample_body_offsets: Dictionary[String, Transform3D]
@@ -300,6 +301,7 @@ func _recover_early_floor_arm_gap() -> void:
 func _project_source_anchors() -> void:
 	super._project_source_anchors()
 	_recover_early_floor_arm_gap()
+	_recover_floor_blocked_hip()
 	if _wall_handoff_frame < 0 or Engine.get_physics_frames() - _wall_handoff_frame \
 			> roundi(WALL_HANDOFF_RECOVERY_SECONDS * Engine.physics_ticks_per_second):
 		return
@@ -341,6 +343,62 @@ func _project_source_anchors() -> void:
 			return
 	if not _test_projection_motion(chest, chest_state.transform, motion):
 		chest_state.transform = chest_state.transform.translated(motion)
+
+func _recover_floor_blocked_hip() -> void:
+	if not _limit_first_contact_stretch or floor_landing_blended or floor_impact_blend > 0.0 \
+			or not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return
+	var chest: PhysicalBone3D = bodies.Chest
+	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if chest_state == null or chest_state.get_contact_count() > 0:
+		return
+	var drop := 0.0
+	for name in ["Leg.L", "Leg.R"]:
+		var limb: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
+		if state == null or state.linear_velocity.y >= 0.0:
+			continue
+		var spec: Dictionary = source_joints[name]
+		var gap: Vector3 = (chest_state.transform * spec.parent_frame).origin \
+			- (state.transform * spec.child_frame).origin
+		if gap.y >= -EARLY_ROLL_ANCHOR_LIMIT or not _is_at_flat_floor(limb, state.transform):
+			continue
+		drop = maxf(drop, minf(-gap.y - SOURCE_ANCHOR_TOLERANCE, FIRST_FLOOR_CHEST_MAX_SHIFT))
+	if drop <= 0.0:
+		return
+
+	# The leg cannot move down any farther. Let the free torso close part of
+	# the gap only if it reduces the worst error across all five joints.
+	var motion := Vector3.DOWN * drop
+	var before := 0.0
+	var after := 0.0
+	for name: String in source_joint_rids:
+		var spec: Dictionary = source_joints[name]
+		var limb: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
+		if state == null or spec.parent != "Chest":
+			return
+		var gap: Vector3 = (chest_state.transform * spec.parent_frame).origin \
+			- (state.transform * spec.child_frame).origin
+		before = maxf(before, gap.length_squared())
+		after = maxf(after, (gap + motion).length_squared())
+	if after < before and not _test_projection_motion(chest, chest_state.transform, motion):
+		chest_state.transform = chest_state.transform.translated(motion)
+
+func _is_at_flat_floor(body: PhysicalBone3D, transform: Transform3D) -> bool:
+	var floor_box := _flat_floor.shape as BoxShape3D
+	var floor_pose := _flat_floor.global_transform
+	if floor_box == null or not floor_pose.basis.y.is_equal_approx(Vector3.UP) \
+			or not floor_pose.basis.get_scale().is_equal_approx(Vector3.ONE):
+		return false
+	var collider := body.get_child(0) as CollisionShape3D
+	var shape := collider.shape as BoxShape3D
+	var pose := floor_pose.affine_inverse() * transform * collider.transform
+	var bounds := pose * AABB(-shape.size * 0.5, shape.size)
+	var half := floor_box.size * 0.5
+	return bounds.position.y <= half.y + PROJECTION_COLLISION_MARGIN \
+		and bounds.position.x >= -half.x and bounds.end.x <= half.x \
+		and bounds.position.z >= -half.z and bounds.end.z <= half.z
 
 func _set_source_joint_bias(joint: RID, bias: float) -> void:
 	if _source_joint_biases.get(joint, -1.0) == bias:
