@@ -51,7 +51,7 @@ func check_sabre_dive(lab) -> void:
 	var landings: Array[int] = []
 	lab.player.heavy_jump_landed.connect(func(_point, _forward, _serial, _height):
 		landings.append(Engine.get_physics_frames()))
-	for attempt in 2:
+	for attempt in 3:
 		lab.reset_player()
 		for i in 8:
 			await physics_frame
@@ -75,16 +75,31 @@ func check_sabre_dive(lab) -> void:
 		if landings.size() != attempt + 1:
 			return
 		check(lab._shake_duration == 0.0, "Touchdown leaves the camera stable until the montage cue")
+		check(not lab._impact_light.visible and not lab.player.effects.particles.any(func(particle): return particle.life > 0.0),
+			"Sabre touchdown waits for the montage before showing the impact burst")
 		if attempt == 1:
 			lab.reset_player()
+		elif attempt == 2:
+			lab._on_player_hit(100)
 		var onset := -1
+		var flash_frame := -1
+		var burst_frame := -1
 		for i in 8:
 			await physics_frame
+			var frame := Engine.get_physics_frames() - 1
 			if lab._shake_duration > 0.0 and onset < 0:
-				onset = Engine.get_physics_frames() - 1
-		if attempt == 1:
-			check(onset < 0 and is_zero_approx(lab.camera.h_offset), "Reset discards a queued aerial shake")
-			return
+				onset = frame
+			if lab._impact_light.visible and flash_frame < 0:
+				flash_frame = frame
+			if burst_frame < 0 and lab.player.effects.particles.any(func(particle): return particle.life > 0.0):
+				burst_frame = frame
+		if attempt > 0:
+			check(onset < 0 and flash_frame < 0 and burst_frame < 0 and is_zero_approx(lab.camera.h_offset),
+				"Reset and defeat discard the queued aerial shake, flash and burst")
+			continue
+		var flash_delay := ceili(0.056890413 * Engine.physics_ticks_per_second)
+		check(flash_frame == landings[0] + flash_delay and burst_frame == flash_frame,
+			"The aerial light and sparks share the authored one-shot VFX key")
 		var delay := ceili(0.052268848 * Engine.physics_ticks_per_second)
 		check(onset == landings[0] + delay, "The Sabre camera pulse starts at its montage cue with no target")
 		lab._process(1.0 / 60.0)
@@ -92,4 +107,4 @@ func check_sabre_dive(lab) -> void:
 		for i in 15:
 			lab._process(1.0 / 60.0)
 		check(is_zero_approx(lab.camera.h_offset), "The pulse settles back to the original camera offset")
-		print("SABRE_DIVE_SHAKE touchdown=", landings[0], " onset=", onset)
+		print("SABRE_DIVE_SHAKE touchdown=", landings[0], " onset=", onset, " flash=", flash_frame, " burst=", burst_frame)
