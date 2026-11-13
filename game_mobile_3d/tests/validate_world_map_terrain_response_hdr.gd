@@ -16,7 +16,7 @@ func run():
  var node=MeshInstance3D.new();var quad=QuadMesh.new();quad.size=Vector2(2,2);node.mesh=quad;vp.add_child(node)
  var shader=Shader.new();shader.code="shader_type spatial;render_mode cull_disabled,ambient_light_disabled;
 "+FileAccess.get_file_as_string("res://materials/world_map_terrain_transport.gdshaderinc")+"
-uniform vec3 test_color=vec3(.3,.2,.1);uniform float test_contact=1.;uniform float test_metal=0.;void vertex(){terrain_sky_light=vec3(.1,.2,.3);terrain_sun_bounce=vec3(.2,.15,.1);}void fragment(){ALBEDO=vec3(0);EMISSION=terrain_indirect(test_color,test_metal,.8,.6,test_contact);}";
+uniform vec3 test_color=vec3(.3,.2,.1);uniform float test_contact=1.;uniform float test_metal=0.;void vertex(){terrain_sky_light=vec3(.1,.2,.3);terrain_sun_bounce=vec3(.2,.15,.1);}void fragment(){ALBEDO=vec3(0);EMISSION=terrain_indirect(test_color,test_metal,.8,.6,test_contact,1.0,CAMERA_POSITION_WORLD);}";
  var m=ShaderMaterial.new();m.shader=shader;node.material_override=m;m.set_shader_parameter("terrain_ambient_scale",.7);m.set_shader_parameter("terrain_key_radiance",Vector3(.3,.4,.5))
  var rows=[];var worst:=0.
  for enabled in [false,true]:
