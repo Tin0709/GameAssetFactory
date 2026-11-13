@@ -6,6 +6,8 @@ const DEEP_CONTACT_SHARED_LIFT := 0.065
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
+const WALL_ARM_HANDOFF_MAX_SHIFT := 0.06
+const WALL_ARM_HANDOFF_MIN_GAP := 3.5 * SOURCE_ANCHOR_TOLERANCE
 const WALL_NECK_BRACE_MIN_GAP := 2.5 * SOURCE_ANCHOR_TOLERANCE
 const WALL_NECK_LANDING_BLEND_END := 0.5
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
@@ -345,6 +347,7 @@ func _project_source_anchors() -> void:
 	# limb's projection, so check whether the chest has room to meet it.
 	var motion := Vector3.ZERO
 	var neck_wall := RID()
+	var handoff_arm: PhysicsDirectBodyState3D
 	var largest_gap := 2.0 * SOURCE_ANCHOR_TOLERANCE
 	var chest: PhysicalBone3D = bodies.Chest
 	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
@@ -418,12 +421,22 @@ func _project_source_anchors() -> void:
 		var distance := gap.length()
 		if not recent_handoff or distance <= largest_gap:
 			continue
-		var shift := _wall_anchor_motion(state, gap, false, name == "Arm.L" or name == "Arm.R")
+		var is_arm := name == "Arm.L" or name == "Arm.R"
+		var shift := _wall_anchor_motion(state, gap, false, is_arm)
 		if not shift.is_zero_approx():
 			largest_gap = distance
 			motion = shift
+			handoff_arm = state if is_arm and shift.length_squared() > WALL_CHEST_MAX_SHIFT ** 2 else null
 	if motion.is_zero_approx():
 		return
+	if handoff_arm != null and largest_gap > WALL_ARM_HANDOFF_MIN_GAP and chest_state.get_contact_count() > 0:
+		# A rebounding arm and chest on the same wall can need more room
+		# than the ordinary rebound correction. Check the whole retreat.
+		var wall := _shared_wall_contact(chest_state, handoff_arm, motion)
+		var extra_motion := motion.normalized() * WALL_ARM_HANDOFF_MAX_SHIFT
+		if wall.is_valid() and _wall_chest_shift_preserves_joints(gaps, largest_gap, extra_motion) \
+				and _reduce_chest_wall_overlap(chest, chest_state, extra_motion, wall):
+			return
 	var extended_arm_shift := motion.length_squared() > WALL_CHEST_MAX_SHIFT * WALL_CHEST_MAX_SHIFT + 0.000001
 	if _wall_chest_shift_preserves_joints(gaps, largest_gap, motion):
 		if not _test_projection_motion(chest, chest_state.transform, motion):
