@@ -580,7 +580,12 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1) ->
 			ATTACK_POOL:
 				slot = _replace_priority_slot(first, start, &"zombie_hit", group, frame)
 			0:
-				slot = start
+				if group == &"crossbow_hit" or group == &"crossbow_fire":
+					# An impact burst shares the weapon pool. Leave room for the
+					# local firing cue and let only the admitted impacts rotate.
+					slot = _replace_priority_slot(first, start, &"crossbow_fire", group, frame)
+				else:
+					slot = start
 		if slot == -1:
 			return null
 	var stream := _next_stream(group)
