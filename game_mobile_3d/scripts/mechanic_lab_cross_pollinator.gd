@@ -24,6 +24,9 @@ const RECOIL_END := 18.0 / 30.0
 const RECHARGE_DELAY := 1.0
 const RECHARGE_PERIOD := 0.8
 const BOLT_SPEED := 35.0
+# The live Polaris movement component sweeps a SphereComponent of 10 cm.
+const BOLT_RADIUS := 0.10
+const CONTACT_PROBE_DISTANCE := 0.0001
 const BOLT_LIFETIME := 5.0
 const WORLD_MASK := 1
 const BOLT_MASK := WORLD_MASK | 4
@@ -49,6 +52,7 @@ var ammo := AMMO_MAX
 var bolt_mesh: Mesh
 var _recharge_remaining := 0.0
 var _bolts: Array[Dictionary] = []
+var _sweep_query := PhysicsShapeQueryParameters3D.new()
 
 static func icon() -> Texture2D:
 	return Source.icon(DIRECTORY, "T_UI_RapidCrossbow_Unique_Icon",
@@ -108,6 +112,9 @@ static func load_locomotion(actor: CharacterBody3D, root: String) -> Dictionary:
 	return {"clips": slots, "gait": gait}
 
 func _ready() -> void:
+	var sphere := SphereShape3D.new()
+	sphere.radius = BOLT_RADIUS
+	_sweep_query.shape = sphere
 	set_physics_process(false)
 
 func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vector3) -> bool:
@@ -117,9 +124,7 @@ func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vec
 	_recharge_remaining = RECHARGE_DELAY + RECHARGE_PERIOD
 	ammo_changed.emit(ammo)
 	shot_fired.emit(origin)
-	var clearance := PhysicsRayQueryParameters3D.create(clearance_start, origin, WORLD_MASK)
-	clearance.hit_from_inside = true
-	var obstruction := get_world_3d().direct_space_state.intersect_ray(clearance)
+	var obstruction := _sweep_bolt(get_world_3d().direct_space_state, clearance_start, origin, WORLD_MASK)
 	if not obstruction.is_empty():
 		bolt_impact.emit(obstruction, direction, serial)
 		set_physics_process(true)
@@ -159,9 +164,7 @@ func _physics_process(delta: float) -> void:
 		var node: MeshInstance3D = bolt.node
 		var start := node.global_position
 		var end := start + Vector3(bolt.direction) * BOLT_SPEED * minf(delta, bolt.life)
-		var query := PhysicsRayQueryParameters3D.create(start, end, BOLT_MASK)
-		query.hit_from_inside = true
-		var hit := space.intersect_ray(query)
+		var hit := _sweep_bolt(space, start, end, BOLT_MASK)
 		bolt.life -= delta
 		if not hit.is_empty() or bolt.life <= 0.000001:
 			_bolts.remove_at(index)
@@ -172,6 +175,25 @@ func _physics_process(delta: float) -> void:
 			node.global_position = end
 	if ammo == AMMO_MAX and _bolts.is_empty():
 		set_physics_process(false)
+
+func _sweep_bolt(space: PhysicsDirectSpaceState3D, start: Vector3, end: Vector3, mask: int) -> Dictionary:
+	_sweep_query.collision_mask = mask
+	_sweep_query.transform = Transform3D(Basis.IDENTITY, start)
+	_sweep_query.motion = Vector3.ZERO
+	# Motion casts ignore shapes already overlapping the sphere.
+	var hit := space.get_rest_info(_sweep_query)
+	if hit.is_empty():
+		var travel := end - start
+		_sweep_query.motion = travel
+		var fractions := space.cast_motion(_sweep_query)
+		# Probe just inside contact to obtain its collider and surface point.
+		_sweep_query.motion = Vector3.ZERO
+		_sweep_query.transform.origin = start + travel * fractions[1] + travel.normalized() * CONTACT_PROBE_DISTANCE
+		hit = space.get_rest_info(_sweep_query)
+	if not hit.is_empty():
+		hit.collider = instance_from_id(hit.collider_id)
+		hit.position = hit.point
+	return hit
 
 func _remove_bolt(bolt: MeshInstance3D) -> void:
 	bolt.hide()
