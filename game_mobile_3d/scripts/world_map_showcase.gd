@@ -83,7 +83,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"daylight_balance": ["Daylight color balance", 1.],
 	&"player_sky": ["Player sky fill", 2.],
 	&"player_bounce": ["Ánh nắng hắt lên nhân vật", 1.],
-	&"foot_contact": ["Player ground contact (preview)", 1.],
+	&"foot_contact": ["Bóng tiếp xúc dưới chân", 1.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"turf_ambient_color": ["Sắc ánh hắt trên cỏ lúc tối", 1.],
 	&"dawn_turf_ambient": ["Ánh hắt trên cỏ rạng sáng", 1.],
@@ -181,7 +181,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 102
+const LIGHTING_MIX_VERSION := 103
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -202,6 +202,7 @@ const BALANCED_ATMOSPHERE := {
 	&"exposure": .9,
 	&"player_sky": 1.25,
 	&"player_bounce": 0.,
+	&"foot_contact": 0.,
 	&"daylight_bounce": 0.,
 	&"grass_sky": 0.,
 	&"spruce_sky": 0.,
@@ -1205,7 +1206,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"sunlit_mist":
 		return .24
 	if effect == &"foot_contact":
-		return 0.
+		return .45
 	if effect == &"player_bounce":
 		return .5
 	if effect == &"player_sun_shoulder":
@@ -1592,7 +1593,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 30 and effect == &"sunlit_mist":
 			missing_value = 0.
-		if version < 31 and effect == &"foot_contact":
+		if version < 103 and effect == &"foot_contact":
 			missing_value = 0.
 		if version < 33 and effect == &"projected_sun":
 			missing_value = 0.
@@ -2459,7 +2460,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Try 24% in the forest at 16:30. Scatters sunlight through canopy gaps; fades to zero at noon and night." if slider.editable else "Requires the verified private canopy field and the Mobile renderer."
 		if effect == &"foot_contact":
 			slider.editable = player_contact.available()
-			slider.tooltip_text = "Soft indirect-light contact beneath each boot. Try 75% in the forest. Zero compares the prior look. Noon keeps its approved lighting."
+			slider.tooltip_text = "Bóng mềm trong ánh gián tiếp dưới từng chân. So 0% và 45% trên bậc đá lúc 07:00. Hiệu ứng giảm khi chân rời đất và tắt lúc 12:00."
 		if effect == &"forest_path_beam":
 			slider.tooltip_text = "Aim the fixed forest light downward across the path using the captured angular falloff. Set 0% to compare the previous beam."
 		if effect == &"forest_path_air":

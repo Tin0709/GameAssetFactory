@@ -36,7 +36,7 @@ const ITEMS := {
 	"daylight_balance": ["Daylight color balance", "Daylight color balance", "Làm sắc xanh trong bóng ban ngày dịu hơn ở chế độ Combined.", "So sánh 0% và 100% lúc 07:00 hoặc 16:30 ở cùng một góc."],
 	"player_sky": ["Player sky fill", "Player sky fill", "Chỉnh lượng ánh sáng bầu trời lấp vào mặt tối của nhân vật.", "Thử ngoài giờ Trưa, đứng yên dưới tán cây và nhìn mặt áo hoặc mặt khuất của kiếm."],
 	"player_bounce": ["Ánh nắng hắt lên nhân vật", "Ánh nắng hắt lên nhân vật", "Nền đất hắt một phần ánh nắng lên Valorie và Sabre. Sắc và độ mạnh thay đổi theo vị trí.", "Thử lúc 07:00 hoặc 16:30 ở lối rừng. Mặc định 50%, chọn 0% để so sánh."],
-	"foot_contact": ["Player ground contact (preview)", "Player ground contact (preview)", "Thêm vùng tối mềm ngay bên dưới mỗi bàn chân để nhân vật trông bám đất hơn.", "Thử 75% ngoài giờ Trưa và quan sát phần tiếp xúc giữa chân với lối đi."],
+	"foot_contact": ["Bóng tiếp xúc dưới chân", "Player ground contact", "Giảm nhẹ ánh gián tiếp ngay dưới từng đế giày để Valorie bám nền rõ hơn. Bóng mờ dần khi chân rời đất.", "So 0% và 45% trên bậc đá lúc 07:00. 12:00 giữ ánh sáng đã duyệt."],
 	"grass_sky": ["Grass sky fill", "Grass sky fill", "Cho cỏ nhận ánh sáng bầu trời dựa trên vùng đất ngay dưới gốc.", "So sánh 0% và 100% tại ranh giới giữa cỏ dưới tán và cỏ ngoài nắng."],
 	"grass_shade_color": ["Grass shade color", "Grass shade color", "Tạo sắc mát trên cỏ dưới tán cây trong Combined.", "Bật ánh sáng trời cho cỏ, thử ở Sáng hoặc Chiều và nhìn hai phía của mép bóng."],
 	"diffuse_openings": ["Sunlit diffuse fill", "Sunlit diffuse fill", "Thêm ánh sáng tản trên cỏ và đất ở khoảng trống có nắng.", "Thử 100% lúc 07:00 hoặc 16:30 với Combined và dữ liệu ánh sáng địa hình."],
