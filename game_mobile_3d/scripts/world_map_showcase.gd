@@ -168,6 +168,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"bloom_diffusion": ["Độ mềm bloom", 1.],
+	&"daylight_bloom_diffusion": ["Độ mềm bloom sáng / chiều", 1.],
 	&"night_soft_bloom": ["Ánh tán mềm ban đêm", 1.],
 	&"twilight_soft_bloom": ["Ánh tán mềm chạng vạng", 1.],
 	&"world_outline_strength": ["World Outline", 4.],
@@ -184,7 +185,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 111
+const LIGHTING_MIX_VERSION := 112
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1190,6 +1191,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .65
 	if effect == &"daylight_haze":
 		return .65
+	if effect == &"daylight_bloom_diffusion":
+		return .40
 	if effect == &"sun_opening":
 		return .75
 	if effect == &"twilight_shadow_color":
@@ -1316,6 +1319,13 @@ func local_exposure_mix_scale() -> float:
 		var scale := _lighting_scale(&"exposure")
 		return lerpf(1., scale, PHASE_FINISH.phase_weight(hour)) if _balanced_preview else scale
 	return 1.
+
+func daylight_bloom_diffusion_weight() -> float:
+	if _balanced_preview or not forest_active() or atmosphere_review != "combined":
+		return 0.
+	var morning := smoothstep(5.5, 7., hour) * (1. - smoothstep(7., 12., hour))
+	var afternoon := smoothstep(12., 16.5, hour) * (1. - smoothstep(16.5, 19., hour))
+	return _lighting_scale(&"daylight_bloom_diffusion") * (morning + afternoon)
 
 func local_exposure_shadow_lift() -> float:
 	if _balanced_preview:
@@ -1653,6 +1663,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 50 and effect == &"projected_sun_position":
 			missing_value = 0.
+		if version < 112 and effect == &"daylight_bloom_diffusion":
+			missing_value = 0.
 		if version < 51 and effect == &"bloom_diffusion":
 			missing_value = 0.
 		if version < 52 and effect == &"sculk_surface":
@@ -1892,7 +1904,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return # Terrain transport refreshes both receivers together.
 	if changed_effect in [&"night_soft_bloom", &"twilight_soft_bloom"] and level != null:
 		set_coupled_bloom(coupled_bloom)
-	if changed_effect in [&"night_soft_bloom", &"twilight_soft_bloom", &"bloom_diffusion", &"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
+	if changed_effect in [&"night_soft_bloom", &"twilight_soft_bloom", &"bloom_diffusion", &"daylight_bloom_diffusion", &"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return

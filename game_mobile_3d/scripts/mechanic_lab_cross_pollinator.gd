@@ -27,6 +27,12 @@ const BOLT_SPEED := 35.0
 # The live Polaris movement component sweeps a SphereComponent of 10 cm.
 const BOLT_RADIUS := 0.10
 const BOLT_MESH_SCALE := 0.7
+# BP_ArrowProp uses the same source mesh, scaled to 0.6 with a -6 cm offset.
+const EMBEDDED_SCALE := 0.6
+const EMBEDDED_OFFSET := 0.06
+const EMBEDDED_WOBBLE_SECONDS := 1.0
+const EMBEDDED_WOBBLE_SCALE := 10.0
+const EMBEDDED_CAPACITY := 24
 const CONTACT_PROBE_DISTANCE := 0.0001
 const BOLT_LIFETIME := 5.0
 const WORLD_MASK := 1
@@ -54,6 +60,8 @@ var bolt_mesh: Mesh
 var _recharge_remaining := 0.0
 var _bolts: Array[Dictionary] = []
 var _sweep_query := PhysicsShapeQueryParameters3D.new()
+var _embedded: MultiMesh
+var _embedded_arrows: Array[Dictionary] = []
 
 static func icon() -> Texture2D:
 	return Source.icon(DIRECTORY, "T_UI_RapidCrossbow_Unique_Icon",
@@ -116,6 +124,17 @@ func _ready() -> void:
 	var sphere := SphereShape3D.new()
 	sphere.radius = BOLT_RADIUS
 	_sweep_query.shape = sphere
+	if bolt_mesh != null:
+		_embedded = MultiMesh.new()
+		_embedded.transform_format = MultiMesh.TRANSFORM_3D
+		_embedded.mesh = bolt_mesh
+		_embedded.instance_count = EMBEDDED_CAPACITY
+		_embedded.visible_instance_count = 0
+		var renderer := MultiMeshInstance3D.new()
+		renderer.name = "EmbeddedArrows"
+		renderer.multimesh = _embedded
+		renderer.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(renderer)
 	set_physics_process(false)
 
 func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vector3) -> bool:
@@ -148,12 +167,17 @@ func reset() -> void:
 	for bolt: Dictionary in _bolts:
 		_remove_bolt(bolt.node)
 	_bolts.clear()
+	_embedded_arrows.clear()
+	if _embedded != null:
+		_embedded.visible_instance_count = 0
 	_recharge_remaining = 0.0
 	ammo = AMMO_MAX
 	ammo_changed.emit(ammo)
 	set_physics_process(false)
 
 func _physics_process(delta: float) -> void:
+	if not _embedded_arrows.is_empty():
+		_update_embedded_arrows(delta)
 	if ammo < AMMO_MAX:
 		_recharge_remaining -= delta
 		if _recharge_remaining <= 0.000001:
@@ -172,11 +196,39 @@ func _physics_process(delta: float) -> void:
 			_bolts.remove_at(index)
 			_remove_bolt(node)
 			if not hit.is_empty():
+				_embed_on_terrain(hit, bolt.direction)
 				bolt_impact.emit(hit, bolt.direction, bolt.serial)
 		else:
 			node.global_position = end
-	if ammo == AMMO_MAX and _bolts.is_empty():
+	if ammo == AMMO_MAX and _bolts.is_empty() and _embedded_arrows.is_empty():
 		set_physics_process(false)
+
+func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
+	var collider := hit.collider as StaticBody3D
+	if _embedded == null or collider == null or not collider.collision_layer & WORLD_MASK:
+		return
+	if _embedded_arrows.size() == EMBEDDED_CAPACITY:
+		_embedded_arrows.pop_front()
+	var up := Vector3.UP if absf(direction.y) < 0.999 else Vector3.FORWARD
+	var basis := Basis.looking_at(direction, up, true) * Basis(Vector3.UP, -PI * 0.5)
+	var pose := Transform3D(basis, Vector3(hit.position) - direction * EMBEDDED_OFFSET)
+	_embedded_arrows.append({"pose": global_transform.affine_inverse() * pose, "age": 0.0})
+
+func _update_embedded_arrows(delta: float) -> void:
+	for index in range(_embedded_arrows.size() - 1, -1, -1):
+		var arrow := _embedded_arrows[index]
+		arrow.age += delta
+		if arrow.age >= EMBEDDED_WOBBLE_SECONDS:
+			_embedded_arrows.remove_at(index)
+			continue
+		var pose: Transform3D = arrow.pose
+		var phase := float(arrow.age) / EMBEDDED_WOBBLE_SECONDS
+		# The native component supplies the duration and scale. This damped
+		# motion and one-second prop display are MechanicLab approximations.
+		var angle := deg_to_rad(EMBEDDED_WOBBLE_SCALE) * sin(TAU * 6.0 * phase) * pow(1.0 - phase, 2.0)
+		pose.basis = pose.basis * Basis(Vector3.UP, angle) * Basis.from_scale(Vector3.ONE * EMBEDDED_SCALE)
+		_embedded.set_instance_transform(index, pose)
+	_embedded.visible_instance_count = _embedded_arrows.size()
 
 func _sweep_bolt(space: PhysicsDirectSpaceState3D, start: Vector3, end: Vector3, mask: int) -> Dictionary:
 	_sweep_query.collision_mask = mask

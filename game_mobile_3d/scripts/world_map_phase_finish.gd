@@ -128,7 +128,9 @@ func refresh()->void:
  var shadow_color: float = showcase.shadow_color_detail_weight() if finish_scale > 0. else 0.
  effect.set_twilight_shadow_color(shadow_color)
  var soft_light := maxf(showcase.night_soft_bloom_weight(), showcase.twilight_soft_bloom_weight())
- var bloom_diffusion := maxf(showcase._lighting_scale(&"bloom_diffusion"), .35 * soft_light)
+ var manual: float = showcase._lighting_scale(&"bloom_diffusion")
+ var daylight: float = showcase.daylight_bloom_diffusion_weight()
+ var bloom_diffusion := maxf(maxf(manual, daylight), .35 * soft_light)
  effect.set_bloom_diffusion(.85 * bloom_diffusion * weight)
  _publish_humid_light(effect)
  env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=false
