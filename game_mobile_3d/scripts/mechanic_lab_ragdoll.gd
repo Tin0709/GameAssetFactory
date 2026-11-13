@@ -7,6 +7,7 @@ const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
 const WALL_NECK_BRACE_MIN_GAP := 2.5 * SOURCE_ANCHOR_TOLERANCE
+const WALL_NECK_LANDING_BLEND_END := 0.5
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
@@ -325,8 +326,11 @@ func _recover_early_floor_arm_gap() -> void:
 			_slide_supported_anchor(arm, state, gap, gap.length(), floor_body.get_rid())
 
 func _project_source_anchors() -> void:
-	var sabre_flight := _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0 \
+	var sabre_floor := _limit_first_contact_stretch and not floor_landing_blended \
 		and is_instance_valid(_flat_floor) and not _flat_floor.disabled
+	var sabre_flight := sabre_floor and floor_impact_blend <= 0.0
+	var early_wall_landing := sabre_floor and floor_impact_blend > 0.0 \
+		and floor_impact_blend <= WALL_NECK_LANDING_BLEND_END
 	if sabre_flight:
 		_recover_leading_head_wall_overlap()
 	super._project_source_anchors()
@@ -334,7 +338,7 @@ func _project_source_anchors() -> void:
 	_recover_floor_blocked_hip()
 	var recent_handoff := _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _wall_handoff_frame \
 		<= roundi(WALL_HANDOFF_RECOVERY_SECONDS * Engine.physics_ticks_per_second)
-	if not recent_handoff and not sabre_flight:
+	if not recent_handoff and not sabre_flight and not early_wall_landing:
 		return
 
 	# All five source joints share the chest. A side contact can block a
@@ -353,9 +357,15 @@ func _project_source_anchors() -> void:
 			and chest_state.get_contact_count() == 0
 		for name in ["Head", "Arm.L", "Arm.R"]:
 			var is_arm: bool = name != "Head"
+			# A wall can still pin the descending head during the first part
+			# of the floor roll. Only a free chest can follow it.
+			if early_wall_landing and (is_arm or chest_state.get_contact_count() > 0):
+				continue
 			var limb: PhysicalBone3D = bodies[name]
 			var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
 			if state == null or state.get_contact_count() == 0:
+				continue
+			if early_wall_landing and state.linear_velocity.y >= 0.0:
 				continue
 			var spec: Dictionary = source_joints[name]
 			var gap: Vector3 = (chest_state.transform * spec.parent_frame).origin \
@@ -364,6 +374,11 @@ func _project_source_anchors() -> void:
 			if distance <= largest_gap:
 				continue
 			var shift := _wall_anchor_motion(state, gap, not is_arm or not first_contact, is_arm)
+			if early_wall_landing and not shift.is_zero_approx():
+				var toward_anchor := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
+				if not _test_projection_motion(limb, state.transform, toward_anchor) \
+						or _projection_hit.get_collision_safe_fraction() > 0.0:
+					continue
 			var braced_neck := not is_arm and chest_state.get_contact_count() > 0
 			var wall := RID()
 			if braced_neck:
@@ -372,7 +387,7 @@ func _project_source_anchors() -> void:
 				wall = _shared_wall_contact(chest_state, state, shift)
 				if not wall.is_valid():
 					continue
-			elif not is_arm and shift.is_zero_approx():
+			elif sabre_flight and not is_arm and shift.is_zero_approx():
 				# The head can still be moving inward while the wall pins its
 				# anchor. Confirm the block and follow the torso's retreat.
 				shift = _wall_anchor_motion(state, gap, false)
