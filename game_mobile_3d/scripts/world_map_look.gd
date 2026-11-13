@@ -42,6 +42,7 @@ const BASE_CLOUD_SHAPE:=Vector4(13.,.50,.73,.20)
 const POCKET_CLOUD_SHAPE:=Vector4(1.35,.40,.65,.49)
 const DEEPER_POCKET_CLOUD_SHAPE := Vector4(1.35,.39,.56,.72)
 var level: Node3D
+var _flat_lab := false
 var motion=MOTION.new()
 var wind_materials: Array[ShaderMaterial]=[]
 var travelling_breeze := true
@@ -162,13 +163,43 @@ func setup(map: Node3D) -> void:
 		batch.extra_cull_margin=.65 if kind=="tall_grass" else .3
 	configure_path_materials()
 	refresh_vegetation_ground_detail()
+	_collect_actor_materials()
+	previous_position=level.player.position
+	set_stage(2)
+
+func setup_flat_lab(map: Node3D, ground: ShaderMaterial) -> void:
+	level = map
+	_flat_lab = true
+	var mobile := atmosphere_review_available()
+	level.get_node("WorldEnvironment").environment = PRESET.environment.duplicate()
+	var sun: DirectionalLight3D = level.get_node("Sun")
+	for property: String in PRESET.sun_settings:
+		sun.set(property, PRESET.sun_settings[property])
+	_shadow_review_requested = mobile
+	_atmosphere_requested = mobile
+	_direct_clouds_requested = foliage_light_available()
+	if mobile:
+		_day_finish_previous = {"palette": DayPalette.NONE}
+		_palette_requested = DayPalette.BALANCED
+	refresh_atmosphere()
+	_refresh_day_palette()
+	build_cloud_field()
+	ground.shader = _review_variant(PRESET.ground_shader, direct_clouds_active(), false)
+	ground.set_shader_parameter("clouds_enabled", true)
+	ground.set_shader_parameter("ground_grade", 1)
+	materials[&"grass_block"] = ground
+	_collect_actor_materials()
+	_apply_directional_shadow_review(sun)
+	_apply_daylight_pockets()
+	_apply_actor_materials(direct_clouds_active(), false)
+	set_local_exposure(mobile and level.showcase.private_primary)
+
+func _collect_actor_materials() -> void:
 	for node: Node in level.player.visual.find_children("*","MeshInstance3D",true,false):
 		for index in node.mesh.get_surface_count():
 			var native: Material=node.get_active_material(index)
 			if native is BaseMaterial3D:
 				actor_materials.append([node,index,node.get_surface_override_material(index),native.duplicate(),native.albedo_color])
-	previous_position=level.player.position
-	set_stage(2)
 
 func make_material(native: BaseMaterial3D,kind: String) -> ShaderMaterial:
 	var key: String=str(native.get_instance_id())+":"+kind
@@ -618,6 +649,11 @@ func _apply_review_shaders() -> void:
 			var strength := 0.2652 if leaves else (0.1248 if plant_kind == 0 else 0.1794)
 			material.set_shader_parameter("foliage_transmission", strength)
 	_apply_canopy_contact()
+	_apply_actor_materials(direct, actor_sky)
+	_bind_ground_radiance()
+	if level.get("terrain_light")!=null:level.terrain_light.bind(true)
+
+func _apply_actor_materials(direct: bool, actor_sky: bool) -> void:
 	if _private_player_material_scope():
 		_apply_player_materials(direct,actor_sky)
 	elif (direct or actor_sky) and _direct_actor_materials.is_empty():
@@ -633,8 +669,6 @@ func _apply_review_shaders() -> void:
 			item[0].set_surface_override_material(item[1],item[2])
 		else:
 			item[0].set_surface_override_material(item[1],adapter if (direct or actor_sky) else item[3])
-	_bind_ground_radiance()
-	if level.get("terrain_light")!=null:level.terrain_light.bind(true)
 
 func terrain_spatial_active()->bool:
 	return level.get("terrain_light")!=null and level.terrain_light.is_active()
@@ -672,7 +706,7 @@ func _apply_player_materials(direct:bool,sky:bool)->void:
 		var enabled:=player_adapter_enabled and stage==2 and player_material.available() and m!=null
 		if not enabled:
 			row[0].set_surface_override_material(row[1],row[2]);continue
-		var visible_sky:bool=sky and is_instance_valid(level.grove) and level.grove.is_visible_in_tree()
+		var visible_sky:bool=sky and not _flat_lab and is_instance_valid(level.grove) and level.grove.is_visible_in_tree()
 		m.shader=player_material.variant(row[3].transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,direct and player_cloud_enabled,visible_sky)
 		m.set_shader_parameter("albedo_tint",row[4])
 		var verified:bool=m.get_meta("verified_valorie",false) and player_effects_available()
@@ -787,7 +821,8 @@ func _apply_daylight_pockets() -> void:
 		_pockets_texture=ImageTexture.create_from_image(_pockets_image)
 	var texture:=_pockets_texture if pockets else cloud_texture
 	_publish_cloud_style(texture, _daylight_cloud_shape() if pockets else BASE_CLOUD_SHAPE)
-	refresh_grove_lighting()
+	if not _flat_lab:
+		refresh_grove_lighting()
 	if stage==2:
 		var sun: DirectionalLight3D=level.get_node("Sun")
 		sun.light_color=Color(1.,.963,.865) if pockets else PRESET.sun_settings.light_color
@@ -806,7 +841,7 @@ func refresh_daylight_cloud_shape() -> void:
 	if _cloud_shape == shape:
 		return
 	_publish_cloud_style(null, shape)
-	if level.grove != null and level.grove.visible:
+	if not _flat_lab and level.grove != null and level.grove.visible:
 		level.grove.publish_cloud_shape(shape)
 
 func _publish_cloud_style(texture: Texture2D, shape: Vector4) -> void:
@@ -821,7 +856,8 @@ func _publish_cloud_style(texture: Texture2D, shape: Vector4) -> void:
 				if texture != null:
 					material.set_shader_parameter("cloud_field",texture)
 				material.set_shader_parameter("cloud_shape",_cloud_shape)
-	level.geometry.update_cloud_style(texture,_cloud_shape)
+	if not _flat_lab:
+		level.geometry.update_cloud_style(texture,_cloud_shape)
 
 func set_grove_reveal_coverage(enabled: bool) -> void:
 	if enabled == grove_reveal_coverage_requested:
@@ -1006,6 +1042,11 @@ func _release_local_exposure() -> void:
 	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
 
 func _process(_delta: float) -> void:
+	if _flat_lab:
+		if _private_player_material_scope() and player_effects_available() != _player_effects_applied:
+			_apply_actor_materials(direct_clouds_active(), false)
+		_check_exposure()
+		return
 	if _private_player_material_scope() and player_effects_available()!=_player_effects_applied:
 		_apply_review_shaders()
 	if ground_bounce_active() != _ground_bounce_applied:
@@ -1018,6 +1059,9 @@ func _process(_delta: float) -> void:
 	if _palette_requested != DayPalette.NONE and stage == 2:
 		_refresh_day_palette()
 	if level.get("showcase")!=null:level.showcase.apply_time()
+	_check_exposure()
+
+func _check_exposure() -> void:
 	if _exposure_effect == null: return
 	if not is_instance_valid(_exposure_camera) or _exposure_camera.compositor != _exposure_compositor:
 		set_local_exposure(false)
@@ -1092,6 +1136,16 @@ func set_stage(value: int) -> void:
 	publish_clouds(cloud_clock)
 
 func _physics_process(delta: float) -> void:
+	if _flat_lab:
+		elapsed += delta
+		var time := level.presentation.wind_time(elapsed) as float
+		for material: ShaderMaterial in materials.values():
+			material.set_shader_parameter("cloud_time", time)
+		for material: ShaderMaterial in _direct_actor_materials:
+			if material != null:
+				material.set_shader_parameter("cloud_time", time)
+		cloud_clock = time
+		return
 	if not active or not is_instance_valid(level):return
 	var position: Vector3=level.player.global_position
 	if position.distance_to(previous_position)>2.0:motion=MOTION.new();motion.clock=elapsed
