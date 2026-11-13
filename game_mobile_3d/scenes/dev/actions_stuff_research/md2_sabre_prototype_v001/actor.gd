@@ -331,6 +331,9 @@ func _combat_entry(key:String)->bool:
 		if key==combo.native_windows[i].get("attack_key","Attack%d"%(i+1)):return true
 	return false
 
+func _combat_entry_blend(_key: String) -> float:
+	return float(combat_handoffs.blend_in_seconds)
+
 func _ground_graph_enabled()->bool:
 	return source_gait!=null and native_gait_enabled and not ground_graph.is_empty()
 
@@ -789,7 +792,7 @@ func _play(key:String,blend:float=.04)->void:
 			if _continuous_combat_segment(active_clip,key) or continuous_hybrid_jump:
 				_outgoing_locomotion_state.clear();source_transition.discard_raw()
 			elif _combat_entry(key):
-				_outgoing_locomotion_state.clear();source_transition.begin(float(combat_handoffs.blend_in_seconds))
+				_outgoing_locomotion_state.clear();source_transition.begin(_combat_entry_blend(key))
 			elif hybrid_jump_boundary:
 				_outgoing_locomotion_state.clear();source_transition.begin_evaluated(.10,Callable(),&"smoothstep")
 			elif _ground_graph_enabled() and _grounded and (idle_to_move or move_to_idle):

@@ -43,6 +43,13 @@ func _play(key: String, blend: float = 0.04) -> void:
 			return
 	super._play(key, blend)
 
+func _combat_entry_blend(key: String) -> float:
+	var seconds := super._combat_entry_blend(key)
+	if key == CrossPollinator.SHOT and active_clip in GAITS:
+		# Blend the running stride into the authored shot within one shot period.
+		return maxf(seconds, 0.10)
+	return seconds
+
 func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 	if key not in GAITS or (key not in LabLocomotion.WALKS and not weapon_source_locomotion):
 		return super._outgoing_locomotion_sampler(key, phase)
