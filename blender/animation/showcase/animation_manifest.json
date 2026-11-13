@@ -4638,6 +4638,148 @@
       "shoulder_overlap_m": 0.002,
       "approval_note": "Source-derived landing plus original translation-only shoulder attachment. Body/head/legs and arm swing preserved. Private linked research; no Godot integration.",
       "playback_sync": "FRAME_DROP"
+    },
+    {
+      "action": "Sneak_Enter_ActionsStuff_113_Source_RESEARCH",
+      "source_rig": "Showcase_Player_Rig",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBShowcase_Player_Rig",
+      "action_sha256": "426fbe4d97d36297087a4be71134722576d252efc032ccfe47ada4ec3a346bbd",
+      "action_frame_range": [
+        1.0,
+        64.0
+      ],
+      "start": 1,
+      "end": 64,
+      "fps": 60,
+      "fps_base": 1.0,
+      "status": "pending",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "research_only": true,
+      "production_eligible": false,
+      "external_linked_research": true,
+      "source_pack_release": "1.13",
+      "source_pack_sha256": "945247ac83cccb1f9cc70609bd77457649a9d9e79b4f34e1a0e5937224192d36",
+      "source_animation": "animation.oreville_ans.chdinz",
+      "source_animations": [
+        "animation.oreville_ans.chdinz"
+      ],
+      "in_place": true,
+      "preview_floor_z_m": 0.0,
+      "approval_note": "Third-person, unarmed standard player on the Showcase rig.",
+      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_sneak_113\\AS_Sneak_1.13.blend",
+      "source_sha256": "5215a94a5a3c7418ef04c2b6744fbdf7eead4730f093758baf5a00162ce8c0b6"
+    },
+    {
+      "action": "Sneak_Walk_ActionsStuff_113_Source_RESEARCH",
+      "source_rig": "Showcase_Player_Rig",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBShowcase_Player_Rig",
+      "action_sha256": "5a35d27a92118e8fa67c5e2bddd2b91de5b73658c4f66549146aa8158af7e7d7",
+      "action_frame_range": [
+        1.0,
+        481.0
+      ],
+      "start": 1,
+      "end": 480,
+      "fps": 60,
+      "fps_base": 1.0,
+      "status": "pending",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "research_only": true,
+      "production_eligible": false,
+      "external_linked_research": true,
+      "source_pack_release": "1.13",
+      "source_pack_sha256": "945247ac83cccb1f9cc70609bd77457649a9d9e79b4f34e1a0e5937224192d36",
+      "source_animation": "animation.oreville_ans.tldiyl",
+      "source_animations": [
+        "animation.oreville_ans.tldiyl",
+        "animation.oreville_ans.chdinz",
+        "animation.oreville_ans.ucaryc"
+      ],
+      "in_place": true,
+      "preview_floor_z_m": 0.0,
+      "approval_note": "Third-person, unarmed standard player on the Showcase rig.",
+      "closing_key": 481,
+      "period_s": 8.0,
+      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_sneak_113\\AS_Sneak_1.13.blend",
+      "source_sha256": "5215a94a5a3c7418ef04c2b6744fbdf7eead4730f093758baf5a00162ce8c0b6"
+    },
+    {
+      "action": "Sneak_Exit_ActionsStuff_113_Source_RESEARCH",
+      "source_rig": "Showcase_Player_Rig",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBShowcase_Player_Rig",
+      "action_sha256": "cb6c14dc7dcec74a8f632c43eaa7b9ae1a3656719153dfc72c38499eb8f4cf72",
+      "action_frame_range": [
+        1.0,
+        59.0
+      ],
+      "start": 1,
+      "end": 59,
+      "fps": 60,
+      "fps_base": 1.0,
+      "status": "pending",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "research_only": true,
+      "production_eligible": false,
+      "external_linked_research": true,
+      "source_pack_release": "1.13",
+      "source_pack_sha256": "945247ac83cccb1f9cc70609bd77457649a9d9e79b4f34e1a0e5937224192d36",
+      "source_animation": "animation.oreville_ans.eetykv",
+      "source_animations": [
+        "animation.oreville_ans.eetykv"
+      ],
+      "in_place": true,
+      "preview_floor_z_m": 0.0,
+      "approval_note": "Third-person, unarmed standard player on the Showcase rig.",
+      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_sneak_113\\AS_Sneak_1.13.blend",
+      "source_sha256": "5215a94a5a3c7418ef04c2b6744fbdf7eead4730f093758baf5a00162ce8c0b6"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
@@ -5435,6 +5577,18 @@
       {
         "kind": "action",
         "id": "Run_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Sneak_Enter_ActionsStuff_113_Source_RESEARCH"
+      },
+      {
+        "kind": "action",
+        "id": "Sneak_Walk_ActionsStuff_113_Source_RESEARCH"
+      },
+      {
+        "kind": "action",
+        "id": "Sneak_Exit_ActionsStuff_113_Source_RESEARCH"
       },
       {
         "kind": "review_sequence",
