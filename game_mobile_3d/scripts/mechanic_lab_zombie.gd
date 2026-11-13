@@ -64,6 +64,7 @@ const SABRE_ROLL_RESPONSE_TIME := 0.10
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
 const HEIGHT := 1.95
 const CHASE_SPEED := 3.1
+const BLOCKED_CHASE_MAX_SPEED_SQUARED := 0.01
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
 # Zombie overrides damage and attack speed. MeleeAttackMob supplies the range,
@@ -129,6 +130,9 @@ var _death_rng := RandomNumberGenerator.new()
 var _poise := MAX_POISE
 var _poise_recovery_wait := 0.0
 var _attack_cooldown := 0.0
+var _crowd_slot := 0
+var _blocked_chase := false
+var _skipped_blocked_step := false
 var _flash_left := 0.0
 var _corpse_age := 0.0
 var _corpse_landed := false
@@ -155,6 +159,7 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 	target = player
 	_physics_profile = physics_profile
 	_corpse_floor = corpse_floor
+	_crowd_slot = serial
 	_death_rng.seed = hash(Vector2i(serial, 1709))
 	_walk_clip = WALK_CLIPS[serial % WALK_CLIPS.size()]
 	add_child(model)
@@ -273,6 +278,7 @@ func _physics_process(delta: float) -> void:
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 	var controlled_time := maxf(0.0, delta - _knockback_control_left)
 	_knockback_control_left = maxf(0.0, _knockback_control_left - delta)
+	var pushed := not _knockback.is_zero_approx()
 	var travel := _integrate_knockback(delta)
 	if controlled_time > 0.000001:
 		travel += _chase_velocity(controlled_time) * (controlled_time / delta)
@@ -282,7 +288,17 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0.0
 	else:
 		velocity += get_gravity() * _gravity_scale(ZOMBIE_GRAVITY) * delta
-	move_and_slide()
+	var chasing := not pushed and controlled_time == delta and not travel.is_zero_approx() \
+		and animation.current_animation in WALK_CLIPS
+	var crowd := is_instance_valid(_corpse_floor) and get_parent().get_child_count() >= 32
+	var retry_stride := maxi(1, roundi(Engine.physics_ticks_per_second / 30.0))
+	_skipped_blocked_step = crowd and chasing and _blocked_chase and is_on_floor() \
+		and Engine.get_physics_frames() % retry_stride != _crowd_slot % retry_stride
+	if not _skipped_blocked_step:
+		move_and_slide()
+		var actual := get_real_velocity()
+		_blocked_chase = crowd and chasing and is_on_floor() and is_on_wall() \
+			and Vector2(actual.x, actual.z).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
 	_advance_animation(delta)
 	ragdoll.sample(delta)
 
@@ -362,6 +378,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		push_duration := 0.0) -> void:
 	if health <= 0 or amount <= 0:
 		return
+	_blocked_chase = false
 	health = maxi(0, health - amount)
 	direction.y = 0.0
 	direction = direction.normalized()
