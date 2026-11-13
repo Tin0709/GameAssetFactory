@@ -81,6 +81,7 @@ const CORPSE_COLLISION_LAYER := 8
 # remnants linger. The thresholds map that timing onto this shader's noise.
 const CORPSE_LIFETIME := 5.0
 const CORPSE_DISSOLVE_DURATION := 0.48
+const CORPSE_FRAGMENT_BIND_COUNT := 19
 const CORPSE_DISSOLVE_KEYS := [
 	Vector2(0.0, 0.0), Vector2(0.067, 0.25), Vector2(0.117, 0.45),
 	Vector2(0.183, 0.60), Vector2(0.25, 0.81), Vector2(0.383, 0.853),
@@ -141,6 +142,7 @@ var _corpse_age := 0.0
 var _corpse_landed := false
 var _limb_support_age := 0.0
 var _corpse_parked := false
+var _corpse_fragment_directions_ready := false
 var _settled_seconds := 0.0
 var _landing_age := INF
 var _roll_damping_weight := 0.0
@@ -676,6 +678,44 @@ func _update_corpse_material(remaining: float) -> void:
 	var gray := smoothstep(CORPSE_DESATURATION_START, CORPSE_DESATURATION_END, _corpse_age) * 0.80
 	_mesh.set_instance_shader_parameter("desaturation", gray)
 	_mesh.set_instance_shader_parameter("dissolve", _corpse_breakup_threshold(remaining))
+	if _corpse_parked and remaining < CORPSE_DISSOLVE_DURATION:
+		if not _corpse_fragment_directions_ready:
+			_set_corpse_fragment_directions()
+		var elapsed := CORPSE_DISSOLVE_DURATION - remaining
+		_mesh.set_instance_shader_parameter("fragment_travel", smoothstep(0.0, 0.34, elapsed))
+
+func _set_corpse_fragment_directions() -> void:
+	_corpse_fragment_directions_ready = true
+	var skin := _mesh.skin
+	if skin == null or skin.get_bind_count() != CORPSE_FRAGMENT_BIND_COUNT:
+		return
+	var skeleton := ragdoll.skeleton
+	var core := skeleton.find_bone(&"J_Shoulders")
+	if core < 0:
+		return
+	var centre := skeleton.global_transform * skeleton.get_bone_global_pose(core).origin
+	var world_to_mesh := _mesh.global_basis.inverse()
+	var directions := PackedVector3Array()
+	directions.resize(CORPSE_FRAGMENT_BIND_COUNT)
+	for bind in skin.get_bind_count():
+		var bone := skin.get_bind_bone(bind)
+		var bind_name := skin.get_bind_name(bind)
+		if not bind_name.is_empty():
+			bone = skeleton.find_bone(bind_name)
+		if bone < 0 or bone >= skeleton.get_bone_count():
+			continue
+		# The eyes and mouth share the head's displacement.
+		while bone != core and skeleton.get_bone_name(bone) not in RAGDOLL_BONES.values():
+			bone = skeleton.get_bone_parent(bone)
+			if bone < 0:
+				break
+		if bone < 0:
+			continue
+		var position := skeleton.global_transform * skeleton.get_bone_global_pose(bone).origin
+		var radial := (position - centre).slide(Vector3.UP).normalized()
+		var lift := 0.17 if skeleton.get_bone_name(bone) == &"J_Head" else 0.11
+		directions[bind] = world_to_mesh * (radial * 0.15 + Vector3.UP * lift)
+	_corpse_material.set_shader_parameter("fragment_directions", directions)
 
 static func _corpse_breakup_threshold(remaining: float) -> float:
 	var elapsed := CORPSE_DISSOLVE_DURATION - remaining
