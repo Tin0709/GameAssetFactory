@@ -182,7 +182,7 @@ var enabled := false
 var sword_equipped := false
 var curved_equipped := false
 var gauntlets_equipped := false
-var zombie_attack_listener: AudioListener3D
+var zombie_listener: AudioListener3D
 var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _player_hurt_voice: AudioStreamPlayer
@@ -191,9 +191,11 @@ var _next_voice: Array[int] = [0, 0, 0, 0, 0]
 var _flight_targets: Dictionary[AudioStreamPlayer3D, Node3D]
 var _started_frames: PackedInt64Array
 var _player_hurt_frame := -1
-var _zombie_attack_frame := -1
+var _zombie_cue_frame := -1
 var _attack_contacts: Array[Dictionary] = []
 var _attack_windups: Array[Dictionary] = []
+var _reaction_deaths: Array[Dictionary] = []
+var _reaction_hurts: Array[Dictionary] = []
 var _zombie_step_frame := -1
 var _step_points: Array[Vector3] = []
 var _step_distances: Array[float] = []
@@ -251,7 +253,11 @@ func contact(point: Vector3, serial: int, lethal: bool, clip := "") -> void:
 		if clip.begins_with("NativeGauntlet"):
 			group = &"gauntlet_hit"
 		_play(group, point, HIT_GAIN_DB)
-	_play(&"death" if lethal else &"hurt", point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
+	var reaction := &"death" if lethal else &"hurt"
+	if not is_instance_valid(zombie_listener):
+		_play(reaction, point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
+	else:
+		_queue_zombie_cue(reaction, point, _reaction_deaths if lethal else _reaction_hurts)
 
 func _weapon_hit_group() -> StringName:
 	if curved_equipped:
@@ -358,18 +364,21 @@ func player_hurt() -> void:
 
 func zombie_attack(point: Vector3, contact: bool) -> void:
 	var group := &"zombie_hit" if contact else &"zombie_windup"
-	if not enabled or not _groups.has(group) or not is_instance_valid(zombie_attack_listener):
+	if enabled:
+		_queue_zombie_cue(group, point, _attack_contacts if contact else _attack_windups)
+
+func _queue_zombie_cue(group: StringName, point: Vector3, pending: Array[Dictionary]) -> void:
+	if not _groups.has(group) or not is_instance_valid(zombie_listener):
 		return
 	var frame := Engine.get_physics_frames()
-	if frame != _zombie_attack_frame:
-		flush_zombie_attacks()
-		_zombie_attack_frame = frame
-	var distance := point.distance_squared_to(zombie_attack_listener.global_position)
+	if frame != _zombie_cue_frame:
+		flush_zombie_combat_cues()
+		_zombie_cue_frame = frame
+	var distance := point.distance_squared_to(zombie_listener.global_position)
 	if distance > SPATIAL_VOICE_DISTANCE * SPATIAL_VOICE_DISTANCE:
 		return
 	# Bound each priority to the number of playable voices, preserving ties
 	# in event order. Only cues selected for playback advance sample rotation.
-	var pending := _attack_contacts if contact else _attack_windups
 	var index := pending.size()
 	while index > 0 and distance < float(pending[index - 1].distance):
 		index -= 1
@@ -378,13 +387,16 @@ func zombie_attack(point: Vector3, contact: bool) -> void:
 		if pending.size() > VOICES_PER_POOL:
 			pending.pop_back()
 
-func flush_zombie_attacks() -> void:
-	for cue: Dictionary in _attack_contacts:
-		_play(&"zombie_hit", cue.point, ZOMBIE_HIT_GAIN_DB, _zombie_attack_frame)
-	for cue: Dictionary in _attack_windups:
-		_play(&"zombie_windup", cue.point, ZOMBIE_WINDUP_GAIN_DB, _zombie_attack_frame)
-	_attack_contacts.clear()
-	_attack_windups.clear()
+func flush_zombie_combat_cues() -> void:
+	_play_zombie_cues(_attack_contacts, &"zombie_hit", ZOMBIE_HIT_GAIN_DB)
+	_play_zombie_cues(_attack_windups, &"zombie_windup", ZOMBIE_WINDUP_GAIN_DB)
+	_play_zombie_cues(_reaction_deaths, &"death", DEATH_GAIN_DB)
+	_play_zombie_cues(_reaction_hurts, &"hurt", HURT_GAIN_DB)
+
+func _play_zombie_cues(pending: Array[Dictionary], group: StringName, gain: float) -> void:
+	for cue: Dictionary in pending:
+		_play(group, cue.point, gain, _zombie_cue_frame)
+	pending.clear()
 
 func queue_zombie_step(sole: Vector3, listener: Vector3, find_support: Callable, known_support: Variant = null) -> void:
 	if not enabled or not _groups.has(&"zombie_step"):
@@ -426,7 +438,9 @@ func reset() -> void:
 	set_process(false)
 	_attack_contacts.clear()
 	_attack_windups.clear()
-	_zombie_attack_frame = -1
+	_reaction_deaths.clear()
+	_reaction_hurts.clear()
+	_zombie_cue_frame = -1
 	_step_points.clear()
 	_step_distances.clear()
 	_zombie_step_frame = -1

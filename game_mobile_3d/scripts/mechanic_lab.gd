@@ -180,7 +180,7 @@ func _ready() -> void:
 		listener.make_current()
 		_combat_audio = CombatAudio.new()
 		_combat_audio.name = "CombatAudio"
-		_combat_audio.zombie_attack_listener = listener
+		_combat_audio.zombie_listener = listener
 		add_child(_combat_audio)
 		_setup_movement_audio()
 		var dust := MovementDust.new()
@@ -551,7 +551,7 @@ func _update_time_label() -> void:
 func _process(delta: float) -> void:
 	_flush_player_damage()
 	if _combat_audio != null:
-		_combat_audio.flush_zombie_attacks()
+		_combat_audio.flush_zombie_combat_cues()
 		_combat_audio.flush_zombie_steps()
 	if _crowd_spawns_left > 0:
 		_spawn_crowd_frame()
