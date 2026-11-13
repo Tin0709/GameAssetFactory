@@ -34,6 +34,8 @@ const PRIVATE_CONTROLS := "WASD di chuyển · Shift đi bộ · Space nhảy ·
 const TIME_PRESETS := [2.5, 7.0, 12.0, 16.5, 18.5, 19.5, 22.0]
 # AM_Player_Sabre_JumpAttack: PlayDebrisEffect minus LandingStart.
 const SABRE_LANDING_DEBRIS_DELAY := 0.045126423
+# AM_Player_Sabre_JumpAttack: CameraShakeNotify_C minus LandingStart.
+const SABRE_LANDING_SHAKE_DELAY := 0.052268848
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD }
 
@@ -66,6 +68,7 @@ var _shake_serial := -1
 var _shake_age := 0.0
 var _shake_duration := 0.0
 var _shake_strength := 0.0
+var _slam_shake_frame := -1
 var _light_serial := -1
 var _light_remaining := 0.0
 var _light_peak := 0.0
@@ -172,6 +175,7 @@ func _ready() -> void:
 		player.connect("heavy_jump_landed", $Zombies.land_sabre)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
+		player.presentation_reset.connect(_clear_camera_shake)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
@@ -394,13 +398,25 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	if falloff <= 0.0:
 		return
 	_shake_serial = serial
-	_shake_strength = FINISHER_SHAKE_HEIGHT_FRACTION * falloff
+	_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION * falloff)
+
+func _start_camera_shake(strength: float) -> void:
+	_shake_strength = strength
 	_shake_age = 0.0
 	_shake_duration = HEAVY_SHAKE_DURATION
+
+func _clear_camera_shake() -> void:
+	_slam_shake_frame = -1
+	_shake_serial = -1
+	_shake_duration = 0.0
+	camera.h_offset = 0.0
+	camera.v_offset = 0.0
 
 func _on_sabre_landing(point: Vector3, serial: int) -> void:
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
+	if _equipped_weapon == Weapon.SABRE:
+		_slam_shake_frame = Engine.get_physics_frames() + ceili(SABRE_LANDING_SHAKE_DELAY * Engine.physics_ticks_per_second)
 	if not _combat_audio.enabled:
 		return
 	var delay_ticks := ceili(_heavy_debris_delay() * Engine.physics_ticks_per_second)
@@ -423,7 +439,11 @@ func _start_contact_light(point: Vector3, serial: int, energy: float) -> void:
 func _physics_process(_delta: float) -> void:
 	if player.position.y < -5.0:
 		reset_player()
-	if _slam_audio_frame >= 0 and Engine.get_physics_frames() >= _slam_audio_frame:
+	var frame := Engine.get_physics_frames()
+	if _slam_shake_frame >= 0 and frame >= _slam_shake_frame:
+		_slam_shake_frame = -1
+		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION)
+	if _slam_audio_frame >= 0 and frame >= _slam_audio_frame:
 		_cancel_slam_audio()
 		_combat_audio.slam_landed(_slam_audio_point)
 
@@ -522,10 +542,7 @@ func reset_player() -> void:
 		for number: Node3D in _player_damage_numbers.get_children():
 			number.hide()
 			number.queue_free()
-	_shake_serial = -1
-	_shake_duration = 0.0
-	camera.h_offset = 0.0
-	camera.v_offset = 0.0
+	_clear_camera_shake()
 	_light_serial = -1
 	_light_remaining = 0.0
 	_impact_light.light_energy = 0.0
