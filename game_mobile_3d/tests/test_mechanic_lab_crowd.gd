@@ -101,11 +101,12 @@ func check_zombie_dust() -> void:
 		return
 	if chase_dust_peak == 0:
 		failures.append("Actual chasing zombies emit dust on the grass")
+	print("CROWD_ZOMBIE_DUST chase_peak=", chase_dust_peak)
 	dust.clear()
 	lab._on_zombie_step(Vector3(0.0, 2.0, 0.0))
 	lab._on_zombie_step(Vector3(51.0, 0.0, 0.0))
 	for i in COUNT:
-		lab._on_zombie_step(Vector3(i % 10 - 4.5, 0.0, i / 10.0 - 4.5))
+		lab._on_zombie_step(Vector3(i % 10 - 4.5, 0.0, floori(i / 10.0) - 4.5))
 	dust._process(0.0)
 	if dust.multimesh.visible_instance_count != COUNT or dust.multimesh.mesh.get_surface_count() != 1:
 		failures.append("One batch draws 100 grounded steps and rejects unsupported steps")
