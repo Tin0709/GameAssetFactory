@@ -77,16 +77,7 @@ const TELEGRAPH_END := 15.0 / 30.0
 const MELEE_CONTACT_TIME := 17.0 / 30.0
 const LEVEL_COLLISION_MASK := 1
 const CORPSE_COLLISION_LAYER := 8
-# Honeycomb Farm footage: the silhouette breaks up quickly, then a few
-# remnants linger. The thresholds map that timing onto this shader's noise.
 const CORPSE_LIFETIME := 5.0
-const CORPSE_DISSOLVE_DURATION := 0.48
-const CORPSE_FRAGMENT_BIND_COUNT := 19
-const CORPSE_DISSOLVE_KEYS := [
-	Vector2(0.0, 0.0), Vector2(0.067, 0.25), Vector2(0.117, 0.45),
-	Vector2(0.183, 0.60), Vector2(0.25, 0.81), Vector2(0.383, 0.853),
-	Vector2(0.433, 0.90), Vector2(CORPSE_DISSOLVE_DURATION, 1.0),
-]
 const CORPSE_DESATURATION_START := 2.3
 const CORPSE_DESATURATION_END := 3.6
 const CORPSE_SETTLE_TIME := 0.10
@@ -142,8 +133,6 @@ var _corpse_age := 0.0
 var _corpse_landed := false
 var _limb_support_age := 0.0
 var _corpse_parked := false
-var _corpse_fragment_directions_ready := false
-var _corpse_fragment_started_at := INF
 var _settled_seconds := 0.0
 var _landing_age := INF
 var _roll_damping_weight := 0.0
@@ -405,12 +394,11 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 
 func _update_death(delta: float) -> void:
 	_corpse_age += delta
-	var remaining := CORPSE_LIFETIME - _corpse_age
-	if remaining <= 0.00001:
+	if _corpse_age >= CORPSE_LIFETIME - 0.00001:
 		queue_free()
 		return
 	if _corpse_age >= CORPSE_DESATURATION_START:
-		_update_corpse_material(remaining)
+		_update_corpse_material()
 	if _corpse_parked:
 		return
 	var sabre_finisher := _death_strike == DeathStrike.SABRE_FINISHER
@@ -471,10 +459,6 @@ func _update_death(delta: float) -> void:
 				body.bounce = 0.0
 	if _corpse_landed:
 		var supported: bool = contact.supports > 0
-		if supported and remaining < CORPSE_DISSOLVE_DURATION and not _corpse_fragment_directions_ready:
-			var skeleton := ragdoll.skeleton
-			if not skeleton.skeleton_updated.is_connected(_capture_corpse_breakup):
-				skeleton.skeleton_updated.connect(_capture_corpse_breakup, CONNECT_ONE_SHOT)
 		if supported and source_rig and contact.core_supports == 0 and not is_instance_valid(_corpse_floor):
 			# Keep Overworld gravity while the corpse is perched upright without core support.
 			supported = absf(_corpse_axis().normalized().y) <= CORPSE_UPRIGHT_AXIS_Y
@@ -672,7 +656,7 @@ func _apply_death_tumble(spin: Vector3, mass: float) -> void:
 		body.apply_central_impulse(spin.cross(body.global_position - centre) * body.mass)
 		body.angular_velocity += spin
 
-func _update_corpse_material(remaining: float) -> void:
+func _update_corpse_material() -> void:
 	if _mesh.material_override == null:
 		if _corpse_base_material == null:
 			var skin := _mesh.get_active_material(0) as StandardMaterial3D
@@ -684,73 +668,6 @@ func _update_corpse_material(remaining: float) -> void:
 		_mesh.material_override = _corpse_base_material
 	var gray := smoothstep(CORPSE_DESATURATION_START, CORPSE_DESATURATION_END, _corpse_age) * 0.80
 	_mesh.set_instance_shader_parameter("desaturation", gray)
-	_mesh.set_instance_shader_parameter("dissolve", _corpse_breakup_threshold(remaining))
-	if remaining >= CORPSE_DISSOLVE_DURATION:
-		return
-	if _corpse_parked and not _corpse_fragment_directions_ready:
-		_corpse_fragment_started_at = CORPSE_LIFETIME - CORPSE_DISSOLVE_DURATION
-		_set_corpse_fragment_directions()
-	if _corpse_fragment_directions_ready:
-		_mesh.set_instance_shader_parameter("fragment_travel",
-			smoothstep(0.0, 0.34, _corpse_age - _corpse_fragment_started_at))
-
-func _capture_corpse_breakup() -> void:
-	if not _corpse_fragment_directions_ready:
-		# Read the physical pose while the skeleton modifiers are applied.
-		_corpse_fragment_started_at = _corpse_age
-		_set_corpse_fragment_directions()
-
-func _set_corpse_fragment_directions() -> void:
-	_corpse_fragment_directions_ready = true
-	var skin := _mesh.skin
-	if skin == null or skin.get_bind_count() != CORPSE_FRAGMENT_BIND_COUNT:
-		return
-	var skeleton := ragdoll.skeleton
-	var core := skeleton.find_bone(&"J_Shoulders")
-	var head := skeleton.find_bone(&"J_Head")
-	if core < 0 or head < 0:
-		return
-	var centre := skeleton.global_transform * skeleton.get_bone_global_pose(core).origin
-	var world_to_mesh := _mesh.global_basis.inverse()
-	var directions := PackedVector3Array()
-	directions.resize(CORPSE_FRAGMENT_BIND_COUNT)
-	for bind in skin.get_bind_count():
-		var bone := skin.get_bind_bone(bind)
-		var bind_name := skin.get_bind_name(bind)
-		if not bind_name.is_empty():
-			bone = skeleton.find_bone(bind_name)
-		if bone < 0 or bone >= skeleton.get_bone_count():
-			continue
-		# The eyes and mouth share the head's displacement.
-		while bone != core and skeleton.get_bone_name(bone) not in RAGDOLL_BONES.values():
-			if skeleton.get_bone_name(bone) == &"J_Neck":
-				bone = head
-				break
-			bone = skeleton.get_bone_parent(bone)
-			if bone < 0:
-				break
-		if bone < 0:
-			continue
-		var position := skeleton.global_transform * skeleton.get_bone_global_pose(bone).origin
-		var radial := (position - centre).slide(Vector3.UP).normalized()
-		var lift := 0.17 if skeleton.get_bone_name(bone) == &"J_Head" else 0.11
-		directions[bind] = world_to_mesh * (radial * 0.15 + Vector3.UP * lift)
-	# The vector array belongs to this pose. Share the shader and texture, but
-	# keep separate material parameters when more than one corpse breaks up.
-	var material := _corpse_base_material.duplicate() as ShaderMaterial
-	material.set_shader_parameter("fragment_directions", directions)
-	_mesh.material_override = material
-
-static func _corpse_breakup_threshold(remaining: float) -> float:
-	var elapsed := CORPSE_DISSOLVE_DURATION - remaining
-	if elapsed <= 0.0:
-		return 0.0
-	for i in range(1, CORPSE_DISSOLVE_KEYS.size()):
-		var next: Vector2 = CORPSE_DISSOLVE_KEYS[i]
-		if elapsed <= next.x:
-			var prior: Vector2 = CORPSE_DISSOLVE_KEYS[i - 1]
-			return remap(elapsed, prior.x, next.x, prior.y, next.y)
-	return 1.0
 
 func _exit_tree() -> void:
 	if is_instance_valid(ragdoll):
