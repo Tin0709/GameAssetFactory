@@ -216,10 +216,11 @@ func check_floor_edge_landing(lab, dust: Node3D) -> void:
 					func(sprite): return absf(sprite.global_position.x - 50.0) < 0.45)
 				if not heavy:
 					source_landing = dust._particles.filter(func(particle): return particle.sprite.visible).all(
-						func(particle): return particle.duration >= 1.0 and particle.duration <= 2.0
-							and is_equal_approx(particle.origin.y, 0.50)
-							and is_equal_approx(particle.sprite.pixel_size * 16.0, 1.0)
-							and absf(particle.origin.x - 50.0) < 0.03)
+						func(particle):
+							return (particle.duration >= 1.0 and particle.duration <= 2.0
+								and is_equal_approx(particle.origin.y, 0.50)
+								and is_equal_approx(particle.sprite.pixel_size * 16.0, 1.0)
+								and absf(particle.origin.x - 50.0) < 0.03))
 		check(lab.player.is_on_floor() and lab.player.global_position.x > 50.0,
 			"The capsule lands while its centre is past the grass edge")
 		check((max_dust == 10 if heavy else max_dust in [4, 5, 6]) and dust_near_edge,
