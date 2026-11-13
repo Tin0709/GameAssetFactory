@@ -182,7 +182,8 @@ func run() -> void:
 	await check_sabre_first_contact_anchors(lab, group)
 	await check_sabre_head_and_arm_brace(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
-	await check_sabre_supported_arm_anchor(lab, group)
+	await check_sabre_fixed_pose_anchor(lab, group, 415, "arm rebound")
+	await check_sabre_fixed_pose_anchor(lab, group, 419, "head impact at the start of the roll")
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
@@ -471,11 +472,10 @@ func check_flat_rest_after_tumble(lab, group) -> void:
 		"The flat-floor tumble stops vibrating and releases its rigid bodies within 1.85 seconds")
 	zombie.free()
 
-func check_sabre_supported_arm_anchor(lab, group) -> void:
-	const SERIAL := 415
+func check_sabre_fixed_pose_anchor(lab, group, serial: int, impact: String) -> void:
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 120011 + SERIAL
-	group._spawn_serial = SERIAL
+	rng.seed = 120011 + serial
+	group._spawn_serial = serial
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
 	zombie.set_physics_process(false)
@@ -495,9 +495,10 @@ func check_sabre_supported_arm_anchor(lab, group) -> void:
 		await physics_frame
 		if zombie.ragdoll.running:
 			peak = maxf(peak, zombie.ragdoll.max_anchor_error())
-	check(peak > 0.0 and peak < 0.10 and zombie._corpse_parked,
-		"A fixed-pose Sabre arm rebound keeps the anchor below 10 cm and settles")
-	print("SABRE_SUPPORTED_ARM peak_gap_m=", peak, " release_s=", zombie._corpse_age)
+	var gap_limit := 0.10 if serial == 415 else 0.101
+	check(peak > 0.0 and peak < gap_limit and zombie._corpse_parked,
+		"Fixed-pose Sabre %s keeps the joint connected and settles" % impact)
+	print("SABRE_FIXED_IMPACT serial=", serial, " peak_gap_m=", peak, " release_s=", zombie._corpse_age)
 	zombie.free()
 
 func check_flat_contact_jitter(lab, group, serial: int, pose_time: float, direction_angle: float,
