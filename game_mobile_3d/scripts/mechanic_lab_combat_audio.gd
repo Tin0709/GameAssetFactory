@@ -104,6 +104,7 @@ var _voices: Array[AudioStreamPlayer3D] = []
 var _player_hurt_voice: AudioStreamPlayer
 var _next_choice: Dictionary[StringName, int] = {}
 var _next_voice: Array[int] = [0, 0, 0]
+var _reaction_started_frame: Array[int] = []
 var _last_weapon_serial := -1
 var _master_was_muted := false
 
@@ -178,6 +179,7 @@ func zombie_attack(point: Vector3, contact: bool) -> void:
 			ZOMBIE_HIT_GAIN_DB if contact else ZOMBIE_WINDUP_GAIN_DB)
 
 func reset() -> void:
+	_reaction_started_frame.fill(-1)
 	_last_weapon_serial = -1
 	_next_voice.fill(0)
 	for voice in _voices:
@@ -194,6 +196,8 @@ static func _research_root() -> String:
 func _load_audio() -> void:
 	if not OS.has_feature("editor"):
 		return
+	_reaction_started_frame.resize(VOICES_PER_POOL)
+	_reaction_started_frame.fill(-1)
 	var root := _research_root()
 	# DefaultPlayer routes SW.Audio.Generic.Hurt to SW.Audio.Category.Player.Local.
 	_player_hurt_voice = AudioStreamPlayer.new()
@@ -256,8 +260,7 @@ func _next_stream(group: StringName) -> AudioStream:
 	return choices[choice]
 
 func _play(group: StringName, point: Vector3, gain: float) -> void:
-	var stream := _next_stream(group)
-	if stream == null:
+	if not _groups.has(group):
 		return
 	# Separate enemy attack and reaction budgets keep the weapon tails audible.
 	var pool := 0
@@ -267,12 +270,23 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 		&"zombie_windup", &"zombie_hit":
 			pool = 2
 	var first := pool * VOICES_PER_POOL
-	var slot := _next_voice[pool]
+	var start := _next_voice[pool]
+	var slot := -1
 	for offset in VOICES_PER_POOL:
-		var candidate := (slot + offset) % VOICES_PER_POOL
+		var candidate := (start + offset) % VOICES_PER_POOL
 		if not _voices[first + candidate].playing:
 			slot = candidate
 			break
+	if pool == 1:
+		var frame := Engine.get_physics_frames()
+		if slot == -1:
+			slot = _replace_reaction_slot(start, group == &"death", frame)
+			if slot == -1:
+				return
+		_reaction_started_frame[slot] = frame
+	elif slot == -1:
+		slot = start
+	var stream := _next_stream(group)
 	var voice := _voices[first + slot]
 	_next_voice[pool] = (slot + 1) % VOICES_PER_POOL
 	voice.stop()
@@ -281,3 +295,17 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 	voice.volume_db = gain
 	voice.max_db = gain
 	voice.play()
+
+func _replace_reaction_slot(start: int, lethal: bool, frame: int) -> int:
+	# Keep the leading cues of a simultaneous hit. Death may replace hurt,
+	# while hurt never cuts off a death cue.
+	var death_streams: Array = _groups.get(&"death", [])
+	var older_slot := -1
+	for offset in VOICES_PER_POOL:
+		var slot := (start + offset) % VOICES_PER_POOL
+		var playing_death := _voices[VOICES_PER_POOL + slot].stream in death_streams
+		if lethal and not playing_death:
+			return slot
+		if lethal == playing_death and older_slot == -1 and _reaction_started_frame[slot] != frame:
+			older_slot = slot
+	return older_slot
