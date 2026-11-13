@@ -11,6 +11,8 @@ var frame_ms: Array[float] = []
 var render_gpu_ms: Array[float] = []
 var draws: Array[float] = []
 var active_peak := 0
+var first_tick_ragdolls := 0
+var peak_damage_glyphs := 0
 var failures: Array[String] = []
 
 func _initialize() -> void:
@@ -64,8 +66,13 @@ func run() -> void:
 	if bars != null and bars.multimesh.visible_instance_count != 0:
 		failures.append("A lethal hit immediately removes the zombie's overhead bar")
 	await measure("simultaneous_ragdolls", 120, group)
-	if active_peak != COUNT:
+	if active_peak != COUNT or first_tick_ragdolls != COUNT:
 		failures.append("Expected all 100 ragdolls to run together")
+	var numbers := lab.get_node_or_null("CombatEffects/ZombieDamageNumbers") as MultiMeshInstance3D
+	if numbers == null or peak_damage_glyphs != COUNT * 3:
+		failures.append("The batched numbers render all 300 glyphs of the simultaneous hits")
+	elif numbers.multimesh.visible_instance_count != 0:
+		failures.append("The batched damage numbers expire")
 	await measure("corpse_cleanup", 200, group)
 	if bars != null and bars.multimesh.visible_instance_count != 0:
 		failures.append("The batch drops the bars of despawned zombies")
@@ -243,6 +250,7 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 	render_gpu_ms.clear()
 	draws.clear()
 	active_peak = 0
+	var numbers := lab.get_node_or_null("CombatEffects/ZombieDamageNumbers") as MultiMeshInstance3D
 	for i in ticks:
 		await physics_frame
 		if group != null:
@@ -250,7 +258,11 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 			for zombie in group.get_children():
 				if zombie.ragdoll.running:
 					active += 1
+			if label == "simultaneous_ragdolls" and i == 1:
+				first_tick_ragdolls = active
 			active_peak = maxi(active_peak, active)
+			if label == "simultaneous_ragdolls" and numbers != null:
+				peak_damage_glyphs = maxi(peak_damage_glyphs, numbers.multimesh.visible_instance_count)
 	print("CROWD_PHASE ", JSON.stringify({"phase": label, "frame_ms": stats(frame_ms),
 		"physics_to_process_ms": stats(physics_ms), "gpu_ms": stats(render_gpu_ms),
 		"draws": stats(draws), "samples": frame_ms.size(), "active_ragdolls_peak": active_peak}))
