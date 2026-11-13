@@ -45,6 +45,7 @@ func run() -> void:
 	check(menu.get_item_text(3) == "The Cross Pollinator", "The Cross Pollinator is named correctly")
 	check(menu.get_item_text(4) == "Prime Enchanter's Gauntlets", "Prime Enchanter's Gauntlets are named correctly")
 	await check_weapon_movement(lab, menu)
+	await check_crossbow_settle(lab, menu)
 	var group := lab.get_node("Zombies")
 	group.sabre_contact.connect(func(_p, _d, clip, _i, _s, _k): contacts.append(clip))
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
@@ -255,6 +256,16 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 			check(player.active_clip == "Run" and player.hybrid_motion.last_kind == "CrossbowRun"
 				and player.hybrid_motion.owns_pose, "Crossbow run uses Actions & Stuff")
 			var grip := lab._crossbow_mount as MeshInstance3D
+			var lowest_pitch := INF
+			var highest_pitch := -INF
+			for frame in 36:
+				await physics_frame
+				var rail: Vector3 = player.visual.global_basis.inverse() * grip.global_basis.z.normalized()
+				var pitch := asin(clampf(rail.y, -1.0, 1.0))
+				lowest_pitch = minf(lowest_pitch, pitch)
+				highest_pitch = maxf(highest_pitch, pitch)
+			check(highest_pitch - lowest_pitch > deg_to_rad(23.0),
+				"The crossbow follows the Actions & Stuff run sway")
 			var presenter = player.render_presenter
 			presenter.prepare(0.5)
 			var mesh_index: int = presenter.meshes.find(grip)
@@ -272,5 +283,33 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 		and lab._right_gauntlet.get_parent().bone_name == "J_R_Arm", "Gauntlets follow both rendered fists")
 	equip(menu, 0)
 	player.scripted_input = false
+	lab.reset_player()
+	await ticks(12)
+
+func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
+	equip(menu, 3)
+	await ticks(14)
+	var player = lab.player
+	var mount := lab._crossbow_mount as MeshInstance3D
+	var rail: Vector3 = player.visual.global_basis.inverse() * mount.global_basis.z.normalized()
+	check(rail.y < -0.40, "MD2's source wrist carries the idle crossbow diagonally down")
+	attack(true)
+	await ticks(2)
+	attack(false)
+	var previous := mount.to_global(CrossPollinator.GRIP)
+	var largest_step := 0.0
+	var idle_frames := 0
+	for frame in 90:
+		await physics_frame
+		var grip := mount.to_global(CrossPollinator.GRIP)
+		if player.active_clip == "Idle":
+			largest_step = maxf(largest_step, previous.distance_to(grip))
+			idle_frames += 1
+			if idle_frames == 18:
+				break
+		previous = grip
+	check(idle_frames == 18 and largest_step < 0.095 and player.source_transition.incoming_weight == 1.0,
+		"The crossbow settles back to idle without snapping the grip")
+	equip(menu, 0)
 	lab.reset_player()
 	await ticks(12)
