@@ -189,7 +189,7 @@ func _ready() -> void:
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
 		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _grass_landing_contact_at,
-				player.source_step_dust_size):
+				player.source_step_dust_size, true):
 			dust.use_source_landing()
 			add_child(dust)
 			var zombie_dust := ZombieStepDust.new()

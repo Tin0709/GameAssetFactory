@@ -25,6 +25,7 @@ class Particle:
 	var origin: Vector3
 	var velocity: Vector3
 	var age := 0.0
+	var contact_tick := -1
 	var duration := 0.0
 	var opacity := 0.0
 	var run_drag := 0.0
@@ -38,6 +39,7 @@ var _landing_contact: Callable
 var _heavy_delay: Callable
 var _particles: Array[Particle] = []
 var _next := 0
+var _contact_clock := false
 var _heavy_landing_point := Vector3.ZERO
 var _heavy_landing_frame := -1
 var _burst_frame := -1
@@ -55,7 +57,7 @@ func _ready() -> void:
 	set_physics_process(false)
 
 func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable(),
-		heavy_delay := Callable(), landing_contact := Callable(), run_profile := Callable()) -> bool:
+		heavy_delay := Callable(), landing_contact := Callable(), run_profile := Callable(), contact_clock := false) -> bool:
 	var texture := _load_mask()
 	if texture == null:
 		return false
@@ -64,6 +66,7 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 	_terrain_contact = terrain_contact
 	_landing_contact = landing_contact
 	_heavy_delay = heavy_delay
+	_contact_clock = contact_clock
 	if run_profile.is_valid():
 		var path := WeaponSource.verified_path(WeaponSource.research_root(), STEP_ALPHA_PATH, STEP_ALPHA_HASH)
 		if not path.is_empty():
@@ -188,6 +191,7 @@ func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: boo
 		particle.origin = ground_point + radial * _random.randf_range(0.02, spread) + Vector3.UP * 0.05
 		particle.velocity = radial * _random.randf_range(0.18, 0.62) - motion * 0.065 + Vector3.UP * 0.25
 		particle.age = 0.0
+		particle.contact_tick = Engine.get_physics_frames()
 		particle.run_drag = 0.0
 		particle.landing_tick = -1
 		particle.duration = _random.randf_range(0.19, 0.28) if landed else _random.randf_range(0.14, 0.22)
@@ -213,6 +217,7 @@ func _emit_run_dust(ground_point: Vector3, surface: String, size: float) -> void
 	particle.origin = ground_point + Vector3.UP * 0.20
 	particle.velocity = Vector3.ZERO
 	particle.age = 0.0
+	particle.contact_tick = Engine.get_physics_frames()
 	particle.duration = _random.randf_range(0.80, 1.75)
 	particle.run_drag = _random.randf_range(4.0, 10.0)
 	particle.landing_tick = -1
@@ -229,6 +234,7 @@ func _emit_source_landing(ground_point: Vector3, surface: String) -> void:
 		particle.landing_position = particle.origin
 		particle.landing_tick = 0
 		particle.age = 0.0
+		particle.contact_tick = Engine.get_physics_frames()
 		particle.duration = _random.randf_range(1.0, 2.0)
 		particle.run_drag = 0.0
 		var yaw := _random.randf_range(0.0, TAU)
@@ -272,10 +278,15 @@ func _update_source_landing(particle: Particle) -> void:
 
 func _process(delta: float) -> void:
 	var active := false
+	var tick := Engine.get_physics_frames()
 	for particle in _particles:
 		if not particle.sprite.visible:
 			continue
-		particle.age += delta
+		if _contact_clock:
+			# The first render delta can include time before the contact.
+			particle.age = (tick - particle.contact_tick) * get_physics_process_delta_time()
+		else:
+			particle.age += delta
 		if particle.age >= particle.duration:
 			particle.sprite.hide()
 			continue
