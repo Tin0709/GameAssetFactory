@@ -1255,7 +1255,7 @@ func _sync_twilight_crown() -> void:
 	if forest_active() and captured_sky_response:
 		# The sampled crown sky dropped to roughly 14% at the dusk anchor.
 		amount = .86 * twilight_finish_weight() * _lighting_scale(&"twilight_crown")
-		if level.grove.source_oaks and atmosphere_review == "combined" and not _balanced_preview:
+		if level.grove.source_oaks and sky_response.available() and atmosphere_review == "combined" and not _balanced_preview:
 			var night := moonlight_weight(hour)
 			depth = lerpf(0.32 * twilight_finish_weight(), 0.62, night) * _lighting_scale(&"crown_ambient_depth")
 	level.grove.set_crown_dusk_occlusion(amount)
@@ -1548,6 +1548,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and point_response.evening_available()
 		if effect in [&"twilight_sky_chroma", &"twilight_ambient", &"twilight_crown"]:
 			slider.editable = slider.editable and sky_response.twilight_available()
+		if effect == &"crown_ambient_depth":
+			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
 		if effect == &"twilight_shadow_lift":
