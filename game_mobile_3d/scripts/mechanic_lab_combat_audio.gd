@@ -11,8 +11,11 @@ const SURFACE_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAt
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
 # The exported waveforms matching the Zombie event names sit under BabyZombie.
 const ZOMBIE_ATTACK := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%sAttack-%03d_soundWave.ogg"
+# Zombie.Step names the adult event. The exported generic candidate is under BabyZombie.
+const ZOMBIE_STEP := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombieStepGeneric-%03d_soundWave.ogg"
 const PLAYER_HURT := "Player/Hurt/sfx_multi_hit-%03d_soundWave.ogg"
 const VOICES_PER_POOL := 3
+const STEP_POOL := 3
 const HIT_GAIN_DB := -9.0
 const SLAM_GAIN_DB := -10.0
 const SURFACE_LANDING_GAIN_DB := -16.0
@@ -21,6 +24,8 @@ const DEATH_GAIN_DB := -14.0
 const ZOMBIE_WINDUP_GAIN_DB := -16.0
 const ZOMBIE_HIT_GAIN_DB := -14.0
 const PLAYER_HURT_GAIN_DB := -14.0
+const ZOMBIE_STEP_GAIN_DB := -21.0
+const ZOMBIE_STEP_DISTANCE := 12.0
 
 const HIT_HASHES := [
 	"01b446de1994e109804c1379e19d13b93d271d826e30bfe211d2f560e4651cb9",
@@ -95,6 +100,13 @@ const ZOMBIE_HIT_HASHES := [
 	"f8916ee7e6e40bc6eee912083d4bd8d67cf2c7fcbab1dab6602dac093f91975f",
 	"1213567ddc6d28e5ce3f10a3571efce2e3d32e7224ec9530ef58f6bb0e50006e",
 ]
+const ZOMBIE_STEP_HASHES := [
+	"b6db306be20e08704880494dc3f8dfb90feae27bdd47374b6b0a8789f90d183b",
+	"c77446a6e366ec815bb3c511ca0992778997939ffdc953b705be9b51bdd7f45f",
+	"35ab10c0ed49602bf0abf0dc651ef1d9ba7367fa05c5002b1bdf69fd0c537b60",
+	"728261296046771323209999a1d60b23d86052655bdf752027de1eaa526f0eec",
+	"d447953adb0b0f692f241d42aee6662653843365e5306d6cfd159c8d0e4f9555",
+]
 
 var enabled := false
 var sword_equipped := false
@@ -103,7 +115,7 @@ var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _player_hurt_voice: AudioStreamPlayer
 var _next_choice: Dictionary[StringName, int] = {}
-var _next_voice: Array[int] = [0, 0, 0]
+var _next_voice: Array[int] = [0, 0, 0, 0]
 var _reaction_started_frame: Array[int] = []
 var _last_weapon_serial := -1
 var _master_was_muted := false
@@ -178,6 +190,18 @@ func zombie_attack(point: Vector3, contact: bool) -> void:
 		_play(&"zombie_hit" if contact else &"zombie_windup", point,
 			ZOMBIE_HIT_GAIN_DB if contact else ZOMBIE_WINDUP_GAIN_DB)
 
+func can_play_zombie_step(point: Vector3, listener: Vector3) -> bool:
+	if not enabled or not _groups.has(&"zombie_step") +			or point.distance_squared_to(listener) > ZOMBIE_STEP_DISTANCE * ZOMBIE_STEP_DISTANCE:
+		return false
+	for slot in VOICES_PER_POOL:
+		if not _voices[STEP_POOL * VOICES_PER_POOL + slot].playing:
+			return true
+	return false
+
+func zombie_step(point: Vector3) -> void:
+	if enabled:
+		_play(&"zombie_step", point, ZOMBIE_STEP_GAIN_DB)
+
 func reset() -> void:
 	_reaction_started_frame.fill(-1)
 	_last_weapon_serial = -1
@@ -224,6 +248,8 @@ func _load_audio() -> void:
 		_load_sample(root, &"zombie_windup", ZOMBIE_ATTACK % ["Pre", i + 1], ZOMBIE_WINDUP_HASHES[i])
 	for i in ZOMBIE_HIT_HASHES.size():
 		_load_sample(root, &"zombie_hit", ZOMBIE_ATTACK % ["", i + 1], ZOMBIE_HIT_HASHES[i])
+	for i in ZOMBIE_STEP_HASHES.size():
+		_load_sample(root, &"zombie_step", ZOMBIE_STEP % (i + 1), ZOMBIE_STEP_HASHES[i])
 
 func _create_voices(count: int) -> void:
 	for i in count:
@@ -269,6 +295,8 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 			pool = 1
 		&"zombie_windup", &"zombie_hit":
 			pool = 2
+		&"zombie_step":
+			pool = STEP_POOL
 	var first := pool * VOICES_PER_POOL
 	var start := _next_voice[pool]
 	var slot := -1
@@ -284,6 +312,8 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 			if slot == -1:
 				return
 		_reaction_started_frame[slot] = frame
+	elif slot == -1 and pool == STEP_POOL:
+		return
 	elif slot == -1:
 		slot = start
 	var stream := _next_stream(group)

@@ -353,7 +353,8 @@ func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
 	for i in 2:
 		var contact: Vector2 = WALK_STEP_FRAMES[clip][i]
 		var at := contact.x / 30.0
-		if (at > previous_phase or wrapped) and (at <= phase or (wrapped and at > previous_phase)):
+		var crossed := (at > previous_phase or at <= phase) if wrapped else (at > previous_phase and at <= phase)
+		if crossed:
 			var side := 0.125 if i == 0 else -0.130
 			step_audio.emit(to_global(Vector3(side, 0.0, contact.y)))
 
