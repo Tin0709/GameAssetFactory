@@ -18,6 +18,12 @@ const CROSSBOW_IMPACT_HASHES := [
 	"f3f457ffb1a05b35e7a1b00e5f902b00a3487ffc6df197ad059809987da650a7",
 	"d1538525efed7c2b0556ee0dff0f16cce4eb99542cb452f5ade26fc110e9d5f9",
 ]
+const CROSSBOW_FLIGHT_HASHES := [
+	"556e500b32ca597245925f34aa1e1b36a9917230076f8d28a2432b9cd75dc806",
+	"fc1b8ed21fda302a2944980403c19d7861192f64d26efab7beaa1e1930c525b1",
+	"6fbbf0fb7172df9564222117c1c33757e88be27e57b6db87b9182e0a6455afff",
+	"505c42c4c85efa8ddf0fc8b4220797110dd76f4d4a8d9418036549b5ca4fae15",
+]
 const GAUNTLET_COMBO := "Items/Weapons/Weapon_Melee/6_weapons_melee_basicCombo/Attack%d/sfx_gauntlets_unique_attack_%s_01.ogg"
 const GAUNTLET_HIT := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_gauntlets_01.ogg"
 const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_01.ogg"
@@ -39,6 +45,8 @@ const VOICES_PER_POOL := 3
 const REACTION_POOL := 1
 const ATTACK_POOL := 2
 const STEP_POOL := 3
+const FLIGHT_POOL := 4
+const FLIGHT_GAIN_DB := -17.0
 const HIT_GAIN_DB := -9.0
 const SLAM_GAIN_DB := -10.0
 const SURFACE_LANDING_GAIN_DB := -16.0
@@ -139,7 +147,8 @@ var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _player_hurt_voice: AudioStreamPlayer
 var _next_choice: Dictionary[StringName, int] = {}
-var _next_voice: Array[int] = [0, 0, 0, 0]
+var _next_voice: Array[int] = [0, 0, 0, 0, 0]
+var _flight_targets: Dictionary[AudioStreamPlayer3D, Node3D]
 var _started_frames: PackedInt64Array
 var _player_hurt_frame := -1
 var _zombie_step_frame := -1
@@ -147,6 +156,9 @@ var _step_points: Array[Vector3] = []
 var _step_distances: Array[float] = []
 var _last_weapon_serial := -1
 var _master_was_muted := false
+
+func _ready() -> void:
+	set_process(false)
 
 func set_enabled(value: bool, preview_point: Vector3) -> void:
 	if enabled == value:
@@ -207,6 +219,8 @@ func load_crossbow(root: String) -> void:
 		_load_sample(root, &"crossbow_fire", CROSSBOW + ("fire_%02d.ogg" % (i + 1)), CROSSBOW_FIRE_HASHES[i])
 	for i in CROSSBOW_IMPACT_HASHES.size():
 		_load_sample(root, &"crossbow_hit", CROSSBOW + ("arrow_impact_%02d.ogg" % (i + 1)), CROSSBOW_IMPACT_HASHES[i])
+	for i in CROSSBOW_FLIGHT_HASHES.size():
+		_load_sample(root, &"crossbow_flight", CROSSBOW + ("arrow_whoosh_%02d.ogg" % (i + 1)), CROSSBOW_FLIGHT_HASHES[i])
 
 func load_gauntlets(root: String) -> void:
 	var weights := ["light", "medium", "heavy"]
@@ -231,6 +245,25 @@ func crossbow_fired(point: Vector3) -> void:
 func crossbow_impact(point: Vector3) -> void:
 	if enabled:
 		_play(&"crossbow_hit", point, HIT_GAIN_DB)
+
+func crossbow_flight(bolt: Node3D) -> void:
+	if not enabled:
+		return
+	var voice := _play(&"crossbow_flight", bolt.global_position, FLIGHT_GAIN_DB)
+	if voice != null:
+		_flight_targets[voice] = bolt
+		set_process(true)
+
+func _process(_delta: float) -> void:
+	for voice: AudioStreamPlayer3D in _flight_targets.keys():
+		var bolt := _flight_targets[voice]
+		if not is_instance_valid(bolt) or bolt.is_queued_for_deletion() or not voice.playing:
+			voice.stop()
+			_flight_targets.erase(voice)
+		else:
+			voice.global_position = bolt.global_position
+	if _flight_targets.is_empty():
+		set_process(false)
 
 func gauntlet_swung(point: Vector3, index: int, airborne: bool) -> void:
 	if enabled:
@@ -300,6 +333,8 @@ func flush_zombie_steps() -> void:
 	_step_distances.clear()
 
 func reset() -> void:
+	_flight_targets.clear()
+	set_process(false)
 	_step_points.clear()
 	_step_distances.clear()
 	_zombie_step_frame = -1
@@ -386,9 +421,9 @@ func _next_stream(group: StringName) -> AudioStream:
 	_next_choice[group] = (choice + 1) % choices.size()
 	return choices[choice]
 
-func _play(group: StringName, point: Vector3, gain: float) -> void:
+func _play(group: StringName, point: Vector3, gain: float) -> AudioStreamPlayer3D:
 	if not _groups.has(group):
-		return
+		return null
 	# Separate enemy attack and reaction budgets keep the weapon tails audible.
 	var pool := 0
 	match group:
@@ -398,7 +433,11 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 			pool = ATTACK_POOL
 		&"zombie_step":
 			pool = STEP_POOL
+		&"crossbow_flight":
+			pool = FLIGHT_POOL
 	var first := pool * VOICES_PER_POOL
+	if first >= _voices.size():
+		return null
 	var start := _next_voice[pool]
 	var slot := -1
 	for offset in VOICES_PER_POOL:
@@ -416,7 +455,7 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 			0:
 				slot = start
 		if slot == -1:
-			return
+			return null
 	var stream := _next_stream(group)
 	var voice_index := first + slot
 	var voice := _voices[voice_index]
@@ -429,6 +468,7 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 	voice.volume_db = gain
 	voice.max_db = gain
 	voice.play()
+	return voice
 
 func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName, frame: int) -> int:
 	# Preserve leading cues in a burst. Only a higher priority can interrupt one.

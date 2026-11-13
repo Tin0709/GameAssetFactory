@@ -3,6 +3,7 @@ extends Node3D
 
 signal ammo_changed(amount: int)
 signal bolt_impact(hit: Dictionary, direction: Vector3, serial: int)
+signal bolt_launched(bolt: Node3D)
 
 const Source := preload("res://scripts/mechanic_lab_weapon_source.gd")
 const SourceGait := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
@@ -111,6 +112,7 @@ func fire(origin: Vector3, direction: Vector3, serial: int) -> bool:
 	bolt.reset_physics_interpolation()
 	_bolts.append({"node": bolt, "direction": direction, "life": BOLT_LIFETIME, "serial": serial})
 	set_physics_process(true)
+	bolt_launched.emit(bolt)
 	return true
 
 func reset() -> void:

@@ -397,7 +397,7 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	if step_samples.size() != 5:
 		lab.free()
 		return
-	var voices: Array = audio._voices.slice(3 * COMBAT_AUDIO.VOICES_PER_POOL)
+	var voices: Array = audio._voices.slice(3 * COMBAT_AUDIO.VOICES_PER_POOL, 4 * COMBAT_AUDIO.VOICES_PER_POOL)
 	for voice in voices:
 		voice.bus = AudioServer.get_bus_name(bus)
 	var group := lab.get_node("Zombies")

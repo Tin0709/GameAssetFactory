@@ -438,6 +438,7 @@ func _load_crossbow(root: String) -> bool:
 	_crossbow.bolt_mesh = bolt
 	_crossbow.ammo_changed.connect(_set_crossbow_ammo)
 	_crossbow.bolt_impact.connect(_on_crossbow_impact)
+	_crossbow.bolt_launched.connect(_combat_audio.crossbow_flight)
 	$CombatEffects.add_child(_crossbow)
 	_set_crossbow_ammo(_crossbow.ammo)
 	_combat_audio.load_crossbow(root)
