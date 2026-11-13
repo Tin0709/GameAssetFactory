@@ -170,8 +170,6 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 		elif attempt == 2:
 			toggle.button_pressed = false
 			toggle.button_pressed = true
-			# Exclude the existing enable preview from the mixer capture.
-			audio.reset()
 		var playback_frame := -1
 		for i in 18:
 			await physics_frame

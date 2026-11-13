@@ -33,7 +33,7 @@ const FINISHER_SHAKE_HEIGHT_FRACTION := 0.008
 const PRIVATE_CONTROLS := "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E %s · R về giữa"
 const TIME_PRESETS := [2.5, 7.0, 12.0, 16.5, 18.5, 19.5, 22.0]
 # AM_Player_Sabre_JumpAttack: PlayDebrisEffect minus LandingStart.
-const SABRE_LANDING_DUST_DELAY := 0.045126423
+const SABRE_LANDING_DEBRIS_DELAY := 0.045126423
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD }
 
@@ -45,6 +45,8 @@ var spawn_position := SPAWN
 var player_health := MAX_PLAYER_HEALTH
 var _previous_msaa: Viewport.MSAA
 var _combat_audio: CombatAudio
+var _slam_audio_frame := -1
+var _slam_audio_point: Vector3
 var _contact_sparks: ContactSparks
 var _movement_audio: MovementAudio
 var _weapon_mesh: MeshInstance3D
@@ -169,6 +171,7 @@ func _ready() -> void:
 		player.connect("grounded_sabre_impact", $Zombies.strike_sabre)
 		player.connect("heavy_jump_landed", $Zombies.land_sabre)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
+		player.presentation_reset.connect(_cancel_slam_audio)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
@@ -355,11 +358,16 @@ func _setup_movement_audio() -> void:
 	_movement_audio.setup(player, null, bundle)
 
 func _heavy_dust_delay() -> float:
-	return SABRE_LANDING_DUST_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
+	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
+
+func _cancel_slam_audio() -> void:
+	_slam_audio_frame = -1
 
 func _set_combat_audio(enabled: bool) -> void:
 	if _combat_audio == null:
 		return
+	if not enabled:
+		_cancel_slam_audio()
 	if player.reference_audio != null:
 		player.reference_audio.enabled = enabled
 	if _movement_audio != null:
@@ -392,7 +400,13 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 func _on_sabre_landing(point: Vector3, serial: int) -> void:
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
-	_combat_audio.slam_landed(point)
+	if not _combat_audio.enabled:
+		return
+	if _equipped_weapon == Weapon.SABRE:
+		_slam_audio_point = point
+		_slam_audio_frame = Engine.get_physics_frames() + ceili(SABRE_LANDING_DEBRIS_DELAY * Engine.physics_ticks_per_second)
+	else:
+		_combat_audio.slam_landed(point)
 
 func _start_contact_light(point: Vector3, serial: int, energy: float) -> void:
 	if _light_serial == serial:
@@ -407,6 +421,9 @@ func _start_contact_light(point: Vector3, serial: int, energy: float) -> void:
 func _physics_process(_delta: float) -> void:
 	if player.position.y < -5.0:
 		reset_player()
+	if _slam_audio_frame >= 0 and Engine.get_physics_frames() >= _slam_audio_frame:
+		_cancel_slam_audio()
+		_combat_audio.slam_landed(_slam_audio_point)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.physical_keycode == KEY_T and event.pressed and not event.echo:
