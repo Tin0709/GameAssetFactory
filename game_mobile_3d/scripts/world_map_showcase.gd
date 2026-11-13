@@ -2064,7 +2064,6 @@ func apply_time()->void:
 	if (not private_primary and not _flat_lab) or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
 	refresh_daylight_shading()
-	_refresh_lantern_glow()
 	if not _flat_lab:
 		_publish_night_path_chroma()
 		_publish_stone_twilight_color()
@@ -2090,6 +2089,7 @@ func apply_time()->void:
 		for field:String in _forest_expected:
 			if env.get(field)!=_forest_expected[field]:unchanged=false;break
 		if unchanged:return
+	_refresh_lantern_glow()
 	if _time_applied:_restore_day()
 	if is_day_anchor():
 		if use_forest:_apply_forest(env,sun);_time_applied=true
