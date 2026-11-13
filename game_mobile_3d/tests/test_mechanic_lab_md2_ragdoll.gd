@@ -147,6 +147,19 @@ func run() -> void:
 	for bone in skeleton.get_bone_count():
 		held_still = held_still and skeleton.get_bone_global_pose(bone).is_equal_approx(resting_pose[bone])
 	check(held_still, "The parked corpse holds every bone still across later physics frames")
+	var pre_breakup: Variant = zombie._mesh.get_instance_shader_parameter("fragment_travel")
+	check(pre_breakup == null or is_zero_approx(float(pre_breakup)),
+		"The parked corpse does not separate before the dissolve")
+	while is_instance_valid(zombie) and zombie._corpse_age < 4.74:
+		await physics_frame
+	var travel: Variant = zombie._mesh.get_instance_shader_parameter("fragment_travel")
+	check(travel != null and float(travel) > 0.0,
+		"The source body parts move during the dissolve")
+	var directions: Variant = zombie._corpse_material.get_shader_parameter("fragment_directions")
+	check(directions is PackedVector3Array and directions.size() == zombie._mesh.skin.get_bind_count()
+		and directions[2].distance_to(directions[15]) > 0.05
+		and directions[15].is_equal_approx(directions[18]),
+		"Source head and legs separate while the mouth follows the head")
 	while is_instance_valid(zombie) and zombie._corpse_age < 4.96:
 		await physics_frame
 	check(is_instance_valid(zombie), "Corpse remains until the table's five-second lifespan")
