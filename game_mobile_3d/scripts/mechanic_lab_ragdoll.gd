@@ -305,14 +305,16 @@ func _recover_early_floor_arm_gap() -> void:
 		var spec: Dictionary = source_joints[name]
 		var gap: Vector3 = (chest_state.transform * spec.parent_frame).origin \
 			- (state.transform * spec.child_frame).origin
-		var tangent := gap.slide(Vector3.UP).length()
+		var along_floor := gap.slide(Vector3.UP)
+		var tangent := along_floor.length()
 		if tangent > 2.0 * SOURCE_ANCHOR_TOLERANCE and absf(gap.y) <= tangent * 0.75 \
 				and _body_supported_by(arm, floor_body):
+			# Only extend the slide when its normal limit leaves a large gap.
 			var remaining_tangent := sqrt(maxf(EARLY_ARM_SLIDE_RESIDUAL ** 2 - gap.y * gap.y, 0.0))
 			var slide_limit := FIRST_CONTACT_ANCHOR_MAX_SLIDE + EARLY_ARM_SLIDE_EXTRA
 			var slide_distance := minf(slide_limit, tangent - remaining_tangent)
 			if slide_distance > FIRST_CONTACT_ANCHOR_MAX_SLIDE:
-				var motion := gap.slide(Vector3.UP) * (slide_distance / tangent)
+				var motion := along_floor * (slide_distance / tangent)
 				if not _test_projection_motion(arm, state.transform, motion, floor_body.get_rid()):
 					state.transform = state.transform.translated(motion)
 					continue
