@@ -602,6 +602,9 @@ func _emit_surface_contact(soles: Array, landed: bool) -> void:
 func _uses_native_jump_pose(key:String)->bool:
 	return native_jump_pose_enabled and using_original_source and key in ["JumpTakeoff","JumpAirborne","JumpLanding"]
 
+func _combat_stride_pose(phase: float, speed: float) -> Array[Transform3D]:
+	return source_gait.compose(phase, speed)
+
 func _animate(delta:float)->void:
 	if foot_placement!=null:foot_placement.restore()
 	var permission_before:bool=combo.movement_allowed()
@@ -643,7 +646,7 @@ func _animate(delta:float)->void:
 		var before_phase:=_gait_resume_phase
 		var advance_phase:=delta/float(leg_state.period) if moving_legs else 0.
 		_gait_resume_phase=fposmod(before_phase+advance_phase,1.)
-		combat_legs.apply(source_gait.compose(_gait_resume_phase,motion_speed),moving_legs,delta)
+		combat_legs.apply(_combat_stride_pose(_gait_resume_phase,motion_speed),moving_legs,delta)
 		_gait_cycles_this_tick+=advance_phase
 		if moving_legs:
 			var event_clip:String=leg_state.right if float(leg_state.weight)>.5 else leg_state.left

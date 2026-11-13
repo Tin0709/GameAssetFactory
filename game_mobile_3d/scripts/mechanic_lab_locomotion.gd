@@ -36,7 +36,7 @@ func apply(actor, key: String, delta: float) -> void:
 	super.apply(actor, key, delta)
 
 func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transform3D]:
-	var actions_and_stuff := _locals(_sample("Run", (cycle + CROSSBOW_RUN_PHASE_OFFSET) * float(streams.Run.duration)))
+	var actions_and_stuff := run_pose(cycle)
 	# Carry both authored MD2 arms as a unit with the A&S torso. The arm,
 	# wrist and weapon joints keep their relative transforms through the run.
 	for bone in _leg_bones:
@@ -47,6 +47,9 @@ func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transf
 	native[spine] = native[spine].interpolate_with(actions_and_stuff[spine], 0.7)
 	native[_body_bone] = native[_body_bone].interpolate_with(actions_and_stuff[_body_bone], 0.7)
 	return native
+
+func run_pose(cycle: float) -> Array[Transform3D]:
+	return _locals(_sample("Run", (cycle + CROSSBOW_RUN_PHASE_OFFSET) * float(streams.Run.duration)))
 
 func keep_shoulders_attached() -> void:
 	# The paired grip already comes from the source shoulders.

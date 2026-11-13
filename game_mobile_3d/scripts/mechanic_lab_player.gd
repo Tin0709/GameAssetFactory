@@ -50,6 +50,11 @@ func _combat_entry_blend(key: String) -> float:
 		return maxf(seconds, 0.10)
 	return seconds
 
+func _combat_stride_pose(phase: float, speed: float) -> Array[Transform3D]:
+	if crossbow_equipped and _run_requested and hybrid_motion != null:
+		return hybrid_motion.run_pose(phase)
+	return super._combat_stride_pose(phase, speed)
+
 func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 	if key not in GAITS or (key not in LabLocomotion.WALKS and not weapon_source_locomotion):
 		return super._outgoing_locomotion_sampler(key, phase)
