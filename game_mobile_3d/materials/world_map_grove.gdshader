@@ -2,6 +2,10 @@ shader_type spatial;
 #ifdef GAF_GROVE_REVEAL_COVERAGE
 render_mode alpha_to_coverage_and_one;
 #endif
+#ifdef GAF_GROVE_PLAYER_CUE
+stencil_mode write, compare_always, 122;
+uniform float player_cue_weight = 0.0;
+#endif
 #include "res://materials/world_map_wind.gdshaderinc"
 #include "res://materials/world_map_crown_wind.gdshaderinc"
 #ifdef GAF_WORLD_TREE_SKY
@@ -133,6 +137,9 @@ void fragment() {
 		float distance_to_player = length(max(extent - 0.48, vec2(0.0)));
 		if (offset.z > 0.01 && distance_to_player < 0.80) {
 			float opacity = smoothstep(0.35, 0.80, distance_to_player);
+#ifdef GAF_GROVE_PLAYER_CUE
+			opacity = mix(opacity, 1.0, player_cue_weight);
+#endif
 			float threshold = fract(52.9829189 * fract(dot(floor(FRAGCOORD.xy), vec2(0.06711056, 0.00583715))));
 #ifdef GAF_GROVE_REVEAL_COVERAGE
 			// Share the transition across two MSAA samples, with the original
