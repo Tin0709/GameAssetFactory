@@ -72,7 +72,7 @@ func run() -> void:
 	check(sparks != null, "Polaris loads its two source impact emitters")
 	var burst_sizes: Array[int] = []
 	lab._crossbow.bolt_impact.connect(func(_hit: Dictionary, _direction: Vector3, _serial: int) -> void:
-		burst_sizes.append(sparks.multimesh.visible_instance_count if sparks != null else 0))
+		burst_sizes.append(sparks._active_count if sparks != null else 0))
 	var muzzle_errors: Array[float] = []
 	lab._crossbow.bolt_launched.connect(func(projectile: Node3D) -> void:
 		muzzle_errors.append(projectile.global_position.distance_to(lab._crossbow_mount.to_global(CrossPollinator.MUZZLE))))
@@ -178,6 +178,7 @@ func run() -> void:
 		"Reset clears an embedded arrow immediately")
 	await check_crossbow_collision_radius(lab)
 	await check_crossbow_trail(lab)
+	await check_crossbow_impact_burst(lab, sparks)
 	await ticks(12)
 	target.position = Vector3(2.5, 0.0, 3.0)
 	lab.player._q = true
@@ -310,6 +311,30 @@ func run() -> void:
 		await process_frame
 	print("MECHANIC_LAB_REQUESTED_WEAPONS failures=", failures)
 	quit(1 if failures else 0)
+
+func check_crossbow_impact_burst(lab: Node3D, sparks: MultiMeshInstance3D) -> void:
+	if sparks == null:
+		return
+	var crossbow = lab._crossbow
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(8.0, 2.0, 0.1)
+	collider.shape = box
+	wall.add_child(collider)
+	lab.add_child(wall)
+	wall.position = Vector3(18.0, 1.25, 3.0)
+	await ticks(2)
+	for index in 25:
+		var origin := Vector3(15.0 + index * 0.25, 1.25, 0.0)
+		crossbow.fire(origin, Vector3.BACK, -300 - index, origin)
+	await ticks(8)
+	check(crossbow._bolts.is_empty() and sparks.multimesh.visible_instance_count in range(200, 251),
+		"One batch can draw both emitters for all 25 simultaneous arrow impacts")
+	crossbow.reset()
+	check(sparks.multimesh.visible_instance_count == 0,
+		"Reset clears the whole batch immediately")
+	wall.queue_free()
 
 func check_crossbow_trail(lab: Node3D) -> void:
 	var crossbow = lab._crossbow

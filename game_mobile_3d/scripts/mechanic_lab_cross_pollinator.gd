@@ -226,7 +226,6 @@ func reset() -> void:
 	set_physics_process(false)
 
 func _physics_process(delta: float) -> void:
-	var sparks_active := impact_sparks != null and impact_sparks.advance(delta)
 	if not _embedded_arrows.is_empty():
 		_update_embedded_arrows(delta)
 	if ammo < AMMO_MAX:
@@ -259,12 +258,12 @@ func _physics_process(delta: float) -> void:
 			if not hit.is_empty():
 				_embed_on_terrain(hit, bolt.direction)
 				_report_impact(hit, direction, bolt.serial)
-				sparks_active = impact_sparks != null
 		else:
 			node.global_position = end
 			trail.distance += start.distance_to(end)
 	if not _trails.is_empty():
 		_update_trails()
+	var sparks_active := impact_sparks != null and impact_sparks.advance(delta)
 	if ammo == AMMO_MAX and _bolts.is_empty() and _embedded_arrows.is_empty() and _trails.is_empty() and not sparks_active:
 		set_physics_process(false)
 

@@ -73,7 +73,6 @@ func burst(point: Vector3, direction: Vector3, normal: Vector3) -> void:
 		var velocity := _cone_direction(frame.y, 0.8) * _random.randf_range(5.0, 12.0)
 		_spawn(outside + offset, velocity, Vector3.DOWN * 1.5, Vector2(_random.randf_range(0.09, 0.13), 0.07),
 			_random.randf_range(0.2, 0.3), 4.0, _sphere_colors)
-	advance(0.0)
 
 func _cone_direction(axis: Vector3, spread: float) -> Vector3:
 	var minimum := cos(PI * _random.randf() * spread) if spread < 1.0 else -1.0

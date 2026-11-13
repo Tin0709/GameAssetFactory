@@ -646,7 +646,8 @@ func _set_combat_audio(enabled: bool) -> void:
 	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP)
 
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, lethal: bool) -> void:
-	if clip != CrossPollinator.SHOT or _crossbow.impact_sparks == null:
+	var has_arrow_sparks := clip == CrossPollinator.SHOT and _crossbow != null and _crossbow.impact_sparks != null
+	if not has_arrow_sparks:
 		if _contact_sparks != null:
 			_contact_sparks.burst(point, direction)
 		else:
