@@ -161,7 +161,18 @@ func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame:
 		"The handoff places all linked bodies on the actor's side of the wall")
 	check(absf(ragdoll.skeleton.global_position.x) <= 0.12 + 0.0001,
 		"The handoff keeps the existing whole-pose translation limit")
-	print("LAB_STRADDLED_WALL clip=", clip, " farthest=", farthest, " gap=", ragdoll.max_anchor_error())
+	var handoff_gap: float = ragdoll.max_anchor_error()
+	zombie.set_physics_process(true)
+	var escaped := false
+	for i in 90:
+		await physics_frame
+		if not ragdoll.running:
+			break
+		for body: PhysicalBone3D in ragdoll.bodies.values():
+			farthest = maxf(farthest, body.global_position.x)
+		escaped = escaped or farthest > 0.75
+	check(not escaped, "The launch keeps all six body centres on the near side through contact")
+	print("LAB_STRADDLED_WALL clip=", clip, " farthest=", farthest, " handoff_gap=", handoff_gap)
 	wall.free()
 	lab.free()
 
