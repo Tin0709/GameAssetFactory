@@ -95,6 +95,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_detail_softness": ["Stone texture softness", 1.],
 	&"night_spatial_sky": ["Night terrain bounce (preview)", 1.],
 	&"night_stone_blue_softness": ["Dịu sắc lam trên đá ban đêm", 1.],
+	&"dawn_stone_sky_color": ["Sắc ánh trời trên đá rạng sáng", 1.],
 	&"night_stone_fill_balance": ["Cân bằng sắc đá ban đêm", 1.],
 	&"night_stone_top_cool": ["Sắc xanh trên mặt đá", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
@@ -170,7 +171,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 90
+const LIGHTING_MIX_VERSION := 91
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1263,6 +1264,15 @@ func night_stone_blue_softness() -> float:
 		return 0.0
 	return moonlight_weight(hour) * _lighting_scale(&"night_stone_blue_softness")
 
+func dawn_stone_sky_color() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() \
+			or not captured_sky_response or not sky_response.available() or not moonlight_enabled:
+		return 0.0
+	return _dawn_shadow_weight() * _lighting_scale(&"dawn_stone_sky_color")
+
+func _dawn_shadow_weight() -> float:
+	return smoothstep(0.0, 2.5, hour) * (1.0 - smoothstep(2.5, 4.5, hour))
+
 func _publish_dawn_turf_color() -> void:
 	if _point_kernel_owner == null or _point_kernel_owner.get_ref() != self:
 		return
@@ -1270,8 +1280,7 @@ func _publish_dawn_turf_color() -> void:
 	if not _balanced_preview and atmosphere_review == "combined" and forest_spatial_sky_context() \
 			and captured_sky_response and sky_response.available() and moonlight_enabled \
 			and plants != null and plants.grass_light.active and is_instance_valid(_player_light):
-		var dawn := smoothstep(0.0, 2.5, hour) * (1.0 - smoothstep(2.5, 4.5, hour))
-		strength = dawn * _lighting_scale(&"dawn_turf_color")
+		strength = _dawn_shadow_weight() * _lighting_scale(&"dawn_turf_color")
 	if strength != _dawn_turf_color:
 		_dawn_turf_color = strength
 		RenderingServer.global_shader_parameter_set("gaf_dawn_turf_color", strength)
@@ -1593,6 +1602,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 90 and effect == &"dawn_turf_color":
 			missing_value = 0.
+		if version < 91 and effect == &"dawn_stone_sky_color":
+			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
 		if version < 84 and effect == &"night_stone_blue_softness":
@@ -1689,7 +1700,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _regional_sky_editable()
 		if effect == &"daylight_bounce":
 			slider.editable = _day_bounce_editable()
-		if effect == &"night_stone_blue_softness":
+		if effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color"]:
 			slider.editable = slider.editable and sky_response.available() and level.terrain_light.installed
 		if effect == &"stone_diffuse_contrast":
 			slider.editable = _stone_diffuse_editable()
@@ -1719,7 +1730,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"diffuse_openings":
 		return # Published with the final camera and sun before drawing.
-	if changed_effect == &"night_stone_blue_softness":
+	if changed_effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color"]:
 		level.terrain_light.bind()
 		return
 	if changed_effect in [&"regional_sky", &"daylight_bounce", &"stone_diffuse_contrast", &"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
