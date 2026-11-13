@@ -94,6 +94,7 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
 	check(steps >= 3 and peak > 0.001 and peak < 0.9,
 		"Movement contacts send MD2 grass steps to the mixer with headroom")
+	Input.action_release("move_forward")
 	Input.action_press("jump")
 	for i in 10:
 		await physics_frame
@@ -103,6 +104,7 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var before_landing: int = movement.event_count.grass
 	var stayed_quiet := true
 	for i in 75:
+		capture.clear_buffer()
 		await physics_frame
 		if lab.player._grounded:
 			break
@@ -111,11 +113,17 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 		and movement.event_count.grass == before_landing
 		and movement.last_sources.get("land_grass", "").begins_with("sfx_player_land_grassPath_"),
 		"A normal jump plays the pinned MD2 landing family without adding a grass footstep")
+	for i in 12:
+		await physics_frame
+	var landing_peak := 0.0
+	for sample in capture.get_buffer(capture.get_frames_available()):
+		landing_peak = maxf(landing_peak, maxf(absf(sample.x), absf(sample.y)))
+	check(landing_peak > 0.001 and landing_peak < 0.9, "The ordinary landing produces audible PCM with headroom")
 	toggle.button_pressed = false
 	check(not movement.footsteps_enabled and not movement.step_voices.any(func(voice): return voice.playing),
 		"Turning off lab audio stops movement voices immediately")
-	Input.action_release("move_forward")
-	print("MECHANIC_LAB_MOVEMENT_AUDIO steps=", steps, " landing=", movement.event_count.landing, " pcm_peak=", peak)
+	print("MECHANIC_LAB_MOVEMENT_AUDIO steps=", steps, " landing=", movement.event_count.landing,
+		" step_peak=", peak, " landing_peak=", landing_peak)
 	lab.free()
 
 func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
