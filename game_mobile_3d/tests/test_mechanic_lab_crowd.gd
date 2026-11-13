@@ -14,6 +14,7 @@ var draws: Array[float] = []
 var active_peak := 0
 var first_tick_ragdolls := 0
 var peak_damage_glyphs := 0
+var late_active_ragdolls := 0
 var failures: Array[String] = []
 
 func _initialize() -> void:
@@ -61,13 +62,8 @@ func run() -> void:
 	Input.action_release("move_backward")
 	await check_crowd_melee(group)
 	await check_blocked_chase(group)
-	# Give each corpse clear room to complete its authored handoff and roll.
-	for i in COUNT:
-		var zombie = group.get_child(i)
-		zombie.global_position = Vector3(i % 10 * 4.0 - 18.0, 0.02, int(i / 10) * 4.0 - 18.0)
-		zombie.velocity = Vector3.ZERO
-		zombie.reset_physics_interpolation()
-		zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
+	var packed := OS.get_cmdline_user_args().has("--packed-ragdolls")
+	await launch_ragdolls(group, packed)
 	var bars := group.get_node_or_null("../ZombieHealthBars") as MultiMeshInstance3D
 	if bars != null and bars.multimesh.visible_instance_count != 0:
 		failures.append("A lethal hit immediately removes the zombie's overhead bar")
@@ -80,6 +76,10 @@ func run() -> void:
 	elif numbers.multimesh.visible_instance_count != 0:
 		failures.append("The batched damage numbers expire")
 	await measure("corpse_cleanup", 200, group)
+	if packed:
+		print("CROWD_PACKED_LATE_ACTIVE ", late_active_ragdolls)
+		if late_active_ragdolls > 0:
+			failures.append("Packed ragdolls beside the wall settle before they despawn")
 	if bars != null and bars.multimesh.visible_instance_count != 0:
 		failures.append("The batch drops the bars of despawned zombies")
 	var clean := group.get_child_count() == 0
@@ -91,6 +91,33 @@ func run() -> void:
 		" adapter=", RenderingServer.get_video_adapter_name())
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func launch_ragdolls(group: Node, packed: bool) -> void:
+	if packed:
+		var wall := StaticBody3D.new()
+		var collider := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = Vector3(0.30, 3.0, 18.0)
+		collider.shape = box
+		wall.add_child(collider)
+		wall.position = Vector3(4.5, 1.5, 0)
+		lab.add_child(wall)
+		await physics_frame
+		await physics_frame
+	var spacing := 0.9 if packed else 4.0
+	var start := spacing * 4.5
+	for i in COUNT:
+		var zombie = group.get_child(i)
+		zombie.global_position = Vector3(i % 10 * spacing - start, 0.02, int(i / 10) * spacing - start)
+		zombie.velocity = Vector3.ZERO
+		zombie.reset_physics_interpolation()
+		if packed:
+			# Start from the known idle pose and remove teleport velocity.
+			zombie.animation.play(ZOMBIE.IDLE, 0.0)
+			zombie.animation.advance(0.0)
+			zombie.ragdoll.sample(1.0 / 60.0)
+			zombie.ragdoll.sample(1.0 / 60.0)
+		zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
 
 func spawn_synchronously(group: Node) -> void:
 	var spawn := lab.get_node("HUD/SpawnZombie") as Button
@@ -302,6 +329,8 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 					active += 1
 			if label == "simultaneous_ragdolls" and i == 1:
 				first_tick_ragdolls = active
+			if label == "corpse_cleanup" and i == 149:
+				late_active_ragdolls = active
 			active_peak = maxi(active_peak, active)
 			if label == "simultaneous_ragdolls" and numbers != null:
 				peak_damage_glyphs = maxi(peak_damage_glyphs, numbers.multimesh.visible_instance_count)
