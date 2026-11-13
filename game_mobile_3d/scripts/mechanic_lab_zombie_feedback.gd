@@ -1,7 +1,7 @@
 extends Node3D
 ## The digit silhouettes come from the external MD2 cue atlas. Timing and colors are lab settings.
 
-const HEALTH_SHADER := preload("res://materials/mechanic_lab_zombie_health.gdshader")
+const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 const DIGIT_SIZE := 32
 const DIGIT_ADVANCE := 24.5
 const NUMBER_DURATION := 0.68
@@ -10,6 +10,8 @@ const NUMBER_PIXEL_SIZE := 0.0144
 var digits: Array[Texture2D]
 var effects: Node3D
 var bar: MeshInstance3D
+var health_bars: HealthBars
+var bar_slot := -1
 var _health_ratio := 1.0
 var _delayed_ratio := 1.0
 var _delay := 0.0
@@ -18,24 +20,33 @@ static var _bar_mesh: QuadMesh
 static var _bar_material: ShaderMaterial
 
 func _ready() -> void:
+	if health_bars != null:
+		bar_slot = health_bars.add_bar(self)
+	else:
+		_create_individual_bar()
+	set_process(false)
+
+func _create_individual_bar() -> void:
 	if _bar_mesh == null:
-		_bar_mesh = QuadMesh.new()
-		_bar_mesh.size = Vector2(0.86, 0.165)
+		_bar_mesh = HealthBars.make_quad()
 		_bar_material = ShaderMaterial.new()
-		_bar_material.shader = HEALTH_SHADER
+		_bar_material.shader = HealthBars.HEALTH_SHADER
 	bar = MeshInstance3D.new()
 	bar.name = "OverheadHealth"
 	bar.mesh = _bar_mesh
 	bar.material_override = _bar_material
 	bar.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(bar)
-	bar.position.y = 2.16
-	set_process(false)
+	bar.position.y = HealthBars.BAR_HEIGHT
 
 func show_hit(amount: int, remaining: int, maximum: int) -> void:
 	_health_ratio = float(remaining) / maximum
-	bar.set_instance_shader_parameter("health_ratio", _health_ratio)
-	bar.visible = remaining > 0
+	if remaining <= 0:
+		_remove_batched_bar()
+		if bar != null:
+			bar.hide()
+	else:
+		_update_bar_fill()
 	_delay = 0.12
 	set_process(remaining > 0)
 	_spawn_number(amount)
@@ -45,9 +56,24 @@ func _process(delta: float) -> void:
 	if _delay > 0.0:
 		return
 	_delayed_ratio = move_toward(_delayed_ratio, _health_ratio, delta * 1.9)
-	bar.set_instance_shader_parameter("delayed_ratio", _delayed_ratio)
+	_update_bar_fill()
 	if is_equal_approx(_delayed_ratio, _health_ratio):
 		set_process(false)
+
+func _update_bar_fill() -> void:
+	if bar_slot >= 0:
+		health_bars.set_bar_health(bar_slot, _health_ratio, _delayed_ratio)
+	elif bar != null:
+		bar.set_instance_shader_parameter("health_ratio", _health_ratio)
+		bar.set_instance_shader_parameter("delayed_ratio", _delayed_ratio)
+
+func _exit_tree() -> void:
+	_remove_batched_bar()
+
+func _remove_batched_bar() -> void:
+	if bar_slot >= 0 and is_instance_valid(health_bars):
+		health_bars.remove_bar(bar_slot)
+		bar_slot = -1
 
 func _spawn_number(amount: int) -> void:
 	var camera := get_viewport().get_camera_3d()

@@ -14,6 +14,7 @@ const PrivateOverworldBundle := preload("res://scenes/dev/actions_stuff_research
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
 const CurvedGreatsword := preload("res://scripts/mechanic_lab_curved_greatsword.gd")
 const DamageFeedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
+const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 const PLAYER_HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_player_hit_flash.gdshader")
 const ContactSparks := preload("res://scripts/mechanic_lab_contact_sparks.gd")
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
@@ -187,6 +188,10 @@ func _ready() -> void:
 		player.combo.use_sabre_air_sections = true
 		player.attack_accepted_timed.disconnect(player.reference_audio.trigger_attack)
 		player.attack_accepted_timed.connect(_on_attack_accepted_timed)
+		var bars := HealthBars.new()
+		bars.name = "ZombieHealthBars"
+		add_child(bars)
+		$Zombies.health_bars = bars
 		$Zombies.setup_combat(player)
 		player.grounded_melee_aim = $Zombies.aim_sabre
 		player.connect("grounded_sabre_impact", $Zombies.strike_sabre)
