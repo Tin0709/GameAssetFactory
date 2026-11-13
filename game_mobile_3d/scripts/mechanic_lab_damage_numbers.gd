@@ -9,6 +9,9 @@ const NUMBER_DURATION := 0.68
 const POP_DURATION := 0.11
 const FADE_DURATION := 0.28
 const INITIAL_CAPACITY := 64
+# A full buffer upload is cheaper for bursts. Sparse hits can write just the live slots.
+const BUFFER_UPLOAD_MIN_GLYPHS := 48
+const INSTANCE_FLOATS := 16
 
 class DamageNumber:
 	var text: String
@@ -19,6 +22,7 @@ class DamageNumber:
 	var depth: float
 
 var _numbers: Array[DamageNumber] = []
+var _instance_buffer := PackedFloat32Array()
 
 func setup(glyphs: Array[Texture2D]) -> void:
 	var atlas := Image.create_empty(DIGIT_SIZE * DIGIT_COUNT, DIGIT_SIZE, false, Image.FORMAT_RGBA8)
@@ -64,6 +68,9 @@ func _process(delta: float) -> void:
 		return
 	if glyph_count > multimesh.instance_count:
 		multimesh.instance_count = nearest_po2(glyph_count)
+	var upload_buffer := glyph_count >= BUFFER_UPLOAD_MIN_GLYPHS
+	if upload_buffer:
+		_instance_buffer.resize(multimesh.instance_count * INSTANCE_FLOATS)
 	var camera := get_viewport().get_camera_3d()
 	var camera_side := camera.global_basis.x if camera != null else Vector3.RIGHT
 	var camera_back := camera.global_basis.z if camera != null else Vector3.BACK
@@ -83,7 +90,23 @@ func _process(delta: float) -> void:
 		var length := number.text.length()
 		for i in length:
 			var origin := number.centre + spacing * (i - (length - 1) * 0.5)
-			multimesh.set_instance_transform(slot, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * scale), to_local(origin)))
-			multimesh.set_instance_custom_data(slot, Color(number.text.unicode_at(i) - 48, alpha, 0.0, 0.0))
+			var point := to_local(origin)
+			var digit := number.text.unicode_at(i) - 48
+			if upload_buffer:
+				# MultiMesh stores three row-major transform rows, then four custom floats.
+				var offset := slot * INSTANCE_FLOATS
+				_instance_buffer[offset] = scale
+				_instance_buffer[offset + 3] = point.x
+				_instance_buffer[offset + 5] = scale
+				_instance_buffer[offset + 7] = point.y
+				_instance_buffer[offset + 10] = scale
+				_instance_buffer[offset + 11] = point.z
+				_instance_buffer[offset + 12] = digit
+				_instance_buffer[offset + 13] = alpha
+			else:
+				multimesh.set_instance_transform(slot, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * scale), point))
+				multimesh.set_instance_custom_data(slot, Color(digit, alpha, 0.0, 0.0))
 			slot += 1
+	if upload_buffer:
+		multimesh.buffer = _instance_buffer
 	multimesh.visible_instance_count = glyph_count
