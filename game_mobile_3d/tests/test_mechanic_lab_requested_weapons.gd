@@ -109,12 +109,29 @@ func run() -> void:
 	check(combat_audio._next_choice.get(&"crossbow_fire", 0) == 2, "Two shots use two different firing samples")
 	barrier.position.z = 0.50
 	await ticks(2)
+	var firing_choices_at_impact: Array[int] = []
+	var flight_counts_at_impact: Array[int] = []
+	var record_impact := func(_hit: Dictionary, _direction: Vector3, _serial: int) -> void:
+		firing_choices_at_impact.append(combat_audio._next_choice.get(&"crossbow_fire", 0))
+		flight_counts_at_impact.append(combat_audio._flight_targets.size())
+	lab._crossbow.bolt_impact.connect(record_impact)
 	attack(true)
 	await ticks(2)
 	attack(false)
 	await ticks(36)
 	check(target.health == 92 and muzzle_errors.size() == 2 and ammo.text.contains("23 / 25"),
 		"A wall inside muzzle reach stops the bolt and still spends the shot")
+	check(firing_choices_at_impact == [0] and flight_counts_at_impact == [0],
+		"A muzzle obstruction plays the third firing cue before impact and starts no flight cue")
+	barrier.position.z = 2.5
+	await ticks(2)
+	attack(true)
+	await ticks(2)
+	attack(false)
+	await ticks(36)
+	check(firing_choices_at_impact == [0, 1] and flight_counts_at_impact == [0, 0],
+		"A travelling bolt stops its flight cue before the impact callback")
+	lab._crossbow.bolt_impact.disconnect(record_impact)
 	sound.button_pressed = false
 	barrier.queue_free()
 
