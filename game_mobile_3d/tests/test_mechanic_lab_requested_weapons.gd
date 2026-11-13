@@ -105,6 +105,14 @@ func run() -> void:
 	check(target.health == 92 and contacts.size() == 1, "A wall blocks the bolt from hitting the zombie")
 	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 2, "A wall hit plays the next arrow impact")
 	check(combat_audio._next_choice.get(&"crossbow_fire", 0) == 2, "Two shots use two different firing samples")
+	barrier.position.z = 0.50
+	await ticks(2)
+	attack(true)
+	await ticks(2)
+	attack(false)
+	await ticks(36)
+	check(target.health == 92 and muzzle_errors.size() == 2 and ammo.text.contains("23 / 25"),
+		"A wall inside muzzle reach stops the bolt and still spends the shot")
 	sound.button_pressed = false
 	barrier.queue_free()
 
