@@ -82,7 +82,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"dawn_sky_transition": ["Ánh sáng hắt rạng sáng", 1.],
 	&"daylight_balance": ["Daylight color balance", 1.],
 	&"player_sky": ["Player sky fill", 2.],
-	&"player_bounce": ["Player reflected sunlight (preview)", 1.],
+	&"player_bounce": ["Ánh nắng hắt lên nhân vật", 1.],
 	&"foot_contact": ["Player ground contact (preview)", 1.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"turf_ambient_color": ["Sắc ánh hắt trên cỏ lúc tối", 1.],
@@ -176,7 +176,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 95
+const LIGHTING_MIX_VERSION := 96
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -196,6 +196,7 @@ const BALANCED_ATMOSPHERE := {
 	&"grade": .55,
 	&"exposure": .9,
 	&"player_sky": 1.25,
+	&"player_bounce": 0.,
 	&"grass_sky": 0.,
 	&"spruce_sky": 0.,
 	&"tree_shade": 0.,
@@ -1194,7 +1195,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"foot_contact":
 		return 0.
 	if effect == &"player_bounce":
-		return 0.
+		return .5
 	if effect == &"projected_sun":
 		return .40
 	if effect == &"night_path_chroma":
@@ -1563,8 +1564,6 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 31 and effect == &"foot_contact":
 			missing_value = 0.
-		if version < 32 and effect == &"player_bounce":
-			missing_value = 0.
 		if version < 33 and effect == &"projected_sun":
 			missing_value = 0.
 		if version < 34 and effect == &"humid_depth":
@@ -1672,6 +1671,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 94 and effect == &"night_glare_control":
 			missing_value = 0.
 		if version < 95 and effect == &"morning_depth_scatter":
+			missing_value = 0.
+		if version < 96 and effect == &"player_bounce":
 			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
@@ -2362,7 +2363,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"player_sky":
 			slider.tooltip_text = "Scale sky fill on the player outside noon. Terrain, direct lights, and the fog keep their own settings."
 		if effect == &"player_bounce":
-			slider.tooltip_text = "Try at 07:00 or 16:30 in the forest. Adds the terrain's sun bounce to the player and Sabre. Requires the verified private forest field. Noon and night keep their approved lighting."
+			slider.tooltip_text = "Ánh nắng hắt từ nền đất lên Valorie và Sabre. Thử ở lối rừng lúc 07:00 hoặc 16:30. Chọn 0% để so sánh."
 		if effect == &"grass_sky":
 			slider.tooltip_text = "Blend the existing grass ambient light with the terrain's baked sky fill at each root. The approved Noon is retained."
 		if effect == &"grass_root_tone":

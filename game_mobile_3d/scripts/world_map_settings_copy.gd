@@ -34,7 +34,7 @@ const ITEMS := {
 	"sky_chroma": ["Sky color", "Sky color", "Điều chỉnh mức ám màu của ánh sáng bầu trời ở độ sáng tương đương.", "Đổi giá trị lúc Sáng hoặc Chiều và nhìn sắc xanh trên phần đá trong bóng."],
 	"daylight_balance": ["Daylight color balance", "Daylight color balance", "Làm sắc xanh trong bóng ban ngày dịu hơn ở chế độ Combined.", "So sánh 0% và 100% lúc 07:00 hoặc 16:30 ở cùng một góc."],
 	"player_sky": ["Player sky fill", "Player sky fill", "Chỉnh lượng ánh sáng bầu trời lấp vào mặt tối của nhân vật.", "Thử ngoài giờ Trưa, đứng yên dưới tán cây và nhìn mặt áo hoặc mặt khuất của kiếm."],
-	"player_bounce": ["Player reflected sunlight (preview)", "Player reflected sunlight (preview)", "Thêm ánh nắng hắt từ mặt đất lên người và thanh Sabre.", "Thử lúc 07:00 hoặc 16:30 trong Forest, ở nơi có nền đất sáng cạnh bóng. Cần dữ liệu Forest trong Godot."],
+	"player_bounce": ["Ánh nắng hắt lên nhân vật", "Ánh nắng hắt lên nhân vật", "Nền đất hắt một phần ánh nắng lên Valorie và Sabre. Sắc và độ mạnh thay đổi theo vị trí.", "Thử lúc 07:00 hoặc 16:30 ở lối rừng. Mặc định 50%, chọn 0% để so sánh."],
 	"foot_contact": ["Player ground contact (preview)", "Player ground contact (preview)", "Thêm vùng tối mềm ngay bên dưới mỗi bàn chân để nhân vật trông bám đất hơn.", "Thử 75% ngoài giờ Trưa và quan sát phần tiếp xúc giữa chân với lối đi."],
 	"grass_sky": ["Grass sky fill", "Grass sky fill", "Cho cỏ nhận ánh sáng bầu trời dựa trên vùng đất ngay dưới gốc.", "So sánh 0% và 100% tại ranh giới giữa cỏ dưới tán và cỏ ngoài nắng."],
 	"grass_shade_color": ["Grass shade color", "Grass shade color", "Tạo sắc mát trên cỏ dưới tán cây trong Combined.", "Bật ánh sáng trời cho cỏ, thử ở Sáng hoặc Chiều và nhìn hai phía của mép bóng."],
