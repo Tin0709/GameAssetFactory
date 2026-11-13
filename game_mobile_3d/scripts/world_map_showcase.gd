@@ -1869,9 +1869,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"forest_path_air", &"forest_path_air_beam", &"sunlit_mist"]:
 		return # The volume reads the live fixture and mix immediately before dispatch.
-	if changed_effect == &"foot_contact":
+	if changed_effect in [&"", &"foot_contact"] and player_contact != null:
 		player_contact.refresh()
-		return
+		if changed_effect == &"foot_contact":
+			return
 	if changed_effect == &"night_glare_control":
 		_refresh_lantern_glow()
 		_sync_forest_night_lights()

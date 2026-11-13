@@ -145,6 +145,13 @@ func run() -> void:
 
 	equip(menu, 4)
 	check(menu.selected == 4 and not ammo.visible, "Gauntlets equip and hide the ranged ammo")
+	for i in 3:
+		var group_name := StringName("gauntlet_swing_%d" % i)
+		var samples: Array = combat_audio._groups.get(group_name, [])
+		check(samples.size() == [3, 4, 3][i], "Each gauntlet strike loads its own MD2 sample variants")
+		check(combat_audio._next_stream(group_name) != combat_audio._next_stream(group_name),
+			"Repeated strikes rotate through different samples")
+	check(combat_audio._groups.get(&"gauntlet_jump", []).size() == 3, "The gauntlet dive starts with the source jump variants")
 	target.position = Vector3(0.0, 0.0, 1.65)
 	target.health = 100
 	contacts.clear()
