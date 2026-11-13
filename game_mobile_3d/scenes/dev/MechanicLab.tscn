@@ -1,13 +1,7 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/mechanic_lab.gd" id="lab"]
-[ext_resource type="Shader" path="res://materials/mechanic_lab_ground.gdshader" id="ground"]
-[ext_resource type="Environment" path="res://environment/MechanicLabDaylight.tres" id="daylight"]
 [ext_resource type="Script" path="res://scripts/mechanic_lab_zombies.gd" id="zombies"]
-
-[sub_resource type="ShaderMaterial" id="grass_block"]
-resource_local_to_scene = true
-shader = ExtResource("ground")
 
 [sub_resource type="BoxMesh" id="ground_mesh"]
 size = Vector3(100, 1, 100)
@@ -30,26 +24,14 @@ corner_radius_bottom_right = 10
 script = ExtResource("lab")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = ExtResource("daylight")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-rotation_degrees = Vector3(-50, -38, 0)
-light_color = Color(0.9833454, 1, 0.89710116, 1)
-light_energy = 1.998142
-shadow_enabled = true
-shadow_bias = 0.12
-shadow_normal_bias = 0.76
-shadow_blur = 1.08
-shadow_opacity = 0.782
-directional_shadow_mode = 0
-directional_shadow_max_distance = 29.0
 
 [node name="Ground" type="StaticBody3D" parent="."]
 position = Vector3(0, -0.5, 0)
 
 [node name="Mesh" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("ground_mesh")
-material_override = SubResource("grass_block")
 
 [node name="Collision" type="CollisionShape3D" parent="Ground"]
 shape = SubResource("ground_collision")
@@ -101,6 +83,21 @@ theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 18
 text = "100 / 100 HP"
+horizontal_alignment = 2
+
+[node name="TimeOfDay" type="Label" parent="HUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -225.0
+offset_top = 43.0
+offset_right = -18.0
+offset_bottom = 65.0
+mouse_filter = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 14
 horizontal_alignment = 2
 
 [node name="Controls" type="Label" parent="HUD"]
