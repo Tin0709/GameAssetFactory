@@ -5,7 +5,8 @@ const WALKS := ["Walk", "StrafeLeft", "StrafeRight", "CombatWalk", "CombatStrafe
 const RUNS := ["Run", "CombatRun"]
 # Right-foot contact on the A&S cycle occurs just after the MD2 Walk seam.
 const CROSSBOW_RUN_PHASE_OFFSET := 0.05
-const CROSSBOW_ARM_SWAY_WEIGHT := 0.58
+const CROSSBOW_ARM_SWAY_WEIGHT := 0.40
+const CROSSBOW_TORSO_SWAY_WEIGHT := 0.60
 var _left_arm := -1
 var _right_arm := -1
 var _crossbow_carry: Array[Transform3D] = []
@@ -56,8 +57,8 @@ func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transf
 	for bone in range(_hip_bone + 1):
 		native[bone] = actions_and_stuff[bone]
 	var spine := parents[_body_bone]
-	native[spine] = native[spine].interpolate_with(actions_and_stuff[spine], 0.7)
-	native[_body_bone] = native[_body_bone].interpolate_with(actions_and_stuff[_body_bone], 0.7)
+	native[spine] = native[spine].interpolate_with(actions_and_stuff[spine], CROSSBOW_TORSO_SWAY_WEIGHT)
+	native[_body_bone] = native[_body_bone].interpolate_with(actions_and_stuff[_body_bone], CROSSBOW_TORSO_SWAY_WEIGHT)
 	# Start from the MD2 walk's authored two-handed hold. Sampling two
 	# independently animated run arms on top of this swing made the support
 	# hand travel across the stock.
