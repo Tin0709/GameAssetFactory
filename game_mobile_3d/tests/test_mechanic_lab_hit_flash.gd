@@ -109,6 +109,22 @@ func check_crowd_sparks() -> void:
 	check(counts == [9, 9, 9, 9, 9] and renderer.multimesh.visible_instance_count == 45,
 		"A 100-contact burst shows five complete groups of streaks at the nearest hits")
 	lab.reset_player()
+	for i in 100:
+		group.sabre_contact.emit(origin + Vector3.RIGHT * (100 - i) * 0.8,
+			Vector3.RIGHT, "Attack3", 2, 1701, false)
+	await process_frame
+	await process_frame
+	counts.fill(0)
+	for particle in sparks._particles:
+		if particle.age >= particle.lifetime:
+			continue
+		for i in nearest.size():
+			if particle.origin.distance_squared_to(nearest[i]) < 0.22 ** 2:
+				counts[i] += 1
+	check(counts == [9, 9, 9, 9, 9] and renderer.multimesh.visible_instance_count == 45,
+		"Nearest streak groups are independent of contact order")
+	group.sabre_contact.emit(origin, Vector3.RIGHT, "Attack3", 2, 1702, false)
+	lab.reset_player()
 	await process_frame
 	await process_frame
 	check(renderer.multimesh.visible_instance_count == 0 and not sparks.is_processing(),
