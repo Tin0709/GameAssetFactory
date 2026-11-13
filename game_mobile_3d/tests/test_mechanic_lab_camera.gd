@@ -45,10 +45,33 @@ func run() -> void:
 	check(lab._shake_age > age, "A second target in the same swing does not restart the camera pulse")
 	lab.reset_player()
 	check(is_zero_approx(contact(lab, Vector3(1, 0, 0), 104, "Attack2", 1)), "Sword ordinary strike has zero shake")
+	check_contact_render_hitch(lab)
 	await check_sabre_dive(lab)
 	lab.free()
 	print("PAWN_SHAKE_RANGE failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_contact_render_hitch(lab) -> void:
+	var offsets: Array[float] = []
+	var energies: Array[float] = []
+	var body := lab.player.get_node("BodyCollision") as CollisionShape3D
+	for first_delta in [1.0 / 60.0, 0.22]:
+		lab.reset_player()
+		lab._on_sabre_contact(body.global_position + Vector3.RIGHT, Vector3.RIGHT, "Attack3", 2, 105, false)
+		lab._process(first_delta)
+		check(is_equal_approx(lab._impact_light.light_energy, 2.3)
+			and is_equal_approx(lab.camera.h_offset / lab.camera.size, 0.008),
+			"The first frame shows the full contact light and shake")
+		lab._process(1.0 / 30.0)
+		offsets.append(lab.camera.h_offset / lab.camera.size)
+		energies.append(lab._impact_light.light_energy)
+		lab._process(0.22)
+		check(not lab._impact_light.visible and is_zero_approx(lab.camera.h_offset),
+			"A later hitch clears both contact effects")
+	check(is_equal_approx(offsets[0], offsets[1]) and offsets[1] < 0.0
+		and is_equal_approx(energies[0], energies[1]) and energies[1] > 0.0 and energies[1] < 2.3,
+		"Light decay and camera reversal follow elapsed time after the first displayed frame")
+	lab.reset_player()
 
 func check_sabre_dive(lab) -> void:
 	var landings: Array[int] = []
