@@ -151,8 +151,7 @@ func check_movement_support(lab, movement, toggle: CheckButton) -> void:
 		"Ordinary landing audio uses the raised floor height instead of the posed soles")
 	check(dust.get_children().any(func(particle): return particle.visible),
 		"The supported ordinary landing still emits dust")
-	for i in 30:
-		await physics_frame
+	dust.clear()
 	var before: int = movement.events.size()
 	lab.player.surface_contact.emit(landed_at + Vector3.UP * 2.0, false)
 	lab.player.surface_contact.emit(Vector3(51.0, 0.25, 0.0), false)

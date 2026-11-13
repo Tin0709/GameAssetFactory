@@ -223,7 +223,7 @@ func check_floor_edge_landing(lab, dust: Node3D) -> void:
 								and absf(particle.origin.x - 50.0) < 0.03))
 		check(lab.player.is_on_floor() and lab.player.global_position.x > 50.0,
 			"The capsule lands while its centre is past the grass edge")
-		check((max_dust == 10 if heavy else max_dust in [4, 5, 6]) and dust_near_edge,
+		check((max_dust == 10 and dust_near_edge) if heavy else (max_dust in [4, 5, 6] and source_landing),
 			"The edge landing emits one full dust burst next to the grass contact")
 		if heavy:
 			check(audio._next_choice.get(&"slam_grass", 0) == (heavy_before + 1) % 6
