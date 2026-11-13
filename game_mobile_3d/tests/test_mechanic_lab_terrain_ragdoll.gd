@@ -196,13 +196,13 @@ func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame:
 	wall.free()
 	lab.free()
 
-func check_wall_pinned_joint() -> void:
+func check_wall_pinned_joint(floor_contact := false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
 	await ticks(12)
 	var group := lab.get_node("Zombies")
-	group._spawn_serial = 29
+	group._spawn_serial = 6 if floor_contact else 29
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	if group.get_child_count() != 1:
 		check(false, "The wall-pinned joint fixture loads a source zombie")
@@ -210,15 +210,15 @@ func check_wall_pinned_joint() -> void:
 		return
 	var wall := terrain(lab, Vector3(4.5, 1.5, 0), Vector3(0.30, 3.0, 18.0), 0.0)
 	var zombie = group.get_child(0)
-	zombie.set_physics_process(false)
 	await ticks(2)
-	zombie.global_position = Vector3(4.05, 0.02, -2.25)
-	zombie.rotation.y = 2.913067
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(1.35, 0.02, -4.05) if floor_contact else Vector3(4.05, 0.02, -2.25)
+	zombie.rotation.y = -2.8697657585144 if floor_contact else 2.913067
 	zombie.animation.stop()
 	zombie.ragdoll.skeleton.reset_bone_poses()
-	zombie.animation.play(&"Zombie_Walk_Variant2")
+	zombie.animation.play(&"Zombie_Walk" if floor_contact else &"Zombie_Walk_Variant2")
 	zombie.animation.advance(0.0)
-	zombie.animation.seek(0.30, true)
+	zombie.animation.seek(0.69999988079071 if floor_contact else 0.30, true)
 	var ragdoll = zombie.ragdoll
 	for i in 2:
 		ragdoll.sample(1.0 / 60.0)
@@ -233,9 +233,11 @@ func check_wall_pinned_joint() -> void:
 		peak = maxf(peak, ragdoll.max_anchor_error())
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			farthest = maxf(farthest, body.global_position.x)
-	check(peak > 0.0 and peak < 0.15, "The wall-pinned shoulder stays within the Lab recovery limit")
-	check(farthest < 4.65, "Shoulder recovery keeps the ragdoll on the near side")
-	print("LAB_WALL_PINNED_JOINT peak=", peak, " farthest=", farthest)
+	var limit := 0.12 if floor_contact else 0.15
+	check(peak > 0.0 and peak < limit, "The %s stays within the Lab recovery limit" %
+		("hip at first floor contact" if floor_contact else "wall-pinned shoulder"))
+	check(farthest < 4.65, "The wall-pinned ragdoll stays on the near side")
+	print("LAB_WALL_PINNED_JOINT floor_contact=", floor_contact, " peak=", peak, " farthest=", farthest)
 	wall.free()
 	lab.free()
 
@@ -285,6 +287,7 @@ func run() -> void:
 	await check_straddled_wall_handoff(&"Zombie_Walk", 2, 11, "Arm.L")
 	await check_straddled_wall_handoff(&"Zombie_Staggered", 11, 7, "Head")
 	await check_wall_pinned_joint()
+	await check_wall_pinned_joint(true)
 	await check_edge_landing_gravity()
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
