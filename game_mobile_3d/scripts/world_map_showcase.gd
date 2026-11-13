@@ -2102,6 +2102,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
 		if effect == &"canopy_player_cue":
 			slider.editable = level.canopy_player_cue.available(level)
+		if effect == &"crown_ambient_depth":
+			slider.editable = is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
 		if effect == &"exposure":
 			slider.tooltip_text = "Scales local contrast gain. The color grade remains active."
 		if effect == &"daylight_shadow_lift":
