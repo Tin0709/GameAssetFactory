@@ -57,12 +57,21 @@ func run() -> void:
 	var combat_audio = lab.get_node("CombatAudio")
 	var fire_samples: Array = combat_audio._groups.get(&"crossbow_fire", [])
 	var impact_samples: Array = combat_audio._groups.get(&"crossbow_hit", [])
+	var flight_samples: Array = combat_audio._groups.get(&"crossbow_flight", [])
 	check(fire_samples.size() == 3 and impact_samples.size() == 3, "All verified crossbow firing and impact samples load")
+	check(flight_samples.size() == 4, "All verified arrow flight samples load")
 	check(menu.selected == 3 and ammo.visible and ammo.text.contains("25 / 25"), "Crossbow equips with full ammo")
 	attack(true)
 	await ticks(2)
 	attack(false)
-	await ticks(24)
+	await ticks(3)
+	var flight_voices: Array = combat_audio._voices.filter(func(voice): return voice.stream in flight_samples)
+	var bolt := lab._crossbow.get_child(0) as Node3D
+	check(flight_voices.size() == 1 and bolt != null and
+		flight_voices[0].global_position.distance_to(bolt.global_position) < 0.01,
+		"One spatial flight voice follows the moving bolt")
+	await ticks(21)
+	check(not flight_voices.any(func(voice): return voice.playing), "Flight audio stops after the bolt hits")
 	check(target.health == 92 and contacts.size() == 1, "A tap shoots one 8-damage bolt at a ranged target")
 	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 1, "A living hit plays exactly one arrow impact")
 	check(ammo.text.contains("24 / 25"), "One projectile consumes one arrow")
