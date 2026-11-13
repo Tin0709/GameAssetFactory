@@ -36,21 +36,15 @@ func run() -> void:
 		draws.append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
 	await measure("empty", 90)
 	var group := lab.get_node("Zombies")
-	var spawn := lab.get_node("HUD/SpawnZombie") as Button
-	var cold := Time.get_ticks_usec()
-	var spawn_us: Array[float] = []
-	for i in COUNT:
-		var start := Time.get_ticks_usec()
-		spawn.pressed.emit()
-		spawn_us.append((Time.get_ticks_usec() - start) / 1000.0)
+	if OS.get_cmdline_user_args().has("--sync-spawn"):
+		spawn_synchronously(group)
+	else:
+		await spawn_crowd(group)
 	if group.get_child_count() != COUNT:
-		printerr("Could not spawn all ", COUNT, " zombies")
+		printerr("Could not spawn all ", COUNT, " zombies: ", failures)
 		quit(1)
 		return
 	check_spawn_spacing(group)
-	print("CROWD_SPAWN ", JSON.stringify({"count": COUNT, "burst_ms": (Time.get_ticks_usec() - cold) / 1000.0,
-		"per_spawn_ms": stats(spawn_us), "first_ms": spawn_us[0],
-		"nodes": Performance.get_monitor(Performance.OBJECT_NODE_COUNT)}))
 	await measure("spawn_animation", 70)
 	Input.action_press("move_backward")
 	await measure("chase", 120)
@@ -70,10 +64,57 @@ func run() -> void:
 	var clean := group.get_child_count() == 0
 	if not clean:
 		failures.append("Corpses remain after the cleanup window")
+	if not OS.get_cmdline_user_args().has("--sync-spawn"):
+		await check_reset_during_spawn(group)
 	print("CROWD_END failures=", failures, " renderer=", RenderingServer.get_current_rendering_method(),
 		" adapter=", RenderingServer.get_video_adapter_name())
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func spawn_synchronously(group: Node) -> void:
+	var spawn := lab.get_node("HUD/SpawnZombie") as Button
+	var started := Time.get_ticks_usec()
+	for i in COUNT:
+		spawn.pressed.emit()
+	print("CROWD_SPAWN_SYNC ", JSON.stringify({"count": group.get_child_count(),
+		"burst_ms": (Time.get_ticks_usec() - started) / 1000.0}))
+
+func spawn_crowd(group: Node) -> void:
+	var button := lab.get_node_or_null("HUD/SpawnCrowd") as Button
+	if button == null or not button.is_visible_in_tree() or button.disabled:
+		failures.append("The Lab provides an enabled crowd spawn control")
+		return
+	var base_health := lab.get_node("HUD/BaseZombieToggle") as CheckButton
+	base_health.button_pressed = true
+	frame_ms.clear()
+	var started := Time.get_ticks_usec()
+	button.pressed.emit()
+	var immediate_count := group.get_child_count()
+	base_health.button_pressed = false
+	var previous_count := immediate_count
+	var largest_batch := 0
+	var frames := 0
+	while group.get_child_count() < COUNT and frames < 120:
+		await process_frame
+		var count := group.get_child_count()
+		largest_batch = maxi(largest_batch, count - previous_count)
+		previous_count = count
+		frames += 1
+		if frames == 1:
+			button.pressed.emit()
+	if immediate_count != 0 or largest_batch < 1 or largest_batch > 5:
+		failures.append("Crowd spawn should pace allocation over process frames")
+	if button.disabled or group.get_child_count() != COUNT:
+		failures.append("One crowd request should finish and reenable its button")
+	if not group.get_children().all(func(zombie): return zombie.max_health == ZOMBIE.BASE_HEALTH):
+		failures.append("The crowd uses the HP mode selected when the request began")
+	for i in 3:
+		await process_frame
+	if group.get_child_count() != COUNT:
+		failures.append("A repeated click during an active crowd should not queue another crowd")
+	print("CROWD_SPAWN_PACED ", JSON.stringify({"count": group.get_child_count(),
+		"frames": frames, "largest_batch": largest_batch, "wall_ms": (Time.get_ticks_usec() - started) / 1000.0,
+		"frame_ms": stats(frame_ms)}))
 
 func check_blocked_chase(group: Node) -> void:
 	lab.reset_player()
@@ -115,6 +156,22 @@ func check_blocked_chase(group: Node) -> void:
 	for member in group.get_children():
 		member.set_physics_process(true)
 	print("CROWD_BLOCKED skipped=", skipped_ticks, " samples=", pose_steps)
+
+func check_reset_during_spawn(group: Node) -> void:
+	var button := lab.get_node("HUD/SpawnCrowd") as Button
+	button.pressed.emit()
+	for i in 3:
+		await process_frame
+	var partial := group.get_child_count()
+	lab.reset_player()
+	for i in 5:
+		await process_frame
+	if partial <= 0 or partial >= COUNT or group.get_child_count() != partial or button.disabled:
+		failures.append("Reset cancels pending spawns and preserves zombies already created")
+	var single := lab.get_node("HUD/SpawnZombie") as Button
+	single.pressed.emit()
+	if group.get_child_count() != partial + 1:
+		failures.append("The single-spawn button still creates exactly one zombie immediately")
 
 func check_spawn_spacing(group: Node) -> void:
 	var zombies := group.get_children()
