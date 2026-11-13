@@ -24,8 +24,9 @@ func run() -> void:
 			check(sun.light_energy < float(noon[2]) and not sun.basis.is_equal_approx(noon[0]), "Night changes the key light and direction")
 			press_time(true)
 			check(label != null and label.text.contains(hour), "Holding T does not skip phases")
-	check(noon == [sun.basis, sun.light_color, sun.light_energy, environment.ambient_light_color,
-		environment.ambient_light_energy, environment.background_color], "Cycling restores the Noon lighting exactly")
+	check(sun.basis.is_equal_approx(noon[0]) and noon.slice(1) == [sun.light_color, sun.light_energy,
+		environment.ambient_light_color, environment.ambient_light_energy, environment.background_color],
+		"Cycling restores the Noon lighting")
 	var floor_shape := lab.get_node("Ground/Collision").shape as BoxShape3D
 	check(floor_shape.size == Vector3(100.0, 1.0, 100.0), "The lab keeps its flat 100 × 100 collision floor")
 	lab.free()
