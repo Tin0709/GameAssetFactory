@@ -482,6 +482,7 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 	var voices := audio._voices.slice(2 * COMBAT_AUDIO.VOICES_PER_POOL, 3 * COMBAT_AUDIO.VOICES_PER_POOL)
 	for voice in voices:
 		voice.bus = AudioServer.get_bus_name(bus)
+	await create_timer(0.12).timeout
 	var points: Array[Vector3] = []
 	for i in 100:
 		var point: Vector3 = lab.player.global_position + Vector3(2.0, 1.0, i * 0.01)
@@ -491,6 +492,8 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 	check(audio._next_choice.get(&"zombie_windup", 0) == 3
 		and voices.all(func(voice): return voice.global_position in leading_points),
 		"A same-tick attack burst preserves the first three telegraphs")
+	# Let the real-time mixer start the telegraphs before the contact burst.
+	await create_timer(0.10).timeout
 	capture.clear_buffer()
 	for point in points:
 		group.zombie_attack_audio.emit(point, true)
@@ -512,7 +515,7 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 	await physics_frame
 	group.player_hit.emit(ZOMBIE.MELEE_DAMAGE)
 	check(audio._next_choice.get(&"player_hurt", 0) == 2, "A later hit can play a new local hurt cue")
-	await create_timer(0.18).timeout
+	await create_timer(0.30).timeout
 	var peak := 0.0
 	for frame in capture.get_buffer(capture.get_frames_available()):
 		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
