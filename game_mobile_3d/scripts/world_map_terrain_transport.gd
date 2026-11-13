@@ -215,7 +215,23 @@ func _refresh_stone_diffuse() -> void:
 				strength = 0.0
 	if strength != stone_diffuse_strength:
 		stone_diffuse_strength = strength
-		_bind_sky_receivers()
+		_bind_stone_diffuse_receivers()
+
+func _bind_stone_diffuse_receivers() -> void:
+	# This gain can change every frame during the day/night transition.
+	# Leave the rest of terrain transport and the grass bindings alone.
+	var materials := {}
+	for row in level.look.terrain_materials:
+		materials[row[3]] = true
+	for chunk in level.geometry._cutaway_chunks:
+		for material: ShaderMaterial in chunk.materials:
+			materials[material] = true
+	for material: ShaderMaterial in materials:
+		if material.get_shader_parameter("ground_grade") != 3:
+			continue
+		material.set_shader_parameter("stone_diffuse_strength", stone_diffuse_strength)
+		if stone_diffuse_strength > 0.0 and material.get_shader_parameter("stone_diffuse_field") != stone_diffuse_texture:
+			material.set_shader_parameter("stone_diffuse_field", stone_diffuse_texture)
 
 func _refresh_day_bounce() -> void:
 	var review = level.showcase
@@ -268,10 +284,7 @@ func _bind_sky_receivers() -> void:
 		for material in chunk.materials:
 			materials[material] = true
 	for material: ShaderMaterial in materials:
-		material.set_shader_parameter("stone_diffuse_strength", stone_diffuse_strength)
 		material.set_shader_parameter("night_stone_top_cool", night_stone_top_cool)
-		if stone_diffuse_strength > 0.0 and material.get_shader_parameter("stone_diffuse_field") != stone_diffuse_texture:
-			material.set_shader_parameter("stone_diffuse_field", stone_diffuse_texture)
 		bind_regional_sky(material)
 	var plants = level.showcase.plants
 	if plants != null and plants.grass_light != null:
