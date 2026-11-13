@@ -257,9 +257,9 @@ func _physics_process(delta: float) -> void:
 
 func _update_trails() -> void:
 	_trail_mesh.clear_surfaces()
-	_trail_renderer.hide()
 	var camera := get_viewport().get_camera_3d()
 	var to_local_space := global_transform.affine_inverse()
+	var has_surface := false
 	for index in range(_trails.size() - 1, -1, -1):
 		var trail := _trails[index]
 		var age: float = trail.tail_age
@@ -275,19 +275,43 @@ func _update_trails() -> void:
 		if sideways.is_zero_approx():
 			sideways = camera.global_basis.x
 		var segments := ceili(duration / TRAIL_SAMPLE_SECONDS)
-		_trail_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
-		for sample in range(segments + 1):
+		if not has_surface:
+			_trail_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
+			has_surface = true
+		var previous_point := to_local_space * head
+		var lateral := to_local_space.basis * sideways
+		var previous_width := _trail_half_width(age / TRAIL_LIFETIME)
+		var previous_alpha := 1.0 - 0.5 * age / TRAIL_LIFETIME
+		for sample in range(1, segments + 1):
 			var seconds_back := duration * float(sample) / segments
 			var normalized_age := (age + seconds_back) / TRAIL_LIFETIME
-			# Analytic segments match the cooked width and opacity LUT samples.
-			var width := TRAIL_WIDTH * maxf(0.0, maxf(1.0 - 4.0 * normalized_age, 0.3 - 0.5 * normalized_age))
+			var width := _trail_half_width(normalized_age)
 			var opacity := 1.0 - 0.5 * normalized_age
-			var point := head - direction * BOLT_SPEED * seconds_back
-			_trail_mesh.surface_set_color(Color(1.0, 1.0, 1.0, opacity))
-			_trail_mesh.surface_add_vertex(to_local_space * (point - sideways * width * 0.5))
-			_trail_mesh.surface_add_vertex(to_local_space * (point + sideways * width * 0.5))
+			var point := to_local_space * (head - direction * BOLT_SPEED * seconds_back)
+			var near_left := previous_point - lateral * previous_width
+			var near_right := previous_point + lateral * previous_width
+			var far_left := point - lateral * width
+			var far_right := point + lateral * width
+			_add_trail_vertex(near_left, previous_alpha)
+			_add_trail_vertex(near_right, previous_alpha)
+			_add_trail_vertex(far_left, opacity)
+			_add_trail_vertex(near_right, previous_alpha)
+			_add_trail_vertex(far_right, opacity)
+			_add_trail_vertex(far_left, opacity)
+			previous_point = point
+			previous_width = width
+			previous_alpha = opacity
+	if has_surface:
 		_trail_mesh.surface_end()
-		_trail_renderer.show()
+	_trail_renderer.visible = has_surface
+
+func _add_trail_vertex(point: Vector3, opacity: float) -> void:
+	_trail_mesh.surface_set_color(Color(1.0, 1.0, 1.0, opacity))
+	_trail_mesh.surface_add_vertex(point)
+
+static func _trail_half_width(normalized_age: float) -> float:
+	# The two line segments reproduce the cooked width LUT.
+	return TRAIL_WIDTH * 0.5 * maxf(0.0, maxf(1.0 - 4.0 * normalized_age, 0.3 - 0.5 * normalized_age))
 
 func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
 	var collider := hit.collider as StaticBody3D
