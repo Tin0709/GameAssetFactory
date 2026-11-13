@@ -24,7 +24,6 @@ func run() -> void:
 	root.add_child(lab)
 	current_scene = lab
 	root.size = Vector2i(960, 540)
-	root.msaa_3d = Viewport.MSAA_DISABLED
 	var rid := root.get_viewport_rid()
 	RenderingServer.viewport_set_measure_render_time(rid, true)
 	physics_frame.connect(func(): tick_started = Time.get_ticks_usec())
@@ -37,6 +36,8 @@ func run() -> void:
 		frame_started = now
 		render_gpu_ms.append(RenderingServer.viewport_get_measured_render_time_gpu(rid))
 		draws.append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
+	print("CROWD_RENDER_SETUP viewport=", root.size, " msaa_3d=", root.msaa_3d,
+		" renderer=", RenderingServer.get_current_rendering_method())
 	await measure("empty", 90)
 	# Spawning is paced by rendered frames. On slow renderers the earliest
 	# zombies can finish their spawn and attack before the last batch appears.
