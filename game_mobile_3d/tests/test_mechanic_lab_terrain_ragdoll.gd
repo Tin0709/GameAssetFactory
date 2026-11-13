@@ -124,6 +124,44 @@ func check_wall_handoff(repositioned: bool = false) -> void:
 	wall.free()
 	lab.free()
 
+func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame: int, part: String) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var wall := terrain(lab, Vector3(0.60, 1.5, 0), Vector3(0.30, 3.0, 20.0), 0.0)
+	var group := lab.get_node("Zombies")
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	check(group.get_child_count() == 1, "A source zombie is available for the straddled wall handoff")
+	if group.get_child_count() != 1:
+		lab.free()
+		return
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(0, 0.02, 0)
+	zombie.rotation.y = TAU * facing / 16.0
+	await ticks(2)
+	zombie.animation.play(clip, 0.0)
+	zombie.animation.seek(float(source_frame) / 30.0, true)
+	var ragdoll = zombie.ragdoll
+	ragdoll.sample(1.0 / 60.0)
+	ragdoll.sample(1.0 / 60.0)
+	var torso: Transform3D = ragdoll.current.Chest
+	var limb: Transform3D = ragdoll.current[part]
+	check(torso.origin.x < 0.45 and limb.origin.x > 0.55,
+		"The source pose leaves a limb centre inside or across the wall")
+	zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, zombie.DeathStrike.SABRE_FINISHER)
+	zombie._update_death(1.0 / 60.0)
+	var farthest := -INF
+	for body: PhysicalBone3D in ragdoll.bodies.values():
+		farthest = maxf(farthest, body.global_position.x)
+	check(ragdoll.running and farthest < 0.45 and ragdoll.max_anchor_error() < 0.05,
+		"The handoff places all linked bodies on the actor's side of the wall")
+	check(absf(ragdoll.skeleton.global_position.x) <= 0.12 + 0.0001,
+		"The handoff keeps the existing whole-pose translation limit")
+	print("LAB_STRADDLED_WALL clip=", clip, " farthest=", farthest, " gap=", ragdoll.max_anchor_error())
+	wall.free()
+	lab.free()
+
 func check_edge_landing_gravity() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -166,6 +204,9 @@ func run() -> void:
 	await run_case(false)
 	await check_wall_handoff()
 	await check_wall_handoff(true)
+	await check_straddled_wall_handoff(&"Zombie_BasicAttack", 3, 17, "Arm.L")
+	await check_straddled_wall_handoff(&"Zombie_Walk", 2, 11, "Arm.L")
+	await check_straddled_wall_handoff(&"Zombie_Staggered", 11, 7, "Head")
 	await check_edge_landing_gravity()
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
