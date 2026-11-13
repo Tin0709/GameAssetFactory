@@ -134,6 +134,14 @@ func check_running_wake_support(lab, wind) -> void:
 	check(wind._next == next, "Foot contacts beyond the floor or above the grass do not spawn wakes")
 	Input.action_release("move_right")
 	floor_body.position.y -= 0.25
+	for i in 6:
+		await physics_frame
+	check(wake.mesh.visible and wake.age >= 0.08 and wake.material.albedo_color.a < wind.TINT.a,
+		"The wake moves through its fade on the physics clock after input stops")
+	for i in 9:
+		await physics_frame
+	check(not wake.mesh.visible and not wind.is_processing() and not wind.is_physics_processing(),
+		"The last wake expires and stops both callbacks")
 
 func check_source_run_dust(lab, dust) -> void:
 	var listen := func(_point: Vector3, landed: bool):
