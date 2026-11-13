@@ -79,8 +79,34 @@ func run() -> void:
 	await check_hit(true)
 	await check_crowd_sparks()
 	await check_flash_during_render_hitch()
+	await check_damage_numbers_during_render_hitch()
 	print("MECHANIC_LAB_HIT_FLASH failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_damage_numbers_during_render_hitch() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	await ticks(12)
+	var numbers = lab.get_node("CombatEffects/ZombieDamageNumbers")
+	var origin: Vector3 = lab.player.global_position + Vector3.UP * 2.4
+	numbers.add_number(8, origin, Vector3.ZERO)
+	numbers._process(0.0)
+	numbers._process(0.50)
+	for i in 100:
+		numbers.add_number(100, origin + Vector3.RIGHT * i * 0.05, Vector3.ZERO)
+	numbers._process(0.22)
+	check(numbers.multimesh.visible_instance_count == 300 and numbers._numbers.size() == 100,
+		"A long frame expires the earlier number while displaying all 300 new digits")
+	check(numbers._numbers.all(func(number): return number.age == 0.0 and number.centre == number.origin),
+		"New numbers begin at the hit position before their pop and rise")
+	numbers._process(1.0 / 30.0)
+	check(numbers._numbers.all(func(number): return number.age > 0.0 and number.centre.y > number.origin.y),
+		"New numbers rise on the next frame")
+	numbers._process(0.70)
+	check(numbers.multimesh.visible_instance_count == 0 and not numbers.is_processing(),
+		"The last numbers expire and stop updating")
+	lab.free()
 
 func check_crowd_sparks() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
