@@ -669,7 +669,7 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	var has_arrow_sparks := clip == CrossPollinator.SHOT and _crossbow != null and _crossbow.impact_sparks != null
 	if not has_arrow_sparks:
 		if _contact_sparks != null:
-			_contact_sparks.burst(point, direction)
+			_contact_sparks.queue_contact(point, direction, player.global_position + Vector3.UP)
 		else:
 			player.effects.contact(point, direction)
 	_combat_audio.contact(point, serial, lethal, clip)

@@ -5,8 +5,9 @@ const STREAK_SHADER := preload("res://materials/mechanic_lab_contact_sparks.gdsh
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/Materials/Common/T_PixelStreaksVertical.png"
 const SOURCE_SHA256 := "62965f5ebeead3815fc44ecb3b4f8de27b929d907980e8cae8178c1f260c0c00"
 const SOURCE_REGION := Rect2i(101, 8, 5, 14)
-const CAPACITY := 48
 const SPARKS_PER_CONTACT := 9
+const CONTACTS_PER_FRAME := 5
+const CAPACITY := CONTACTS_PER_FRAME * SPARKS_PER_CONTACT
 const HOT := Color(1.0, 0.89, 0.54)
 const COOL := Color(1.0, 0.44, 0.10)
 
@@ -20,6 +21,7 @@ class Spark:
 
 var _streaks: MultiMesh
 var _particles: Array[Spark] = []
+var _pending: Array[Dictionary] = []
 var _next := 0
 var _random := RandomNumberGenerator.new()
 
@@ -55,12 +57,25 @@ func setup() -> bool:
 	set_process(false)
 	return true
 
-func burst(point: Vector3, attack_direction: Vector3) -> void:
+func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3) -> void:
+	var distance := point.distance_squared_to(viewer)
+	var index := _pending.size()
+	while index > 0 and distance < float(_pending[index - 1].distance):
+		index -= 1
+	if index == CONTACTS_PER_FRAME:
+		return
+	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance})
+	if _pending.size() > CONTACTS_PER_FRAME:
+		_pending.pop_back()
+	set_process(true)
+
+func _spawn_burst(point: Vector3, attack_direction: Vector3) -> void:
 	var angle := _random.randf_range(0.0, TAU)
+	var bias := attack_direction.normalized() * 0.24
 	for i in SPARKS_PER_CONTACT:
 		var yaw := angle + TAU * float(i) / SPARKS_PER_CONTACT + _random.randf_range(-0.17, 0.17)
 		var outward := Vector3(cos(yaw), _random.randf_range(-0.42, 0.8), sin(yaw))
-		outward = (outward + attack_direction.normalized() * 0.24).normalized()
+		outward = (outward + bias).normalized()
 		var spark := _particles[_next]
 		_next = (_next + 1) % _particles.size()
 		spark.origin = point + outward * 0.21
@@ -69,9 +84,11 @@ func burst(point: Vector3, attack_direction: Vector3) -> void:
 		spark.lifetime = _random.randf_range(0.15, 0.24)
 		spark.length = _random.randf_range(0.15, 0.26)
 		spark.width = _random.randf_range(0.045, 0.075)
-	set_process(true)
 
 func _process(delta: float) -> void:
+	for contact: Dictionary in _pending:
+		_spawn_burst(contact.point, contact.direction)
+	_pending.clear()
 	var camera := get_viewport().get_camera_3d()
 	var view := camera.global_basis.orthonormalized() if camera != null else Basis.IDENTITY
 	var count := 0
@@ -97,6 +114,7 @@ func _process(delta: float) -> void:
 	set_process(count > 0)
 
 func clear() -> void:
+	_pending.clear()
 	for spark in _particles:
 		spark.age = spark.lifetime
 	_streaks.visible_instance_count = 0
