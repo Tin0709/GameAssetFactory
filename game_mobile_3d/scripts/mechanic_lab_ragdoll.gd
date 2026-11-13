@@ -102,11 +102,8 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) 
 			skeleton.set_bone_pose(bone, source[bone].interpolate_with(idle[bone], idle_weight))
 		sample(sample_delta)
 		var shift := super._handoff_wall_clearance()
-		if _wall_handoff_is_clear(space, collision_mask, shift):
+		if idle_weight == 1.0 or _wall_handoff_is_clear(space, collision_mask, shift):
 			return _preserve_wall_handoff_branches(space, collision_mask, source, shift)
-		if idle_weight == 1.0:
-			sample(sample_delta)
-			return shift
 	return Vector3.ZERO
 
 func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision_mask: int,
@@ -121,7 +118,7 @@ func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision
 			var basis := Basis(rotation) * Basis.from_scale(safe_pose.basis.get_scale())
 			skeleton.set_bone_pose(bone, Transform3D(basis, safe_pose.origin))
 			sample(sample_delta)
-			if _wall_handoff_is_clear(space, collision_mask, shift):
+			if _wall_handoff_is_clear(space, collision_mask, shift, name):
 				safe_pose = skeleton.get_bone_pose(bone)
 				break
 		skeleton.set_bone_pose(bone, safe_pose)
@@ -130,10 +127,13 @@ func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision
 	sample(sample_delta)
 	return shift
 
-func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: int, shift: Vector3) -> bool:
+func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: int,
+		shift: Vector3, changed_part := "") -> bool:
 	if _handoff_straddles_wall(space, collision_mask, shift, 0.0):
 		return false
 	for name: String in current:
+		if not changed_part.is_empty() and name != changed_part:
+			continue
 		var pose: Transform3D = current[name]
 		var points := _terrain_contacts_at(bodies[name], space, pose.translated(shift))
 		for i in range(0, points.size(), 2):
