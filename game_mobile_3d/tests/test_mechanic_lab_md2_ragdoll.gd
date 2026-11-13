@@ -191,6 +191,7 @@ func run() -> void:
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	await check_fresh_spawn_handoff(lab, group, 0)
 	await check_fresh_spawn_handoff(lab, group, 1)
+	await check_independent_corpse_breakup(lab, group)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
@@ -215,6 +216,35 @@ func check_fresh_spawn_handoff(lab, group, living_ticks: int) -> void:
 	print("FRESH_ZOMBIE_HANDOFF samples=", living_ticks, " active=", zombie.ragdoll.running,
 		" age=", zombie._corpse_age, " pose_gap_m=", zombie.ragdoll.handoff_error)
 	zombie.free()
+
+func check_independent_corpse_breakup(lab, group) -> void:
+	lab.reset_player()
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var first = group.get_child(0)
+	first.take_hit(100, Vector3.RIGHT)
+	await ticks(12)
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var second = group.get_child(1)
+	second.rotation.y += PI * 0.5
+	second.take_hit(100, Vector3.FORWARD)
+	while first._corpse_age < 4.65:
+		await physics_frame
+	var first_material := first._mesh.material_override as ShaderMaterial
+	var second_material := second._mesh.material_override as ShaderMaterial
+	var first_directions: Variant = first_material.get_shader_parameter("fragment_directions")
+	while second._corpse_age < 4.63:
+		await physics_frame
+	var second_directions: Variant = second_material.get_shader_parameter("fragment_directions")
+	check(first._corpse_parked and second._corpse_parked and first._corpse_fragment_directions_ready
+		and second._corpse_fragment_directions_ready and first_directions is PackedVector3Array
+		and second_directions is PackedVector3Array and first_directions != second_directions,
+		"Two settled corpses compute different breakup directions from their own poses")
+	check(first_material.get_shader_parameter("fragment_directions") == first_directions,
+		"A second corpse starting to dissolve does not change the first corpse's fragment directions")
+	print("CORPSE_BREAKUP_ISOLATION same_material=", first_material == second_material,
+		" first_retained=", first_material.get_shader_parameter("fragment_directions") == first_directions)
+	first.free()
+	second.free()
 
 func check_combo_finisher(lab, group, slot: int) -> void:
 	lab.reset_player()
