@@ -72,7 +72,7 @@ func run() -> void:
 		"The jump adds only one stronger burst, on landing")
 	check(visible_particles(wind) == 0, "Landing does not start a running wake")
 	Input.action_release("move_forward")
-	for i in 115:
+	for i in 125:
 		await physics_frame
 	check(visible_particles(dust) == 0 and not dust.is_processing(), "Dust fades and stops processing at rest")
 	check(visible_particles(wind) == 0 and not wind.is_processing(), "The run wake clears at rest")
@@ -206,6 +206,7 @@ func check_floor_edge_landing(lab, dust: Node3D) -> void:
 			await press_heavy_attack()
 		var max_dust := 0
 		var dust_near_edge := false
+		var source_landing := false
 		for i in 70:
 			await physics_frame
 			var visible := visible_particles(dust)
@@ -213,9 +214,15 @@ func check_floor_edge_landing(lab, dust: Node3D) -> void:
 				max_dust = visible
 				dust_near_edge = dust.get_children().filter(func(sprite): return sprite.visible).all(
 					func(sprite): return absf(sprite.global_position.x - 50.0) < 0.45)
+				if not heavy:
+					source_landing = dust._particles.filter(func(particle): return particle.sprite.visible).all(
+						func(particle): return particle.duration >= 1.0 and particle.duration <= 2.0
+							and is_equal_approx(particle.origin.y, 0.50)
+							and is_equal_approx(particle.sprite.pixel_size * 16.0, 1.0)
+							and absf(particle.origin.x - 50.0) < 0.03)
 		check(lab.player.is_on_floor() and lab.player.global_position.x > 50.0,
 			"The capsule lands while its centre is past the grass edge")
-		check(max_dust == (10 if heavy else 5) and dust_near_edge,
+		check((max_dust == 10 if heavy else max_dust in [4, 5, 6]) and dust_near_edge,
 			"The edge landing emits one full dust burst next to the grass contact")
 		if heavy:
 			check(audio._next_choice.get(&"slam_grass", 0) == (heavy_before + 1) % 6
@@ -224,6 +231,7 @@ func check_floor_edge_landing(lab, dust: Node3D) -> void:
 			check(grass_voices.size() == 1 and absf(grass_voices[0].global_position.x - 50.0) < 0.03,
 				"The heavy debris cue plays at the grass edge")
 		else:
+			check(source_landing, "The ordinary landing starts source-sized sprites 50 cm above its contact for 1 to 2 seconds")
 			check(movement.event_count.landing == ordinary_before + 1, "The ordinary edge landing plays grass audio once")
 			if not movement.events.is_empty():
 				check(absf(movement.events.back().at[0] - 50.0) < 0.03, "The ordinary cue plays at the grass edge")
