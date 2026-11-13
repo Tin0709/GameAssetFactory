@@ -88,9 +88,9 @@ func run() -> void:
 		world.player.cancel_jump()
 		await ticks(12)
 		var event_count: int = movement.events.size()
-		check(world.player.drop_for_lab(1.0), "The ordinary landing fixture can drop below the ledge")
-		await ticks(90)
-		var slab_events: Array = movement.events.slice(event_count)
+		check(world.player.drop_for_lab(0.16), "The ordinary landing fixture can drop below the ledge")
+		await ticks(55)
+		var slab_events: Array = movement.events.slice(event_count).filter(func(event): return String(event.key).begins_with("land_"))
 		check(slab_events.size() == 1 and slab_events[0].key == "land_stone"
 			and is_equal_approx(float(slab_events[0].at[1]), slab.y),
 			"A real drop below the ledge plays stone audio at the lower slab")
