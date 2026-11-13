@@ -238,6 +238,8 @@ func check_health_bars(group: Node) -> void:
 	var settled: Color = batch._fills[first_slot]
 	if not is_equal_approx(settled.g, next_health) or feedback.is_processing():
 		failures.append("The delayed fill settles after a later hitch and stops updating")
+	if not headless and not batch.multimesh.get_instance_custom_data(first_slot).is_equal_approx(settled):
+		failures.append("The renderer receives the settled fill of the hit zombie")
 
 func check_crowd_melee(group: Node) -> void:
 	var starting_health: int = lab.player_health
