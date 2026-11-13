@@ -26,6 +26,7 @@ const RECHARGE_PERIOD := 0.8
 const BOLT_SPEED := 35.0
 # The live Polaris movement component sweeps a SphereComponent of 10 cm.
 const BOLT_RADIUS := 0.10
+const BOLT_MESH_SCALE := 0.7
 const CONTACT_PROBE_DISTANCE := 0.0001
 const BOLT_LIFETIME := 5.0
 const WORLD_MASK := 1
@@ -136,6 +137,7 @@ func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vec
 	bolt.global_position = origin
 	bolt.look_at(origin + direction, Vector3.UP if absf(direction.y) < 0.999 else Vector3.FORWARD, true)
 	bolt.rotate_object_local(Vector3.UP, -PI * 0.5)
+	bolt.scale = Vector3.ONE * BOLT_MESH_SCALE
 	bolt.reset_physics_interpolation()
 	_bolts.append({"node": bolt, "direction": direction, "life": BOLT_LIFETIME, "serial": serial})
 	set_physics_process(true)
@@ -188,7 +190,9 @@ func _sweep_bolt(space: PhysicsDirectSpaceState3D, start: Vector3, end: Vector3,
 		var fractions := space.cast_motion(_sweep_query)
 		# Probe just inside contact to obtain its collider and surface point.
 		_sweep_query.motion = Vector3.ZERO
-		_sweep_query.transform.origin = start + travel * fractions[1] + travel.normalized() * CONTACT_PROBE_DISTANCE
+		var distance := travel.length()
+		var contact_distance := minf(distance, distance * fractions[1] + CONTACT_PROBE_DISTANCE)
+		_sweep_query.transform.origin = start + travel.normalized() * contact_distance
 		hit = space.get_rest_info(_sweep_query)
 	if not hit.is_empty():
 		hit.collider = instance_from_id(hit.collider_id)

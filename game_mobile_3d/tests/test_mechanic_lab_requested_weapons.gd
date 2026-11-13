@@ -82,6 +82,8 @@ func run() -> void:
 	check(flight_voices.size() == 1 and bolt != null and
 		flight_voices[0].global_position.distance_to(bolt.global_position) < 0.01,
 		"One spatial flight voice follows the moving bolt")
+	check(bolt != null and bolt.scale.is_equal_approx(Vector3.ONE * 0.7),
+		"The displayed arrow uses the scale of the live Polaris mesh")
 	await ticks(21)
 	check(muzzle_errors.size() == 1 and muzzle_errors[0] < 0.0001, "A bolt launches from the fitted muzzle")
 	check(not flight_voices.any(func(voice): return voice.playing), "Flight audio stops after the bolt hits")
@@ -295,6 +297,12 @@ func check_crossbow_collision_radius(lab: Node3D) -> void:
 	crossbow.fire(origin, Vector3.BACK, -102, origin - Vector3.BACK * 0.3)
 	await ticks(8)
 	check(hits.size() == 1, "The arrow misses a thin obstacle 12 cm from its centre line")
+	target.position = origin + Vector3(0.09, 0.0, -0.30)
+	await ticks(2)
+	var active_bolts: int = crossbow.get_child_count()
+	crossbow.fire(origin, Vector3.BACK, -103, origin - Vector3.BACK * 0.3)
+	check(hits.size() == 2 and hits[1].collider == target and crossbow.get_child_count() == active_bolts,
+		"An obstacle already overlapping the clearance sphere blocks the shot before launch")
 	crossbow.bolt_impact.disconnect(record_hit)
 	crossbow.reset()
 	target.queue_free()
