@@ -4,7 +4,7 @@ const DEEP_CONTACT_LIFT_START := 0.10
 const DEEP_CONTACT_LIFT_FULL := 0.112
 const DEEP_CONTACT_SHARED_LIFT := 0.065
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
-const WALL_HANDOFF_CHEST_MAX_SHIFT := 0.03
+const WALL_CHEST_MAX_SHIFT := 0.03
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 
 var _sample_bone_ids: Dictionary[String, int]
@@ -302,18 +302,35 @@ func _project_source_anchors() -> void:
 	super._project_source_anchors()
 	_recover_early_floor_arm_gap()
 	_recover_floor_blocked_hip()
-	if _wall_handoff_frame < 0 or Engine.get_physics_frames() - _wall_handoff_frame \
-			> roundi(WALL_HANDOFF_RECOVERY_SECONDS * Engine.physics_ticks_per_second):
+	var recent_handoff := _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _wall_handoff_frame \
+		<= roundi(WALL_HANDOFF_RECOVERY_SECONDS * Engine.physics_ticks_per_second)
+	var neck_flight := _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0
+	if not recent_handoff and not neck_flight:
 		return
 
 	# All five source joints share the chest. A side contact can block a
 	# limb's projection, so check whether the chest has room to meet it.
+	var motion := Vector3.ZERO
+	var largest_gap := 2.0 * SOURCE_ANCHOR_TOLERANCE
 	var chest: PhysicalBone3D = bodies.Chest
 	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
 	if chest_state == null:
 		return
-	var motion := Vector3.ZERO
-	var largest_gap := 2.0 * SOURCE_ANCHOR_TOLERANCE
+	if not recent_handoff:
+		var head: PhysicalBone3D = bodies.Head
+		var head_state := PhysicsServer3D.body_get_direct_state(head.get_rid())
+		if chest_state.get_contact_count() > 0 or head_state == null or head_state.get_contact_count() == 0:
+			return
+		var neck: Dictionary = source_joints.Head
+		var neck_gap: Vector3 = (chest_state.transform * neck.parent_frame).origin \
+			- (head_state.transform * neck.child_frame).origin
+		if neck_gap.length_squared() <= largest_gap * largest_gap:
+			return
+		motion = _wall_anchor_motion(head_state, neck_gap, true)
+		if motion.is_zero_approx():
+			return
+		largest_gap = neck_gap.length()
+
 	var gaps: Array[Vector3] = []
 	for name: String in source_joint_rids:
 		var spec: Dictionary = source_joints[name]
@@ -325,17 +342,12 @@ func _project_source_anchors() -> void:
 			- (state.transform * spec.child_frame).origin
 		gaps.append(gap)
 		var distance := gap.length()
-		if distance <= largest_gap:
+		if not recent_handoff or distance <= largest_gap:
 			continue
-		for index in state.get_contact_count():
-			var normal := state.get_contact_local_normal(index)
-			if absf(normal.y) >= MAX_WALL_NORMAL_Y or not state.get_contact_collider_object(index) is StaticBody3D:
-				continue
-			var blocked_distance := -gap.dot(normal) - SOURCE_ANCHOR_TOLERANCE
-			if blocked_distance > 0.0:
-				largest_gap = distance
-				motion = normal * minf(blocked_distance, WALL_HANDOFF_CHEST_MAX_SHIFT)
-				break
+		var shift := _wall_anchor_motion(state, gap, false)
+		if not shift.is_zero_approx():
+			largest_gap = distance
+			motion = shift
 	if motion.is_zero_approx():
 		return
 	for gap: Vector3 in gaps:
@@ -343,6 +355,18 @@ func _project_source_anchors() -> void:
 			return
 	if not _test_projection_motion(chest, chest_state.transform, motion):
 		chest_state.transform = chest_state.transform.translated(motion)
+
+func _wall_anchor_motion(state: PhysicsDirectBodyState3D, gap: Vector3, require_rebound: bool) -> Vector3:
+	for index in state.get_contact_count():
+		var normal := state.get_contact_local_normal(index)
+		if absf(normal.y) >= MAX_WALL_NORMAL_Y or not state.get_contact_collider_object(index) is StaticBody3D:
+			continue
+		if require_rebound and state.linear_velocity.dot(normal) <= 0.0:
+			continue
+		var blocked_distance := -gap.dot(normal) - SOURCE_ANCHOR_TOLERANCE
+		if blocked_distance > 0.0:
+			return normal * minf(blocked_distance, WALL_CHEST_MAX_SHIFT)
+	return Vector3.ZERO
 
 func _recover_floor_blocked_hip() -> void:
 	if not _limit_first_contact_stretch or floor_landing_blended or floor_impact_blend > 0.0 \
