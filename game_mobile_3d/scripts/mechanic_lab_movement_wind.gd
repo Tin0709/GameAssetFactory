@@ -14,18 +14,21 @@ class Wake:
 	var origin: Vector3
 	var trailing: Vector3
 	var age := 0.0
+	var contact_tick := -1
 
 var _actor: CharacterBody3D
 var _terrain_contact: Callable
 var _wakes: Array[Wake] = []
 var _next := 0
+var _physics_clock := false
 
-func setup(actor: CharacterBody3D, terrain_contact := Callable()) -> bool:
+func setup(actor: CharacterBody3D, terrain_contact := Callable(), physics_clock := false) -> bool:
 	var image := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(64, 64))
 	if image == null:
 		return false
 	_actor = actor
 	_terrain_contact = terrain_contact
+	_physics_clock = physics_clock
 	var texture := ImageTexture.create_from_image(image)
 	var quad := QuadMesh.new()
 	quad.orientation = PlaneMesh.FACE_Y
@@ -46,6 +49,7 @@ func setup(actor: CharacterBody3D, terrain_contact := Callable()) -> bool:
 	actor.surface_contact.connect(_on_surface_contact)
 	actor.presentation_reset.connect(clear)
 	set_process(false)
+	set_physics_process(false)
 	return true
 
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
@@ -68,27 +72,42 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	wake.trailing = trailing
 	wake.origin = Vector3(point.x, foot_height + 0.38, point.z) + trailing * 0.50 + lateral * side * 0.18
 	wake.age = 0.0
+	wake.contact_tick = Engine.get_physics_frames()
 	wake.mesh.global_transform = Transform3D(Basis(trailing, Vector3.UP, lateral), wake.origin)
 	wake.material.albedo_color = TINT
 	wake.mesh.show()
 	set_process(true)
+	set_physics_process(_physics_clock)
+
+func _physics_process(delta: float) -> void:
+	var tick := Engine.get_physics_frames()
+	for wake in _wakes:
+		if wake.mesh.visible and wake.contact_tick != tick:
+			wake.age += delta
 
 func _process(delta: float) -> void:
 	var active := false
+	var render_offset := 0.0
+	if _physics_clock and not Engine.is_in_physics_frame():
+		render_offset = Engine.get_physics_interpolation_fraction() * get_physics_process_delta_time()
 	for wake in _wakes:
 		if not wake.mesh.visible:
 			continue
-		wake.age += delta
-		if wake.age >= LIFETIME:
+		if not _physics_clock:
+			wake.age += delta
+		var age := wake.age + render_offset
+		if age >= LIFETIME:
 			wake.mesh.hide()
 			continue
-		var progress := wake.age / LIFETIME
+		var progress := age / LIFETIME
 		wake.mesh.global_position = wake.origin + wake.trailing * progress * 0.16
 		wake.material.albedo_color.a = TINT.a * (1.0 - smoothstep(0.12, 1.0, progress))
 		active = true
 	set_process(active)
+	set_physics_process(active and _physics_clock)
 
 func clear() -> void:
 	for wake in _wakes:
 		wake.mesh.hide()
 	set_process(false)
+	set_physics_process(false)

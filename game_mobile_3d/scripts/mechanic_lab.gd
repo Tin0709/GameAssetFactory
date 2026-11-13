@@ -200,7 +200,7 @@ func _ready() -> void:
 			dust.free()
 		var wind := MovementWind.new()
 		wind.name = "MovementWind"
-		if wind.setup(player, _player_foot_contact_at):
+		if wind.setup(player, _player_foot_contact_at, true):
 			add_child(wind)
 		else:
 			wind.free()
