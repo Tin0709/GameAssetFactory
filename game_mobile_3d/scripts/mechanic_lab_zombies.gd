@@ -102,7 +102,7 @@ var crossbow_equipped := false
 var gauntlets_equipped := false
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
-var _physics_profile: Dictionary
+var _ragdoll_layout: Dictionary
 var _digits: Array[Texture2D]
 var _spawn_serial := 0
 var _attack_serial := -1
@@ -137,7 +137,7 @@ func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie:
 	zombie.position = point
 	zombie.max_health = Zombie.BASE_HEALTH if base_zombie else Zombie.TRAINING_HEALTH
 	var corpse_floor := get_node_or_null("../Ground/Collision") as CollisionShape3D
-	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial, _physics_profile,
+	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial, _ragdoll_layout,
 		corpse_floor, health_bars, damage_numbers)
 	zombie.melee_hit.connect(player_hit.emit)
 	zombie.melee_audio.connect(zombie_attack_audio.emit)
@@ -418,7 +418,8 @@ func _load_assets() -> void:
 			if _verified(path, PHYSICS_PROFILE_HASH):
 				var decoded: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 				if decoded is Dictionary and decoded.get("idle_glb_sha256") == CLIP_HASHES[Zombie.IDLE]:
-					_physics_profile = decoded
+					# Every instance uses this packed rig, so verify its source bind pose once.
+					_ragdoll_layout = Zombie.source_ragdoll_layout(model.find_child("Skeleton3D", true, false), decoded)
 	model.free()
 
 func _add_clips(directory: String, player: AnimationPlayer) -> bool:

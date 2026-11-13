@@ -167,17 +167,17 @@ var _flat_brace_weight := 0.0
 var _terrain_rest_age := 0.0
 var _terrain_rest_duration := 0.0
 var _terrain_rest_poses: Dictionary[String, Transform3D]
-var _physics_profile: Dictionary
+var _ragdoll_layout: Dictionary
 var _corpse_floor: CollisionShape3D
 static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
 static var _corpse_base_material: ShaderMaterial
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D],
-		serial: int, physics_profile: Dictionary = {}, corpse_floor: CollisionShape3D = null,
+		serial: int, ragdoll_layout: Dictionary = {}, corpse_floor: CollisionShape3D = null,
 		health_bars: HealthBars = null, damage_numbers: DamageNumbers = null) -> void:
 	target = player
-	_physics_profile = physics_profile
+	_ragdoll_layout = ragdoll_layout
 	_corpse_floor = corpse_floor
 	_crowd_slot = serial
 	_death_rng.seed = hash(Vector2i(serial, 1709))
@@ -210,7 +210,7 @@ func _ready() -> void:
 	ragdoll = Ragdoll.new()
 	add_child(ragdoll)
 	var skeleton := find_child("Skeleton3D", true, false) as Skeleton3D
-	var source := _source_physics_setup(skeleton)
+	var source := _ragdoll_layout
 	if source.is_empty():
 		ragdoll.setup(skeleton, RAGDOLL_PARTS, RAGDOLL_BONES)
 	else:
@@ -240,8 +240,8 @@ static func _source_frame(frame: Array) -> Transform3D:
 	return Transform3D(Basis(primary, secondary, primary.cross(secondary)).orthonormalized(),
 		_from_unreal(frame[0]) * 0.01)
 
-func _source_physics_setup(skeleton: Skeleton3D) -> Dictionary:
-	if _physics_profile.get("schema") != "md2-zombie-physics/1":
+static func source_ragdoll_layout(skeleton: Skeleton3D, profile: Dictionary) -> Dictionary:
+	if skeleton == null or profile.get("schema") != "md2-zombie-physics/1":
 		return {}
 	var roles := {"J_Spine": "Chest", "J_Neck": "Head", "J_L_Arm": "Arm.L", "J_R_Arm": "Arm.R",
 		"J_L_Leg": "Leg.L", "J_R_Leg": "Leg.R"}
@@ -250,7 +250,7 @@ func _source_physics_setup(skeleton: Skeleton3D) -> Dictionary:
 	var parts := []
 	var joints := {}
 	var total_mass_weight := 0.0
-	for entry: Dictionary in _physics_profile.bodies:
+	for entry: Dictionary in profile.bodies:
 		var name: String = roles.get(entry.bone, "")
 		if name.is_empty() or skeleton.find_bone(entry.bone) < 0:
 			return {}
@@ -263,7 +263,7 @@ func _source_physics_setup(skeleton: Skeleton3D) -> Dictionary:
 	# The density and mass scale are shared. Normalize the relative masses to the lab's total.
 	for part: Array in parts:
 		part[3] *= SOURCE_RIG_LAB_MASS / total_mass_weight
-	for entry: Dictionary in _physics_profile.constraints:
+	for entry: Dictionary in profile.constraints:
 		var child: String = roles[entry.child]
 		var parent: String = roles[entry.parent]
 		var child_frame := _source_frame(entry.child_frame)
