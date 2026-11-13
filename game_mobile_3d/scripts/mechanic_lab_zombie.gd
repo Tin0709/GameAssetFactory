@@ -598,7 +598,8 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		# Keep the existing fall from an upper-body brace through its roll.
 		var drag := smoothstep(0.78, 1.00, _corpse_age) * (1.0 - smoothstep(0.9, 2.0, motion.linear))
 		if drag > 0.0:
-			_resist_grounded_slide(drag * SABRE_GROUNDED_SLIDE_DRAG)	var wall_gravity := _update_wall_brace(delta, motion)
+			_resist_grounded_slide(drag * SABRE_GROUNDED_SLIDE_DRAG)
+	var wall_gravity := _update_wall_brace(delta, motion)
 	# A slow corpse propped on its upper body can take seconds for its
 	# feet to come down. Restore some flight gravity until it rolls off.
 	var braced: bool = flat_sabre_finisher and not ragdoll.source_joints.is_empty() \
