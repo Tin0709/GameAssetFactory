@@ -184,7 +184,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 110
+const LIGHTING_MIX_VERSION := 111
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1211,7 +1211,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"night_cliff_mist":
 		return .75
 	if effect == &"sunlit_mist":
-		return .24
+		return .33
 	if effect == &"foot_contact":
 		return .45
 	if effect in [&"player_bounce", &"player_canopy_color"]:
@@ -1621,8 +1621,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 29 and effect == &"grass_root_tone":
 			missing_value = 0.
-		if version < 30 and effect == &"sunlit_mist":
-			missing_value = 0.
+		if version < 111 and effect == &"sunlit_mist":
+			missing_value = 0. if version < 30 else .24
 		if version < 103 and effect == &"foot_contact":
 			missing_value = 0.
 		if version < 33 and effect == &"projected_sun":
@@ -2497,7 +2497,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
 		if effect == &"sunlit_mist":
 			slider.editable = directional_air.available()
-			slider.tooltip_text = "Try 24% in the forest at 16:30. Scatters sunlight through canopy gaps; fades to zero at noon and night." if slider.editable else "Requires the verified private canopy field and the Mobile renderer."
+			slider.tooltip_text = "Compare the 33% default against 24% at 07:00 or 16:30. Adds scattered sunlight behind canopy gaps; fades to zero at noon and night." if slider.editable else "Requires the verified private canopy field and the Mobile renderer."
 		if effect == &"foot_contact":
 			slider.editable = player_contact.available()
 			slider.tooltip_text = "Bóng mềm trong ánh gián tiếp dưới từng chân. So 0% và 45% trên bậc đá lúc 07:00. Hiệu ứng giảm khi chân rời đất và tắt lúc 12:00."
