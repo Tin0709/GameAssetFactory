@@ -89,6 +89,17 @@ func is_near_flat_floor(tolerance: float) -> bool:
 		minimum_y = minf(minimum_y, bounds.position.y)
 	return absf(minimum_y - floor_half.y) <= tolerance
 
+func has_static_wall_contact() -> bool:
+	for body: PhysicalBone3D in bodies.values():
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			continue
+		for contact in state.get_contact_count():
+			if absf(state.get_contact_local_normal(contact).y) < MAX_WALL_NORMAL_Y \
+					and state.get_contact_collider_object(contact) is StaticBody3D:
+				return true
+	return false
+
 func _limit_shared_first_contact_lift(lifts: Dictionary[PhysicalBone3D, float],
 		depths: Dictionary[PhysicalBone3D, float], shared_lift: float, slop: float) -> void:
 	if shared_lift <= DEEP_CONTACT_LIFT_START:
