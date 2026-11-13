@@ -46,6 +46,12 @@ func run() -> void:
 				found = true
 				break
 			check(found, "The authored map includes an exposed %s test surface" % block)
+		var lower_slab := Vector3(-37.5, 3.5, -35.5)
+		var slab_contact: Dictionary = world._movement_dust_contact(lower_slab + Vector3.UP * 0.08)
+		check(world.surface_height(lower_slab.x, lower_slab.z) > lower_slab.y
+			and slab_contact.get("surface") == "stone"
+			and lower_slab.is_equal_approx(slab_contact.get("position", Vector3.INF)),
+			"A stone slab under a ledge uses its own surface and height")
 		world.player.surface_contact.emit(site + Vector3.UP * 4.0, false)
 		check(dust.get_children().all(func(sprite): return not sprite.visible), "An unsupported foot emits no dust")
 		var saw_live_dust := false
@@ -74,4 +80,3 @@ func run() -> void:
 	print("WORLD_MAP_MOVEMENT_DUST failures=", failures)
 	world.free()
 	quit(0 if failures.is_empty() else 1)
-
