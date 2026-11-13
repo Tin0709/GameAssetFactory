@@ -113,7 +113,9 @@ func _limit_shared_first_contact_lift(lifts: Dictionary[PhysicalBone3D, float],
 		var limb_state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
 		if limb_state == null:
 			return
-		var gap: Vector3 = (chest_state.transform * joint.parent_frame).origin +			- (limb_state.transform * joint.child_frame).origin
+		var chest_anchor: Vector3 = (chest_state.transform * joint.parent_frame).origin
+		var limb_anchor: Vector3 = (limb_state.transform * joint.child_frame).origin
+		var gap := chest_anchor - limb_anchor
 		var old_limb_lift: float = lifts.get(limb, maxf(shared_lift, depths.get(limb, 0.0) - slop))
 		var tolerance := maxf(FIRST_CONTACT_ANCHOR_LIMIT,
 			(gap + Vector3.UP * (old_chest_lift - old_limb_lift)).length())
@@ -126,6 +128,33 @@ func _limit_shared_first_contact_lift(lifts: Dictionary[PhysicalBone3D, float],
 		var limit := limb_gap_limits[limb]
 		lifts[limb] = maxf(limb_clearances[limb], chest_lift + limit.x - limit.y)
 	lifts[chest] = chest_lift
+
+func _constrain_free_anchor_motion(body: PhysicalBone3D, state: PhysicsDirectBodyState3D,
+		motion: Vector3) -> Vector3:
+	if (motion.y >= 0.0 or not _limit_first_contact_stretch or not floor_landing_blended
+			or not is_instance_valid(_flat_floor) or _flat_floor.disabled):
+		return motion
+	var floor_box := _flat_floor.shape as BoxShape3D
+	var floor_pose := _flat_floor.global_transform
+	if (floor_box == null or not floor_pose.basis.y.is_equal_approx(Vector3.UP)
+			or not floor_pose.basis.get_scale().is_equal_approx(Vector3.ONE)):
+		return motion
+	var collider := body.get_child(0) as CollisionShape3D
+	var shape := collider.shape as BoxShape3D
+	var floor_inverse := floor_pose.affine_inverse()
+	var pose := floor_inverse * state.transform * collider.transform
+	var bounds := pose * AABB(-shape.size * 0.5, shape.size)
+	var floor_half := floor_box.size * 0.5
+	var local_motion := floor_inverse.basis * motion
+	var target := bounds.position + local_motion
+	if (target.x < -floor_half.x or target.x + bounds.size.x > floor_half.x
+			or target.z < -floor_half.z or target.z + bounds.size.z > floor_half.z):
+		return motion
+	# Keep the preceding floor recovery when the free limb is already at
+	# the resting clearance. The wall sweep still handles the lateral move.
+	var clearance := bounds.position.y - floor_half.y + FLOOR_REST_SLOP
+	motion.y = maxf(motion.y, -maxf(clearance, 0.0))
+	return motion
 
 func _set_source_joint_bias(joint: RID, bias: float) -> void:
 	if _source_joint_biases.get(joint, -1.0) == bias:

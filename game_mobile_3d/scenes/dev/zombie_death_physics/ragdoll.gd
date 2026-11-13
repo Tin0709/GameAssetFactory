@@ -457,6 +457,7 @@ func _project_source_anchors() -> void:
 			if can_project_contact:
 				_project_contacting_anchor(child, state, motion.limit_length(CONTACT_ANCHOR_RECOVERY_MAX_SHIFT))
 			continue
+		motion = _constrain_free_anchor_motion(child, state, motion)
 		if _test_projection_motion(child, state.transform, motion):
 			var safe_fraction := _projection_hit.get_collision_safe_fraction()
 			if is_zero_approx(safe_fraction) and can_project_contact:
@@ -468,6 +469,10 @@ func _project_source_anchors() -> void:
 			motion *= safe_fraction
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
+
+func _constrain_free_anchor_motion(_body: PhysicalBone3D, _state: PhysicsDirectBodyState3D,
+		motion: Vector3) -> Vector3:
+	return motion
 
 func _set_source_joint_bias(joint: RID, bias: float) -> void:
 	PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_BIAS, bias)
