@@ -35,6 +35,7 @@ func run() -> void:
 	check(lab.player_health == 94, "A real zombie attack takes six HP")
 	check(body.material_overlay != original_overlay and face.material_overlay == body.material_overlay
 		and weapon.material_overlay == weapon_overlay, "The body and face flash while the weapon retains its material")
+	await wait_for_damage_display()
 	check(numbers != null and numbers.get_child_count() == 1, "One number appears on the real hit")
 	if numbers != null and numbers.get_child_count() == 1:
 		var number := numbers.get_child(0) as Node3D
@@ -51,6 +52,7 @@ func run() -> void:
 	lab._on_player_hit(999)
 	check(lab.player_health == 0 and lab.player.is_dead and body.material_overlay != original_overlay,
 		"A lethal hit still flashes and enters defeat")
+	await wait_for_damage_display()
 	if numbers != null:
 		check(numbers.get_child_count() == 1 and numbers.get_child(0).get_meta("amount") == remaining,
 			"Overkill displays only the HP actually lost")
@@ -94,33 +96,47 @@ func check_turned_zombie(lab) -> void:
 func check_simultaneous_damage(lab, numbers: Node) -> void:
 	lab.reset_player()
 	await ticks(3)
-	var group := lab.get_node("Zombies")
+	var group: Node = lab.get_node("Zombies")
 	for i in 4:
 		group.player_hit.emit(ZOMBIE.MELEE_DAMAGE)
 	check(lab.player_health == 76, "Four same-tick hits each apply damage immediately")
-	await process_frame
-	await process_frame
+	await wait_for_damage_display()
 	check(numbers.get_child_count() == 1 and numbers.get_child(0).get_meta("amount") == 24,
 		"Same-tick hits display one readable red total")
+	if numbers.get_child_count() == 1:
+		var total := numbers.get_child(0)
+		check(total.get_child_count() == 2 and (total.get_child(0) as Sprite3D).modulate.g < 0.25,
+			"The total renders both glyphs in the player damage tint")
 	await physics_frame
 	group.player_hit.emit(ZOMBIE.MELEE_DAMAGE)
-	await process_frame
-	await process_frame
+	await wait_for_damage_display()
 	check(numbers.get_child_count() == 2 and numbers.get_child(1).get_meta("amount") == 6,
 		"A separate physics tick produces its own floating number")
+	lab.reset_player()
+	await ticks(3)
+	lab.set_process(false)
+	group.player_hit.emit(2)
+	await physics_frame
+	group.player_hit.emit(3)
+	lab.set_process(true)
+	await wait_for_damage_display()
+	check(numbers.get_child_count() == 2 and numbers.get_child(0).get_meta("amount") == 2
+		and numbers.get_child(1).get_meta("amount") == 3, "Two catch-up ticks keep separate totals")
 	lab.reset_player()
 	await ticks(3)
 	lab.player_health = 9
 	group.player_hit.emit(6)
 	group.player_hit.emit(6)
 	group.player_hit.emit(6)
-	await process_frame
-	await process_frame
+	await wait_for_damage_display()
 	check(lab.player.is_dead and lab.player_health == 0 and numbers.get_child_count() == 1
 		and numbers.get_child(0).get_meta("amount") == 9, "The lethal total includes only the HP actually lost")
 	lab.reset_player()
 	group.player_hit.emit(6)
 	lab.reset_player()
-	await process_frame
-	await process_frame
+	await wait_for_damage_display()
 	check(lab.player_health == 100 and numbers.get_child_count() == 0, "Reset discards a pending damage total")
+
+func wait_for_damage_display() -> void:
+	await process_frame
+	await process_frame
