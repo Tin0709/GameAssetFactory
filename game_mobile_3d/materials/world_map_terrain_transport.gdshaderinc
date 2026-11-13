@@ -8,6 +8,7 @@ varying float stone_diffuse_log;
 uniform sampler2D stone_diffuse_field : filter_nearest, repeat_disable;
 uniform float stone_diffuse_strength = 0.0;
 uniform float night_stone_top_cool = 0.0;
+uniform float night_stone_blue_softness = 0.0;
 
 float gaf_stone_diffuse_sample(int receiver, vec3 world_normal) {
 	if (stone_diffuse_strength <= 0.0 || ground_grade != 3 || abs(world_normal.y) >= 0.1) return 0.0;
@@ -56,6 +57,12 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 		// Keep more of the incident sky chroma on upward-facing stone.
 		float balance = night_sky_state.y * (1.0 - night_stone_top_cool * clamp(face_y, 0.0, 1.0));
 		irradiance = mix(irradiance, vec3(luma), balance);
+	}
+	if (ground_grade == 3 && night_stone_blue_softness > 0.0) {
+		float y = dot(irradiance, vec3(0.2126, 0.7152, 0.0722));
+		float excess_blue = smoothstep(1.30, 2.05, irradiance.b / max(y, 0.000001));
+		float amount = night_stone_blue_softness * excess_blue;
+		irradiance = mix(irradiance, vec3(y), 0.46 * amount) * (1.0 - 0.1375 * amount);
 	}
 	irradiance += terrain_day_bounce;
 #endif

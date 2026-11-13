@@ -572,7 +572,7 @@ func _make_cutaway_material(native: Material) -> ShaderMaterial:
 				"terrain_outline_strength", "terrain_outline_width"]:
 			var value: Variant = native.get_shader_parameter(parameter)
 			if value != null: material.set_shader_parameter(parameter, value)
-		for parameter:String in preload("res://scripts/world_map_terrain_material.gd").PARAMETERS+["terrain_key_radiance","terrain_ambient_scale","terrain_ambient_tint","terrain_colored_visibility","turf_ambient_color"]:
+		for parameter:String in preload("res://scripts/world_map_terrain_material.gd").PARAMETERS+["terrain_key_radiance","terrain_ambient_scale","terrain_ambient_tint","terrain_colored_visibility","turf_ambient_color","night_stone_blue_softness"]:
 			var value:Variant=native.get_shader_parameter(parameter)
 			if value!=null:material.set_shader_parameter(parameter,value)
 		for parameter: String in ["regional_sky_field", "regional_sky_bounds", "regional_sky_phase", "regional_sky_state",

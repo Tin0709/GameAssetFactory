@@ -13,6 +13,7 @@ var _last_key:=Vector3.INF
 var _last_scale:=-1.
 var _last_tint:=Vector3.INF
 var _last_turf_color := Vector3.INF
+var _last_stone_softness := -1.0
 var _last_response:Variant=null
 var _last_dielectric:Variant=null
 var _world_transforms:Dictionary={}
@@ -336,12 +337,14 @@ func bind(force:bool=false)->void:
 	var scale := ambient_scale(env) * float(level.showcase.twilight_ground_ambient_scale())
 	var tint:=ambient_tint(env)
 	var turf_color: Vector3 = level.showcase.turf_ambient_color()
+	var stone_softness: float = level.showcase.night_stone_blue_softness()
 	var response:bool=level.look.terrain_visibility_response
 	var dielectric:bool=level.look.terrain_dielectric_response and level.look.terrain_review=="combined"
-	if not force and key==_last_key and scale==_last_scale and tint==_last_tint and turf_color == _last_turf_color and response==_last_response and dielectric==_last_dielectric:return
+	if not force and key==_last_key and scale==_last_scale and tint==_last_tint and turf_color == _last_turf_color and stone_softness == _last_stone_softness and response==_last_response and dielectric==_last_dielectric:return
 	_last_key=key;_last_scale=scale;_last_tint=tint;_last_response=response
 	_last_dielectric=dielectric
 	_last_turf_color = turf_color
+	_last_stone_softness = stone_softness
 	var materials={}
 	for row in level.look.terrain_materials:materials[row[3]]=true
 	for chunk in level.geometry._cutaway_chunks:
@@ -350,6 +353,7 @@ func bind(force:bool=false)->void:
 		m.set_shader_parameter("terrain_key_radiance",key);m.set_shader_parameter("terrain_ambient_scale",scale);m.set_shader_parameter("terrain_ambient_tint",tint)
 		m.set_shader_parameter("terrain_colored_visibility",response)
 		m.set_shader_parameter("turf_ambient_color", turf_color)
+		m.set_shader_parameter("night_stone_blue_softness", stone_softness)
 		var compatible:bool=dielectric and is_zero_approx(float(m.get_shader_parameter("native_metallic")))
 		m.set_shader_parameter("terrain_dielectric_response",compatible);m.set_shader_parameter("terrain_rough_reflection",compatible);m.set_shader_parameter("terrain_env_brdf",BRDF)
 func _process(_delta:float)->void:
