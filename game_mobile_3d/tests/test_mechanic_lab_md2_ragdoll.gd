@@ -209,7 +209,8 @@ func check_fresh_spawn_handoff(lab, group, living_ticks: int) -> void:
 	for sample: Dictionary in zombie.ragdoll.inherited.values():
 		inherited_motion = inherited_motion or not sample.linear.is_zero_approx() or not sample.angular.is_zero_approx()
 	check(zombie.ragdoll.running and zombie._corpse_age <= 1.0 / 60.0 + 0.00001
-		and zombie.ragdoll.handoff_error < 0.0001 and not inherited_motion,
+		and zombie.ragdoll.handoff_error < 0.0001 and not inherited_motion
+		and zombie.ragdoll.total_applied_impulse.x > 0.0,
 		"A lethal hit with %d prior samples launches on the first death tick from its current pose" % living_ticks)
 	print("FRESH_ZOMBIE_HANDOFF samples=", living_ticks, " active=", zombie.ragdoll.running,
 		" age=", zombie._corpse_age, " pose_gap_m=", zombie.ragdoll.handoff_error)

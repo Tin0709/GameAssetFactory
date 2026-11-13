@@ -416,8 +416,10 @@ func _update_death(delta: float) -> void:
 	var source_rig := not ragdoll.source_joints.is_empty()
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
+			# A fresh spawn has no measured motion. Seed both snapshots from
+			# the paused pose so the hit can launch on this physics tick.
 			ragdoll.sample(delta)
-			return
+			ragdoll.sample(delta)
 		var mass := 0.0
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			# The player uses layer 2, which the living controllers can stand on.
