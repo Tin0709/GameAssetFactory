@@ -369,6 +369,13 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 	audio.flush_zombie_combat_cues()
 	check(reactions.all(func(voice): return voice.global_position in [closest, near_death_points[0], near_death_points[1]]),
 		"A closer death can replace the farthest recent onset")
+	for i in 6:
+		await physics_frame
+	var later_death := ear + Vector3.RIGHT * 10.0
+	audio.contact(later_death, 1103, true)
+	audio.flush_zombie_combat_cues()
+	check(reactions.any(func(voice): return voice.global_position == later_death),
+		"A later kill can use a reaction voice after the earlier onsets")
 	audio.reset()
 	var death_choice: int = audio._next_choice.get(&"death", 0)
 	audio.contact(ear + Vector3.RIGHT * 40.0, 1003, true)
