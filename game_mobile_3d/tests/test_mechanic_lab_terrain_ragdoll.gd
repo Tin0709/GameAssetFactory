@@ -278,6 +278,15 @@ func check_edge_landing_gravity() -> void:
 	zombie._landing_age = 0.0
 	zombie._update_landing_forces(0.2, false, false, motion)
 	check(is_equal_approx(head.gravity_scale, 1.0), "A near-floor pose above the platform retains landing gravity")
+	var overhang := head.get_child(0) as CollisionShape3D
+	var head_half := (overhang.shape as BoxShape3D).size * 0.5
+	var bounds := head.global_transform * AABB(-head_half, 2.0 * head_half)
+	var floor_shape := lab.get_node("Ground/Collision") as CollisionShape3D
+	var edge := floor_shape.global_position.x + (floor_shape.shape as BoxShape3D).size.x * 0.5
+	head.global_position += Vector3(edge - bounds.get_center().x, -0.08 - bounds.position.y, 0.0)
+	zombie._update_landing_forces(1.0 / 60.0, false, false, motion)
+	check(is_equal_approx(head.gravity_scale, 1.0),
+		"An overhanging head does not mask a near-floor foot during a brief gap in contacts")
 	for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
 		body.global_position.x += 8.0
 	zombie._update_landing_forces(1.0 / 60.0, false, false, motion)
