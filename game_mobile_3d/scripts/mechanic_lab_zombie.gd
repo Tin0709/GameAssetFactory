@@ -429,7 +429,7 @@ func _chase_velocity(delta: float) -> Vector3:
 		return offset.normalized() * minf(CHASE_SPEED, (distance - MELEE_RANGE) / delta)
 	# Complete the approach turn before locking the swing's heading.
 	var facing_target := _is_in_melee_cone(offset)
-	if height_delta < 1.15 and facing_target and _attack_cooldown <= 0.0:
+	if height_delta <= MELEE_HEIGHT_LIMIT and facing_target and _attack_cooldown <= 0.0:
 		animation.play(ATTACK, 0.1)
 		_attack_cooldown = MELEE_COOLDOWN
 		melee_audio.emit(global_position + Vector3.UP * (HEIGHT * 0.5), false)
