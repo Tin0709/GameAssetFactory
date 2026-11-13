@@ -35,6 +35,7 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var forest_replay_surface_map_sha256 := ""
 @export var forest_replay_surface_origin := Vector3.ZERO
 @export var forest_replay_surface_extent := Vector3i.ZERO
+@export var forest_replay_surface_source := Vector3.INF
 ## Optional translation in the two axes of the projected sunlight plane.
 @export var projected_sun_shift := Vector2.ZERO
 var runtime: Dictionary

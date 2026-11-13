@@ -34,6 +34,7 @@ forest_replay_surface_sha256 = "1302ac24afebf42551bdae8d6686cf986fda61cc33d0c86c
 forest_replay_surface_map_sha256 = "53e243bb23f95f17990d02d8871393fa1a26c5aa67ae79314361b5cdc1c6f805"
 forest_replay_surface_origin = Vector3(-30.5, 2.75, -48.5)
 forest_replay_surface_extent = Vector3i(48, 27, 47)
+forest_replay_surface_source = Vector3(-24.5, 6.43, -42.5)
 
 [node name="Ground" parent="."]
 collision_layer = 0

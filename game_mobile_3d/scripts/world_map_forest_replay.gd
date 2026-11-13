@@ -73,7 +73,10 @@ func surface_available(world) -> bool:
 
 func publish_surface(world, strength: float) -> void:
 	var gain := 0.0
-	if strength > 0. and _submitted_bounce.w > 0. and _site == world.forest_replay_steps_site and surface_available(world):
+	var source: Vector3 = world.forest_replay_surface_source
+	var bounce_center := Vector3(_submitted_bounce.x, _submitted_bounce.y, _submitted_bounce.z)
+	if strength > 0. and _submitted_bounce.w > 0. and _site == world.forest_replay_steps_site \
+			and source.is_finite() and bounce_center.distance_squared_to(source) < 0.0001 and surface_available(world):
 		if not _surface_attempted:
 			_surface_attempted = true
 			_load_surface(world)
@@ -96,6 +99,7 @@ func _load_surface(world) -> void:
 	var relative: String = world.forest_replay_surface_path.simplify_path()
 	var extent: Vector3i = world.forest_replay_surface_extent
 	if root.is_empty() or relative.is_absolute_path() or relative.begins_with("..") \
+			or not world.forest_replay_surface_origin.is_finite() \
 			or mini(extent.x, mini(extent.y, extent.z)) < 2 or maxi(extent.x, maxi(extent.y * 6, extent.z)) > 256:
 		return
 	var path := root.path_join(relative)
