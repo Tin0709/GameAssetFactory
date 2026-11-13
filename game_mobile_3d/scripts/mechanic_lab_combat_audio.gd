@@ -83,6 +83,7 @@ const REACTION_POOL := 1
 const ATTACK_POOL := 2
 const STEP_POOL := 3
 const FLIGHT_POOL := 4
+const SPATIAL_VOICE_DISTANCE := 35.0
 const FLIGHT_GAIN_DB := -17.0
 const HIT_GAIN_DB := -9.0
 const EQUIP_GAIN_DB := -15.0
@@ -181,6 +182,7 @@ var enabled := false
 var sword_equipped := false
 var curved_equipped := false
 var gauntlets_equipped := false
+var zombie_attack_listener: AudioListener3D
 var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _player_hurt_voice: AudioStreamPlayer
@@ -189,6 +191,9 @@ var _next_voice: Array[int] = [0, 0, 0, 0, 0]
 var _flight_targets: Dictionary[AudioStreamPlayer3D, Node3D]
 var _started_frames: PackedInt64Array
 var _player_hurt_frame := -1
+var _zombie_attack_frame := -1
+var _attack_contacts: Array[Dictionary] = []
+var _attack_windups: Array[Dictionary] = []
 var _zombie_step_frame := -1
 var _step_points: Array[Vector3] = []
 var _step_distances: Array[float] = []
@@ -352,9 +357,34 @@ func player_hurt() -> void:
 		_player_hurt_voice.play()
 
 func zombie_attack(point: Vector3, contact: bool) -> void:
-	if enabled:
-		_play(&"zombie_hit" if contact else &"zombie_windup", point,
-			ZOMBIE_HIT_GAIN_DB if contact else ZOMBIE_WINDUP_GAIN_DB)
+	var group := &"zombie_hit" if contact else &"zombie_windup"
+	if not enabled or not _groups.has(group) or not is_instance_valid(zombie_attack_listener):
+		return
+	var frame := Engine.get_physics_frames()
+	if frame != _zombie_attack_frame:
+		flush_zombie_attacks()
+		_zombie_attack_frame = frame
+	var distance := point.distance_squared_to(zombie_attack_listener.global_position)
+	if distance > SPATIAL_VOICE_DISTANCE * SPATIAL_VOICE_DISTANCE:
+		return
+	# Bound each priority to the number of playable voices, preserving ties
+	# in event order. Only cues selected for playback advance sample rotation.
+	var pending := _attack_contacts if contact else _attack_windups
+	var index := pending.size()
+	while index > 0 and distance < float(pending[index - 1].distance):
+		index -= 1
+	if index < VOICES_PER_POOL:
+		pending.insert(index, {"point": point, "distance": distance})
+		if pending.size() > VOICES_PER_POOL:
+			pending.pop_back()
+
+func flush_zombie_attacks() -> void:
+	for cue: Dictionary in _attack_contacts:
+		_play(&"zombie_hit", cue.point, ZOMBIE_HIT_GAIN_DB)
+	for cue: Dictionary in _attack_windups:
+		_play(&"zombie_windup", cue.point, ZOMBIE_WINDUP_GAIN_DB)
+	_attack_contacts.clear()
+	_attack_windups.clear()
 
 func queue_zombie_step(sole: Vector3, listener: Vector3, find_support: Callable, known_support: Variant = null) -> void:
 	if not enabled or not _groups.has(&"zombie_step"):
@@ -394,6 +424,9 @@ func flush_zombie_steps() -> void:
 func reset() -> void:
 	_flight_targets.clear()
 	set_process(false)
+	_attack_contacts.clear()
+	_attack_windups.clear()
+	_zombie_attack_frame = -1
 	_step_points.clear()
 	_step_distances.clear()
 	_zombie_step_frame = -1
@@ -450,7 +483,7 @@ func _create_voices(count: int) -> void:
 	for i in count:
 		var voice := AudioStreamPlayer3D.new()
 		voice.unit_size = 4.5
-		voice.max_distance = 35.0
+		voice.max_distance = SPATIAL_VOICE_DISTANCE
 		# Preserve the source transient spectrum with distance and panning.
 		voice.attenuation_filter_db = 0.0
 		voice.attenuation_filter_cutoff_hz = 20500.0
