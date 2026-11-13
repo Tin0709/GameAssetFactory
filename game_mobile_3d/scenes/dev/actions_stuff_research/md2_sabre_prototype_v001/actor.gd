@@ -624,7 +624,7 @@ func _animate(delta:float)->void:
 	# transition restoration so omitted constant source tracks cannot accumulate it.
 	if combat_legs!=null:combat_legs.restore()
 	var source_before:=animation_player.current_animation_position
-	var sectioned_air := combo.phase == &"air_attack" and combo.use_sabre_air_sections and review_clip.is_empty()
+	var sectioned_air: bool = combo.phase == &"air_attack" and combo.use_sabre_air_sections and review_clip.is_empty()
 	var hold_air_pose := sectioned_air and _sabre_air_landing_frame == Engine.get_physics_frames()
 	if sectioned_air:
 		animation_player.seek(combo.air_pose_after(0.0 if hold_air_pose else delta), true)
