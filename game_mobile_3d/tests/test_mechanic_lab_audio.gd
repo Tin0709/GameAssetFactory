@@ -169,15 +169,15 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var dust: Node3D = lab.get_node("MovementDust")
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
 	toggle.button_pressed = true
-	for voice: AudioStreamPlayer3D in audio._voices:
+	var swing = lab.player.reference_audio
+	for voice: AudioStreamPlayer in swing.voices:
 		voice.bus = AudioServer.get_bus_name(bus)
 	var landings: Array[int] = []
 	var touchdown_points: Array[Vector3] = []
-	var swing = lab.player.reference_audio
 	lab.player.heavy_jump_landed.connect(func(point, _forward, _serial, _height):
 		landings.append(Engine.get_physics_frames())
 		touchdown_points.append(point))
-	for attempt in 3:
+	for attempt in 4:
 		for i in 20:
 			await physics_frame
 		if attempt == 0:
@@ -213,6 +213,10 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 		elif attempt == 2:
 			toggle.button_pressed = false
 			toggle.button_pressed = true
+		elif attempt == 3:
+			var selector := lab.get_node("HUD/Weapon") as OptionButton
+			selector.select(1)
+			selector.item_selected.emit(1)
 		var playback_frame := -1
 		var dust_frame := -1
 		var swing_frame := -1
@@ -240,12 +244,12 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 			var peak := 0.0
 			for sample in capture.get_buffer(capture.get_frames_available()):
 				peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
-			check(peak > 0.001 and peak < 0.9, "The timed grass cue reaches the mixer")
+			check(peak > 0.001 and peak < 0.9, "The timed Sabre swing reaches the isolated mixer bus")
 			print("MECHANIC_LAB_SABRE_DEBRIS_AUDIO landing=", landings[attempt], " swing=", swing_frame,
 				" playback=", playback_frame, " peak=", peak)
 		else:
 			check(playback_frame == -1 and swing_frame == -1 and swing.played_count == before_swing,
-				"Reset and mute discard unplayed Sabre swing and grass cues")
+				"Reset, mute and weapon switching discard unplayed Sabre swing and grass cues")
 	check(movement.event_count.landing == 0, "The heavy attack does not also play ordinary landing audio")
 	toggle.button_pressed = false
 	lab.free()
