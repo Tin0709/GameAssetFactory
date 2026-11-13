@@ -354,5 +354,7 @@ func run() -> void:
 		&"Zombie_Walk", 0.39999988079071)
 	await check_wall_rebound(69, Vector3(4.05, 0.02, 1.35), 3.10392570495605,
 		&"Zombie_Walk", 0.51666654745737, "Arm.R", 0.145)
+	await check_wall_rebound(99, Vector3(4.05, 0.02, 4.05), -0.14667794108391,
+		&"Zombie_Walk", 0.41666654745737, "Arm.L", 0.125)
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
