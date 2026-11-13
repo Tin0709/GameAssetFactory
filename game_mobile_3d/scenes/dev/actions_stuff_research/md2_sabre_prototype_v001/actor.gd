@@ -605,11 +605,17 @@ func _uses_native_jump_pose(key:String)->bool:
 func _combat_stride_pose(phase: float, speed: float) -> Array[Transform3D]:
 	return source_gait.compose(phase, speed)
 
+func _combat_stride_period(_speed: float, state: Dictionary) -> float:
+	return float(state.period)
+
 func _restart_combat_stride() -> bool:
 	return bool(runtime_locomotion_profile.combat.get("leg_restart_on_resume", false))
 
 func _use_composed_gait(key: String) -> bool:
 	return source_gait != null and native_gait_enabled and review_clip.is_empty() and key in GAITS and _grounded
+
+func _composed_gait_period(_key: String, _speed: float, state: Dictionary) -> float:
+	return float(state.period)
 
 func _animate(delta:float)->void:
 	if foot_placement!=null:foot_placement.restore()
@@ -633,7 +639,7 @@ func _animate(delta:float)->void:
 		_playback_speed=maxf(0.,motion_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
 	var composed_gait := _use_composed_gait(selected)
 	var gait_state:Dictionary=source_gait.state(motion_speed) if composed_gait else {}
-	if composed_gait:_playback_speed=float(clips[selected].duration)/float(gait_state.period) if motion_speed>.001 else 0.
+	if composed_gait:_playback_speed=float(clips[selected].duration)/_composed_gait_period(selected,motion_speed,gait_state) if motion_speed>.001 else 0.
 	if source_transition!=null:source_transition.restore()
 	# Transition's raw snapshot includes the previous layer; restore its base AFTER
 	# transition restoration so omitted constant source tracks cannot accumulate it.
@@ -650,7 +656,7 @@ func _animate(delta:float)->void:
 		var leg_state:Dictionary=source_gait.state(motion_speed)
 		if moving_legs and not _combat_was_moving and _restart_combat_stride():_gait_resume_phase=0.
 		var before_phase:=_gait_resume_phase
-		var advance_phase:=delta/float(leg_state.period) if moving_legs else 0.
+		var advance_phase:=delta/_combat_stride_period(motion_speed,leg_state) if moving_legs else 0.
 		_gait_resume_phase=fposmod(before_phase+advance_phase,1.)
 		combat_legs.apply(_combat_stride_pose(_gait_resume_phase,motion_speed),moving_legs,delta)
 		_gait_cycles_this_tick+=advance_phase

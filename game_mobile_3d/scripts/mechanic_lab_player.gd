@@ -51,15 +51,29 @@ func _combat_entry_blend(key: String) -> float:
 	return seconds
 
 func _combat_stride_pose(phase: float, speed: float) -> Array[Transform3D]:
-	if crossbow_equipped and _run_requested and hybrid_motion != null:
+	if not _run_requested:
+		return source_gait.sample("Walk", phase)
+	if crossbow_equipped and hybrid_motion != null:
 		return hybrid_motion.run_pose(phase)
 	return super._combat_stride_pose(phase, speed)
+
+func _combat_stride_period(speed: float, state: Dictionary) -> float:
+	if not _run_requested:
+		return float(clips.Walk.duration) * walk_stride_speed / maxf(speed, 0.001)
+	if crossbow_equipped and hybrid_motion != null:
+		return hybrid_motion.period(speed, 1.0)
+	return super._combat_stride_period(speed, state)
 
 func _restart_combat_stride() -> bool:
 	return not crossbow_equipped and super._restart_combat_stride()
 
 func _use_composed_gait(key: String) -> bool:
 	return key not in LabLocomotion.WALKS and super._use_composed_gait(key)
+
+func _composed_gait_period(key: String, speed: float, state: Dictionary) -> float:
+	if crossbow_equipped and key in LabLocomotion.RUNS and hybrid_motion != null:
+		return hybrid_motion.period(speed, 1.0)
+	return super._composed_gait_period(key, speed, state)
 
 func _select_clip() -> String:
 	var key := super._select_clip()
@@ -82,7 +96,7 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 	return func(delta: float) -> Array[Transform3D]:
 		var speed := _animation_motion_speed if _combat_plan_active else current_speed
 		var gait_state: Dictionary = source_gait.state(speed)
-		cursor.phase = fposmod(float(cursor.phase) + delta / float(gait_state.period), 1.0)
+		cursor.phase = fposmod(float(cursor.phase) + delta / _composed_gait_period(key, speed, gait_state), 1.0)
 		var pose: Array[Transform3D] = source_gait.compose(float(cursor.phase), speed)
 		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
 
