@@ -360,6 +360,14 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 				highest_pitch = maxf(highest_pitch, pitch)
 			check(highest_pitch - lowest_pitch > deg_to_rad(23.0),
 				"The crossbow follows the Actions & Stuff run sway")
+			var motion = player.hybrid_motion
+			var run_pose: Array[Transform3D] = player.source_gait.sample("Run", 0.66)
+			var left_shoulder: Vector3 = run_pose[motion._left_arm].origin
+			var right_shoulder: Vector3 = run_pose[motion._right_arm].origin
+			var carry_pose: Array[Transform3D] = motion.crossbow_run_pose(run_pose, 0.66)
+			check(carry_pose[motion._left_arm].origin.is_equal_approx(left_shoulder)
+				and carry_pose[motion._right_arm].origin.is_equal_approx(right_shoulder),
+				"The paired crossbow sway rotates at the two source shoulder anchors")
 			var presenter = player.render_presenter
 			presenter.prepare(0.5)
 			var mesh_index: int = presenter.meshes.find(grip)
@@ -398,12 +406,16 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 	var largest_step := 0.0
 	var idle_frames := 0
 	var idle_start := -1
+	var max_recovery_step := 0.0
+	var previous_mesh := mount.mesh
 	for frame in 90:
 		await physics_frame
 		var grip := mount.to_global(CrossPollinator.MUZZLE)
 		var scale := mount.global_basis.get_scale()
 		check(scale.distance_to(Vector3.ONE) < 0.01, "Crossbow stays full size during recoil and blend-out")
 		seen_recoil_mesh = seen_recoil_mesh or mount.mesh != idle_mesh
+		if player.active_clip == CrossPollinator.RECOVERY and mount.mesh == previous_mesh:
+			max_recovery_step = maxf(max_recovery_step, previous.distance_to(grip))
 		if player.active_clip == "Idle":
 			if idle_start < 0:
 				idle_start = frame
@@ -415,6 +427,8 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 			if idle_frames == 18:
 				break
 		previous = grip
+		previous_mesh = mount.mesh
+	check(max_recovery_step < 0.080, "The source recoil lowers smoothly between its authored frames")
 	check(idle_start >= 0 and idle_start < 40 and idle_frames == 18
 		and largest_step < 0.12 and player.source_transition.incoming_weight == 1.0,
 		"The crossbow settles back to idle without snapping the muzzle")
