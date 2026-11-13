@@ -172,6 +172,7 @@ func run() -> void:
 	await check_sabre_landing_reversal(lab, group, true)
 	await check_sabre_first_contact_anchors(lab, group)
 	await check_sabre_head_and_arm_brace(lab, group)
+	await check_sabre_late_roll(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
 	await check_sabre_fixed_pose_anchor(lab, group, 415, 0.10, "arm rebound")
 	await check_sabre_fixed_pose_anchor(lab, group, 419, 0.101, "head impact at the start of the roll")
@@ -508,6 +509,31 @@ func check_sabre_head_and_arm_brace(lab, group) -> void:
 		"Sabre's head-and-arm brace rolls onto leg support and releases within 130 ticks")
 	print("SABRE_HEAD_ARM_REST seconds=", zombie._corpse_age,
 		" braced=", braced, " leg_supported_after_brace=", leg_supported_after_brace)
+	zombie.free()
+
+func check_sabre_late_roll(lab, group) -> void:
+	var zombie = await replay_offset_sabre_finisher(lab, group, 424)
+	var peak_damping := 0.0
+	var first_support_damping := -1.0
+	var overlap := 0.0
+	for i in 120:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+		if not zombie.ragdoll.running:
+			continue
+		var contact: Dictionary = zombie.ragdoll.contact_motion()
+		var chest: PhysicalBone3D = zombie.ragdoll.bodies.Chest
+		if first_support_damping < 0.0 and contact.supports > 0:
+			first_support_damping = chest.angular_damp
+		peak_damping = maxf(peak_damping, chest.angular_damp)
+		overlap = maxf(overlap, -zombie.ragdoll.minimum_corner_y())
+	check(first_support_damping >= 0.0 and first_support_damping <= 4.0,
+		"The late roll adds no angular damping at the first impact")
+	check(peak_damping > 12.0 and zombie._corpse_parked and zombie._corpse_age < 1.15 and overlap <= 0.018,
+		"The supported Sabre roll slows and releases without extra floor penetration")
+	print("SABRE_LATE_ROLL first_damp=", first_support_damping, " peak_damp=", peak_damping,
+		" release_s=", zombie._corpse_age, " overlap_m=", overlap)
 	zombie.free()
 
 func check_flat_rest_after_tumble(lab, group) -> void:
