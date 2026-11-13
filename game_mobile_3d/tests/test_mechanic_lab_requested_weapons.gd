@@ -67,6 +67,7 @@ func run() -> void:
 	var fire_samples: Array = combat_audio._groups.get(&"crossbow_fire", [])
 	var impact_samples: Array = combat_audio._groups.get(&"crossbow_hit", [])
 	var flight_samples: Array = combat_audio._groups.get(&"crossbow_flight", [])
+	var embedded := lab._crossbow.get_node_or_null("EmbeddedArrows") as MultiMeshInstance3D
 	var muzzle_errors: Array[float] = []
 	lab._crossbow.bolt_launched.connect(func(projectile: Node3D) -> void:
 		muzzle_errors.append(projectile.global_position.distance_to(lab._crossbow_mount.to_global(CrossPollinator.MUZZLE))))
@@ -78,7 +79,8 @@ func run() -> void:
 	attack(false)
 	await ticks(3)
 	var flight_voices: Array = combat_audio._voices.filter(func(voice): return voice.stream in flight_samples)
-	var bolt := lab._crossbow.get_child(0) as Node3D
+	var active_bolts: Array = lab._crossbow._bolts
+	var bolt := active_bolts[0].node as MeshInstance3D if not active_bolts.is_empty() else null
 	check(flight_voices.size() == 1 and bolt != null and
 		flight_voices[0].global_position.distance_to(bolt.global_position) < 0.01,
 		"One spatial flight voice follows the moving bolt")
@@ -88,6 +90,8 @@ func run() -> void:
 	check(muzzle_errors.size() == 1 and muzzle_errors[0] < 0.0001, "A bolt launches from the fitted muzzle")
 	check(not flight_voices.any(func(voice): return voice.playing), "Flight audio stops after the bolt hits")
 	check(target.health == 92 and contacts.size() == 1, "A tap shoots one 8-damage bolt at a ranged target")
+	check(embedded != null and embedded.multimesh.visible_instance_count == 0,
+		"A living hit does not leave a terrain prop")
 	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 1, "A living hit plays exactly one arrow impact")
 	check(ammo.text.contains("24 / 25"), "One projectile consumes one arrow")
 	await ticks(115)
@@ -106,7 +110,6 @@ func run() -> void:
 	await ticks(2)
 	attack(false)
 	await ticks(10)
-	var embedded := lab._crossbow.get_node_or_null("EmbeddedArrows") as MultiMeshInstance3D
 	check(embedded != null and embedded.multimesh.visible_instance_count == 1,
 		"A travelling arrow leaves one embedded prop when it hits a wall")
 	if embedded != null and DisplayServer.get_name() != "headless":
@@ -155,12 +158,13 @@ func run() -> void:
 	lab._crossbow.bolt_impact.disconnect(record_impact)
 	sound.button_pressed = false
 	barrier.queue_free()
-	await check_crossbow_collision_radius(lab)
-
+	check(embedded != null and embedded.multimesh.visible_instance_count == 1,
+		"A second wall hit leaves a prop for the reset check")
 	lab.reset_player()
-	await ticks(12)
 	check(embedded != null and embedded.multimesh.visible_instance_count == 0,
 		"Reset clears an embedded arrow immediately")
+	await check_crossbow_collision_radius(lab)
+	await ticks(12)
 	target.position = Vector3(2.5, 0.0, 3.0)
 	lab.player._q = true
 	attack(true)
@@ -200,7 +204,7 @@ func run() -> void:
 	attack(true)
 	await ticks(250)
 	check(ammo.text.contains("0 / 25"), "Holding fire consumes the full magazine")
-	check(lab._crossbow.get_child_count() <= 25, "An empty magazine cannot emit extra bolts")
+	check(lab._crossbow._bolts.size() <= 25, "An empty magazine cannot emit extra bolts")
 	attack(false)
 	await ticks(120)
 	check(not ammo.text.contains("0 / 25"), "An empty magazine can recharge")
@@ -320,9 +324,9 @@ func check_crossbow_collision_radius(lab: Node3D) -> void:
 	check(hits.size() == 1, "The arrow misses a thin obstacle 12 cm from its centre line")
 	target.position = origin + Vector3(0.09, 0.0, -0.30)
 	await ticks(2)
-	var active_bolts: int = crossbow.get_child_count()
+	var active_bolts: int = crossbow._bolts.size()
 	crossbow.fire(origin, Vector3.BACK, -103, origin - Vector3.BACK * 0.3)
-	check(hits.size() == 2 and hits[1].collider == target and crossbow.get_child_count() == active_bolts,
+	check(hits.size() == 2 and hits[1].collider == target and crossbow._bolts.size() == active_bolts,
 		"An obstacle already overlapping the clearance sphere blocks the shot before launch")
 	crossbow.bolt_impact.disconnect(record_hit)
 	crossbow.reset()
