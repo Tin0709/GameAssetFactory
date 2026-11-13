@@ -183,7 +183,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 107
+const LIGHTING_MIX_VERSION := 108
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1200,7 +1200,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"projected_sun_softness":
 		return .75
 	if effect == &"daylight_bounce":
-		return .5
+		return .75
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
 	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"cliff_mist", &"night_spatial_sky"]:
