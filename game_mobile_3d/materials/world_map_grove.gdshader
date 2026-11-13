@@ -39,6 +39,7 @@ uniform float native_specular = 0.24;
 uniform bool crown_detail = false;
 varying vec3 crown_local;
 varying float source_leaf_red;
+varying flat float atlas_leaf;
 
 #ifdef GAF_WORLD_DIRECT_CLOUD
 #include "res://materials/world_map_clouds.gdshaderinc"
@@ -52,15 +53,16 @@ void vertex() {
 	}
 	// Evaluate inside each face so its exact block boundary stays deterministic.
 	crown_local = VERTEX - NORMAL * 0.004;
-	if (use_source_atlas && source_crown_mask_base >= 0 && source_crown_wind.y > 0.0) {
+	atlas_leaf = -1.0;
+	if (use_source_atlas && source_crown_mask_base >= 0) {
 		int index = source_crown_mask_base + VERTEX_ID;
 		int width = textureSize(source_crown_weights, 0).x;
-		float weight = texelFetch(source_crown_weights, ivec2(index % width, index / width), 0).r;
-		if (weight > 0.0) {
+		atlas_leaf = texelFetch(source_crown_weights, ivec2(index % width, index / width), 0).r;
+		if (atlas_leaf > 0.0 && source_crown_wind.y > 0.0) {
 			// Anchor wind to the world so gameplay and shadow cameras see one pose.
 			vec3 world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 			vec3 drift = gaf_leaf_world_drift(source_crown_pattern, world_position,
-				MODEL_MATRIX[3].y, source_crown_wind, weight);
+				MODEL_MATRIX[3].y, source_crown_wind, atlas_leaf);
 			VERTEX += inverse(mat3(MODEL_MATRIX)) * drift;
 		}
 	} else if (crown_wind_enabled && !use_source_atlas) {
@@ -122,8 +124,16 @@ void fragment() {
 	float coverage = 1.0;
 #endif
 	vec3 albedo = crown_detail ? crown_color(COLOR.rgb) : COLOR.rgb;
+	vec2 atlas_uv = UV;
 	if (use_source_atlas) {
-		vec4 texel = texture(source_atlas, UV);
+		// Compressed boundary UVs can select a texel in the adjacent atlas half.
+		float inset = 0.5 / float(textureSize(source_atlas, 0).x);
+		if (atlas_leaf > 0.5) {
+			atlas_uv.x = min(atlas_uv.x, 0.5 - inset);
+		} else if (atlas_leaf >= 0.0) {
+			atlas_uv.x = max(atlas_uv.x, 0.5 + inset);
+		}
+		vec4 texel = texture(source_atlas, atlas_uv);
 		if (texel.a < 0.3333) discard;
 		albedo = texel.rgb;
 		if (source_leaf_red > 0.0) {
@@ -168,7 +178,7 @@ void fragment() {
 		ambient_visibility = mix(1.0, tree_sky, amount);
 	}
 	// The validated tree atlases reserve the left half for leaf triangles.
-	if (use_source_atlas && UV.x < 0.5) {
+	if (use_source_atlas && atlas_uv.x < 0.5) {
 		ambient_visibility *= 1.0 - crown_dusk_occlusion;
 		if (crown_ambient_depth > 0.0) {
 			// Upper faces retain more sky fill than vertical and downward-facing leaves.

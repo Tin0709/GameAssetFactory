@@ -200,9 +200,8 @@ func _load_source_tree(path: String) -> Node3D:
 	var tree := document.generate_scene(state) as Node3D
 	if tree != null:
 		tree.set_meta("source_glb", path.get_file())
-		if source_crown_wind_available():
-			for visual: MeshInstance3D in tree.find_children("*", "MeshInstance3D", true, false):
-				_prepare_source_crown_mask(visual)
+		for visual: MeshInstance3D in tree.find_children("*", "MeshInstance3D", true, false):
+			_prepare_source_crown_mask(visual)
 	return tree
 
 func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:

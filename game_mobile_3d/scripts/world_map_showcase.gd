@@ -119,6 +119,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"lantern_lift": ["Lantern height", 1.5],
 	&"lantern_air": ["Lantern in mist", 2.],
 	&"lantern_glow": ["Lantern glow", 2.],
+	&"night_glare_control": ["Giảm chói đèn đêm", 1.],
 	&"fog": ["Fog density", 2.],
 	&"near_haze": ["Near haze density", 2.],
 	&"near_haze_depth": ["Near haze depth", 1.],
@@ -174,7 +175,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 93
+const LIGHTING_MIX_VERSION := 94
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -676,7 +677,7 @@ func set_coupled_bloom(value:bool)->void:
 		strength *= lerpf(1.0, 1.35, twilight)
 		level.look._exposure_effect.set_air_bloom_response(response * _lighting_scale(&"bloom") * strength if enabled else response)
 		var spread := lerpf(1., _lighting_scale(&"bloom_spread"), PHASE_FINISH.phase_weight(hour)) if enabled else 1.
-		level.look._exposure_effect.set_air_bloom_spread(spread * lerpf(1.0, 1.6, twilight))
+		level.look._exposure_effect.set_air_bloom_spread(spread * lerpf(1.0, 1.6, twilight) * lerpf(1.0, .84, _night_glare_weight()))
 		var shape_weight:float=phase_finish.phase_weight(hour)if phase_finish!=null and phase_finish.requested else 0.
 		if level.look._exposure_effect.has_method("set_bloom_shape"):
 			level.look._exposure_effect.set_bloom_shape(source_bloom_shape and enabled and coherent_bloom,shape_weight)
@@ -1017,7 +1018,12 @@ func _refresh_lantern_glow() -> void:
 		return
 	var lantern = level.player.get("lantern")
 	if lantern != null and lantern.ready_private:
-		lantern.set_emission_gain(LANTERN_EMISSION_GAIN * _lighting_scale(&"lantern_glow"))
+		lantern.set_emission_gain(LANTERN_EMISSION_GAIN * _lighting_scale(&"lantern_glow") * lerpf(1.0, .82, _night_glare_weight()))
+
+func _night_glare_weight() -> float:
+	if _balanced_preview or not forest_active() or atmosphere_review != "combined":
+		return 0.0
+	return moonlight_weight(hour) * _lighting_scale(&"night_glare_control")
 
 func _lantern_light_origin(hip: Vector3) -> Vector3:
 	if not lantern_overhead:
@@ -1651,6 +1657,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 93 and effect == &"sunrise_elevation":
 			missing_value = 0.
+		if version < 94 and effect == &"night_glare_control":
+			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
 		if version < 84 and effect == &"night_stone_blue_softness":
@@ -1803,6 +1811,11 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return # The volume reads the live fixture and mix immediately before dispatch.
 	if changed_effect == &"foot_contact":
 		player_contact.refresh()
+		return
+	if changed_effect == &"night_glare_control":
+		_refresh_lantern_glow()
+		_sync_forest_night_lights()
+		set_coupled_bloom(coupled_bloom)
 		return
 	if changed_effect == &"night_path_chroma":
 		_publish_night_path_chroma()
@@ -2031,7 +2044,7 @@ func _sync_forest_night_lights() -> void:
 		forest_accents.update(level, phase, night_strength)
 	sculk_surface.update(level, maxf(day, phase) if not _balanced_preview else 0., _lighting_scale(&"sculk_surface"))
 	forest_replay.update(level, replay_phase, _lighting_scale(&"forest_replay_emission"),
-		_lighting_scale(&"forest_replay_placement") == 1., _lighting_scale(&"forest_replay_halo"))
+		_lighting_scale(&"forest_replay_placement") == 1., _lighting_scale(&"forest_replay_halo") * lerpf(1.0, .67, _night_glare_weight()))
 	if _point_kernel_owner != null and _point_kernel_owner.get_ref() == self:
 		forest_replay.publish_bounce(_lighting_scale(&"forest_replay_bounce"))
 		forest_replay.publish_surface(level, _lighting_scale(&"forest_replay_surface_bounce"))
@@ -2051,6 +2064,7 @@ func apply_time()->void:
 	if (not private_primary and not _flat_lab) or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
 	refresh_daylight_shading()
+	_refresh_lantern_glow()
 	if not _flat_lab:
 		_publish_night_path_chroma()
 		_publish_stone_twilight_color()
