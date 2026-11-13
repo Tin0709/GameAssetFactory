@@ -98,7 +98,8 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
 
 func _begin_pose_transition(key: String, seconds: float) -> void:
-	if crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY] +			and key in ["Idle", "CombatReady", "InspectWeapon"]:
+	if (crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY]
+			and key in ["Idle", "CombatReady", "InspectWeapon"]):
 		source_transition.begin_evaluated(0.24, Callable(), &"smoothstep")
 		return
 	super._begin_pose_transition(key, seconds)
