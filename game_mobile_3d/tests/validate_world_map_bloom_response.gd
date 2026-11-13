@@ -48,8 +48,10 @@ func run():
    var e=w.look._exposure_effect
    check(e!=null,"Existing exposure survives at "+str(hour))
    var night_gain:float=1.7 if hour in [0.,22.] else (1.35 if hour in [4.,20.25] else 1.)
-   var wanted=.16*s.bloom_response.sample(s.reference_hour())*night_gain
-   check(absf(e._parameters.decode_float(16)-wanted)<.00000008,"Measured phase and soft night bloom reach the GPU at "+str(hour))
+   # 20:15 is midway into moonlight and one quarter into the smooth twilight fade-out.
+   var twilight_gain:float=1.2953125 if hour==20.25 else 1.
+   var wanted=.16*s.bloom_response.sample(s.reference_hour())*night_gain*twilight_gain
+   check(absf(e._parameters.decode_float(16)-wanted)<.00000008,"Measured phase and overlapping evening bloom reach the GPU at "+str(hour))
   s.set_lighting_scale(&"night_soft_bloom",0.);await settle()
   check(is_equal_approx(w.look._exposure_effect._parameters.decode_float(16),.16*s.bloom_response.sample(0.)),"Soft night bloom at 0% restores prior midnight weight")
   s.set_lighting_scale(&"night_soft_bloom",1.);await settle()
