@@ -15,6 +15,7 @@ const MATERIAL := preload("res://materials/world_map_forest_replay.gdshader")
 var fixture: Node3D
 var _material: ShaderMaterial
 var _attempted := false
+var _site := Vector2.INF
 var _submitted := Vector2.INF
 var _submitted_bounce := Vector4.ZERO
 
@@ -29,17 +30,29 @@ func available(world) -> bool:
 		and RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null \
 		and (not _attempted or is_instance_valid(fixture))
 
-func update(world, phase: float, strength: float) -> void:
+func update(world, phase: float, strength: float, use_steps: bool) -> void:
 	var state := Vector2(phase, phase * strength) if strength > 0. else Vector2.ZERO
 	if state.y > 0. and not _attempted and available(world):
 		_attempted = true
 		_load(world)
-	if not is_instance_valid(fixture) or state == _submitted:
+	if not is_instance_valid(fixture):
+		return
+	var site: Vector2 = world.forest_replay_steps_site if use_steps and has_step_site(world) else world.forest_replay_site
+	if site != _site:
+		fixture.position = Vector3(site.x, world.surface_height(site.x, site.y) + .01, site.y)
+		_site = site
+	if state == _submitted:
 		return
 	_submitted = state
 	fixture.visible = state.y > 0.
 	_material.set_shader_parameter("radiant_strength", 3.0 * state.y)
 	_material.set_shader_parameter("phase_coverage", state.x)
+
+func has_step_site(world) -> bool:
+	if world == null or not world.forest_replay_steps_site.is_finite():
+		return false
+	var site: Vector2 = world.forest_replay_steps_site
+	return is_finite(world.surface_height(site.x, site.y))
 
 func publish_bounce(strength: float) -> void:
 	var state := Vector4.ZERO
@@ -94,6 +107,7 @@ func _load(world) -> void:
 	fixture = imported
 	fixture.name = "PrivateForestReplayStatue"
 	fixture.position = Vector3(site.x, ground + .01, site.y)
+	_site = site
 	fixture.rotation_degrees.y = 20.0
 	fixture.hide()
 	world.add_child(fixture)

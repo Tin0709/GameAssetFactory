@@ -28,6 +28,7 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var forest_path_light_offset := Vector2.ZERO
 ## Optional position for the editor-only decorative Forest emission reference.
 @export var forest_replay_site := Vector2.INF
+@export var forest_replay_steps_site := Vector2.INF
 ## Optional translation in the two axes of the projected sunlight plane.
 @export var projected_sun_shift := Vector2.ZERO
 var runtime: Dictionary
