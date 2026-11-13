@@ -43,6 +43,8 @@ const SOURCE_ANCHOR_TOLERANCE := 0.05
 const FIRST_CONTACT_ANCHOR_LIMIT := 0.09
 const FIRST_CONTACT_ANCHOR_MAX_LIFT := 0.04
 const FIRST_CONTACT_ANCHOR_MAX_SLIDE := 0.04
+const EARLY_ROLL_ANCHOR_LIMIT := 0.10
+const EARLY_ROLL_ANCHOR_BLEND_END := 0.30
 const PROJECTION_COLLISION_MARGIN := 0.001
 const CONTACT_ANCHOR_RECOVERY_MAX_SHIFT := 0.18
 @export var maximum_inherited_linear_speed := 3.0
@@ -836,8 +838,11 @@ func _project_floor_contact() -> void:
 			var excess_lift := maxf(shared_lift - FLOOR_LANDING_LIFT_THRESHOLD, 0.0)
 			shared_lift -= minf(excess_lift * floor_impact_blend, FLOOR_LANDING_MAX_LIFT_REDUCTION)
 		var anchor_lifts: Dictionary[PhysicalBone3D, float] = {}
-		if _limit_first_contact_stretch and not landing_blended and floor_impact_blend <= 0.0 and not depths.is_empty():
-			_limit_floor_anchor_stretch(anchor_lifts, depths, shared_lift, slop)
+		if _limit_first_contact_stretch and not landing_blended and floor_impact_blend < EARLY_ROLL_ANCHOR_BLEND_END \
+				and not depths.is_empty():
+			# Give the supported roll more room to move than the first impact.
+			var anchor_limit := EARLY_ROLL_ANCHOR_LIMIT if floor_impact_blend > 0.0 else FIRST_CONTACT_ANCHOR_LIMIT
+			_limit_floor_anchor_stretch(anchor_lifts, depths, shared_lift, slop, anchor_limit)
 		for body: PhysicalBone3D in bodies.values():
 			var correction: float = anchor_lifts.get(body, maxf(shared_lift, depths.get(body, 0.0) - slop))
 			if correction <= 0.0:
@@ -849,7 +854,7 @@ func _project_floor_contact() -> void:
 		_preempt_floor_penetration(floor_half, floor_inverse, floor_pose.origin.y + floor_half.y)
 
 func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
-		shared_lift: float, slop: float) -> void:
+		shared_lift: float, slop: float, anchor_limit: float) -> void:
 	for name: String in source_joint_rids:
 		var joint: Dictionary = source_joints[name]
 		var child: PhysicalBone3D = bodies[name]
@@ -866,7 +871,7 @@ func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depth
 		var parent_anchor: Vector3 = (parent_state.transform * joint.parent_frame).origin
 		var child_anchor: Vector3 = (child_state.transform * joint.child_frame).origin
 		var gap := parent_anchor - child_anchor
-		var tolerance := maxf(gap.length(), FIRST_CONTACT_ANCHOR_LIMIT)
+		var tolerance := maxf(gap.length(), anchor_limit)
 		var vertical_limit := sqrt(maxf(tolerance * tolerance - gap.x * gap.x - gap.z * gap.z, 0.0))
 		var excess := (gap.y + offset) * signf(offset) - vertical_limit
 		if excess > 0.0:
