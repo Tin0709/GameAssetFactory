@@ -238,7 +238,7 @@ func check_wall_pinned_joint(floor_contact := false) -> void:
 			lowest_corner = minf(lowest_corner, ragdoll.minimum_corner_y())
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			farthest = maxf(farthest, body.global_position.x)
-	var limit := 0.125 if floor_contact else 0.15
+	var limit := 0.125 if floor_contact else 0.118
 	check(peak > 0.0 and peak < limit, "The %s stays within the Lab recovery limit" %
 		("hip at first floor contact" if floor_contact else "wall-pinned shoulder"))
 	check(farthest < 4.65, "The wall-pinned ragdoll stays on the near side")
