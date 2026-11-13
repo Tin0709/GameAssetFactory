@@ -449,10 +449,8 @@ func _project_source_anchors() -> void:
 			and chest_state.get_contact_count() > 0 and chest_state.linear_velocity.dot(motion) > 0.0 \
 			and _shared_wall_contact(chest_state, handoff_arm, motion).is_valid()
 		if shared_wall_retreat or (extended_arm_shift and (recent_handoff or chest_state.get_contact_count() == 0)):
-			# A rebounding arm can expose a chest overlap before the solver
-			# reports chest contact. The forward sweep stops at that overlap.
-			# The shared escape test checks clearance at the other end and
-			# sweeps back to rule out an intervening obstacle.
+			# The forward sweep stops inside the chest's starting overlap.
+			# Require clearance at the destination and sweep back to the start.
 			var start := chest_state.transform
 			_project_contacting_anchor(chest, chest_state, motion, true)
 			if not chest_state.transform.is_equal_approx(start):

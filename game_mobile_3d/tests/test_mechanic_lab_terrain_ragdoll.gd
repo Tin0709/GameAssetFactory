@@ -376,6 +376,8 @@ func run() -> void:
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,
 		&"Zombie_Walk", 0.39999988079071)
+	await check_wall_rebound(19, Vector3(4.05, 0.02, -3.15), 0.02946007624269,
+		&"Zombie_BasicAttack", 1.45, "Arm.L", 0.12, true)
 	await check_wall_rebound(69, Vector3(4.05, 0.02, 1.35), 3.10392570495605,
 		&"Zombie_Walk", 0.51666654745737, "Arm.R", 0.145)
 	await check_wall_rebound(69, Vector3(4.05, 0.02, 1.35), 3.10486793518066,
