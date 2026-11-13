@@ -52,10 +52,10 @@ func run() -> void:
 		"per_spawn_ms": stats(spawn_us), "first_ms": spawn_us[0],
 		"nodes": Performance.get_monitor(Performance.OBJECT_NODE_COUNT)}))
 	await measure("spawn_animation", 70)
-	await check_blocked_chase(group)
-	Input.action_press("move_backward")
+		Input.action_press("move_backward")
 	await measure("chase", 120)
 	Input.action_release("move_backward")
+	await check_blocked_chase(group)
 	# Give each corpse clear room to complete its authored handoff and roll.
 	for i in COUNT:
 		var zombie = group.get_child(i)
@@ -92,6 +92,8 @@ func check_blocked_chase(group: Node) -> void:
 		member.velocity = Vector3.ZERO
 		member.set_physics_process(i == 0)
 	zombie.global_position = Vector3(0, 0.02, -3.5)
+	zombie.animation.play(ZOMBIE.IDLE, 0.0)
+	zombie.animation.advance(0.0)
 	for i in 45:
 		await physics_frame
 	var samples: int = zombie.ragdoll.sample_count
@@ -101,7 +103,8 @@ func check_blocked_chase(group: Node) -> void:
 		await physics_frame
 		if zombie.get("_skipped_blocked_step") == true:
 			skipped_ticks += 1
-	if skipped_ticks < 14 or skipped_ticks > 16 or zombie.ragdoll.sample_count - samples != 30 \
+	var pose_steps: int = zombie.ragdoll.sample_count - samples
+	if skipped_ticks < 14 or skipped_ticks > 16 or pose_steps != 30 \
 			or zombie.global_position.distance_to(last_position) > 0.02:
 		failures.append("A blocked crowd zombie should alternate collision checks and retain every pose sample")
 	wall.free()
@@ -111,7 +114,7 @@ func check_blocked_chase(group: Node) -> void:
 		failures.append("A blocked zombie did not resume when the wall was removed")
 	for member in group.get_children():
 		member.set_physics_process(true)
-	print("CROWD_BLOCKED skipped=", skipped_ticks, " samples=", zombie.ragdoll.sample_count - samples)
+	print("CROWD_BLOCKED skipped=", skipped_ticks, " samples=", pose_steps)
 
 func check_spawn_spacing(group: Node) -> void:
 	var zombies := group.get_children()
