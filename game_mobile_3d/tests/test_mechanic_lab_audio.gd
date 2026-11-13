@@ -407,7 +407,7 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	zombie.global_position = Vector3(0.0, 0.02, 9.0)
 	var contacts: Array[Dictionary] = []
 	var record_contact := func(point: Vector3):
-		contacts.append({"point": point, "phase": zombie.animation.current_animation_position}))
+		contacts.append({"point": point, "phase": zombie.animation.current_animation_position})
 	zombie.step_audio.connect(record_contact)
 	capture.clear_buffer()
 	for i in 180:
