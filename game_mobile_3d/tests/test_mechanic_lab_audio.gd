@@ -172,11 +172,9 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	for voice: AudioStreamPlayer3D in audio._voices:
 		voice.bus = AudioServer.get_bus_name(bus)
 	var landings: Array[int] = []
-	var touchdown := Vector3.INF
-	lab.player.heavy_jump_landed.connect(func(_point, _forward, _serial, _height):
-		landings.append(Engine.get_physics_frames()))
 	var touchdown_points: Array[Vector3] = []
 	lab.player.heavy_jump_landed.connect(func(point, _forward, _serial, _height):
+		landings.append(Engine.get_physics_frames())
 		touchdown_points.append(point))
 	for attempt in 3:
 		for i in 20:
@@ -218,7 +216,7 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 			if dust_frame < 0 and dust.get_children().any(func(particle): return particle.visible):
 				dust_frame = Engine.get_physics_frames() - 1
 		if attempt == 0:
-			touchdown = touchdown_points[attempt]
+			var touchdown := touchdown_points[attempt]
 			var grass_voices: Array = audio._voices.filter(func(voice): return voice.stream in audio._groups[&"slam_grass"])
 			check(grass_voices.size() == 1 and grass_voices[0].global_position.is_equal_approx(
 				Vector3(touchdown.x, 0.0, touchdown.z)),

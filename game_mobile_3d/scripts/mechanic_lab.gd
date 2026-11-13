@@ -141,7 +141,7 @@ func _ready() -> void:
 		_setup_movement_audio()
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
-		if dust.setup(player, $Ground/Collision, Callable(), _heavy_debris_delay):
+		if dust.setup(player, null, _grass_contact_at, _heavy_debris_delay):
 			add_child(dust)
 		else:
 			dust.free()
@@ -363,7 +363,14 @@ func _setup_movement_audio() -> void:
 	_movement_audio = MovementAudio.new()
 	_movement_audio.name = "MovementAudio"
 	add_child(_movement_audio)
-	_movement_audio.setup(player, null, bundle)
+	_movement_audio.setup(player, null, bundle, _grass_contact_at)
+
+func _grass_contact_at(sole: Vector3) -> Dictionary:
+	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * 0.08, sole - Vector3.UP * 0.30, 1)
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty() or hit.collider != $Ground or hit.normal.y < cos(player.floor_max_angle):
+		return {}
+	return {"position": hit.position, "surface": "grass"}
 
 func _heavy_debris_delay() -> float:
 	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
@@ -424,20 +431,23 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	if not support.is_empty() and support.normal.y >= cos(player.floor_max_angle):
 		fall_height = maxf(0.0, fall_height + point.y - float(support.position.y))
 	$Zombies.land_sabre(point, facing, serial, fall_height)
+	if not _combat_audio.enabled:
+		return
+	var contact := _grass_contact_at(point)
+	if contact.is_empty():
+		return
+	var delay_ticks := ceili(_heavy_debris_delay() * Engine.physics_ticks_per_second)
+	if delay_ticks > 0:
+		_slam_audio_point = contact.position
+		_slam_audio_frame = Engine.get_physics_frames() + delay_ticks
+	else:
+		_combat_audio.slam_landed(contact.position)
 
 func _on_sabre_landing(point: Vector3, serial: int) -> void:
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
 	if _equipped_weapon == Weapon.SABRE:
 		_slam_shake_frame = Engine.get_physics_frames() + ceili(SABRE_LANDING_SHAKE_DELAY * Engine.physics_ticks_per_second)
-	if not _combat_audio.enabled:
-		return
-	var delay_ticks := ceili(_heavy_debris_delay() * Engine.physics_ticks_per_second)
-	if delay_ticks > 0:
-		_slam_audio_point = point
-		_slam_audio_frame = Engine.get_physics_frames() + delay_ticks
-	else:
-		_combat_audio.slam_landed(point)
 
 func _start_contact_light(point: Vector3, serial: int, energy: float) -> void:
 	if _light_serial == serial:
