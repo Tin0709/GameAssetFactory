@@ -139,9 +139,7 @@ func setup(map: Node3D) -> void:
 	build_path_map()
 	_ground_bounce_layout_matches = FileAccess.get_sha256(level.DATA) == GROUND_RADIANCE.get_meta("source_runtime_sha256", "")
 	build_cloud_field()
-	saved_shadow_size=int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/size"))
-	saved_shadow_16bit=bool(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/16_bits"))
-	saved_shadow_quality=int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality"))
+	_capture_shadow_settings()
 	for property: String in PRESET.sun_settings:
 		baseline_sun[property]=level.get_node("Sun").get(property)
 	for chunk: MeshInstance3D in level.geometry.terrain_chunks:
@@ -189,6 +187,7 @@ func setup_flat_lab(map: Node3D, ground: ShaderMaterial) -> void:
 	ground.set_shader_parameter("ground_grade", 1)
 	materials[&"grass_block"] = ground
 	_collect_actor_materials()
+	_capture_shadow_settings()
 	_apply_directional_shadow_review(sun)
 	_apply_daylight_pockets()
 	_apply_actor_materials(direct_clouds_active(), false)
@@ -200,6 +199,11 @@ func _collect_actor_materials() -> void:
 			var native: Material=node.get_active_material(index)
 			if native is BaseMaterial3D:
 				actor_materials.append([node,index,node.get_surface_override_material(index),native.duplicate(),native.albedo_color])
+
+func _capture_shadow_settings() -> void:
+	saved_shadow_size=int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/size"))
+	saved_shadow_16bit=bool(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/16_bits"))
+	saved_shadow_quality=int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality"))
 
 func make_material(native: BaseMaterial3D,kind: String) -> ShaderMaterial:
 	var key: String=str(native.get_instance_id())+":"+kind

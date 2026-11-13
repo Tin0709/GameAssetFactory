@@ -9,7 +9,7 @@ func run() -> void:
 	var lab := preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
-	await process_frame
+	await settle()
 	var sun := lab.get_node("Sun") as DirectionalLight3D
 	var environment: Environment = lab.get_node("WorldEnvironment").environment
 	var noon := [sun.basis, sun.light_color, sun.light_energy, environment.ambient_light_color,
@@ -18,12 +18,15 @@ func run() -> void:
 	check(label != null and label.text.contains("12:00"), "Lab displays the Noon starting hour")
 	for hour: String in ["16:30", "22:00", "07:00", "12:00"]:
 		press_time(false)
-		await process_frame
+		await settle()
 		check(label != null and label.text.contains(hour), "T changes the hour to " + hour)
 		if hour == "22:00":
 			check(sun.light_energy < float(noon[2]) and not sun.basis.is_equal_approx(noon[0]), "Night changes the key light and direction")
 			press_time(true)
 			check(label != null and label.text.contains(hour), "Holding T does not skip phases")
+			if lab.showcase.forest_active():
+				check(lab.showcase.mist.effect.snapshot().ready and lab.showcase.phase_finish.active,
+					"Night enables the same spatial mist and phase finishing as WorldMap")
 	check(sun.basis.is_equal_approx(noon[0]) and noon.slice(1) == [sun.light_color, sun.light_energy,
 		environment.ambient_light_color, environment.ambient_light_energy, environment.background_color],
 		"Cycling restores the Noon lighting")
@@ -32,6 +35,10 @@ func run() -> void:
 	lab.free()
 	print("MECHANIC_LAB_LIGHTING failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func settle() -> void:
+	for i in 24:
+		await process_frame
 
 func press_time(echo: bool) -> void:
 	var event := InputEventKey.new()
