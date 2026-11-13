@@ -167,6 +167,8 @@ var _late_roll_damping := 0.0
 var _wall_brace_age := 0.0
 var _wall_gravity := false
 var _flat_brace_weight := 0.0
+var _landing_gravity_sent := NAN
+var _landing_linear_damp_sent := NAN
 var _terrain_rest_age := 0.0
 var _terrain_rest_duration := 0.0
 var _terrain_rest_poses: Dictionary[String, Transform3D]
@@ -625,10 +627,19 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 	var base_angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 	var angular_damp := lerpf(base_angular_damp, DEATH_SUPPORTED_ANGULAR_DAMP, roll_weight) + late_roll_damping
+	var final_gravity := gravity_scale * ragdoll_gravity_multiplier
+	# The six Lab bodies receive the same values. Roll damping can keep
+	# changing after these channels have finished their landing blend.
+	var write_gravity := not flat_floor or final_gravity != _landing_gravity_sent or is_zero_approx(final_gravity)
+	var write_linear_damp := not flat_floor or linear_damp != _landing_linear_damp_sent
 	for body: PhysicalBone3D in ragdoll.bodies.values():
-		body.gravity_scale = gravity_scale * ragdoll_gravity_multiplier
-		body.linear_damp = linear_damp
+		if write_gravity:
+			body.gravity_scale = final_gravity
+		if write_linear_damp:
+			body.linear_damp = linear_damp
 		body.angular_damp = angular_damp
+	_landing_gravity_sent = final_gravity
+	_landing_linear_damp_sent = linear_damp
 
 func _sabre_roll_weight(delta: float, contact_age: float, motion: Dictionary, fully_supported: bool) -> float:
 	var target := 0.0
