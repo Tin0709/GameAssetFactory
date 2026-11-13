@@ -19,7 +19,10 @@ var previous:=Vector3.ZERO
 var previous_velocity:=Vector3.ZERO
 var initialized:=false
 var angle:=0.
+var swing_angle:=0.
+var previous_angle:=0.
 var angular_velocity:=0.
+var mount_offset:=Vector3.ZERO
 var ready_private:=false
 var _emission_materials: Array[StandardMaterial3D] = []
 var _base_emission_energy := 0.
@@ -47,6 +50,8 @@ func setup(body:Node3D)->void:
    previous_time=key.Time
  profile=data;spine=actor.skeleton.find_bone("J_Spine")
  if spine<0:return
+ var offset: Array = profile.spine_offset
+ mount_offset = Vector3(offset[0], offset[1], offset[2])
  mesh_root=actor.load_private_model(profile.files.mesh.path)
  if mesh_root==null:return
  lantern_center=Node3D.new();lantern_center.name="LanternCenter";add_child(lantern_center)
@@ -80,6 +85,8 @@ func setup(body:Node3D)->void:
     mesh.set_surface_override_material(i,material)
    center=mesh_root.position+mesh_root.basis*(mesh.transform*mesh.get_aabb().get_center())
  _load_inspect();ready_private=true;_apply_toggle(0.)
+ actor.physics_pose_ready.connect(_step_swing)
+ actor.presentation_reset.connect(_reset_swing)
 
 func set_emission_gain(gain: float) -> void:
  for material in _emission_materials:
@@ -129,6 +136,48 @@ func _apply_toggle(delta:float)->void:
  lantern_center.visible=visual_scale>.000001
  lantern_center.scale=Vector3.ONE*visual_scale
 func emitter_position()->Vector3:return global_transform*(lantern_center.transform*center)
+
+func _spine_pose() -> Transform3D:
+ return actor.skeleton.global_transform * actor.skeleton.get_bone_global_pose(spine)
+
+func _reset_swing() -> void:
+ initialized = false
+ previous_velocity = Vector3.ZERO
+ previous_angle = 0.
+ swing_angle = 0.
+ angle = 0.
+ angular_velocity = 0.
+
+func _step_swing() -> void:
+ # Derive acceleration from consecutive simulation poses. Render interpolation
+ # holds/repeats poses at some frame rates and creates false velocity spikes.
+ var delta := actor.get_physics_process_delta_time()
+ if delta <= 0.:
+  return
+ var pivot := _spine_pose() * mount_offset
+ if not initialized or pivot.distance_to(previous) > 2.:
+  _reset_swing()
+  previous = pivot
+  initialized = true
+  return
+ previous_angle = swing_angle
+ var velocity := (pivot - previous) / delta
+ var basis := actor.visual.global_basis.orthonormalized()
+ var force := basis.inverse() * ((velocity - previous_velocity) / delta).limit_length(30.)
+ var limit := deg_to_rad(float(profile.swing_limit_degrees))
+ var left := minf(delta, .1)
+ while left > 0.:
+  var dt := minf(left, 1. / 120.)
+  # Original pendulum solver; Chaos stiffness/damping units are not copied.
+  angular_velocity += (-9.8 / .3 * sin(swing_angle) - 9. * angular_velocity - force.z / .3) * dt
+  swing_angle += angular_velocity * dt
+  if absf(swing_angle) > limit:
+   swing_angle = clampf(swing_angle, -limit, limit)
+   angular_velocity = 0.
+  left -= dt
+ previous = pivot
+ previous_velocity = velocity
+
 func _process(delta:float)->void:
  if not ready_private or delta<=0.:return
  if follow_phase:
@@ -136,25 +185,20 @@ func _process(delta:float)->void:
   var showcase=world.get("showcase")
   if showcase!=null and showcase._player_light!=null:set_lit(showcase._player_light.visible)
  _apply_toggle(delta)
- var bone:Transform3D=actor.skeleton.global_transform*actor.skeleton.get_bone_global_pose(spine)
- if actor.render_presenter!=null and actor.render_presenter.display_world.size()>spine:bone=actor.render_presenter.display_world[spine]
- var offset:Array=profile.spine_offset;var pivot:=bone*Vector3(offset[0],offset[1],offset[2])
- var basis:Basis=actor.visual.global_basis.orthonormalized()
- if not initialized or pivot.distance_to(previous)>2.:
-  previous=pivot;previous_velocity=Vector3.ZERO;angle=0.;angular_velocity=0.;initialized=true
- var velocity:Vector3=(pivot-previous)/delta
- var force:Vector3=basis.inverse()*((velocity-previous_velocity)/delta).limit_length(30.)
- var left:=minf(delta,.1)
- while left>0.:
-  var dt:=minf(left,1./120.)
-  # Original pendulum solver; Chaos stiffness/damping units are not copied.
-  angular_velocity+=(-9.8/.3*sin(angle)-9.*angular_velocity-force.z/.3)*dt
-  angle+=angular_velocity*dt
-  var limit:=deg_to_rad(float(profile.swing_limit_degrees))
-  if absf(angle)>limit:angle=clampf(angle,-limit,limit);angular_velocity=0.
-  left-=dt
- global_transform=Transform3D(basis*Basis(Vector3.RIGHT,angle),pivot)
- previous=pivot;previous_velocity=velocity
+ var basis: Basis = actor.visual.global_basis.orthonormalized()
+ var presenter: Node = actor.render_presenter
+ var bone: Transform3D
+ angle = swing_angle
+ if presenter != null and presenter.display_world.size() > spine:
+  bone = presenter.display_world[spine]
+  var rig: Basis = presenter.current.rig.basis.orthonormalized()
+  var presented_rig := Basis(Transform3D(presenter.previous.rig).basis.orthonormalized().get_rotation_quaternion().slerp(
+    rig.get_rotation_quaternion(), presenter.render_alpha))
+  basis = presented_rig * rig.inverse() * basis
+  angle = lerpf(previous_angle, swing_angle, presenter.render_alpha)
+ else:
+  bone = _spine_pose()
+ global_transform = Transform3D(basis * Basis(Vector3.RIGHT, angle), bone * mount_offset)
  var world=actor.get_parent().get_parent()
  var showcase=world.get("showcase")
  if showcase!=null:showcase.sync_lantern_emitter(emitter_position())
