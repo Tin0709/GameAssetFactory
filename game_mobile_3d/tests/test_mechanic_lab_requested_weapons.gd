@@ -431,6 +431,9 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 			check(player.active_clip == "Run" and player.hybrid_motion.last_kind == "CrossbowRun"
 				and player.hybrid_motion.owns_pose, "Crossbow run uses Actions & Stuff")
 			var grip := lab._crossbow_mount as MeshInstance3D
+			var support_hand: int = player.skeleton.find_bone("J_R_Hand")
+			var support_x_min := INF
+			var support_x_max := -INF
 			var lowest_pitch := INF
 			var highest_pitch := -INF
 			for frame in 36:
@@ -439,8 +442,14 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 				var pitch := asin(clampf(rail.y, -1.0, 1.0))
 				lowest_pitch = minf(lowest_pitch, pitch)
 				highest_pitch = maxf(highest_pitch, pitch)
+				var palm: Vector3 = player.skeleton.to_global(player.skeleton.get_bone_global_pose(support_hand).origin)
+				var support_x := grip.to_local(palm).x
+				support_x_min = minf(support_x_min, support_x)
+				support_x_max = maxf(support_x_max, support_x)
 			check(highest_pitch - lowest_pitch > deg_to_rad(23.0),
 				"The crossbow follows the Actions & Stuff run sway")
+			check(support_x_max - support_x_min < 0.015,
+				"The support hand stays seated on the crossbow throughout the running sway")
 			var motion = player.hybrid_motion
 			var run_pose: Array[Transform3D] = player.source_gait.sample("Run", 0.66)
 			var left_shoulder: Vector3 = run_pose[motion._left_arm].origin
@@ -532,7 +541,15 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 	check(player.active_clip == "Run" and player.source_transition.duration >= 0.16
 		and player.source_transition.incoming_weight < 0.05,
 		"Releasing a shot while moving blends into the running pose")
-	await ticks(12)
+	var last_muzzle: Vector3 = player.visual.to_local(mount.to_global(CrossPollinator.MUZZLE))
+	var peak_moving_step := 0.0
+	for frame in 15:
+		await physics_frame
+		var muzzle: Vector3 = player.visual.to_local(mount.to_global(CrossPollinator.MUZZLE))
+		peak_moving_step = maxf(peak_moving_step, last_muzzle.distance_to(muzzle))
+		last_muzzle = muzzle
+	check(peak_moving_step < 0.19,
+		"The crossbow lowers into the run without a muzzle jump (%.3f m)" % peak_moving_step)
 	check(player.hybrid_motion.last_kind == "CrossbowRun" and mount.mesh == idle_mesh,
 		"Running after a shot restores the Actions & Stuff carry")
 	player.scripted_input = false
