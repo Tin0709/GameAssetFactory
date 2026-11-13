@@ -1551,7 +1551,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if effect in [&"forest_replay_emission", &"forest_replay_bounce"]:
 			slider.editable = slider.editable and forest_replay.available(level)
 		if effect == &"canopy_player_cue":
-			slider.editable = slider.editable and (level.canopy_player_cue == null or level.canopy_player_cue.available(level))
+			slider.editable = slider.editable and level.canopy_player_cue.available(level)
 		if effect == &"forest_path_placement":
 			slider.editable = slider.editable and level.forest_path_light_offset.is_finite() \
 				and not level.forest_path_light_offset.is_zero_approx()
@@ -2090,6 +2090,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		var slider := HSlider.new()
 		slider.accessibility_name = label.text
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
+		if effect == &"canopy_player_cue":
+			slider.editable = level.canopy_player_cue.available(level)
 		if effect == &"exposure":
 			slider.tooltip_text = "Scales local contrast gain. The color grade remains active."
 		if effect == &"daylight_shadow_lift":

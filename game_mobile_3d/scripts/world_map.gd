@@ -146,6 +146,9 @@ func _ready() -> void:
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	_setup_heavy_landing_audio()
+	canopy_player_cue = CanopyPlayerCue.new()
+	canopy_player_cue.name = "CanopyPlayerCue"
+	add_child(canopy_player_cue)
 	showcase.setup(self)
 	_setup_movement_dust()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
@@ -154,9 +157,6 @@ func _ready() -> void:
 	player_light.name="PlayerColoredTransport";add_child(player_light);player_light.setup(self)
 	showcase.air_light.setup(self)
 	if showcase.mist!=null:showcase.mist.light_provider=showcase.air_field
-	canopy_player_cue = CanopyPlayerCue.new()
-	canopy_player_cue.name = "CanopyPlayerCue"
-	add_child(canopy_player_cue)
 	var spruce_sky := preload("res://scripts/world_map_spruce_sky.gd").new()
 	spruce_sky.name = "SpruceSkyVisibility"
 	add_child(spruce_sky)

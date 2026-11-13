@@ -39,8 +39,13 @@ func sync(level: Node, strength: float) -> void:
 func _build(surfaces: Array[Array], presenter: Node) -> void:
 	_attempted = true
 	var copies: Dictionary[MeshInstance3D, MeshInstance3D] = {}
+	var counts: Dictionary[MeshInstance3D, int] = {}
+	for row: Array in surfaces:
+		counts[row[0]] = counts.get(row[0], 0) + 1
 	for row: Array in surfaces:
 		var source: MeshInstance3D = row[0]
+		if counts[source] != source.mesh.get_surface_count():
+			continue
 		var proxy: MeshInstance3D = copies.get(source)
 		if proxy == null:
 			proxy = MeshInstance3D.new()
