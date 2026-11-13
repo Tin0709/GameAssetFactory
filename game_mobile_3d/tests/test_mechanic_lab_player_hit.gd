@@ -65,6 +65,7 @@ func run() -> void:
 	for zombie in lab.get_node("Zombies").get_children():
 		zombie.free()
 	await check_turned_zombie(lab)
+	await check_melee_height(lab)
 	await check_simultaneous_damage(lab, numbers)
 	lab.free()
 	print("MECHANIC_LAB_PLAYER_HIT failures=", failures)
@@ -92,6 +93,28 @@ func check_turned_zombie(lab) -> void:
 	print("MECHANIC_LAB_ZOMBIE_FACING first_dot=", openings.front() if not openings.is_empty() else "none",
 		" attacks=", openings.size(), " hp=", lab.player_health)
 	zombie.free()
+
+func check_melee_height(lab) -> void:
+	var group: Node = lab.get_node("Zombies")
+	lab.player.set_physics_process(false)
+	for height: float in [1.65, 2.05]:
+		lab.reset_player()
+		lab.player.global_position = Vector3.UP * height
+		lab.get_node("HUD/SpawnZombie").pressed.emit()
+		var zombie := group.get_child(0) as ZOMBIE
+		zombie.global_position = Vector3(0.0, 0.02, -1.34)
+		zombie.rotation.y = 0.0
+		zombie.animation.play(ZOMBIE.IDLE, 0.0)
+		zombie.animation.advance(0.0)
+		await ticks(60)
+		var expected_health := 94 if height < 2.0 else 100
+		check(lab.player_health == expected_health, "The source 2 m melee height limit applies at %.2f m" % height)
+		if height > 2.0:
+			check(zombie.animation.current_animation != ZOMBIE.ATTACK, "Targets beyond the height limit do not start a windup")
+		zombie.free()
+	lab.player.set_physics_process(true)
+	lab.reset_player()
+	await ticks(2)
 
 func check_simultaneous_damage(lab, numbers: Node) -> void:
 	lab.reset_player()
