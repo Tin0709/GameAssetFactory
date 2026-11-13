@@ -1,3 +1,8 @@
+## MechanicLab scope
+
+- Keep MechanicLab combat and other work requested for the lab inside MechanicLab. Integrate with main gameplay only when the user explicitly asks.
+- Add weapons to MechanicLab only when the user explicitly asks.
+
 ## Asset sourcing for private gameplay and testing
 
 Use only verified Minecraft Dungeons II source assets for all new asset selections and replacements in private tests and private gameplay. This applies to every asset type, including meshes, textures, materials, rigs, animations, audio and VFX. Confirm provenance in the MD2 Research workspace before use. If a source asset is unavailable, leave that new test element out and document the gap. Preserve existing approved work while its sources are audited and equivalent MD2 assets are verified.
