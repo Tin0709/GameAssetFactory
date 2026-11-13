@@ -286,6 +286,55 @@ func check_edge_landing_gravity() -> void:
 	print("LAB_EDGE_GRAVITY scale=", head.gravity_scale)
 	lab.free()
 
+func check_neck_wall_impact(serial: int, origin: Vector3, facing: float, clip: StringName, phase: float) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	await ticks(12)
+	var group := lab.get_node("Zombies")
+	group._spawn_serial = serial
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	if group.get_child_count() != 1:
+		check(false, "The neck wall fixture loads a source zombie")
+		lab.free()
+		return
+	var wall := terrain(lab, Vector3(4.5, 1.5, 0), Vector3(0.30, 3.0, 18.0), 0.0)
+	await ticks(2)
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = origin
+	zombie.rotation.y = facing
+	zombie.animation.stop()
+	var ragdoll = zombie.ragdoll
+	ragdoll.skeleton.reset_bone_poses()
+	zombie.animation.play(clip)
+	zombie.animation.advance(0.0)
+	zombie.animation.seek(phase, true)
+	for i in 2:
+		ragdoll.sample(1.0 / 60.0)
+	zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, zombie.DeathStrike.SABRE_FINISHER)
+	zombie.set_physics_process(true)
+	var peak := 0.0
+	var farthest := -INF
+	var rebounded := false
+	for i in 90:
+		await physics_frame
+		if not ragdoll.running:
+			continue
+		peak = maxf(peak, ragdoll.max_anchor_error())
+		for body: PhysicalBone3D in ragdoll.bodies.values():
+			farthest = maxf(farthest, body.global_position.x)
+		var head: PhysicalBone3D = ragdoll.bodies.Head
+		var state := PhysicsServer3D.body_get_direct_state(head.get_rid())
+		for contact in state.get_contact_count():
+			if state.get_contact_collider_object(contact) == wall and state.linear_velocity.x < -1.0:
+				rebounded = rebounded or is_equal_approx(state.total_gravity.y, -50.0)
+	check(rebounded, "The head rebounds from the side wall under flight gravity")
+	check(peak > 0.0 and peak < 0.115, "The neck stays attached through the side impact (%s)" % serial)
+	check(farthest < 4.65, "The ragdoll stays on the near side of the neck fixture wall")
+	print("LAB_NECK_WALL serial=", serial, " peak=", peak, " farthest=", farthest, " rebound=", rebounded)
+	lab.free()
+
 func run() -> void:
 	await run_case(true)
 	await run_case(false)
@@ -297,5 +346,9 @@ func run() -> void:
 	await check_wall_pinned_joint()
 	await check_wall_pinned_joint(true)
 	await check_edge_landing_gravity()
+	await check_neck_wall_impact(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
+		&"Zombie_Walk_Variant2", 0.13333353201548)
+	await check_neck_wall_impact(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,
+		&"Zombie_Walk", 0.39999988079071)
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
