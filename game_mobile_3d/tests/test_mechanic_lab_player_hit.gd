@@ -1,5 +1,7 @@
 extends SceneTree
 
+const ZOMBIE = preload("res://scripts/mechanic_lab_zombie.gd")
+
 var failures: Array[String] = []
 
 func _initialize() -> void:
@@ -58,6 +60,32 @@ func run() -> void:
 	await ticks(3)
 	check(lab.player_health == 100 and body.material_overlay == original_overlay
 		and numbers != null and numbers.get_child_count() == 0, "Retry clears player hit effects")
+	for zombie in lab.get_node("Zombies").get_children():
+		zombie.free()
+	await check_turned_zombie(lab)
 	lab.free()
 	print("MECHANIC_LAB_PLAYER_HIT failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_turned_zombie(lab) -> void:
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = lab.get_node("Zombies").get_child(0)
+	zombie.global_position = Vector3(0.0, 0.0, -1.34)
+	zombie.rotation.y = deg_to_rad(170.0)
+	zombie.animation.play(ZOMBIE.IDLE, 0.0)
+	zombie.animation.advance(0.0)
+	var openings: Array[float] = []
+	zombie.melee_audio.connect(func(_point, contact):
+		if not contact:
+			var offset: Vector3 = lab.player.global_position - zombie.global_position
+			offset.y = 0.0
+			openings.append(zombie.global_basis.z.dot(offset.normalized())))
+	for i in 90:
+		await physics_frame
+		if lab.player_health < 100:
+			break
+	check(openings.size() == 1 and openings[0] >= ZOMBIE.MELEE_HALF_ANGLE_COS and lab.player_health == 94,
+		"An initially turned zombie faces the stationary player before its first windup and lands once")
+	print("MECHANIC_LAB_ZOMBIE_FACING first_dot=", openings.front() if not openings.is_empty() else "none",
+		" attacks=", openings.size(), " hp=", lab.player_health)
+	zombie.free()
