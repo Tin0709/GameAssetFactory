@@ -55,6 +55,7 @@ const DEATH_LIMB_SUPPORT_MAX_SPEED := 2.0
 const DEATH_LANDING_LINEAR_DAMP := 3.0
 const DEATH_LANDING_ANGULAR_DAMP := 4.0
 const DEATH_SUPPORTED_ANGULAR_DAMP := 12.0
+const SABRE_LATE_ROLL_ANGULAR_DAMP := 6.0
 const SABRE_ROLL_BLEND_END := 0.35
 const SABRE_BRACE_MIN_AGE := 0.82
 const SABRE_BRACE_GRAVITY_SHARE := 0.65
@@ -136,6 +137,7 @@ var _corpse_parked := false
 var _settled_seconds := 0.0
 var _landing_age := INF
 var _roll_damping_weight := 0.0
+var _late_roll_damping := 0.0
 var _wall_brace_age := 0.0
 var _wall_gravity := false
 var _flat_brace_weight := 0.0
@@ -503,11 +505,18 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		and motion.core_supports > 0 and motion.supports == 2 and not motion.leg_supported
 	var brace_target := 1.0 - smoothstep(0.6, 1.6, motion.linear) if braced else 0.0
 	var flat_brace_weight := move_toward(_flat_brace_weight, brace_target, delta / SABRE_BRACE_BLEND_TIME)
+	var late_roll_damping := 0.0
+	if flat_sabre_finisher and contact_age >= DEATH_LANDING_BLEND_TIME and motion.leg_supported and motion.core_supports > 0:
+		# Fade in more resistance during the slow final roll on the lab floor.
+		var slow_roll := (1.0 - smoothstep(0.4, 1.5, motion.linear)) * smoothstep(0.60, 0.90, _corpse_age)
+		late_roll_damping = SABRE_LATE_ROLL_ANGULAR_DAMP * roll_weight * slow_roll
 	if is_equal_approx(contact_age, _landing_age) and is_equal_approx(roll_weight, _roll_damping_weight) \
-			and wall_gravity == _wall_gravity and is_equal_approx(flat_brace_weight, _flat_brace_weight):
+			and wall_gravity == _wall_gravity and is_equal_approx(flat_brace_weight, _flat_brace_weight) \
+			and is_equal_approx(late_roll_damping, _late_roll_damping):
 		return
 	_landing_age = contact_age
 	_roll_damping_weight = roll_weight
+	_late_roll_damping = late_roll_damping
 	_wall_gravity = wall_gravity
 	_flat_brace_weight = flat_brace_weight
 	var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
@@ -519,7 +528,7 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	ragdoll.floor_landing_blended = not wall_gravity and is_equal_approx(gravity_blend, 1.0)
 	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 	var base_angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
-	var angular_damp := lerpf(base_angular_damp, DEATH_SUPPORTED_ANGULAR_DAMP, roll_weight)
+	var angular_damp := lerpf(base_angular_damp, DEATH_SUPPORTED_ANGULAR_DAMP, roll_weight) + late_roll_damping
 	for body: PhysicalBone3D in ragdoll.bodies.values():
 		body.gravity_scale = gravity_scale * ragdoll_gravity_multiplier
 		body.linear_damp = linear_damp
