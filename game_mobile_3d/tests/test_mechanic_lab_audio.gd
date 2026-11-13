@@ -2,6 +2,7 @@
 extends SceneTree
 
 const COMBAT_AUDIO = preload("res://scripts/mechanic_lab_combat_audio.gd")
+const ZOMBIE = preload("res://scripts/mechanic_lab_zombie.gd")
 var failures: Array[String] = []
 var checks := 0
 
@@ -384,6 +385,70 @@ func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 		await create_timer(0.1).timeout
 	lab.free()
 
+func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var audio = lab.get_node("CombatAudio")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	var step_samples: Array = audio._groups.get(&"zombie_step", [])
+	check(step_samples.size() == 5, "Five pinned MD2 zombie step samples decode")
+	if step_samples.size() != 5:
+		lab.free()
+		return
+	var voices: Array = audio._voices.slice(3 * COMBAT_AUDIO.VOICES_PER_POOL)
+	for voice in voices:
+		voice.bus = AudioServer.get_bus_name(bus)
+	var group := lab.get_node("Zombies")
+	var button := lab.get_node("HUD/SpawnZombie") as Button
+	button.pressed.emit()
+	var zombie = group.get_child(0)
+	zombie.global_position = Vector3(0.0, 0.02, 9.0)
+	var contacts: Array[Dictionary] = []
+	group.zombie_step_audio.connect(func(point):
+		contacts.append({"point": point, "phase": zombie.animation.current_animation_position}))
+	capture.clear_buffer()
+	for i in 180:
+		await physics_frame
+		if contacts.size() >= 2:
+			break
+	var phases := contacts.map(func(event): return event.phase)
+	check(phases.size() == 2 and absf(phases[0] - 10.0 / 30.0) < 0.018
+		and absf(phases[1] - 34.0 / 30.0) < 0.018,
+		"The real chasing zombie steps on its two source walk contacts")
+	check(audio._next_choice.get(&"zombie_step", 0) == 2 and voices.any(func(voice):
+		return voice.stream in step_samples and absf(voice.global_position.y) < 0.01),
+		"Both steps use the grounded grass contact for playback")
+	var peak := 0.0
+	for frame in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
+	check(peak > 0.001 and peak < 0.35, "The step pool produces spatial PCM with headroom")
+	var before_death: int = contacts.size()
+	zombie.take_hit(100, Vector3.FORWARD)
+	for i in 100:
+		await physics_frame
+	check(contacts.size() == before_death, "Airborne and settled corpses post no walking sounds")
+	audio.reset()
+	var near: Vector3 = lab.player.global_position + Vector3.FORWARD * 2.0
+	lab._on_zombie_step(near + Vector3.FORWARD * 30.0)
+	lab._on_zombie_step(near + Vector3.UP * 2.0)
+	check(audio._next_choice.get(&"zombie_step", 0) == 2, "Distant and unsupported contacts produce no cue")
+	for i in 100:
+		lab._on_zombie_step(near)
+	check(voices.size() == 3 and voices.all(func(voice): return voice.playing)
+		and audio._next_choice.get(&"zombie_step", 0) == 0,
+		"A 100-step burst uses only three voices without restarting them")
+	audio.zombie_attack(near, false)
+	check(audio._next_choice.get(&"zombie_windup", 0) == 1, "Step overflow leaves a telegraph voice available")
+	toggle.button_pressed = false
+	check(voices.all(func(voice): return not voice.playing and voice.stream == null),
+		"Muting the lab stops all step voices")
+	lab._on_zombie_step(near)
+	check(audio._next_choice.get(&"zombie_step", -1) == 0, "A muted foot contact starts no sample")
+	print("MECHANIC_LAB_ZOMBIE_STEP_AUDIO phases=", phases, " peak=", peak)
+	lab.free()
+
 func run() -> void:
 	var camera := Camera3D.new()
 	root.add_child(camera)
@@ -465,6 +530,7 @@ func run() -> void:
 	await check_movement_audio(bus, capture)
 	await check_sabre_debris_audio(bus, capture)
 	await check_sabre_crowd_audio(bus, capture)
+	await check_zombie_steps(bus, capture)
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
