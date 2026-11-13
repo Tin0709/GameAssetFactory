@@ -707,6 +707,8 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 		_combat_audio.slam_landed(contact.position)
 
 func _on_sabre_landing(point: Vector3, serial: int) -> void:
+	if _equipped_weapon == Weapon.GAUNTLETS:
+		_combat_audio.mauler_dive_landed(point)
 	if _equipped_weapon != Weapon.SABRE:
 		_show_landing_burst(point, serial)
 		return

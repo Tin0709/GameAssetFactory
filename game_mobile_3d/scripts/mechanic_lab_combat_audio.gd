@@ -10,6 +10,12 @@ const CROSSBOW := "Items/Weapons/Weapon_Ranged/RapidCrossbow/RapidCrossbowUnique
 const GAUNTLET_COMBO := "Items/Weapons/Weapon_Melee/6_weapons_melee_basicCombo/Attack%d/sfx_gauntlets_unique_attack_%s_01.ogg"
 const GAUNTLET_HIT := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_gauntlets_01.ogg"
 const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_01.ogg"
+const MAULER_DIVE := "Items/Enchantments/3_Activate/sfx_enchantment_maulerDive-%03d.ogg"
+const MAULER_DIVE_HASHES := [
+	"079834c484903bd6802992bc3e5daea5b3e0383fb115aba7e1a2188ac4073286",
+	"d36cdcd95dc818c4bdf01fa4cc0099b88d9c6a0b2cef667e4e02c63bf85ada20",
+	"76c22383b3ec293ea75bc231a0ac99f6931b74144b7f8e99c73690c58091a119",
+]
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
 const SURFACE_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttackDebris/sfx_HJA_impact debris_%s_%02d.ogg"
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
@@ -205,6 +211,8 @@ func load_gauntlets(root: String) -> void:
 		"b5dd3f6184aec5dbaea52ae9e4b9b139487515f0b019004cc7523221ac1fa883")
 	_load_sample(root, &"gauntlet_jump", GAUNTLET_JUMP,
 		"230dae33f21cd973a3067b847caa782f1ed8e31d13d11b7584a22a4f6b7aab03")
+	for i in MAULER_DIVE_HASHES.size():
+		_load_sample(root, &"mauler_dive", MAULER_DIVE % (i + 1), MAULER_DIVE_HASHES[i])
 
 func crossbow_fired(point: Vector3) -> void:
 	if enabled:
@@ -213,6 +221,10 @@ func crossbow_fired(point: Vector3) -> void:
 func gauntlet_swung(point: Vector3, index: int, airborne: bool) -> void:
 	if enabled:
 		_play(&"gauntlet_jump" if airborne else StringName("gauntlet_swing_%d" % index), point, HIT_GAIN_DB)
+
+func mauler_dive_landed(point: Vector3) -> void:
+	if enabled:
+		_play(&"mauler_dive", point, SLAM_GAIN_DB)
 
 func slam_landed(point: Vector3, surface: String = "grass") -> void:
 	if not enabled:
