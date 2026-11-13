@@ -63,7 +63,7 @@ const SABRE_BRACE_BLEND_TIME := 0.10
 const SABRE_ROLL_RESPONSE_TIME := 0.10
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
 const HEIGHT := 1.95
-const CHASE_SPEED := 3.1
+const CHASE_SPEED := 3.0 # Zombie MovementSpeed is 300 cm/s.
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
 # Zombie overrides damage and attack speed. MeleeAttackMob supplies the range,
@@ -316,7 +316,7 @@ func _check_melee_contact() -> void:
 	if absf(offset.y) > MELEE_HEIGHT_LIMIT:
 		return
 	offset.y = 0.0
-	if offset.length_squared() > MELEE_REACH * MELEE_REACH or global_basis.z.dot(offset) < offset.length() * MELEE_HALF_ANGLE_COS:
+	if offset.length_squared() > MELEE_REACH * MELEE_REACH or not _is_in_melee_cone(offset):
 		return
 	var height := Vector3.UP * (HEIGHT * 0.5)
 	var ray := PhysicsRayQueryParameters3D.create(global_position + height, target.global_position + height, LEVEL_COLLISION_MASK)
@@ -324,6 +324,9 @@ func _check_melee_contact() -> void:
 	if get_world_3d().direct_space_state.intersect_ray(ray).is_empty():
 		melee_audio.emit(global_position + height, true)
 		melee_hit.emit(MELEE_DAMAGE)
+
+func _is_in_melee_cone(planar_offset: Vector3) -> bool:
+	return global_basis.z.dot(planar_offset) >= planar_offset.length() * MELEE_HALF_ANGLE_COS
 
 func _chase_velocity(delta: float) -> Vector3:
 	if animation.current_animation in [SPAWN, ATTACK, STAGGER]:
@@ -340,7 +343,9 @@ func _chase_velocity(delta: float) -> Vector3:
 	if distance > MELEE_RANGE + MELEE_RANGE_TOLERANCE:
 		_play_loop(_walk_clip)
 		return offset.normalized() * minf(CHASE_SPEED, (distance - MELEE_RANGE) / delta)
-	if height_delta < 1.15 and _attack_cooldown <= 0.0:
+	# Complete the approach turn before locking the swing's heading.
+	var facing_target := _is_in_melee_cone(offset)
+	if height_delta < 1.15 and facing_target and _attack_cooldown <= 0.0:
 		animation.play(ATTACK, 0.1)
 		_attack_cooldown = MELEE_COOLDOWN
 		melee_audio.emit(global_position + Vector3.UP * (HEIGHT * 0.5), false)
