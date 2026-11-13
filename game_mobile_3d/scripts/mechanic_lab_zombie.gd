@@ -367,6 +367,12 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		_death_direction = direction
 		_death_strength = knockback_strength
 		_death_strike = death_strike
+		if is_instance_valid(_corpse_floor) and animation.current_animation == SPAWN:
+			# The source spawn clip scales J_Hip to 1%. The ragdoll's authored
+			# colliders and joint frames require the full-size skeleton.
+			animation.play(IDLE, 0.0)
+			animation.advance(0.0)
+			ragdoll.sample_count = 0
 		animation.pause()
 		set_deferred("collision_layer", 0)
 		set_deferred("collision_mask", 0)
