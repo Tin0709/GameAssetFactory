@@ -120,6 +120,9 @@ var _next_choice: Dictionary[StringName, int] = {}
 var _next_voice: Array[int] = [0, 0, 0, 0]
 var _started_frames: PackedInt64Array
 var _player_hurt_frame := -1
+var _zombie_step_frame := -1
+var _step_points: Array[Vector3] = []
+var _step_distances: Array[float] = []
 var _last_weapon_serial := -1
 var _master_was_muted := false
 
@@ -197,20 +200,45 @@ func zombie_attack(point: Vector3, contact: bool) -> void:
 		_play(&"zombie_hit" if contact else &"zombie_windup", point,
 			ZOMBIE_HIT_GAIN_DB if contact else ZOMBIE_WINDUP_GAIN_DB)
 
-func can_play_zombie_step(point: Vector3, listener: Vector3) -> bool:
-	if (not enabled or not _groups.has(&"zombie_step")
-			or point.distance_squared_to(listener) > ZOMBIE_STEP_DISTANCE * ZOMBIE_STEP_DISTANCE):
-		return false
+func queue_zombie_step(sole: Vector3, listener: Vector3, find_support: Callable) -> void:
+	if not enabled or not _groups.has(&"zombie_step"):
+		return
+	var frame := Engine.get_physics_frames()
+	if frame != _zombie_step_frame:
+		flush_zombie_steps()
+		_zombie_step_frame = frame
+	var distance := sole.distance_squared_to(listener)
+	if distance > ZOMBIE_STEP_DISTANCE * ZOMBIE_STEP_DISTANCE:
+		return
+	var available := 0
 	for slot in VOICES_PER_POOL:
-		if not _voices[STEP_POOL * VOICES_PER_POOL + slot].playing:
-			return true
-	return false
+		available += int(not _voices[STEP_POOL * VOICES_PER_POOL + slot].playing)
+	if available == 0:
+		return
+	var index := _step_distances.size()
+	while index > 0 and distance < _step_distances[index - 1]:
+		index -= 1
+	if index >= available:
+		return
+	var support: Dictionary = find_support.call(sole)
+	if support.is_empty():
+		return
+	_step_distances.insert(index, distance)
+	_step_points.insert(index, support.position)
+	if _step_points.size() > available:
+		_step_distances.pop_back()
+		_step_points.pop_back()
 
-func zombie_step(point: Vector3) -> void:
-	if enabled:
+func flush_zombie_steps() -> void:
+	for point: Vector3 in _step_points:
 		_play(&"zombie_step", point, ZOMBIE_STEP_GAIN_DB)
+	_step_points.clear()
+	_step_distances.clear()
 
 func reset() -> void:
+	_step_points.clear()
+	_step_distances.clear()
+	_zombie_step_frame = -1
 	_started_frames.fill(-1)
 	_player_hurt_frame = -1
 	_last_weapon_serial = -1

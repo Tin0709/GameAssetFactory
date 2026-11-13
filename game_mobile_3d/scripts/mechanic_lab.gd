@@ -365,6 +365,8 @@ func _update_time_label() -> void:
 
 func _process(delta: float) -> void:
 	_flush_player_damage()
+	if _combat_audio != null:
+		_combat_audio.flush_zombie_steps()
 	if _crowd_spawns_left > 0:
 		_spawn_crowd_frame()
 	var focus: Vector3 = presentation.player_position()
@@ -442,11 +444,7 @@ func _grass_landing_contact_at(point: Vector3) -> Dictionary:
 	return {"position": nearest, "surface": "grass"} if closest < INF else {}
 
 func _on_zombie_step(sole: Vector3) -> void:
-	if not _combat_audio.can_play_zombie_step(sole, player.global_position):
-		return
-	var contact := _grass_contact_at(sole)
-	if not contact.is_empty():
-		_combat_audio.zombie_step(contact.position)
+	_combat_audio.queue_zombie_step(sole, player.global_position, _grass_contact_at)
 
 func _heavy_debris_delay() -> float:
 	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0

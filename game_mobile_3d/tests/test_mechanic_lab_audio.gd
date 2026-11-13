@@ -418,6 +418,8 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	check(phases.size() == 2 and absf(phases[0] - 10.0 / 30.0) < 0.018
 		and absf(phases[1] - 34.0 / 30.0) < 0.018,
 		"The real chasing zombie steps on its two source walk contacts")
+	await process_frame
+	await process_frame
 	check(audio._next_choice.get(&"zombie_step", 0) == 2 and voices.any(func(voice):
 		return voice.stream in step_samples and absf(voice.global_position.y) < 0.01),
 		"Both steps use the grounded grass contact for playback")
@@ -457,6 +459,8 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 		"Distant and unsupported contacts produce no cue")
 	for i in 100:
 		lab._on_zombie_step(near)
+	await process_frame
+	await process_frame
 	check(voices.size() == 3 and voices.all(func(voice): return voice.playing)
 		and audio._next_choice.get(&"zombie_step", 0) == (before_overflow + 3) % step_samples.size(),
 		"A 100-step burst uses only three voices without restarting them")
@@ -485,7 +489,20 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	played_distances.sort()
 	check(played_distances == selected_distances,
 		"Same-tick step overflow selects the nearest supported contacts")
+	audio.reset()
+	var before_reset: int = audio._next_choice.get(&"zombie_step", 0)
+	lab._on_zombie_step(near)
+	lab.reset_player()
+	await process_frame
+	await process_frame
+	check(audio._next_choice.get(&"zombie_step", 0) == before_reset,
+		"Retry discards a step awaiting playback")
+	lab._on_zombie_step(near)
 	toggle.button_pressed = false
+	await process_frame
+	await process_frame
+	check(audio._next_choice.get(&"zombie_step", 0) == before_reset,
+		"Muting discards a step awaiting playback")
 	await create_timer(0.1).timeout
 	print("MECHANIC_LAB_ZOMBIE_STEP_AUDIO phases=", phases, " peak=", peak)
 	lab.free()
