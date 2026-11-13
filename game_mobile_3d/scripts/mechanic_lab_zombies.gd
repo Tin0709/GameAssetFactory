@@ -107,6 +107,8 @@ func damage_digits() -> Array[Texture2D]:
 func setup_combat(attacker: CharacterBody3D) -> void:
 	_attacker = attacker
 	_attacker_visual = attacker.get("visual") as Node3D
+	if _visual == null:
+		_load_assets()
 
 func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie: bool = false) -> bool:
 	if _visual == null:
