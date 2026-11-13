@@ -115,7 +115,7 @@ void fragment() {
 	if (gaf_diffuse_opening.w > 0.0) {
 		terrain_opening_incident = terrain_opening_fill(ALBEDO, receiver_contact, sole);
 	}
-	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top)*sole;
+	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top,CAMERA_POSITION_WORLD)*sole;
 	EMISSION += gaf_dawn_turf_chroma(diffuse_fill, vec3(1.42, 1.0, .65), .55 * dawn_turf);
 	EMISSION+=ALBEDO*(1.0-METALLIC)*gaf_replay_incident(surface_world,surface_normal)*receiver_contact*sole;
 	if(terrain_rough_reflection)EMISSION+=terrain_reflected(normalize(NORMAL),normalize(VIEW),ROUGHNESS,AO,cloud_transmission,receiver_contact,native_specular);

@@ -41,7 +41,7 @@ vec3 terrain_contact_response(vec3 albedo,float contact){
 	vec3 reflectance=clamp(albedo,vec3(0.0),vec3(0.5));
 	return vec3(single)+returned*reflectance/max(vec3(1.0)-(1.0-return_ratio)*reflectance,vec3(0.00001));
 }
-vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,float contact,float face_y){
+vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,float contact,float face_y,vec3 camera_position){
 	vec3 sky = terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
@@ -63,7 +63,7 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 			smoothstep(1.13, 1.27, color.g / max(color.b, 0.0001));
 		sky_fill = mix(sky_fill, gaf_turf_ambient(sky_fill), turf);
 	}
-	vec3 irradiance = gaf_pre_twilight_diffuse(sky_fill, CAMERA_POSITION_WORLD) + terrain_sun_bounce * terrain_key_radiance * cloud;
+	vec3 irradiance = gaf_pre_twilight_diffuse(sky_fill, camera_position) + terrain_sun_bounce * terrain_key_radiance * cloud;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (ground_grade == 3 && night_sky_state.y > 0.0) {
 		float luma = dot(irradiance, vec3(.2126, .7152, .0722));
