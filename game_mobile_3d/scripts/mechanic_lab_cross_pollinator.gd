@@ -21,7 +21,8 @@ const RECHARGE_DELAY := 1.0
 const RECHARGE_PERIOD := 0.8
 const BOLT_SPEED := 35.0
 const BOLT_LIFETIME := 5.0
-const BOLT_MASK := 1 | 4
+const WORLD_MASK := 1
+const BOLT_MASK := WORLD_MASK | 4
 const STRIKE := {"damage": 8, "strength": 400.0, "angle": 25.0, "stagger": 8.1}
 const ACTION_HASH := "09471c7fa549624245482513aefd2e2f8fa35a18152dfb9b23b04baabd4e65d0"
 # Points on SM_RapidCrossbow_Unique_F0, in imported mesh coordinates.
@@ -107,12 +108,19 @@ static func load_locomotion(actor: CharacterBody3D, root: String) -> Dictionary:
 func _ready() -> void:
 	set_physics_process(false)
 
-func fire(origin: Vector3, direction: Vector3, serial: int) -> bool:
+func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vector3) -> bool:
 	if ammo == 0:
 		return false
 	ammo -= 1
 	_recharge_remaining = RECHARGE_DELAY + RECHARGE_PERIOD
 	ammo_changed.emit(ammo)
+	var clearance := PhysicsRayQueryParameters3D.create(clearance_start, origin, WORLD_MASK)
+	clearance.hit_from_inside = true
+	var obstruction := get_world_3d().direct_space_state.intersect_ray(clearance)
+	if not obstruction.is_empty():
+		bolt_impact.emit(obstruction, direction, serial)
+		set_physics_process(true)
+		return true
 	var bolt := MeshInstance3D.new()
 	bolt.mesh = bolt_mesh
 	bolt.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

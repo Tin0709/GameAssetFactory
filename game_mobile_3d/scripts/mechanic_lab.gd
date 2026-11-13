@@ -491,7 +491,8 @@ func _on_grounded_attack(index: int, clip: String, serial: int) -> void:
 				direction = aim.normalized()
 	else:
 		direction = $Zombies.bolt_direction(muzzle, forward, serial)
-	if _crossbow.fire(muzzle, direction, serial):
+	var clearance_start := Vector3(player.global_position.x, muzzle.y, player.global_position.z)
+	if _crossbow.fire(muzzle, direction, serial, clearance_start):
 		_combat_audio.crossbow_fired(muzzle)
 
 func _setup_world_look() -> void:
