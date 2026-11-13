@@ -304,6 +304,10 @@ func check_crossbow_trail(lab: Node3D) -> void:
 	check(ribbon != null, "Polaris has a shared ribbon renderer")
 	if ribbon == null:
 		return
+	check(is_equal_approx(CrossPollinator._trail_opacity(0.2), 0.2)
+		and is_equal_approx(CrossPollinator._trail_opacity(0.5), 0.05)
+		and is_zero_approx(CrossPollinator._trail_opacity(0.6)),
+		"Polaris opacity follows the measured two-segment curve")
 	var wall := StaticBody3D.new()
 	var collider := CollisionShape3D.new()
 	var box := BoxShape3D.new()
