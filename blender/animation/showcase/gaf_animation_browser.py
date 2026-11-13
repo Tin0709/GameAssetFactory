@@ -2,7 +2,7 @@
 import unicodedata
 
 FILTER_ITEMS=[
- ('AS_WALKRUN','A&S | Walk / Run','The two original Actions & Stuff walking/running source studies'),
+ ('AS_WALKRUN','A&S | Walk / Run / Sneak','Actions & Stuff walking, running and sneaking source studies'),
  ('CURRENT_JUMP','Jump | Current v004','Current attached-shoulder jump and landing review'),
  ('AS_SOURCE','A&S | Other source','Idle, directional movement, jump and landing source studies'),
  ('AUTHORED','Original | Walk / Run','Own authored A&S-inspired and hybrid locomotion experiments'),
@@ -15,6 +15,9 @@ FILTER_ITEMS=[
 ALIASES={
  'Walk_ActionsStuff_Source_Test_v001':'Walking - A&S source',
  'Run_ActionsStuff_Source_Test_v001':'Running - A&S source',
+ 'Sneak_Enter_ActionsStuff_113_Source_RESEARCH':'Sneak - Crouch down (A&S 1.13)',
+ 'Sneak_Walk_ActionsStuff_113_Source_RESEARCH':'Sneak - Crouch walk (A&S 1.13)',
+ 'Sneak_Exit_ActionsStuff_113_Source_RESEARCH':'Sneak - Stand up (A&S 1.13)',
  'Idle_ActionsStuff_Source_Test_v001':'Idle - A&S source',
  'Jump_AS_Stationary_ShouldersAttached_v004_RESEARCH':'Jump v004 - Stationary',
  'Jump_AS_Moving_ShouldersAttached_v004_RESEARCH':'Jump v004 - Moving',
@@ -22,7 +25,13 @@ ALIASES={
  'Walk_ASInspired_Original_v001_PENDING':'Walking - Own A&S-inspired v001',
  'Run_ASInspired_Original_v001_PENDING':'Running - Own A&S-inspired v001',
 }
-SOURCE_WALKRUN=('Walk_ActionsStuff_Source_Test_v001','Run_ActionsStuff_Source_Test_v001')
+SOURCE_WALKRUN=(
+ 'Walk_ActionsStuff_Source_Test_v001',
+ 'Run_ActionsStuff_Source_Test_v001',
+ 'Sneak_Enter_ActionsStuff_113_Source_RESEARCH',
+ 'Sneak_Walk_ActionsStuff_113_Source_RESEARCH',
+ 'Sneak_Exit_ActionsStuff_113_Source_RESEARCH',
+)
 
 def category(entry):
  name=entry['id'];lower=name.casefold()
@@ -44,9 +53,9 @@ def visible_entries(entries,group='AS_WALKRUN',search=''):
  for entry in entries:
   item=dict(entry);item['label']=ALIASES.get(item['id'],item['label']);item['category']=category(item)
   tags='walking di bo actions stuff source' if item['id']==SOURCE_WALKRUN[0] else ('running chay actions stuff source' if item['id']==SOURCE_WALKRUN[1] else '')
+  if item['id'] in SOURCE_WALKRUN[2:]:tags='sneaking crouch di cui actions stuff source'
   haystack=normalize(' '.join([item['label'],item['id'],item['category'],tags]))
   if (terms and all(term in haystack for term in terms)) or (not terms and (group=='ALL' or item['category']==group)):out.append(item)
  order={key:i for i,(key,_,_) in enumerate(FILTER_ITEMS)}
- # Prioritize the actual requested source Walk/Run, without renaming Actions.
- out.sort(key=lambda e:(order[e['category']],SOURCE_WALKRUN.index(e['id']) if e['id'] in SOURCE_WALKRUN else 2))
+ out.sort(key=lambda e:(order[e['category']],SOURCE_WALKRUN.index(e['id']) if e['id'] in SOURCE_WALKRUN else len(SOURCE_WALKRUN)))
  return out

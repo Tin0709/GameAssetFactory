@@ -487,7 +487,7 @@ def draw_focus_selector(layout,scene):
     all_entries=ordered_library_entries(data,True)
     box=layout.box()
     row=box.row();row.scale_y=1.15
-    row.operator('gaf.browse_group',text='A&S - Walking / Running',icon='BOOKMARKS',depress=home.gaf_library_group=='AS_WALKRUN' and not home.gaf_library_search).group_id='AS_WALKRUN'
+    row.operator('gaf.browse_group',text='A&S - Walk / Run / Sneak',icon='BOOKMARKS',depress=home.gaf_library_group=='AS_WALKRUN' and not home.gaf_library_search).group_id='AS_WALKRUN'
     box.prop(home,'gaf_library_group',text='Group')
     box.prop(home,'gaf_library_search',text='',icon='VIEWZOOM',placeholder='Search all animations...')
     entries=visible_entries(all_entries,home.gaf_library_group,home.gaf_library_search)
@@ -534,7 +534,8 @@ class GAF_PT_animation_library(bpy.types.Panel):
         row=layout.row(align=True);row.operator('gaf.play_pause',text='Pause' if context.screen.is_animation_playing else 'Play',icon='PAUSE' if context.screen.is_animation_playing else 'PLAY');row.operator('gaf.restart',text='Restart',icon='REW')
         if s.gaf_clips and json.loads(s.gaf_clips[s.gaf_active_index].entry_json).get('research_only'):
             layout.label(text='SOURCE RESEARCH ONLY — DO NOT SHIP',icon='INFO')
-            layout.label(text='Continuous take; replay resets clocks')
+            if not e.get('seamless_loop'):
+                layout.label(text='Continuous take; replay resets clocks')
         layout.prop(s,'gaf_loop',text='Loop playback')
         row=layout.row(align=True)
         for text,direction in [('Front','FRONT'),('3/4','THREE_QUARTER'),('Side','SIDE')]:row.operator('gaf.view',text=text).direction=direction
