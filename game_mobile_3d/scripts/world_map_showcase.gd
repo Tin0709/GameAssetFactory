@@ -12,6 +12,7 @@ const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 # User-directed art adjustment; recovered Forest profiles stay untouched.
 const GENTLE_NOON_DIRECT_SCALE:=.82
+const TIME_SHORTCUT_HOURS := [7.0, 12.0, 16.5, 22.0]
 ## Original WorldMap entry distance and reference height. Extinction is fitted
 ## to three captured actor rays, normalized by their relative phase density.
 const NEAR_HAZE_ENTRY_M := 23.945624
@@ -20,6 +21,7 @@ const NEAR_HAZE_REFERENCE_HEIGHT_M := 1.65
 const FOREST_NEAR_SCATTER_CENTER := Vector2(-24.0, 15.0)
 const FOREST_NEAR_SCATTER_MAX_GAIN := 2.0
 var level:Node3D
+var _flat_lab := false
 var private_primary:=true
 var unavailable_reason:=""
 var panel:PanelContainer
@@ -315,19 +317,12 @@ func setup(world:Node3D)->void:
 	if level.player.has_method("setup_world_audio"):level.player.setup_world_audio(level)
 	set_audio_enabled(false)
 	_capture_day()
-	if forest.available():
-		_evening_lantern_bounds = Vector2(forest.sample(point_response.EVENING_START).player_light_weight,
-			forest.sample(point_response.EVENING_END).player_light_weight)
-		_player_light=OmniLight3D.new();_player_light.name="AtmospherePlayerLight";_player_light.shadow_enabled=false
-		_player_light.omni_range=forest.player_range;_player_light.omni_attenuation=2.;_player_light.position.y=1.4
-		level.player.add_child(_player_light);_player_light.hide()
-		mist=preload("res://scripts/world_map_atmosphere_volume.gd").new();level.get_node("Camera3D").add_child(mist);mist.setup();mist.material_provider=_mist_materials;mist.medium_state=_mist_state;mist.path_light_provider=_path_air_source;mist.compositor_owned=func(c):return c==level.look._exposure_compositor
+	_setup_atmosphere()
+	if mist != null:
 		directional_air.setup(level, self)
 		if directional_air.available():
 			mist.effect.directional_grid = directional_air.texture
 			mist.effect.directional_provider = directional_air.parameters
-	grade_review=preload("res://scripts/world_map_grade_review.gd").new();add_child(grade_review);grade_review.setup(self)
-	phase_finish=PHASE_FINISH.new();add_child(phase_finish);phase_finish.setup(self)
 	player_contact = PlayerContact.new()
 	add_child(player_contact)
 	player_contact.setup(level)
@@ -337,6 +332,28 @@ func setup(world:Node3D)->void:
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
 	DisplayServer.window_set_title("GameAssetFactory · Overworld Showcase · A&S / MD2 Sabre · L HUD")
 	print("WORLD_MAP_SHOWCASE_READY ",JSON.stringify({"primary_ready":unavailable_reason.is_empty(),"private_external":true,"hour":hour,"experimental_terrain_sky":false}))
+
+func setup_flat_lab(world: Node3D) -> void:
+	level = world
+	_flat_lab = true
+	process_priority = -10
+	_capture_day()
+	_setup_atmosphere()
+	_create_atmosphere_overlay(level.get_node("HUD"))
+	_refresh_lantern_glow()
+	apply_time()
+	_update_mist()
+
+func _setup_atmosphere() -> void:
+	if forest.available():
+		_evening_lantern_bounds = Vector2(forest.sample(point_response.EVENING_START).player_light_weight,
+			forest.sample(point_response.EVENING_END).player_light_weight)
+		_player_light=OmniLight3D.new();_player_light.name="AtmospherePlayerLight";_player_light.shadow_enabled=false
+		_player_light.omni_range=forest.player_range;_player_light.omni_attenuation=2.;_player_light.position.y=1.4
+		level.player.add_child(_player_light);_player_light.hide()
+		mist=preload("res://scripts/world_map_atmosphere_volume.gd").new();level.get_node("Camera3D").add_child(mist);mist.setup();mist.material_provider=_mist_materials;mist.medium_state=_mist_state;mist.path_light_provider=_path_air_source;mist.compositor_owned=func(c):return c==level.look._exposure_compositor
+	grade_review=preload("res://scripts/world_map_grade_review.gd").new();add_child(grade_review);grade_review.setup(self)
+	phase_finish=PHASE_FINISH.new();add_child(phase_finish);phase_finish.setup(self)
 
 func _capture_day()->void:
 	_environment=level.get_node("WorldEnvironment").environment
@@ -678,13 +695,14 @@ func _update_mist()->void:
 		local_phase = PHASE_FINISH.phase_weight(hour)
 	var daylight := _balanced_daylight_weight()
 	var fog_gain := _lighting_scale(&"fog") * minf(1., _lighting_scale(&"near_haze"))
-	mist.set_local_region(level.local_mist_region, _lighting_scale(&"local_mist") * local_phase * daylight * fog_gain)
 	# These daylight and night windows meet at 19:30 with zero strength.
 	var night_weight := moonlight_weight(hour) if local_phase > 0. else 0.
-	if night_weight > 0.:
-		mist.set_additional_local_region(level.night_mist_region, _lighting_scale(&"night_cliff_mist") * night_weight * fog_gain)
-	else:
-		mist.set_additional_local_region(level.additional_mist_region, _lighting_scale(&"cliff_mist") * local_phase * daylight * fog_gain)
+	if not _flat_lab:
+		mist.set_local_region(level.local_mist_region, _lighting_scale(&"local_mist") * local_phase * daylight * fog_gain)
+		if night_weight > 0.:
+			mist.set_additional_local_region(level.night_mist_region, _lighting_scale(&"night_cliff_mist") * night_weight * fog_gain)
+		else:
+			mist.set_additional_local_region(level.additional_mist_region, _lighting_scale(&"cliff_mist") * local_phase * daylight * fog_gain)
 	var luma:=Vector3(.2126,.7152,.0722);var ambient:=env.ambient_light_color.srgb_to_linear()
 	var sun:DirectionalLight3D=level.get_node("Sun");var key:=sun.light_color.srgb_to_linear()
 	var incoming:=Vector3(ambient.r,ambient.g,ambient.b).dot(luma)*env.ambient_light_energy*.75+Vector3(key.r,key.g,key.b).dot(luma)*sun.light_energy*.03
@@ -721,7 +739,7 @@ func _update_mist()->void:
 		var depth_mix := _lighting_scale(&"near_haze_depth")
 		if depth_mix > 0.:
 			sample.near_fade_start = lerpf(.4, NEAR_HAZE_FADE_START, depth_mix)
-		if strength > 0.0 and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
+		if strength > 0.0 and not _flat_lab and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
 			var gain := _lighting_scale(&"forest_near_scatter") * FOREST_NEAR_SCATTER_MAX_GAIN
 			if gain > 0.0:
 				sample.near_scatter = Vector3(FOREST_NEAR_SCATTER_CENTER.x, FOREST_NEAR_SCATTER_CENTER.y, gain)
@@ -983,6 +1001,8 @@ func _mist_state(ready:bool,error:String)->void:
 func _mist_materials()->Array:
 	var result:Array=level.look.materials.values()
 	result.append_array(level.look._direct_actor_materials)
+	if _flat_lab:
+		return result
 	if plants!=null:result.append_array(plants.materials)
 	for chunk:Dictionary in level.geometry._cutaway_chunks:result.append_array(chunk.materials)
 	if grove_mist_enabled and level.grove != null:
@@ -1832,7 +1852,16 @@ func end_environment_edit()->void:
 
 func set_hour(value:float)->void:
 	hour=fposmod(value,24.);apply_time()
-	if level!=null:level.look._refresh_ground_bounce()
+	if _flat_lab:
+		_update_mist()
+	elif level!=null:
+		level.look._refresh_ground_bounce()
+
+func next_shortcut_hour() -> float:
+	for phase: float in TIME_SHORTCUT_HOURS:
+		if phase > hour + 0.01:
+			return phase
+	return TIME_SHORTCUT_HOURS[0]
 
 func _choose_hour(value: float) -> void:
 	if not is_equal_approx(hour, value):
@@ -1905,13 +1934,14 @@ func sync_world_outline() -> void:
 	level.look.set_terrain_outline(strength, _lighting_scale(&"world_outline_width"))
 
 func apply_time()->void:
-	if not private_primary or level==null or level.look==null:
+	if (not private_primary and not _flat_lab) or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
-	refresh_daylight_shading()
-	_publish_night_path_chroma()
-	_publish_stone_twilight_color()
-	_sync_twilight_crown()
-	_sync_forest_night_lights()
+	if not _flat_lab:
+		refresh_daylight_shading()
+		_publish_night_path_chroma()
+		_publish_stone_twilight_color()
+		_sync_twilight_crown()
+		_sync_forest_night_lights()
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
 		key_response_active=false
@@ -1934,6 +1964,7 @@ func apply_time()->void:
 	if _time_applied:_restore_day()
 	if is_day_anchor():
 		if use_forest:_apply_forest(env,sun);_time_applied=true
+		elif _flat_lab:_forest_hour=hour
 		return
 	var p:Dictionary=palette.sample(hour);var noon:Dictionary=palette.sample(12.)
 	sun.rotation_degrees=Vector3(_day.sun_rotation)+Vector3(p.pitch-noon.pitch,p.yaw-noon.yaw,0)
@@ -1947,6 +1978,7 @@ func apply_time()->void:
 	env.fog_light_color=p.fog
 	env.fog_density=float(_day.fog_density)*float(p.fog_amount)/float(noon.fog_amount)
 	if use_forest:_apply_forest(env,sun)
+	elif _flat_lab:_forest_hour=hour
 	_time_applied=true
 
 func compare_baseline()->void:
@@ -2020,6 +2052,9 @@ func _stone_detail_editable() -> bool:
 	return not _balanced_preview and _source_terrain_toggle != null and _source_terrain_toggle.button_pressed
 
 func _process(delta:float)->void:
+	if _flat_lab:
+		_update_mist()
+		return
 	_update_shape_control()
 	if not private_primary or level==null:return
 	var regional_slider: HSlider = _lighting_sliders.get(&"regional_sky")
@@ -2571,15 +2606,20 @@ func _build_ui()->void:
 	_vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_vignette.z_index=-20
 	var material:=ShaderMaterial.new();material.shader=preload("res://materials/world_map_atmosphere_vignette.gdshader");_vignette.material=material
 	# The vignette is part of the image, so it stays visible with the HUD hidden.
+	_settings.setup(hud, panel, box, _lighting_sliders, status, true)
+	panel.visibility_changed.connect(func():
+		if not panel.is_visible_in_tree():
+			_end_mix_drag(false))
+
+func _create_atmosphere_overlay(hud: CanvasLayer) -> void:
+	_vignette=ColorRect.new();_vignette.name="AtmosphereVignette";_vignette.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	_vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_vignette.z_index=-20
+	var material:=ShaderMaterial.new();material.shader=preload("res://materials/world_map_atmosphere_vignette.gdshader");_vignette.material=material
 	var atmosphere_layer := CanvasLayer.new()
 	atmosphere_layer.name = "AtmosphereOverlay"
 	atmosphere_layer.layer = hud.layer - 1
 	level.add_child(atmosphere_layer)
 	atmosphere_layer.add_child(_vignette);_vignette.hide()
-	_settings.setup(hud, panel, box, _lighting_sliders, status, true)
-	panel.visibility_changed.connect(func():
-		if not panel.is_visible_in_tree():
-			_end_mix_drag(false))
 
 func handle_hud_key(event: InputEventKey) -> bool:
 	if event.physical_keycode == KEY_L:
@@ -2607,9 +2647,6 @@ func handle_key(event:InputEventKey)->bool:
 			_settings.remember_edit(func(): cycle_enabled = previous)
 			cycle_enabled=not cycle_enabled
 		else:
-			var phases:=[7.,12.,16.5,22.];var next:=7.
-			for h:float in phases:
-				if h>hour+.01:next=h;break
-			_choose_hour(next)
+			_choose_hour(next_shortcut_hour())
 		return true
 	return false
