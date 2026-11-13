@@ -97,7 +97,9 @@ func check_turned_zombie(lab) -> void:
 func check_melee_height(lab) -> void:
 	var group: Node = lab.get_node("Zombies")
 	lab.player.set_physics_process(false)
-	for height: float in [1.65, 2.05]:
+	for fixture: Vector2 in [Vector2(1.65, 0.0), Vector2(2.05, 0.0), Vector2(1.65, 1.0)]:
+		var height := fixture.x
+		var blocked := fixture.y > 0.0
 		lab.reset_player()
 		lab.player.global_position = Vector3.UP * height
 		lab.get_node("HUD/SpawnZombie").pressed.emit()
@@ -106,11 +108,24 @@ func check_melee_height(lab) -> void:
 		zombie.rotation.y = 0.0
 		zombie.animation.play(ZOMBIE.IDLE, 0.0)
 		zombie.animation.advance(0.0)
+		var wall: StaticBody3D
+		if blocked:
+			wall = StaticBody3D.new()
+			var collider := CollisionShape3D.new()
+			var box := BoxShape3D.new()
+			box.size = Vector3(3.0, 3.0, 0.15)
+			collider.shape = box
+			wall.add_child(collider)
+			wall.position = Vector3(0.0, 1.5, -0.67)
+			lab.add_child(wall)
 		await ticks(60)
-		var expected_health := 94 if height < 2.0 else 100
-		check(lab.player_health == expected_health, "The source 2 m melee height limit applies at %.2f m" % height)
+		var expected_health := 94 if height < 2.0 and not blocked else 100
+		check(lab.player_health == expected_health, "Zombie attack at height %.2f m with wall=%s" % [height, blocked])
 		if height > 2.0:
 			check(zombie.animation.current_animation != ZOMBIE.ATTACK, "Targets beyond the height limit do not start a windup")
+		if wall != null:
+			check(zombie.animation.current_animation == ZOMBIE.ATTACK, "The wall blocks the hit after a real windup")
+			wall.free()
 		zombie.free()
 	lab.player.set_physics_process(true)
 	lab.reset_player()
