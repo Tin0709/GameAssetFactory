@@ -441,6 +441,10 @@ func _shared_wall_contact(chest: PhysicsDirectBodyState3D, head: PhysicsDirectBo
 		return RID()
 	var away := motion.normalized()
 	var wall := chest.get_contact_collider(0)
+	if not wall.is_valid() or PhysicsServer3D.body_get_shape_count(wall) != 1:
+		return RID()
+	if PhysicsServer3D.shape_get_type(PhysicsServer3D.body_get_shape(wall, 0)) != PhysicsServer3D.SHAPE_BOX:
+		return RID()
 	for index in chest.get_contact_count():
 		if chest.get_contact_collider(index) != wall or chest.get_contact_local_normal(index).dot(away) < 0.95:
 			return RID()
