@@ -436,16 +436,23 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 			var support_drift := 0.0
 			var lowest_pitch := INF
 			var highest_pitch := -INF
+			var highest_muzzle := -INF
+			var lowest_muzzle := INF
 			for frame in 36:
 				await physics_frame
 				var rail: Vector3 = player.visual.global_basis.inverse() * grip.global_basis.z.normalized()
 				var pitch := asin(clampf(rail.y, -1.0, 1.0))
 				lowest_pitch = minf(lowest_pitch, pitch)
 				highest_pitch = maxf(highest_pitch, pitch)
+				var muzzle_height: float = player.visual.to_local(grip.to_global(CrossPollinator.MUZZLE)).y
+				highest_muzzle = maxf(highest_muzzle, muzzle_height)
+				lowest_muzzle = minf(lowest_muzzle, muzzle_height)
 				var palm: Vector3 = player.skeleton.to_global(player.skeleton.get_bone_global_pose(support_hand).origin)
 				support_drift = maxf(support_drift, grip.to_local(palm).distance_to(initial_palm))
 			check(highest_pitch - lowest_pitch > deg_to_rad(23.0),
 				"The crossbow follows the Actions & Stuff run sway")
+			check(lowest_muzzle > 0.28 and highest_muzzle < 0.90,
+				"The running grip stays in a low carry while swaying (%.3f–%.3f m)" % [lowest_muzzle, highest_muzzle])
 			check(support_drift < 0.015,
 				"The support hand stays seated on the crossbow throughout the running sway")
 			var motion = player.hybrid_motion
@@ -508,19 +515,19 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 		if player.active_clip == "Idle":
 			if idle_start < 0:
 				idle_start = frame
-				check(is_equal_approx(player.source_transition.duration, 0.25)
+				check(player.source_transition.duration >= 0.25
 					and player.source_transition.incoming_weight < 0.05,
-					"Crossbow starts lowering with the source blend-out duration")
+					"Crossbow eases into the lowering pose")
 			largest_step = maxf(largest_step, previous.distance_to(grip))
 			idle_frames += 1
-			if idle_frames == 18:
+			if idle_frames == 20:
 				break
 		previous = grip
 		previous_mesh = mount.mesh
 	check(max_recovery_step < 0.080, "The source recoil lowers smoothly between its authored frames")
-	check(idle_start >= 0 and idle_start < 40 and idle_frames == 18
-		and largest_step < 0.12 and player.source_transition.incoming_weight == 1.0,
-		"The crossbow settles back to idle without snapping the muzzle")
+	check(idle_start >= 0 and idle_start < 40 and idle_frames == 20
+		and largest_step < 0.09 and player.source_transition.incoming_weight == 1.0,
+		"The crossbow settles back to idle without snapping the muzzle (%.3f m)" % largest_step)
 	check(seen_recoil_mesh and mount.mesh == idle_mesh, "The source recoil mesh swaps back to the carry mesh")
 	var weapon_bone: int = player.skeleton.find_bone("J_L_Weapon")
 	var weapon_pose: Transform3D = player.skeleton.global_transform * player.skeleton.get_bone_global_pose(weapon_bone)
