@@ -182,9 +182,48 @@ func run() -> void:
 	await check_fresh_spawn_handoff(lab, group, 0)
 	await check_fresh_spawn_handoff(lab, group, 1)
 	await check_spawn_dive_handoff(lab, group)
+	await check_moving_pose_history(lab, group)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_moving_pose_history(lab, group) -> void:
+	lab.reset_player()
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie := group.get_child(0) as ZOMBIE
+	zombie.global_position = Vector3(0.0, 0.02, 9.0)
+	for i in 150:
+		await process_frame
+		if zombie.animation.current_animation in ZOMBIE.WALK_CLIPS and zombie.get_real_velocity().length() > 1.0:
+			break
+	var ragdoll := zombie.ragdoll
+	var previous := ragdoll.previous
+	var current := ragdoll.current
+	var saved := current.duplicate()
+	await process_frame
+	check(is_same(previous, ragdoll.current) and is_same(current, ragdoll.previous),
+		"Consecutive pose samples reuse the same pair of buffers")
+	var skeleton_pose := ragdoll.skeleton.global_transform
+	var transforms_match := true
+	var expected_velocity: Dictionary[String, Vector3] = {}
+	for name: String in ragdoll.bodies:
+		var body: PhysicalBone3D = ragdoll.bodies[name]
+		var current_pose := skeleton_pose * ragdoll.skeleton.get_bone_global_pose(body.get_bone_id()) * body.body_offset
+		var prior_pose: Transform3D = saved[name]
+		transforms_match = (transforms_match and ragdoll.previous[name].is_equal_approx(prior_pose)
+			and ragdoll.current[name].is_equal_approx(current_pose))
+		expected_velocity[name] = ((current_pose.origin - prior_pose.origin) / ragdoll.sample_delta).limit_length(
+			ragdoll.maximum_inherited_linear_speed)
+	check(transforms_match, "Both snapshots retain the evaluated world poses of all six bodies")
+	zombie.take_hit(100, Vector3.RIGHT)
+	await process_frame
+	var launch_matches := ragdoll.running and ragdoll.handoff_error < 0.005
+	for name in expected_velocity:
+		var inherited: Dictionary = ragdoll.inherited.get(name, {})
+		launch_matches = (launch_matches and inherited.get("linear", Vector3.INF).is_equal_approx(expected_velocity[name]))
+	check(launch_matches and expected_velocity.get("Chest", Vector3.ZERO).length() > 1.0,
+		"The first death tick inherits the actual moving pose without snapping")
+	zombie.free()
 
 func check_fresh_spawn_handoff(lab, group, living_ticks: int) -> void:
 	lab.reset_player()
