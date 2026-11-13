@@ -413,7 +413,33 @@ func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 			"A windup plays once when the player leaves reach, without a contact cue")
 		lab._on_player_hit(lab.player_health)
 		check(lab.player_health == 0 and local_voice.playing, "The final hit plays through the defeat transition")
+		var defeat_voice := audio.get_node_or_null("PlayerDefeat") as AudioStreamPlayer
+		check(defeat_voice != null and audio._groups.get(&"player_defeat", []).size() == 1,
+			"The pinned MD2 defeat cue has its own local voice")
+		if defeat_voice != null:
+			check(defeat_voice.playing and defeat_voice.stream in audio._groups.get(&"player_defeat", []),
+				"The lethal hit starts the defeat cue alongside the final hurt")
+			defeat_voice.bus = AudioServer.get_bus_name(bus)
+			local_voice.stop()
+			await create_timer(0.08).timeout
+			capture.clear_buffer()
+			lab._on_player_hit(6)
+			await create_timer(0.35).timeout
+			var defeat_peak := 0.0
+			for frame in capture.get_buffer(capture.get_frames_available()):
+				defeat_peak = maxf(defeat_peak, maxf(absf(frame.x), absf(frame.y)))
+			check(defeat_voice.get_playback_position() > 0.25 and defeat_peak > 0.001 and defeat_peak < 0.9,
+				"The defeat cue reaches the mixer and further damage does not restart it")
+			lab.reset_player()
+			check(not defeat_voice.playing and defeat_voice.stream == null,
+				"Retry clears the previous defeat cue")
+			await physics_frame
+			lab._on_player_hit(lab.player_health)
+			check(defeat_voice.playing, "A new defeat plays its cue after retry")
 		toggle.button_pressed = false
+		if defeat_voice != null:
+			check(not defeat_voice.playing and defeat_voice.stream == null,
+				"Muting clears the active defeat cue")
 		check(not local_voice.playing and local_voice.stream == null and AudioServer.is_bus_mute(0),
 			"Turning audio off stops a live player-hurt cue and restores mute")
 		await create_timer(0.1).timeout
