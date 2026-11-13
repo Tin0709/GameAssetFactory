@@ -8,6 +8,7 @@ uniform float player_probe_base=0.;
 uniform float player_probe_scale=1.;
 uniform vec3 player_probe_tint=vec3(1);
 uniform vec3 player_probe_key=vec3(0);
+uniform float actor_canopy_color_mix=0.;
 uniform bool skin_wrap_enabled=false;
 uniform sampler2D skin_profile_mask:hint_default_black,filter_nearest,repeat_disable;
 varying float player_skin_weight;
@@ -23,4 +24,15 @@ vec3 player_cube_light(vec3 n,float height,float cloud,float sky_visibility){
  return w.x*player_axis_light(n.x>=0.?0:1,height,cloud,sky_visibility)
 	+w.y*player_axis_light(n.y>=0.?2:3,height,cloud,sky_visibility)
 	+w.z*player_axis_light(n.z>=0.?4:5,height,cloud,sky_visibility);
+}
+
+vec3 player_cube_sky(vec3 n, float height, float visibility) {
+ int lo = height < 1.0 ? 0 : 6;
+ float blend = height < 1.0 ? clamp((height - .25) / .75, 0., 1.) : clamp((height - 1.) / .8, 0., 1.);
+ ivec3 axis = ivec3(n.x >= 0. ? 0 : 1, n.y >= 0. ? 2 : 3, n.z >= 0. ? 4 : 5) + ivec3(lo);
+ vec3 w = n * n;
+ vec3 sky = w.x * mix(player_probe_sky[axis.x], player_probe_sky[axis.x + 6], blend)
+     + w.y * mix(player_probe_sky[axis.y], player_probe_sky[axis.y + 6], blend)
+     + w.z * mix(player_probe_sky[axis.z], player_probe_sky[axis.z + 6], blend);
+ return sky * player_probe_scale * player_probe_tint * visibility;
 }
