@@ -160,6 +160,51 @@ func check_movement_support(lab, movement, toggle: CheckButton) -> void:
 	toggle.button_pressed = false
 	await create_timer(0.08).timeout
 
+func check_landing_voice_under_step_burst(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	var movement = lab.get_node("MovementAudio")
+	var player: CharacterBody3D = lab.player
+	for i in 12:
+		await physics_frame
+	# Deliver the real movement event at grounded positions while the mixer
+	# is waiting for its next update. Repeat after playback has started.
+	var point := player.global_position
+	player.surface_contact.emit(point, true)
+	var landing: AudioStreamPlayer3D
+	for voice: AudioStreamPlayer3D in movement.step_voices:
+		if voice.playing and movement.groups.land_grass.any(func(row): return row.stream == voice.stream):
+			landing = voice
+			break
+	check(landing != null, "A supported landing queues an original grass landing sample")
+	if landing == null:
+		lab.free()
+		return
+	var source := landing.stream
+	for i in 4:
+		player.surface_contact.emit(point + Vector3.RIGHT * (i + 1) * 0.1, false)
+	check(landing.playing and landing.stream == source,
+		"A burst of supported footsteps keeps the landing onset queued")
+	landing.bus = AudioServer.get_bus_name(bus)
+	capture.clear_buffer()
+	await create_timer(0.12).timeout
+	var peak := 0.0
+	for sample in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+	check(landing.playing and landing.stream == source and landing.get_playback_position() > 0.0
+		and peak > 0.001 and peak < 0.9, "The original landing reaches the isolated mixer through the burst")
+	for i in 4:
+		player.surface_contact.emit(point + Vector3.LEFT * (i + 1) * 0.1, false)
+	check(landing.playing and landing.stream == source, "Further supported steps keep the active landing tail")
+	toggle.button_pressed = false
+	check(not landing.playing, "Muting stops the protected landing voice")
+	print("MECHANIC_LAB_LANDING_VOICE peak=", peak, " preserved=", landing.stream == source)
+	await create_timer(0.08).timeout
+	lab.free()
+
 func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -757,6 +802,7 @@ func run() -> void:
 	await create_timer(0.08).timeout
 	await check_local_hurt(bus, capture)
 	await check_movement_audio(bus, capture)
+	await check_landing_voice_under_step_burst(bus, capture)
 	await check_sabre_debris_audio(bus, capture)
 	await check_sabre_crowd_audio(bus, capture)
 	await check_zombie_steps(bus, capture)
