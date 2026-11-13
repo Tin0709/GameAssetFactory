@@ -426,10 +426,12 @@ func _project_source_anchors() -> void:
 		if not shift.is_zero_approx():
 			largest_gap = distance
 			motion = shift
-			handoff_arm = state if is_arm and shift.length_squared() > WALL_CHEST_MAX_SHIFT ** 2 else null
+			handoff_arm = state if is_arm else null
 	if motion.is_zero_approx():
 		return
-	if handoff_arm != null and largest_gap > WALL_ARM_HANDOFF_MIN_GAP and chest_state.get_contact_count() > 0:
+	var extended_arm_shift := motion.length_squared() > WALL_CHEST_MAX_SHIFT * WALL_CHEST_MAX_SHIFT + 0.000001
+	if handoff_arm != null and extended_arm_shift and largest_gap > WALL_ARM_HANDOFF_MIN_GAP \
+			and chest_state.get_contact_count() > 0:
 		# A rebounding arm and chest on the same wall can need more room
 		# than the ordinary rebound correction. Check the whole retreat.
 		var wall := _shared_wall_contact(chest_state, handoff_arm, motion)
@@ -437,14 +439,16 @@ func _project_source_anchors() -> void:
 		if wall.is_valid() and _wall_chest_shift_preserves_joints(gaps, largest_gap, extra_motion) \
 				and _reduce_chest_wall_overlap(chest, chest_state, extra_motion, wall):
 			return
-	var extended_arm_shift := motion.length_squared() > WALL_CHEST_MAX_SHIFT * WALL_CHEST_MAX_SHIFT + 0.000001
 	if _wall_chest_shift_preserves_joints(gaps, largest_gap, motion):
 		if not _test_projection_motion(chest, chest_state.transform, motion):
 			chest_state.transform = chest_state.transform.translated(motion)
 			return
 		if neck_wall.is_valid() and _reduce_chest_wall_overlap(chest, chest_state, motion, neck_wall):
 			return
-		if extended_arm_shift and (recent_handoff or chest_state.get_contact_count() == 0):
+		var shared_wall_retreat := handoff_arm != null and not extended_arm_shift \
+			and chest_state.get_contact_count() > 0 and chest_state.linear_velocity.dot(motion) > 0.0 \
+			and _shared_wall_contact(chest_state, handoff_arm, motion).is_valid()
+		if shared_wall_retreat or (extended_arm_shift and (recent_handoff or chest_state.get_contact_count() == 0)):
 			# A rebounding arm can expose a chest overlap before the solver
 			# reports chest contact. The forward sweep stops at that overlap.
 			# The shared escape test checks clearance at the other end and
