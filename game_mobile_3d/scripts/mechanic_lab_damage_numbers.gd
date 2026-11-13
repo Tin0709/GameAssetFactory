@@ -15,6 +15,8 @@ class DamageNumber:
 	var origin: Vector3
 	var travel: Vector3
 	var age := 0.0
+	var centre: Vector3
+	var depth: float
 
 var _numbers: Array[DamageNumber] = []
 
@@ -64,17 +66,23 @@ func _process(delta: float) -> void:
 		multimesh.instance_count = nearest_po2(glyph_count)
 	var camera := get_viewport().get_camera_3d()
 	var camera_side := camera.global_basis.x if camera != null else Vector3.RIGHT
+	var camera_back := camera.global_basis.z if camera != null else Vector3.BACK
+	for number in _numbers:
+		var offset: Vector3 = Tween.interpolate_value(Vector3.ZERO, number.travel,
+			number.age, NUMBER_DURATION, Tween.TRANS_QUAD, Tween.EASE_OUT)
+		number.centre = number.origin + offset
+		number.depth = number.centre.dot(camera_back)
+	# Draw farther glyphs first, including when two fading numbers overlap.
+	_numbers.sort_custom(func(a: DamageNumber, b: DamageNumber) -> bool: return a.depth < b.depth)
 	var slot := 0
 	for number in _numbers:
-		var centre := number.origin + Tween.interpolate_value(Vector3.ZERO, number.travel,
-			number.age, NUMBER_DURATION, Tween.TRANS_QUAD, Tween.EASE_OUT) as Vector3
 		var scale: float = Tween.interpolate_value(0.85, 0.28, minf(number.age, POP_DURATION),
 			POP_DURATION, Tween.TRANS_BACK, Tween.EASE_OUT)
 		var alpha := minf(1.0, (NUMBER_DURATION - number.age) / FADE_DURATION)
 		var spacing := camera_side * (DIGIT_ADVANCE * NUMBER_PIXEL_SIZE * scale)
 		var length := number.text.length()
 		for i in length:
-			var origin := centre + spacing * (i - (length - 1) * 0.5)
+			var origin := number.centre + spacing * (i - (length - 1) * 0.5)
 			multimesh.set_instance_transform(slot, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * scale), to_local(origin)))
 			multimesh.set_instance_custom_data(slot, Color(number.text.unicode_at(i) - 48, alpha, 0.0, 0.0))
 			slot += 1
