@@ -1,5 +1,26 @@
 extends Node3D
 ## Exact external media, original event/mix adapter. Native Wwise graphs unavailable.
+const LANDING_DIRECTORY := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events/Spicewood/Player/Locomotion/Jump"
+const LANDING_FAMILIES := {
+	"grass": ["grassPath", [
+		"b0067dc6c4fc64831e5fd8abf9ae8a2942ac4e5c7733e58d780882021e974fa5",
+		"776dd7c002b5b21b98a50db4c97f1716517fdb0b89c28c9d278f0df3e149d7d6",
+		"c566493cc289830cd48919d99a0423a494df5bc32619965d3add5a7fa26cdc15",
+		"9e2c47a54d249fa735f0469112712c69b36ba6710212b887e53bd591c0b6d2d6",
+	]],
+	"dirt": ["dirt", [
+		"77417d94ee79bb903ddd8faaa5c569a0ef8aebd858a1c3b6b450c96a851b17c2",
+		"8907de2b4fc67e86aca9cead2b0ac2369b972df17ff2251e05e060868a9f8551",
+		"494d11c18fe43c36381593921dc769261dcb30deefa7feeeed8e8ed57178783f",
+		"8e092d6a448354b7677ac934da925fb863995a1902ccfeca03066f425818cffe",
+	]],
+	"stone": ["stone", [
+		"db0ee2fa00ff09a299a8ee91e9186da024313a8c23cd9bebe439cd2401a74eea",
+		"9ee42099e7ecead99c65a14bced9c54fa00abf44911290015654c56e777cd87d",
+		"34b30cfe0ba487db9aedf9112545e6b64b5af95f3ce09d11476288ba4b5d3ee0",
+		"44cef66ab8bfb8edb59cee87e0d6ed7da7c1458d1b121202b73d4141814998d8",
+	]],
+}
 var ambient_enabled:=true:
 	set(value):
 		ambient_enabled=value
@@ -34,6 +55,7 @@ var _next_bird:=2.5
 var _step_index:=0
 var _rustle_index:=0
 var _nature_index:=0
+var _heavy_landing_frame := -1
 
 func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted)->void:
 	actor=body;meadow=field;reader=bundle;config=reader.data.get("audio_config",{});_random.seed=281027
@@ -44,6 +66,9 @@ func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted)->void:
 			if stream==null:rejected_count+=1;continue
 			stream.loop=false;rows.append({"stream":stream,"name":row.name,"seconds":row.seconds});loaded_count+=1
 		groups[key]=rows
+	for surface: String in LANDING_FAMILIES:
+		if groups.has(surface):
+			_load_landing_family(surface)
 	# The flat grass lab supplies its own listener and only needs footsteps.
 	if meadow == null:
 		ambient_enabled = false
@@ -59,8 +84,29 @@ func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted)->void:
 			var voice:=_voice("MeadowNature",float(config.get("environment_radius_m",20.)));voice.unit_size=float(config.get("nature_unit_size_m_adapter",2.));nature_voices.append(voice)
 		var listener:=AudioListener3D.new();listener.name="GroundLevelAudioListener";actor.add_child(listener);listener.position.y=1.55;listener.make_current()
 	actor.surface_contact.connect(_on_surface_contact)
+	if actor.has_signal("heavy_jump_landed"):
+		actor.heavy_jump_landed.connect(_on_heavy_landing)
 	actor.presentation_reset.connect(reset_contacts)
 	print("OVERWORLD_AUDIO_READY ",JSON.stringify({"loaded":loaded_count,"rejected":rejected_count,"groups":groups.keys(),"scope":reader.data.audio_scope}))
+
+func _load_landing_family(surface: String) -> void:
+	var family: Array = LANDING_FAMILIES[surface]
+	var hashes: Array = family[1]
+	var directory: String = reader.root.path_join(LANDING_DIRECTORY)
+	var rows: Array = []
+	for i in hashes.size():
+		var name := "sfx_player_land_%s_%02d" % [family[0], i + 1]
+		var stream: AudioStreamOggVorbis = reader.audio_stream({"path": directory.path_join(name + ".ogg"), "sha256": hashes[i]})
+		if stream == null:
+			rejected_count += 1
+			continue
+		stream.loop = false
+		rows.append({"stream": stream, "name": name})
+		loaded_count += 1
+	groups["land_" + surface] = rows
+
+func _on_heavy_landing(_point: Vector3, _direction: Vector3, _serial: int, _fall_height: float) -> void:
+	_heavy_landing_frame = Engine.get_physics_frames()
 
 func _voice(label:String,distance:float)->AudioStreamPlayer3D:
 	var voice:=AudioStreamPlayer3D.new();voice.name=label;voice.max_distance=distance;voice.unit_size=2.;voice.attenuation_model=AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE;voice.max_db=-3.;add_child(voice);return voice
@@ -123,9 +169,11 @@ func _play(key:String,voice:AudioStreamPlayer3D,point:Vector3,db:float,pitch:flo
 
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	var key: String = meadow.surface_at(point) if meadow != null else "grass"
-	if footsteps_enabled:
+	var heavy := landed and _heavy_landing_frame == Engine.get_physics_frames()
+	if footsteps_enabled and not heavy:
 		var db := float(config.get("landing_db", -9.0)) if landed else float(config.get("footsteps_db", -14.0))
-		_play(key, step_voices[_step_index % 4], point, db, 1.0)
+		var cue := "land_" + key if landed and not groups.get("land_" + key, []).is_empty() else key
+		_play(cue, step_voices[_step_index % 4], point, db, 1.0)
 		_step_index += 1
 		if landed:
 			event_count.landing += 1

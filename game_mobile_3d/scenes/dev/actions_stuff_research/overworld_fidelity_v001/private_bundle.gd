@@ -19,12 +19,12 @@ func permitted(path:String)->bool:
 	if not OS.has_feature("editor") or not path.is_absolute_path() or path.begins_with("res://") or path.begins_with("user://"):return false
 	var clean:=path.simplify_path().replace("\\","/").to_lower()
 	var project:=ProjectSettings.globalize_path("res://").simplify_path().replace("\\","/").to_lower()
-	return not clean.begins_with(project) and (root.is_empty() or clean.begins_with(root+"/"))
+	return not clean.begins_with(project) and (root.is_empty() or clean.begins_with(root.to_lower()+"/"))
 
 func read(path:String)->Dictionary:
 	error="";data.clear();meshes.clear();textures.clear();materials.clear();_material_map.clear();root=""
 	if not permitted(path) or not FileAccess.file_exists(path):return _fail("Private reference bundle unavailable; use its Research launcher (editor only).")
-	root=path.simplify_path().replace("\\","/").get_base_dir().get_base_dir().get_base_dir().to_lower()
+	root=path.simplify_path().replace("\\","/").get_base_dir().get_base_dir().get_base_dir()
 	var parsed:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not parsed is Dictionary or parsed.get("schema","")!="private_overworld_v1" or not parsed.get("private_only",false):return _fail("Invalid private bundle schema.")
 	data=parsed
@@ -85,7 +85,7 @@ func read_audio(path: String, group := "") -> bool:
 			error = "Private audio group unavailable: " + group
 			return false
 		samples = {group: samples[group]}
-	root = path.simplify_path().replace("\\", "/").get_base_dir().get_base_dir().get_base_dir().to_lower()
+	root = path.simplify_path().replace("\\", "/").get_base_dir().get_base_dir().get_base_dir()
 	data = {"audio": samples, "audio_config": parsed.get("audio_config", {}), "audio_scope": parsed.get("audio_scope", "")}
 	return true
 
