@@ -108,8 +108,9 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 			break
 		stayed_quiet = stayed_quiet and movement.event_count.grass == before_landing
 	check(lab.player._grounded and stayed_quiet and movement.event_count.landing == 1
-		and movement.event_count.grass == before_landing + 1,
-		"A normal jump emits one landing sample and no airborne steps")
+		and movement.event_count.grass == before_landing
+		and movement.last_sources.get("land_grass", "").begins_with("sfx_player_land_grassPath_"),
+		"A normal jump plays the pinned MD2 landing family without adding a grass footstep")
 	toggle.button_pressed = false
 	check(not movement.footsteps_enabled and not movement.step_voices.any(func(voice): return voice.playing),
 		"Turning off lab audio stops movement voices immediately")

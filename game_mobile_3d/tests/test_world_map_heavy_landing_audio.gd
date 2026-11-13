@@ -31,6 +31,9 @@ func run() -> void:
 	if audio != null:
 		check(not audio.enabled and audio._voices.is_empty(), "WorldMap starts muted without loading the heavy landing voices")
 		world.showcase.set_audio_enabled(true)
+		var movement = world.player.environment_audio.audio
+		for surface in ["grass", "dirt", "stone"]:
+			check(movement.groups.get("land_" + surface, []).size() == 4, "The four pinned ordinary landing samples load for " + surface)
 		check(not AudioServer.is_bus_mute(0) and audio._voices.size() == 3,
 			"WorldMap audio uses one spatial landing pool")
 		check(audio._groups.size() == 3 and audio._groups.get(&"slam_grass", []).size() == 6
@@ -44,12 +47,15 @@ func run() -> void:
 		await ticks(105)
 		check(audio._next_choice.get(&"slam_grass", 0) == 1 and audio._next_choice.size() == 1,
 			"A real Sabre dive posts one grass cue at ground contact")
+		check(movement.event_count.landing == 0, "A heavy landing has no ordinary landing layer")
 		world.reset_player()
 		await ticks(12)
 		var before: Dictionary = audio._next_choice.duplicate()
 		check(world.player.drop_for_lab(5.0), "The fixture can repeat an ordinary drop")
 		await ticks(110)
 		check(audio._next_choice == before, "Ordinary landing posts no heavy attack cue")
+		check(movement.event_count.landing == 1 and movement.last_sources.get("land_grass", "").begins_with("sfx_player_land_grassPath_"),
+			"An ordinary WorldMap drop plays one MD2 grass-path landing sample")
 		var landings := {
 			&"slam_dirt": Vector3(0.5, 3.0, -6.5),
 			&"slam_stone": Vector3(-22.5, 3.5, -39.5),
