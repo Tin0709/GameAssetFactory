@@ -119,7 +119,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"near_haze_depth": ["Near haze depth", 1.],
 	&"local_mist": ["Local mist volume (preview)", 1.],
 	&"cliff_mist": ["Cliff mist depth (preview)", 1.],
-	&"night_cliff_mist": ["Night cliff mist (preview)", 1.],
+	&"night_cliff_mist": ["Night cliff mist", 1.],
 	&"forest_near_scatter": ["Forest mist depth light", 1.],
 	&"sunlit_mist": ["Canopy sunlight in mist", DirectionalAir.MAX_GAIN],
 	&"scatter": ["Fog brightness", 2.],
@@ -163,7 +163,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 84
+const LIGHTING_MIX_VERSION := 85
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1075,8 +1075,10 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 0.
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
-	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"cliff_mist", &"night_cliff_mist", &"night_spatial_sky"]:
+	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"cliff_mist", &"night_spatial_sky"]:
 		return 0.
+	if effect == &"night_cliff_mist":
+		return .75
 	if effect == &"sunlit_mist":
 		return .24
 	if effect == &"foot_contact":
@@ -1451,7 +1453,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 45 and effect in [&"night_spatial_sky", &"night_stone_fill_balance"]:
 			missing_value = 0.
-		if version < 46 and effect == &"night_cliff_mist":
+		if version < 85 and effect == &"night_cliff_mist":
 			missing_value = 0.
 		if version < 47 and effect == &"daylight_bounce":
 			missing_value = 0.
