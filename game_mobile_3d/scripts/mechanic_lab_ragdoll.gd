@@ -350,32 +350,40 @@ func _project_source_anchors() -> void:
 		var distance := gap.length()
 		if not recent_handoff or distance <= largest_gap:
 			continue
-		var shift := _wall_anchor_motion(state, gap, false)
-		if name in ["Arm.L", "Arm.R"]:
-			var rebound_shift := _wall_anchor_motion(state, gap, true, WALL_HANDOFF_ARM_REBOUND_MAX_SHIFT)
-			if not rebound_shift.is_zero_approx():
-				shift = rebound_shift
+		var shift := _wall_anchor_motion(state, gap, false, name == "Arm.L" or name == "Arm.R")
 		if not shift.is_zero_approx():
 			largest_gap = distance
 			motion = shift
 	if motion.is_zero_approx():
 		return
+	if _can_shift_wall_chest(chest, chest_state, gaps, largest_gap, motion):
+		chest_state.transform = chest_state.transform.translated(motion)
+	elif motion.length_squared() > WALL_CHEST_MAX_SHIFT * WALL_CHEST_MAX_SHIFT + 0.000001:
+		# A braced torso or another joint may still allow the ordinary shift.
+		var fallback := motion.limit_length(WALL_CHEST_MAX_SHIFT)
+		if _can_shift_wall_chest(chest, chest_state, gaps, largest_gap, fallback):
+			chest_state.transform = chest_state.transform.translated(fallback)
+
+func _can_shift_wall_chest(chest: PhysicalBone3D, state: PhysicsDirectBodyState3D,
+		gaps: Array[Vector3], largest_gap: float, motion: Vector3) -> bool:
 	for gap: Vector3 in gaps:
 		if (gap + motion).length() > largest_gap:
-			return
-	if not _test_projection_motion(chest, chest_state.transform, motion):
-		chest_state.transform = chest_state.transform.translated(motion)
+			return false
+	return not _test_projection_motion(chest, state.transform, motion)
 
 func _wall_anchor_motion(state: PhysicsDirectBodyState3D, gap: Vector3, require_rebound: bool,
-		max_shift := WALL_CHEST_MAX_SHIFT) -> Vector3:
+		allow_extra_arm_shift := false) -> Vector3:
 	for index in state.get_contact_count():
 		var normal := state.get_contact_local_normal(index)
 		if absf(normal.y) >= MAX_WALL_NORMAL_Y or not state.get_contact_collider_object(index) is StaticBody3D:
 			continue
-		if require_rebound and state.linear_velocity.dot(normal) <= 0.0:
+		var rebounding := state.linear_velocity.dot(normal) > 0.0
+		if require_rebound and not rebounding:
 			continue
 		var blocked_distance := -gap.dot(normal) - SOURCE_ANCHOR_TOLERANCE
 		if blocked_distance > 0.0:
+			var max_shift := WALL_HANDOFF_ARM_REBOUND_MAX_SHIFT if allow_extra_arm_shift and rebounding \
+				else WALL_CHEST_MAX_SHIFT
 			return normal * minf(blocked_distance, max_shift)
 	return Vector3.ZERO
 
