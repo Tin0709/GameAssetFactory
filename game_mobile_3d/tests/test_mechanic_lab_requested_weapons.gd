@@ -179,6 +179,12 @@ func run() -> void:
 	target.position = Vector3(0.0, 0.0, 1.65)
 	target.health = 100
 	contacts.clear()
+	sound.button_pressed = true
+	var hit_choices: Array[int] = []
+	var record_punch := func(_p, _d, clip: String, _i, _s, _k) -> void:
+		if clip.begins_with("NativeGauntlet"):
+			hit_choices.append(combat_audio._next_choice.get(&"gauntlet_hit", -1))
+	group.sabre_contact.connect(record_punch)
 	attack(true)
 	await ticks(68)
 	attack(false)
@@ -187,6 +193,9 @@ func run() -> void:
 		"NativeGauntletAttack1", "NativeGauntletAttack2", "NativeGauntletAttack3",
 	], "Held input plays all three gauntlet strikes in order")
 	check(target.health <= 65, "Gauntlet combo applies its own 10/11/14 damage")
+	check(hit_choices.slice(0, 3) == [1, 2, 0], "Three consecutive punches cycle through the source hit cues")
+	group.sabre_contact.disconnect(record_punch)
+	var punch_choice_before_slam: int = combat_audio._next_choice.get(&"gauntlet_hit", -1)
 	lab.reset_player()
 	await ticks(12)
 	sound.button_pressed = true
@@ -211,7 +220,8 @@ func run() -> void:
 	check(target.health < 100 and contacts.has("AirAttack"), "Gauntlets can hit with their jump slam")
 	check(combat_audio._next_choice.get(&"mauler_dive", 0) == 1, "The first slam plays one Mauler Dive cue")
 	check(combat_audio._next_choice.get(&"gauntlet_slam", 0) == 1 and
-		not combat_audio._next_choice.has(&"gauntlet_hit"), "A jump hit uses the slam cue without doubling it with a punch hit")
+		combat_audio._next_choice.get(&"gauntlet_hit", -1) == punch_choice_before_slam,
+		"A jump hit uses the slam cue without doubling it with a punch hit")
 	check(lab.player.clips.AirAttack.source_name == "Player_Jump_Gauntlet-Attack_Heavy", "The slam uses the source gauntlet pose")
 	target.position = Vector3(12.0, 0.0, 0.0)
 	lab.get_node("HUD/DropMedium").pressed.emit()
