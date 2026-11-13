@@ -418,8 +418,9 @@ func _load_crossbow(root: String) -> bool:
 	var profile := CrossPollinator.combat_profile(root)
 	if not player.animation_player.has_animation_library(CrossPollinator.LIBRARY):
 		player._load_private_combat_clips(profile, CrossPollinator.LIBRARY)
-	if not player.animation_player.has_animation_library(CrossPollinator.LIBRARY):
-		return false
+		if not player.animation_player.has_animation_library(CrossPollinator.LIBRARY):
+			return false
+		CrossPollinator.interpolate_shot_poses(player)
 	_crossbow_locomotion = CrossPollinator.load_locomotion(player, root)
 	if _crossbow_locomotion.is_empty():
 		return false

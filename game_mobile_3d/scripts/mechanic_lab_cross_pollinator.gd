@@ -91,6 +91,22 @@ static func combat_profile(root: String) -> Dictionary:
 	result.windows = [shot, shot, shot]
 	return result
 
+static func interpolate_shot_poses(actor: CharacterBody3D) -> void:
+	for key in [SHOT, RECOVERY]:
+		var clip: Dictionary = actor.clips[key]
+		var animation: Animation = actor.animation_player.get_animation(clip.action)
+		for track in animation.get_track_count():
+			var type := animation.track_get_type(track)
+			if type != Animation.TYPE_POSITION_3D and type != Animation.TYPE_ROTATION_3D:
+				continue
+			# The verified export repeats every 30 Hz key four times at 120 Hz.
+			# Keep the authored poses and sample continuously between them.
+			var count := animation.track_get_key_count(track)
+			for index in range(count - 1, 0, -1):
+				if index % 4 != 0:
+					animation.track_remove_key(track, index)
+			animation.track_set_interpolation_type(track, Animation.INTERPOLATION_LINEAR)
+
 static func load_locomotion(actor: CharacterBody3D, root: String) -> Dictionary:
 	var entries: Array[Dictionary] = []
 	for slot: String in LOCOMOTION:
@@ -205,7 +221,7 @@ func _physics_process(delta: float) -> void:
 
 func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
 	var collider := hit.collider as StaticBody3D
-	if _embedded == null or collider == null or not collider.collision_layer & WORLD_MASK:
+	if _embedded == null or collider == null or (collider.collision_layer & WORLD_MASK) == 0:
 		return
 	if _embedded_arrows.size() == EMBEDDED_CAPACITY:
 		_embedded_arrows.pop_front()
@@ -215,7 +231,8 @@ func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
 	_embedded_arrows.append({"pose": global_transform.affine_inverse() * pose, "age": 0.0})
 
 func _update_embedded_arrows(delta: float) -> void:
-	for index in range(_embedded_arrows.size() - 1, -1, -1):
+	var index := 0
+	while index < _embedded_arrows.size():
 		var arrow := _embedded_arrows[index]
 		arrow.age += delta
 		if arrow.age >= EMBEDDED_WOBBLE_SECONDS:
@@ -228,6 +245,7 @@ func _update_embedded_arrows(delta: float) -> void:
 		var angle := deg_to_rad(EMBEDDED_WOBBLE_SCALE) * sin(TAU * 6.0 * phase) * pow(1.0 - phase, 2.0)
 		pose.basis = pose.basis * Basis(Vector3.UP, angle) * Basis.from_scale(Vector3.ONE * EMBEDDED_SCALE)
 		_embedded.set_instance_transform(index, pose)
+		index += 1
 	_embedded.visible_instance_count = _embedded_arrows.size()
 
 func _sweep_bolt(space: PhysicsDirectSpaceState3D, start: Vector3, end: Vector3, mask: int) -> Dictionary:

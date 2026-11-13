@@ -55,15 +55,15 @@ func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transf
 	native[spine] = native[spine].interpolate_with(actions_and_stuff[spine], 0.7)
 	native[_body_bone] = native[_body_bone].interpolate_with(actions_and_stuff[_body_bone], 0.7)
 	# Transfer the alternating A&S arm swing to the paired MD2 grip.
-	# Applying it around a common pivot keeps both hands together.
+	# Rotate around the line through both shoulders. Each shoulder stays
+	# seated and the two hands share one rigid rotation with the weapon.
 	var left_axis := actions_and_stuff[_left_arm].basis.z
 	var right_axis := actions_and_stuff[_right_arm].basis.z
 	var swing := (atan2(right_axis.y, right_axis.z) - atan2(left_axis.y, left_axis.z)) * 0.5
-	var sway := Basis(Vector3.RIGHT, swing * CROSSBOW_ARM_SWAY_WEIGHT)
-	var pivot := (native[_left_arm].origin + native[_right_arm].origin) * 0.5
+	var shoulder_axis := (native[_left_arm].origin - native[_right_arm].origin).normalized()
+	var sway := Basis(shoulder_axis, swing * CROSSBOW_ARM_SWAY_WEIGHT)
 	for bone in [_left_arm, _right_arm]:
-		var arm := native[bone]
-		native[bone] = Transform3D(sway * arm.basis, pivot + sway * (arm.origin - pivot))
+		native[bone].basis = sway * native[bone].basis
 	return native
 
 func run_pose(cycle: float) -> Array[Transform3D]:
