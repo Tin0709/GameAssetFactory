@@ -8,6 +8,7 @@ const CAMERA_DISTANCE_SQUARED := 100.0 * 100.0
 class Puff:
 	var origin: Vector3
 	var contact_tick: int
+	var age := 0.0
 	var lifetime: float
 	var drag: float
 	var cell: Vector2
@@ -65,12 +66,12 @@ func _process(_delta: float) -> void:
 	var step := get_physics_process_delta_time()
 	var count := 0
 	for puff in _puffs:
-		var age := maxf(render_tick - puff.contact_tick, 0.0) * step
-		if age >= puff.lifetime:
+		puff.age = maxf(render_tick - puff.contact_tick, 0.0) * step
+		if puff.age >= puff.lifetime:
 			continue
 		_puffs[count] = puff
-		var point := puff.origin + Vector3.UP * MovementDust.source_step_height(age, puff.drag)
-		var opacity := MovementDust._sample_curve(_alpha, age / (puff.lifetime * _alpha_duration))
+		var point := puff.origin + Vector3.UP * MovementDust.source_step_height(puff.age, puff.drag)
+		var opacity := MovementDust._sample_curve(_alpha, puff.age / (puff.lifetime * _alpha_duration))
 		multimesh.set_instance_transform(count, Transform3D(Basis.IDENTITY, point))
 		multimesh.set_instance_custom_data(count, Color(puff.cell.x, puff.cell.y, opacity, 0.0))
 		count += 1

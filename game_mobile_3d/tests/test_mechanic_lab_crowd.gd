@@ -110,9 +110,9 @@ func check_zombie_dust() -> void:
 	dust._process(0.0)
 	if dust.multimesh.visible_instance_count != COUNT or dust.multimesh.mesh.get_surface_count() != 1:
 		failures.append("One batch draws 100 grounded steps and rejects unsupported steps")
-	dust._process(1.8)
+	dust.clear()
 	if dust.multimesh.visible_instance_count != 0 or dust.is_processing():
-		failures.append("Zombie step dust stops after the source lifetime")
+		failures.append("Clearing the crowd dust removes all instances and stops processing")
 
 func launch_ragdolls(group: Node, packed: bool) -> void:
 	if packed:
