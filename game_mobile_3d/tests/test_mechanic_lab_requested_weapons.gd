@@ -161,10 +161,25 @@ func run() -> void:
 	check(target.health < 100 and contacts.has("AirAttack"), "Gauntlets can hit with their jump slam")
 	check(combat_audio._next_choice.get(&"mauler_dive", 0) == 1, "The first slam plays one Mauler Dive cue")
 	check(lab.player.clips.AirAttack.source_name == "Player_Jump_Gauntlet-Attack_Heavy", "The slam uses the source gauntlet pose")
+	target.position = Vector3(12.0, 0.0, 0.0)
+	lab.get_node("HUD/DropMedium").pressed.emit()
+	await ticks(5)
+	attack(true)
+	await ticks(2)
+	attack(false)
+	await ticks(95)
+	check(combat_audio._next_choice.get(&"mauler_dive", 0) == 2, "A missed slam advances to the next sample")
+	sound.button_pressed = false
+	lab.get_node("HUD/DropMedium").pressed.emit()
+	await ticks(5)
+	attack(true)
+	await ticks(2)
+	attack(false)
+	await ticks(95)
+	check(combat_audio._next_choice.get(&"mauler_dive", 0) == 2, "The combat mute suppresses Mauler Dive")
 	equip(menu, 0)
 	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
 		"Switching back restores the original Sabre")
-	sound.button_pressed = false
 	lab.queue_free()
 	# Let the audio server release stopped voices before a fixed-FPS test exits.
 	var audio_end := Time.get_ticks_msec() + 100
