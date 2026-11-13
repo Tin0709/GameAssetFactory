@@ -6,6 +6,7 @@ const SABRE_AIR_LOOP := 0.127934694
 const SABRE_AIR_LANDING := 0.233467355
 const SABRE_AIR_DAMAGE := 0.287836909
 const SABRE_AIR_SLASH := 0.289097339
+const SABRE_AIR_RESUME := 0.643821359
 const SABRE_AIR_END := 0.826677978
 
 var clips:Dictionary={}
@@ -82,6 +83,8 @@ func movement_source_gate()->float:
 	return (ceilf(float(w.resume)/float(w.rate)*movement_evaluation_hz-.0000001)+movement_consumer_ticks)/movement_evaluation_hz*float(w.rate)
 
 func movement_allowed()->bool:
+	if phase == &"air_attack" and use_sabre_air_sections:
+		return air_landing_started and time >= SABRE_AIR_RESUME - 0.00000001
 	return not active() or (native_enabled and (phase==&"recovery" or (phase==&"attack" and time>=movement_source_gate()-.00000001)))
 
 func chain_source_gate()->float:
@@ -94,6 +97,8 @@ func chain_source_gate()->float:
 func boundary_seconds()->float:
 	if not active():return INF
 	var boundary:=remaining()
+	if phase == &"air_attack" and use_sabre_air_sections and air_landing_started and not movement_allowed():
+		boundary = minf(boundary, SABRE_AIR_RESUME - time)
 	if native_enabled and phase==&"attack":
 		var resume:=movement_source_gate()
 		if time<resume-.00000001:boundary=minf(boundary,resume-time)
