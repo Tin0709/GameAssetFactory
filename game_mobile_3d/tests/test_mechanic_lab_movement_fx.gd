@@ -89,6 +89,7 @@ func run() -> void:
 	await check_heavy_dust_timing(lab, dust)
 	await check_running_wake_support(lab, wind)
 	await check_floor_edge_landing(lab, dust)
+	await check_dust_contact_clock(lab, dust)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
 	lab.free()
@@ -252,6 +253,44 @@ func check_floor_edge_landing(lab, dust: Node3D) -> void:
 	toggle.button_pressed = false
 	# Allow the real-time Ogg mixer to release stopped streams before teardown.
 	await create_timer(0.10, true, false, true).timeout
+
+func check_dust_contact_clock(lab, dust) -> void:
+	lab.reset_player()
+	for i in 12:
+		await physics_frame
+	var peak_drift := [0.0, 0.0]
+	var contact_count := [0, 0]
+	var listen := func(_point: Vector3, landed: bool):
+		var slot := int(landed)
+		if contact_count[slot] > 0:
+			return
+		var particle = dust._particles[posmod(dust._next - 1, dust._particles.size())]
+		var origin: Vector3 = particle.sprite.global_position
+		var alpha: float = particle.sprite.modulate.a
+		# The render interval includes time before the contact arrived.
+		dust._process(0.15)
+		peak_drift[slot] = origin.distance_to(particle.sprite.global_position)
+		check(particle.sprite.visible and is_equal_approx(particle.sprite.modulate.a, alpha),
+			"New movement dust keeps its initial alpha on the contact tick (landing=%s)" % landed)
+		contact_count[slot] += 1
+	lab.player.surface_contact.connect(listen)
+	Input.action_press("move_forward")
+	for i in 45:
+		await physics_frame
+		if contact_count[0] > 0:
+			break
+	Input.action_release("move_forward")
+	Input.action_press("jump")
+	for i in 75:
+		await physics_frame
+		if contact_count[1] > 0:
+			break
+	Input.action_release("jump")
+	lab.player.surface_contact.disconnect(listen)
+	check(contact_count == [1, 1] and maxf(peak_drift[0], peak_drift[1]) < 0.001,
+		"Run and jump dust begin at the contact position, even after a delayed render")
+	print("MECHANIC_LAB_DUST_CONTACT_CLOCK drift=", peak_drift, " contacts=", contact_count)
+	lab.reset_player()
 
 func start_heavy_drop(lab) -> void:
 	lab.get_node("HUD/DropMedium").pressed.emit()
