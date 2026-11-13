@@ -199,16 +199,32 @@ func is_near_flat_floor(tolerance: float) -> bool:
 	var floor_half := floor_box.size * 0.5
 	var floor_inverse := floor_pose.affine_inverse()
 	var minimum_y := INF
+	var edge_support := false
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var size: Vector3 = part[2]
-		var bounds := (floor_inverse * body.global_transform) * AABB(-size * 0.5, size)
-		# Ignore limbs that have already cleared the finite floor footprint.
+		var pose := floor_inverse * body.global_transform
+		var bounds := pose * AABB(-size * 0.5, size)
 		if bounds.position.x > floor_half.x or bounds.end.x < -floor_half.x \
 				or bounds.position.z > floor_half.z or bounds.end.z < -floor_half.z:
 			continue
-		minimum_y = minf(minimum_y, bounds.position.y)
-	return absf(minimum_y - floor_half.y) <= tolerance
+		if bounds.position.x >= -floor_half.x and bounds.end.x <= floor_half.x \
+				and bounds.position.z >= -floor_half.z and bounds.end.z <= floor_half.z:
+			minimum_y = minf(minimum_y, bounds.position.y)
+			continue
+		# The lowest corner of a straddling box may already be below the lip.
+		# Only count an actual corner near the top and within the footprint.
+		if not edge_support and bounds.position.y <= floor_half.y + tolerance \
+				and bounds.end.y >= floor_half.y - tolerance:
+			var half := size * 0.5
+			for corner in 8:
+				var point := pose * (half * Vector3(1 if corner & 1 else -1,
+					1 if corner & 2 else -1, 1 if corner & 4 else -1))
+				if absf(point.y - floor_half.y) <= tolerance and absf(point.x) <= floor_half.x \
+						and absf(point.z) <= floor_half.z:
+					edge_support = true
+					break
+	return edge_support or absf(minimum_y - floor_half.y) <= tolerance
 
 func has_flat_wall_rest_support(core_grounded: bool) -> bool:
 	if not core_grounded:
