@@ -147,6 +147,7 @@ func check_sabre_landing_movement(lab, hz: int) -> void:
 	var origin: Vector3 = actor.global_position
 	var touchdown_tick := Engine.get_physics_frames()
 	actor.requested_direction = Vector2(0.0, -1.0)
+	actor.requested_run = true
 	var first_step := -1
 	for i in hz:
 		await physics_frame
@@ -159,7 +160,8 @@ func check_sabre_landing_movement(lab, hz: int) -> void:
 	var expected_travel: float = actor.run_speed * (float(first_step) / hz - delay)
 	check(absf(absf(actor.global_position.z - origin.z) - expected_travel) < 0.001,
 		"Sabre only moves during the open fraction of that step at %d Hz" % hz)
-	print("SABRE_LANDING_MOVEMENT hz=", hz, " first_step=", first_step, " clip=", actor.active_clip)
+	print("SABRE_LANDING_MOVEMENT hz=", hz, " first_step=", first_step, " clip=", actor.active_clip,
+		" travel=", absf(actor.global_position.z - origin.z), " expected=", expected_travel)
 	actor.requested_direction = Vector2.ZERO
 
 
