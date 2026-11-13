@@ -67,6 +67,13 @@ func run() -> void:
 	await check_turned_zombie(lab)
 	await check_melee_height(lab)
 	await check_simultaneous_damage(lab, numbers)
+	lab._on_player_hit(6)
+	lab._process(0.12)
+	lab._process(1.0 / 60.0)
+	check(body.material_overlay != original_overlay and float(body.get_instance_shader_parameter(&"player_hit_flash")) > 0.9,
+		"A render hitch before the first displayed frame does not consume the player flash")
+	lab._process(0.12)
+	check(body.material_overlay == original_overlay, "A later render hitch expires the player flash")
 	lab.free()
 	print("MECHANIC_LAB_PLAYER_HIT failures=", failures)
 	quit(0 if failures.is_empty() else 1)

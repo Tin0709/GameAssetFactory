@@ -78,6 +78,7 @@ func run() -> void:
 	await check_hit(false)
 	await check_hit(true)
 	await check_crowd_sparks()
+	await check_flash_during_render_hitch()
 	print("MECHANIC_LAB_HIT_FLASH failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 
@@ -116,4 +117,23 @@ func check_crowd_sparks() -> void:
 	await process_frame
 	check(renderer.multimesh.visible_instance_count == 0 and not sparks.is_processing(),
 		"Reset clears the crowd sparks and stops their frame callback")
+	lab.free()
+
+func check_flash_during_render_hitch() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	await ticks(12)
+	var group := lab.get_node("Zombies")
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	var mesh := zombie._mesh as MeshInstance3D
+	zombie.take_hit(1, Vector3.RIGHT)
+	zombie._process(0.10)
+	zombie._process(1.0 / 60.0)
+	check(mesh.material_overlay != null and float(mesh.get_instance_shader_parameter(&"hit_flash")) > 0.9,
+		"A render hitch before the first displayed frame does not consume the zombie flash")
+	zombie._process(0.10)
+	check(mesh.material_overlay == null and not zombie.is_processing(),
+		"A render hitch after the first displayed frame expires the zombie flash")
 	lab.free()
