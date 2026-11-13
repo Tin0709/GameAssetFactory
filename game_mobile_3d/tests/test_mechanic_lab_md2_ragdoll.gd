@@ -149,6 +149,20 @@ func run() -> void:
 	for bone in skeleton.get_bone_count():
 		held_still = held_still and skeleton.get_bone_global_pose(bone).is_equal_approx(resting_pose[bone])
 	check(held_still, "The parked corpse holds every bone still across later physics frames")
+	while zombie._corpse_age < 2.95:
+		await physics_frame
+	var mid_fade: float = zombie._mesh.get_instance_shader_parameter("desaturation")
+	check(absf(mid_fade - 0.4) < 0.02, "The corpse progresses through the existing color fade")
+	while zombie._corpse_age < 3.60:
+		await physics_frame
+	var final_fade: float = zombie._mesh.get_instance_shader_parameter("desaturation")
+	check(is_equal_approx(final_fade, 0.8), "The corpse reaches 80 percent desaturation")
+	# A sentinel detects subsequent renderer writes of the same completed value.
+	zombie._mesh.set_instance_shader_parameter("desaturation", 0.79)
+	await ticks(2)
+	var held_fade: float = zombie._mesh.get_instance_shader_parameter("desaturation")
+	check(is_equal_approx(held_fade, 0.79), "The completed fade stops submitting shader updates")
+	zombie._mesh.set_instance_shader_parameter("desaturation", final_fade)
 	while is_instance_valid(zombie) and zombie._corpse_age < 4.96:
 		await physics_frame
 	check(is_instance_valid(zombie), "Corpse remains until the table's five-second lifespan")
