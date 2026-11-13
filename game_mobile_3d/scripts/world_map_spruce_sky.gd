@@ -9,6 +9,7 @@ static var _owner: WeakRef
 var proof_ready := false
 var applied_strength := 0.
 var applied_tree_strength := 0.
+var applied_edge_fill := 0.
 var _level: Node3D
 var _camera: Camera3D
 var _texture: ImageTexture3D
@@ -73,6 +74,7 @@ func setup(level: Node3D) -> void:
 	_owner = weakref(self)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_region", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
+	RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_extent", Vector3(_dimensions))
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", _texture)
 	proof_ready = true
@@ -95,6 +97,7 @@ func refresh() -> void:
 	if not proof_ready or _owner == null or _owner.get_ref() != self:
 		applied_strength = 0.
 		applied_tree_strength = 0.
+		applied_edge_fill = 0.
 		return
 	var strength := 0.
 	var review = _level.showcase
@@ -111,6 +114,12 @@ func refresh() -> void:
 	if tree_strength != applied_tree_strength:
 		applied_tree_strength = tree_strength
 		RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", tree_strength)
+	var edge_fill := 0.
+	if strength > 0. and not review._balanced_preview:
+		edge_fill = review._lighting_scale(&"canopy_edge_fill") * review._balanced_daylight_weight()
+	if edge_fill != applied_edge_fill:
+		applied_edge_fill = edge_fill
+		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", edge_fill)
 	if strength > 0. and _published_camera != _camera.global_position:
 		_published_camera = _camera.global_position
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_camera", _published_camera)
@@ -119,5 +128,6 @@ func _exit_tree() -> void:
 	if _owner != null and _owner.get_ref() == self:
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_region", Vector4.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
+		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", null)
 		_owner = null

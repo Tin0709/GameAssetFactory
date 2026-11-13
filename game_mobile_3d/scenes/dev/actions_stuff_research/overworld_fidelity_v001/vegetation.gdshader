@@ -90,7 +90,7 @@ void vertex(){
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 	// The patch origin stays in its own cell while the blades bend.
 	study_ground_sky_at_root = study_ground_sky_mix > 0.0 ? grass_ground_sky(MODEL_MATRIX[3].xz) : vec4(0.0);
-	study_canopy_sky_at_root = gaf_spruce_sky(MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz);
+	study_canopy_sky_at_root = gaf_ground_canopy_sky(MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz);
 	study_day_bounce_at_root = grass_day_bounce(MODEL_MATRIX[3].xz);
 #endif
 	// Full float custom attribute: normalized height, blade height, phase, response.

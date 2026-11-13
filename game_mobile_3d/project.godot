@@ -131,6 +131,10 @@ gaf_grove_sky_strength={
 "type": "float",
 "value": 0.0
 }
+gaf_canopy_edge_fill={
+"type": "float",
+"value": 0.0
+}
 gaf_spruce_sky_region={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 0)

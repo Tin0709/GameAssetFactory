@@ -47,7 +47,7 @@ void vertex() {
 	vec3 world_point = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	int receiver = int(CUSTOM1.a);
 	vec3 sky = gaf_regional_sky(CUSTOM1.rgb, terrain_ambient_tint, world_point.xz, receiver);
-	float canopy = gaf_spruce_sky(world_point, INV_VIEW_MATRIX[3].xyz);
+	float canopy = gaf_ground_canopy_sky(world_point, INV_VIEW_MATRIX[3].xyz);
 	terrain_sky_light = sky * canopy;
 	terrain_night_sky_light = gaf_night_sky(sky, receiver) * canopy;
 	terrain_day_bounce = gaf_day_bounce(receiver);
