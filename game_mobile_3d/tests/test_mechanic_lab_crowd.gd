@@ -54,6 +54,7 @@ func run() -> void:
 	Input.action_press("move_backward")
 	await measure("chase", 120)
 	Input.action_release("move_backward")
+	await check_crowd_melee(group)
 	await check_blocked_chase(group)
 	# Give each corpse clear room to complete its authored handoff and roll.
 	for i in COUNT:
@@ -163,6 +164,20 @@ func check_health_bars(group: Node) -> void:
 	if not is_equal_approx(first_bar.g, expected):
 		failures.append("The delayed fill catches up to the target's current health")
 
+func check_crowd_melee(group: Node) -> void:
+	# Let the crowd keep attacking over the entire measurement window.
+	const FIXTURE_HP := 10000
+	lab.player_health = FIXTURE_HP
+	var attacks: Array[int] = []
+	var record_hit := func(amount: int): attacks.append(amount)
+	group.player_hit.connect(record_hit)
+	await measure("crowd_melee", 300)
+	group.player_hit.disconnect(record_hit)
+	if group.get_child_count() != COUNT or attacks.size() < 20 or lab.player_health != FIXTURE_HP - attacks.size() * 6:
+		failures.append("The packed crowd keeps attacking at the verified six HP per hit")
+	print("CROWD_MELEE_HITS ", attacks.size())
+	lab.reset_player()
+
 func check_blocked_chase(group: Node) -> void:
 	lab.reset_player()
 	var wall := StaticBody3D.new()
@@ -200,9 +215,27 @@ func check_blocked_chase(group: Node) -> void:
 		await physics_frame
 	if zombie.global_position.z <= last_position.z + 0.4:
 		failures.append("A blocked zombie did not resume when the wall was removed")
+	var blocker := group.get_child(1) as ZOMBIE
+	blocker.global_position = Vector3(0, 0.02, -2.0)
+	zombie.global_position = Vector3(0, 0.02, -3.5)
+	zombie.velocity = Vector3.ZERO
+	for i in 45:
+		await physics_frame
+	samples = zombie.ragdoll.sample_count
+	last_position = zombie.global_position
+	var packed_skips := 0
+	for i in 40:
+		await physics_frame
+		packed_skips += int(zombie.get("_skipped_blocked_step") == true)
+	if packed_skips < 29 or packed_skips > 31 or zombie.ragdoll.sample_count - samples != 40:
+		failures.append("A crowd zombie blocked by another zombie retries at 15 Hz and samples every tick")
+	blocker.global_position.x += 3.0
+	await physics_frame
+	if zombie.global_position.z <= last_position.z + 0.01:
+		failures.append("Moving the blocking zombie wakes the chaser on the next tick")
 	for member in group.get_children():
 		member.set_physics_process(true)
-	print("CROWD_BLOCKED skipped=", skipped_ticks, " samples=", pose_steps)
+	print("CROWD_BLOCKED wall_skips=", skipped_ticks, " samples=", pose_steps, " packed_skips=", packed_skips)
 
 func check_reset_during_spawn(group: Node) -> void:
 	var button := lab.get_node("HUD/SpawnCrowd") as Button
