@@ -689,11 +689,13 @@ func _has_rest_support(motion: Dictionary) -> bool:
 
 func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: bool) -> bool:
 	var two_parts: bool = motion.supports == 2
+	var flat_floor := is_instance_valid(_corpse_floor)
+	var speed_scale := 1.0 if flat_floor else 0.5
 	var slow_support: bool = not normally_supported and not ragdoll.source_joints.is_empty() \
 		and motion.supports >= 2 and motion.core_supports > 0 and (not two_parts or motion.leg_supported) \
-		and motion.linear <= CORPSE_SETTLE_SPEED * 0.5 and motion.angular <= CORPSE_SETTLE_SPIN * 0.5
+		and motion.linear <= CORPSE_SETTLE_SPEED * speed_scale and motion.angular <= CORPSE_SETTLE_SPIN * speed_scale
 	if slow_support:
-		if is_instance_valid(_corpse_floor):
+		if flat_floor:
 			# A wall can carry the upper body while the chest and legs rest
 			# on the flat floor. Let the existing pose window verify stability.
 			slow_support = not two_parts and motion.leg_supported and ragdoll.has_static_wall_contact() \
@@ -706,7 +708,7 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 		return false
 	# Solver velocities can oscillate on a supported edge. Check that each
 	# body stays near the same pose throughout the whole rest window.
-	var duration := CORPSE_WALL_REST_TIME if two_parts else CORPSE_TERRAIN_REST_TIME
+	var duration := CORPSE_WALL_REST_TIME if flat_floor or two_parts else CORPSE_TERRAIN_REST_TIME
 	var moved := false
 	for name in _terrain_rest_poses:
 		var body: PhysicalBone3D = ragdoll.bodies[name]
