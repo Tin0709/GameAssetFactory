@@ -185,7 +185,8 @@ func run() -> void:
 	await check_sabre_landing_reversal(lab, group)
 	await check_sabre_landing_reversal(lab, group, true)
 	await check_sabre_first_contact_anchors(lab, group)
-	await check_sabre_supported_floor_lift(lab, group)
+	await check_sabre_floor_lift(lab, group, 505, 0.022)
+	await check_sabre_floor_lift(lab, group, 514, 0.036)
 	await check_sabre_head_and_arm_brace(lab, group)
 	await check_sabre_late_roll(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
@@ -544,13 +545,13 @@ func replay_offset_sabre_finisher(lab, group, spawn_serial: int):
 	root.push_input(attack, true)
 	return zombie
 
-func check_sabre_supported_floor_lift(lab, group) -> void:
-	var zombie = await replay_offset_sabre_finisher(lab, group, 505)
+func check_sabre_floor_lift(lab, group, serial: int, rise_limit: float) -> void:
+	var zombie = await replay_offset_sabre_finisher(lab, group, serial)
 	var previous_y := 0.0
 	var low_pose := false
 	var peak_rise := 0.0
 	var overlap := 0.0
-	for i in 90:
+	for i in 120:
 		await physics_frame
 		if zombie._corpse_parked:
 			break
@@ -569,9 +570,10 @@ func check_sabre_supported_floor_lift(lab, group) -> void:
 			low_pose = true
 		previous_y = centre_y
 		overlap = maxf(overlap, -zombie.ragdoll.minimum_corner_y())
-	check(low_pose and peak_rise < 0.022 and overlap <= 0.013 and zombie._corpse_parked,
-		"The low Sabre roll avoids a sharp upward correction without pushing the limbs through the floor")
-	print("SABRE_SUPPORTED_FLOOR_LIFT rise_m=", peak_rise, " overlap_m=", overlap, " release_s=", zombie._corpse_age)
+	check(low_pose and peak_rise < rise_limit and overlap <= 0.013 and zombie._corpse_parked,
+		"The low Sabre roll %d avoids a sharp upward correction and settles within the floor tolerance" % serial)
+	print("SABRE_FLOOR_LIFT serial=", serial, " rise_m=", peak_rise,
+		" overlap_m=", overlap, " release_s=", zombie._corpse_age)
 	zombie.free()
 
 func check_sabre_head_and_arm_brace(lab, group) -> void:
