@@ -191,6 +191,8 @@ func check_sabre_landing_damage(lab, group) -> void:
 			"Primary and splash damage resolve on the first physics tick after the authored Sabre notify")
 		check(zombies[0].health == 8 and zombies[1].health == 36 and zombies[2].health == 48,
 			"Medium Sabre landing deals 40 primary and 12 splash damage, with wall occlusion")
+		print("SABRE_NOTIFY touchdown=", landings, " contacts=", contacts,
+			" health=", zombies.map(func(zombie): return zombie.health), " directions=", directions)
 		check(not directions.is_empty() and directions[0].dot(forward) > 0.999,
 			"The launched target uses the saved landing origin")
 	group.sabre_landing.disconnect(record_landing)
