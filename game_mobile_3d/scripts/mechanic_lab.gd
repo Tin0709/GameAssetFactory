@@ -68,6 +68,7 @@ var _slam_audio_point: Vector3
 var _contact_sparks: ContactSparks
 var _movement_audio: MovementAudio
 var _weapon_mesh: MeshInstance3D
+var _requested_weapon_mesh: MeshInstance3D
 var _equipped_weapon := Weapon.SABRE
 var _sabre_mesh: Mesh
 var _sword_mesh: Mesh
@@ -250,6 +251,12 @@ func _setup_weapon_selector() -> void:
 	if _weapon_mesh == null or not player.combo.native_enabled:
 		return
 	_sabre_mesh = _weapon_mesh.mesh
+	# The light rig stores surface overrides for the original Sabre mesh.
+	# Give these weapons a separate instance so each keeps its source material.
+	_requested_weapon_mesh = MeshInstance3D.new()
+	_requested_weapon_mesh.name = "LabRightWeapon"
+	_requested_weapon_mesh.hide()
+	_weapon_mesh.get_parent().add_child(_requested_weapon_mesh)
 	_sabre_blade_base = player.marker_base.position
 	_sabre_blade_tip = player.marker_tip.position
 	_sabre_profile = player.runtime_locomotion_profile.combat
@@ -319,8 +326,14 @@ func _select_weapon(index: int) -> void:
 			blade_tip = blade_base
 			aliases = {}
 			rates = {}
-	_weapon_mesh.mesh = mesh
-	_weapon_mesh.rotation.y = rotation_y
+	var use_requested_mesh := index in [Weapon.CROSS_POLLINATOR, Weapon.GAUNTLETS]
+	_weapon_mesh.visible = not use_requested_mesh
+	_requested_weapon_mesh.visible = use_requested_mesh
+	if use_requested_mesh:
+		_requested_weapon_mesh.mesh = mesh
+		_requested_weapon_mesh.rotation.y = rotation_y
+	else:
+		_weapon_mesh.mesh = mesh
 	if _left_gauntlet != null:
 		_left_gauntlet.visible = index == Weapon.GAUNTLETS
 	player.marker_base.position = blade_base
@@ -464,7 +477,15 @@ func _on_grounded_attack(index: int, clip: String, serial: int) -> void:
 	var forward: Vector3 = player.visual.global_basis.z.normalized()
 	# The exported model and local shot use the same right-hand origin.
 	var muzzle: Vector3 = player._weapon_attachment.global_position + player.visual.global_basis * Vector3(-0.05, 0.25, 0.25)
-	var direction: Vector3 = $Zombies.bolt_direction(muzzle, forward, serial)
+	var direction := forward
+	if player.combat_requested:
+		if player.has_aim_point:
+			var aim: Vector3 = player.aim_point - player.global_position
+			aim.y = 0.0
+			if not aim.is_zero_approx():
+				direction = aim.normalized()
+	else:
+		direction = $Zombies.bolt_direction(muzzle, forward, serial)
 	if _crossbow.fire(muzzle, direction, serial):
 		_combat_audio.crossbow_fired(muzzle)
 
