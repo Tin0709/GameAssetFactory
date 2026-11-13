@@ -103,11 +103,26 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) 
 		sample(sample_delta)
 		var shift := super._handoff_wall_clearance()
 		if idle_weight == 1.0 or _wall_handoff_is_clear(space, collision_mask, shift):
-			# The chosen pose has no observed velocity. Both snapshots must
-			# agree so the correction itself doesn't become a launch impulse.
-			sample(sample_delta)
-			return shift
+			return _preserve_wall_handoff_arms(space, collision_mask, source, shift)
 	return Vector3.ZERO
+
+func _preserve_wall_handoff_arms(space: PhysicsDirectSpaceState3D, collision_mask: int,
+		source: Array[Transform3D], shift: Vector3) -> Vector3:
+	# Restore as much local arm rotation as the resolved torso allows.
+	for name in ["Arm.L", "Arm.R"]:
+		var bone: int = _sample_bone_ids[name]
+		var safe_pose := skeleton.get_bone_pose(bone)
+		for weight: float in [1.0, 0.5, 0.25]:
+			skeleton.set_bone_pose(bone, safe_pose.interpolate_with(source[bone], weight))
+			sample(sample_delta)
+			if _wall_handoff_is_clear(space, collision_mask, shift):
+				safe_pose = skeleton.get_bone_pose(bone)
+				break
+		skeleton.set_bone_pose(bone, safe_pose)
+	# Both snapshots must agree so the correction itself doesn't become a launch impulse.
+	sample(sample_delta)
+	sample(sample_delta)
+	return shift
 
 func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: int, shift: Vector3) -> bool:
 	if _handoff_straddles_wall(space, collision_mask, shift, 0.0):
