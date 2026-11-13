@@ -113,6 +113,9 @@ func launch_ragdolls(group: Node, packed: bool) -> void:
 		zombie.reset_physics_interpolation()
 		if packed:
 			# Start from the known idle pose and remove teleport velocity.
+			zombie.rotation.y = atan2(-zombie.position.x, -zombie.position.z)
+			zombie.animation.stop()
+			zombie.ragdoll.skeleton.reset_bone_poses()
 			zombie.animation.play(ZOMBIE.IDLE, 0.0)
 			zombie.animation.advance(0.0)
 			zombie.ragdoll.sample(1.0 / 60.0)

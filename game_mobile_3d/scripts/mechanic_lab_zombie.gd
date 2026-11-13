@@ -692,16 +692,18 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 	var flat_floor := is_instance_valid(_corpse_floor)
 	var speed_scale := 1.0 if flat_floor else 0.5
 	var slow_support: bool = not normally_supported and not ragdoll.source_joints.is_empty() \
-		and motion.supports >= 2 and motion.core_supports > 0 and (not two_parts or motion.leg_supported) \
+		and motion.supports >= 2 \
 		and motion.linear <= CORPSE_SETTLE_SPEED * speed_scale and motion.angular <= CORPSE_SETTLE_SPIN * speed_scale
 	if slow_support:
 		if flat_floor:
-			# A wall can carry the upper body while the chest and legs rest
-			# on the flat floor. Let the existing pose window verify stability.
-			slow_support = not two_parts and motion.leg_supported and ragdoll.has_static_wall_contact() \
+			# A wall can carry the upper body while the floor carries the
+			# chest and legs, or both feet. Verify the pose stays put.
+			slow_support = motion.leg_supported and (not two_parts or motion.core_supports == 0) \
+				and ragdoll.has_flat_wall_rest_support(motion.core_supports > 0) \
 				and ragdoll.max_anchor_error() <= Ragdoll.SOURCE_ANCHOR_TOLERANCE
 		else:
-			slow_support = ragdoll.terrain_support_margin(two_parts) > CORPSE_TERRAIN_SUPPORT_MARGIN
+			slow_support = motion.core_supports > 0 and (not two_parts or motion.leg_supported) \
+				and ragdoll.terrain_support_margin(two_parts) > CORPSE_TERRAIN_SUPPORT_MARGIN
 	if not slow_support:
 		_terrain_rest_age = 0.0
 		_terrain_rest_poses.clear()

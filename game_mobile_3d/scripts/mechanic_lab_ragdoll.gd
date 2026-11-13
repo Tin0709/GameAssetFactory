@@ -89,8 +89,16 @@ func is_near_flat_floor(tolerance: float) -> bool:
 		minimum_y = minf(minimum_y, bounds.position.y)
 	return absf(minimum_y - floor_half.y) <= tolerance
 
-func has_static_wall_contact() -> bool:
-	for body: PhysicalBone3D in bodies.values():
+func has_flat_wall_rest_support(core_grounded: bool) -> bool:
+	if not core_grounded:
+		if _flat_floor.disabled:
+			return false
+		var floor_body := _flat_floor.get_parent()
+		if not _body_supported_by(bodies["Leg.L"], floor_body) \
+				or not _body_supported_by(bodies["Leg.R"], floor_body):
+			return false
+	for part in ["Head", "Chest"]:
+		var body: PhysicalBone3D = bodies[part]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if state == null:
 			continue
