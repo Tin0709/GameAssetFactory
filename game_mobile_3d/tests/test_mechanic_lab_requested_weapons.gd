@@ -164,5 +164,8 @@ func run() -> void:
 	equip(menu, 0)
 	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
 		"Switching back restores the original Sabre")
+	lab.queue_free()
+	await process_frame
+	await process_frame
 	print("MECHANIC_LAB_REQUESTED_WEAPONS failures=", failures)
 	quit(1 if failures else 0)
