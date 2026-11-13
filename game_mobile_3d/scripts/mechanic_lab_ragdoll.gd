@@ -6,6 +6,7 @@ const DEEP_CONTACT_SHARED_LIFT := 0.065
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
+const WALL_NECK_BRACE_MIN_GAP := 2.5 * SOURCE_ANCHOR_TOLERANCE
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
@@ -337,6 +338,7 @@ func _project_source_anchors() -> void:
 	# All five source joints share the chest. A side contact can block a
 	# limb's projection, so check whether the chest has room to meet it.
 	var motion := Vector3.ZERO
+	var neck_wall := RID()
 	var largest_gap := 2.0 * SOURCE_ANCHOR_TOLERANCE
 	var chest: PhysicalBone3D = bodies.Chest
 	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
@@ -349,8 +351,6 @@ func _project_source_anchors() -> void:
 			and chest_state.get_contact_count() == 0
 		for name in ["Head", "Arm.L", "Arm.R"]:
 			var is_arm: bool = name != "Head"
-			if not is_arm and chest_state.get_contact_count() > 0:
-				continue
 			var limb: PhysicalBone3D = bodies[name]
 			var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
 			if state == null or state.get_contact_count() == 0:
@@ -362,7 +362,15 @@ func _project_source_anchors() -> void:
 			if distance <= largest_gap:
 				continue
 			var shift := _wall_anchor_motion(state, gap, not is_arm or not first_contact, is_arm)
-			if not is_arm and shift.is_zero_approx():
+			var braced_neck := not is_arm and chest_state.get_contact_count() > 0
+			var wall := RID()
+			if braced_neck:
+				if distance <= WALL_NECK_BRACE_MIN_GAP:
+					continue
+				wall = _shared_wall_contact(chest_state, state, shift)
+				if not wall.is_valid():
+					continue
+			elif not is_arm and shift.is_zero_approx():
 				# The head can still be moving inward while the wall pins its
 				# anchor. Confirm the block and follow the torso's retreat.
 				shift = _wall_anchor_motion(state, gap, false)
@@ -376,6 +384,7 @@ func _project_source_anchors() -> void:
 			if not shift.is_zero_approx():
 				largest_gap = distance
 				motion = shift
+				neck_wall = wall
 		if motion.is_zero_approx():
 			return
 
@@ -403,6 +412,8 @@ func _project_source_anchors() -> void:
 		if not _test_projection_motion(chest, chest_state.transform, motion):
 			chest_state.transform = chest_state.transform.translated(motion)
 			return
+		if neck_wall.is_valid() and _reduce_chest_wall_overlap(chest, chest_state, motion, neck_wall):
+			return
 		if extended_arm_shift and recent_handoff:
 			# The forward sweep reports the torso's existing wall overlap.
 			# The shared escape test checks clearance at the other end and
@@ -422,6 +433,37 @@ func _wall_chest_shift_preserves_joints(gaps: Array[Vector3], largest_gap: float
 	for gap: Vector3 in gaps:
 		if (gap + motion).length() > largest_gap:
 			return false
+	return true
+
+func _shared_wall_contact(chest: PhysicsDirectBodyState3D, head: PhysicsDirectBodyState3D,
+		motion: Vector3) -> RID:
+	if motion.is_zero_approx():
+		return RID()
+	var away := motion.normalized()
+	var wall := chest.get_contact_collider(0)
+	for index in chest.get_contact_count():
+		if chest.get_contact_collider(index) != wall or chest.get_contact_local_normal(index).dot(away) < 0.95:
+			return RID()
+	for index in head.get_contact_count():
+		if head.get_contact_collider(index) == wall and head.get_contact_local_normal(index).dot(away) >= 0.95:
+			return wall
+	return RID()
+
+func _reduce_chest_wall_overlap(chest: PhysicalBone3D, state: PhysicsDirectBodyState3D,
+		motion: Vector3, wall: RID) -> bool:
+	# Both boxes hit the same face. The chest can retreat even if 3 cm
+	# is insufficient to clear its starting overlap in one physics tick.
+	var start := state.transform
+	if _test_projection_motion(chest, start, motion, wall):
+		return false
+	var depth := _deepest_contact(_terrain_contact_points(chest, state, Vector3.ZERO))
+	var halfway := _deepest_contact(_terrain_contact_points(chest, state, motion * 0.5))
+	var end := _deepest_contact(_terrain_contact_points(chest, state, motion))
+	var distance := motion.length()
+	if depth <= PROJECTION_COLLISION_MARGIN or halfway >= depth or end >= halfway \
+			or end > maxf(depth - distance, 0.0) + 2.0 * PROJECTION_COLLISION_MARGIN:
+		return false
+	state.transform = start.translated(motion)
 	return true
 
 func _wall_anchor_motion(state: PhysicsDirectBodyState3D, gap: Vector3, require_rebound: bool,
