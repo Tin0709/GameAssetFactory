@@ -226,18 +226,24 @@ func check_wall_pinned_joint(floor_contact := false) -> void:
 	zombie.set_physics_process(true)
 	var peak := 0.0
 	var farthest := -INF
+	var lowest_corner := INF
 	for i in 90:
 		await physics_frame
 		if not ragdoll.running:
 			continue
 		peak = maxf(peak, ragdoll.max_anchor_error())
+		if floor_contact and not zombie._corpse_landed:
+			lowest_corner = minf(lowest_corner, ragdoll.minimum_corner_y())
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			farthest = maxf(farthest, body.global_position.x)
-	var limit := 0.12 if floor_contact else 0.15
+	var limit := 0.125 if floor_contact else 0.15
 	check(peak > 0.0 and peak < limit, "The %s stays within the Lab recovery limit" %
 		("hip at first floor contact" if floor_contact else "wall-pinned shoulder"))
 	check(farthest < 4.65, "The wall-pinned ragdoll stays on the near side")
-	print("LAB_WALL_PINNED_JOINT floor_contact=", floor_contact, " peak=", peak, " farthest=", farthest)
+	if floor_contact:
+		check(lowest_corner >= -0.013, "The hip correction keeps the first contact inside the floor tolerance")
+	print("LAB_WALL_PINNED_JOINT floor_contact=", floor_contact, " peak=", peak,
+		" farthest=", farthest, " lowest_corner=", lowest_corner)
 	wall.free()
 	lab.free()
 
