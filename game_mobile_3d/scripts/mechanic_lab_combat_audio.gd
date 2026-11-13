@@ -191,7 +191,8 @@ func zombie_attack(point: Vector3, contact: bool) -> void:
 			ZOMBIE_HIT_GAIN_DB if contact else ZOMBIE_WINDUP_GAIN_DB)
 
 func can_play_zombie_step(point: Vector3, listener: Vector3) -> bool:
-	if not enabled or not _groups.has(&"zombie_step") +			or point.distance_squared_to(listener) > ZOMBIE_STEP_DISTANCE * ZOMBIE_STEP_DISTANCE:
+	if (not enabled or not _groups.has(&"zombie_step")
+			or point.distance_squared_to(listener) > ZOMBIE_STEP_DISTANCE * ZOMBIE_STEP_DISTANCE):
 		return false
 	for slot in VOICES_PER_POOL:
 		if not _voices[STEP_POOL * VOICES_PER_POOL + slot].playing:

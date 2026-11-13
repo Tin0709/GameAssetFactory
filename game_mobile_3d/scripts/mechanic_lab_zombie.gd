@@ -334,7 +334,8 @@ func _integrate_knockback(delta: float) -> Vector3:
 func _advance_animation(delta: float) -> void:
 	var clip := animation.current_animation
 	if clip != ATTACK:
-		var play_steps := step_audio.has_connections() and clip in WALK_STEP_FRAMES and is_on_floor() +			and not _skipped_blocked_step and get_real_velocity().slide(Vector3.UP).length_squared() >= STEP_MIN_SPEED_SQUARED
+		var play_steps := (step_audio.has_connections() and clip in WALK_STEP_FRAMES and is_on_floor()
+			and not _skipped_blocked_step and get_real_velocity().slide(Vector3.UP).length_squared() >= STEP_MIN_SPEED_SQUARED)
 		var previous_phase := animation.current_animation_position if play_steps else 0.0
 		animation.advance(delta)
 		if play_steps:
