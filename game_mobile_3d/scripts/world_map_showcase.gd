@@ -2544,7 +2544,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Adjust the base glow radius independently of Bloom brightness. Leaves the approved noon look intact."
 		if effect == &"daylight_haze":
 			slider.editable = DepthDiffusion.supported(level.get_viewport())
-			slider.tooltip_text = "Soften the distant lit mist in the morning and afternoon. 0% restores the prior finish. Requires Mobile Vulkan or D3D12 with sampleable 2× MSAA depth."
+			slider.tooltip_text = "Soften the distant lit mist in the morning and afternoon. 0% restores the prior finish. Requires sampleable 2× or 4× MSAA depth on Mobile Vulkan or D3D12."
 		if effect == &"daylight_haze_spill":
 			slider.editable = DepthDiffusion.supported(level.get_viewport())
 			slider.tooltip_text = "Blend from the earlier daylight haze to light spilling from bright areas into nearby shade. Requires Daylight haze softness."
@@ -2552,7 +2552,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Soften lit areas into the surrounding haze. Try 65% at 16:30. Requires Combined mist and the Mobile Forest finish. Noon keeps its approved look."
 		if effect == &"humid_depth":
 			slider.editable = DepthDiffusion.supported(level.get_viewport())
-			slider.tooltip_text = "At 100%, move Humid light diffusion from near surfaces to the distant mist. Try Humid light diffusion at 65% and time 16:30. Requires Mobile Vulkan or D3D12 with sampleable 2× MSAA depth."
+			slider.tooltip_text = "At 100%, move Humid light diffusion from near surfaces to the distant mist. Try Humid light diffusion at 65% and time 16:30. Requires sampleable 2× or 4× MSAA depth on Mobile Vulkan or D3D12."
 		if effect == &"tree_wind":
 			slider.tooltip_text = "Adjust sway for the source oaks and spruces. 100% is the previous response, 125% is the new default. Alt+N toggles sway."
 		if effect == &"night_path_chroma":

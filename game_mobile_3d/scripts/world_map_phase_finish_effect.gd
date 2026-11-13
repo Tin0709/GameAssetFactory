@@ -223,7 +223,7 @@ func _append_diffusion_depth(rd: RenderingDevice, uniforms: Array[RDUniform]) ->
  _guard.unlock()
  if data.size() != DepthDiffusion.SETTINGS_SIZE:
   return ""
- var storage := _keep(rd.storage_buffer_create(DepthDiffusion.SETTINGS_SIZE, data))
+ var storage := _keep(rd.storage_buffer_create(DepthDiffusion.GPU_SETTINGS_SIZE, _depth_diffusion.gpu_parameters(data)))
  var depth_sampler := _sampler(rd, RenderingDevice.SAMPLER_FILTER_NEAREST)
  var mist_sampler := _sampler(rd, RenderingDevice.SAMPLER_FILTER_LINEAR)
  if not storage.is_valid() or not depth_sampler.is_valid() or not mist_sampler.is_valid():
