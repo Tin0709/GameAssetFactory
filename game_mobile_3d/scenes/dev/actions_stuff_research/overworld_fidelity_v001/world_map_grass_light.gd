@@ -4,6 +4,7 @@ const GROUND_SKY_PATH = "res://assets/graphics/world_map_terrain_transport_v001/
 var world:Node3D
 var configured:=false
 var active:=false
+var edge_sampling_active:=false
 var error:=""
 var weight:=0.
 var _records:Array[Dictionary]=[]
@@ -45,7 +46,7 @@ func supported()->bool:
 func restore()->void:
 	for row:Dictionary in _records:
 		if preload("res://scripts/world_map_atmosphere_volume.gd").base_shader(row.material.shader)==row.variant:row.material.shader=row.original
-	_records.clear();active=false
+	_records.clear();active=false;edge_sampling_active=false
 	_ground_sky_state=Vector4.INF
 	_grass_shade_color = Vector3.INF
 	_turf_ambient_color = Vector3.INF
@@ -54,24 +55,28 @@ func restore()->void:
 	_twilight_ambient = -1.
 	_shadow_height_scale = -1.
 
-func apply(materials:Array[ShaderMaterial],enabled:bool)->void:
+func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->void:
 	restore()
 	if not enabled or not supported():return
 	for material:ShaderMaterial in materials:
 		if material.get_shader_parameter("tinted_grass")!=true:continue
 		var source:Shader=preload("res://scripts/world_map_atmosphere_volume.gd").base_shader(material.shader)
-		if not _variants.has(source):
+		var variants:Dictionary=_variants.get_or_add(source,{})
+		if not variants.has(edge_sampling):
 			var variant:=Shader.new();variant.resource_name="Grass lighting · captured world normal"
 			var header:="shader_type spatial;\n#define GAF_REFERENCE_GRASS_LIGHTING"
+			if edge_sampling:header+="\n#define GAF_GRASS_EDGE_SAMPLING"
 			if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):header+="\n#define GAF_GRASS_FORCE_LAMBERT"
 			variant.code=source.code.replace("shader_type spatial;",header)
-			_variants[source]=variant
-		var shader:Shader=_variants[source]
+			variants[edge_sampling]=variant
+		var shader:Shader=variants[edge_sampling]
 		_records.append({"material":material,"original":source,"variant":shader})
 		material.shader=shader
+		if edge_sampling:material.set_shader_parameter("edge_atlas",material.get_shader_parameter("atlas"))
 		material.set_shader_parameter("study_grass_up_weight",weight)
 		material.set_shader_parameter("study_transmission",.1248)
 	active=not _records.is_empty()
+	edge_sampling_active=active and edge_sampling
 	if world.terrain_light != null:
 		bind_regional_sky(world.terrain_light)
 	sync()

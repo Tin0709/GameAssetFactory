@@ -12,6 +12,7 @@ var grass_wind:RefCounted
 var recovered_wind_enabled:=true
 var grass_light:RefCounted
 var grass_lighting_enabled:=true
+var grass_edge_sampling_enabled:=true
 var grass_splay:RefCounted
 var grass_splay_enabled:=true
 var dense_grass_review:=true
@@ -76,9 +77,17 @@ func _refresh_grass_wind()->void:
 func set_grass_lighting(value:bool)->void:
 	grass_lighting_enabled=value;_refresh_grass_lighting()
 
+func set_grass_edge_sampling(value:bool)->void:
+	if value==grass_edge_sampling_enabled:return
+	grass_edge_sampling_enabled=value
+	_refresh_grass_lighting()
+
+func _grass_edge_sampling_wanted()->bool:
+	return grass_edge_sampling_enabled and get_viewport().msaa_3d != Viewport.MSAA_DISABLED
+
 func _refresh_grass_lighting()->void:
 	if grass_light==null:return
-	grass_light.apply(materials,grass_lighting_enabled and world.look.stage==2)
+	grass_light.apply(materials,grass_lighting_enabled and world.look.stage==2,_grass_edge_sampling_wanted())
 	for node:Node in get_children():
 		if node is MultiMeshInstance3D:
 			node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_ON if grass_light.active and node.get_meta("green_grass",false) else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -276,7 +285,8 @@ func _process(_delta:float)->void:
 	if not visible:return
 	if grass_light!=null:
 		var wanted:bool=grass_lighting_enabled and world.look.stage==2 and grass_light.supported()
-		if wanted!=grass_light.active:_refresh_grass_lighting()
+		if wanted!=grass_light.active or (wanted and _grass_edge_sampling_wanted()!=grass_light.edge_sampling_active):
+			_refresh_grass_lighting()
 		grass_light.sync()
 	present(Engine.get_physics_interpolation_fraction())
 	var displayed:float=world.presentation.wind_time(clock) if world.presentation.enabled else clock

@@ -2837,6 +2837,14 @@ func _build_ui()->void:
 	if plants!=null:
 		var grass_light:=CheckButton.new();grass_light.text="Grass lighting · MD2 study";grass_light.button_pressed=plants.grass_lighting_enabled
 		grass_light.focus_mode=Control.FOCUS_NONE;box.add_child(grass_light);grass_light.toggled.connect(plants.set_grass_lighting)
+		var grass_edges:=CheckButton.new()
+		grass_edges.name="GrassEdgeSampling"
+		grass_edges.text="Khử răng cưa mép cỏ"
+		grass_edges.tooltip_text="Làm mượt mép cắt của cỏ khi dùng Mobile MSAA. Giữ màu pixel và hình dạng bóng cỏ."
+		grass_edges.button_pressed=plants.grass_edge_sampling_enabled
+		grass_edges.focus_mode=Control.FOCUS_NONE
+		box.add_child(grass_edges)
+		grass_edges.toggled.connect(plants.set_grass_edge_sampling)
 		var splay:=CheckButton.new();splay.text="Grass spread · captured inclinations";splay.button_pressed=plants.grass_splay_enabled
 		splay.focus_mode=Control.FOCUS_NONE;box.add_child(splay);splay.toggled.connect(plants.set_grass_splay)
 		var gusts:=CheckButton.new();gusts.text="Grass gusts · recovered MD2 wind";gusts.button_pressed=plants.recovered_wind_enabled

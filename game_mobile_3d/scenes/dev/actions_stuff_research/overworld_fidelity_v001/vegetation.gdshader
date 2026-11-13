@@ -2,7 +2,11 @@ shader_type spatial;
 #ifdef GAF_SHARED_MIST
 #include "res://materials/world_map_mist.gdshaderinc"
 #endif
+#ifdef GAF_GRASS_EDGE_SAMPLING
+render_mode cull_disabled, diffuse_burley, specular_disabled, alpha_to_coverage_and_one;
+#else
 render_mode cull_disabled, diffuse_burley, specular_disabled;
+#endif
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_splay.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_wind.gdshaderinc"
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
@@ -58,6 +62,9 @@ vec4 grass_ground_sky(vec2 world_position) {
 }
 #endif
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
+#ifdef GAF_GRASS_EDGE_SAMPLING
+uniform sampler2D edge_atlas : filter_linear, repeat_disable;
+#endif
 uniform sampler2D mre_map : filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
 uniform sampler2D interaction_previous : filter_linear, repeat_disable;
@@ -181,6 +188,17 @@ void fragment(){
 	color = gaf_dawn_turf_chroma(color, vec3(1.21, 1.0, 1.08), 0.68 * dawn_turf);
 #endif
 	ALBEDO=color;ALPHA=texel.a;ALPHA_SCISSOR_THRESHOLD=cutoff;
+#ifdef GAF_GRASS_EDGE_SAMPLING
+	// Filter coverage from the same atlas, separately from the nearest color.
+	// Retain the original binary shape for the shadow-map pass.
+	ALPHA_ANTIALIASING_EDGE=0.0;
+	if(!IN_SHADOW_PASS){
+		ALPHA=texture(edge_atlas,UV).a;
+		ALPHA_SCISSOR_THRESHOLD=min(cutoff,0.02);
+		ALPHA_ANTIALIASING_EDGE=cutoff-ALPHA_SCISSOR_THRESHOLD;
+		ALPHA_TEXTURE_COORDINATE=UV*vec2(textureSize(edge_atlas,0));
+	}
+#endif
 	if(ground_mask_enabled){
 		vec2 mask_uv=(floor(foliage_world.xz)-ground_coverage_origin+vec2(0.5))/ground_coverage_extent;
 		float inside=step(0.0,mask_uv.x)*step(mask_uv.x,1.0)*step(0.0,mask_uv.y)*step(mask_uv.y,1.0);
