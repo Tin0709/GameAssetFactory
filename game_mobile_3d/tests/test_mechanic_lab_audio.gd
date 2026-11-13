@@ -421,6 +421,10 @@ func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 		check(heard_damage == 6 and local_voice.stream in audio._groups[&"player_hurt"]
 			and audio._next_choice.get(&"player_hurt", 0) == 1,
 			"Confirmed zombie contact starts the player-hurt voice in the same physics tick")
+		# The spatial hit queue drains in the render callback, which can
+		# follow more than one physics tick at low render rates.
+		await process_frame
+		await process_frame
 		check(audio._next_choice.get(&"zombie_hit", 0) == 1, "A confirmed strike also plays the zombie's contact cue")
 		await create_timer(0.16).timeout
 		var peak := 0.0
