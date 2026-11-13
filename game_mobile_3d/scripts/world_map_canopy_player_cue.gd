@@ -21,7 +21,7 @@ func sync(level: Node, strength: float) -> void:
 		var noon_distance: float = absf(level.showcase.hour - 12.0)
 		target = strength * smoothstep(0.0, 0.5, noon_distance)
 	if target > 0.0 and not _attempted:
-		_build(level.look.actor_materials)
+		_build(level.look.actor_materials, level.player.render_presenter)
 	if meshes.is_empty():
 		target = 0.0
 	if target == weight:
@@ -36,7 +36,7 @@ func sync(level: Node, strength: float) -> void:
 	for material in _cue_materials:
 		material.set_shader_parameter("cue_weight", target)
 
-func _build(surfaces: Array[Array]) -> void:
+func _build(surfaces: Array[Array], presenter: Node) -> void:
 	_attempted = true
 	var copies: Dictionary[MeshInstance3D, MeshInstance3D] = {}
 	for row: Array in surfaces:
@@ -48,6 +48,7 @@ func _build(surfaces: Array[Array]) -> void:
 			proxy.mesh = source.mesh
 			proxy.skin = source.skin
 			proxy.layers = source.layers
+			proxy.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 			proxy.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			proxy.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
 			proxy.hide()
@@ -55,6 +56,7 @@ func _build(surfaces: Array[Array]) -> void:
 			var skeleton := source.get_node_or_null(source.skeleton)
 			if skeleton is Skeleton3D:
 				proxy.skeleton = proxy.get_path_to(skeleton)
+			presenter.add_mesh_follower(source, proxy)
 			copies[source] = proxy
 			meshes.append(proxy)
 		var opacity: BaseMaterial3D = row[3]

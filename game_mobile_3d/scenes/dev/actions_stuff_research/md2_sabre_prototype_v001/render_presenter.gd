@@ -19,6 +19,12 @@ var render_alpha:=1.
 var enabled:=true
 var presented_frames:=0
 var last_uploaded_actor:=Vector3.ZERO
+var mesh_followers: Dictionary[int, RID] = {}
+
+func add_mesh_follower(source: MeshInstance3D, follower: MeshInstance3D) -> void:
+	var index := meshes.find(source)
+	if index >= 0:
+		mesh_followers[index] = follower.get_instance()
 
 func setup(body:CharacterBody3D)->void:
 	actor=body;rig=actor.skeleton;actor._refresh_markers()
@@ -112,6 +118,8 @@ func _upload()->void:
 	for index in meshes.size():
 		var mesh:=meshes[index];var record:Dictionary=bindings[index]
 		RenderingServer.instance_set_transform(mesh.get_instance(),display_meshes[index])
+		if mesh_followers.has(index):
+			RenderingServer.instance_set_transform(mesh_followers[index], display_meshes[index])
 		if record.skin==null:continue
 		var inverse:=display_meshes[index].affine_inverse()
 		var skin_reference:SkinReference=record.skin
