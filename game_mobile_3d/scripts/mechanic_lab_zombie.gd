@@ -64,6 +64,8 @@ const SABRE_ROLL_RESPONSE_TIME := 0.10
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
 const HEIGHT := 1.95
 const CHASE_SPEED := 3.1
+const CROWD_RETRY_MIN_ZOMBIES := 32
+const BLOCKED_CHASE_RETRY_HZ := 30.0
 const BLOCKED_CHASE_MAX_SPEED_SQUARED := 0.01
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
@@ -288,17 +290,19 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0.0
 	else:
 		velocity += get_gravity() * _gravity_scale(ZOMBIE_GRAVITY) * delta
-	var chasing := not pushed and controlled_time == delta and not travel.is_zero_approx() \
+	var crowd := is_instance_valid(_corpse_floor) and get_parent().get_child_count() >= CROWD_RETRY_MIN_ZOMBIES
+	var chasing := crowd and not pushed and controlled_time == delta and not travel.is_zero_approx() \
 		and animation.current_animation in WALK_CLIPS
-	var crowd := is_instance_valid(_corpse_floor) and get_parent().get_child_count() >= 32
-	var retry_stride := maxi(1, roundi(Engine.physics_ticks_per_second / 30.0))
-	_skipped_blocked_step = crowd and chasing and _blocked_chase and is_on_floor() \
-		and Engine.get_physics_frames() % retry_stride != _crowd_slot % retry_stride
+	_skipped_blocked_step = false
+	if chasing and _blocked_chase and is_on_floor():
+		# Spread collision retries across zombies. Keep animation and pose history
+		# on the full physics clock, including frames without a movement query.
+		var stride := maxi(1, roundi(Engine.physics_ticks_per_second / BLOCKED_CHASE_RETRY_HZ))
+		_skipped_blocked_step = Engine.get_physics_frames() % stride != _crowd_slot % stride
 	if not _skipped_blocked_step:
 		move_and_slide()
-		var actual := get_real_velocity()
-		_blocked_chase = crowd and chasing and is_on_floor() and is_on_wall() \
-			and Vector2(actual.x, actual.z).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
+		_blocked_chase = chasing and is_on_floor() and is_on_wall() \
+			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
 	_advance_animation(delta)
 	ragdoll.sample(delta)
 
