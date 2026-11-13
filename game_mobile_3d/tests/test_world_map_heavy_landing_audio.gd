@@ -71,6 +71,17 @@ func run() -> void:
 			attack(false)
 			await ticks(105)
 			check(audio._next_choice.get(cue, 0) == 1, "A real dive plays exactly one %s sample" % cue)
+			world.player.global_position = landings[cue] + Vector3.UP * 0.02
+			world.player.cancel_jump()
+			await ticks(12)
+			var surface := String(cue).trim_prefix("slam_")
+			var ordinary_cue := "land_" + surface
+			var landing_count: int = movement.event_count.landing
+			check(world.player.drop_for_lab(5.0), "The ordinary %s fixture starts over terrain" % surface)
+			await ticks(110)
+			check(movement.event_count.landing == landing_count + 1
+				and movement.last_sources.get(ordinary_cue, "").begins_with("sfx_player_land_" + surface + "_"),
+				"A real ordinary drop plays one MD2 %s landing sample" % surface)
 		check(audio._next_choice.size() == 3, "Grass, dirt and stone are independent playback groups")
 		world.showcase.set_audio_enabled(false)
 		check(AudioServer.is_bus_mute(0) and audio._voices.all(func(v): return not v.playing and v.stream == null),
