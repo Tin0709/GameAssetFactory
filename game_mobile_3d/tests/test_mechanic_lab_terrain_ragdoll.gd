@@ -370,25 +370,29 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 		" farthest=", farthest, " rebound=", rebounded, " overlap=", overlap)
 	lab.free()
 
-func check_corner_shoulder() -> void:
+func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
 	var first_wall := terrain(lab, Vector3(4.5, 1.5, -1.85), Vector3(0.30, 3.0, 12.4), 0.0)
 	var second_wall := terrain(lab, Vector3(-1.70, 1.5, 4.5), Vector3(12.7, 3.0, 0.30), 0.0)
 	var group := lab.get_node("Zombies")
-	group._spawn_serial = 1970
+	group._spawn_serial = 1800 + seed
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	if group.get_child_count() != 1:
+		check(false, "The closed corner fixture loads a source zombie")
+		lab.free()
+		return
 	var zombie = group.get_child(0)
 	zombie.set_physics_process(false)
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 472201
-	var gap := rng.randf_range(0.47, 0.70)
+	rng.seed = 472031 + seed
+	var gap := rng.randf_range(0.47, 0.70) if seed < 64 else rng.randf_range(0.9, 3.0)
 	zombie.global_position = Vector3(4.35 - gap, 0.02, 4.35 - gap + rng.randf_range(-0.035, 0.035))
 	zombie.rotation.y = rng.randf_range(-PI, PI)
 	zombie.animation.stop()
 	zombie.ragdoll.skeleton.reset_bone_poses()
-	zombie.animation.play(zombie.ATTACK)
+	zombie.animation.play(zombie.ATTACK if seed % 2 == 0 else zombie.WALK_CLIPS[seed % 3])
 	zombie.animation.advance(0.0)
 	zombie.animation.seek(rng.randf_range(0.05, 0.40), true)
 	await ticks(2)
@@ -400,7 +404,7 @@ func check_corner_shoulder() -> void:
 	var peak_gap := 0.0
 	var farthest := 0.0
 	var walls_hit := {}
-	for i in 120:
+	for i in roundi(settle_seconds * 60.0):
 		await physics_frame
 		if zombie._corpse_parked:
 			break
@@ -414,10 +418,14 @@ func check_corner_shoulder() -> void:
 				var collider := state.get_contact_collider_object(index)
 				if collider == first_wall or collider == second_wall:
 					walls_hit[collider] = true
-	check(walls_hit.size() == 2 and farthest < 4.65 and zombie._corpse_parked,
-		"The Sabre ragdoll meets both faces of the closed corner and settles on the near side")
-	check(peak_gap > 0.0 and peak_gap < 0.23, "The shoulder can slide toward its anchor along the corner wall")
-	print("LAB_CORNER_SHOULDER gap=", peak_gap, " farthest=", farthest, " walls=", walls_hit.size())
+	check(walls_hit.size() == 2 and farthest < 4.65,
+		"The Sabre ragdoll meets both faces of the closed corner and stays on the near side")
+	check(zombie._corpse_parked == should_settle and (not should_settle or zombie.ragdoll.bodies.is_empty()),
+		"The corner ragdoll %d has the expected rest state" % seed)
+	if seed == 170:
+		check(peak_gap > 0.0 and peak_gap < 0.23, "The shoulder can slide toward its anchor along the corner wall")
+	print("LAB_CORNER seed=", seed, " gap=", peak_gap, " farthest=", farthest, " walls=", walls_hit.size(),
+		" parked=", zombie._corpse_parked, " seconds=", zombie._corpse_age)
 	lab.free()
 
 func run() -> void:
@@ -431,7 +439,9 @@ func run() -> void:
 	await check_wall_pinned_joint()
 	await check_wall_pinned_joint(true)
 	await check_edge_landing_gravity()
-	await check_corner_shoulder()
+	await check_corner_ragdoll(170, 2.0)
+	await check_corner_ragdoll(65, 4.25)
+	await check_corner_ragdoll(29, 4.25, false)
 	await check_wall_rebound(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,
