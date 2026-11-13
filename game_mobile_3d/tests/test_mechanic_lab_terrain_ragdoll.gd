@@ -140,7 +140,10 @@ func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame:
 	zombie.global_position = Vector3(0, 0.02, 0)
 	zombie.rotation.y = TAU * facing / 16.0
 	await ticks(2)
+	zombie.animation.stop()
+	zombie.ragdoll.skeleton.reset_bone_poses()
 	zombie.animation.play(clip, 0.0)
+	zombie.animation.advance(0.0)
 	zombie.animation.seek(float(source_frame) / 30.0, true)
 	var ragdoll = zombie.ragdoll
 	ragdoll.sample(1.0 / 60.0)

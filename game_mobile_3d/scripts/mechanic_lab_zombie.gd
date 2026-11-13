@@ -213,6 +213,8 @@ func _ready() -> void:
 	animation.play(SPAWN)
 	animation.advance(0)
 	ragdoll = Ragdoll.new()
+	ragdoll.wall_handoff_animation = animation
+	ragdoll.wall_handoff_idle = IDLE
 	add_child(ragdoll)
 	var skeleton := find_child("Skeleton3D", true, false) as Skeleton3D
 	var source := _ragdoll_layout

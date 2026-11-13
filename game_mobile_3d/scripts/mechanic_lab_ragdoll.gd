@@ -8,6 +8,8 @@ var _sample_bone_ids: Dictionary[String, int]
 var _sample_body_offsets: Dictionary[String, Transform3D]
 var _sampled_skeleton_transform: Transform3D
 var _source_joint_biases: Dictionary[RID, float]
+var wall_handoff_animation: AnimationPlayer
+var wall_handoff_idle: StringName
 
 static var _handoff_bounds_shape: BoxShape3D
 static var _handoff_bounds_query: PhysicsShapeQueryParameters3D
@@ -77,7 +79,36 @@ func _handoff_wall_clearance() -> Vector3:
 	var space := skeleton.get_world_3d().direct_space_state
 	if space.intersect_shape(_handoff_bounds_query, 1).is_empty():
 		return Vector3.ZERO
+	if wall_handoff_animation != null and _handoff_straddles_wall(space, collision_mask):
+		# Keep the authored body offsets and joints together when an animated
+		# limb is already across a wall. Starting those bodies as captured can
+		# send the limb and torso in opposite directions on the first solve.
+		wall_handoff_animation.stop()
+		skeleton.reset_bone_poses()
+		wall_handoff_animation.play(wall_handoff_idle)
+		wall_handoff_animation.advance(0.0)
+		wall_handoff_animation.pause()
+		sample(sample_delta)
+		sample(sample_delta)
 	return super._handoff_wall_clearance()
+
+func _handoff_straddles_wall(space: PhysicsDirectSpaceState3D, collision_mask: int) -> bool:
+	var ray := PhysicsRayQueryParameters3D.new()
+	ray.collision_mask = collision_mask
+	var origin := skeleton.global_position
+	for pose: Transform3D in current.values():
+		ray.from = Vector3(origin.x, pose.origin.y, origin.z)
+		ray.to = pose.origin
+		if ray.from.distance_squared_to(ray.to) <= SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
+			continue
+		var hit := space.intersect_ray(ray)
+		if hit.is_empty() or not hit.collider is StaticBody3D:
+			continue
+		var normal: Vector3 = hit.normal
+		var point: Vector3 = hit.position
+		if absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - ray.to) > SOURCE_ANCHOR_TOLERANCE:
+			return true
+	return false
 
 func is_near_flat_floor(tolerance: float) -> bool:
 	var floor_box := _flat_floor.shape as BoxShape3D
