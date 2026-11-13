@@ -403,7 +403,7 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	var group := lab.get_node("Zombies")
 	var button := lab.get_node("HUD/SpawnZombie") as Button
 	button.pressed.emit()
-	var zombie = group.get_child(0)
+	var zombie := group.get_child(0) as ZOMBIE
 	zombie.global_position = Vector3(0.0, 0.02, 9.0)
 	var contacts: Array[Dictionary] = []
 	group.zombie_step_audio.connect(func(point):
@@ -429,15 +429,34 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	for i in 100:
 		await physics_frame
 	check(contacts.size() == before_death, "Airborne and settled corpses post no walking sounds")
+	for clip_index in range(1, ZOMBIE.WALK_CLIPS.size()):
+		button.pressed.emit()
+		zombie = group.get_child(group.get_child_count() - 1) as ZOMBIE
+		zombie.global_position = Vector3(0.0, 0.02, 10.0)
+		var variant_phases: Array[float] = []
+		var sample := func(_point: Vector3): variant_phases.append(zombie.animation.current_animation_position)
+		zombie.step_audio.connect(sample)
+		for i in 240:
+			await physics_frame
+			if variant_phases.size() == 3:
+				break
+		check(zombie._walk_clip == ZOMBIE.WALK_CLIPS[clip_index] and variant_phases.size() == 3
+			and absf(variant_phases[0] - 22.0 / 30.0) < 0.018
+			and absf(variant_phases[1] - 45.0 / 30.0) < 0.018
+			and absf(variant_phases[2] - 22.0 / 30.0) < 0.018,
+			"The zombie walk variant keeps both contacts and repeats correctly across the loop")
+		zombie.free()
 	audio.reset()
+	var before_overflow: int = audio._next_choice.get(&"zombie_step", 0)
 	var near: Vector3 = lab.player.global_position + Vector3.FORWARD * 2.0
 	lab._on_zombie_step(near + Vector3.FORWARD * 30.0)
 	lab._on_zombie_step(near + Vector3.UP * 2.0)
-	check(audio._next_choice.get(&"zombie_step", 0) == 2, "Distant and unsupported contacts produce no cue")
+	check(audio._next_choice.get(&"zombie_step", 0) == before_overflow,
+		"Distant and unsupported contacts produce no cue")
 	for i in 100:
 		lab._on_zombie_step(near)
 	check(voices.size() == 3 and voices.all(func(voice): return voice.playing)
-		and audio._next_choice.get(&"zombie_step", 0) == 0,
+		and audio._next_choice.get(&"zombie_step", 0) == (before_overflow + 3) % step_samples.size(),
 		"A 100-step burst uses only three voices without restarting them")
 	audio.zombie_attack(near, false)
 	check(audio._next_choice.get(&"zombie_windup", 0) == 1, "Step overflow leaves a telegraph voice available")
@@ -445,7 +464,8 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	check(voices.all(func(voice): return not voice.playing and voice.stream == null),
 		"Muting the lab stops all step voices")
 	lab._on_zombie_step(near)
-	check(audio._next_choice.get(&"zombie_step", -1) == 0, "A muted foot contact starts no sample")
+	check(audio._next_choice.get(&"zombie_step", -1) == (before_overflow + 3) % step_samples.size(),
+		"A muted foot contact starts no sample")
 	print("MECHANIC_LAB_ZOMBIE_STEP_AUDIO phases=", phases, " peak=", peak)
 	lab.free()
 
