@@ -28,8 +28,8 @@ func sync(level: Node, strength: float) -> void:
 		return
 	var stencil_changed := (target > 0.0) != (weight > 0.0)
 	weight = target
+	level.grove.set_player_cue_weight(target)
 	if stencil_changed:
-		level.grove.set_player_cue_active(target > 0.0)
 		level.look.refresh_grove_lighting()
 	for proxy in meshes:
 		proxy.visible = target > 0.0

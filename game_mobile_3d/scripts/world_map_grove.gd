@@ -92,6 +92,7 @@ const TRUNK_HEIGHT := 2.6
 
 var _appearance := ShaderMaterial.new()
 var _canopy_appearance := ShaderMaterial.new()
+var player_cue_weight := 0.0
 var _canopy_shadow := ShaderMaterial.new()
 var _direct_clouds := false
 var _mist_strength := -1.0
@@ -537,6 +538,8 @@ func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D,
 			if values[i] != null: material.set_shader_parameter(parameters[i], values[i])
 		if source_oaks and material == _canopy_appearance:
 			_bind_source_atlas(material)
+	if player_cue_weight > 0.0:
+		material.set_shader_parameter("player_cue_weight", player_cue_weight)
 	if field != null:
 		material.set_shader_parameter("clouds_enabled", true)
 		material.set_shader_parameter("cloud_field", field)
@@ -569,6 +572,13 @@ func publish_cloud_shape(shape: Vector4) -> void:
 	_appearance.set_shader_parameter("cloud_shape", shape)
 	_canopy_appearance.set_shader_parameter("cloud_shape", shape)
 	if spruce_available(): _spruce_appearance.set_shader_parameter("cloud_shape", shape)
+
+func set_player_cue_weight(value: float) -> void:
+	player_cue_weight = value
+	if value <= 0.0:
+		return
+	for material: ShaderMaterial in [_appearance, _canopy_appearance, _spruce_appearance]:
+		material.set_shader_parameter("player_cue_weight", value)
 
 func update_focus(camera: Camera3D, player_position: Vector3, gameplay: bool) -> void:
 	_appearance.set_shader_parameter("reveal_player", gameplay)

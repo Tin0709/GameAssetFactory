@@ -134,6 +134,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sculk_surface": ["Sculk phát sáng", 1.],
 	&"forest_replay_emission": ["Ánh bệ đá trong rừng", 1.],
 	&"forest_replay_bounce": ["Ánh hắt quanh bệ đá", 1.],
+	&"canopy_player_cue": ["Dáng nhân vật sau tán", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
 	&"forest_path_placement": ["Vị trí đèn lối rừng", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
@@ -158,7 +159,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 79
+const LIGHTING_MIX_VERSION := 80
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1488,6 +1489,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 79 and effect == &"forest_replay_bounce":
 			missing_value = 0.
+		if version < 80 and effect == &"canopy_player_cue":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1547,6 +1550,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sculk_surface.available(level)
 		if effect in [&"forest_replay_emission", &"forest_replay_bounce"]:
 			slider.editable = slider.editable and forest_replay.available(level)
+		if effect == &"canopy_player_cue":
+			slider.editable = slider.editable and (level.canopy_player_cue == null or level.canopy_player_cue.available(level))
 		if effect == &"forest_path_placement":
 			slider.editable = slider.editable and level.forest_path_light_offset.is_finite() \
 				and not level.forest_path_light_offset.is_zero_approx()
@@ -1622,6 +1627,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce"]:
 		_sync_forest_night_lights()
+		return
+	if changed_effect == &"canopy_player_cue":
+		level.sync_canopy_player_cue()
 		return
 	if changed_effect == &"twilight_ground_ambient":
 		level.terrain_light.bind()

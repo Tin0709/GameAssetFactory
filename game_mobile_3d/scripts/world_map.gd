@@ -15,6 +15,7 @@ const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV
 const LocalMistRegion = preload("res://scripts/local_mist_region.gd")
 const RegionalSkyRegion = preload("res://scripts/regional_sky_region.gd")
 const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
+const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var local_mist_region: LocalMistRegion
 @export var additional_mist_region: LocalMistRegion
 @export var night_mist_region: LocalMistRegion
@@ -46,6 +47,7 @@ var actor_fill: Node
 var terrain_sky: Node
 var terrain_light: Node
 var player_light:Node
+var canopy_player_cue: Node
 var vegetation_visible:=true
 var showcase: Node
 var heavy_landing_audio: CombatAudio
@@ -152,6 +154,9 @@ func _ready() -> void:
 	player_light.name="PlayerColoredTransport";add_child(player_light);player_light.setup(self)
 	showcase.air_light.setup(self)
 	if showcase.mist!=null:showcase.mist.light_provider=showcase.air_field
+	canopy_player_cue = CanopyPlayerCue.new()
+	canopy_player_cue.name = "CanopyPlayerCue"
+	add_child(canopy_player_cue)
 	var spruce_sky := preload("res://scripts/world_map_spruce_sky.gd").new()
 	spruce_sky.name = "SpruceSkyVisibility"
 	add_child(spruce_sky)
@@ -298,6 +303,7 @@ func _physics_process(_delta: float) -> void:
 
 func _process(delta: float) -> void:
 	if not map_ready:return
+	sync_canopy_player_cue()
 	if not is_finite(_camera_ground_y):_camera_ground_y=player.global_position.y
 	# Hold the last supported elevation through the jump. Horizontal tracking
 	# remains exact; a different landing elevation settles without a camera pop.
@@ -319,6 +325,10 @@ func _process(delta: float) -> void:
 		if grove != null and (grove.visible or grove.spruce_visible()):grove.update_focus(camera,focus,true)
 	if presentation.enabled and look != null and look.active:
 		look.publish_render_wind(presentation.wind_time(look.motion.clock))
+
+func sync_canopy_player_cue() -> void:
+	if canopy_player_cue != null:
+		canopy_player_cue.sync(self, showcase._lighting_scale(&"canopy_player_cue"))
 
 func set_review_view(mode: String) -> void:
 	if showcase!=null:showcase.begin_environment_edit()
