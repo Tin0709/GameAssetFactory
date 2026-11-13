@@ -12,6 +12,7 @@ vec3 gaf_replay_incident(vec3 world_position, vec3 normal) {
 	float fade = max(1.0 - distance_squared / (3.9 * 3.9), 0.0);
 	float facing = max(dot(normal, toward) * inversesqrt(max(distance_squared, 0.2)), 0.0);
 	float incident = fade * fade * (0.078 + 0.922 * facing);
+	float legacy = gaf_replay_bounce.w * fade * fade * (0.078 + 0.922 * facing);
 	if (gaf_replay_surface.w > 0.0 && distance_squared < 39.0625) {
 		ivec3 texels = textureSize(gaf_replay_surface_field, 0);
 		float face_height = float(texels.y / 6);
@@ -25,9 +26,10 @@ vec3 gaf_replay_incident(vec3 world_position, vec3 normal) {
 			vec3 index = grid + 0.5 * axes;
 			index.y += float(face) * face_height;
 			vec2 field = textureLod(gaf_replay_surface_field, index / vec3(texels), 0.0).rg;
-			incident = mix(incident, 4.0 * field.r * field.r,
+			float baked = 4.0 * field.r * field.r * gaf_replay_bounce.w;
+			legacy = mix(legacy, baked,
 				gaf_replay_surface.w * smoothstep(0.15, 0.85, field.g));
 		}
 	}
-	return vec3(1.0, 0.29, 0.02) * (gaf_replay_bounce.w * incident);
+	return vec3(1.0, 0.29, 0.02) * legacy;
 }
