@@ -1,5 +1,9 @@
 extends "res://scenes/dev/zombie_death_physics/ragdoll.gd"
 
+const DEEP_CONTACT_LIFT_START := 0.10
+const DEEP_CONTACT_LIFT_FULL := 0.112
+const DEEP_CONTACT_SHARED_LIFT := 0.065
+
 var _sample_bone_ids: Dictionary[String, int]
 var _sample_body_offsets: Dictionary[String, Transform3D]
 var _source_joint_biases: Dictionary[RID, float]
@@ -84,6 +88,44 @@ func is_near_flat_floor(tolerance: float) -> bool:
 			continue
 		minimum_y = minf(minimum_y, bounds.position.y)
 	return absf(minimum_y - floor_half.y) <= tolerance
+
+func _limit_shared_first_contact_lift(lifts: Dictionary[PhysicalBone3D, float],
+		depths: Dictionary[PhysicalBone3D, float], shared_lift: float, slop: float) -> void:
+	if shared_lift <= DEEP_CONTACT_LIFT_START:
+		return
+	# All five MD2 zombie joints share one spine body. Solve its minimum
+	# lift first, then raise only the limbs that need floor or joint clearance.
+	var chest: PhysicalBone3D = bodies.Chest
+	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if chest_state == null:
+		return
+	var weight := smoothstep(DEEP_CONTACT_LIFT_START, DEEP_CONTACT_LIFT_FULL, shared_lift)
+	var reduced_lift := lerpf(shared_lift, DEEP_CONTACT_SHARED_LIFT, weight)
+	var chest_lift := maxf(reduced_lift, depths.get(chest, 0.0) - slop)
+	var old_chest_lift: float = lifts.get(chest, maxf(shared_lift, depths.get(chest, 0.0) - slop))
+	var limb_clearances: Dictionary[PhysicalBone3D, float] = {}
+	var limb_gap_limits: Dictionary[PhysicalBone3D, Vector2] = {}
+	for name: String in source_joint_rids:
+		var joint: Dictionary = source_joints[name]
+		if joint.parent != "Chest":
+			return
+		var limb: PhysicalBone3D = bodies[name]
+		var limb_state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
+		if limb_state == null:
+			return
+		var gap: Vector3 = (chest_state.transform * joint.parent_frame).origin +			- (limb_state.transform * joint.child_frame).origin
+		var old_limb_lift: float = lifts.get(limb, maxf(shared_lift, depths.get(limb, 0.0) - slop))
+		var tolerance := maxf(FIRST_CONTACT_ANCHOR_LIMIT,
+			(gap + Vector3.UP * (old_chest_lift - old_limb_lift)).length())
+		var vertical_limit := sqrt(maxf(tolerance * tolerance - gap.x * gap.x - gap.z * gap.z, 0.0))
+		var limb_clearance := maxf(reduced_lift, depths.get(limb, 0.0) - slop)
+		chest_lift = maxf(chest_lift, limb_clearance - gap.y - vertical_limit)
+		limb_clearances[limb] = limb_clearance
+		limb_gap_limits[limb] = Vector2(gap.y, vertical_limit)
+	for limb: PhysicalBone3D in limb_clearances:
+		var limit := limb_gap_limits[limb]
+		lifts[limb] = maxf(limb_clearances[limb], chest_lift + limit.x - limit.y)
+	lifts[chest] = chest_lift
 
 func _set_source_joint_bias(joint: RID, bias: float) -> void:
 	if _source_joint_biases.get(joint, -1.0) == bias:

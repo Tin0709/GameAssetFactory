@@ -867,6 +867,8 @@ func _project_floor_contact() -> void:
 			var early_roll := not landing_blended and floor_impact_blend > 0.0
 			var anchor_limit := EARLY_ROLL_ANCHOR_LIMIT if early_roll else FIRST_CONTACT_ANCHOR_LIMIT
 			_limit_floor_anchor_stretch(anchor_lifts, depths, shared_lift, slop, anchor_limit)
+			if not landing_blended and floor_impact_blend <= 0.0:
+				_limit_shared_first_contact_lift(anchor_lifts, depths, shared_lift, slop)
 		for body: PhysicalBone3D in bodies.values():
 			var correction: float = anchor_lifts.get(body, maxf(shared_lift, depths.get(body, 0.0) - slop))
 			if correction <= 0.0:
@@ -876,6 +878,10 @@ func _project_floor_contact() -> void:
 				state.transform = state.transform.translated(Vector3.UP * correction)
 	if _flat_floor_has_contact and not landing_blended and floor_impact_blend > 0.0:
 		_preempt_floor_penetration(floor_half, floor_inverse, floor_pose.origin.y + floor_half.y)
+
+func _limit_shared_first_contact_lift(_lifts: Dictionary[PhysicalBone3D, float],
+		_depths: Dictionary[PhysicalBone3D, float], _shared_lift: float, _slop: float) -> void:
+	pass
 
 func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
 		shared_lift: float, slop: float, anchor_limit: float) -> void:
