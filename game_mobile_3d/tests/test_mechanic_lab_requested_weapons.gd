@@ -70,11 +70,23 @@ func run() -> void:
 	attack(true)
 	await ticks(68)
 	attack(false)
-	await ticks(75)
+	await ticks(100)
 	check(contacts.size() >= 3 and contacts.slice(0, 3) == [
 		"NativeGauntletAttack1", "NativeGauntletAttack2", "NativeGauntletAttack3",
 	], "Held input plays all three gauntlet strikes in order")
 	check(target.health <= 65, "Gauntlet combo applies its own 10/11/14 damage")
+	lab.reset_player()
+	await ticks(12)
+	target.position = Vector3(0.0, 0.0, 1.6)
+	target.health = 100
+	lab.get_node("HUD/DropMedium").pressed.emit()
+	await ticks(5)
+	attack(true)
+	await ticks(2)
+	attack(false)
+	await ticks(95)
+	check(target.health < 100 and contacts.has("AirAttack"), "Gauntlets can hit with their jump slam")
+	check(lab.player.clips.AirAttack.source_name == "Player_Jump_Gauntlet-Attack_Heavy", "The slam uses the source gauntlet pose")
 	equip(menu, 0)
 	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
 		"Switching back restores the original Sabre")
