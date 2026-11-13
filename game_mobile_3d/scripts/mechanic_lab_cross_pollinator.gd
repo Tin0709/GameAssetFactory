@@ -52,7 +52,7 @@ const MESH_OFFSET := Vector3(0.0, 0.16, 0.0)
 const MUZZLE := Vector3(0.0, 0.075, 0.65)
 # AM_Player_CrossBow_Action blend-out duration. The Lab blends from its
 # interrupted recovery pose so the lowering starts promptly after firing.
-const IDLE_BLEND_SECONDS := 0.25
+const BLEND_OUT_SECONDS := 0.25
 const LOCOMOTION := {
 	"Idle": ["Player_Crossbow_Idle", 80, "5efd6e1c0d15066ab98c1bd31262b499435e125512a75a972ee87f1a74bd222a"],
 	"Walk": ["Player_Crossbow_Walk", 26, "a291db024a4b3d10ec01ecc66b068c364fb8bc22d8a245150cbd69dce1af2e9c"],

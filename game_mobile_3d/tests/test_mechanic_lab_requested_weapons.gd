@@ -432,8 +432,8 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 				and player.hybrid_motion.owns_pose, "Crossbow run uses Actions & Stuff")
 			var grip := lab._crossbow_mount as MeshInstance3D
 			var support_hand: int = player.skeleton.find_bone("J_R_Hand")
-			var support_x_min := INF
-			var support_x_max := -INF
+			var initial_palm := grip.to_local(player.skeleton.to_global(player.skeleton.get_bone_global_pose(support_hand).origin))
+			var support_drift := 0.0
 			var lowest_pitch := INF
 			var highest_pitch := -INF
 			for frame in 36:
@@ -443,12 +443,10 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 				lowest_pitch = minf(lowest_pitch, pitch)
 				highest_pitch = maxf(highest_pitch, pitch)
 				var palm: Vector3 = player.skeleton.to_global(player.skeleton.get_bone_global_pose(support_hand).origin)
-				var support_x := grip.to_local(palm).x
-				support_x_min = minf(support_x_min, support_x)
-				support_x_max = maxf(support_x_max, support_x)
+				support_drift = maxf(support_drift, grip.to_local(palm).distance_to(initial_palm))
 			check(highest_pitch - lowest_pitch > deg_to_rad(23.0),
 				"The crossbow follows the Actions & Stuff run sway")
-			check(support_x_max - support_x_min < 0.015,
+			check(support_drift < 0.015,
 				"The support hand stays seated on the crossbow throughout the running sway")
 			var motion = player.hybrid_motion
 			var run_pose: Array[Transform3D] = player.source_gait.sample("Run", 0.66)

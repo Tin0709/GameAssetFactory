@@ -141,7 +141,7 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 func _begin_pose_transition(key: String, seconds: float) -> void:
 	if crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY]:
 		if key in GAITS or key in ["Idle", "CombatReady", "InspectWeapon"]:
-			source_transition.begin_evaluated(CrossPollinator.IDLE_BLEND_SECONDS, Callable(), &"smoothstep")
+			source_transition.begin_evaluated(CrossPollinator.BLEND_OUT_SECONDS, Callable(), &"smoothstep")
 			return
 	super._begin_pose_transition(key, seconds)
 
