@@ -5,6 +5,7 @@ const DEEP_CONTACT_LIFT_FULL := 0.112
 const DEEP_CONTACT_SHARED_LIFT := 0.065
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
+const WALL_HANDOFF_ARM_REBOUND_MAX_SHIFT := 0.045
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 
 var _sample_bone_ids: Dictionary[String, int]
@@ -350,6 +351,10 @@ func _project_source_anchors() -> void:
 		if not recent_handoff or distance <= largest_gap:
 			continue
 		var shift := _wall_anchor_motion(state, gap, false)
+		if name in ["Arm.L", "Arm.R"]:
+			var rebound_shift := _wall_anchor_motion(state, gap, true, WALL_HANDOFF_ARM_REBOUND_MAX_SHIFT)
+			if not rebound_shift.is_zero_approx():
+				shift = rebound_shift
 		if not shift.is_zero_approx():
 			largest_gap = distance
 			motion = shift
@@ -361,7 +366,8 @@ func _project_source_anchors() -> void:
 	if not _test_projection_motion(chest, chest_state.transform, motion):
 		chest_state.transform = chest_state.transform.translated(motion)
 
-func _wall_anchor_motion(state: PhysicsDirectBodyState3D, gap: Vector3, require_rebound: bool) -> Vector3:
+func _wall_anchor_motion(state: PhysicsDirectBodyState3D, gap: Vector3, require_rebound: bool,
+		max_shift := WALL_CHEST_MAX_SHIFT) -> Vector3:
 	for index in state.get_contact_count():
 		var normal := state.get_contact_local_normal(index)
 		if absf(normal.y) >= MAX_WALL_NORMAL_Y or not state.get_contact_collider_object(index) is StaticBody3D:
@@ -370,7 +376,7 @@ func _wall_anchor_motion(state: PhysicsDirectBodyState3D, gap: Vector3, require_
 			continue
 		var blocked_distance := -gap.dot(normal) - SOURCE_ANCHOR_TOLERANCE
 		if blocked_distance > 0.0:
-			return normal * minf(blocked_distance, WALL_CHEST_MAX_SHIFT)
+			return normal * minf(blocked_distance, max_shift)
 	return Vector3.ZERO
 
 func _recover_floor_blocked_hip() -> void:
