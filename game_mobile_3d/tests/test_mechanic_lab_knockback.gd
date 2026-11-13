@@ -86,6 +86,7 @@ func run() -> void:
 	check(lab.player_health == player_hp - 6, "The active attack can still connect if the player stays in reach")
 	zombie.free()
 	await check_sword_finisher_push(lab, group)
+	await check_sabre_landing_damage(lab, group)
 	await check_crowd(lab, group)
 	lab.free()
 	print("MECHANIC_LAB_KNOCKBACK first_chase_step=", first_chase_step,
@@ -136,6 +137,71 @@ func check_sword_finisher_push(lab, group) -> void:
 	zombie.free()
 	selector.select(0)
 	selector.item_selected.emit(0)
+
+func check_sabre_landing_damage(lab, group) -> void:
+	lab.reset_player()
+	await ticks(5)
+	for i in 3:
+		lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombies: Array[Node] = group.get_children()
+	var origin: Vector3 = lab.player.global_position
+	var forward: Vector3 = lab.player.visual.global_basis.z
+	var right := Vector3.UP.cross(forward)
+	var centre := origin + forward * 1.5
+	for i in zombies.size():
+		zombies[i].set_physics_process(false)
+		zombies[i].global_position = centre + right * [0.0, 2.0, 3.0][i]
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(0.2, 1.5, 0.2)
+	collider.shape = shape
+	wall.add_child(collider)
+	lab.add_child(wall)
+	# Put the third zombie inside the primary radius with a wall on its ray.
+	zombies[2].global_position = centre - right
+	wall.global_position = origin.lerp(zombies[2].global_position, 0.5) + Vector3.UP * 0.65
+	var landings: Array[int] = []
+	var contacts: Array[int] = []
+	var directions: Array[Vector3] = []
+	var record_landing := func(_point, _serial): landings.append(Engine.get_physics_frames())
+	var record_hit := func(_point, direction, clip, _index, _serial, _lethal):
+		if clip == "AirAttack":
+			contacts.append(Engine.get_physics_frames())
+			directions.append(direction)
+	group.sabre_landing.connect(record_landing)
+	group.sabre_contact.connect(record_hit)
+	lab.get_node("HUD/DropMedium").pressed.emit()
+	await ticks(2)
+	attack(true)
+	await ticks(2)
+	attack(false)
+	for i in Engine.physics_ticks_per_second:
+		await physics_frame
+		if not landings.is_empty():
+			break
+	check(landings.size() == 1 and contacts.is_empty() and zombies[0].health == 48,
+		"Actual Sabre landing triggers the floor effect before applying damage")
+	if not landings.is_empty():
+		# A new player position must not redirect an already landed strike.
+		lab.player.global_position += right * 5.0
+		await ticks(ceili(0.1 * Engine.physics_ticks_per_second) + 1)
+		var offset_ticks := ceili(0.054369554 * Engine.physics_ticks_per_second)
+		check(contacts == [landings[0] + offset_ticks, landings[0] + offset_ticks],
+			"Primary and splash damage resolve on the first physics tick after the authored Sabre notify")
+		check(zombies[0].health == 8 and zombies[1].health == 36 and zombies[2].health == 48,
+			"Medium Sabre landing deals 40 primary and 12 splash damage, with wall occlusion")
+		check(not directions.is_empty() and directions[0].dot(forward) > 0.999,
+			"The launched target uses the saved landing origin")
+	group.sabre_landing.disconnect(record_landing)
+	group.sabre_contact.disconnect(record_hit)
+	wall.free()
+	group.land_sabre(origin, forward, 999, 0.25)
+	lab.reset_player()
+	await ticks(ceili(0.1 * Engine.physics_ticks_per_second) + 1)
+	check(zombies[0].health == 8, "Reset cancels a pending Sabre landing hit")
+	for zombie in zombies:
+		zombie.free()
 
 func check_crowd(lab, group) -> void:
 	lab.reset_player()
