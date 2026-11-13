@@ -396,7 +396,7 @@ func _is_at_flat_floor(body: PhysicalBone3D, transform: Transform3D) -> bool:
 	var pose := floor_pose.affine_inverse() * transform * collider.transform
 	var bounds := pose * AABB(-shape.size * 0.5, shape.size)
 	var half := floor_box.size * 0.5
-	return bounds.position.y <= half.y + PROJECTION_COLLISION_MARGIN \
+	return absf(bounds.position.y - half.y) <= FLOOR_REST_SLOP + PROJECTION_COLLISION_MARGIN \
 		and bounds.position.x >= -half.x and bounds.end.x <= half.x \
 		and bounds.position.z >= -half.z and bounds.end.z <= half.z
 

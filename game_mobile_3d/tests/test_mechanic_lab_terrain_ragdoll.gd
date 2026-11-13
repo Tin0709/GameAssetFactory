@@ -210,6 +210,8 @@ func check_wall_pinned_joint(floor_contact := false) -> void:
 		return
 	var wall := terrain(lab, Vector3(4.5, 1.5, 0), Vector3(0.30, 3.0, 18.0), 0.0)
 	var zombie = group.get_child(0)
+	if not floor_contact:
+		zombie.set_physics_process(false)
 	await ticks(2)
 	zombie.set_physics_process(false)
 	zombie.global_position = Vector3(1.35, 0.02, -4.05) if floor_contact else Vector3(4.05, 0.02, -2.25)
