@@ -58,16 +58,22 @@ func add_manifest(research_root: String, manifest: String) -> void:
 		groups[key]=entries
 
 func trigger_attack(_index:int,clip:String,serial:int,event_time:float=-1.)->void:
+	_trigger_attack(clip, serial, event_time, true)
+
+func trigger_attack_at_notify(clip: String, serial: int) -> void:
+	_trigger_attack(clip, serial, clock, false)
+
+func _trigger_attack(clip: String, serial: int, event_time: float, align_envelope: bool) -> void:
 	if not enabled or serial<=last_serial:return
 	clip=String(clip_aliases.get(clip,clip))
 	if not groups.has(clip) or groups[clip].is_empty():return
 	last_serial=serial;last_sources.clear();event_count+=1
 	var rate:=maxf(.001,float(clip_play_rates.get(clip,1.)))
 	var at:=event_time if event_time>=0. else clock
-	_schedule_group(clip,serial,rate,at)
-	if clip=="Attack3":_schedule_group("Attack3Whoosh",serial,rate,at)
+	_schedule_group(clip,serial,rate,at,align_envelope)
+	if clip=="Attack3":_schedule_group("Attack3Whoosh",serial,rate,at,align_envelope)
 
-func _schedule_group(key:String,serial:int,rate:float,accepted_at:float)->void:
+func _schedule_group(key:String,serial:int,rate:float,accepted_at:float,align_envelope:bool)->void:
 	var entries:Array=groups.get(key,[])
 	if entries.is_empty():return
 	var index:int=int(_choices.get(key,0))%entries.size();_choices[key]=index+1
@@ -75,7 +81,7 @@ func _schedule_group(key:String,serial:int,rate:float,accepted_at:float)->void:
 	if pending.size()>=MAX_PENDING:pending.pop_front()
 	# Move the envelope peak, not the source sample pitch. Targets are source
 	# motion landmarks, not recovered native Wwise notifies.
-	var delay:=maxf(0.,float(entry.target)/rate-float(entry.peak))
+	var delay:=maxf(0.,float(entry.target)/rate-float(entry.peak)) if align_envelope else 0.0
 	pending.append({"at":accepted_at+delay,"entry":entry,"serial":serial});last_sources.append(entry.source)
 
 func _physics_process(delta:float)->void:advance(delta)

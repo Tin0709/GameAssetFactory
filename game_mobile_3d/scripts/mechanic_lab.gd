@@ -32,6 +32,8 @@ const FINISHER_SHAKE_OUTER_RADIUS := 3.0
 const FINISHER_SHAKE_HEIGHT_FRACTION := 0.008
 const PRIVATE_CONTROLS := "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E %s · R về giữa"
 const TIME_PRESETS := [2.5, 7.0, 12.0, 16.5, 18.5, 19.5, 22.0]
+# AM_Player_Sabre_JumpAttack: first PostAudioEvent minus LandingStart.
+const SABRE_LANDING_SWING_DELAY := 0.033083633
 # AM_Player_Sabre_JumpAttack: PlayDebrisEffect minus LandingStart.
 const SABRE_LANDING_DEBRIS_DELAY := 0.045126423
 # AM_Player_Sabre_JumpAttack: CameraShakeNotify_C minus LandingStart.
@@ -47,6 +49,8 @@ var spawn_position := SPAWN
 var player_health := MAX_PLAYER_HEALTH
 var _previous_msaa: Viewport.MSAA
 var _combat_audio: CombatAudio
+var _slam_swing_frame := -1
+var _slam_swing_serial := -1
 var _slam_audio_frame := -1
 var _slam_audio_point: Vector3
 var _contact_sparks: ContactSparks
@@ -170,7 +174,8 @@ func _ready() -> void:
 		_set_combat_audio(false)
 		player.combo.native_tap_buffer_seconds = SABRE_TAP_BUFFER
 		player.combo.use_sabre_air_sections = true
-		player.reference_audio.clip_play_rates["AirAttack"] = 1.0
+		player.attack_accepted_timed.disconnect(player.reference_audio.trigger_attack)
+		player.attack_accepted_timed.connect(_on_attack_accepted_timed)
 		$Zombies.setup_combat(player)
 		player.grounded_melee_aim = $Zombies.aim_sabre
 		player.connect("grounded_sabre_impact", $Zombies.strike_sabre)
@@ -375,8 +380,15 @@ func _grass_contact_at(sole: Vector3) -> Dictionary:
 func _heavy_debris_delay() -> float:
 	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
 
+func _on_attack_accepted_timed(index: int, clip: String, serial: int, at: float) -> void:
+	# The Sabre aerial montage loops until support, so its cue follows the
+	# landing section. Other attacks keep their existing sample timing.
+	if clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
+		player.reference_audio.trigger_attack(index, clip, serial, at)
+
 func _cancel_slam_audio() -> void:
 	_slam_audio_frame = -1
+	_slam_swing_frame = -1
 
 func _set_combat_audio(enabled: bool) -> void:
 	if _combat_audio == null:
@@ -433,6 +445,9 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	$Zombies.land_sabre(point, facing, serial, fall_height)
 	if not _combat_audio.enabled:
 		return
+	if _equipped_weapon == Weapon.SABRE:
+		_slam_swing_serial = serial
+		_slam_swing_frame = Engine.get_physics_frames() + ceili(SABRE_LANDING_SWING_DELAY * Engine.physics_ticks_per_second)
 	var contact := _grass_contact_at(point)
 	if contact.is_empty():
 		return
@@ -466,6 +481,10 @@ func _physics_process(_delta: float) -> void:
 	if _slam_shake_frame >= 0 and frame >= _slam_shake_frame:
 		_slam_shake_frame = -1
 		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION)
+	if _slam_swing_frame >= 0 and frame >= _slam_swing_frame:
+		_slam_swing_frame = -1
+		if player.combo.serial == _slam_swing_serial and player.combo.active():
+			player.reference_audio.trigger_attack_at_notify("AirAttack", _slam_swing_serial)
 	if _slam_audio_frame >= 0 and frame >= _slam_audio_frame:
 		_cancel_slam_audio()
 		_combat_audio.slam_landed(_slam_audio_point)
