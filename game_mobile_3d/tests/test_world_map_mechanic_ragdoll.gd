@@ -340,6 +340,27 @@ func near_wall_handoff(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	zombie.free()
 	await ticks(2)
 
+func check_supported_breakup(world: Node3D, group: Node3D, effects: Node3D) -> void:
+	group._spawn_serial = 5
+	var zombie = await launch(world, group, effects, Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT)
+	if zombie == null:
+		return
+	while zombie._corpse_age < 4.40:
+		await physics_frame
+	var mesh: MeshInstance3D = zombie._mesh
+	check(is_zero_approx(float(mesh.get_instance_shader_parameter("fragment_travel"))),
+		"The terrace corpse does not separate before its breakup window")
+	while zombie._corpse_age < 4.73:
+		await physics_frame
+	check(zombie._corpse_landed and zombie.ragdoll.running and zombie.ragdoll.contact_motion().supports > 0,
+		"The terrace fixture still has an active, supported ragdoll during breakup")
+	var directions: Variant = mesh.material_override.get_shader_parameter("fragment_directions")
+	check(float(mesh.get_instance_shader_parameter("fragment_travel")) > 0.0
+		and directions is PackedVector3Array and directions.size() == mesh.skin.get_bind_count(),
+		"An active, supported corpse separates using its evaluated pose")
+	await ticks(20)
+	check(not is_instance_valid(zombie), "The supported breakup still despawns at five seconds")
+
 func run() -> void:
 	var world = preload("res://scenes/WorldMap.tscn").instantiate()
 	root.add_child(world)
@@ -406,6 +427,7 @@ func run() -> void:
 		await terrain_supported_rest(world, group, effects, 48, Vector3(-37.46, 3.0, -33.5),
 			Vector3.FORWARD.rotated(Vector3.UP, 0.085), -0.195, Zombie.DeathStrike.GROUND, 4)
 		await cliff_delayed_roll_case(world, group, effects)
+		await check_supported_breakup(world, group, effects)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
