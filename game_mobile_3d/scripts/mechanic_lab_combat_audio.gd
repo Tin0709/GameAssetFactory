@@ -24,9 +24,32 @@ const CROSSBOW_FLIGHT_HASHES := [
 	"6fbbf0fb7172df9564222117c1c33757e88be27e57b6db87b9182e0a6455afff",
 	"505c42c4c85efa8ddf0fc8b4220797110dd76f4d4a8d9418036549b5ca4fae15",
 ]
-const GAUNTLET_COMBO := "Items/Weapons/Weapon_Melee/6_weapons_melee_basicCombo/Attack%d/sfx_gauntlets_unique_attack_%s_01.ogg"
+const GAUNTLET_COMBO := "Items/Weapons/Weapon_Melee/6_weapons_melee_basicCombo/Attack%d/sfx_gauntlets_unique_attack_%s_%02d.ogg"
 const GAUNTLET_HIT := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_gauntlets_01.ogg"
-const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_01.ogg"
+const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_%02d.ogg"
+const GAUNTLET_SWING_HASHES := {
+	"light": [
+		"5ca970f981961963617c5903b5bb66505e76ceefc41ab0ad52286ecdd738e07f",
+		"5bac59bacc2d8de291ab9e48d7d491e515ba06ef43495cfa891da88222b5cce1",
+		"4abf9e81cae657f87bcc590f5bee8ac130ef8fc9be4082aaefa63aac1f25a3d0",
+	],
+	"medium": [
+		"46eef63fa11387a9361eaf8bc7142267f392143de9eec35fe227d5ac6fdf0ccf",
+		"91774ee223a968ecaf54808122faf041db488f6ab9fa5fdf37961c3fe4133a87",
+		"01e7b6990b3b83138f1374f12429cfd93148a3f534d603581e88559dde639187",
+		"dbf195696aba3ea0957dc005ce6bee79c00b4aa5475cd96adfe03fb857bd5b9c",
+	],
+	"heavy": [
+		"560425504d85ca0b56e20f4ad07ec7a370aff34e5d90105fc365e7b83005a108",
+		"4dd3f590253835382e3e6561d38cf64f2a5c388407cecd6cff287217e2629b8e",
+		"9ea1378bfc777e06cfa54ecb2b2a736104efeb0ffd83b2e4696a9c2f042af083",
+	],
+}
+const GAUNTLET_JUMP_HASHES := [
+	"230dae33f21cd973a3067b847caa782f1ed8e31d13d11b7584a22a4f6b7aab03",
+	"db1d1e7820566272a5e1369020d2b3f916c94f404fe3b60f4393190759d38707",
+	"7044a9c787f1b5d3899af16cb54172a8206eb80798672a1394f41f4cb4b52f6c",
+]
 const MAULER_DIVE := "Items/Enchantments/3_Activate/sfx_enchantment_maulerDive-%03d.ogg"
 const MAULER_DIVE_HASHES := [
 	"079834c484903bd6802992bc3e5daea5b3e0383fb115aba7e1a2188ac4073286",
@@ -224,17 +247,16 @@ func load_crossbow(root: String) -> void:
 
 func load_gauntlets(root: String) -> void:
 	var weights := ["light", "medium", "heavy"]
-	var hashes := [
-		"5ca970f981961963617c5903b5bb66505e76ceefc41ab0ad52286ecdd738e07f",
-		"46eef63fa11387a9361eaf8bc7142267f392143de9eec35fe227d5ac6fdf0ccf",
-		"560425504d85ca0b56e20f4ad07ec7a370aff34e5d90105fc365e7b83005a108",
-	]
 	for i in weights.size():
-		_load_sample(root, StringName("gauntlet_swing_%d" % i), GAUNTLET_COMBO % [i + 1, weights[i]], hashes[i])
+		var weight: String = weights[i]
+		var hashes: Array = GAUNTLET_SWING_HASHES[weight]
+		var group := StringName("gauntlet_swing_%d" % i)
+		for sample in hashes.size():
+			_load_sample(root, group, GAUNTLET_COMBO % [i + 1, weight, sample + 1], hashes[sample])
 	_load_sample(root, &"gauntlet_hit", GAUNTLET_HIT,
 		"b5dd3f6184aec5dbaea52ae9e4b9b139487515f0b019004cc7523221ac1fa883")
-	_load_sample(root, &"gauntlet_jump", GAUNTLET_JUMP,
-		"230dae33f21cd973a3067b847caa782f1ed8e31d13d11b7584a22a4f6b7aab03")
+	for i in GAUNTLET_JUMP_HASHES.size():
+		_load_sample(root, &"gauntlet_jump", GAUNTLET_JUMP % (i + 1), GAUNTLET_JUMP_HASHES[i])
 	for i in MAULER_DIVE_HASHES.size():
 		_load_sample(root, &"mauler_dive", MAULER_DIVE % (i + 1), MAULER_DIVE_HASHES[i])
 
