@@ -2075,6 +2075,8 @@ func apply_time()->void:
 		key_response_active=false
 		key_direction_active=false
 		sky_response_active=false
+		if _time_applied:
+			_refresh_lantern_glow()
 		_time_applied=false;_forest_expected.clear()
 		if _vignette!=null:_vignette.hide()
 		if _player_light!=null:_player_light.hide()
