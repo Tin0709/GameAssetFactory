@@ -16,14 +16,16 @@ class Wake:
 	var age := 0.0
 
 var _actor: CharacterBody3D
+var _terrain_contact: Callable
 var _wakes: Array[Wake] = []
 var _next := 0
 
-func setup(actor: CharacterBody3D) -> bool:
+func setup(actor: CharacterBody3D, terrain_contact := Callable()) -> bool:
 	var image := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(64, 64))
 	if image == null:
 		return false
 	_actor = actor
+	_terrain_contact = terrain_contact
 	var texture := ImageTexture.create_from_image(image)
 	var quad := QuadMesh.new()
 	quad.orientation = PlaneMesh.FACE_Y
@@ -49,6 +51,13 @@ func setup(actor: CharacterBody3D) -> bool:
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	if landed or not _actor._run_requested or _actor.current_speed < _actor.run_speed * RUN_SPEED_FRACTION:
 		return
+	var foot_height := _actor.global_position.y
+	if _terrain_contact.is_valid():
+		var contact: Dictionary = _terrain_contact.call(point)
+		if contact.is_empty():
+			return
+		point = contact.position
+		foot_height = point.y
 	var motion := _actor.get_real_velocity()
 	motion.y = 0.0
 	var trailing := -motion.normalized()
@@ -57,7 +66,7 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	var wake := _wakes[_next]
 	_next = (_next + 1) % _wakes.size()
 	wake.trailing = trailing
-	wake.origin = Vector3(point.x, _actor.global_position.y + 0.38, point.z) + trailing * 0.50 + lateral * side * 0.18
+	wake.origin = Vector3(point.x, foot_height + 0.38, point.z) + trailing * 0.50 + lateral * side * 0.18
 	wake.age = 0.0
 	wake.mesh.global_transform = Transform3D(Basis(trailing, Vector3.UP, lateral), wake.origin)
 	wake.material.albedo_color = TINT

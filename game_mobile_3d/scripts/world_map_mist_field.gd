@@ -11,7 +11,7 @@ const DEPTH_SCATTER_BYTES := 32
 const MAX_DEPTH_SCATTER_GAIN := 6.0
 const MAX_DEPTH_OPTICAL_GAIN := .85
 const DEPTH_SCATTER_START_M := 2.0
-const DEPTH_SCATTER_FULL_M := 8.0
+const DEPTH_SCATTER_RAMP_M := 6.0
 var directional_grid: ImageTexture3D
 var directional_provider: Callable
 var _directional_parameters := PackedByteArray()
@@ -47,7 +47,8 @@ func configure_with_mist_regions(parameters: PackedByteArray, size: Vector2i, no
 
 func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, noise: RID, light: RID,
 		path_light: PackedFloat32Array, local_mist: PackedFloat32Array, additional_mist: PackedFloat32Array,
-		depth_scatter: float, depth_color: Vector3 = Vector3.ZERO, depth_optical: float = 0.0) -> void:
+		depth_scatter: float, depth_color: Vector3 = Vector3.ZERO, depth_optical: float = 0.0,
+		depth_scatter_offset: float = DEPTH_SCATTER_START_M) -> void:
 	var path_bytes := path_light.to_byte_array()
 	if path_bytes.size() == LEGACY_PATH_SOURCE_BYTES:
 		path_bytes.resize(PATH_SOURCE_BYTES)
@@ -74,7 +75,8 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 	var gain := clampf(depth_scatter, 0.0, MAX_DEPTH_SCATTER_GAIN) if entry > 0.0 and is_finite(depth_scatter) else 0.0
 	var color := depth_color if gain > 0.0 and depth_color.is_finite() else Vector3.ZERO
 	var optical_gain := clampf(depth_optical, 0.0, MAX_DEPTH_OPTICAL_GAIN) if entry > 0.0 and is_finite(depth_optical) else 0.0
-	var depth_bytes := PackedFloat32Array([entry + DEPTH_SCATTER_START_M, entry + DEPTH_SCATTER_FULL_M,
+	var offset := maxf(0.0, depth_scatter_offset) if is_finite(depth_scatter_offset) else DEPTH_SCATTER_START_M
+	var depth_bytes := PackedFloat32Array([entry + offset, entry + offset + DEPTH_SCATTER_RAMP_M,
 		gain, optical_gain, color.x, color.y, color.z, 1.0 if color != Vector3.ZERO else 0.0]).to_byte_array()
 	_mutex.lock()
 	_parameters=parameters.duplicate()

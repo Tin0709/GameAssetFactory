@@ -156,7 +156,7 @@ func _ready() -> void:
 			dust.free()
 		var wind := MovementWind.new()
 		wind.name = "MovementWind"
-		if wind.setup(player):
+		if wind.setup(player, _grass_contact_at):
 			add_child(wind)
 		else:
 			wind.free()
