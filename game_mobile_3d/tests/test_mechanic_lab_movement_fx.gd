@@ -90,6 +90,7 @@ func run() -> void:
 	await check_running_wake_support(lab, wind)
 	await check_floor_edge_landing(lab, dust)
 	await check_non_grass_landing(lab, dust)
+	await check_non_grass_steps(lab, dust, wind)
 	await check_dust_contact_clock(lab, dust)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
@@ -295,6 +296,54 @@ func check_non_grass_landing(lab, dust: Node3D) -> void:
 			" peak_dust=", peak_dust, " grass_landings=", movement.event_count.landing - ordinary_before,
 			" heavy_landings=", heavy_landings.size())
 	lab.player.heavy_jump_landed.disconnect(record_heavy)
+	toggle.button_pressed = false
+	slab.free()
+	lab.reset_player()
+	await create_timer(0.10, true, false, true).timeout
+
+func check_non_grass_steps(lab, dust, wind) -> void:
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var movement = lab.get_node("MovementAudio")
+	var slab := StaticBody3D.new()
+	slab.position = Vector3(0.0, 0.09, 0.0)
+	var collision := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(1.0, 0.18, 30.0)
+	collision.shape = box
+	slab.add_child(collision)
+	lab.add_child(slab)
+	toggle.button_pressed = true
+	lab.reset_player()
+	lab.player.scripted_input = true
+	lab.player.global_position = Vector3(0.45, 0.7, -6.0)
+	for i in 34:
+		await physics_frame
+	var outside_steps: Array[float] = []
+	var record := func(point: Vector3, landed: bool):
+		if not landed and point.x > 0.5:
+			outside_steps.append(point.x)
+	lab.player.surface_contact.connect(record)
+	for running in [false, true]:
+		outside_steps.clear()
+		var before_audio: int = movement.event_count.grass
+		var before_dust: int = dust._next
+		var before_wind: int = wind._next
+		lab.player.requested_run = running
+		lab.player.requested_direction = Vector2(0, 1)
+		for i in 100:
+			await physics_frame
+		var grass_steps: int = movement.event_count.grass - before_audio
+		check(lab.player.is_on_floor() and lab.player.global_position.y > 0.16 and not outside_steps.is_empty(),
+			"The player plants a posed sole past the edge while the capsule stays on the slab")
+		check(grass_steps == 0 and dust._next == before_dust and wind._next == before_wind,
+			"Footsteps over the slab edge do not play grass audio, dust or wake (running=%s)" % running)
+		print("MECHANIC_LAB_SLAB_STEPS running=", running, " contacts=", outside_steps.size(),
+			" grass_audio=", grass_steps, " dust_changed=", dust._next != before_dust,
+			" wind_changed=", wind._next != before_wind)
+	lab.player.surface_contact.disconnect(record)
+	lab.player.requested_direction = Vector2.ZERO
+	lab.player.requested_run = false
+	lab.player.scripted_input = false
 	toggle.button_pressed = false
 	slab.free()
 	lab.reset_player()
