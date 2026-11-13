@@ -25,19 +25,24 @@ class Particle:
 var _actor: CharacterBody3D
 var _ground: CollisionShape3D
 var _terrain_contact: Callable
+var _heavy_delay: Callable
 var _particles: Array[Particle] = []
 var _next := 0
 var _heavy_landing_point := Vector3.ZERO
 var _heavy_landing_frame := -1
+var _burst_frame := -1
+var _burst_point: Vector3
+var _burst_surface: String
 var _random := RandomNumberGenerator.new()
 
-func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable()) -> bool:
+func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable(), heavy_delay := Callable()) -> bool:
 	var texture := _load_mask()
 	if texture == null:
 		return false
 	_actor = actor
 	_ground = ground
 	_terrain_contact = terrain_contact
+	_heavy_delay = heavy_delay
 	_random.seed = 27381
 	for i in CAPACITY:
 		var particle := Particle.new()
@@ -55,6 +60,7 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 	actor.heavy_jump_landed.connect(_on_heavy_jump_landed)
 	actor.presentation_reset.connect(clear)
 	set_process(false)
+	set_physics_process(false)
 	return true
 
 static func _load_mask() -> Texture2D:
@@ -97,6 +103,23 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		if absf(local.x) > half.x or absf(local.z) > half.z:
 			return
 		ground_point = _ground.to_global(Vector3(local.x, half.y, local.z))
+	if heavy and _heavy_delay.is_valid():
+		var delay_ticks := ceili(float(_heavy_delay.call()) * Engine.physics_ticks_per_second)
+		if delay_ticks > 0:
+			_burst_frame = Engine.get_physics_frames() + delay_ticks
+			_burst_point = ground_point
+			_burst_surface = surface
+			set_physics_process(true)
+			return
+	_emit_dust(ground_point, surface, landed, heavy)
+
+func _physics_process(_delta: float) -> void:
+	if Engine.get_physics_frames() < _burst_frame:
+		return
+	set_physics_process(false)
+	_emit_dust(_burst_point, _burst_surface, true, true)
+
+func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: bool) -> void:
 	var tint: Color = SURFACE_DUST.get(surface, SURFACE_DUST.grass)
 	var motion := _actor.get_real_velocity()
 	motion.y = 0.0
@@ -149,6 +172,7 @@ func _process(delta: float) -> void:
 
 func clear() -> void:
 	_heavy_landing_frame = -1
+	set_physics_process(false)
 	for particle in _particles:
 		particle.sprite.hide()
 	set_process(false)

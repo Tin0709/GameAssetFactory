@@ -32,6 +32,8 @@ const FINISHER_SHAKE_OUTER_RADIUS := 3.0
 const FINISHER_SHAKE_HEIGHT_FRACTION := 0.008
 const PRIVATE_CONTROLS := "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E %s · R về giữa"
 const TIME_PRESETS := [2.5, 7.0, 12.0, 16.5, 18.5, 19.5, 22.0]
+# AM_Player_Sabre_JumpAttack: PlayDebrisEffect minus LandingStart.
+const SABRE_LANDING_DUST_DELAY := 0.045126423
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD }
 
@@ -134,7 +136,7 @@ func _ready() -> void:
 		_setup_movement_audio()
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
-		if dust.setup(player, $Ground/Collision):
+		if dust.setup(player, $Ground/Collision, Callable(), _heavy_dust_delay):
 			add_child(dust)
 		else:
 			dust.free()
@@ -351,6 +353,9 @@ func _setup_movement_audio() -> void:
 	_movement_audio.name = "MovementAudio"
 	add_child(_movement_audio)
 	_movement_audio.setup(player, null, bundle)
+
+func _heavy_dust_delay() -> float:
+	return SABRE_LANDING_DUST_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
 
 func _set_combat_audio(enabled: bool) -> void:
 	if _combat_audio == null:
