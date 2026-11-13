@@ -103,6 +103,7 @@ var _light_serial := -1
 var _light_remaining := 0.0
 var _light_peak := 0.0
 var _player_flash_remaining := 0.0
+var _player_flash_pending := false
 var _player_flash_material: ShaderMaterial
 var _player_flash_meshes: Array[MeshInstance3D] = []
 var _player_overlays: Dictionary[MeshInstance3D, Material] = {}
@@ -558,13 +559,16 @@ func _process(delta: float) -> void:
 	var focus: Vector3 = presentation.player_position()
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
 	if not _player_overlays.is_empty():
-		if _player_flash_remaining <= 0.0:
-			_clear_player_flash()
+		if _player_flash_pending:
+			_player_flash_pending = false
 		else:
-			var weight := smoothstep(0.0, PLAYER_HIT_FLASH_DURATION * 0.65, _player_flash_remaining)
-			for mesh: MeshInstance3D in _player_overlays:
-				mesh.set_instance_shader_parameter(&"player_hit_flash", weight)
 			_player_flash_remaining = maxf(0.0, _player_flash_remaining - delta)
+			if _player_flash_remaining <= 0.0:
+				_clear_player_flash()
+			else:
+				var weight := smoothstep(0.0, PLAYER_HIT_FLASH_DURATION * 0.65, _player_flash_remaining)
+				for mesh: MeshInstance3D in _player_overlays:
+					mesh.set_instance_shader_parameter(&"player_hit_flash", weight)
 	if _shake_duration > 0.0:
 		# Sample the hit at age zero on its first displayed frame.
 		var decay := 1.0 - _shake_age / _shake_duration
@@ -902,6 +906,7 @@ func _show_player_hit(lost: int) -> void:
 	for mesh: MeshInstance3D in _player_overlays:
 		mesh.set_instance_shader_parameter(&"player_hit_flash", 1.0)
 	_player_flash_remaining = PLAYER_HIT_FLASH_DURATION
+	_player_flash_pending = true
 	# Several physics ticks can run before the next frame is drawn.
 	var tick := Engine.get_physics_frames()
 	if _player_damage_tick != tick:
@@ -926,6 +931,7 @@ func _clear_player_flash() -> void:
 		mesh.material_overlay = _player_overlays[mesh]
 	_player_overlays.clear()
 	_player_flash_remaining = 0.0
+	_player_flash_pending = false
 
 func reset_player() -> void:
 	_foot_contact_tick = -1

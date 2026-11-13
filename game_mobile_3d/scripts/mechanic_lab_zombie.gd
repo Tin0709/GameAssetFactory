@@ -155,6 +155,7 @@ var _blocking_position := Vector3.ZERO
 var _blocked_target_position := Vector3.ZERO
 var _skipped_blocked_step := false
 var _flash_left := 0.0
+var _flash_pending := false
 var _corpse_age := 0.0
 var _corpse_landed := false
 var _limb_support_age := 0.0
@@ -287,14 +288,17 @@ static func source_ragdoll_layout(skeleton: Skeleton3D, profile: Dictionary) -> 
 	return {"parts": parts, "bones": bones, "offsets": offsets, "joints": joints}
 
 func _process(delta: float) -> void:
-	# Sample before advancing so the first drawn frame gets the full flash.
+	# The first render delta includes time before the hit. Start the fade
+	# after the full-strength frame that take_hit has already submitted.
+	if _flash_pending:
+		_flash_pending = false
+		return
+	_flash_left = maxf(0.0, _flash_left - delta)
 	var flash := smoothstep(0.0, HIT_FLASH_DURATION * 0.65, _flash_left)
 	_mesh.set_instance_shader_parameter("hit_flash", flash)
 	if _flash_left <= 0.0:
 		_mesh.material_overlay = null
 		set_process(false)
-	else:
-		_flash_left = maxf(0.0, _flash_left - delta)
 
 func _physics_process(delta: float) -> void:
 	if health <= 0:
@@ -461,6 +465,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 	_mesh.material_overlay = _flash_material
 	_mesh.set_instance_shader_parameter("hit_flash", 1.0)
 	_flash_left = HIT_FLASH_DURATION
+	_flash_pending = true
 	set_process(true)
 	if health <= 0:
 		_death_direction = direction
