@@ -73,6 +73,7 @@ func run() -> void:
 		muzzle_errors.append(projectile.global_position.distance_to(lab._crossbow_mount.to_global(CrossPollinator.MUZZLE))))
 	check(fire_samples.size() == 3 and impact_samples.size() == 3, "All verified crossbow firing and impact samples load")
 	check(flight_samples.size() == 4, "All verified arrow flight samples load")
+	await check_crossbow_trail(lab)
 	check(menu.selected == 3 and ammo.visible and ammo.text.contains("25 / 25"), "Crossbow equips with full ammo")
 	attack(true)
 	await ticks(2)
@@ -296,6 +297,40 @@ func run() -> void:
 		await process_frame
 	print("MECHANIC_LAB_REQUESTED_WEAPONS failures=", failures)
 	quit(1 if failures else 0)
+
+func check_crossbow_trail(lab: Node3D) -> void:
+	var crossbow = lab._crossbow
+	var ribbon := crossbow.get_node_or_null("ArrowTrail") as MeshInstance3D
+	check(ribbon != null, "Polaris has a shared ribbon renderer")
+	if ribbon == null:
+		return
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(2.0, 2.0, 0.1)
+	collider.shape = box
+	wall.add_child(collider)
+	lab.add_child(wall)
+	wall.position = Vector3(18.0, 1.25, 4.0)
+	await ticks(2)
+	var origin := Vector3(18.0, 1.25, 0.0)
+	crossbow.fire(origin, Vector3.BACK, -201, origin)
+	await ticks(4)
+	check(ribbon.visible and crossbow._trails.size() == 1 and crossbow._bolts.size() == 1,
+		"A travelling bolt draws a ribbon in the shared renderer")
+	await ticks(8)
+	check(ribbon.visible and crossbow._bolts.is_empty() and crossbow._trails.size() == 1,
+		"The already-laid ribbon decays after impact")
+	if crossbow._trails.size() == 1:
+		check(absf(float(crossbow._trails[0].distance) - 3.95) < 0.03,
+			"The ribbon stops at the wall surface")
+	await ticks(18)
+	check(not ribbon.visible and crossbow._trails.is_empty(), "The last ribbon sample expires after 0.30 seconds")
+	crossbow.fire(origin, Vector3.BACK, -202, origin)
+	await ticks(3)
+	crossbow.reset()
+	check(not ribbon.visible and crossbow._trails.is_empty(), "Reset clears the flying ribbon immediately")
+	wall.queue_free()
 
 func check_crossbow_collision_radius(lab: Node3D) -> void:
 	var crossbow = lab._crossbow
