@@ -50,9 +50,9 @@ const ACTION_HASH := "09471c7fa549624245482513aefd2e2f8fa35a18152dfb9b23b04baabd
 # respective left-weapon sockets. The GLB coordinate conversion maps it to +Y.
 const MESH_OFFSET := Vector3(0.0, 0.16, 0.0)
 const MUZZLE := Vector3(0.0, 0.075, 0.65)
-# AM_Player_CrossBow_Action blend-out duration. The Lab blends from its
-# interrupted recovery pose so the lowering starts promptly after firing.
-const BLEND_OUT_SECONDS := 0.25
+# The source montage blends out over 0.25 s. Allow another 0.05 s in the Lab
+# for the muzzle to follow the full-body handoff from raised aim to low carry.
+const BLEND_OUT_SECONDS := 0.30
 const LOCOMOTION := {
 	"Idle": ["Player_Crossbow_Idle", 80, "5efd6e1c0d15066ab98c1bd31262b499435e125512a75a972ee87f1a74bd222a"],
 	"Walk": ["Player_Crossbow_Walk", 26, "a291db024a4b3d10ec01ecc66b068c364fb8bc22d8a245150cbd69dce1af2e9c"],
