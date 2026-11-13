@@ -351,11 +351,13 @@ func _project_source_anchors() -> void:
 				# The head can still be moving inward while the wall pins its
 				# anchor. Confirm the block before moving the free torso.
 				shift = _wall_anchor_motion(state, gap, false)
-				if not shift.is_zero_approx():
+				if not shift.is_zero_approx() and chest_state.linear_velocity.dot(shift) > 0.0:
 					var toward_anchor := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
 					if not _test_projection_motion(limb, state.transform, toward_anchor) \
 							or _projection_hit.get_collision_safe_fraction() > 0.0:
 						shift = Vector3.ZERO
+				else:
+					shift = Vector3.ZERO
 			if not shift.is_zero_approx():
 				largest_gap = distance
 				motion = shift
