@@ -272,8 +272,34 @@ func _constrain_free_anchor_motion(body: PhysicalBone3D, state: PhysicsDirectBod
 	motion.y = maxf(motion.y, -maxf(clearance, 0.0))
 	return motion
 
+func _recover_early_floor_arm_gap() -> void:
+	if not _limit_first_contact_stretch or floor_landing_blended or floor_impact_blend <= 0.0 \
+			or floor_impact_blend >= EARLY_ROLL_ANCHOR_BLEND_END \
+			or not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return
+	var floor_body := _flat_floor.get_parent() as StaticBody3D
+	var chest: PhysicalBone3D = bodies.Chest
+	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if floor_body == null or chest_state == null:
+		return
+	# During early support, continue the existing first-contact slide only
+	# for a falling arm with a large gap mostly along the floor.
+	for name in ["Arm.L", "Arm.R"]:
+		var arm: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(arm.get_rid())
+		if state == null or state.linear_velocity.y > 0.0:
+			continue
+		var spec: Dictionary = source_joints[name]
+		var gap: Vector3 = (chest_state.transform * spec.parent_frame).origin \
+			- (state.transform * spec.child_frame).origin
+		var tangent := gap.slide(Vector3.UP).length()
+		if tangent > 2.0 * SOURCE_ANCHOR_TOLERANCE and absf(gap.y) <= tangent * 0.75 \
+				and _body_supported_by(arm, floor_body):
+			_slide_supported_anchor(arm, state, gap, gap.length(), floor_body.get_rid())
+
 func _project_source_anchors() -> void:
 	super._project_source_anchors()
+	_recover_early_floor_arm_gap()
 	if _wall_handoff_frame < 0 or Engine.get_physics_frames() - _wall_handoff_frame \
 			> roundi(WALL_HANDOFF_RECOVERY_SECONDS * Engine.physics_ticks_per_second):
 		return
