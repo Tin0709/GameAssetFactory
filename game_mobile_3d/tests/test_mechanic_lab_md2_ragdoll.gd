@@ -197,6 +197,7 @@ func run() -> void:
 	await check_sabre_fixed_pose_anchor(lab, group, 652, 0.095, "leg contact after the landing blend")
 	await check_sabre_fixed_pose_anchor(lab, group, 655, 0.105, "arm after the landing blend", 0.013)
 	await check_sabre_fixed_pose_anchor(lab, group, 703, 0.11, "arm sliding during the first roll", 0.013)
+	await check_sabre_walking_arm_slide(lab, group)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	await check_fresh_spawn_handoff(lab, group, 0)
@@ -710,6 +711,35 @@ func check_sabre_fixed_pose_anchor(lab, group, serial: int, gap_limit: float, im
 		"Fixed-pose Sabre %s keeps the joint connected, clears the floor and settles" % impact)
 	print("SABRE_FIXED_IMPACT serial=", serial, " peak_gap_m=", peak,
 		" overlap_m=", overlap, " release_s=", zombie._corpse_age)
+	zombie.free()
+
+func check_sabre_walking_arm_slide(lab, group) -> void:
+	group._spawn_serial = 61
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(-3.15, 0.02, 1.35)
+	zombie.rotation.y = -1.85652160644531
+	zombie.animation.stop()
+	zombie.ragdoll.skeleton.reset_bone_poses()
+	zombie.animation.play(&"Zombie_Walk_Variant1")
+	zombie.animation.advance(0.0)
+	zombie.animation.seek(0.21666686534881, true)
+	for i in 2:
+		zombie.ragdoll.sample(1.0 / 60.0)
+	zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
+	zombie.set_physics_process(true)
+	var peak := 0.0
+	var overlap := 0.0
+	while not zombie._corpse_parked and zombie._corpse_age < 1.55:
+		await physics_frame
+		if zombie.ragdoll.running:
+			peak = maxf(peak, zombie.ragdoll.max_anchor_error())
+			overlap = maxf(overlap, -zombie.ragdoll.minimum_corner_y())
+	check(peak > 0.0 and peak < 0.132, "Sabre's walking-pose arm stays attached during the first roll")
+	check(overlap <= 0.013 and zombie._corpse_parked,
+		"The walking-pose corpse stays within floor tolerance and settles")
+	print("SABRE_WALKING_ARM_SLIDE gap_m=", peak, " overlap_m=", overlap, " release_s=", zombie._corpse_age)
 	zombie.free()
 
 func check_flat_contact_jitter(lab, group, serial: int, pose_time: float, direction_angle: float,
