@@ -77,6 +77,26 @@ func run() -> void:
 			if not landing_bursts.is_empty():
 				break
 		check(landing_bursts == [5], "An actual WorldMap jump emits exactly one burst on landing")
+		landing_bursts.clear()
+		world.reset_player()
+		for i in 12:
+			await physics_frame
+		check(world.player.drop_for_lab(5.0), "The heavy landing fixture starts over the authored terrain")
+		for i in 5:
+			await physics_frame
+		var key := InputEventKey.new()
+		key.physical_keycode = KEY_E
+		key.pressed = true
+		root.push_input(key, true)
+		await physics_frame
+		await physics_frame
+		key.pressed = false
+		root.push_input(key, true)
+		for i in 100:
+			await physics_frame
+		check(landing_bursts == [10], "A real heavy attack replaces the ordinary dust with one wider burst")
+		check(not dust.is_processing() and dust.get_children().all(func(sprite): return not sprite.visible),
+			"The heavy burst expires and stops processing")
 	print("WORLD_MAP_MOVEMENT_DUST failures=", failures)
 	world.free()
 	quit(0 if failures.is_empty() else 1)
