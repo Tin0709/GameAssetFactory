@@ -13,6 +13,9 @@ const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
 const PrivateOverworldBundle := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/private_bundle.gd")
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
 const CurvedGreatsword := preload("res://scripts/mechanic_lab_curved_greatsword.gd")
+const WeaponSource := preload("res://scripts/mechanic_lab_weapon_source.gd")
+const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd")
+const Gauntlets := preload("res://scripts/mechanic_lab_gauntlets.gd")
 const DamageFeedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
@@ -46,7 +49,7 @@ const SABRE_LANDING_SHAKE_DELAY := 0.052268848
 # AM_Player_Sabre_JumpAttack: one-shot PlayNiagaraEffect minus LandingStart.
 const SABRE_LANDING_BURST_DELAY := 0.056890413
 
-enum Weapon { SABRE, SWORD, CURVED_GREATSWORD }
+enum Weapon { SABRE, SWORD, CURVED_GREATSWORD, CROSS_POLLINATOR, GAUNTLETS }
 
 var presentation: Node
 var look: WorldLook
@@ -75,6 +78,15 @@ var _sabre_profile: Dictionary
 var _sword_profile: Dictionary
 var _curved_profile: Dictionary
 var _curved_locomotion: Dictionary
+var _crossbow: CrossPollinator
+var _crossbow_mesh: Mesh
+var _crossbow_profile: Dictionary
+var _crossbow_locomotion: Dictionary
+var _gauntlet_mesh: Mesh
+var _left_gauntlet: MeshInstance3D
+var _gauntlet_profile: Dictionary
+var _sabre_air_clip: Dictionary
+var _sabre_air_rate := 1.0
 var _sabre_audio_aliases: Dictionary
 var _sabre_audio_rates: Dictionary
 var _shake_serial := -1
@@ -110,7 +122,11 @@ func _enter_tree() -> void:
 	presentation.name = "RenderPresentation"
 	add_child(presentation)
 	presentation.begin(self)
-	var actor := PlayerFactory.create(PlayerFactory.uses_private_player())
+	var using_private := PlayerFactory.uses_private_player()
+	var actor := PlayerFactory.create(using_private)
+	if using_private and OS.has_feature("editor") and "primary_ready" in actor:
+		actor.free()
+		actor = load("res://scripts/mechanic_lab_player.gd").new()
 	if "native_jump_pose_enabled" in actor:
 		actor.native_jump_pose_enabled = true
 	actor.name = "Player"
@@ -208,7 +224,7 @@ func _ready() -> void:
 			$CombatEffects.add_child(numbers)
 			$Zombies.damage_numbers = numbers
 		player.grounded_melee_aim = $Zombies.aim_sabre
-		player.connect("grounded_sabre_impact", $Zombies.strike_sabre)
+		player.connect("grounded_sabre_impact", _on_grounded_attack)
 		player.connect("heavy_jump_landed", _on_heavy_jump_landed)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
@@ -226,6 +242,8 @@ func _setup_weapon_selector() -> void:
 	$HUD/Weapon.add_item("Sabre")
 	$HUD/Weapon.add_item("Sword")
 	$HUD/Weapon.add_item("Curved Greatsword")
+	_add_weapon_option("The Cross Pollinator", CrossPollinator.icon())
+	_add_weapon_option("Prime Enchanter's Gauntlets", Gauntlets.icon())
 	_weapon_mesh = player.model.find_child("SabrePrototypeSabre", true, false) as MeshInstance3D
 	if _weapon_mesh == null or not player.combo.native_enabled:
 		return
@@ -233,11 +251,19 @@ func _setup_weapon_selector() -> void:
 	_sabre_blade_base = player.marker_base.position
 	_sabre_blade_tip = player.marker_tip.position
 	_sabre_profile = player.runtime_locomotion_profile.combat
+	_sabre_air_clip = player.clips.AirAttack
+	_sabre_air_rate = player.combo.air_attack_play_rate
 	_sword_profile = Sword.combat_profile(_sabre_profile, player.clips)
 	_sabre_audio_aliases = player.reference_audio.clip_aliases.duplicate()
 	_sabre_audio_rates = player.reference_audio.clip_play_rates.duplicate()
 	$HUD/Weapon.disabled = false
 	$HUD/Weapon.item_selected.connect(_select_weapon)
+
+func _add_weapon_option(label: String, icon: Texture2D) -> void:
+	if icon == null:
+		$HUD/Weapon.add_item(label)
+	else:
+		$HUD/Weapon.add_icon_item(icon, label)
 
 func _select_weapon(index: int) -> void:
 	if index == _equipped_weapon:
@@ -260,6 +286,8 @@ func _select_weapon(index: int) -> void:
 	var blade_tip := _sabre_blade_tip
 	var aliases := _sabre_audio_aliases
 	var rates := _sabre_audio_rates
+	var rotation_y := 0.0
+	var locomotion := {}
 	match index:
 		Weapon.SWORD:
 			mesh = _sword_mesh
@@ -270,13 +298,29 @@ func _select_weapon(index: int) -> void:
 				"SwordAirAttack": player.combo.air_attack_play_rate}
 		Weapon.CURVED_GREATSWORD:
 			mesh = _curved_mesh
+			locomotion = _curved_locomotion
 			blade_base = CurvedGreatsword.BLADE_BASE
 			blade_tip = CurvedGreatsword.BLADE_TIP
 			aliases = {}
 			rates = {"NativeCurvedAttack1": CurvedGreatsword.PLAYBACK_RATE,
 				"NativeCurvedAttack2": CurvedGreatsword.PLAYBACK_RATE,
 				"NativeCurvedAttack3": CurvedGreatsword.PLAYBACK_RATE}
+		Weapon.CROSS_POLLINATOR:
+			mesh = _crossbow_mesh
+			locomotion = _crossbow_locomotion
+			rotation_y = PI
+			blade_tip = blade_base
+			aliases = {}
+			rates = {}
+		Weapon.GAUNTLETS:
+			mesh = _gauntlet_mesh
+			blade_tip = blade_base
+			aliases = {"AirAttack": Gauntlets.AIR}
+			rates = {}
 	_weapon_mesh.mesh = mesh
+	_weapon_mesh.rotation.y = rotation_y
+	if _left_gauntlet != null:
+		_left_gauntlet.visible = index == Weapon.GAUNTLETS
 	player.marker_base.position = blade_base
 	player.marker_tip.position = blade_tip
 	player.reference_audio.reset()
@@ -288,16 +332,30 @@ func _select_weapon(index: int) -> void:
 	_equipped_weapon = index as Weapon
 	var sword_equipped := index == Weapon.SWORD
 	var curved_equipped := index == Weapon.CURVED_GREATSWORD
+	var crossbow_equipped := index == Weapon.CROSS_POLLINATOR
+	var gauntlets_equipped := index == Weapon.GAUNTLETS
+	player.crossbow_equipped = crossbow_equipped
+	player.gauntlets_equipped = gauntlets_equipped
+	player.clips.AirAttack = player.clips[Gauntlets.AIR] if gauntlets_equipped else _sabre_air_clip
+	player.combo.air_attack_play_rate = 1.0 if gauntlets_equipped else _sabre_air_rate
 	player.combo.use_sabre_air_sections = index == Weapon.SABRE
 	_combat_audio.sword_equipped = sword_equipped
 	_combat_audio.curved_equipped = curved_equipped
 	$Zombies.sword_equipped = sword_equipped
 	$Zombies.curved_equipped = curved_equipped
+	$Zombies.gauntlets_equipped = gauntlets_equipped
+	$Zombies.crossbow_equipped = crossbow_equipped
+	$HUD/CrossbowAmmo.visible = crossbow_equipped
 	player.aerial_melee_enabled = not curved_equipped
-	player.set_weapon_locomotion(_curved_locomotion if curved_equipped else {})
+	player.set_weapon_locomotion({})
+	player.set_weapon_locomotion(locomotion)
 	$HUD/DropMedium.disabled = curved_equipped
 	$HUD/DropHigh.disabled = curved_equipped
 	var attack_hint := "chém dưới đất" if curved_equipped else "chém hoặc bổ trên không"
+	if crossbow_equipped:
+		attack_hint = "bắn nỏ"
+	elif gauntlets_equipped:
+		attack_hint = "đấm hoặc bổ trên không"
 	$HUD/Controls.text = (PRIVATE_CONTROLS % attack_hint) + " · Cuộn chuột để zoom"
 	$HUD/SpawnStatus.text = "Thiếu dữ liệu tư thế hai tay đã xác minh." if curved_equipped and _curved_locomotion.is_empty() else ""
 
@@ -307,15 +365,21 @@ func _weapon_profile(index: int) -> Dictionary:
 			return _sword_profile
 		Weapon.CURVED_GREATSWORD:
 			return _curved_profile
+		Weapon.CROSS_POLLINATOR:
+			return _crossbow_profile
+		Weapon.GAUNTLETS:
+			return _gauntlet_profile
 	return _sabre_profile
 
 func _load_weapon(index: int) -> bool:
 	if index == Weapon.SABRE or (index == Weapon.SWORD and _sword_mesh != null) \
 			or (index == Weapon.CURVED_GREATSWORD and not _curved_profile.is_empty()):
 		return true
-	var research_root := OS.get_environment("MD2_RESEARCH_ROOT")
-	if research_root.is_empty():
-		research_root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
+	var research_root := WeaponSource.research_root()
+	if index == Weapon.CROSS_POLLINATOR:
+		return _load_crossbow(research_root)
+	if index == Weapon.GAUNTLETS:
+		return _load_gauntlets(research_root)
 	if index == Weapon.SWORD:
 		_sword_mesh = Sword.load_mesh(player, research_root)
 		if _sword_mesh == null:
@@ -333,6 +397,69 @@ func _load_weapon(index: int) -> bool:
 	_curved_locomotion = CurvedGreatsword.load_locomotion(player, research_root)
 	player.reference_audio.add_manifest(research_root, CurvedGreatsword.MEDIA_MANIFEST)
 	return true
+
+func _load_crossbow(root: String) -> bool:
+	if _crossbow != null:
+		return true
+	var mesh := CrossPollinator.load_mesh(player, root)
+	var bolt := CrossPollinator.load_bolt(player, root)
+	if mesh == null or bolt == null:
+		return false
+	var profile := CrossPollinator.combat_profile(root)
+	player._load_private_combat_clips(profile, CrossPollinator.LIBRARY)
+	if not player.animation_player.has_animation_library(CrossPollinator.LIBRARY):
+		return false
+	_crossbow_locomotion = CrossPollinator.load_locomotion(player, root)
+	if _crossbow_locomotion.is_empty():
+		return false
+	_crossbow_mesh = mesh
+	_crossbow_profile = profile
+	_crossbow = CrossPollinator.new()
+	_crossbow.name = "CrossPollinator"
+	_crossbow.bolt_mesh = bolt
+	_crossbow.ammo_changed.connect(_set_crossbow_ammo)
+	_crossbow.bolt_impact.connect($Zombies.strike_bolt)
+	$CombatEffects.add_child(_crossbow)
+	_set_crossbow_ammo(_crossbow.ammo)
+	_combat_audio.load_crossbow(root)
+	return true
+
+func _load_gauntlets(root: String) -> bool:
+	if _left_gauntlet != null:
+		return true
+	var mesh := Gauntlets.load_mesh(player, root)
+	if mesh == null or player.skeleton.find_bone("J_L_Weapon") < 0:
+		return false
+	var profile := Gauntlets.combat_profile(root)
+	player._load_private_combat_clips(profile, Gauntlets.LIBRARY)
+	if not player.animation_player.has_animation_library(Gauntlets.LIBRARY):
+		return false
+	var socket := BoneAttachment3D.new()
+	socket.name = "LabLeftGauntletSocket"
+	socket.bone_name = "J_L_Weapon"
+	player.skeleton.add_child(socket)
+	_left_gauntlet = MeshInstance3D.new()
+	_left_gauntlet.name = "LabLeftGauntlet"
+	_left_gauntlet.mesh = mesh
+	_left_gauntlet.hide()
+	socket.add_child(_left_gauntlet)
+	_gauntlet_mesh = mesh
+	_gauntlet_profile = profile
+	_combat_audio.load_gauntlets(root)
+	return true
+
+func _set_crossbow_ammo(amount: int) -> void:
+	$HUD/CrossbowAmmo.text = "Đạn nỏ  %d / %d" % [amount, CrossPollinator.AMMO_MAX]
+
+func _on_grounded_attack(index: int, clip: String, serial: int) -> void:
+	if clip != CrossPollinator.SHOT:
+		$Zombies.strike_sabre(index, clip, serial)
+		return
+	var forward: Vector3 = player.visual.global_basis.z.normalized()
+	var muzzle: Vector3 = player._weapon_attachment.global_position + forward * 0.25
+	var direction: Vector3 = $Zombies.bolt_direction(muzzle, forward, serial)
+	if _crossbow.fire(muzzle, direction, serial):
+		_combat_audio.crossbow_fired(muzzle)
 
 func _setup_world_look() -> void:
 	var viewport := get_viewport()
@@ -452,7 +579,9 @@ func _heavy_debris_delay() -> float:
 func _on_attack_accepted_timed(index: int, clip: String, serial: int, at: float) -> void:
 	# The Sabre aerial montage loops until support, so its cue follows the
 	# landing section. Other attacks keep their existing sample timing.
-	if clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
+	if _equipped_weapon == Weapon.GAUNTLETS:
+		_combat_audio.gauntlet_swung(player.global_position + Vector3.UP, index, clip == "AirAttack")
+	elif clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
 		player.reference_audio.trigger_attack(index, clip, serial, at)
 
 func _cancel_slam_audio() -> void:
@@ -477,8 +606,8 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 		_contact_sparks.burst(point, direction)
 	else:
 		player.effects.contact(point, direction)
-	_combat_audio.contact(point, serial, lethal)
-	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3"]
+	_combat_audio.contact(point, serial, lethal, clip)
+	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3"]
 	if clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
 		_start_contact_light(point, serial, 2.3 if finisher else 1.8)
 	# These finishers share the source radii and non-oriented shake.
@@ -529,6 +658,8 @@ func _landing_floor_height(point: Vector3) -> float:
 	return height
 
 func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_height: float) -> void:
+	if _equipped_weapon == Weapon.GAUNTLETS:
+		player.begin_gauntlet_landing()
 	# Evaluate the height tiers against the support rather than the capsule origin.
 	fall_height = maxf(0.0, fall_height + point.y - _landing_floor_height(point))
 	$Zombies.land_sabre(point, facing, serial, fall_height)
@@ -748,6 +879,8 @@ func reset_player() -> void:
 	_clear_contact_light()
 	if _combat_audio != null:
 		_combat_audio.reset()
+	if _crossbow != null:
+		_crossbow.reset()
 	player.position = SPAWN
 	player.velocity = Vector3.ZERO
 	if player.has_method("cancel_jump"):
