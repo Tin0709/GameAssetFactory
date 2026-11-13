@@ -91,7 +91,7 @@ func run() -> void:
 
 	lab.reset_player()
 	await ticks(12)
-	target.position = Vector3(0.0, 0.0, 5.0)
+	target.position = Vector3(0.0, 0.0, 4.0)
 	lab.get_node("HUD/DropMedium").pressed.emit()
 	await ticks(5)
 	attack(true)
@@ -100,6 +100,7 @@ func run() -> void:
 	await ticks(4)
 	check(ammo.text.contains("24 / 25"), "Crossbow can fire during a fall")
 	await ticks(90)
+	check(target.health == 84, "A bolt fired above the melee height limit can hit a zombie on the ground")
 
 	lab.reset_player()
 	await ticks(12)

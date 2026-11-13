@@ -32,6 +32,17 @@ func _play(key: String, blend: float = 0.04) -> void:
 			return
 	super._play(key, blend)
 
+func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
+	if not crossbow_equipped or not weapon_source_locomotion or key not in GAITS:
+		return super._outgoing_locomotion_sampler(key, phase)
+	var cursor := {"clip": key, "phase": phase}
+	_outgoing_locomotion_state = cursor
+	return func(delta: float) -> Array[Transform3D]:
+		var speed := _animation_motion_speed if _combat_plan_active else current_speed
+		var gait_state: Dictionary = source_gait.state(speed)
+		cursor.phase = fposmod(float(cursor.phase) + delta / float(gait_state.period), 1.0)
+		return source_gait.compose(float(cursor.phase), speed)
+
 func begin_gauntlet_landing() -> void:
 	combo.air_landing_started = true
 	combo.time = Gauntlets.AIR_CONTACT

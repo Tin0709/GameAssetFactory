@@ -197,14 +197,14 @@ func aim_sabre(index: int, serial: int, movement: Vector3) -> Vector3:
 		_aim_target = null
 	if not is_instance_valid(_aim_target) or _aim_target.health <= 0 or _aim_target.is_queued_for_deletion():
 		var reach := CrossPollinator.AIM_RANGE if crossbow_equipped else float(_strikes()[index].range_m)
-		_aim_target = _find_melee_target(reach, movement)
+		_aim_target = _find_attack_target(reach, movement, crossbow_equipped)
 		if _aim_target == null:
 			return Vector3.ZERO
 	var direction := _aim_target.global_position - _attacker.global_position
 	direction.y = 0.0
 	return direction
 
-func _find_melee_target(reach: float, movement: Vector3, ranged := false) -> Zombie:
+func _find_attack_target(reach: float, movement: Vector3, ranged := false) -> Zombie:
 	var origin := _attacker.global_position
 	var space := get_world_3d().direct_space_state
 	var ray := _melee_ray(origin)
@@ -243,7 +243,7 @@ func bolt_direction(muzzle: Vector3, forward: Vector3, serial: int) -> Vector3:
 	if serial == _aim_serial and is_instance_valid(_aim_target) and _aim_target.health > 0:
 		target = _aim_target
 	else:
-		target = _find_melee_target(CrossPollinator.AIM_RANGE, forward, true)
+		target = _find_attack_target(CrossPollinator.AIM_RANGE, forward, true)
 	if target == null:
 		return forward
 	return (target.global_position + MELEE_CONTACT_HEIGHT - muzzle).normalized()
