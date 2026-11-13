@@ -87,6 +87,7 @@ func run() -> void:
 	zombie.free()
 	await check_sword_finisher_push(lab, group)
 	await check_sabre_landing_damage(lab, group)
+	await check_coincident_sabre_landing(lab, group)
 	await check_crowd(lab, group)
 	lab.free()
 	print("MECHANIC_LAB_KNOCKBACK first_chase_step=", first_chase_step,
@@ -210,6 +211,28 @@ func check_sabre_landing_damage(lab, group) -> void:
 	check(zombies[0].health == 8, "Reset cancels a pending Sabre landing hit")
 	for zombie in zombies:
 		zombie.free()
+
+func check_coincident_sabre_landing(lab, group) -> void:
+	lab.reset_player()
+	await ticks(5)
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	var origin: Vector3 = lab.player.global_position
+	zombie.global_position = origin
+	zombie.health = 8
+	# Inject the touchdown event to align both centres exactly, independent of
+	# the living colliders' separation. Capture the ragdoll's actual impulse.
+	group.land_sabre(origin, Vector3.RIGHT, 998, 0.25)
+	await ticks(ceili(0.1 * Engine.physics_ticks_per_second) + 1)
+	check(zombie.health == 0, "The coincident zombie takes the full landing hit")
+	zombie.set_physics_process(true)
+	await ticks(2)
+	var impulse: Vector3 = zombie.ragdoll.total_applied_impulse
+	check(zombie.ragdoll.running and impulse.x > 0.0 and absf(impulse.z) < 0.001,
+		"A coincident zombie is launched in the saved facing direction")
+	print("SABRE_COINCIDENT_LANDING impulse=", impulse)
+	zombie.free()
 
 func check_crowd(lab, group) -> void:
 	lab.reset_player()
