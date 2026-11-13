@@ -81,6 +81,19 @@ func _load_evening(path: String) -> void:
 func evening_available() -> bool:
  return kernel_available() and _evening_energy.size() == EVENING_HOURS.size()
 
+func afternoon_lantern_energy(hour: float, authored: float, strength: float, half_past_nineteen: float) -> float:
+ if not evening_available() or strength <= 0.0 or hour <= 12.0 or hour >= EVENING_HOURS[1]:
+  return authored
+ # Forest Day-to-Sunset captures contain no matching point light through
+ # the slot assigned to 18:30. The 19:00 slot is the first measured light.
+ var first := minf(_evening_energy[0], half_past_nineteen)
+ var target := 0.0
+ if hour > EVENING_HOURS[0]:
+  target = lerpf(first, half_past_nineteen, inverse_lerp(EVENING_HOURS[0], EVENING_HOURS[1], hour))
+ elif hour > EVENING_START:
+  target = lerpf(0.0, first, inverse_lerp(EVENING_START, EVENING_HOURS[0], hour))
+ return lerpf(authored, target, strength)
+
 func evening_lantern_energy(hour: float, authored: float, strength: float, bounds: Vector2) -> float:
  if not evening_available() or authored <= 0.0 or strength <= 0.0 or not is_finite(hour) or hour <= EVENING_START or hour >= EVENING_END:
   return authored

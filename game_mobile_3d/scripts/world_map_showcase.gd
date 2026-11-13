@@ -121,6 +121,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"shadow_softness": ["Shadow softness", 1.5],
 	&"lantern": ["Hip lantern", 2.],
 	&"evening_lantern": ["Đèn hông chạng vạng", 1.],
+	&"afternoon_lantern": ["Đèn hông bật muộn", 1.],
 	&"lantern_lift": ["Lantern height", 1.5],
 	&"lantern_air": ["Lantern in mist", 2.],
 	&"lantern_glow": ["Lantern glow", 2.],
@@ -185,7 +186,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 112
+const LIGHTING_MIX_VERSION := 113
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1709,6 +1710,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 72 and effect == &"evening_lantern":
 			missing_value = 0.
+		if version < 113 and effect == &"afternoon_lantern":
+			missing_value = 0.
 		if version < 73 and effect == &"twilight_crown":
 			missing_value = 0.
 		if version < 74 and effect == &"twilight_ground_ambient":
@@ -1820,7 +1823,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and key_response.sunrise_elevation_available() and direction_response.available()
 		if effect == &"evening_key_response":
 			slider.editable = slider.editable and key_response.evening_available()
-		if effect == &"evening_lantern":
+		if effect in [&"evening_lantern", &"afternoon_lantern"]:
 			slider.editable = slider.editable and point_response.evening_available()
 		if effect in [&"twilight_sky_chroma", &"twilight_ambient", &"twilight_crown"]:
 			slider.editable = slider.editable and sky_response.twilight_available()
@@ -2026,8 +2029,15 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 			# Use the captured transition fraction, independent of the user's fog slider.
 			p.player_light_weight=point_response.dawn_gain(hour,source.density_ratio,p.player_light_weight)
 	if not _balanced_preview and atmosphere_review == "combined":
+		var evening_mix := _lighting_scale(&"evening_lantern")
 		p.player_light_weight = point_response.evening_lantern_energy(hour, p.player_light_weight,
-			_lighting_scale(&"evening_lantern"), _evening_lantern_bounds)
+			evening_mix, _evening_lantern_bounds)
+		if hour > 12. and hour < point_response.EVENING_HOURS[1]:
+			var end_hour: float = point_response.EVENING_HOURS[1]
+			var endpoint := point_response.evening_lantern_energy(end_hour,
+				forest.sample(end_hour).player_light_weight, evening_mix, _evening_lantern_bounds)
+			p.player_light_weight = point_response.afternoon_lantern_energy(hour, p.player_light_weight,
+				_lighting_scale(&"afternoon_lantern"), endpoint)
 	if atmosphere_review in ["lighting","combined"]:
 		var linear:=env.ambient_light_color.srgb_to_linear();var source:=Vector3(linear.r,linear.g,linear.b)
 		var tinted:Vector3=source*p.ambient_tint;var luma:=Vector3(.2126,.7152,.0722)
