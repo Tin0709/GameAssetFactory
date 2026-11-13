@@ -267,24 +267,34 @@ func check_non_grass_landing(lab, dust: Node3D) -> void:
 	collision.shape = box
 	slab.add_child(collision)
 	lab.add_child(slab)
+	var heavy_landings: Array[Vector3] = []
+	var record_heavy := func(point: Vector3, _direction: Vector3, _serial: int, _height: float):
+		heavy_landings.append(point)
+	lab.player.heavy_jump_landed.connect(record_heavy)
 	toggle.button_pressed = true
 	for heavy in [false, true]:
 		lab.reset_player()
 		lab.player.global_position = Vector3(0.53, 1.0, 0.0)
 		var ordinary_before: int = movement.event_count.landing
 		var heavy_before: int = audio._next_choice.get(&"slam_grass", 0)
+		heavy_landings.clear()
 		if heavy:
 			lab.player.global_position.y = 5.0
 			await press_heavy_attack()
+		var peak_dust := 0
 		for i in 70:
 			await physics_frame
+			peak_dust = maxi(peak_dust, visible_particles(dust))
 		check(lab.player.is_on_floor() and lab.player.global_position.y > 0.20,
 			"The player's capsule comes to rest on the raised slab")
-		check(visible_particles(dust) == 0 and movement.event_count.landing == ordinary_before
+		check(heavy_landings.size() == int(heavy) and peak_dust == 0
+			and movement.event_count.landing == ordinary_before
 			and audio._next_choice.get(&"slam_grass", 0) == heavy_before,
 			"Landing on a slab edge does not emit dust or audio for the grass below (heavy=%s)" % heavy)
 		print("MECHANIC_LAB_SLAB_LANDING heavy=", heavy, " y=", lab.player.global_position.y,
-			" dust=", visible_particles(dust), " grass_landings=", movement.event_count.landing - ordinary_before)
+			" peak_dust=", peak_dust, " grass_landings=", movement.event_count.landing - ordinary_before,
+			" heavy_landings=", heavy_landings.size())
+	lab.player.heavy_jump_landed.disconnect(record_heavy)
 	toggle.button_pressed = false
 	slab.free()
 	lab.reset_player()
