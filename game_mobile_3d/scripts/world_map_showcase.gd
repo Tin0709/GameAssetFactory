@@ -127,6 +127,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
 	&"night_depth_scatter": ["Ánh xanh trong sương xa", 1.],
+	&"night_far_air": ["Chiều sâu sương đêm", 1.],
 	&"twilight_depth_scatter": ["Ánh tán xạ xa chạng vạng", 1.],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
 	&"twilight_far_air_color": ["Sắc lạnh của sương xa", 1.],
@@ -168,7 +169,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 88
+const LIGHTING_MIX_VERSION := 89
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -735,8 +736,9 @@ func _update_mist()->void:
 		# stay independent, so the distant haze can lift without hiding the actor.
 		var night_mix := moonlight_weight(hour) * _lighting_scale(&"night_mist_light")
 		sample.scatter_energy *= lerpf(1.0, NIGHT_MIST_MAX_GAIN, night_mix)
-		sample.depth_scatter = _mist_depth_scatter(night_weight)
-		sample.depth_scatter_color = _mist_depth_scatter_color(linear)
+		var distant_night := _night_far_air_weight(night_weight)
+		sample.depth_scatter = _mist_depth_scatter(night_weight, distant_night)
+		sample.depth_scatter_color = _mist_depth_scatter_color(linear, distant_night)
 		sample.depth_optical = _mist_depth_optical()
 	sample.player_light_weight *= _lighting_scale(&"lantern") * _lighting_scale(&"lantern_air")
 	var near_scale := _lighting_scale(&"near_haze")
@@ -759,8 +761,13 @@ func _update_mist()->void:
 		emitter=origin-Vector3.UP*1.4
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
 
-func _mist_depth_scatter(night_weight: float) -> float:
-	var night := night_weight * _lighting_scale(&"night_depth_scatter")
+func _night_far_air_weight(night_weight: float) -> float:
+	if not captured_mist_source or atmosphere_review != "combined" or _balanced_preview:
+		return 0.0
+	return night_weight * (1.0 - _twilight_window()) * _lighting_scale(&"night_far_air")
+
+func _mist_depth_scatter(night_weight: float, distant_night: float = 0.0) -> float:
+	var night := maxf(night_weight * _lighting_scale(&"night_depth_scatter"), 2.4 * distant_night)
 	if _balanced_preview or atmosphere_review != "combined" or not captured_mist_source \
 			or phase_air.evening_anchors.is_empty():
 		return night
@@ -776,20 +783,24 @@ func _mist_depth_optical() -> float:
 	# Fit the distant transmission to the Forest comparison without moving the near boundary.
 	return .85 * _twilight_window() * _lighting_scale(&"twilight_far_optical")
 
-func _mist_depth_scatter_color(source: Vector3) -> Vector3:
-	if _balanced_preview or not captured_mist_source or atmosphere_review != "combined" \
-			or phase_air.evening_anchors.is_empty() or _lighting_scale(&"twilight_depth_scatter") <= 0.0:
-		return Vector3.ZERO
-	var weight := .4 * _twilight_window() * _lighting_scale(&"twilight_far_air_color")
-	if weight <= 0.0:
+func _mist_depth_scatter_color(source: Vector3, distant_night: float = 0.0) -> Vector3:
+	if _balanced_preview or not captured_mist_source or atmosphere_review != "combined":
 		return Vector3.ZERO
 	const LUMA := Vector3(.2126, .7152, .0722)
-	# Compensate the weaker cool-color separation of our finish at distance.
-	var cooler := source * Vector3(.87, .65, 1.38)
-	var cooler_luma := cooler.dot(LUMA)
-	if cooler_luma <= 0.0:
-		return Vector3.ZERO
-	return (cooler * (source.dot(LUMA) / cooler_luma) - source) * weight
+	var offset := Vector3.ZERO
+	if not phase_air.evening_anchors.is_empty() and _lighting_scale(&"twilight_depth_scatter") > 0.0:
+		var weight := .4 * _twilight_window() * _lighting_scale(&"twilight_far_air_color")
+		if weight > 0.0:
+			var cooler := source * Vector3(.87, .65, 1.38)
+			var cooler_luma := cooler.dot(LUMA)
+			if cooler_luma > 0.0:
+				offset = (cooler * (source.dot(LUMA) / cooler_luma) - source) * weight
+	if distant_night > 0.0:
+		# Forest GPU haze chromaticities. Retain the local profile's source luminance.
+		var dawn := smoothstep(0.0, 2.5, hour) if hour < 12.0 else 0.0
+		var color := Vector3(.550, 1.0, 1.294).lerp(Vector3(1.022, 1.0, .922), dawn)
+		offset = offset.lerp(color * (source.dot(LUMA) / color.dot(LUMA)) - source, distant_night)
+	return offset
 
 func set_captured_mist_source(value:bool)->void:
 	captured_mist_source=value;_update_mist()
@@ -1561,6 +1572,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 88 and effect == &"forest_replay_halo":
 			missing_value = 0.
+		if version < 89 and effect == &"night_far_air":
+			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
 		if version < 84 and effect == &"night_stone_blue_softness":
@@ -1753,7 +1766,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile"]:
 		_update_mist()
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
