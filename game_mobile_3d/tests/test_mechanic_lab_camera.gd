@@ -54,10 +54,20 @@ func check_sabre_dive(lab) -> void:
 	var landings: Array[int] = []
 	lab.player.heavy_jump_landed.connect(func(_point, _forward, _serial, _height):
 		landings.append(Engine.get_physics_frames()))
-	for attempt in 3:
+	for attempt in 4:
 		lab.reset_player()
 		for i in 8:
 			await physics_frame
+		var target: CharacterBody3D
+		var target_hits: Array[int] = []
+		if attempt == 3:
+			lab.get_node("HUD/SpawnZombie").pressed.emit()
+			target = lab.get_node("Zombies").get_child(0)
+			target.set_physics_process(false)
+			target.collision_layer = 0
+			target.global_position = lab.player.global_position + lab.player.visual.global_basis.z * 1.5
+			lab.get_node("Zombies").sabre_contact.connect(func(_point, _direction, _clip, _index, _serial, _lethal):
+				target_hits.append(Engine.get_physics_frames()))
 		lab.get_node("HUD/DropMedium").pressed.emit()
 		for i in 2:
 			await physics_frame
@@ -87,7 +97,7 @@ func check_sabre_dive(lab) -> void:
 		var onset := -1
 		var flash_frame := -1
 		var burst_frame := -1
-		for i in 8:
+		for i in 16:
 			await physics_frame
 			var frame := Engine.get_physics_frames() - 1
 			if lab._shake_duration > 0.0 and onset < 0:
@@ -96,18 +106,24 @@ func check_sabre_dive(lab) -> void:
 				flash_frame = frame
 			if burst_frame < 0 and lab.player.effects.particles.any(func(particle): return particle.life > 0.0):
 				burst_frame = frame
-		if attempt > 0:
+		if attempt in [1, 2]:
 			check(onset < 0 and flash_frame < 0 and burst_frame < 0 and is_zero_approx(lab.camera.h_offset),
 				"Reset and defeat discard the queued aerial shake, flash and burst")
 			continue
 		var flash_delay := ceili(0.056890413 * Engine.physics_ticks_per_second)
-		check(flash_frame == landings[0] + flash_delay and burst_frame == flash_frame,
+		check(flash_frame == landings[attempt] + flash_delay and burst_frame == flash_frame,
 			"The aerial light and sparks share the authored one-shot VFX key")
 		var delay := ceili(0.052268848 * Engine.physics_ticks_per_second)
-		check(onset == landings[0] + delay, "The Sabre camera pulse starts at its montage cue with no target")
+		check(onset == landings[attempt] + delay, "The Sabre camera pulse starts at its montage cue")
+		if target != null:
+			var damage_delay := ceili(0.054369554 * Engine.physics_ticks_per_second)
+			check(target_hits == [landings[attempt] + damage_delay] and target.health == 8
+				and is_equal_approx(lab._impact_light.light_energy, 2.3),
+				"Target damage keeps its own key and cannot replace the landing flash")
+			target.free()
 		lab._process(1.0 / 60.0)
 		check(not is_zero_approx(lab.camera.h_offset), "The aerial cue moves the actual camera")
 		for i in 15:
 			lab._process(1.0 / 60.0)
 		check(is_zero_approx(lab.camera.h_offset), "The pulse settles back to the original camera offset")
-		print("SABRE_DIVE_SHAKE touchdown=", landings[0], " onset=", onset, " flash=", flash_frame, " burst=", burst_frame)
+		print("SABRE_DIVE_SHAKE touchdown=", landings[attempt], " onset=", onset, " flash=", flash_frame, " burst=", burst_frame)
