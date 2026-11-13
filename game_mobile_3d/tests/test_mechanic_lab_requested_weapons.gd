@@ -106,11 +106,12 @@ func run() -> void:
 	await ticks(12)
 	attack(true)
 	await ticks(3)
-	lab.player.requested_jump = true
+	Input.action_press("jump")
 	await ticks(10)
-	lab.player.requested_jump = false
+	Input.action_release("jump")
 	attack(false)
-	check(lab._crossbow.ammo < 24, "Holding fire continues after an accepted jump")
+	check(not lab.player.is_on_floor() and lab._crossbow.ammo < 24,
+		"Holding fire continues after an accepted jump")
 
 	lab.reset_player()
 	await ticks(12)
