@@ -38,6 +38,8 @@ const SABRE_LANDING_SWING_DELAY := 0.033083633
 const SABRE_LANDING_DEBRIS_DELAY := 0.045126423
 # AM_Player_Sabre_JumpAttack: CameraShakeNotify_C minus LandingStart.
 const SABRE_LANDING_SHAKE_DELAY := 0.052268848
+# AM_Player_Sabre_JumpAttack: one-shot PlayNiagaraEffect minus LandingStart.
+const SABRE_LANDING_BURST_DELAY := 0.056890413
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD }
 
@@ -73,6 +75,9 @@ var _shake_age := 0.0
 var _shake_duration := 0.0
 var _shake_strength := 0.0
 var _slam_shake_frame := -1
+var _slam_burst_frame := -1
+var _slam_burst_point: Vector3
+var _slam_burst_serial := -1
 var _light_serial := -1
 var _light_remaining := 0.0
 var _light_peak := 0.0
@@ -183,6 +188,7 @@ func _ready() -> void:
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
 		player.presentation_reset.connect(_clear_camera_shake)
+		player.presentation_reset.connect(_clear_contact_light)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
@@ -410,7 +416,8 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 		player.effects.contact(point, direction)
 	_combat_audio.contact(point, serial, lethal)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3"]
-	_start_contact_light(point, serial, 2.3 if finisher else 1.8)
+	if clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
+		_start_contact_light(point, serial, 2.3 if finisher else 1.8)
 	# These finishers share the source radii and non-oriented shake.
 	# Approximate StartMatineeCameraShakeAtPawn using the capsule center.
 	if not finisher or _shake_serial == serial or _player_body == null:
@@ -459,10 +466,19 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 		_combat_audio.slam_landed(contact.position)
 
 func _on_sabre_landing(point: Vector3, serial: int) -> void:
+	if _equipped_weapon != Weapon.SABRE:
+		_show_landing_burst(point, serial)
+		return
+	var frame := Engine.get_physics_frames()
+	var rate := Engine.physics_ticks_per_second
+	_slam_shake_frame = frame + ceili(SABRE_LANDING_SHAKE_DELAY * rate)
+	_slam_burst_frame = frame + ceili(SABRE_LANDING_BURST_DELAY * rate)
+	_slam_burst_point = point
+	_slam_burst_serial = serial
+
+func _show_landing_burst(point: Vector3, serial: int) -> void:
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
-	if _equipped_weapon == Weapon.SABRE:
-		_slam_shake_frame = Engine.get_physics_frames() + ceili(SABRE_LANDING_SHAKE_DELAY * Engine.physics_ticks_per_second)
 
 func _start_contact_light(point: Vector3, serial: int, energy: float) -> void:
 	if _light_serial == serial:
@@ -474,6 +490,13 @@ func _start_contact_light(point: Vector3, serial: int, energy: float) -> void:
 	_impact_light.light_energy = _light_peak
 	_impact_light.show()
 
+func _clear_contact_light() -> void:
+	_slam_burst_frame = -1
+	_light_serial = -1
+	_light_remaining = 0.0
+	_impact_light.light_energy = 0.0
+	_impact_light.hide()
+
 func _physics_process(_delta: float) -> void:
 	if player.position.y < -5.0:
 		reset_player()
@@ -481,6 +504,9 @@ func _physics_process(_delta: float) -> void:
 	if _slam_shake_frame >= 0 and frame >= _slam_shake_frame:
 		_slam_shake_frame = -1
 		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION)
+	if _slam_burst_frame >= 0 and frame >= _slam_burst_frame:
+		_slam_burst_frame = -1
+		_show_landing_burst(_slam_burst_point, _slam_burst_serial)
 	if _slam_swing_frame >= 0 and frame >= _slam_swing_frame:
 		_slam_swing_frame = -1
 		if player.combo.serial == _slam_swing_serial and player.combo.active():
@@ -585,10 +611,7 @@ func reset_player() -> void:
 			number.hide()
 			number.queue_free()
 	_clear_camera_shake()
-	_light_serial = -1
-	_light_remaining = 0.0
-	_impact_light.light_energy = 0.0
-	_impact_light.hide()
+	_clear_contact_light()
 	if _combat_audio != null:
 		_combat_audio.reset()
 	player.position = SPAWN
