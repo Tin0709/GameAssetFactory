@@ -42,6 +42,7 @@ const SOURCE_ANCHOR_TOLERANCE := 0.05
 # Limit extra separation from a deep first-contact correction without lifting the whole rig.
 const FIRST_CONTACT_ANCHOR_LIMIT := 0.09
 const FIRST_CONTACT_ANCHOR_MAX_LIFT := 0.04
+const FIRST_CONTACT_ANCHOR_MAX_SLIDE := 0.04
 const PROJECTION_COLLISION_MARGIN := 0.001
 const CONTACT_ANCHOR_RECOVERY_MAX_SHIFT := 0.18
 @export var maximum_inherited_linear_speed := 3.0
@@ -429,10 +430,15 @@ func _project_source_anchors() -> void:
 		var bias := CONE_OVERSHOOT_BIAS if overshot else CONE_DEFAULT_BIAS
 		PhysicsServer3D.cone_twist_joint_set_param(source_joint_rids[name], PhysicsServer3D.CONE_TWIST_JOINT_BIAS, bias)
 		var contacting := state.get_contact_count() > 0
-		if contacting and flat_floor:
-			continue
 		var correction := parent_frame.origin - child_frame.origin
 		var distance := correction.length()
+		if contacting and flat_floor:
+			if _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0 \
+					and distance > 2.0 * SOURCE_ANCHOR_TOLERANCE and not _flat_floor.disabled:
+				var floor_body := _flat_floor.get_parent() as StaticBody3D
+				if floor_body != null and _body_supported_by(child, floor_body):
+					_slide_supported_anchor(child, state, correction, distance, floor_body.get_rid())
+			continue
 		if distance <= SOURCE_ANCHOR_TOLERANCE:
 			continue
 		# Leave the authored tolerance and preserve rotation and velocities.
@@ -454,6 +460,15 @@ func _project_source_anchors() -> void:
 			motion *= safe_fraction
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
+
+func _slide_supported_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState3D,
+		gap: Vector3, distance: float, floor_rid: RID) -> void:
+	# The limb can slide along the support without being pushed through it or
+	# lifting it off the floor. Leave its velocity and rotation with the solver.
+	var slide := gap.slide(Vector3.UP).limit_length(minf(FIRST_CONTACT_ANCHOR_MAX_SLIDE,
+		distance - SOURCE_ANCHOR_TOLERANCE))
+	if not slide.is_zero_approx() and not _test_projection_motion(body, state.transform, slide, floor_rid):
+		state.transform = state.transform.translated(slide)
 
 func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, motion: Vector3,
 		require_overlap := false) -> void:
@@ -483,7 +498,7 @@ func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodySt
 			return
 	state.transform = destination
 
-func _test_projection_motion(body: PhysicalBone3D, start: Transform3D, motion: Vector3) -> bool:
+func _test_projection_motion(body: PhysicalBone3D, start: Transform3D, motion: Vector3, excluded_floor := RID()) -> bool:
 	if _projection_query == null:
 		_projection_query = PhysicsTestMotionParameters3D.new()
 		_projection_query.margin = PROJECTION_COLLISION_MARGIN
@@ -491,7 +506,12 @@ func _test_projection_motion(body: PhysicalBone3D, start: Transform3D, motion: V
 		_projection_hit = PhysicsTestMotionResult3D.new()
 	_projection_query.from = start
 	_projection_query.motion = motion
-	return PhysicsServer3D.body_test_motion(body.get_rid(), _projection_query, _projection_hit)
+	if excluded_floor.is_valid():
+		_projection_query.exclude_bodies = [excluded_floor]
+	var collided := PhysicsServer3D.body_test_motion(body.get_rid(), _projection_query, _projection_hit)
+	if excluded_floor.is_valid():
+		_projection_query.exclude_bodies = []
+	return collided
 
 func _project_terrain_contact() -> void:
 	var lift := 0.0
