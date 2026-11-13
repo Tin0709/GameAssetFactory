@@ -14,6 +14,9 @@ const WALL_ARM_HANDOFF_MAX_SHIFT := 0.06
 const WALL_ARM_HANDOFF_MIN_GAP := 3.5 * SOURCE_ANCHOR_TOLERANCE
 const WALL_NECK_BRACE_MIN_GAP := 2.5 * SOURCE_ANCHOR_TOLERANCE
 const WALL_NECK_LANDING_BLEND_END := 0.5
+const WALL_SHOULDER_SLIDE_WINDOW := 5.0 / 60.0
+const WALL_SHOULDER_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
+const WALL_SHOULDER_SLIDE_MAX := 0.08
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
@@ -365,6 +368,9 @@ func _project_source_anchors() -> void:
 	if sabre_flight:
 		_recover_leading_head_wall_overlap()
 	super._project_source_anchors()
+	if sabre_flight and _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _launch_frame \
+			<= roundi(WALL_SHOULDER_SLIDE_WINDOW * Engine.physics_ticks_per_second):
+		_slide_wall_shoulder_anchors()
 	_recover_early_floor_arm_gap()
 	_recover_floor_blocked_hip()
 	var recent_handoff := _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _wall_handoff_frame \
@@ -524,6 +530,37 @@ func _recover_leading_head_wall_overlap() -> void:
 		correction = normal * minf(recovery, TERRAIN_MAX_RECOVERY_SHIFT)
 	if not correction.is_zero_approx():
 		_try_terrain_translation(correction, head)
+
+func _slide_wall_shoulder_anchors() -> void:
+	var chest: PhysicalBone3D = bodies.Chest
+	var core := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if core == null:
+		return
+	for name in ["Arm.L", "Arm.R"]:
+		var limb: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
+		if state == null or state.get_contact_count() == 0:
+			continue
+		var spec: Dictionary = source_joints[name]
+		var gap: Vector3 = (core.transform * spec.parent_frame).origin - (state.transform * spec.child_frame).origin
+		var distance := gap.length()
+		if distance <= WALL_SHOULDER_SLIDE_MIN_GAP:
+			continue
+		for i in state.get_contact_count():
+			var wall := state.get_contact_collider_object(i) as StaticBody3D
+			var normal := state.get_contact_local_normal(i)
+			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y or absf(gap.dot(normal)) > distance * 0.2:
+				continue
+			# Sweep against the other geometry, then verify that sliding along
+			# the contact face does not deepen the starting overlap.
+			var motion := gap.slide(normal).limit_length(WALL_SHOULDER_SLIDE_MAX)
+			if not _test_projection_motion(limb, state.transform, motion, wall.get_rid()):
+				var start := _deepest_contact(_terrain_contact_points(limb, state, Vector3.ZERO))
+				var end := _deepest_contact(_terrain_contact_points(limb, state, motion))
+				var mid := _deepest_contact(_terrain_contact_points(limb, state, motion * 0.5))
+				if maxf(mid, end) <= maxf(start, PROJECTION_COLLISION_MARGIN) + PROJECTION_COLLISION_MARGIN:
+					state.transform = state.transform.translated(motion)
+			break
 
 func _wall_chest_shift_preserves_joints(gaps: Array[Vector3], largest_gap: float, motion: Vector3) -> bool:
 	for gap: Vector3 in gaps:
