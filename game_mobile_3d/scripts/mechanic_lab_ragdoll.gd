@@ -551,10 +551,14 @@ func _slide_wall_shoulder_anchors() -> void:
 			var normal := state.get_contact_local_normal(i)
 			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y or absf(gap.dot(normal)) > distance * 0.2:
 				continue
+			var wall_rid := wall.get_rid()
+			if PhysicsServer3D.body_get_shape_count(wall_rid) != 1 \
+					or PhysicsServer3D.shape_get_type(PhysicsServer3D.body_get_shape(wall_rid, 0)) != PhysicsServer3D.SHAPE_BOX:
+				continue
 			# Sweep against the other geometry, then verify that sliding along
 			# the contact face does not deepen the starting overlap.
 			var motion := gap.slide(normal).limit_length(WALL_SHOULDER_SLIDE_MAX)
-			if not _test_projection_motion(limb, state.transform, motion, wall.get_rid()):
+			if not _test_projection_motion(limb, state.transform, motion, wall_rid):
 				var start := _deepest_contact(_terrain_contact_points(limb, state, Vector3.ZERO))
 				var end := _deepest_contact(_terrain_contact_points(limb, state, motion))
 				var mid := _deepest_contact(_terrain_contact_points(limb, state, motion * 0.5))
