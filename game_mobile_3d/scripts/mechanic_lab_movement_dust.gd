@@ -99,6 +99,9 @@ func use_source_landing() -> void:
 	_landing_alpha_duration = float(data.alpha_duration)
 	_landing_drag = PackedFloat32Array(data.drag)
 
+func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:
+	return batch.setup(_particles[0].sprite.texture, _run_alpha, _run_alpha_duration)
+
 static func _load_mask() -> Texture2D:
 	var atlas := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(128, 64))
 	if atlas == null:

@@ -52,7 +52,7 @@ func burst(ground_point: Vector3) -> void:
 	puff.lifetime = _random.randf_range(0.80, 1.75)
 	puff.drag = _random.randf_range(4.0, 10.0)
 	var frame: int = MovementDust.FRAMES[_random.randi_range(0, MovementDust.FRAMES.size() - 1)]
-	puff.cell = Vector2(frame % 8, frame / 8)
+	puff.cell = Vector2(frame % 8, floori(float(frame) / 8.0))
 	_puffs.append(puff)
 	set_process(true)
 

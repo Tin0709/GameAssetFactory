@@ -190,7 +190,7 @@ func _ready() -> void:
 			add_child(dust)
 			var zombie_dust := ZombieStepDust.new()
 			zombie_dust.name = "ZombieStepDust"
-			if zombie_dust.setup(dust._particles[0].sprite.texture, dust._run_alpha, dust._run_alpha_duration):
+			if dust.setup_zombie_steps(zombie_dust):
 				_zombie_step_dust = zombie_dust
 				add_child(zombie_dust)
 			else:
