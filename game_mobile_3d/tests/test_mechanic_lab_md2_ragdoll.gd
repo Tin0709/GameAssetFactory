@@ -180,6 +180,7 @@ func run() -> void:
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	await check_fresh_spawn_handoff(lab, group, 0)
 	await check_fresh_spawn_handoff(lab, group, 1)
+	await check_spawn_dive_handoff(lab, group)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
@@ -203,6 +204,49 @@ func check_fresh_spawn_handoff(lab, group, living_ticks: int) -> void:
 		"A lethal hit with %d prior samples launches on the first death tick from its current pose" % living_ticks)
 	print("FRESH_ZOMBIE_HANDOFF samples=", living_ticks, " active=", zombie.ragdoll.running,
 		" age=", zombie._corpse_age, " pose_gap_m=", zombie.ragdoll.handoff_error)
+	zombie.free()
+
+func check_spawn_dive_handoff(lab, group) -> void:
+	lab.reset_player()
+	await ticks(8)
+	var selector := lab.get_node("HUD/Weapon") as OptionButton
+	selector.select(0)
+	selector.item_selected.emit(0)
+	check(selector.selected == 0 and lab.player.drop_for_lab(5.0), "Fresh spawn fixture starts a Sabre dive")
+	await ticks(2)
+	var touchdown: Array[int] = []
+	var landed := func(_point, _facing, _serial, _height): touchdown.append(Engine.get_physics_frames())
+	lab.player.heavy_jump_landed.connect(landed)
+	lab.player.attack(true)
+	await ticks(1)
+	lab.player.attack(false)
+	for i in 60:
+		await physics_frame
+		if not touchdown.is_empty():
+			break
+	lab.player.heavy_jump_landed.disconnect(landed)
+	check(touchdown.size() == 1, "The real dive touches down once before spawning the target")
+	if touchdown.is_empty():
+		return
+	group._spawn_serial = 5
+	lab.get_node("HUD/BaseZombieToggle").button_pressed = true
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	for i in 12:
+		await physics_frame
+		if zombie.ragdoll.running:
+			break
+	check(zombie.health == 0 and zombie.ragdoll.running, "Sabre kills the zombie during its spawn clip")
+	var gap := 0.0
+	var first_support := INF
+	for i in 40:
+		await physics_frame
+		gap = maxf(gap, zombie.ragdoll.max_anchor_error())
+		if zombie._corpse_landed and first_support == INF:
+			first_support = zombie._corpse_age
+	check(gap < 0.10 and first_support > 0.20 and is_finite(first_support),
+		"The fresh corpse launches with connected joints before its first landing")
+	print("SPAWN_DIVE_HANDOFF peak_gap_m=", gap, " landing_s=", first_support)
 	zombie.free()
 
 func check_combo_finisher(lab, group, slot: int) -> void:
