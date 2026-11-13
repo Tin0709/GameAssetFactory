@@ -182,6 +182,7 @@ func run() -> void:
 	await check_sabre_first_contact_anchors(lab, group)
 	await check_sabre_head_and_arm_brace(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
+	await check_sabre_supported_arm_anchor(lab, group)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
@@ -468,6 +469,35 @@ func check_flat_rest_after_tumble(lab, group) -> void:
 		await physics_frame
 	check(zombie._corpse_parked and zombie.ragdoll.bodies.is_empty(),
 		"The flat-floor tumble stops vibrating and releases its rigid bodies within 1.85 seconds")
+	zombie.free()
+
+func check_sabre_supported_arm_anchor(lab, group) -> void:
+	const SERIAL := 415
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 120011 + SERIAL
+	group._spawn_serial = SERIAL
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(2.0, 0.02, 0.0)
+	zombie.rotation.y = rng.randf_range(0.0, TAU)
+	zombie.animation.play(ZOMBIE.ATTACK)
+	zombie.animation.advance(rng.randf_range(0.05, 0.3))
+	zombie.reset_physics_interpolation()
+	await ticks(4)
+	for i in 2:
+		zombie.ragdoll.sample(1.0 / 60.0)
+	var direction := Vector3.RIGHT.rotated(Vector3.UP, rng.randf_range(0.0, TAU))
+	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
+	zombie.set_physics_process(true)
+	var peak := 0.0
+	while not zombie._corpse_parked and zombie._corpse_age < 1.55:
+		await physics_frame
+		if zombie.ragdoll.running:
+			peak = maxf(peak, zombie.ragdoll.max_anchor_error())
+	check(peak > 0.0 and peak < 0.10 and zombie._corpse_parked,
+		"A fixed-pose Sabre arm rebound keeps the anchor below 10 cm and settles")
+	print("SABRE_SUPPORTED_ARM peak_gap_m=", peak, " release_s=", zombie._corpse_age)
 	zombie.free()
 
 func check_flat_contact_jitter(lab, group, serial: int, pose_time: float, direction_angle: float,
