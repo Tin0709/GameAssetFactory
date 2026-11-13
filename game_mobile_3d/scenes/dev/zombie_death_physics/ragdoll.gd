@@ -838,10 +838,11 @@ func _project_floor_contact() -> void:
 			var excess_lift := maxf(shared_lift - FLOOR_LANDING_LIFT_THRESHOLD, 0.0)
 			shared_lift -= minf(excess_lift * floor_impact_blend, FLOOR_LANDING_MAX_LIFT_REDUCTION)
 		var anchor_lifts: Dictionary[PhysicalBone3D, float] = {}
-		if _limit_first_contact_stretch and not landing_blended and floor_impact_blend < EARLY_ROLL_ANCHOR_BLEND_END \
+		if _limit_first_contact_stretch and (landing_blended or floor_impact_blend < EARLY_ROLL_ANCHOR_BLEND_END) \
 				and not depths.is_empty():
-			# Give the supported roll more room to move than the first impact.
-			var anchor_limit := EARLY_ROLL_ANCHOR_LIMIT if floor_impact_blend > 0.0 else FIRST_CONTACT_ANCHOR_LIMIT
+			# Give the early roll extra room until per-limb floor recovery takes over.
+			var early_roll := not landing_blended and floor_impact_blend > 0.0
+			var anchor_limit := EARLY_ROLL_ANCHOR_LIMIT if early_roll else FIRST_CONTACT_ANCHOR_LIMIT
 			_limit_floor_anchor_stretch(anchor_lifts, depths, shared_lift, slop, anchor_limit)
 		for body: PhysicalBone3D in bodies.values():
 			var correction: float = anchor_lifts.get(body, maxf(shared_lift, depths.get(body, 0.0) - slop))
