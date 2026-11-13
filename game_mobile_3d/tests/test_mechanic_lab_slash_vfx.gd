@@ -57,10 +57,51 @@ func run() -> void:
 	lab.reset_player()
 	await physics_frame
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
+	await check_sabre_dive(lab, selector)
 	lab.free()
 	await check_world_map_slash()
 	print("SABRE_SLASH_VFX failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_sabre_dive(lab, selector: OptionButton) -> void:
+	for i in 8:
+		await physics_frame
+	selector.select(0)
+	selector.item_selected.emit(0)
+	check(selector.selected == 0, "The aerial fixture equips Sabre")
+	var actor: CharacterBody3D = lab.player
+	var landings: Array[int] = []
+	actor.heavy_jump_landed.connect(func(_point, _facing, _serial, _height):
+		landings.append(Engine.get_physics_frames()))
+	for button_name in ["DropMedium", "DropHigh"]:
+		lab.reset_player()
+		for i in 8:
+			await physics_frame
+		landings.clear()
+		lab.get_node("HUD/" + button_name).pressed.emit()
+		for i in 2:
+			await physics_frame
+		attack(true)
+		await physics_frame
+		attack(false)
+		var slash_frame := -1
+		var air_loop_samples := 0
+		var landing_pose_time := -1.0
+		for i in Engine.physics_ticks_per_second:
+			await physics_frame
+			if landings.is_empty() and actor.combo.time >= 0.127934694 and actor.combo.time < 0.233467355:
+				air_loop_samples += 1
+			if landings.size() == 1 and landing_pose_time < 0.0:
+				landing_pose_time = actor.animation_player.current_animation_position
+			if not actor.effects.samples.is_empty() and slash_frame < 0:
+				slash_frame = Engine.get_physics_frames() - 1
+		check(landings.size() == 1 and air_loop_samples > 7,
+			button_name + " remains in the authored airborne loop until real floor contact")
+		check(landing_pose_time >= 0.233467355 and landing_pose_time <= 0.233467355 + 1.0 / Engine.physics_ticks_per_second + 0.0001,
+			button_name + " enters the landing section on touchdown")
+		check(not landings.is_empty() and slash_frame == landings[0] + ceili(0.055629984 * Engine.physics_ticks_per_second),
+			button_name + " creates the first blade ribbon sample at the montage slash cue")
+		print("SABRE_DIVE_SLASH fixture=", button_name, " landing=", landings, " pose=", landing_pose_time, " slash=", slash_frame)
 
 func check_world_map_slash() -> void:
 	var world := (load("res://scenes/WorldMap.tscn") as PackedScene).instantiate()
