@@ -82,6 +82,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"player_bounce": ["Player reflected sunlight (preview)", 1.],
 	&"foot_contact": ["Player ground contact (preview)", 1.],
 	&"grass_sky": ["Grass sky fill", 1.],
+	&"turf_ambient_color": ["Sắc ánh hắt trên cỏ lúc tối", 1.],
 	&"grass_shade_color": ["Grass shade color", 1.],
 	&"diffuse_openings": ["Sunlit diffuse fill", 1.],
 	&"regional_sky": ["Local cliff skylight (preview)", 1.],
@@ -160,7 +161,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 81
+const LIGHTING_MIX_VERSION := 82
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1203,6 +1204,16 @@ func grass_shade_color_mix() -> Vector3:
 	var tint := Vector2(.80, 1.24).lerp(Vector2(.84, 1.14), smoothstep(7., 16.5, hour))
 	return Vector3(tint.x, tint.y, strength) if strength > 0. else Vector3.ZERO
 
+func turf_ambient_color() -> Vector3:
+	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() \
+			or not captured_sky_response or not sky_response.available() or plants == null or not plants.grass_light.active:
+		return Vector3.ONE
+	# PIX confirms a shared incident color on paired receivers. These gains are calibrated to the WorldMap palette.
+	var twilight := Vector3.ONE.lerp(Vector3(1.4, 1.75, .88), twilight_finish_weight())
+	var night := moonlight_weight(hour) if moonlight_enabled else 0.0
+	var gain := twilight.lerp(Vector3(.9, 1.7, .88), night)
+	return Vector3.ONE.lerp(gain, .65 * _lighting_scale(&"turf_ambient_color"))
+
 func twilight_ground_ambient_scale() -> float:
 	if not forest_spatial_sky_context() or not captured_sky_response or plants == null or not plants.grass_light.active:
 		return 1.0
@@ -1497,6 +1508,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
+		if version < 82 and effect == &"turf_ambient_color":
+			missing_value = 0.
 		if version < 81 and effect == &"crown_ambient_depth":
 			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
@@ -1550,7 +1563,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"crown_ambient_depth":
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
-		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient"]:
+		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
 		if effect == &"twilight_shadow_lift":
 			slider.editable = slider.editable and phase_finish != null and phase_finish.available() and sky_response.twilight_available()
@@ -1641,7 +1654,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"canopy_player_cue":
 		level.sync_canopy_player_cue()
 		return
-	if changed_effect == &"twilight_ground_ambient":
+	if changed_effect in [&"twilight_ground_ambient", &"turf_ambient_color"]:
 		level.terrain_light.bind()
 		if plants != null:
 			plants.grass_light.sync()
