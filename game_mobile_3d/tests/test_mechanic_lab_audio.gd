@@ -132,6 +132,7 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	current_scene = lab
 	var audio = lab.get_node("CombatAudio")
 	var movement = lab.get_node("MovementAudio")
+	var dust := lab.get_node("MovementDust")
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
 	toggle.button_pressed = true
 	for voice: AudioStreamPlayer3D in audio._voices:
@@ -171,15 +172,18 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 			toggle.button_pressed = false
 			toggle.button_pressed = true
 		var playback_frame := -1
+		var dust_frame := -1
 		for i in 18:
 			await physics_frame
 			if playback_frame < 0 and audio._next_choice.get(&"slam_grass", 0) != before:
 				playback_frame = Engine.get_physics_frames() - 1
+			if dust_frame < 0 and dust.get_children().any(func(particle): return particle.visible):
+				dust_frame = Engine.get_physics_frames() - 1
 		if attempt == 0:
 			var delay_ticks := ceili(0.045126423 * Engine.physics_ticks_per_second)
-			check(playback_frame == landings[attempt] + delay_ticks
+			check(playback_frame == landings[attempt] + delay_ticks and playback_frame == dust_frame
 				and audio._next_choice.get(&"slam_grass", 0) == 1 and audio._next_choice.get(&"slam", 0) == 0,
-				"Sabre plays exactly one verified grass sample at the debris notify")
+				"Sabre plays exactly one verified grass sample on the same tick as its dust burst")
 			var peak := 0.0
 			for sample in capture.get_buffer(capture.get_frames_available()):
 				peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
