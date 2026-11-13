@@ -189,9 +189,31 @@ func run() -> void:
 	await check_sabre_fixed_pose_anchor(lab, group, 652, 0.095, "leg contact after the landing blend")
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
+	await check_fresh_spawn_handoff(lab, group, 0)
+	await check_fresh_spawn_handoff(lab, group, 1)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_fresh_spawn_handoff(lab, group, living_ticks: int) -> void:
+	lab.reset_player()
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	# The physics_frame signal runs before the zombie's physics callback.
+	for i in living_ticks:
+		await process_frame
+	check(zombie.ragdoll.sample_count == living_ticks, "The fresh-spawn fixture has the expected pose history")
+	zombie.take_hit(100, Vector3.RIGHT)
+	await process_frame
+	var inherited_motion := false
+	for sample: Dictionary in zombie.ragdoll.inherited.values():
+		inherited_motion = inherited_motion or not sample.linear.is_zero_approx() or not sample.angular.is_zero_approx()
+	check(zombie.ragdoll.running and zombie._corpse_age <= 1.0 / 60.0 + 0.00001
+		and zombie.ragdoll.handoff_error < 0.0001 and not inherited_motion,
+		"A lethal hit with %d prior samples launches on the first death tick from its current pose" % living_ticks)
+	print("FRESH_ZOMBIE_HANDOFF samples=", living_ticks, " active=", zombie.ragdoll.running,
+		" age=", zombie._corpse_age, " pose_gap_m=", zombie.ragdoll.handoff_error)
+	zombie.free()
 
 func check_combo_finisher(lab, group, slot: int) -> void:
 	lab.reset_player()
