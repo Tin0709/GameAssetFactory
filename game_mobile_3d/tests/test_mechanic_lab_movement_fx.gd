@@ -85,10 +85,47 @@ func run() -> void:
 	await physics_frame
 	check(visible_particles(dust) == 0 and visible_particles(wind) == 0, "Reset clears both movement effects")
 	await check_heavy_dust_timing(lab, dust)
+	await check_running_wake_support(lab, wind)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_running_wake_support(lab, wind) -> void:
+	lab.reset_player()
+	var floor_body := lab.get_node("Ground") as StaticBody3D
+	floor_body.position.y += 0.25
+	lab.player.global_position += Vector3.UP * 0.75
+	for i in 45:
+		await physics_frame
+	Input.action_press("move_forward")
+	for i in 20:
+		await physics_frame
+	Input.action_release("move_forward")
+	Input.action_press("move_right")
+	var supported_steps: Array[Vector3] = []
+	var listen := func(point, landed):
+		if not landed:
+			supported_steps.append(point)
+	lab.player.surface_contact.connect(listen)
+	for i in 35:
+		await physics_frame
+		if not supported_steps.is_empty():
+			break
+	lab.player.surface_contact.disconnect(listen)
+	var wake = wind._wakes[posmod(wind._next - 1, wind._wakes.size())]
+	var velocity: Vector3 = lab.player.get_real_velocity().slide(Vector3.UP)
+	check(not supported_steps.is_empty() and wake.mesh.visible and wake.trailing.dot(-velocity.normalized()) > 0.999,
+		"After turning, the wake trails the actual movement on a supported foot contact")
+	check(is_equal_approx(wake.origin.y, 0.25 + 0.38),
+		"The wake's height is measured from the grass under the foot")
+	var next: int = wind._next
+	var over_edge := Vector3(51.0, 0.25, 0.0)
+	lab.player.surface_contact.emit(over_edge, false)
+	lab.player.surface_contact.emit(lab.player.global_position + Vector3.UP * 2.0, false)
+	check(wind._next == next, "Foot contacts beyond the floor or above the grass do not spawn wakes")
+	Input.action_release("move_right")
+	floor_body.position.y -= 0.25
 
 func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 	for i in 8:
