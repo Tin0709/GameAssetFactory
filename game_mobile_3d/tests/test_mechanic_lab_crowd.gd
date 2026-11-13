@@ -3,6 +3,7 @@ extends SceneTree
 const LAB = preload("res://scenes/dev/MechanicLab.tscn")
 const ZOMBIE = preload("res://scripts/mechanic_lab_zombie.gd")
 const COUNT := 100
+const FIXTURE_HP := 10000
 var lab: Node3D
 var tick_started := 0
 var frame_started := 0
@@ -37,6 +38,9 @@ func run() -> void:
 		render_gpu_ms.append(RenderingServer.viewport_get_measured_render_time_gpu(rid))
 		draws.append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
 	await measure("empty", 90)
+	# Spawning is paced by rendered frames. On slow renderers the earliest
+	# zombies can finish their spawn and attack before the last batch appears.
+	lab.player_health = FIXTURE_HP
 	var group := lab.get_node("Zombies")
 	var verify_spawn := func(zombie: Node): check_spawn_spacing(group, zombie)
 	group.child_entered_tree.connect(verify_spawn)
@@ -165,15 +169,13 @@ func check_health_bars(group: Node) -> void:
 		failures.append("The delayed fill catches up to the target's current health")
 
 func check_crowd_melee(group: Node) -> void:
-	# Let the crowd keep attacking over the entire measurement window.
-	const FIXTURE_HP := 10000
-	lab.player_health = FIXTURE_HP
+	var starting_health: int = lab.player_health
 	var attacks: Array[int] = []
 	var record_hit := func(amount: int): attacks.append(amount)
 	group.player_hit.connect(record_hit)
 	await measure("crowd_melee", 300)
 	group.player_hit.disconnect(record_hit)
-	if group.get_child_count() != COUNT or attacks.size() < 20 or lab.player_health != FIXTURE_HP - attacks.size() * 6:
+	if group.get_child_count() != COUNT or attacks.size() < 20 or lab.player_health != starting_health - attacks.size() * 6:
 		failures.append("The packed crowd keeps attacking at the verified six HP per hit")
 	print("CROWD_MELEE_HITS ", attacks.size())
 	lab.reset_player()
