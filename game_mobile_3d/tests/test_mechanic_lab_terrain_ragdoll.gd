@@ -287,7 +287,7 @@ func check_edge_landing_gravity() -> void:
 	lab.free()
 
 func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: StringName, phase: float,
-		part := "Head", peak_limit := 0.115) -> void:
+		part := "Head", peak_limit := 0.115, first_contact := false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -318,6 +318,7 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 	var peak := 0.0
 	var farthest := -INF
 	var rebounded := false
+	var reached_wall := false
 	for i in 90:
 		await physics_frame
 		if not ragdoll.running:
@@ -328,9 +329,16 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 		var body: PhysicalBone3D = ragdoll.bodies[part]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		for contact in state.get_contact_count():
-			if state.get_contact_collider_object(contact) == wall and state.linear_velocity.x < -1.0:
+			if state.get_contact_collider_object(contact) != wall:
+				continue
+			if state.linear_velocity.x > 1.0:
+				reached_wall = reached_wall or is_equal_approx(state.total_gravity.y, -50.0)
+			if state.linear_velocity.x < -1.0:
 				rebounded = rebounded or is_equal_approx(state.total_gravity.y, -50.0)
-	check(rebounded, "%s rebounds from the side wall under flight gravity" % part)
+	if first_contact:
+		check(reached_wall, "%s reaches the side wall while moving inward under flight gravity" % part)
+	else:
+		check(rebounded, "%s rebounds from the side wall under flight gravity" % part)
 	check(peak > 0.0 and peak < peak_limit, "The %s joint stays attached through the side impact (%s)" % [part, serial])
 	check(farthest < 4.65, "The ragdoll stays on the near side of the rebound fixture wall")
 	print("LAB_WALL_REBOUND serial=", serial, " part=", part, " peak=", peak,
@@ -356,5 +364,7 @@ func run() -> void:
 		&"Zombie_Walk", 0.51666654745737, "Arm.R", 0.145)
 	await check_wall_rebound(99, Vector3(4.05, 0.02, 4.05), -0.14667794108391,
 		&"Zombie_Walk", 0.41666654745737, "Arm.L", 0.125)
+	await check_wall_rebound(29, Vector3(4.05, 0.02, -2.25), -3.00971364974976,
+		&"Zombie_Walk_Variant2", 0.31666686534881, "Arm.R", 0.128, true)
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
