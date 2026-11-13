@@ -630,6 +630,7 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var final_gravity := gravity_scale * ragdoll_gravity_multiplier
 	# The six Lab bodies receive the same values. Roll damping can keep
 	# changing after these channels have finished their landing blend.
+	# GodotPhysics can wake a body when its old gravity is near zero.
 	var write_gravity := not flat_floor or final_gravity != _landing_gravity_sent or is_zero_approx(final_gravity)
 	var write_linear_damp := not flat_floor or linear_damp != _landing_linear_damp_sent
 	for body: PhysicalBone3D in ragdoll.bodies.values():
