@@ -182,8 +182,9 @@ func run() -> void:
 	await check_sabre_first_contact_anchors(lab, group)
 	await check_sabre_head_and_arm_brace(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
-	await check_sabre_fixed_pose_anchor(lab, group, 415, "arm rebound")
-	await check_sabre_fixed_pose_anchor(lab, group, 419, "head impact at the start of the roll")
+	await check_sabre_fixed_pose_anchor(lab, group, 415, 0.10, "arm rebound")
+	await check_sabre_fixed_pose_anchor(lab, group, 419, 0.101, "head impact at the start of the roll")
+	await check_sabre_fixed_pose_anchor(lab, group, 652, 0.095, "leg contact after the landing blend")
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
@@ -472,7 +473,7 @@ func check_flat_rest_after_tumble(lab, group) -> void:
 		"The flat-floor tumble stops vibrating and releases its rigid bodies within 1.85 seconds")
 	zombie.free()
 
-func check_sabre_fixed_pose_anchor(lab, group, serial: int, impact: String) -> void:
+func check_sabre_fixed_pose_anchor(lab, group, serial: int, gap_limit: float, impact: String) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 120011 + serial
 	group._spawn_serial = serial
@@ -495,7 +496,6 @@ func check_sabre_fixed_pose_anchor(lab, group, serial: int, impact: String) -> v
 		await physics_frame
 		if zombie.ragdoll.running:
 			peak = maxf(peak, zombie.ragdoll.max_anchor_error())
-	var gap_limit := 0.10 if serial == 415 else 0.101
 	check(peak > 0.0 and peak < gap_limit and zombie._corpse_parked,
 		"Fixed-pose Sabre %s keeps the joint connected and settles" % impact)
 	print("SABRE_FIXED_IMPACT serial=", serial, " peak_gap_m=", peak, " release_s=", zombie._corpse_age)
