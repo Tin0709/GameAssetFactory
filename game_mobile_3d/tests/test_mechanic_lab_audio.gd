@@ -126,6 +126,73 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 		" step_peak=", peak, " landing_peak=", landing_peak)
 	lab.free()
 
+func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var audio = lab.get_node("CombatAudio")
+	var movement = lab.get_node("MovementAudio")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	for voice: AudioStreamPlayer3D in audio._voices:
+		voice.bus = AudioServer.get_bus_name(bus)
+	var landings: Array[int] = []
+	lab.player.heavy_jump_landed.connect(func(_point, _forward, _serial, _height):
+		landings.append(Engine.get_physics_frames()))
+	for attempt in 3:
+		for i in 20:
+			await physics_frame
+		lab.get_node("HUD/DropMedium").pressed.emit()
+		for i in 2:
+			await physics_frame
+		var attack := InputEventKey.new()
+		attack.physical_keycode = KEY_E
+		attack.pressed = true
+		root.push_input(attack, true)
+		for i in 2:
+			await physics_frame
+		attack = InputEventKey.new()
+		attack.physical_keycode = KEY_E
+		root.push_input(attack, true)
+		for i in Engine.physics_ticks_per_second:
+			await physics_frame
+			if landings.size() > attempt:
+				break
+		check(landings.size() == attempt + 1, "The audio fixture performs a real Sabre landing")
+		if landings.size() != attempt + 1:
+			break
+		var before := mini(attempt, 1)
+		check(audio._next_choice.get(&"slam_grass", 0) == before,
+			"Sabre floor contact waits for the montage debris cue")
+		capture.clear_buffer()
+		if attempt == 1:
+			lab.reset_player()
+		elif attempt == 2:
+			toggle.button_pressed = false
+			toggle.button_pressed = true
+			# Exclude the existing enable preview from the mixer capture.
+			audio.reset()
+		var playback_frame := -1
+		for i in 18:
+			await physics_frame
+			if playback_frame < 0 and audio._next_choice.get(&"slam_grass", 0) != before:
+				playback_frame = Engine.get_physics_frames() - 1
+		if attempt == 0:
+			var delay_ticks := ceili(0.045126423 * Engine.physics_ticks_per_second)
+			check(playback_frame == landings[attempt] + delay_ticks
+				and audio._next_choice.get(&"slam_grass", 0) == 1 and audio._next_choice.get(&"slam", 0) == 0,
+				"Sabre plays exactly one verified grass sample at the debris notify")
+			var peak := 0.0
+			for sample in capture.get_buffer(capture.get_frames_available()):
+				peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+			check(peak > 0.001 and peak < 0.9, "The timed grass cue reaches the mixer")
+			print("MECHANIC_LAB_SABRE_DEBRIS_AUDIO landing=", landings[attempt], " playback=", playback_frame, " peak=", peak)
+		else:
+			check(playback_frame == -1, "Reset and mute discard unplayed Sabre grass cues")
+	check(movement.event_count.landing == 0, "The heavy attack does not also play ordinary landing audio")
+	toggle.button_pressed = false
+	lab.free()
+
 func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -261,6 +328,7 @@ func run() -> void:
 	await create_timer(0.08).timeout
 	await check_local_hurt(bus, capture)
 	await check_movement_audio(bus, capture)
+	await check_sabre_debris_audio(bus, capture)
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
