@@ -8,6 +8,12 @@ var crossbow_equipped := false
 var gauntlets_equipped := false
 var _crossbow_pose_serial := -1
 
+func _physics_process(delta: float) -> void:
+	super._physics_process(delta)
+	if crossbow_equipped and not is_dead and (_left or _e) and not combo.held:
+		# The shared jump cancels melee. Keep a physically held ranged trigger.
+		attack(true)
+
 func attack(value: bool) -> void:
 	if crossbow_equipped:
 		if value:
