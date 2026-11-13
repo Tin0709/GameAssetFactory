@@ -104,6 +104,16 @@ func run() -> void:
 
 	lab.reset_player()
 	await ticks(12)
+	attack(true)
+	await ticks(3)
+	lab.player.requested_jump = true
+	await ticks(10)
+	lab.player.requested_jump = false
+	attack(false)
+	check(lab._crossbow.ammo < 24, "Holding fire continues after an accepted jump")
+
+	lab.reset_player()
+	await ticks(12)
 	target.position = Vector3(12.0, 0.0, 5.0)
 	attack(true)
 	await ticks(250)
