@@ -108,6 +108,9 @@ const CORPSE_TERRAIN_SUPPORT_MARGIN := 0.012
 # Compare pose drift over a rest window using MD2's default material sleep speeds.
 const CORPSE_TERRAIN_REST_SHIFT := 0.01 * CORPSE_WALL_REST_TIME
 const CORPSE_TERRAIN_REST_TURN := 0.05 * CORPSE_WALL_REST_TIME
+# Contact normals can oscillate against a wall even after visible motion stops.
+const CORPSE_FLAT_WALL_REST_SHIFT := 0.015
+const CORPSE_FLAT_WALL_REST_TURN := 0.05
 const HIT_FLASH_DURATION := 0.083
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
@@ -711,13 +714,15 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 	# Solver velocities can oscillate on a supported edge. Check that each
 	# body stays near the same pose throughout the whole rest window.
 	var duration := CORPSE_WALL_REST_TIME if flat_floor or two_parts else CORPSE_TERRAIN_REST_TIME
+	var shift_limit := CORPSE_FLAT_WALL_REST_SHIFT if flat_floor else CORPSE_TERRAIN_REST_SHIFT
+	var turn_limit := CORPSE_FLAT_WALL_REST_TURN if flat_floor else CORPSE_TERRAIN_REST_TURN
 	var moved := false
 	for name in _terrain_rest_poses:
 		var body: PhysicalBone3D = ragdoll.bodies[name]
 		var start := _terrain_rest_poses[name]
 		var pose := body.global_transform
-		if pose.origin.distance_to(start.origin) > CORPSE_TERRAIN_REST_SHIFT \
-				or pose.basis.get_rotation_quaternion().angle_to(start.basis.get_rotation_quaternion()) > CORPSE_TERRAIN_REST_TURN:
+		if pose.origin.distance_to(start.origin) > shift_limit \
+				or pose.basis.get_rotation_quaternion().angle_to(start.basis.get_rotation_quaternion()) > turn_limit:
 			moved = true
 			break
 	if moved or _terrain_rest_poses.is_empty() or duration != _terrain_rest_duration:
