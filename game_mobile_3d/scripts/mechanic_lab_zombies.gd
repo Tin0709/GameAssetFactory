@@ -140,23 +140,43 @@ func _find_spawn_point(player_position: Vector3, facing: Basis) -> Vector3:
 	var preferred := player_position + facing * Vector3(0.42, 0.0, 1.78)
 	preferred.x = clampf(preferred.x, -FLOOR_LIMIT, FLOOR_LIMIT)
 	preferred.z = clampf(preferred.z, -FLOOR_LIMIT, FLOOR_LIMIT)
-	if _spawn_point_clear(preferred, player_position):
+	var occupied: Dictionary[Vector2i, PackedVector3Array] = {}
+	# Snapshot live positions once per search. Every candidate only needs to
+	# inspect its own cell and the eight neighbours for the spacing check.
+	for zombie: Zombie in get_children():
+		if zombie.health <= 0:
+			continue
+		var position := zombie.position
+		var cell := _spawn_cell(position)
+		var positions: PackedVector3Array = occupied.get(cell, PackedVector3Array())
+		positions.append(position)
+		occupied[cell] = positions
+	if _spawn_point_clear(preferred, player_position, occupied):
 		return preferred
 	for ring in range(1, 80):
 		for slot in 8 * ring:
 			var angle := TAU * slot / (8 * ring)
 			var offset := Vector3(cos(angle), 0.0, sin(angle)) * SPACING * ring
 			var point := preferred + facing * offset
-			if absf(point.x) <= FLOOR_LIMIT and absf(point.z) <= FLOOR_LIMIT and _spawn_point_clear(point, player_position):
+			if absf(point.x) <= FLOOR_LIMIT and absf(point.z) <= FLOOR_LIMIT and _spawn_point_clear(point, player_position, occupied):
 				return point
 	return Vector3.INF
 
-func _spawn_point_clear(point: Vector3, player_position: Vector3) -> bool:
+static func _spawn_cell(point: Vector3) -> Vector2i:
+	return Vector2i(floori(point.x / SPACING), floori(point.z / SPACING))
+
+static func _spawn_point_clear(point: Vector3, player_position: Vector3, occupied: Dictionary[Vector2i, PackedVector3Array]) -> bool:
 	if point.distance_squared_to(player_position) < SPACING * SPACING:
 		return false
-	for zombie in get_children():
-		if zombie.health > 0 and point.distance_squared_to(zombie.position) < SPACING * SPACING:
-			return false
+	var cell := _spawn_cell(point)
+	for x in range(cell.x - 1, cell.x + 2):
+		for z in range(cell.y - 1, cell.y + 2):
+			var neighbor := Vector2i(x, z)
+			if not occupied.has(neighbor):
+				continue
+			for position: Vector3 in occupied[neighbor]:
+				if point.distance_squared_to(position) < SPACING * SPACING:
+					return false
 	return true
 
 func aim_sabre(index: int, serial: int, movement: Vector3) -> Vector3:
