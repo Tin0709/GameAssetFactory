@@ -287,7 +287,8 @@ func check_edge_landing_gravity() -> void:
 	lab.free()
 
 func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: StringName, phase: float,
-		part := "Head", peak_limit := 0.115, first_contact := false, overlap_limit := INF) -> void:
+		part := "Head", peak_limit := 0.115, first_contact := false, overlap_limit := INF,
+		during_landing := false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -340,13 +341,18 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 		for contact in state.get_contact_count():
 			if state.get_contact_collider_object(contact) != wall:
 				continue
+			if during_landing and zombie._corpse_landed and state.linear_velocity.x < -0.1 and state.linear_velocity.y < -0.5:
+				rebounded = true
 			if state.linear_velocity.x > 1.0:
 				reached_wall = reached_wall or flight_gravity
-			if state.linear_velocity.x < -1.0:
+			if not during_landing and state.linear_velocity.x < -1.0:
 				rebounded = rebounded or flight_gravity
 	if first_contact:
 		check(reached_wall, "%s reaches the side wall while moving inward under flight gravity" % part)
-	check(rebounded, "%s rebounds from the side wall under flight gravity" % part)
+	if during_landing:
+		check(rebounded, "The head moves outward and downward at the wall during the landing roll")
+	else:
+		check(rebounded, "%s rebounds from the side wall under flight gravity" % part)
 	check(peak > 0.0 and peak < peak_limit, "The %s joint stays attached through the side impact (%s)" % [part, serial])
 	check(farthest < 4.65, "The ragdoll stays on the near side of the rebound fixture wall")
 	if overlap_limit < INF:
@@ -388,5 +394,7 @@ func run() -> void:
 		&"Zombie_Walk_Variant1", 0.13333353201548, "Head", 0.13, false, 0.28)
 	await check_wall_rebound(17, Vector3(2.25, 0.02, -3.15), -0.67080754041672,
 		&"Zombie_Walk_Variant2", 0.13333353201548, "Arm.L", 0.145)
+	await check_wall_rebound(94, Vector3(-0.45, 0.02, 4.05), -2.41648817062378,
+		&"Zombie_Walk_Variant1", 0.10000019868214, "Head", 0.13, false, INF, true)
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
