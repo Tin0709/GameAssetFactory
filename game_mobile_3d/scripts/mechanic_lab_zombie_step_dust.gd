@@ -7,7 +7,7 @@ const CAMERA_DISTANCE_SQUARED := 100.0 * 100.0
 
 class Puff:
 	var origin: Vector3
-	var age := 0.0
+	var contact_tick: int
 	var lifetime: float
 	var drag: float
 	var cell: Vector2
@@ -49,6 +49,7 @@ func burst(ground_point: Vector3) -> void:
 		_puffs.pop_front()
 	var puff := Puff.new()
 	puff.origin = to_local(ground_point + Vector3.UP * 0.20)
+	puff.contact_tick = Engine.get_physics_frames()
 	puff.lifetime = _random.randf_range(0.80, 1.75)
 	puff.drag = _random.randf_range(4.0, 10.0)
 	var frame: int = MovementDust.FRAMES[_random.randi_range(0, MovementDust.FRAMES.size() - 1)]
@@ -56,15 +57,20 @@ func burst(ground_point: Vector3) -> void:
 	_puffs.append(puff)
 	set_process(true)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
+	# Use the same interpolated contact clock as the player's dust.
+	var render_tick := float(Engine.get_physics_frames())
+	if not Engine.is_in_physics_frame():
+		render_tick += Engine.get_physics_interpolation_fraction() - 1.0
+	var step := get_physics_process_delta_time()
 	var count := 0
 	for puff in _puffs:
-		puff.age += delta
-		if puff.age >= puff.lifetime:
+		var age := maxf(render_tick - puff.contact_tick, 0.0) * step
+		if age >= puff.lifetime:
 			continue
 		_puffs[count] = puff
-		var point := puff.origin + Vector3.UP * MovementDust.source_step_height(puff.age, puff.drag)
-		var opacity := MovementDust._sample_curve(_alpha, puff.age / (puff.lifetime * _alpha_duration))
+		var point := puff.origin + Vector3.UP * MovementDust.source_step_height(age, puff.drag)
+		var opacity := MovementDust._sample_curve(_alpha, age / (puff.lifetime * _alpha_duration))
 		multimesh.set_instance_transform(count, Transform3D(Basis.IDENTITY, point))
 		multimesh.set_instance_custom_data(count, Color(puff.cell.x, puff.cell.y, opacity, 0.0))
 		count += 1
