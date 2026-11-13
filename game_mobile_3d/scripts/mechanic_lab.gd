@@ -646,10 +646,11 @@ func _set_combat_audio(enabled: bool) -> void:
 	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP)
 
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, lethal: bool) -> void:
-	if _contact_sparks != null:
-		_contact_sparks.burst(point, direction)
-	else:
-		player.effects.contact(point, direction)
+	if clip != CrossPollinator.SHOT or _crossbow.impact_sparks == null:
+		if _contact_sparks != null:
+			_contact_sparks.burst(point, direction)
+		else:
+			player.effects.contact(point, direction)
 	_combat_audio.contact(point, serial, lethal, clip)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3"]
 	if clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:

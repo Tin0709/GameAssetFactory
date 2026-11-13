@@ -29,6 +29,7 @@ const BOLT_RADIUS := 0.10
 const BOLT_MESH_SCALE := 0.7
 # NS_ArrowTrail's Trail emitter initializes a world-space ribbon.
 const TRAIL_SHADER := preload("res://materials/mechanic_lab_polaris_trail.gdshader")
+const ImpactSparks := preload("res://scripts/mechanic_lab_polaris_impact.gd")
 const TRAIL_LIFETIME := 0.30
 const TRAIL_WIDTH := 0.08
 const TRAIL_FADE_END_AGE := 0.60 * TRAIL_LIFETIME
@@ -68,6 +69,7 @@ var _bolts: Array[Dictionary] = []
 var _trails: Array[Dictionary] = []
 var _trail_mesh := ImmediateMesh.new()
 var _trail_renderer: MeshInstance3D
+var impact_sparks: ImpactSparks
 var _sweep_query := PhysicsShapeQueryParameters3D.new()
 var _embedded: MultiMesh
 var _embedded_arrows: Array[Dictionary] = []
@@ -158,6 +160,13 @@ func _ready() -> void:
 	_trail_renderer.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_trail_renderer.hide()
 	add_child(_trail_renderer)
+	var sparks := ImpactSparks.new()
+	sparks.name = "ArrowImpactSparks"
+	if sparks.setup(Source.research_root()):
+		impact_sparks = sparks
+		add_child(sparks)
+	else:
+		sparks.free()
 	if bolt_mesh != null:
 		_embedded = MultiMesh.new()
 		_embedded.transform_format = MultiMesh.TRANSFORM_3D
@@ -180,7 +189,7 @@ func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vec
 	shot_fired.emit(origin)
 	var obstruction := _sweep_bolt(get_world_3d().direct_space_state, clearance_start, origin, WORLD_MASK)
 	if not obstruction.is_empty():
-		bolt_impact.emit(obstruction, direction, serial)
+		_report_impact(obstruction, direction, serial)
 		set_physics_process(true)
 		return true
 	var bolt := MeshInstance3D.new()
@@ -206,6 +215,8 @@ func reset() -> void:
 	_trails.clear()
 	_trail_mesh.clear_surfaces()
 	_trail_renderer.hide()
+	if impact_sparks != null:
+		impact_sparks.clear()
 	_embedded_arrows.clear()
 	if _embedded != null:
 		_embedded.visible_instance_count = 0
@@ -215,6 +226,7 @@ func reset() -> void:
 	set_physics_process(false)
 
 func _physics_process(delta: float) -> void:
+	var sparks_active := impact_sparks != null and impact_sparks.advance(delta)
 	if not _embedded_arrows.is_empty():
 		_update_embedded_arrows(delta)
 	if ammo < AMMO_MAX:
@@ -246,14 +258,20 @@ func _physics_process(delta: float) -> void:
 			_remove_bolt(node)
 			if not hit.is_empty():
 				_embed_on_terrain(hit, bolt.direction)
-				bolt_impact.emit(hit, bolt.direction, bolt.serial)
+				_report_impact(hit, direction, bolt.serial)
+				sparks_active = impact_sparks != null
 		else:
 			node.global_position = end
 			trail.distance += start.distance_to(end)
 	if not _trails.is_empty():
 		_update_trails()
-	if ammo == AMMO_MAX and _bolts.is_empty() and _embedded_arrows.is_empty() and _trails.is_empty():
+	if ammo == AMMO_MAX and _bolts.is_empty() and _embedded_arrows.is_empty() and _trails.is_empty() and not sparks_active:
 		set_physics_process(false)
+
+func _report_impact(hit: Dictionary, direction: Vector3, serial: int) -> void:
+	if impact_sparks != null:
+		impact_sparks.burst(hit.position, direction, hit.normal)
+	bolt_impact.emit(hit, direction, serial)
 
 func _update_trails() -> void:
 	_trail_mesh.clear_surfaces()
