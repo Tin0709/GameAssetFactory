@@ -32,6 +32,9 @@ var day_bounce_texture: ImageTexture3D
 var day_bounce_key := Vector4.ZERO
 var stone_diffuse_texture: ImageTexture
 var stone_diffuse_strength := 0.0
+var stone_twilight_texture: ImageTexture
+var stone_twilight_strength := 0.0
+var _stone_twilight_ready := false
 var _day_sky_ready := false
 var _night_sky_ready := false
 var _day_bounce_ready := false
@@ -143,6 +146,7 @@ func _install()->bool:
 		_night_sky_ready = _regional_sky.has_night_field()
 		_day_bounce_ready = _regional_sky.has_sun_bounce_field()
 		_stone_diffuse_ready = _regional_sky.has_stone_diffuse_field()
+		_stone_twilight_ready = _regional_sky.has_stone_twilight_sky()
 		if _day_bounce_ready and level.showcase._lighting_scale(&"daylight_bounce") > 0.0:
 			# Prepare the default field during map loading, before the first daylight transition.
 			_load_day_bounce()
@@ -200,6 +204,9 @@ func _load_day_bounce() -> void:
 func stone_diffuse_available() -> bool:
 	return _stone_diffuse_ready
 
+func stone_twilight_available() -> bool:
+	return _stone_twilight_ready
+
 func _refresh_stone_diffuse() -> void:
 	var review = level.showcase
 	var strength := 0.0
@@ -213,8 +220,22 @@ func _refresh_stone_diffuse() -> void:
 			if stone_diffuse_texture == null:
 				_stone_diffuse_ready = false
 				strength = 0.0
-	if strength != stone_diffuse_strength:
+	var twilight := 0.0
+	if stone_twilight_available() and is_active() and level.look.terrain_review == "combined" \
+			and review.forest_spatial_sky_context() and review.atmosphere_review == "combined" \
+			and not review._balanced_preview and level.view_mode == "gameplay" \
+			and not review.phase_air.evening_anchors.is_empty():
+		var hour: float = review.hour
+		var phase := smoothstep(17.0, 18.25, hour) * (1.0 - smoothstep(18.5, 19.5, hour))
+		twilight = phase * review._lighting_scale(&"stone_twilight_sky")
+		if twilight > 0.0 and stone_twilight_texture == null:
+			stone_twilight_texture = _regional_sky.load_stone_twilight_sky()
+			if stone_twilight_texture == null:
+				_stone_twilight_ready = false
+				twilight = 0.0
+	if strength != stone_diffuse_strength or twilight != stone_twilight_strength:
 		stone_diffuse_strength = strength
+		stone_twilight_strength = twilight
 		_bind_stone_diffuse_receivers()
 
 func _bind_stone_diffuse_receivers() -> void:
@@ -230,6 +251,9 @@ func _bind_stone_diffuse_receivers() -> void:
 		if material.get_shader_parameter("ground_grade") != 3:
 			continue
 		material.set_shader_parameter("stone_diffuse_strength", stone_diffuse_strength)
+		material.set_shader_parameter("stone_twilight_strength", stone_twilight_strength)
+		if stone_twilight_strength > 0.0 and material.get_shader_parameter("stone_twilight_field") != stone_twilight_texture:
+			material.set_shader_parameter("stone_twilight_field", stone_twilight_texture)
 		if stone_diffuse_strength > 0.0 and material.get_shader_parameter("stone_diffuse_field") != stone_diffuse_texture:
 			material.set_shader_parameter("stone_diffuse_field", stone_diffuse_texture)
 

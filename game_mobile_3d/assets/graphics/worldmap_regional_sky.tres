@@ -26,3 +26,5 @@ sun_bounce_slices = PackedInt32Array(0, 1, 2, 2, 3, 4)
 sun_bounce_layer_count = 5
 stone_diffuse_path = "godot_lab/world_map_unified_showcase_v001/stone_face_transition_v002/diffuse_contrast.private.r8"
 stone_diffuse_sha256 = "980aa2c65c3e3fdf494e80f5659ef66853eb6440d6c3838a198a8cce180be813"
+stone_twilight_sky_path = "graphics_vfx/forest_pix_capture_20261112/forest_morning_depth/pre_twilight/face_depth/stone_twilight_sky.private.r8"
+stone_twilight_sky_sha256 = "4b3733491c08b5eb063e6654e06edd08a9ce1f5a9b3a3e64789769ef3279d9ba"

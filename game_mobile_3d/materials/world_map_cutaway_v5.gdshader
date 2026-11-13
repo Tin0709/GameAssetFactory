@@ -52,6 +52,7 @@ void vertex() {
 	terrain_night_sky_light = gaf_night_sky(sky, receiver) * canopy;
 	terrain_day_bounce = gaf_day_bounce(receiver);
 	stone_diffuse_log = gaf_stone_diffuse_sample(receiver, MODEL_NORMAL_MATRIX * NORMAL);
+	stone_twilight_factor = gaf_stone_twilight_sample(receiver, (MODEL_NORMAL_MATRIX * NORMAL).y);
 	terrain_sun_bounce = CUSTOM2.rgb;
 #endif
 #ifdef GAF_WORLD_TERRAIN_SKY
@@ -129,7 +130,10 @@ void fragment() {
 	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top,CAMERA_POSITION_WORLD)*sole;
 	EMISSION += gaf_dawn_turf_chroma(diffuse_fill, vec3(1.42, 1.0, .65), .55 * dawn_turf);
 	EMISSION+=ALBEDO*(1.0-METALLIC)*gaf_replay_incident(cutaway_world,surface_normal)*receiver_contact*sole;
-	if(terrain_rough_reflection)EMISSION+=terrain_reflected(normalize(NORMAL),normalize(VIEW),ROUGHNESS,AO,cloud_transmission,receiver_contact,native_specular);
+	if (terrain_rough_reflection) {
+		vec3 reflected = terrain_reflected(normalize(NORMAL), normalize(VIEW), ROUGHNESS, AO, cloud_transmission, receiver_contact, native_specular);
+		EMISSION += gaf_stone_reflection_balance(reflected, diffuse_fill);
+	}
 #endif
 #ifdef GAF_SHARED_MIST
 	FOG=gaf_surface_mist(SCREEN_UV,-VERTEX.z,INV_VIEW_MATRIX[3].xyz,-INV_VIEW_MATRIX[2].xyz,vec2(PROJECTION_MATRIX[0][0],PROJECTION_MATRIX[1][1]));

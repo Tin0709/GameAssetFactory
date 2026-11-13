@@ -9,6 +9,16 @@ varying vec3 terrain_day_bounce;
 varying float stone_diffuse_log;
 uniform sampler2D stone_diffuse_field : filter_nearest, repeat_disable;
 uniform float stone_diffuse_strength = 0.0;
+uniform sampler2D stone_twilight_field : filter_nearest, repeat_disable;
+uniform float stone_twilight_strength = 0.0;
+varying float stone_twilight_factor;
+
+float gaf_stone_twilight_sample(int receiver, float face_y) {
+	if (stone_twilight_strength <= 0.0 || ground_grade != 3 || abs(face_y) >= .1) return 1.0;
+	int width = textureSize(stone_twilight_field, 0).x;
+	float ratio = .25 + texelFetch(stone_twilight_field, ivec2(receiver % width, receiver / width), 0).r;
+	return mix(1.0, ratio, stone_twilight_strength);
+}
 uniform float night_stone_top_cool = 0.0;
 uniform float night_stone_blue_softness = 0.0;
 uniform float dawn_stone_sky_color = 0.0;
@@ -45,6 +55,7 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 	vec3 sky = terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
+	else if (stone_twilight_strength > 0.0) sky *= stone_twilight_factor;
 	if (ground_grade == 3 && stone_diffuse_strength > 0.0) sky *= exp2(stone_diffuse_log * stone_diffuse_strength);
 #endif
 	vec3 sky_fill = sky * terrain_ambient_scale * terrain_ambient_tint * visibility;
@@ -98,6 +109,16 @@ vec3 terrain_opening_fill(vec3 albedo, float contact, float sole) {
 #ifdef GAF_WORLD_TERRAIN_PBR
 // Recovered split-sum consumer form; independently integrated GGX LUT.
 // Existing diffuse transport is only a low-frequency incident-radiance proxy.
+#ifdef GAF_TERRAIN_NIGHT_SKY
+vec3 gaf_stone_reflection_balance(vec3 reflected, vec3 diffuse) {
+	if (stone_twilight_strength <= 0.0 || ground_grade != 3) return reflected;
+	const vec3 luma = vec3(.2126, .7152, .0722);
+	// Cap the separate reflection estimate at 10% of diffuse plus reflection.
+	float max_y = dot(diffuse, luma) / 9.0;
+	float scale = min(1.0, max_y / max(dot(reflected, luma), 1.e-7));
+	return reflected * mix(1.0, scale, stone_twilight_strength);
+}
+#endif
 vec3 terrain_reflected(vec3 normal,vec3 view,float rough,float visibility,float cloud,float contact,float source_spec){
 	vec3 incident=terrain_sky_light*terrain_ambient_scale*terrain_ambient_tint*visibility+terrain_sun_bounce*terrain_key_radiance*cloud;
 	vec2 integrated=texture(terrain_env_brdf,vec2(clamp(dot(normal,view),0.,1.),clamp(rough,0.,1.))).rg;

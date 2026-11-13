@@ -23,6 +23,8 @@ extends Resource
 @export var sun_bounce_layer_count := 0
 @export var stone_diffuse_path: String
 @export var stone_diffuse_sha256: String
+@export var stone_twilight_sky_path: String
+@export var stone_twilight_sky_sha256: String
 
 func read_ids(transport_path: String, vertex_count: int) -> PackedFloat32Array:
 	if not OS.has_feature("editor") or not center_xz.is_finite() or not grass_origin.is_finite():
@@ -35,7 +37,7 @@ func read_ids(transport_path: String, vertex_count: int) -> PackedFloat32Array:
 		return PackedFloat32Array()
 	if transport_sha256.length() != 64 or FileAccess.get_sha256(transport_path) != transport_sha256:
 		return PackedFloat32Array()
-	if not has_day_field() and not has_night_field() and not has_sun_bounce_field() and not has_stone_diffuse_field():
+	if not has_day_field() and not has_night_field() and not has_sun_bounce_field() and not has_stone_diffuse_field() and not has_stone_twilight_sky():
 		return PackedFloat32Array()
 	var ids := _read_verified(indices_path, indices_sha256, vertex_count * 4).to_float32_array()
 	for id in ids:
@@ -52,6 +54,16 @@ func has_night_field() -> bool:
 func has_stone_diffuse_field() -> bool:
 	return OS.has_feature("editor") and stone_diffuse_sha256.length() == 64 \
 		and FileAccess.file_exists(_private_path(stone_diffuse_path))
+
+func has_stone_twilight_sky() -> bool:
+	return OS.has_feature("editor") and stone_twilight_sky_sha256.length() == 64 \
+		and FileAccess.file_exists(_private_path(stone_twilight_sky_path))
+
+func load_stone_twilight_sky() -> ImageTexture:
+	var bytes := _read_verified(stone_twilight_sky_path, stone_twilight_sky_sha256, extent.x * extent.y)
+	if bytes.is_empty():
+		return null
+	return ImageTexture.create_from_image(Image.create_from_data(extent.x, extent.y, false, Image.FORMAT_R8, bytes))
 
 func load_stone_diffuse_texture() -> ImageTexture:
 	var bytes := _read_verified(stone_diffuse_path, stone_diffuse_sha256, extent.x * extent.y)

@@ -94,6 +94,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"daylight_bounce": ["Ánh sáng hắt ban ngày", 1.],
 	&"stone_diffuse_contrast": ["Stone face lighting transition (preview)", 1.],
 	&"stone_day_face_fill": ["Ánh hắt mặt đá ban ngày", 1.],
+	&"stone_twilight_sky": ["Ánh trời trên vách đá chiều muộn", 1.],
 	&"stone_detail_softness": ["Stone texture softness", 1.],
 	&"night_spatial_sky": ["Night terrain bounce (preview)", 1.],
 	&"night_stone_blue_softness": ["Dịu sắc lam trên đá ban đêm", 1.],
@@ -188,7 +189,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 115
+const LIGHTING_MIX_VERSION := 116
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1736,6 +1737,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 72 and effect == &"evening_lantern":
 			missing_value = 0.
+		if version < 116 and effect == &"stone_twilight_sky":
+			missing_value = 0.
 		if version < 115 and effect == &"pre_twilight_receiver":
 			missing_value = 0.
 		if version < 114 and effect == &"pre_twilight_air":
@@ -1900,6 +1903,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _day_bounce_editable()
 		if effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color"]:
 			slider.editable = slider.editable and sky_response.available() and level.terrain_light.installed
+		if effect == &"stone_twilight_sky":
+			slider.editable = level.terrain_light.stone_twilight_available()
 		if effect == &"stone_diffuse_contrast":
 			slider.editable = _stone_diffuse_editable()
 		if effect == &"stone_day_face_fill":
@@ -1934,6 +1939,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return # Published with the final camera and sun before drawing.
 	if changed_effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color", &"stone_day_sky"]:
 		level.terrain_light.bind()
+		return
+	if changed_effect == &"stone_twilight_sky":
+		level.terrain_light._refresh_stone_diffuse()
 		return
 	if changed_effect in [&"regional_sky", &"daylight_bounce", &"stone_diffuse_contrast", &"stone_day_face_fill", &"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
 		return # Terrain transport refreshes both receivers together.
@@ -2354,6 +2362,9 @@ func _process(delta:float)->void:
 	var stone_diffuse_slider: HSlider = _lighting_sliders.get(&"stone_diffuse_contrast")
 	if stone_diffuse_slider != null:
 		stone_diffuse_slider.editable = _stone_diffuse_editable()
+	var stone_twilight_slider: HSlider = _lighting_sliders.get(&"stone_twilight_sky")
+	if stone_twilight_slider != null:
+		stone_twilight_slider.editable = level.terrain_light.stone_twilight_available()
 	var stone_day_face_slider: HSlider = _lighting_sliders.get(&"stone_day_face_fill")
 	if stone_day_face_slider != null:
 		stone_day_face_slider.editable = _stone_diffuse_editable() and _stone_detail_editable()
