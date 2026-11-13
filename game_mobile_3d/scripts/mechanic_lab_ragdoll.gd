@@ -202,17 +202,13 @@ func is_near_flat_floor(tolerance: float) -> bool:
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var size: Vector3 = part[2]
-		var pose := floor_inverse * body.global_transform
-		var bounds := pose * AABB(-size * 0.5, size)
-		if bounds.position.x > floor_half.x or bounds.end.x < -floor_half.x \
-				or bounds.position.z > floor_half.z or bounds.end.z < -floor_half.z:
+		var bounds := (floor_inverse * body.global_transform) * AABB(-size * 0.5, size)
+		# A box over the lip can have its lowest corner outside the floor.
+		# Use solver contacts for those parts and this fallback for boxes on top.
+		if bounds.position.x < -floor_half.x or bounds.end.x > floor_half.x \
+				or bounds.position.z < -floor_half.z or bounds.end.z > floor_half.z:
 			continue
-		if bounds.position.x >= -floor_half.x and bounds.end.x <= floor_half.x \
-				and bounds.position.z >= -floor_half.z and bounds.end.z <= floor_half.z:
-			minimum_y = minf(minimum_y, bounds.position.y)
-			continue
-		# A straddling box cannot use its lowest corner if it lies off
-		# the platform. Confirm partial support through the contact solver.
+		minimum_y = minf(minimum_y, bounds.position.y)
 	return absf(minimum_y - floor_half.y) <= tolerance
 
 func has_flat_wall_rest_support(core_grounded: bool) -> bool:
