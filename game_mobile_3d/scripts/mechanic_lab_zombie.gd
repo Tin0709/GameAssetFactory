@@ -509,7 +509,13 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	if flat_sabre_finisher and contact_age >= DEATH_LANDING_BLEND_TIME and motion.leg_supported and motion.core_supports > 0:
 		# Fade in more resistance during the slow final roll on the lab floor.
 		var slow_roll := (1.0 - smoothstep(0.4, 1.5, motion.linear)) * smoothstep(0.60, 0.90, _corpse_age)
-		late_roll_damping = SABRE_LATE_ROLL_ANGULAR_DAMP * roll_weight * slow_roll
+		var target := SABRE_LATE_ROLL_ANGULAR_DAMP * roll_weight * slow_roll
+		var roll_gain := DEATH_SUPPORTED_ANGULAR_DAMP - DEATH_LANDING_ANGULAR_DAMP
+		var damping_step := roll_gain * delta / SABRE_ROLL_RESPONSE_TIME
+		# Share the existing ramp with the ordinary supported-roll damping.
+		var head: PhysicalBone3D = ragdoll.bodies.Head
+		var base_damping := lerpf(DEATH_LANDING_ANGULAR_DAMP, DEATH_SUPPORTED_ANGULAR_DAMP, roll_weight)
+		late_roll_damping = minf(target, maxf(head.angular_damp + damping_step - base_damping, 0.0))
 	if is_equal_approx(contact_age, _landing_age) and is_equal_approx(roll_weight, _roll_damping_weight) \
 			and wall_gravity == _wall_gravity and is_equal_approx(flat_brace_weight, _flat_brace_weight) \
 			and is_equal_approx(late_roll_damping, _late_roll_damping):
