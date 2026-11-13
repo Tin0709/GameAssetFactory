@@ -20,6 +20,7 @@ var _surface_attempted := false
 var _submitted_surface_gain := 0.
 var _site := Vector2.INF
 var _submitted := Vector2.INF
+var _submitted_halo := 0.0
 var _submitted_bounce := Vector4.ZERO
 
 static func evening_weight(hour: float) -> float:
@@ -33,7 +34,7 @@ func available(world) -> bool:
 		and RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null \
 		and (not _attempted or is_instance_valid(fixture))
 
-func update(world, phase: float, strength: float, use_steps: bool) -> void:
+func update(world, phase: float, strength: float, use_steps: bool, halo: float) -> void:
 	var state := Vector2(phase, phase * strength) if strength > 0. else Vector2.ZERO
 	if state.y > 0. and not _attempted and available(world):
 		_attempted = true
@@ -44,11 +45,13 @@ func update(world, phase: float, strength: float, use_steps: bool) -> void:
 	if site != _site:
 		fixture.position = Vector3(site.x, world.surface_height(site.x, site.y) + .01, site.y)
 		_site = site
-	if state == _submitted:
+	var halo_mix := halo if use_steps and has_step_site(world) else 0.0
+	if state == _submitted and halo_mix == _submitted_halo:
 		return
 	_submitted = state
+	_submitted_halo = halo_mix
 	fixture.visible = state.y > 0.
-	_material.set_shader_parameter("radiant_strength", 3.0 * state.y)
+	_material.set_shader_parameter("radiant_strength", lerpf(3.0, 6.0, halo_mix) * state.y)
 	_material.set_shader_parameter("phase_coverage", state.x)
 
 func has_step_site(world) -> bool:

@@ -138,6 +138,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"sculk_surface": ["Sculk phát sáng", 1.],
 	&"forest_replay_emission": ["Ánh bệ đá trong rừng", 1.],
+	&"forest_replay_halo": ["Quầng sáng bệ đá", 1.],
 	&"forest_replay_bounce": ["Ánh hắt quanh bệ đá", 1.],
 	&"forest_replay_surface_bounce": ["Ánh hắt theo mặt đá", 1.],
 	&"forest_replay_placement": ["Vị trí bệ đá", 1.],
@@ -167,7 +168,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 87
+const LIGHTING_MIX_VERSION := 88
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1550,6 +1551,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 87 and effect == &"forest_replay_surface_bounce":
 			missing_value = 0.
+		if version < 88 and effect == &"forest_replay_halo":
+			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
 		if version < 84 and effect == &"night_stone_blue_softness":
@@ -1624,6 +1627,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if effect in [&"forest_replay_emission", &"forest_replay_bounce"]:
 			slider.editable = slider.editable and forest_replay.available(level)
 		if effect == &"forest_replay_placement":
+			slider.editable = slider.editable and forest_replay.available(level) and forest_replay.has_step_site(level)
+		if effect == &"forest_replay_halo":
 			slider.editable = slider.editable and forest_replay.available(level) and forest_replay.has_step_site(level)
 		if effect == &"forest_replay_surface_bounce":
 			slider.editable = slider.editable and forest_replay.surface_available(level)
@@ -1707,7 +1712,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
-	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce", &"forest_replay_placement", &"forest_replay_surface_bounce"]:
+	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce", &"forest_replay_placement", &"forest_replay_surface_bounce", &"forest_replay_halo"]:
 		_sync_forest_night_lights()
 		return
 	if changed_effect == &"canopy_player_cue":
@@ -1917,7 +1922,7 @@ func _sync_forest_night_lights() -> void:
 		forest_accents.update(level, phase, night_strength)
 	sculk_surface.update(level, maxf(day, phase) if not _balanced_preview else 0., _lighting_scale(&"sculk_surface"))
 	forest_replay.update(level, replay_phase, _lighting_scale(&"forest_replay_emission"),
-		_lighting_scale(&"forest_replay_placement") == 1.)
+		_lighting_scale(&"forest_replay_placement") == 1., _lighting_scale(&"forest_replay_halo"))
 	if _point_kernel_owner != null and _point_kernel_owner.get_ref() == self:
 		forest_replay.publish_bounce(_lighting_scale(&"forest_replay_bounce"))
 		forest_replay.publish_surface(level, _lighting_scale(&"forest_replay_surface_bounce"))
