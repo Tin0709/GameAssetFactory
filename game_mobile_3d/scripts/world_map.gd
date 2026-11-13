@@ -9,6 +9,7 @@ const CAMERA_ZOOM_STEP := 1.15
 # Extend the orthographic depth range past the view origin for foreground cliffs.
 const GAMEPLAY_CAMERA_NEAR := -8.0
 const GROVE_REVIEW := preload("res://scripts/world_map_grove.gd")
+const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
 const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 const LocalMistRegion = preload("res://scripts/local_mist_region.gd")
 const RegionalSkyRegion = preload("res://scripts/regional_sky_region.gd")
@@ -141,6 +142,7 @@ func _ready() -> void:
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	showcase.setup(self)
+	_setup_movement_dust()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
 	terrain_light.name="TerrainColoredTransport";add_child(terrain_light);terrain_light.setup(self)
 	player_light=load("res://scripts/world_map_player_transport.gd").new()
@@ -174,6 +176,37 @@ func index_columns() -> void:
 		if not solid_intervals.has(column):solid_intervals[column]=[]
 		solid_intervals[column].append(Vector2(low,high))
 		if entry.category=="terrain":columns[column]=maxf(float(columns.get(column,-INF)),high)
+
+func _setup_movement_dust() -> void:
+	if player.get("primary_ready") != true:
+		return
+	var dust := MovementDust.new()
+	dust.name = "MovementDust"
+	if dust.setup(player, null, _movement_dust_contact):
+		add_child(dust)
+	else:
+		dust.free()
+
+func _movement_dust_contact(sole: Vector3) -> Dictionary:
+	# Follow the support immediately below the foot, including slabs under a ledge.
+	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * 0.08, sole - Vector3.UP * 0.30, 1)
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty() or hit.normal.y < 0.7 or not geometry.is_ancestor_of(hit.collider):
+		return {}
+	var position: Vector3 = hit.position
+	var offset: Array = runtime.offset
+	var block := Vector3i(floori(position.x - float(offset[0])),
+		floori(position.y - float(offset[1]) - 0.01), floori(position.z - float(offset[2])))
+	var tile: Dictionary = runtime.palette[geometry.cells[block]] if geometry.cells.has(block) else {}
+	if tile.get("category") != "terrain":
+		return {}
+	var kind: String = tile.kind
+	var surface := "grass"
+	if kind.begins_with("dirt"):
+		surface = "dirt"
+	elif kind.begins_with("stone"):
+		surface = "stone"
+	return {"position": position, "surface": surface}
 
 func surface_height(x: float,z: float) -> float:
 	var column:=Vector2i(floori(x-float(runtime.offset[0])),floori(z-float(runtime.offset[2])))

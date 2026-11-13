@@ -5,7 +5,11 @@ const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Smoke/T_SmokePi
 const SOURCE_SHA256 := "78d326787c4065d70e227ec386a7330f53621c8733ad114bc80eaea7f7f1b5fc"
 const FRAMES := [0, 9, 10, 16, 24, 25]
 const CAPACITY := 16
-const GRASS_DUST := Color("#c8b67b")
+const SURFACE_DUST := {
+	"grass": Color("#c8b67b"),
+	"dirt": Color("#b1815d"),
+	"stone": Color("#b6b6b6"),
+}
 
 class Particle:
 	var sprite: Sprite3D
@@ -17,16 +21,18 @@ class Particle:
 
 var _actor: CharacterBody3D
 var _ground: CollisionShape3D
+var _terrain_contact: Callable
 var _particles: Array[Particle] = []
 var _next := 0
 var _random := RandomNumberGenerator.new()
 
-func setup(actor: CharacterBody3D, ground: CollisionShape3D) -> bool:
+func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable()) -> bool:
 	var texture := _load_mask()
 	if texture == null:
 		return false
 	_actor = actor
 	_ground = ground
+	_terrain_contact = terrain_contact
 	_random.seed = 27381
 	for i in CAPACITY:
 		var particle := Particle.new()
@@ -59,14 +65,24 @@ static func _load_mask() -> Texture2D:
 	return ImageTexture.create_from_image(Image.create_from_data(128, 64, false, Image.FORMAT_RGBA8, pixels))
 
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
-	var box := _ground.shape as BoxShape3D
-	if _ground.disabled or box == null:
-		return
-	var half := box.size * 0.5
-	var local := _ground.to_local(point)
-	if absf(local.x) > half.x or absf(local.z) > half.z:
-		return
-	var ground_point := _ground.to_global(Vector3(local.x, half.y, local.z))
+	var ground_point: Vector3
+	var surface := "grass"
+	if _terrain_contact.is_valid():
+		var contact: Dictionary = _terrain_contact.call(point)
+		if contact.is_empty():
+			return
+		ground_point = contact.position
+		surface = contact.surface
+	else:
+		var box := _ground.shape as BoxShape3D if is_instance_valid(_ground) else null
+		if box == null or _ground.disabled:
+			return
+		var half := box.size * 0.5
+		var local := _ground.to_local(point)
+		if absf(local.x) > half.x or absf(local.z) > half.z:
+			return
+		ground_point = _ground.to_global(Vector3(local.x, half.y, local.z))
+	var tint: Color = SURFACE_DUST[surface]
 	var motion := _actor.get_real_velocity()
 	motion.y = 0.0
 	var running := motion.length_squared() > 16.0
@@ -88,7 +104,7 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		particle.sprite.pixel_size = _random.randf_range(0.010, 0.016) if landed else _random.randf_range(0.007, 0.013)
 		particle.sprite.scale = Vector3.ONE
 		particle.sprite.global_position = particle.origin
-		particle.sprite.modulate = Color(GRASS_DUST, particle.opacity)
+		particle.sprite.modulate = Color(tint, particle.opacity)
 		particle.sprite.show()
 	set_process(true)
 
