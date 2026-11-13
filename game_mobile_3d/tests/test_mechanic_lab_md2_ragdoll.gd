@@ -188,6 +188,7 @@ func run() -> void:
 	await check_sabre_floor_lift(lab, group, 505, 0.022)
 	await check_sabre_floor_lift(lab, group, 510, 0.041)
 	await check_sabre_floor_lift(lab, group, 514, 0.036)
+	await check_sabre_first_support_lift(lab, group)
 	await check_sabre_head_and_arm_brace(lab, group)
 	await check_sabre_late_roll(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
@@ -575,6 +576,39 @@ func check_sabre_floor_lift(lab, group, serial: int, rise_limit: float) -> void:
 		"The low Sabre roll %d avoids a sharp upward correction and settles within the floor tolerance" % serial)
 	print("SABRE_FLOOR_LIFT serial=", serial, " rise_m=", peak_rise,
 		" overlap_m=", overlap, " release_s=", zombie._corpse_age)
+	zombie.free()
+
+func check_sabre_first_support_lift(lab, group) -> void:
+	var zombie = await replay_offset_sabre_finisher(lab, group, 528)
+	var previous_y := INF
+	var peak_rise := 0.0
+	var peak_overlap := 0.0
+	var peak_anchor := 0.0
+	var first_support := INF
+	for i in 90:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+		if not zombie.ragdoll.running:
+			continue
+		var weighted_y := 0.0
+		var mass := 0.0
+		for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
+			weighted_y += body.global_position.y * body.mass
+			mass += body.mass
+		var centre_y := weighted_y / mass
+		if zombie.ragdoll.contact_motion().supports > 0:
+			first_support = minf(first_support, zombie._corpse_age)
+		if zombie._corpse_age <= first_support + 0.18 and is_finite(first_support):
+			peak_rise = maxf(peak_rise, centre_y - previous_y)
+		previous_y = centre_y
+		peak_overlap = maxf(peak_overlap, -zombie.ragdoll.minimum_corner_y())
+		peak_anchor = maxf(peak_anchor, zombie.ragdoll.max_anchor_error())
+	check(is_finite(first_support) and peak_rise < 0.060 and peak_overlap <= 0.013
+		and peak_anchor <= 0.093 and zombie._corpse_parked,
+		"A deep first contact limits Sabre's whole-body rise while keeping floor clearance and connected joints")
+	print("SABRE_DEEP_FIRST_SUPPORT rise_m=", peak_rise, " overlap_m=", peak_overlap,
+		" anchor_m=", peak_anchor, " release_s=", zombie._corpse_age)
 	zombie.free()
 
 func check_sabre_head_and_arm_brace(lab, group) -> void:
