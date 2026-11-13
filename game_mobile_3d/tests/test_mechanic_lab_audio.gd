@@ -471,6 +471,56 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	print("MECHANIC_LAB_ZOMBIE_STEP_AUDIO phases=", phases, " peak=", peak)
 	lab.free()
 
+func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var audio := lab.get_node("CombatAudio") as COMBAT_AUDIO
+	var group := lab.get_node("Zombies")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	var voices := audio._voices.slice(2 * COMBAT_AUDIO.VOICES_PER_POOL, 3 * COMBAT_AUDIO.VOICES_PER_POOL)
+	for voice in voices:
+		voice.bus = AudioServer.get_bus_name(bus)
+	var points: Array[Vector3] = []
+	for i in 100:
+		var point: Vector3 = lab.player.global_position + Vector3(2.0, 1.0, i * 0.01)
+		points.append(point)
+		group.zombie_attack_audio.emit(point, false)
+	check(audio._next_choice.get(&"zombie_windup", 0) == 3
+		and voices.all(func(voice): return voice.global_position in points.slice(0, 3)),
+		"A same-tick attack burst preserves the first three telegraphs")
+	capture.clear_buffer()
+	for point in points:
+		group.zombie_attack_audio.emit(point, true)
+	check(audio._next_choice.get(&"zombie_hit", 0) == 3
+		and voices.all(func(voice): return voice.stream in audio._groups[&"zombie_hit"]
+			and voice.global_position in points.slice(0, 3)),
+		"Confirmed contacts replace windups and preserve the first three contact cues")
+	var hit_streams := voices.map(func(voice): return voice.stream)
+	for point in points:
+		group.zombie_attack_audio.emit(point, false)
+	check(audio._next_choice.get(&"zombie_windup", 0) == 3
+		and hit_streams == voices.map(func(voice): return voice.stream),
+		"Overflow windups cannot cut off confirmed contact cues")
+	var initial_hp: int = lab.player_health
+	for i in 4:
+		group.player_hit.emit(ZOMBIE.MELEE_DAMAGE)
+	check(lab.player_health == initial_hp - 24 and audio._next_choice.get(&"player_hurt", 0) == 1,
+		"Same-tick damage is applied fully while the local hurt cue starts once")
+	await physics_frame
+	group.player_hit.emit(ZOMBIE.MELEE_DAMAGE)
+	check(audio._next_choice.get(&"player_hurt", 0) == 2, "A later hit can play a new local hurt cue")
+	await create_timer(0.18).timeout
+	var peak := 0.0
+	for frame in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
+	check(peak > 0.005 and peak < 0.9, "The contact pool produces PCM with headroom")
+	toggle.button_pressed = false
+	await create_timer(0.08).timeout
+	print("MECHANIC_LAB_ZOMBIE_ATTACK_OVERFLOW peak=", peak)
+	lab.free()
+
 func run() -> void:
 	var camera := Camera3D.new()
 	root.add_child(camera)
@@ -553,6 +603,7 @@ func run() -> void:
 	await check_sabre_debris_audio(bus, capture)
 	await check_sabre_crowd_audio(bus, capture)
 	await check_zombie_steps(bus, capture)
+	await check_zombie_attack_overflow(bus, capture)
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
