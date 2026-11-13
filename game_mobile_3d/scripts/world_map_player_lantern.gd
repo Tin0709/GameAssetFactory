@@ -2,6 +2,8 @@ extends Node3D
 ## Transient private reference asset; original constrained pendulum presentation.
 const FILE="godot_lab/world_map_unified_showcase_v001/lantern_idle_v001/profile_v002.private.json"
 const SHA="68b5d9f8d321aa313b5340798a598f325fa5c532aab8e0ba1e6d3f13f79e7499"
+## Upper center of the handle on the verified SM_SWT_MetalLantern.
+const HANDLE_LOCAL := Vector3(.15625, .5625, -.15625)
 var actor:Node3D
 var profile:Dictionary={}
 var spine:=-1
@@ -48,10 +50,11 @@ func setup(body:Node3D)->void:
  mesh_root=actor.load_private_model(profile.files.mesh.path)
  if mesh_root==null:return
  lantern_center=Node3D.new();lantern_center.name="LanternCenter";add_child(lantern_center)
- # The native timeline scales this child, not its fixed mounting translation.
- lantern_center.position=Vector3(0.,-.225,0.);lantern_center.add_child(mesh_root)
+ lantern_center.add_child(mesh_root)
  mesh_root.scale=Vector3.ONE*profile.mesh_scale
- var at:Array=profile.mesh_offset;mesh_root.position=Vector3(at[0],at[1],at[2])-lantern_center.position
+ # Place the origin of both the swing and grow/shrink at the handle. The
+ # native simulated body offset is not a hook location on the visual mesh.
+ mesh_root.position = -(mesh_root.basis * HANDLE_LOCAL)
  var packed_image:=Image.load_from_file(profile.files.packed.path)
  var packed:=ImageTexture.create_from_image(packed_image)
  var emission_image:=Image.create(packed_image.get_width(),packed_image.get_height(),false,Image.FORMAT_RGB8)

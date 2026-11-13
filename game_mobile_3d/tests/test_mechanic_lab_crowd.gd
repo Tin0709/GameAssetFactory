@@ -48,6 +48,7 @@ func run() -> void:
 		quit(1)
 		return
 	await measure("spawn_animation", 70)
+	await check_health_bars(group)
 	Input.action_press("move_backward")
 	await measure("chase", 120)
 	Input.action_release("move_backward")
@@ -63,6 +64,9 @@ func run() -> void:
 	if active_peak != COUNT:
 		failures.append("Expected all 100 ragdolls to run together")
 	await measure("corpse_cleanup", 200, group)
+	var bars := group.get_node_or_null("../ZombieHealthBars") as MultiMeshInstance3D
+	if bars != null and bars.multimesh.visible_instance_count != 0:
+		failures.append("The batch drops the bars of despawned zombies")
 	var clean := group.get_child_count() == 0
 	if not clean:
 		failures.append("Corpses remain after the cleanup window")
@@ -117,6 +121,29 @@ func spawn_crowd(group: Node) -> void:
 	print("CROWD_SPAWN_PACED ", JSON.stringify({"count": group.get_child_count(),
 		"frames": frames, "largest_batch": largest_batch, "wall_ms": (Time.get_ticks_usec() - started) / 1000.0,
 		"frame_ms": stats(frame_ms)}))
+
+func check_health_bars(group: Node) -> void:
+	var batch := group.get_node_or_null("../ZombieHealthBars") as MultiMeshInstance3D
+	if batch == null:
+		failures.append("MechanicLab batches its overhead health bars")
+		return
+	if batch.multimesh.visible_instance_count != COUNT:
+		failures.append("All 100 living zombies have an overhead health bar")
+	var first = group.get_child(0)
+	var second = group.get_child(1)
+	var first_slot: int = first._feedback.bar_slot
+	var second_slot: int = second._feedback.bar_slot
+	first.take_hit(1, Vector3.RIGHT, Vector2.ZERO, 0.0)
+	await process_frame
+	var first_bar := batch.multimesh.get_instance_custom_data(first_slot)
+	var second_bar := batch.multimesh.get_instance_custom_data(second_slot)
+	var expected := float(first.health) / float(first.max_health)
+	if not is_equal_approx(first_bar.r, expected) or not is_equal_approx(first_bar.g, 1.0) \
+			or not is_equal_approx(second_bar.r, 1.0):
+		failures.append("A hit changes only the target bar while preserving its delayed fill")
+	var centre := batch.to_global(batch.multimesh.get_instance_transform(first_slot).origin)
+	if centre.distance_to(first.global_position + Vector3.UP * 2.16) > 0.15:
+		failures.append("The batched bar follows the zombie above its head")
 
 func check_blocked_chase(group: Node) -> void:
 	lab.reset_player()
