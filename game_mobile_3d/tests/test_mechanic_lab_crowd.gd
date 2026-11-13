@@ -52,6 +52,7 @@ func run() -> void:
 		"per_spawn_ms": stats(spawn_us), "first_ms": spawn_us[0],
 		"nodes": Performance.get_monitor(Performance.OBJECT_NODE_COUNT)}))
 	await measure("spawn_animation", 70)
+	await check_blocked_chase(group)
 	Input.action_press("move_backward")
 	await measure("chase", 120)
 	Input.action_release("move_backward")
@@ -73,6 +74,44 @@ func run() -> void:
 		" adapter=", RenderingServer.get_video_adapter_name())
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_blocked_chase(group: Node) -> void:
+	lab.reset_player()
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(8.0, 3.0, 0.2)
+	collider.shape = shape
+	wall.add_child(collider)
+	lab.add_child(wall)
+	wall.position = Vector3(0, 1, -2.0)
+	var zombie = group.get_child(0)
+	for i in group.get_child_count():
+		var member = group.get_child(i)
+		member.global_position = Vector3(12.0 + i % 10 * 2.0, 0.02, -15.0 + int(i / 10) * 2.0)
+		member.velocity = Vector3.ZERO
+		member.set_physics_process(i == 0)
+	zombie.global_position = Vector3(0, 0.02, -3.5)
+	for i in 45:
+		await physics_frame
+	var samples: int = zombie.ragdoll.sample_count
+	var last_position: Vector3 = zombie.global_position
+	var skipped_ticks := 0
+	for i in 30:
+		await physics_frame
+		if zombie.get("_skipped_blocked_step") == true:
+			skipped_ticks += 1
+	if skipped_ticks < 14 or skipped_ticks > 16 or zombie.ragdoll.sample_count - samples != 30 \
+			or zombie.global_position.distance_to(last_position) > 0.02:
+		failures.append("A blocked crowd zombie should alternate collision checks and retain every pose sample")
+	wall.free()
+	for i in 16:
+		await physics_frame
+	if zombie.global_position.z <= last_position.z + 0.4:
+		failures.append("A blocked zombie did not resume when the wall was removed")
+	for member in group.get_children():
+		member.set_physics_process(true)
+	print("CROWD_BLOCKED skipped=", skipped_ticks, " samples=", zombie.ragdoll.sample_count - samples)
 
 func check_spawn_spacing(group: Node) -> void:
 	var zombies := group.get_children()
