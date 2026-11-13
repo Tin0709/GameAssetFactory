@@ -287,7 +287,7 @@ func check_edge_landing_gravity() -> void:
 	lab.free()
 
 func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: StringName, phase: float,
-		part := "Head", peak_limit := 0.115, first_contact := false) -> void:
+		part := "Head", peak_limit := 0.115, first_contact := false, overlap_limit := INF) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -317,6 +317,7 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 	zombie.set_physics_process(true)
 	var peak := 0.0
 	var farthest := -INF
+	var overlap := 0.0
 	var rebounded := false
 	var reached_wall := false
 	for i in 90:
@@ -328,6 +329,11 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 			farthest = maxf(farthest, body.global_position.x)
 		var body: PhysicalBone3D = ragdoll.bodies[part]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if overlap_limit < INF:
+			var collider := body.get_child(0) as CollisionShape3D
+			var box := collider.shape as BoxShape3D
+			var extent := (state.transform * collider.transform) * AABB(-box.size * 0.5, box.size)
+			overlap = maxf(overlap, extent.end.x - 4.35)
 		var flight_gravity := is_equal_approx(state.total_gravity.y, -50.0)
 		if first_contact and reached_wall and state.linear_velocity.x < -1.0 and flight_gravity:
 			rebounded = true
@@ -343,8 +349,10 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 	check(rebounded, "%s rebounds from the side wall under flight gravity" % part)
 	check(peak > 0.0 and peak < peak_limit, "The %s joint stays attached through the side impact (%s)" % [part, serial])
 	check(farthest < 4.65, "The ragdoll stays on the near side of the rebound fixture wall")
+	if overlap_limit < INF:
+		check(overlap < overlap_limit, "The leading box limits its overlap with the side wall")
 	print("LAB_WALL_REBOUND serial=", serial, " part=", part, " peak=", peak,
-		" farthest=", farthest, " rebound=", rebounded)
+		" farthest=", farthest, " rebound=", rebounded, " overlap=", overlap)
 	lab.free()
 
 func run() -> void:
@@ -374,5 +382,9 @@ func run() -> void:
 		&"Zombie_Walk", 0.39999988079071, "Head", 0.14)
 	await check_wall_rebound(99, Vector3(4.05, 0.02, 4.05), -0.6086288690567,
 		&"Zombie_Walk", 0.39999988079071, "Head", 0.14)
+	await check_wall_rebound(46, Vector3(1.35, 0.02, -0.45), -1.91272187232971,
+		&"Zombie_Walk_Variant1", 0.11666686534881, "Head", 0.13, false, 0.28)
+	await check_wall_rebound(46, Vector3(1.35, 0.02, -0.45), -1.80590081214905,
+		&"Zombie_Walk_Variant1", 0.13333353201548, "Head", 0.13, false, 0.28)
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
