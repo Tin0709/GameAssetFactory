@@ -117,6 +117,15 @@ focus_mode = 0
 text = "Spawn Zombie"
 tooltip_text = "Tạo một zombie để thử Sabre"
 
+[node name="SpawnCrowd" type="Button" parent="HUD"]
+offset_left = 990.0
+offset_top = 69.0
+offset_right = 1140.0
+offset_bottom = 103.0
+focus_mode = 0
+text = "Spawn 100 zombie"
+tooltip_text = "Tạo thêm 100 zombie theo từng đợt ngắn để thử hiệu năng."
+
 [node name="SpawnStatus" type="Label" parent="HUD"]
 offset_left = 18.0
 offset_top = 145.0
@@ -258,6 +267,7 @@ focus_mode = 0
 text = "Thử lại (R)"
 
 [connection signal="pressed" from="HUD/SpawnZombie" to="." method="_spawn_zombie"]
+[connection signal="pressed" from="HUD/SpawnCrowd" to="." method="_start_crowd_spawn"]
 [connection signal="toggled" from="HUD/CombatAudioToggle" to="." method="_set_combat_audio"]
 [connection signal="value_changed" from="HUD/RagdollTuning/Launch/Slider" to="." method="_set_ragdoll_launch"]
 [connection signal="value_changed" from="HUD/RagdollTuning/Gravity/Slider" to="." method="_set_ragdoll_gravity"]

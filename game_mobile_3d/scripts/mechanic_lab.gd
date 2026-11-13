@@ -23,6 +23,9 @@ const MAX_CAMERA_SIZE := 30.0
 const ZOOM_STEP := 1.15
 const SABRE_TAP_BUFFER := 0.16
 const MAX_PLAYER_HEALTH := 100
+const CROWD_SPAWN_COUNT := 100
+const CROWD_SPAWN_LIMIT_PER_FRAME := 5
+const CROWD_SPAWN_BUDGET_USEC := 2500
 const PLAYER_HIT_FLASH_DURATION := 0.10
 const PLAYER_DAMAGE_TINT := Color(1.0, 0.18, 0.22)
 const CONTACT_LIGHT_DURATION := 0.17
@@ -49,6 +52,8 @@ var showcase: WorldShowcase
 var view_mode := "gameplay"
 var spawn_position := SPAWN
 var player_health := MAX_PLAYER_HEALTH
+var _crowd_spawns_left := 0
+var _crowd_base_health := false
 var _previous_msaa: Viewport.MSAA
 var _combat_audio: CombatAudio
 var _slam_swing_frame := -1
@@ -127,6 +132,7 @@ func _ready() -> void:
 		$HUD/Controls.text = "WASD di chuyển · Shift chạy · Space nhảy · R về giữa"
 	$HUD/Controls.text += " · Cuộn chuột để zoom"
 	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
+	$HUD/SpawnCrowd.disabled = $HUD/SpawnZombie.disabled
 	$HUD/CombatAudioToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/RagdollTuning.visible = not $HUD/SpawnZombie.disabled
@@ -338,6 +344,8 @@ func _update_time_label() -> void:
 	$HUD/TimeOfDay.text = "%02d:%02d  ·  T đổi giờ" % [floori(minutes / 60.0), minutes % 60]
 
 func _process(delta: float) -> void:
+	if _crowd_spawns_left > 0:
+		_spawn_crowd_frame()
 	var focus: Vector3 = presentation.player_position()
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
 	if not _player_overlays.is_empty():
@@ -565,12 +573,47 @@ func _set_ragdoll_gravity(percent: float) -> void:
 	$Zombies.ragdoll_gravity_multiplier = percent * 0.01
 	$HUD/RagdollTuning/Gravity/Value.text = "Trọng lực ragdoll · %d%%" % roundi(percent)
 
-func _spawn_zombie() -> void:
+func _spawn_one_zombie(base_health: bool) -> bool:
 	var facing := Basis(Vector3.UP, player.visual.rotation.y)
-	if $Zombies.spawn(player, facing, $CombatEffects, $HUD/BaseZombieToggle.button_pressed):
-		$HUD/SpawnStatus.text = ""
+	return $Zombies.spawn(player, facing, $CombatEffects, base_health)
+
+func _spawn_zombie() -> void:
+	if _spawn_one_zombie($HUD/BaseZombieToggle.button_pressed):
+		if _crowd_spawns_left == 0:
+			$HUD/SpawnStatus.text = ""
 	else:
 		$HUD/SpawnStatus.text = "Không thể tạo zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
+
+func _start_crowd_spawn() -> void:
+	if $HUD/SpawnCrowd.disabled or player_health == 0:
+		return
+	_crowd_spawns_left = CROWD_SPAWN_COUNT
+	_crowd_base_health = $HUD/BaseZombieToggle.button_pressed
+	$HUD/SpawnCrowd.disabled = true
+	$HUD/SpawnStatus.text = "Đang tạo zombie… 0/%d" % CROWD_SPAWN_COUNT
+
+func _spawn_crowd_frame() -> void:
+	var deadline := Time.get_ticks_usec() + CROWD_SPAWN_BUDGET_USEC
+	for i in mini(_crowd_spawns_left, CROWD_SPAWN_LIMIT_PER_FRAME):
+		if not _spawn_one_zombie(_crowd_base_health):
+			var created := CROWD_SPAWN_COUNT - _crowd_spawns_left
+			_stop_crowd_spawn()
+			$HUD/SpawnStatus.text = "Đã tạo %d/%d zombie. Hãy kiểm tra chỗ trống hoặc dữ liệu MD2." % [created, CROWD_SPAWN_COUNT]
+			return
+		_crowd_spawns_left -= 1
+		if Time.get_ticks_usec() >= deadline:
+			break
+	if _crowd_spawns_left == 0:
+		_stop_crowd_spawn()
+		$HUD/SpawnStatus.text = "Đã tạo %d zombie." % CROWD_SPAWN_COUNT
+	else:
+		$HUD/SpawnStatus.text = "Đang tạo zombie… %d/%d" % [CROWD_SPAWN_COUNT - _crowd_spawns_left, CROWD_SPAWN_COUNT]
+
+func _stop_crowd_spawn() -> void:
+	if _crowd_spawns_left > 0:
+		$HUD/SpawnStatus.text = ""
+	_crowd_spawns_left = 0
+	$HUD/SpawnCrowd.disabled = $HUD/SpawnZombie.disabled or player_health == 0
 
 func _drop_player(height: float) -> void:
 	if player_health == 0:
@@ -589,6 +632,7 @@ func _on_player_hit(amount: int) -> void:
 	_combat_audio.player_hurt()
 	_show_player_hit(lost)
 	if player_health == 0:
+		_stop_crowd_spawn()
 		player.enter_lab_defeat()
 		# The popup captures keyboard input while it is open, including R.
 		$HUD/Weapon.get_popup().hide()
@@ -623,6 +667,7 @@ func reset_player() -> void:
 		$HUD/Defeat.hide()
 		$HUD/Weapon.disabled = _weapon_mesh == null or not player.combo.native_enabled
 	player_health = MAX_PLAYER_HEALTH
+	_stop_crowd_spawn()
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
 	_clear_player_flash()
 	if _player_damage_numbers != null:
