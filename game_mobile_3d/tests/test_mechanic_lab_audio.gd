@@ -423,13 +423,15 @@ func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 			local_voice.stop()
 			await create_timer(0.08).timeout
 			capture.clear_buffer()
+			await create_timer(0.25).timeout
 			lab._on_player_hit(6)
-			await create_timer(0.35).timeout
+			await create_timer(0.12).timeout
 			var defeat_peak := 0.0
 			for frame in capture.get_buffer(capture.get_frames_available()):
 				defeat_peak = maxf(defeat_peak, maxf(absf(frame.x), absf(frame.y)))
-			check(defeat_voice.get_playback_position() > 0.25 and defeat_peak > 0.001 and defeat_peak < 0.9,
-				"The defeat cue reaches the mixer and further damage does not restart it")
+			check(defeat_voice.get_playback_position() > 0.30 and defeat_peak > 0.001 and defeat_peak < 0.9,
+				"The defeat cue reaches the mixer without restarting (peak %.4f)" % defeat_peak)
+			print("MECHANIC_LAB_PLAYER_DEFEAT_PEAK ", defeat_peak)
 			lab.reset_player()
 			check(not defeat_voice.playing and defeat_voice.stream == null,
 				"Retry clears the previous defeat cue")
