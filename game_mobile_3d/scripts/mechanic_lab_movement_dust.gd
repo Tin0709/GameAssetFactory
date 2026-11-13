@@ -284,7 +284,7 @@ func _process(delta: float) -> void:
 			continue
 		if _contact_clock:
 			# The first render delta can include time before the contact.
-			particle.age = (tick - particle.contact_tick) * get_physics_process_delta_time()
+			particle.age = maxf(render_tick - particle.contact_tick, 0.0) * step
 		else:
 			particle.age += delta
 		if particle.age >= particle.duration:
