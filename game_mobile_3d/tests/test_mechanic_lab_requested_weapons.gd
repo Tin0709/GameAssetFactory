@@ -322,11 +322,14 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 		await physics_frame
 		var grip := mount.to_global(CrossPollinator.MUZZLE)
 		var scale := mount.global_basis.get_scale()
-		check(absf(scale.length() - sqrt(3.0)) < 0.01, "Crossbow stays full size during recoil and blend-out")
+		check(scale.distance_to(Vector3.ONE) < 0.01, "Crossbow stays full size during recoil and blend-out")
 		seen_recoil_mesh = seen_recoil_mesh or mount.mesh != idle_mesh
 		if player.active_clip == "Idle":
 			if idle_start < 0:
 				idle_start = frame
+				check(is_equal_approx(player.source_transition.duration, 0.25)
+					and player.source_transition.incoming_weight < 0.05,
+					"Crossbow starts lowering with the source blend-out duration")
 			largest_step = maxf(largest_step, previous.distance_to(grip))
 			idle_frames += 1
 			if idle_frames == 18:
@@ -341,6 +344,25 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 	check(mount.global_position.distance_to(weapon_pose * Vector3(0, 0.16, 0)) < 0.001
 		and mount.global_basis.z.normalized().dot(weapon_pose.basis.z.normalized()) > 0.9999,
 		"Idle uses the MD2 weapon socket and its 16 cm offset")
+	player.scripted_input = true
+	player.attack(true)
+	await ticks(3)
+	player.attack(false)
+	player.requested_direction = Vector2(0, 1)
+	player.requested_run = true
+	for frame in 45:
+		await physics_frame
+		if player.active_clip == "Run":
+			break
+	check(player.active_clip == "Run" and player.source_transition.duration >= 0.16
+		and player.source_transition.incoming_weight < 0.05,
+		"Releasing a shot while moving blends into the running pose")
+	await ticks(12)
+	check(player.hybrid_motion.last_kind == "CrossbowRun" and mount.mesh == idle_mesh,
+		"Running after a shot restores the Actions & Stuff carry")
+	player.scripted_input = false
+	player.requested_direction = Vector2.ZERO
+	player.requested_run = false
 	equip(menu, 0)
 	lab.reset_player()
 	await ticks(12)

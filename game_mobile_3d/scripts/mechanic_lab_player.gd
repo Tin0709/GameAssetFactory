@@ -11,7 +11,7 @@ var _crossbow_pose_serial := -1
 var _crossbow_mount: MeshInstance3D
 var _crossbow_carry_mesh: Mesh
 var _crossbow_recoil_mesh: Mesh
-var _crossbow_hand := -1
+var _crossbow_socket: BoneAttachment3D
 var _crossbow_carry_bone := -1
 var _crossbow_recoil_bone := -1
 
@@ -19,7 +19,7 @@ func configure_crossbow_mount(mount: MeshInstance3D, carry_mesh: Mesh, recoil_me
 	_crossbow_mount = mount
 	_crossbow_carry_mesh = carry_mesh
 	_crossbow_recoil_mesh = recoil_mesh
-	_crossbow_hand = skeleton.find_bone(&"J_L_Hand")
+	_crossbow_socket = mount.get_parent() as BoneAttachment3D
 	_crossbow_carry_bone = skeleton.find_bone(&"J_L_Weapon")
 	_crossbow_recoil_bone = skeleton.find_bone(&"J_L_Weapon1")
 
@@ -27,7 +27,7 @@ func _refresh_markers() -> void:
 	super._refresh_markers()
 	if not crossbow_equipped or _crossbow_mount == null:
 		return
-	var hand := skeleton.get_bone_global_pose(_crossbow_hand)
+	var hand := skeleton.get_bone_global_pose(_crossbow_socket.bone_idx)
 	var carry := skeleton.get_bone_global_pose(_crossbow_carry_bone)
 	var recoil := skeleton.get_bone_global_pose(_crossbow_recoil_bone)
 	var recoiling := recoil.basis.x.length_squared() > carry.basis.x.length_squared()
@@ -35,8 +35,7 @@ func _refresh_markers() -> void:
 	# The source switches models by collapsing one weapon branch. Use a
 	# single full-size instance so transitions never interpolate that scale.
 	var relative := (hand.affine_inverse() * weapon).orthonormalized()
-	var socket := _crossbow_mount.get_parent() as BoneAttachment3D
-	socket.transform = hand
+	_crossbow_socket.transform = hand
 	_crossbow_mount.transform = relative * Transform3D(Basis.IDENTITY, CrossPollinator.MESH_OFFSET)
 	var mesh := _crossbow_recoil_mesh if recoiling else _crossbow_carry_mesh
 	if _crossbow_mount.mesh != mesh:
