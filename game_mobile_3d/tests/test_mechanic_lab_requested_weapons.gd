@@ -68,6 +68,11 @@ func run() -> void:
 	var impact_samples: Array = combat_audio._groups.get(&"crossbow_hit", [])
 	var flight_samples: Array = combat_audio._groups.get(&"crossbow_flight", [])
 	var embedded := lab._crossbow.get_node_or_null("EmbeddedArrows") as MultiMeshInstance3D
+	var sparks := lab._crossbow.get_node_or_null("ArrowImpactSparks") as MultiMeshInstance3D
+	check(sparks != null, "Polaris loads its two source impact emitters")
+	var burst_sizes: Array[int] = []
+	lab._crossbow.bolt_impact.connect(func(_hit: Dictionary, _direction: Vector3, _serial: int) -> void:
+		burst_sizes.append(sparks.multimesh.visible_instance_count if sparks != null else 0))
 	var muzzle_errors: Array[float] = []
 	lab._crossbow.bolt_launched.connect(func(projectile: Node3D) -> void:
 		muzzle_errors.append(projectile.global_position.distance_to(lab._crossbow_mount.to_global(CrossPollinator.MUZZLE))))
@@ -90,6 +95,10 @@ func run() -> void:
 	check(muzzle_errors.size() == 1 and muzzle_errors[0] < 0.0001, "A bolt launches from the fitted muzzle")
 	check(not flight_voices.any(func(voice): return voice.playing), "Flight audio stops after the bolt hits")
 	check(target.health == 92 and contacts.size() == 1, "A tap shoots one 8-damage bolt at a ranged target")
+	check(burst_sizes.size() == 1 and burst_sizes[0] in [8, 9, 10],
+		"A living hit spawns a single pair of Polaris spark bursts")
+	check(lab._contact_sparks == null or lab._contact_sparks._streaks.visible_instance_count == 0,
+		"Polaris does not double up with the generic melee sparks")
 	check(embedded != null and embedded.multimesh.visible_instance_count == 0,
 		"A living hit does not leave a terrain prop")
 	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 1, "A living hit plays exactly one arrow impact")
@@ -112,6 +121,8 @@ func run() -> void:
 	await ticks(10)
 	check(embedded != null and embedded.multimesh.visible_instance_count == 1,
 		"A travelling arrow leaves one embedded prop when it hits a wall")
+	check(burst_sizes.size() == 2 and burst_sizes[1] in [8, 9, 10],
+		"A wall hit spawns the same two source emitters")
 	if embedded != null and DisplayServer.get_name() != "headless":
 		var first_pose := embedded.multimesh.get_instance_transform(0)
 		await ticks(5)
@@ -126,6 +137,8 @@ func run() -> void:
 		await ticks(54)
 	check(embedded != null and embedded.multimesh.visible_instance_count == 0,
 		"The embedded arrow expires at the end of the short Lab display window")
+	check(sparks != null and sparks.multimesh.visible_instance_count == 0,
+		"Both impact emitters finish within the source lifetime")
 	check(target.health == 92 and contacts.size() == 1, "A wall blocks the bolt from hitting the zombie")
 	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 2, "A wall hit plays the next arrow impact")
 	check(combat_audio._next_choice.get(&"crossbow_fire", 0) == 2, "Two shots use two different firing samples")
