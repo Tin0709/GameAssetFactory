@@ -406,8 +406,9 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	var zombie := group.get_child(0) as ZOMBIE
 	zombie.global_position = Vector3(0.0, 0.02, 9.0)
 	var contacts: Array[Dictionary] = []
-	group.zombie_step_audio.connect(func(point):
+	var record_contact := func(point: Vector3):
 		contacts.append({"point": point, "phase": zombie.animation.current_animation_position}))
+	zombie.step_audio.connect(record_contact)
 	capture.clear_buffer()
 	for i in 180:
 		await physics_frame
@@ -429,6 +430,7 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	for i in 100:
 		await physics_frame
 	check(contacts.size() == before_death, "Airborne and settled corpses post no walking sounds")
+	zombie.free()
 	for clip_index in range(1, ZOMBIE.WALK_CLIPS.size()):
 		button.pressed.emit()
 		zombie = group.get_child(group.get_child_count() - 1) as ZOMBIE
