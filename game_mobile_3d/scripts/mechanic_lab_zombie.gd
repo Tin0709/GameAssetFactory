@@ -143,6 +143,7 @@ var _corpse_landed := false
 var _limb_support_age := 0.0
 var _corpse_parked := false
 var _corpse_fragment_directions_ready := false
+var _corpse_fragment_started_at := INF
 var _settled_seconds := 0.0
 var _landing_age := INF
 var _roll_damping_weight := 0.0
@@ -470,6 +471,10 @@ func _update_death(delta: float) -> void:
 				body.bounce = 0.0
 	if _corpse_landed:
 		var supported: bool = contact.supports > 0
+		if supported and remaining < CORPSE_DISSOLVE_DURATION and not _corpse_fragment_directions_ready:
+			var skeleton := ragdoll.skeleton
+			if not skeleton.skeleton_updated.is_connected(_capture_corpse_breakup):
+				skeleton.skeleton_updated.connect(_capture_corpse_breakup, CONNECT_ONE_SHOT)
 		if supported and source_rig and contact.core_supports == 0 and not is_instance_valid(_corpse_floor):
 			# Keep Overworld gravity while the corpse is perched upright without core support.
 			supported = absf(_corpse_axis().normalized().y) <= CORPSE_UPRIGHT_AXIS_Y
@@ -680,11 +685,20 @@ func _update_corpse_material(remaining: float) -> void:
 	var gray := smoothstep(CORPSE_DESATURATION_START, CORPSE_DESATURATION_END, _corpse_age) * 0.80
 	_mesh.set_instance_shader_parameter("desaturation", gray)
 	_mesh.set_instance_shader_parameter("dissolve", _corpse_breakup_threshold(remaining))
-	if _corpse_parked and remaining < CORPSE_DISSOLVE_DURATION:
-		if not _corpse_fragment_directions_ready:
-			_set_corpse_fragment_directions()
-		var elapsed := CORPSE_DISSOLVE_DURATION - remaining
-		_mesh.set_instance_shader_parameter("fragment_travel", smoothstep(0.0, 0.34, elapsed))
+	if remaining >= CORPSE_DISSOLVE_DURATION:
+		return
+	if _corpse_parked and not _corpse_fragment_directions_ready:
+		_corpse_fragment_started_at = CORPSE_LIFETIME - CORPSE_DISSOLVE_DURATION
+		_set_corpse_fragment_directions()
+	if _corpse_fragment_directions_ready:
+		_mesh.set_instance_shader_parameter("fragment_travel",
+			smoothstep(0.0, 0.34, _corpse_age - _corpse_fragment_started_at))
+
+func _capture_corpse_breakup() -> void:
+	if not _corpse_fragment_directions_ready:
+		# Read the physical pose while the skeleton modifiers are applied.
+		_corpse_fragment_started_at = _corpse_age
+		_set_corpse_fragment_directions()
 
 func _set_corpse_fragment_directions() -> void:
 	_corpse_fragment_directions_ready = true
