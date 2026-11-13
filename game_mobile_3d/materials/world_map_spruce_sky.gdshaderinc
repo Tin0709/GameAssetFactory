@@ -27,8 +27,8 @@ float gaf_ground_canopy_sky(float current) {
 	return mix(current, 1.0, gaf_canopy_edge_fill * (1.0 - smoothstep(0.18, 0.60, cover)));
 }
 
-vec3 gaf_canopy_diffuse_color(vec3 rgb, float visibility) {
-	float weight = gaf_canopy_sky_color * (1.0 - smoothstep(.72, .96, visibility));
+vec3 gaf_canopy_diffuse_color(vec3 rgb, float visibility, float gain) {
+	float weight = gain * (1.0 - smoothstep(.72, .96, visibility));
 	if (weight <= 0.0) return rgb;
 	const vec3 luma = vec3(.2126, .7152, .0722);
 	vec3 cool = rgb * vec3(.72, 1.0, 1.48);

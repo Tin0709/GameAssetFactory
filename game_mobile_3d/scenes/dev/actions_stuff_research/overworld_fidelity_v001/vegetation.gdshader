@@ -198,7 +198,7 @@ void fragment(){
 	AO = (1.0 - ground_mix) * study_canopy_sky_at_root;
 	AO_LIGHT_AFFECT = 0.0;
 	EMISSION = color * (1.0 - METALLIC) * study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix * study_canopy_sky_at_root;
-	vec3 shared_sky = gaf_canopy_diffuse_color(EMISSION, study_raw_canopy_sky);
+	vec3 ungraded_sky = EMISSION;
 	// The canopy field weights the color change without altering sky irradiance.
 	float shade_mix = study_grass_shade_color.z * (1.0 - smoothstep(0.73, 0.96, study_canopy_sky_at_root));
 	if (shade_mix > 0.0) {
@@ -209,6 +209,7 @@ void fragment(){
 	}
 	if (gaf_canopy_sky_color > 0.0) {
 		// Fade out the old grass-only treatment as the common sky color takes over.
+		vec3 shared_sky = gaf_canopy_diffuse_color(ungraded_sky, study_raw_canopy_sky, 1.0);
 		EMISSION = mix(EMISSION, shared_sky, gaf_canopy_sky_color);
 	}
 	float sole = gaf_player_contact(foliage_world, CAMERA_POSITION_WORLD);
