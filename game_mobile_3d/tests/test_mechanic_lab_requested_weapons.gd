@@ -134,6 +134,7 @@ func run() -> void:
 	lab._crossbow.bolt_impact.disconnect(record_impact)
 	sound.button_pressed = false
 	barrier.queue_free()
+	await check_crossbow_collision_radius(lab)
 
 	lab.reset_player()
 	await ticks(12)
@@ -268,6 +269,35 @@ func run() -> void:
 		await process_frame
 	print("MECHANIC_LAB_REQUESTED_WEAPONS failures=", failures)
 	quit(1 if failures else 0)
+
+func check_crossbow_collision_radius(lab: Node3D) -> void:
+	var crossbow = lab._crossbow
+	var target := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(0.04, 0.8, 0.02)
+	collider.shape = box
+	target.add_child(collider)
+	lab.add_child(target)
+	var origin := Vector3(15.0, 2.0, 0.0)
+	target.position = origin + Vector3(0.09, 0.0, 2.2)
+	var hits: Array[Dictionary] = []
+	var record_hit := func(hit: Dictionary, _direction: Vector3, _serial: int) -> void:
+		hits.append(hit)
+	crossbow.bolt_impact.connect(record_hit)
+	await ticks(2)
+	crossbow.fire(origin, Vector3.BACK, -101, origin - Vector3.BACK * 0.3)
+	await ticks(8)
+	check(hits.size() == 1 and hits[0].collider == target and absf(hits[0].position.z - 2.19) < 0.03,
+		"The source-size arrow hits a thin obstacle 7 cm from its centre line")
+	target.position.x += 0.05
+	await ticks(2)
+	crossbow.fire(origin, Vector3.BACK, -102, origin - Vector3.BACK * 0.3)
+	await ticks(8)
+	check(hits.size() == 1, "The arrow misses a thin obstacle 12 cm from its centre line")
+	crossbow.bolt_impact.disconnect(record_hit)
+	crossbow.reset()
+	target.queue_free()
 
 func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 	var player = lab.player
