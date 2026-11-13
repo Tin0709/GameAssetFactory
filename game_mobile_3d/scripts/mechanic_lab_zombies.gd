@@ -77,6 +77,8 @@ const CURVED_STRIKES := [
 const GROUND_HEIGHT_LIMIT := 2.1
 const AIR_CENTRE_OFFSET := 1.5
 const AIR_PRIMARY_RANGE := 1.5
+# AM_Player_Sabre_JumpAttack: AN_HeavyJumpAttack minus LandingStart.
+const SABRE_LANDING_NOTIFY_DELAY := 0.054369554
 # GA_HeavyJumpAttackInstanceData. Use apex-to-contact displacement in this lab.
 const MEDIUM_FALL_HEIGHT := 4.0
 const HIGH_FALL_HEIGHT := 6.5
@@ -96,6 +98,7 @@ var _digits: Array[Texture2D]
 var _spawn_serial := 0
 var _attack_serial := -1
 var _landing_serial := -1
+var _pending_landings: Array[Dictionary] = []
 var _aim_serial := -1
 var _aim_target: Zombie
 var _attacker: CharacterBody3D
@@ -245,18 +248,26 @@ func strike_sabre(index: int, clip: String, serial: int) -> void:
 		return
 	if _aim_serial == serial and is_instance_valid(_aim_target) and candidates.has(_aim_target):
 		primary = _aim_target
-	_apply_contact(primary, primary.global_position + MELEE_CONTACT_HEIGHT, clip, index, serial, strike, forward, false)
+	_apply_contact(primary, primary.global_position + MELEE_CONTACT_HEIGHT, clip, index, serial, strike, forward, false, origin)
 	for zombie in candidates:
 		if zombie != primary:
-			_apply_contact(zombie, zombie.global_position + MELEE_CONTACT_HEIGHT, clip, index, serial, strike, forward, true)
+			_apply_contact(zombie, zombie.global_position + MELEE_CONTACT_HEIGHT, clip, index, serial, strike, forward, true, origin)
+
+func cancel_pending_landings() -> void:
+	_pending_landings.clear()
+
+func _physics_process(_delta: float) -> void:
+	var frame := Engine.get_physics_frames()
+	while not _pending_landings.is_empty() and _pending_landings[0].frame <= frame:
+		var landing: Dictionary = _pending_landings.pop_front()
+		_resolve_landing(landing.origin, landing.forward, landing.serial, landing.strike)
 
 func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: float) -> void:
 	if serial == _landing_serial:
 		return
 	_landing_serial = serial
 	var forward := Vector3(facing.x, 0.0, facing.z).normalized()
-	var centre := position + forward * AIR_CENTRE_OFFSET
-	sabre_landing.emit(centre, serial)
+	sabre_landing.emit(position + forward * AIR_CENTRE_OFFSET, serial)
 	var strike := (SWORD_AIR_STRIKE if sword_equipped else AIR_STRIKE).duplicate()
 	if fall_height >= HIGH_FALL_HEIGHT:
 		strike.damage *= 3
@@ -264,6 +275,15 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 	elif fall_height >= MEDIUM_FALL_HEIGHT:
 		strike.damage *= 2
 		strike.strength *= 1.2
+	if sword_equipped or curved_equipped:
+		_resolve_landing(position, forward, serial, strike)
+		return
+	var delay_ticks := ceili(SABRE_LANDING_NOTIFY_DELAY * Engine.physics_ticks_per_second)
+	_pending_landings.append({"frame": Engine.get_physics_frames() + delay_ticks,
+		"origin": position, "forward": forward, "serial": serial, "strike": strike})
+
+func _resolve_landing(position: Vector3, forward: Vector3, serial: int, strike: Dictionary) -> void:
+	var centre := position + forward * AIR_CENTRE_OFFSET
 	var space := get_world_3d().direct_space_state
 	var ray := PhysicsRayQueryParameters3D.create(position + Vector3.UP * 0.65, position, LEVEL_COLLISION_MASK)
 	ray.hit_from_inside = true
@@ -278,16 +298,16 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 		ray.to = contact
 		if not space.intersect_ray(ray).is_empty():
 			continue
-		_apply_contact(zombie, contact, "AirAttack", 0, serial, strike, forward, distance > AIR_PRIMARY_RANGE)
+		_apply_contact(zombie, contact, "AirAttack", 0, serial, strike, forward, distance > AIR_PRIMARY_RANGE, position)
 
-func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool) -> void:
+func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool, origin: Vector3) -> void:
 	var air_attack := clip == "AirAttack"
 	var sabre_ground := not sword_equipped and not curved_equipped and not air_attack
 	var sabre_finisher := index == 2 and sabre_ground
 	var radial := air_attack or sabre_finisher
-	var direction := zombie.global_position - _attacker.global_position if radial else forward
+	var direction := zombie.global_position - origin if radial else forward
 	direction.y = 0.0
-	direction = direction.normalized()
+	direction = forward if direction.is_zero_approx() else direction.normalized()
 	var damage := roundi(float(strike.damage) * SPLASH_MULTIPLIER) if splash else int(strike.damage)
 	var angle := deg_to_rad(float(strike.angle))
 	var impulse := Vector2(cos(angle), sin(angle)) * float(strike.strength) * IMPULSE_PER_STRENGTH

@@ -166,6 +166,7 @@ func _ready() -> void:
 		player.grounded_melee_aim = $Zombies.aim_sabre
 		player.connect("grounded_sabre_impact", $Zombies.strike_sabre)
 		player.connect("heavy_jump_landed", $Zombies.land_sabre)
+		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
