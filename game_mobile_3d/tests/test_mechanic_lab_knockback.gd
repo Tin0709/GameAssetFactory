@@ -135,8 +135,11 @@ func check_sword_finisher_push(lab, group) -> void:
 		check(travel > 0.73 and travel < 0.79, "Sword's finisher keeps its calibrated outward travel")
 		print("MECHANIC_LAB_SWORD_PUSH stop=", stop_time, " travel=", travel, " lock_left=", remaining_lock)
 	zombie.free()
+	lab.reset_player()
+	await ticks(5)
 	selector.select(0)
 	selector.item_selected.emit(0)
+	check(selector.selected == 0 and not group.sword_equipped, "Switch back to Sabre after the Sword combo ends")
 
 func check_sabre_landing_damage(lab, group) -> void:
 	lab.reset_player()
@@ -144,13 +147,16 @@ func check_sabre_landing_damage(lab, group) -> void:
 	for i in 3:
 		lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombies: Array[Node] = group.get_children()
+	check(zombies.size() == 3, "The Sabre landing fixture has three targets")
+	if zombies.size() != 3:
+		return
 	var origin: Vector3 = lab.player.global_position
 	var forward: Vector3 = lab.player.visual.global_basis.z
 	var right := Vector3.UP.cross(forward)
 	var centre := origin + forward * 1.5
 	for i in zombies.size():
 		zombies[i].set_physics_process(false)
-		zombies[i].global_position = centre + right * [0.0, 2.0, 3.0][i]
+		zombies[i].global_position = centre + right * (2.0 if i == 1 else 0.0)
 	var wall := StaticBody3D.new()
 	var collider := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
