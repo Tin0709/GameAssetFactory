@@ -43,7 +43,8 @@ func run() -> void:
 		await physics_frame
 		walking_peak = maxi(walking_peak, visible_particles(dust))
 		walking_wind = maxi(walking_wind, visible_particles(wind))
-	check(contacts.size() >= 2 and walking_peak > 0, "Walking emits small ground puffs with audio off")
+	check(contacts.size() >= 2 and walking_peak == 0,
+		"MD2 Walk keeps foot contacts without spawning the Run dust emitter")
 	check(walking_wind == 0, "Walking does not emit the run wake")
 	Input.action_release("sprint")
 	var running_wind := 0
@@ -51,6 +52,7 @@ func run() -> void:
 		await physics_frame
 		running_wind = maxi(running_wind, visible_particles(wind))
 	check(running_wind > 0, "Fast running emits a short wind wake")
+	await check_source_run_dust(lab, dust)
 	var run_contacts := contacts.size()
 	Input.action_press("jump")
 	for i in 10:
@@ -70,7 +72,7 @@ func run() -> void:
 		"The jump adds only one stronger burst, on landing")
 	check(visible_particles(wind) == 0, "Landing does not start a running wake")
 	Input.action_release("move_forward")
-	for i in 45:
+	for i in 115:
 		await physics_frame
 	check(visible_particles(dust) == 0 and not dust.is_processing(), "Dust fades and stops processing at rest")
 	check(visible_particles(wind) == 0 and not wind.is_processing(), "The run wake clears at rest")
@@ -127,6 +129,24 @@ func check_running_wake_support(lab, wind) -> void:
 	check(wind._next == next, "Foot contacts beyond the floor or above the grass do not spawn wakes")
 	Input.action_release("move_right")
 	floor_body.position.y -= 0.25
+
+func check_source_run_dust(lab, dust) -> void:
+	var listen := func(_point: Vector3, landed: bool):
+		if not landed:
+			var particle = dust._particles[posmod(dust._next - 1, dust._particles.size())]
+			check(particle.duration >= 0.8 and particle.duration <= 1.75,
+				"Run dust uses the authored 0.80 to 1.75 second particle lifetime")
+			check(is_equal_approx(particle.sprite.pixel_size * 16.0, 1.0)
+				and is_equal_approx(particle.sprite.modulate.a, 0.4),
+				"The run notify passes its one-metre sprite size and begins at source alpha 0.4")
+	var before: int = dust._next
+	lab.player.surface_contact.connect(listen)
+	for i in 45:
+		await physics_frame
+		if dust._next != before:
+			break
+	lab.player.surface_contact.disconnect(listen)
+	check(dust._next != before, "The source Run emitter starts at a supported step")
 
 func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 	for i in 8:
