@@ -17,6 +17,7 @@ const FLOOR_REST_SLOP := 0.012
 const FLOOR_SHARED_LIFT_THRESHOLD := 0.05
 const FLOOR_LANDING_LIFT_THRESHOLD := 0.045
 const FLOOR_LANDING_MAX_LIFT_REDUCTION := 0.02
+const FLOOR_SUPPORTED_SHARED_LIFT := 0.03
 const FLOOR_PREDICTION_SLOP := 0.01
 const FLOOR_PREDICTION_MIN_CLOSING_SPEED := 0.6
 const FLOOR_PREDICTION_FRICTION := 0.15
@@ -840,6 +841,12 @@ func _project_floor_contact() -> void:
 			# During the roll, bound the extra local correction to limit joint separation.
 			var excess_lift := maxf(shared_lift - FLOOR_LANDING_LIFT_THRESHOLD, 0.0)
 			shared_lift -= minf(excess_lift * floor_impact_blend, FLOOR_LANDING_MAX_LIFT_REDUCTION)
+			# Once two parts carry the Sabre roll, keep more of the floor
+			# correction on the penetrating limbs so the whole rig doesn't pop up.
+			if floor_impact_blend > 0.16 and shared_lift > FLOOR_SUPPORTED_SHARED_LIFT \
+					and _has_two_flat_floor_supports():
+				var supported_blend := smoothstep(0.16, 0.42, floor_impact_blend)
+				shared_lift = lerpf(shared_lift, FLOOR_SUPPORTED_SHARED_LIFT, supported_blend)
 		var anchor_lifts: Dictionary[PhysicalBone3D, float] = {}
 		if _limit_first_contact_stretch and (landing_blended or floor_impact_blend < EARLY_ROLL_ANCHOR_BLEND_END) \
 				and not depths.is_empty():
@@ -1018,6 +1025,16 @@ func has_flat_limb_support() -> bool:
 	var floor_body := _flat_floor.get_parent()
 	return _body_supported_by(bodies["Leg.L"], floor_body) and _body_supported_by(bodies["Leg.R"], floor_body) \
 		and (_body_supported_by(bodies["Arm.L"], floor_body) or _body_supported_by(bodies["Arm.R"], floor_body))
+
+func _has_two_flat_floor_supports() -> bool:
+	var floor_body := _flat_floor.get_parent()
+	var supports := 0
+	for body: PhysicalBone3D in bodies.values():
+		if _body_supported_by(body, floor_body):
+			supports += 1
+			if supports == 2:
+				return true
+	return false
 
 static func _body_supported_by(body: PhysicalBone3D, floor_body: Node) -> bool:
 	var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
