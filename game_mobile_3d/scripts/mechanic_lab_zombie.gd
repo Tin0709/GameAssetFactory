@@ -63,7 +63,7 @@ const SABRE_BRACE_BLEND_TIME := 0.10
 const SABRE_ROLL_RESPONSE_TIME := 0.10
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
 const HEIGHT := 1.95
-const CHASE_SPEED := 3.0 # Zombie MovementSpeed is 300 cm/s.
+const CHASE_SPEED := 3.1
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
 # Zombie overrides damage and attack speed. MeleeAttackMob supplies the range,
