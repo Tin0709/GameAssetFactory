@@ -57,7 +57,7 @@ func run() -> void:
 	var combat_audio = lab.get_node("CombatAudio")
 	var fire_samples: Array = combat_audio._groups.get(&"crossbow_fire", [])
 	var impact_samples: Array = combat_audio._groups.get(&"crossbow_hit", [])
-	check(fire_samples.size() == 3 and impact_samples.size() == 3, "All verified nỏ firing and impact samples load")
+	check(fire_samples.size() == 3 and impact_samples.size() == 3, "All verified crossbow firing and impact samples load")
 	check(menu.selected == 3 and ammo.visible and ammo.text.contains("25 / 25"), "Crossbow equips with full ammo")
 	attack(true)
 	await ticks(2)

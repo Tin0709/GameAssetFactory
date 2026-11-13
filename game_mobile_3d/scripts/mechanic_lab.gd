@@ -437,11 +437,15 @@ func _load_crossbow(root: String) -> bool:
 	_crossbow.name = "CrossPollinator"
 	_crossbow.bolt_mesh = bolt
 	_crossbow.ammo_changed.connect(_set_crossbow_ammo)
-	_crossbow.bolt_impact.connect($Zombies.strike_bolt)
+	_crossbow.bolt_impact.connect(_on_crossbow_impact)
 	$CombatEffects.add_child(_crossbow)
 	_set_crossbow_ammo(_crossbow.ammo)
 	_combat_audio.load_crossbow(root)
 	return true
+
+func _on_crossbow_impact(hit: Dictionary, direction: Vector3, serial: int) -> void:
+	_combat_audio.crossbow_impact(hit.position)
+	$Zombies.strike_bolt(hit, direction, serial)
 
 func _load_gauntlets(root: String) -> bool:
 	if _left_gauntlet != null:

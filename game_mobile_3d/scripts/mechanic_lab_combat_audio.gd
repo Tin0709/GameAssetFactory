@@ -2,11 +2,22 @@ extends Node3D
 ## Extracted MD2 samples. Group selection and gains are local playback settings.
 
 const ReferenceAudio := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
+const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd")
 const SOURCE := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events/Spicewood"
 const SABRE := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_sabre_hitmarker_%02d.ogg"
 const SWORD := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_sword_%02d.ogg"
 const CURVED := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_hitmarker_curvedGreatsword-%03d.ogg"
 const CROSSBOW := "Items/Weapons/Weapon_Ranged/RapidCrossbow/RapidCrossbowUnique/sfx_item_rapidCrossbowUnique_"
+const CROSSBOW_FIRE_HASHES := [
+	"500b59e16faf185c10a4ef8b7a22b4f6f40c21a1884aafbf3e328e4e1b169157",
+	"0a90dec3091bbcd16f181c16f214e8a928e9b50488d132d26b5440ae0590b06c",
+	"891546a2cbf6e08322e0515ec8e33bed5c40e190f7ad8e386af6f163c4dffbed",
+]
+const CROSSBOW_IMPACT_HASHES := [
+	"22693848bc6767c7c60454f5a0cfc3959f96f1d53d0021c357f8e18b5d9c4760",
+	"f3f457ffb1a05b35e7a1b00e5f902b00a3487ffc6df197ad059809987da650a7",
+	"d1538525efed7c2b0556ee0dff0f16cce4eb99542cb452f5ade26fc110e9d5f9",
+]
 const GAUNTLET_COMBO := "Items/Weapons/Weapon_Melee/6_weapons_melee_basicCombo/Attack%d/sfx_gauntlets_unique_attack_%s_01.ogg"
 const GAUNTLET_HIT := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_gauntlets_01.ogg"
 const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_01.ogg"
@@ -177,12 +188,11 @@ func _exit_tree() -> void:
 func contact(point: Vector3, serial: int, lethal: bool, clip := "") -> void:
 	if not enabled:
 		return
-	if serial != _last_weapon_serial:
+	# Projectile collisions already play their own cue, including terrain hits.
+	if serial != _last_weapon_serial and clip != CrossPollinator.SHOT:
 		_last_weapon_serial = serial
 		var group := _weapon_hit_group()
-		if clip == "NativeCrossPollinatorShot":
-			group = &"crossbow_hit"
-		elif clip.begins_with("NativeGauntlet") or (clip == "AirAttack" and gauntlets_equipped):
+		if clip.begins_with("NativeGauntlet") or (clip == "AirAttack" and gauntlets_equipped):
 			group = &"gauntlet_hit"
 		_play(group, point, HIT_GAIN_DB)
 	_play(&"death" if lethal else &"hurt", point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
@@ -193,10 +203,10 @@ func _weapon_hit_group() -> StringName:
 	return &"sword_hit" if sword_equipped else &"hit"
 
 func load_crossbow(root: String) -> void:
-	_load_sample(root, &"crossbow_fire", CROSSBOW + "fire_01.ogg",
-		"500b59e16faf185c10a4ef8b7a22b4f6f40c21a1884aafbf3e328e4e1b169157")
-	_load_sample(root, &"crossbow_hit", CROSSBOW + "arrow_impact_01.ogg",
-		"22693848bc6767c7c60454f5a0cfc3959f96f1d53d0021c357f8e18b5d9c4760")
+	for i in CROSSBOW_FIRE_HASHES.size():
+		_load_sample(root, &"crossbow_fire", CROSSBOW + ("fire_%02d.ogg" % (i + 1)), CROSSBOW_FIRE_HASHES[i])
+	for i in CROSSBOW_IMPACT_HASHES.size():
+		_load_sample(root, &"crossbow_hit", CROSSBOW + ("arrow_impact_%02d.ogg" % (i + 1)), CROSSBOW_IMPACT_HASHES[i])
 
 func load_gauntlets(root: String) -> void:
 	var weights := ["light", "medium", "heavy"]
@@ -217,6 +227,10 @@ func load_gauntlets(root: String) -> void:
 func crossbow_fired(point: Vector3) -> void:
 	if enabled:
 		_play(&"crossbow_fire", point, HIT_GAIN_DB)
+
+func crossbow_impact(point: Vector3) -> void:
+	if enabled:
+		_play(&"crossbow_hit", point, HIT_GAIN_DB)
 
 func gauntlet_swung(point: Vector3, index: int, airborne: bool) -> void:
 	if enabled:
