@@ -1,11 +1,14 @@
 extends Node3D
 
 const EffectSource := preload("res://scripts/mechanic_lab_effect_source.gd")
+const WeaponSource := preload("res://scripts/mechanic_lab_weapon_source.gd")
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Smoke/T_SmokePixel.png"
 const SOURCE_SHA256 := "78d326787c4065d70e227ec386a7330f53621c8733ad114bc80eaea7f7f1b5fc"
 const FRAMES := [0, 9, 10, 16, 24, 25]
 const CAPACITY := 16
 const HEAVY_PARTICLE_COUNT := 10
+const STEP_ALPHA_PATH := "reports/depth/vfx/step-dust-alpha.private.json"
+const STEP_ALPHA_HASH := "c2dae47cc6feaad21508e960739ab5451fcdd691bb194b70ffd85380285579ff"
 # Keep the lab grass tint. The dirt and stone tints lift the source tile
 # medians toward a lighter, less saturated dust color.
 const SURFACE_DUST := {
@@ -21,6 +24,7 @@ class Particle:
 	var age := 0.0
 	var duration := 0.0
 	var opacity := 0.0
+	var run_drag := 0.0
 
 var _actor: CharacterBody3D
 var _ground: CollisionShape3D
@@ -35,12 +39,15 @@ var _burst_frame := -1
 var _burst_point: Vector3
 var _burst_surface: String
 var _random := RandomNumberGenerator.new()
+var _run_profile: Callable
+var _run_alpha := PackedFloat32Array()
+var _run_alpha_duration := 1.0
 
 func _ready() -> void:
 	set_physics_process(false)
 
 func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable(),
-		heavy_delay := Callable(), landing_contact := Callable()) -> bool:
+		heavy_delay := Callable(), landing_contact := Callable(), run_profile := Callable()) -> bool:
 	var texture := _load_mask()
 	if texture == null:
 		return false
@@ -49,6 +56,13 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 	_terrain_contact = terrain_contact
 	_landing_contact = landing_contact
 	_heavy_delay = heavy_delay
+	if run_profile.is_valid():
+		var path := WeaponSource.verified_path(WeaponSource.research_root(), STEP_ALPHA_PATH, STEP_ALPHA_HASH)
+		if not path.is_empty():
+			var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
+			_run_alpha = PackedFloat32Array(data.alpha)
+			_run_alpha_duration = float(data.alpha_duration)
+			_run_profile = run_profile
 	_random.seed = 27381
 	for i in CAPACITY:
 		var particle := Particle.new()
@@ -87,6 +101,9 @@ func _on_heavy_jump_landed(point: Vector3, _forward: Vector3, _serial: int, _fal
 	_heavy_landing_frame = Engine.get_physics_frames()
 
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
+	var step_size := float(_run_profile.call()) if not landed and _run_profile.is_valid() else -1.0
+	if is_zero_approx(step_size):
+		return
 	var heavy := landed and _heavy_landing_frame == Engine.get_physics_frames()
 	if heavy:
 		point = _heavy_landing_point
@@ -117,7 +134,10 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 			_burst_surface = surface
 			set_physics_process(true)
 			return
-	_emit_dust(ground_point, surface, landed, heavy)
+	if step_size > 0.0:
+		_emit_run_dust(ground_point, surface, step_size)
+	else:
+		_emit_dust(ground_point, surface, landed, heavy)
 
 func _physics_process(_delta: float) -> void:
 	if _burst_frame < 0 or Engine.get_physics_frames() < _burst_frame:
@@ -146,6 +166,7 @@ func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: boo
 		particle.origin = ground_point + radial * _random.randf_range(0.02, spread) + Vector3.UP * 0.05
 		particle.velocity = radial * _random.randf_range(0.18, 0.62) - motion * 0.065 + Vector3.UP * 0.25
 		particle.age = 0.0
+		particle.run_drag = 0.0
 		particle.duration = _random.randf_range(0.19, 0.28) if landed else _random.randf_range(0.14, 0.22)
 		particle.opacity = 0.58 if landed else (0.44 if running else 0.36)
 		particle.sprite.frame = FRAMES[_random.randi_range(0, FRAMES.size() - 1)]
@@ -161,6 +182,24 @@ func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: boo
 		particle.sprite.show()
 	set_process(true)
 
+func _emit_run_dust(ground_point: Vector3, surface: String, size: float) -> void:
+	# NS_Step_Dust spawns one sprite 20 cm above the supported foot, with
+	# zero initial velocity and an upward acceleration of 100 cm/s².
+	var particle := _particles[_next]
+	_next = (_next + 1) % _particles.size()
+	particle.origin = ground_point + Vector3.UP * 0.20
+	particle.velocity = Vector3.ZERO
+	particle.age = 0.0
+	particle.duration = _random.randf_range(0.80, 1.75)
+	particle.run_drag = _random.randf_range(4.0, 10.0)
+	particle.sprite.frame = FRAMES[_random.randi_range(0, FRAMES.size() - 1)]
+	particle.sprite.pixel_size = size / 16.0
+	particle.sprite.scale = Vector3.ONE
+	particle.sprite.global_position = particle.origin
+	particle.sprite.modulate = Color(SURFACE_DUST.get(surface, SURFACE_DUST.grass), _run_alpha[0])
+	particle.sprite.show()
+	set_process(true)
+
 func _process(delta: float) -> void:
 	var active := false
 	for particle in _particles:
@@ -171,6 +210,17 @@ func _process(delta: float) -> void:
 			particle.sprite.hide()
 			continue
 		var progress := particle.age / particle.duration
+		if particle.run_drag > 0.0:
+			# Closed form of upward acceleration with linear drag, sampled
+			# by age so the rendered path is independent of render cadence.
+			var drag := particle.run_drag
+			var height := (particle.age - (1.0 - exp(-drag * particle.age)) / drag) / drag
+			particle.sprite.global_position = particle.origin + Vector3.UP * height
+			var cursor := progress / _run_alpha_duration * (_run_alpha.size() - 1)
+			var index := floori(cursor)
+			particle.sprite.modulate.a = lerpf(_run_alpha[index], _run_alpha[index + 1], cursor - index)
+			active = true
+			continue
 		particle.sprite.global_position = particle.origin + particle.velocity * particle.age * (1.0 - 0.4 * progress)
 		particle.sprite.scale = Vector3.ONE * (1.0 + 0.35 * progress)
 		particle.sprite.modulate.a = particle.opacity * (1.0 - smoothstep(0.12, 1.0, progress))

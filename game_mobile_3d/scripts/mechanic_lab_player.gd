@@ -15,6 +15,15 @@ var _crossbow_socket: BoneAttachment3D
 var _crossbow_carry_bone := -1
 var _crossbow_recoil_bone := -1
 
+func source_step_dust_size() -> float:
+	var source: String = clips.get(active_clip, {}).get("source_name", "")
+	match source:
+		"Player_Master_Run":
+			return 1.0
+		"Player_Master_Walk", "Player_Crossbow_Walk", "Player_Crossbow_Run":
+			return 0.0
+	return -1.0
+
 func configure_crossbow_mount(mount: MeshInstance3D, carry_mesh: Mesh, recoil_mesh: Mesh) -> void:
 	_crossbow_mount = mount
 	_crossbow_carry_mesh = carry_mesh

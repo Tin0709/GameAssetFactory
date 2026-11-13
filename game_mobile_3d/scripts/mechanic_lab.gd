@@ -182,7 +182,8 @@ func _ready() -> void:
 		_setup_movement_audio()
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
-		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _grass_landing_contact_at):
+		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _grass_landing_contact_at,
+				player.source_step_dust_size):
 			add_child(dust)
 		else:
 			dust.free()
