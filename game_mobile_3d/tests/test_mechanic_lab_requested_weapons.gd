@@ -1,5 +1,11 @@
 extends SceneTree
 
+const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd")
+const WALK_SOURCES := [
+	"Player_Master_Walk", "Player_Master_Walk", "Player_2H_Medium_Walk",
+	"Player_Crossbow_Walk", "Player_Master_Walk",
+]
+
 var failures := 0
 var contacts: Array[String] = []
 
@@ -38,6 +44,7 @@ func run() -> void:
 		return
 	check(menu.get_item_text(3) == "The Cross Pollinator", "The Cross Pollinator is named correctly")
 	check(menu.get_item_text(4) == "Prime Enchanter's Gauntlets", "Prime Enchanter's Gauntlets are named correctly")
+	await check_weapon_movement(lab, menu)
 	var group := lab.get_node("Zombies")
 	group.sabre_contact.connect(func(_p, _d, clip, _i, _s, _k): contacts.append(clip))
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
@@ -58,6 +65,9 @@ func run() -> void:
 	var fire_samples: Array = combat_audio._groups.get(&"crossbow_fire", [])
 	var impact_samples: Array = combat_audio._groups.get(&"crossbow_hit", [])
 	var flight_samples: Array = combat_audio._groups.get(&"crossbow_flight", [])
+	var muzzle_errors: Array[float] = []
+	lab._crossbow.bolt_launched.connect(func(projectile: Node3D) -> void:
+		muzzle_errors.append(projectile.global_position.distance_to(lab._crossbow_mount.to_global(CrossPollinator.MUZZLE))))
 	check(fire_samples.size() == 3 and impact_samples.size() == 3, "All verified crossbow firing and impact samples load")
 	check(flight_samples.size() == 4, "All verified arrow flight samples load")
 	check(menu.selected == 3 and ammo.visible and ammo.text.contains("25 / 25"), "Crossbow equips with full ammo")
@@ -71,6 +81,7 @@ func run() -> void:
 		flight_voices[0].global_position.distance_to(bolt.global_position) < 0.01,
 		"One spatial flight voice follows the moving bolt")
 	await ticks(21)
+	check(muzzle_errors.size() == 1 and muzzle_errors[0] < 0.0001, "A bolt launches from the fitted muzzle")
 	check(not flight_voices.any(func(voice): return voice.playing), "Flight audio stops after the bolt hits")
 	check(target.health == 92 and contacts.size() == 1, "A tap shoots one 8-damage bolt at a ranged target")
 	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 1, "A living hit plays exactly one arrow impact")
@@ -217,3 +228,41 @@ func run() -> void:
 		await process_frame
 	print("MECHANIC_LAB_REQUESTED_WEAPONS failures=", failures)
 	quit(1 if failures else 0)
+
+func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
+	var player = lab.player
+	player.scripted_input = true
+	for index in WALK_SOURCES.size():
+		equip(menu, index)
+		await ticks(4)
+		check(lab._equipped_weapon == index, "Equips weapon %d for movement" % index)
+		player.requested_direction = Vector2(0.0, 1.0)
+		await ticks(25)
+		check(player.active_clip == "Walk" and player.clips.Walk.source_name == WALK_SOURCES[index]
+			and not player._use_composed_gait(player.active_clip) and not player.hybrid_motion.owns_pose,
+			"Shift walk uses the MD2 source for weapon %d" % index)
+		if index == 3:
+			player.requested_run = true
+			await ticks(25)
+			check(player.active_clip == "Run" and player.hybrid_motion.last_kind == "CrossbowRun"
+				and player.hybrid_motion.owns_pose, "Crossbow run uses Actions & Stuff")
+			var grip := lab._crossbow_mount as MeshInstance3D
+			var presenter = player.render_presenter
+			presenter.prepare(0.5)
+			var mesh_index: int = presenter.meshes.find(grip)
+			var bone: int = player._weapon_attachment.bone_idx
+			check(mesh_index >= 0 and Vector3(presenter.display_meshes[mesh_index] * CrossPollinator.GRIP)
+				.distance_to(presenter.display_world[bone].origin) < 0.001,
+				"Crossbow grip follows the right-hand socket between physics ticks")
+			player.requested_run = false
+			await ticks(12)
+			check(player.active_clip == "Walk" and not player.hybrid_motion.owns_pose,
+				"Crossbow returns to MD2 Walk when slowing down")
+		player.requested_direction = Vector2.ZERO
+		await ticks(26)
+	check(lab._left_gauntlet.get_parent().bone_name == "J_L_Arm"
+		and lab._right_gauntlet.get_parent().bone_name == "J_R_Arm", "Gauntlets follow both rendered fists")
+	equip(menu, 0)
+	player.scripted_input = false
+	lab.reset_player()
+	await ticks(12)
