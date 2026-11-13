@@ -137,6 +137,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sculk_surface": ["Sculk phát sáng", 1.],
 	&"forest_replay_emission": ["Ánh bệ đá trong rừng", 1.],
 	&"forest_replay_bounce": ["Ánh hắt quanh bệ đá", 1.],
+	&"forest_replay_surface_bounce": ["Ánh hắt theo mặt đá", 1.],
 	&"forest_replay_placement": ["Vị trí bệ đá", 1.],
 	&"canopy_player_cue": ["Dáng nhân vật sau tán", 1.],
 	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
@@ -164,7 +165,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 86
+const LIGHTING_MIX_VERSION := 87
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -297,6 +298,8 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_replay_bounce", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_replay_surface", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_replay_surface_field", null)
 	RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
 	get_tree().node_added.connect(_track_point_light)
 	for light in get_tree().root.find_children("*","Light3D",true,false):_track_point_light(light)
@@ -639,6 +642,7 @@ func _exit_tree()->void:
 		RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 		forest_replay.publish_bounce(0.0)
+		forest_replay.release_surface()
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
 		RenderingServer.global_shader_parameter_set("gaf_point_soft",Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_point_mixed",false)
@@ -1524,6 +1528,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 86 and effect == &"forest_replay_placement":
 			missing_value = 0.
+		if version < 87 and effect == &"forest_replay_surface_bounce":
+			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
 		if version < 84 and effect == &"night_stone_blue_softness":
@@ -1599,6 +1605,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and forest_replay.available(level)
 		if effect == &"forest_replay_placement":
 			slider.editable = slider.editable and forest_replay.available(level) and forest_replay.has_step_site(level)
+		if effect == &"forest_replay_surface_bounce":
+			slider.editable = slider.editable and forest_replay.surface_available(level)
 		if effect == &"canopy_player_cue":
 			slider.editable = slider.editable and level.canopy_player_cue.available(level)
 		if effect == &"forest_path_placement":
@@ -1679,7 +1687,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
-	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce", &"forest_replay_placement"]:
+	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce", &"forest_replay_placement", &"forest_replay_surface_bounce"]:
 		_sync_forest_night_lights()
 		return
 	if changed_effect == &"canopy_player_cue":
@@ -1883,6 +1891,7 @@ func _sync_forest_night_lights() -> void:
 		_lighting_scale(&"forest_replay_placement") == 1.)
 	if _point_kernel_owner != null and _point_kernel_owner.get_ref() == self:
 		forest_replay.publish_bounce(_lighting_scale(&"forest_replay_bounce"))
+		forest_replay.publish_surface(level, _lighting_scale(&"forest_replay_surface_bounce"))
 	var offset: Vector2 = level.forest_path_light_offset if _lighting_scale(&"forest_path_placement") == 1. else Vector2.ZERO
 	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light"), offset):
 		_publish_point_cutoff()
