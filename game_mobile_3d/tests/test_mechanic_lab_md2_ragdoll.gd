@@ -196,6 +196,7 @@ func run() -> void:
 	await check_sabre_fixed_pose_anchor(lab, group, 419, 0.101, "head impact at the start of the roll")
 	await check_sabre_fixed_pose_anchor(lab, group, 652, 0.095, "leg contact after the landing blend")
 	await check_sabre_fixed_pose_anchor(lab, group, 655, 0.105, "arm after the landing blend", 0.013)
+	await check_sabre_fixed_pose_anchor(lab, group, 703, 0.11, "arm sliding during the first roll", 0.013)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	await check_fresh_spawn_handoff(lab, group, 0)
