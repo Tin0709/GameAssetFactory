@@ -206,6 +206,8 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		2 * COMBAT_AUDIO.VOICES_PER_POOL)
 	for voice in reactions:
 		voice.bus = AudioServer.get_bus_name(bus)
+	for i in 20:
+		await physics_frame
 	var hit_choice: int = audio._next_choice[&"hit"]
 	var forward: Vector3 = lab.player.visual.global_basis.z
 	var centre: Vector3 = lab.player.global_position + forward * 1.5
@@ -218,6 +220,7 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		zombie.set_physics_process(false)
 		zombie.collision_layer = 0
 		zombie.global_position = centre + right * (i - 3) * 0.35
+		zombie.max_health = 100
 		zombie.health = health[i]
 	var deaths: Array[Vector3] = []
 	var hits: Array[int] = []
