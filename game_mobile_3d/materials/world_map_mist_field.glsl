@@ -37,7 +37,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 additional_center_strength;
  vec4 additional_radii;
  vec4 additional_scatter_multiplier;
- vec4 depth_scatter; // World metres along the ray: start, full effect, source gain, extinction gain.
+ vec4 depth_scatter; // World metres along the ray: start, full effect, source gain, extinction gain (negative selects the bounded morning band).
  vec4 depth_scatter_color; // Linear change to ambient source RGB, enabled in w.
 } p;
 const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
@@ -90,7 +90,12 @@ vec3 directional_air(vec3 point){
 }
 #endif
 float distant_optical_gain(float depth_m) {
- if (p.depth_scatter.w <= 0.0) return 1.0;
+ if (p.depth_scatter.w == 0.0) return 1.0;
+ if (p.depth_scatter.w < 0.0) {
+  float after_entry = depth_m - p.origin.w;
+  float band = smoothstep(0.0, 6.0, after_entry) * (1.0 - smoothstep(8.0, 15.0, after_entry));
+  return 1.0 - p.depth_scatter.w * band;
+ }
  return 1.0 + p.depth_scatter.w * smoothstep(p.depth_scatter.x, p.depth_scatter.y, depth_m);
 }
 float near_optical(vec3 origin,vec3 ray,float ray_length,float start,float end){

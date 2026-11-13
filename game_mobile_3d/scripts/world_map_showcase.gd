@@ -137,6 +137,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_far_air": ["Chiều sâu sương đêm", 1.],
 	&"twilight_depth_scatter": ["Ánh tán xạ xa chạng vạng", 1.],
 	&"morning_depth_scatter": ["Tán xạ trung cảnh buổi sáng", 1.],
+	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
 	&"twilight_far_air_color": ["Sắc lạnh của sương xa", 1.],
 	&"twilight_far_optical": ["Mật độ lớp sương xa", 1.],
@@ -180,7 +181,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 101
+const LIGHTING_MIX_VERSION := 102
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -795,7 +796,9 @@ func _update_mist()->void:
 		sample.depth_scatter = _mist_depth_scatter(night_weight, distant_night)
 		sample.depth_scatter_color = _mist_depth_scatter_color(linear, distant_night)
 		sample.depth_optical = _mist_depth_optical()
-		var morning := _morning_depth_scatter_weight()
+		var morning := _morning_depth_weight()
+		sample.morning_optical = morning * _lighting_scale(&"morning_depth_optical")
+		morning *= _lighting_scale(&"morning_depth_scatter")
 		if morning > 0.0:
 			sample.depth_scatter = 1.5 * morning
 			sample.depth_scatter_offset = 0.0
@@ -825,12 +828,11 @@ func _night_far_air_weight(night_weight: float) -> float:
 		return 0.0
 	return night_weight * (1.0 - _twilight_window()) * _lighting_scale(&"night_far_air")
 
-func _morning_depth_scatter_weight() -> float:
+func _morning_depth_weight() -> float:
 	if _balanced_preview or not captured_mist_source or level.view_mode != "gameplay":
 		return 0.0
-	# The camera adapter already sets the clear foreground boundary. Shape
-	# only the scatter source beyond it. The hours are WorldMap calibration.
-	return smoothstep(4.5, 5.5, hour) * (1.0 - smoothstep(7.0, 8.5, hour)) * _lighting_scale(&"morning_depth_scatter")
+	# WorldMap clock calibration shared by the independent source and density controls.
+	return smoothstep(4.5, 5.5, hour) * (1.0 - smoothstep(7.0, 8.5, hour))
 
 func _mist_depth_scatter(night_weight: float, distant_night: float = 0.0) -> float:
 	var night := maxf(night_weight * _lighting_scale(&"night_depth_scatter"), 2.4 * distant_night)
@@ -1212,6 +1214,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .5
 	if effect == &"stone_day_sky":
 		return .3
+	if effect == &"morning_depth_optical":
+		return .35
 	if effect == &"projected_sun":
 		return .40
 	if effect == &"night_path_chroma":
@@ -1708,6 +1712,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 101 and effect == &"stone_day_sky":
 			missing_value = 0.
+		if version < 102 and effect == &"morning_depth_optical":
+			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
 		if version < 84 and effect == &"night_stone_blue_softness":
@@ -1757,7 +1763,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect in [&"dawn_sky_transition", &"night_sky_fill"]:
 			slider.editable = slider.editable and sky_response.available()
-		if effect in [&"dawn_mist_source", &"morning_depth_scatter"]:
+		if effect in [&"dawn_mist_source", &"morning_depth_scatter", &"morning_depth_optical"]:
 			slider.editable = slider.editable and not phase_air.anchors.is_empty()
 		if effect in [&"evening_mist_profile", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical"]:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
@@ -1870,7 +1876,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_sync_forest_night_lights()
 		set_coupled_bloom(coupled_bloom)
 		return
-	if changed_effect == &"morning_depth_scatter":
+	if changed_effect in [&"morning_depth_scatter", &"morning_depth_optical"]:
 		_update_mist()
 		return
 	if changed_effect == &"night_path_chroma":
