@@ -222,6 +222,22 @@ func check_health_bars(group: Node) -> void:
 	first_bar = batch._fills[first_slot] if headless else batch.multimesh.get_instance_custom_data(first_slot)
 	if not is_equal_approx(first_bar.g, expected):
 		failures.append("The delayed fill catches up to the target's current health")
+	first.take_hit(2, Vector3.RIGHT, Vector2.ZERO, 0.0)
+	var feedback = first._feedback
+	var next_health := float(first.health) / float(first.max_health)
+	feedback._process(0.22)
+	var first_display: Color = batch._fills[first_slot]
+	if not is_equal_approx(first_display.r, next_health) or not is_equal_approx(first_display.g, expected):
+		failures.append("A hitch at contact preserves the delayed fill on its first displayed frame")
+	feedback._process(0.10)
+	feedback._process(0.05)
+	var after_delay: Color = batch._fills[first_slot]
+	if not is_equal_approx(after_delay.g, expected - 0.03 * 1.9):
+		failures.append("The delayed fill drains only for the elapsed portion after the hold")
+	feedback._process(0.22)
+	var settled: Color = batch._fills[first_slot]
+	if not is_equal_approx(settled.g, next_health) or feedback.is_processing():
+		failures.append("The delayed fill settles after a later hitch and stops updating")
 
 func check_crowd_melee(group: Node) -> void:
 	var starting_health: int = lab.player_health
