@@ -13,6 +13,7 @@ var _sample_body_offsets: Dictionary[String, Transform3D]
 var _sampled_skeleton_transform: Transform3D
 var _source_joint_biases: Dictionary[RID, float]
 var _wall_handoff_frame := -1
+var _launch_frame := -1
 var wall_handoff_animation: AnimationPlayer
 var wall_handoff_idle: StringName
 
@@ -24,6 +25,14 @@ func _make_body_shape(size: Vector3) -> BoxShape3D:
 	if not _body_shapes.has(size):
 		_body_shapes[size] = super._make_body_shape(size)
 	return _body_shapes[size]
+
+func begin(profile: Resource, direction: Vector3, location: String, distance: float, gravity: float,
+		flat_floor: CollisionShape3D = null, floor_impact_limb_share := 0.0, limit_first_contact_stretch := false) -> bool:
+	if not super.begin(profile, direction, location, distance, gravity,
+			flat_floor, floor_impact_limb_share, limit_first_contact_stretch):
+		return false
+	_launch_frame = Engine.get_physics_frames()
+	return true
 
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
 		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}) -> void:
@@ -319,7 +328,10 @@ func _project_source_anchors() -> void:
 	if chest_state == null:
 		return
 	if not recent_handoff:
-		# Outside the handoff window, respond only to an observed rebound.
+		# The first contact can pin an arm before the solver turns it around.
+		# Allow the ordinary positional shift on that tick with a free torso.
+		var first_contact := Engine.get_physics_frames() == _launch_frame + 1 \
+			and chest_state.get_contact_count() == 0
 		for name in ["Head", "Arm.L", "Arm.R"]:
 			var is_arm: bool = name != "Head"
 			if not is_arm and chest_state.get_contact_count() > 0:
@@ -334,7 +346,8 @@ func _project_source_anchors() -> void:
 			var distance := gap.length()
 			if distance <= largest_gap:
 				continue
-			var shift := _wall_anchor_motion(state, gap, true, is_arm)
+			var require_rebound := not is_arm or not first_contact
+			var shift := _wall_anchor_motion(state, gap, require_rebound, is_arm)
 			if not shift.is_zero_approx():
 				largest_gap = distance
 				motion = shift
