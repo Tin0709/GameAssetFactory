@@ -5,6 +5,16 @@ const WALKS := ["Walk", "StrafeLeft", "StrafeRight", "CombatWalk", "CombatStrafe
 const RUNS := ["Run", "CombatRun"]
 # Right-foot contact on the A&S cycle occurs just after the MD2 Walk seam.
 const CROSSBOW_RUN_PHASE_OFFSET := 0.05
+const CROSSBOW_ARM_SWAY_WEIGHT := 0.58
+var _left_arm := -1
+var _right_arm := -1
+
+func setup(skeleton: Skeleton3D, path: String, target_path: String) -> bool:
+	if not super.setup(skeleton, path, target_path):
+		return false
+	_left_arm = rig.find_bone("J_L_Arm")
+	_right_arm = rig.find_bone("J_R_Arm")
+	return _left_arm >= 0 and _right_arm >= 0
 
 func apply(actor, key: String, delta: float) -> void:
 	if actor.review_clip.is_empty() and key in WALKS:
@@ -37,8 +47,6 @@ func apply(actor, key: String, delta: float) -> void:
 
 func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transform3D]:
 	var actions_and_stuff := run_pose(cycle)
-	# Carry both authored MD2 arms as a unit with the A&S torso. The arm,
-	# wrist and weapon joints keep their relative transforms through the run.
 	for bone in _leg_bones:
 		native[bone] = actions_and_stuff[bone]
 	for bone in range(_hip_bone + 1):
@@ -46,6 +54,16 @@ func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transf
 	var spine := parents[_body_bone]
 	native[spine] = native[spine].interpolate_with(actions_and_stuff[spine], 0.7)
 	native[_body_bone] = native[_body_bone].interpolate_with(actions_and_stuff[_body_bone], 0.7)
+	# Transfer the alternating A&S arm swing to the paired MD2 grip.
+	# Applying it around a common pivot keeps both hands together.
+	var left_axis := actions_and_stuff[_left_arm].basis.z
+	var right_axis := actions_and_stuff[_right_arm].basis.z
+	var swing := (atan2(right_axis.y, right_axis.z) - atan2(left_axis.y, left_axis.z)) * 0.5
+	var sway := Basis(Vector3.RIGHT, swing * CROSSBOW_ARM_SWAY_WEIGHT)
+	var pivot := (native[_left_arm].origin + native[_right_arm].origin) * 0.5
+	for bone in [_left_arm, _right_arm]:
+		var arm := native[bone]
+		native[bone] = Transform3D(sway * arm.basis, pivot + sway * (arm.origin - pivot))
 	return native
 
 func run_pose(cycle: float) -> Array[Transform3D]:

@@ -420,8 +420,7 @@ func _load_crossbow(root: String) -> bool:
 	if _crossbow_locomotion.is_empty():
 		return false
 	var socket := player._weapon_attachment as BoneAttachment3D
-	_crossbow_mount = _mount_weapon(mesh, socket, "LabCrossbow", CrossPollinator.grip_transform(socket.basis), CrossPollinator.GRIP)
-	player.crossbow_mount = _crossbow_mount
+	_crossbow_mount = _mount_weapon(mesh, socket, "LabCrossbow", CrossPollinator.grip_transform(), CrossPollinator.GRIP)
 	_crossbow_profile = profile
 	_crossbow = CrossPollinator.new()
 	_crossbow.name = "CrossPollinator"

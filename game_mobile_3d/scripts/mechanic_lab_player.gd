@@ -7,7 +7,6 @@ const LabLocomotion := preload("res://scripts/mechanic_lab_locomotion.gd")
 
 var crossbow_equipped := false
 var gauntlets_equipped := false
-var crossbow_mount: MeshInstance3D
 var _crossbow_pose_serial := -1
 
 func _create_hybrid_motion() -> RefCounted:
@@ -98,10 +97,11 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 		var pose: Array[Transform3D] = source_gait.compose(float(cursor.phase), speed)
 		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
 
-func _refresh_markers() -> void:
-	super._refresh_markers()
-	if crossbow_equipped and crossbow_mount != null:
-		crossbow_mount.transform = CrossPollinator.grip_transform(_weapon_attachment.basis)
+func _begin_pose_transition(key: String, seconds: float) -> void:
+	if crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY] +			and key in ["Idle", "CombatReady", "InspectWeapon"]:
+		source_transition.begin_evaluated(0.24, Callable(), &"smoothstep")
+		return
+	super._begin_pose_transition(key, seconds)
 
 func begin_gauntlet_landing() -> void:
 	combo.air_landing_started = true

@@ -778,6 +778,9 @@ func _select_clip()->String:
 		return ("CombatRun" if _last_run_gait else "CombatWalk") if combat_requested else ("Run" if _last_run_gait else "Walk")
 	if not _transition.is_empty():return _transition
 	return "CombatReady" if combat_requested else "Idle"
+func _begin_pose_transition(_key: String, seconds: float) -> void:
+	source_transition.begin(seconds)
+
 func _play(key:String,blend:float=.04)->void:
 	var looping:bool=review_loop if not review_clip.is_empty() else bool(clips[key].loop)
 	animation_player.get_animation(clips[key].action).loop_mode=Animation.LOOP_LINEAR if looping else Animation.LOOP_NONE
@@ -815,7 +818,7 @@ func _play(key:String,blend:float=.04)->void:
 				var outgoing_phase:float=animation_player.current_animation_position/float(clips[active_clip].duration)
 				source_transition.begin_evaluated(seconds,_outgoing_locomotion_sampler(active_clip,outgoing_phase),StringName(ground_graph.curve))
 			else:
-				_outgoing_locomotion_state.clear();source_transition.begin(transition_blend/rate)
+				_outgoing_locomotion_state.clear();_begin_pose_transition(key,transition_blend/rate)
 		else:source_transition.clear()
 	# glTF import drops channels that remain equal to the bone rest. A new clip
 	# must begin from those defaults, rather than retaining a prior clip's pupil

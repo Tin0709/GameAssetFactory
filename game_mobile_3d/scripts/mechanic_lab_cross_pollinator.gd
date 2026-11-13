@@ -56,13 +56,10 @@ static func load_bolt(actor: CharacterBody3D, root: String) -> Mesh:
 		"SM_Arrow", "b68f888b24264d7db5b1fc1fe48852f33761cccc44e71ba7a65820f148cb33c3",
 		"T_Arrow", "f0bf1ee4c8f45d2361fc73d0635bd8ac5ff9a10d0f63e5759959bef5e77bbd5d")
 
-static func grip_transform(socket: Basis) -> Transform3D:
-	# The stock pivots on the source right grip. Correct the steep carry angle
-	# using the wrist's measured pitch; the authored shot is already raised.
-	var dip := atan2(socket.z.normalized().y, -socket.y.normalized().y)
-	var pitch := clampf(dip * 0.85, 0.0, 0.64)
-	# The mesh's rail sits diagonally across the exported right-hand grip.
-	var basis := Basis(Vector3.RIGHT, PI - pitch) * Basis(Vector3.UP, -0.32)
+static func grip_transform() -> Transform3D:
+	# Fit the imported stock to the MD2 wrist once so the authored idle,
+	# carry and shot can each control the angle of the nỏ.
+	var basis := Basis(Vector3.RIGHT, PI) * Basis(Vector3.UP, -0.32)
 	return Transform3D(basis, -(basis * GRIP))
 
 static func combat_profile(root: String) -> Dictionary:
