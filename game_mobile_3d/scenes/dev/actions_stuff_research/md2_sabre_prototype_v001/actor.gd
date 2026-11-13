@@ -127,6 +127,7 @@ var _jump_held:=false
 var _jump_stage:=""
 var _jump_time:=0.
 var _heavy_slam_active:=false
+var _sabre_air_landing_frame := -1
 var _airborne_peak_height := -INF
 var _transition:=""
 var _transition_time:=0.
@@ -507,6 +508,9 @@ func _physics_process(delta:float)->void:
 		_step_ready=_step_distance>=COMBAT_STEP_DISTANCE or _step_elapsed>=COMBAT_STEP_TIMEOUT-.0000001
 	if _grounded:
 		if not was_grounded and _heavy_slam_active and _floor_initialized and review_clip.is_empty():
+			if combo.phase == &"air_attack" and combo.use_sabre_air_sections:
+				combo.land_air_attack()
+				_sabre_air_landing_frame = Engine.get_physics_frames()
 			var fall_height := maxf(0.0, _airborne_peak_height - global_position.y)
 			heavy_jump_landed.emit(global_position, visual.global_basis.z, combo.serial, fall_height)
 		_airborne_peak_height = global_position.y
@@ -620,7 +624,12 @@ func _animate(delta:float)->void:
 	# transition restoration so omitted constant source tracks cannot accumulate it.
 	if combat_legs!=null:combat_legs.restore()
 	var source_before:=animation_player.current_animation_position
-	animation_player.advance(delta*_playback_speed)
+	var sectioned_air := combo.phase == &"air_attack" and combo.use_sabre_air_sections and review_clip.is_empty()
+	var hold_air_pose := sectioned_air and _sabre_air_landing_frame == Engine.get_physics_frames()
+	if sectioned_air:
+		animation_player.seek(combo.air_pose_after(0.0 if hold_air_pose else delta), true)
+	else:
+		animation_player.advance(delta*_playback_speed)
 	if composed_gait:source_gait.apply(animation_player.current_animation_position/float(clips[selected].duration),motion_speed)
 	if layered_combat:
 		var leg_state:Dictionary=source_gait.state(motion_speed)
@@ -651,7 +660,7 @@ func _animate(delta:float)->void:
 		var duration:float=clips[review_clip].duration
 		_review_time=fposmod(_review_time,duration) if review_loop else minf(_review_time,duration)
 	else:
-		combo.advance(delta)
+		combo.advance(delta, hold_air_pose)
 		if input_order_trace.enabled and permission_before!=combo.movement_allowed():_record_order(&"movement_permission_change",{"before":permission_before,"after":combo.movement_allowed()})
 		if not _jump_stage.is_empty():
 			_jump_time+=delta
@@ -691,6 +700,8 @@ func _animate(delta:float)->void:
 		if combo.phase in [&"attack",&"air_attack"] and review_clip.is_empty():
 			var window:Array=clips[combo.clip()].vfx_window
 			if combo.native_enabled and combo.phase==&"attack":window=combo.native_windows[combo.index].get("trail_window",window)
+			if sectioned_air:
+				window = [combo.SABRE_AIR_SLASH, float(window[1])]
 			active=combo.time>=float(window[0]) and combo.time<=float(window[1])
 		effects.sample(delta,active,marker_base.global_position,marker_tip.global_position,combo.serial)
 

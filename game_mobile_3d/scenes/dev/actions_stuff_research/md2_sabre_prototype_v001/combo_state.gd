@@ -1,6 +1,13 @@
 extends RefCounted
 ## Optional private source-event policy, with authored fallback. The220ms
 ## input buffer remains an adapter; native timing is validated against clips.
+# AM_Player_Sabre_JumpAttack, single FullBody segment at 1x.
+const SABRE_AIR_LOOP := 0.127934694
+const SABRE_AIR_LANDING := 0.233467355
+const SABRE_AIR_DAMAGE := 0.287836909
+const SABRE_AIR_SLASH := 0.289097339
+const SABRE_AIR_END := 0.826677978
+
 var clips:Dictionary={}
 var phase:StringName=&"ready"
 var index:=0
@@ -11,6 +18,8 @@ var buffer_until:=-1.
 var buffer_seconds:=.22
 var attack_play_rates:Array=[1.,1.,1.] # Source profile sets verified table rates.
 var air_attack_play_rate:=1. # Optional physics-cadence adapter; not native data.
+var use_sabre_air_sections := false
+var air_landing_started := false
 var movement_breaks_enabled:=false
 var movement_requested:=false
 var step_serial:=0
@@ -103,7 +112,7 @@ func movement_plan(delta:float)->Array[Dictionary]:
 	var copy=get_script().new();copy.clips=clips;copy.native_windows=native_windows;copy.native_enabled=native_enabled;copy.native_input_policy=native_input_policy;copy.native_event_hz=native_event_hz;copy.native_air_interrupt=native_air_interrupt
 	copy.movement_evaluation_hz=movement_evaluation_hz;copy.movement_consumer_ticks=movement_consumer_ticks
 	copy.native_tap_buffer_seconds = native_tap_buffer_seconds
-	for key in ["phase","index","time","clock","held","buffer_until","buffer_seconds","attack_play_rates","air_attack_play_rate","movement_breaks_enabled","movement_requested","step_serial","step_next_index","step_buffered","serial","_impact_sent"]:copy.set(key,get(key))
+	for key in ["phase","index","time","clock","held","buffer_until","buffer_seconds","attack_play_rates","air_attack_play_rate","use_sabre_air_sections","air_landing_started","movement_breaks_enabled","movement_requested","step_serial","step_next_index","step_buffered","serial","_impact_sent"]:copy.set(key,get(key))
 	var result:Array[Dictionary]=[];var left:=maxf(0.,delta)
 	while left>0.:
 		copy._resolve_native()
@@ -127,15 +136,19 @@ func windup_seconds_left() -> float:
 	return maxf(0.0, (_impact_source_time() - time) / playback_rate())
 
 func _impact_source_time() -> float:
+	if phase == &"air_attack" and use_sabre_air_sections:
+		return SABRE_AIR_DAMAGE
 	if native_enabled and phase == &"attack":
 		return float(native_windows[index].melee)
 	return float(clips[clip()].vfx_window[0])
 
 func playback_rate()->float:
-	if phase==&"air_attack":return maxf(.001,air_attack_play_rate)
+	if phase==&"air_attack":return 1.0 if use_sabre_air_sections else maxf(.001,air_attack_play_rate)
 	if native_enabled and phase in [&"attack",&"recovery"]:return float(native_windows[index].rate)
 	return maxf(.001,float(attack_play_rates[index])) if phase==&"attack" else 1.
 func remaining()->float:
+	if phase == &"air_attack" and use_sabre_air_sections:
+		return maxf(0.0, SABRE_AIR_END - time)
 	if native_enabled and phase in [&"attack",&"recovery"]:return maxf(0.,float(native_windows[index]["attack_duration" if phase==&"attack" else "recovery_duration"])-time)
 	return maxf(0.,float(clips[clip()].duration)-time) if active() else INF
 func attack(value:bool,airborne:bool=false)->void:
@@ -158,6 +171,7 @@ func request_attack(airborne:bool=false)->void:
 	else:buffer_until=clock+buffer_seconds
 func _start_attack(which:int,airborne:bool=false)->void:
 	phase=&"air_attack" if airborne else &"attack";index=which;time=0.;serial+=1
+	air_landing_started = false
 	buffer_until=-1.;step_buffered=false;_impact_sent=false
 	_events.append({"kind":"accepted","index":index,"serial":serial,"clip":clip(),"at":clock})
 func _finish()->void:
@@ -181,7 +195,20 @@ func finish_step()->void:
 	if phase!=&"step":return
 	if held or step_buffered:_start_attack(step_next_index)
 	else:phase=&"ready";time=0.;buffer_until=-1.
-func advance(delta:float)->void:
+func land_air_attack() -> void:
+	air_landing_started = true
+	time = SABRE_AIR_LANDING
+
+func air_pose_after(delta: float) -> float:
+	var next := time + delta
+	if not air_landing_started and next >= SABRE_AIR_LANDING:
+		return SABRE_AIR_LOOP + fposmod(next - SABRE_AIR_LANDING, SABRE_AIR_LANDING - SABRE_AIR_LOOP)
+	return minf(next, SABRE_AIR_END)
+
+func advance(delta:float, hold_air_pose := false)->void:
+	if hold_air_pose:
+		clock += delta
+		return
 	_resolve_native()
 	if active() and remaining()<=.00000001:_finish();_resolve_native()
 	var left:=maxf(delta,0.)
@@ -191,7 +218,8 @@ func advance(delta:float)->void:
 		var segment:=minf(left,boundary_seconds())
 		if segment<=0.:_finish();_resolve_native();continue
 		var previous:=time
-		time+=segment*rate;clock+=segment;left-=segment
+		time = air_pose_after(segment) if phase == &"air_attack" and use_sabre_air_sections else time + segment * rate
+		clock+=segment;left-=segment
 		if phase in [&"attack",&"air_attack"] and not _impact_sent:
 			var gate := _impact_source_time()
 			if previous<=gate and time>=gate:

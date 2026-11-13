@@ -169,6 +169,8 @@ func _ready() -> void:
 		$CombatEffects.add_child(_player_damage_numbers)
 		_set_combat_audio(false)
 		player.combo.native_tap_buffer_seconds = SABRE_TAP_BUFFER
+		player.combo.use_sabre_air_sections = true
+		player.reference_audio.clip_play_rates["AirAttack"] = 1.0
 		$Zombies.setup_combat(player)
 		player.grounded_melee_aim = $Zombies.aim_sabre
 		player.connect("grounded_sabre_impact", $Zombies.strike_sabre)
@@ -249,6 +251,7 @@ func _select_weapon(index: int) -> void:
 	_equipped_weapon = index as Weapon
 	var sword_equipped := index == Weapon.SWORD
 	var curved_equipped := index == Weapon.CURVED_GREATSWORD
+	player.combo.use_sabre_air_sections = index == Weapon.SABRE
 	_combat_audio.sword_equipped = sword_equipped
 	_combat_audio.curved_equipped = curved_equipped
 	$Zombies.sword_equipped = sword_equipped
