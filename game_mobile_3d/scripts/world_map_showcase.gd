@@ -182,7 +182,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 104
+const LIGHTING_MIX_VERSION := 105
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1213,7 +1213,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"player_sun_shoulder":
 		return .2
 	if effect == &"canopy_sky_color":
-		return .5
+		return .85
 	if effect == &"stone_day_sky":
 		return .3
 	if effect == &"morning_depth_optical":
