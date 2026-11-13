@@ -199,17 +199,20 @@ func is_near_flat_floor(tolerance: float) -> bool:
 	var floor_half := floor_box.size * 0.5
 	var floor_inverse := floor_pose.affine_inverse()
 	var minimum_y := INF
+	var inner_minimum_y := INF
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var size: Vector3 = part[2]
 		var bounds := (floor_inverse * body.global_transform) * AABB(-size * 0.5, size)
-		# A box over the lip can have its lowest corner outside the floor.
-		# Use solver contacts for those parts and this fallback for boxes on top.
-		if bounds.position.x < -floor_half.x or bounds.end.x > floor_half.x \
-				or bounds.position.z < -floor_half.z or bounds.end.z > floor_half.z:
+		if bounds.position.x > floor_half.x or bounds.end.x < -floor_half.x \
+				or bounds.position.z > floor_half.z or bounds.end.z < -floor_half.z:
 			continue
 		minimum_y = minf(minimum_y, bounds.position.y)
-	return absf(minimum_y - floor_half.y) <= tolerance
+		if bounds.position.x >= -floor_half.x and bounds.end.x <= floor_half.x \
+				and bounds.position.z >= -floor_half.z and bounds.end.z <= floor_half.z:
+			inner_minimum_y = minf(inner_minimum_y, bounds.position.y)
+	# A corner below the lip can hide another part resting wholly on the floor.
+	return absf(minimum_y - floor_half.y) <= tolerance or absf(inner_minimum_y - floor_half.y) <= tolerance
 
 func has_flat_wall_rest_support(core_grounded: bool) -> bool:
 	if not core_grounded:
