@@ -205,6 +205,41 @@ func check_landing_voice_under_step_burst(bus: int, capture: AudioEffectCapture)
 	await create_timer(0.08).timeout
 	lab.free()
 
+func check_crossbow_fire_under_impact_burst(audio: Node, bus: int, capture: AudioEffectCapture) -> void:
+	audio.load_crossbow(audio._research_root())
+	audio.reset()
+	var point := Vector3.FORWARD * 2.0
+	audio.crossbow_fired(point)
+	var fire_samples: Array = audio._groups.get(&"crossbow_fire", [])
+	var fire: AudioStreamPlayer3D
+	for voice: AudioStreamPlayer3D in audio._voices:
+		if voice.playing and voice.stream in fire_samples:
+			fire = voice
+			break
+	check(fire != null, "Polaris queues the original firing sample")
+	if fire == null:
+		return
+	var source := fire.stream
+	for i in 25:
+		audio.crossbow_impact(point + Vector3.RIGHT * i * 0.1)
+	check(fire.playing and fire.stream == source
+		and audio._next_choice.get(&"crossbow_hit", -1) == 2,
+		"A simultaneous volley of impacts keeps the firing onset and two impact cues")
+	var bus_name := AudioServer.get_bus_name(bus)
+	for voice: AudioStreamPlayer3D in audio._voices:
+		voice.bus = &"Master"
+	fire.bus = bus_name
+	capture.clear_buffer()
+	await create_timer(0.11).timeout
+	var peak := 0.0
+	for sample in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+	check(fire.stream == source and peak > 0.001 and peak < 0.9,
+		"The isolated original firing sample reaches the mixer through the impacts")
+	print("MECHANIC_LAB_CROSSBOW_FIRE peak=", peak)
+	fire.bus = &"Master"
+	audio.reset()
+
 func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -798,6 +833,7 @@ func run() -> void:
 	for frame in capture.get_buffer(capture.get_frames_available()):
 		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
 	check(peak > 0.01 and peak < 0.9, "Simultaneous MD2 impact, slam and reactions have mix headroom")
+	await check_crossbow_fire_under_impact_burst(audio, bus, capture)
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
 	await check_local_hurt(bus, capture)
