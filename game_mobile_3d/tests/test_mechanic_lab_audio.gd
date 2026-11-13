@@ -173,13 +173,18 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 		voice.bus = AudioServer.get_bus_name(bus)
 	var landings: Array[int] = []
 	var touchdown_points: Array[Vector3] = []
+	var swing = lab.player.reference_audio
 	lab.player.heavy_jump_landed.connect(func(point, _forward, _serial, _height):
 		landings.append(Engine.get_physics_frames())
 		touchdown_points.append(point))
 	for attempt in 3:
 		for i in 20:
 			await physics_frame
-		lab.get_node("HUD/DropMedium").pressed.emit()
+		if attempt == 0:
+			check(lab.player.drop_for_lab(16.0), "The extended drop exercises the airborne loop")
+		else:
+			lab.get_node("HUD/DropMedium").pressed.emit()
+		var before_swing: int = swing.played_count
 		for i in 2:
 			await physics_frame
 		var attack := InputEventKey.new()
@@ -198,6 +203,7 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 		check(landings.size() == attempt + 1, "The audio fixture performs a real Sabre landing")
 		if landings.size() != attempt + 1:
 			break
+		check(swing.played_count == before_swing, "The looping aerial Sabre pose is quiet before touchdown")
 		var before := mini(attempt, 1)
 		check(audio._next_choice.get(&"slam_grass", 0) == before,
 			"Sabre floor contact waits for the montage debris cue")
@@ -209,13 +215,19 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 			toggle.button_pressed = true
 		var playback_frame := -1
 		var dust_frame := -1
+		var swing_frame := -1
 		for i in 18:
 			await physics_frame
+			if swing_frame < 0 and swing.played_count > before_swing:
+				swing_frame = Engine.get_physics_frames() - 1
 			if playback_frame < 0 and audio._next_choice.get(&"slam_grass", 0) != before:
 				playback_frame = Engine.get_physics_frames() - 1
 			if dust_frame < 0 and dust.get_children().any(func(particle): return particle.visible):
 				dust_frame = Engine.get_physics_frames() - 1
 		if attempt == 0:
+			var swing_ticks := ceili(0.033083633 * Engine.physics_ticks_per_second)
+			check(swing_frame == landings[attempt] + swing_ticks and swing.played_count == before_swing + 1,
+				"Sabre plays one swing at the first authored post-audio key after landing")
 			var touchdown := touchdown_points[attempt]
 			var grass_voices: Array = audio._voices.filter(func(voice): return voice.stream in audio._groups[&"slam_grass"])
 			check(grass_voices.size() == 1 and grass_voices[0].global_position.is_equal_approx(
@@ -229,9 +241,11 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 			for sample in capture.get_buffer(capture.get_frames_available()):
 				peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
 			check(peak > 0.001 and peak < 0.9, "The timed grass cue reaches the mixer")
-			print("MECHANIC_LAB_SABRE_DEBRIS_AUDIO landing=", landings[attempt], " playback=", playback_frame, " peak=", peak)
+			print("MECHANIC_LAB_SABRE_DEBRIS_AUDIO landing=", landings[attempt], " swing=", swing_frame,
+				" playback=", playback_frame, " peak=", peak)
 		else:
-			check(playback_frame == -1, "Reset and mute discard unplayed Sabre grass cues")
+			check(playback_frame == -1 and swing_frame == -1 and swing.played_count == before_swing,
+				"Reset and mute discard unplayed Sabre swing and grass cues")
 	check(movement.event_count.landing == 0, "The heavy attack does not also play ordinary landing audio")
 	toggle.button_pressed = false
 	lab.free()
