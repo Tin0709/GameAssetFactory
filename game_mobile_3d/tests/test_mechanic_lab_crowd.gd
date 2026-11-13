@@ -230,12 +230,13 @@ func check_blocked_chase(group: Node) -> void:
 	if packed_skips < 29 or packed_skips > 31 or zombie.ragdoll.sample_count - samples != 40:
 		failures.append("A crowd zombie blocked by another zombie retries at 15 Hz and samples every tick")
 	blocker.global_position.x += 3.0
-	# Commit the fixture teleport to the physics space before measuring the retry.
-	blocker.force_update_transform()
 	await physics_frame
+	await physics_frame
+	if zombie.get("_skipped_blocked_step") == true:
+		failures.append("Moving the blocking zombie causes an immediate collision retry")
 	await physics_frame
 	if zombie.global_position.z <= last_position.z + 0.01:
-		failures.append("Moving the blocking zombie wakes the chaser on the next tick")
+		failures.append("The chaser resumes as soon as the physics space clears the blocker")
 	for member in group.get_children():
 		member.set_physics_process(true)
 	print("CROWD_BLOCKED wall_skips=", skipped_ticks, " samples=", pose_steps, " packed_skips=", packed_skips)

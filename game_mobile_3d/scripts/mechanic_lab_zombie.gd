@@ -321,13 +321,7 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		_blocked_chase = chasing and is_on_floor() and is_on_wall() \
 			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
-		_blocking_zombie_id = 0
-		if _blocked_chase and get_slide_collision_count() > 0:
-			var blocker := get_last_slide_collision().get_collider() as CharacterBody3D
-			if blocker != null and blocker.get_parent() == get_parent():
-				_blocking_zombie_id = blocker.get_instance_id()
-				_blocking_position = blocker.global_position
-				_blocked_target_position = target.global_position
+		_update_chase_blocker()
 	_advance_animation(delta)
 	ragdoll.sample(delta)
 
@@ -342,6 +336,21 @@ func _wait_for_chase_retry() -> bool:
 		retry_hz = PACKED_CHASE_RETRY_HZ
 	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / retry_hz))
 	return Engine.get_physics_frames() % stride != _crowd_slot % stride
+
+func _update_chase_blocker() -> void:
+	if not _blocked_chase or get_slide_collision_count() == 0:
+		_blocking_zombie_id = 0
+		return
+	var blocker := get_last_slide_collision().get_collider() as CharacterBody3D
+	if blocker == null or blocker.get_parent() != get_parent():
+		_blocking_zombie_id = 0
+		return
+	_blocking_zombie_id = blocker.get_instance_id()
+	# The node can move before the physics space sees its new position.
+	var collider_transform: Transform3D = PhysicsServer3D.body_get_state(
+		blocker.get_rid(), PhysicsServer3D.BODY_STATE_TRANSFORM)
+	_blocking_position = collider_transform.origin
+	_blocked_target_position = target.global_position
 
 func _integrate_knockback(delta: float) -> Vector3:
 	var speed := _knockback.length()
