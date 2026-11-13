@@ -283,10 +283,12 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 			var presenter = player.render_presenter
 			presenter.prepare(0.5)
 			var mesh_index: int = presenter.meshes.find(grip)
-			var bone: int = player._weapon_attachment.bone_idx
-			check(mesh_index >= 0 and Vector3(presenter.display_meshes[mesh_index] * CrossPollinator.GRIP)
-				.distance_to(presenter.display_world[bone].origin) < 0.001,
-				"Crossbow grip follows the right-hand socket between physics ticks")
+			var bone: int = player.skeleton.find_bone("J_L_Hand")
+			var socket := grip.get_parent() as BoneAttachment3D
+			check(socket.bone_idx == bone and mesh_index >= 0 and
+				Vector3(presenter.display_meshes[mesh_index].origin).distance_to(
+					Vector3(presenter.display_world[bone].origin)) < 0.20,
+				"Crossbow follows the left-hand socket between physics ticks")
 			player.requested_run = false
 			await ticks(12)
 			check(player.active_clip == "Walk" and not player.hybrid_motion.owns_pose,
@@ -310,13 +312,18 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 	attack(true)
 	await ticks(2)
 	attack(false)
-	var previous := mount.to_global(CrossPollinator.GRIP)
+	var idle_mesh := mount.mesh
+	var seen_recoil_mesh := false
+	var previous := mount.to_global(CrossPollinator.MUZZLE)
 	var largest_step := 0.0
 	var idle_frames := 0
 	var idle_start := -1
 	for frame in 90:
 		await physics_frame
-		var grip := mount.to_global(CrossPollinator.GRIP)
+		var grip := mount.to_global(CrossPollinator.MUZZLE)
+		var scale := mount.global_basis.get_scale()
+		check(absf(scale.length() - sqrt(3.0)) < 0.01, "Crossbow stays full size during recoil and blend-out")
+		seen_recoil_mesh = seen_recoil_mesh or mount.mesh != idle_mesh
 		if player.active_clip == "Idle":
 			if idle_start < 0:
 				idle_start = frame
@@ -326,8 +333,14 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 				break
 		previous = grip
 	check(idle_start >= 0 and idle_start < 40 and idle_frames == 18
-		and largest_step < 0.095 and player.source_transition.incoming_weight == 1.0,
-		"The crossbow settles back to idle without snapping the grip")
+		and largest_step < 0.12 and player.source_transition.incoming_weight == 1.0,
+		"The crossbow settles back to idle without snapping the muzzle")
+	check(seen_recoil_mesh and mount.mesh == idle_mesh, "The source recoil mesh swaps back to the carry mesh")
+	var weapon_bone: int = player.skeleton.find_bone("J_L_Weapon")
+	var weapon_pose: Transform3D = player.skeleton.global_transform * player.skeleton.get_bone_global_pose(weapon_bone)
+	check(mount.global_position.distance_to(weapon_pose * Vector3(0, 0.16, 0)) < 0.001
+		and mount.global_basis.z.normalized().dot(weapon_pose.basis.z.normalized()) > 0.9999,
+		"Idle uses the MD2 weapon socket and its 16 cm offset")
 	equip(menu, 0)
 	lab.reset_player()
 	await ticks(12)
