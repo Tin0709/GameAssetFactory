@@ -352,7 +352,7 @@ func _recover_floor_blocked_hip() -> void:
 	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
 	if chest_state == null or chest_state.get_contact_count() > 0:
 		return
-	var drop := 0.0
+	var lift := 0.0
 	for name in ["Leg.L", "Leg.R"]:
 		var limb: PhysicalBone3D = bodies[name]
 		var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
@@ -363,13 +363,13 @@ func _recover_floor_blocked_hip() -> void:
 			- (state.transform * spec.child_frame).origin
 		if gap.y >= -EARLY_ROLL_ANCHOR_LIMIT or not _is_at_flat_floor(limb, state.transform):
 			continue
-		drop = maxf(drop, minf(-gap.y - SOURCE_ANCHOR_TOLERANCE, FIRST_FLOOR_CHEST_MAX_SHIFT))
-	if drop <= 0.0:
+		lift = maxf(lift, minf(-gap.y - SOURCE_ANCHOR_TOLERANCE, FIRST_FLOOR_CHEST_MAX_SHIFT))
+	if lift <= 0.0:
 		return
 
 	# The leg cannot move down any farther. Let the free torso close part of
 	# the gap only if it reduces the worst error across all five joints.
-	var motion := Vector3.DOWN * drop
+	var motion := Vector3.UP * lift
 	var before := 0.0
 	var after := 0.0
 	for name: String in source_joint_rids:
