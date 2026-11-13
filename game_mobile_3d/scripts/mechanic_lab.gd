@@ -93,6 +93,9 @@ var _player_flash_material: ShaderMaterial
 var _player_flash_meshes: Array[MeshInstance3D] = []
 var _player_overlays: Dictionary[MeshInstance3D, Material] = {}
 var _player_damage_numbers: Node3D
+var _pending_player_damage := 0
+var _player_damage_tick := -1
+var _player_damage_origin: Vector3
 var _player_hit_serial := 0
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
@@ -358,6 +361,7 @@ func _update_time_label() -> void:
 	$HUD/TimeOfDay.text = "%02d:%02d  ·  T đổi giờ" % [floori(minutes / 60.0), minutes % 60]
 
 func _process(delta: float) -> void:
+	_flush_player_damage()
 	if _crowd_spawns_left > 0:
 		_spawn_crowd_frame()
 	var focus: Vector3 = presentation.player_position()
@@ -688,10 +692,23 @@ func _show_player_hit(lost: int) -> void:
 	for mesh: MeshInstance3D in _player_overlays:
 		mesh.set_instance_shader_parameter(&"player_hit_flash", 1.0)
 	_player_flash_remaining = PLAYER_HIT_FLASH_DURATION
+	# Several physics ticks can run before the next frame is drawn.
+	var tick := Engine.get_physics_frames()
+	if _player_damage_tick != tick:
+		_flush_player_damage()
+		_player_damage_tick = tick
+	if _pending_player_damage == 0:
+		_player_damage_origin = player.global_position + Vector3.UP * 2.32
+	_pending_player_damage += lost
+
+func _flush_player_damage() -> void:
+	if _pending_player_damage == 0:
+		return
 	var lateral := camera.global_basis.x * (1.0 if _player_hit_serial % 2 == 0 else -1.0)
 	_player_hit_serial += 1
-	DamageFeedback.spawn_number(lost, $Zombies.damage_digits(), _player_damage_numbers,
-		player.global_position + Vector3.UP * 2.32, lateral, PLAYER_DAMAGE_TINT)
+	DamageFeedback.spawn_number(_pending_player_damage, $Zombies.damage_digits(), _player_damage_numbers,
+		_player_damage_origin, lateral, PLAYER_DAMAGE_TINT)
+	_pending_player_damage = 0
 
 func _clear_player_flash() -> void:
 	for mesh: MeshInstance3D in _player_overlays:
@@ -711,6 +728,7 @@ func reset_player() -> void:
 	_stop_crowd_spawn()
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
 	_clear_player_flash()
+	_pending_player_damage = 0
 	if _player_damage_numbers != null:
 		for number: Node3D in _player_damage_numbers.get_children():
 			number.hide()
