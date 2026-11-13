@@ -3,6 +3,9 @@ extends SceneTree
 var failures: Array[String] = []
 
 func _initialize() -> void:
+	var args := OS.get_cmdline_user_args()
+	if not args.is_empty():
+		Engine.physics_ticks_per_second = int(args[0])
 	call_deferred("run")
 
 func check(ok: bool, message: String) -> void:
