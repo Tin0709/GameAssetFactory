@@ -346,6 +346,7 @@ func set_audio_enabled(value:bool)->void:
 	AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"),not value)
 	var actor=level.player
 	if actor.get("reference_audio")!=null:actor.reference_audio.enabled=value
+	if level.heavy_landing_audio != null:level.heavy_landing_audio.set_surface_landing_enabled(value)
 	if actor.get("environment_audio")!=null and actor.environment_audio.audio!=null:
 		actor.environment_audio.audio.ambient_enabled=value
 		actor.environment_audio.audio.footsteps_enabled=value;actor.environment_audio.audio.rustle_enabled=value

@@ -10,6 +10,7 @@ const CAMERA_ZOOM_STEP := 1.15
 const GAMEPLAY_CAMERA_NEAR := -8.0
 const GROVE_REVIEW := preload("res://scripts/world_map_grove.gd")
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
+const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 const LocalMistRegion = preload("res://scripts/local_mist_region.gd")
 const RegionalSkyRegion = preload("res://scripts/regional_sky_region.gd")
@@ -47,6 +48,7 @@ var terrain_light: Node
 var player_light:Node
 var vegetation_visible:=true
 var showcase: Node
+var heavy_landing_audio: CombatAudio
 var _camera_ground_y := NAN
 var _camera_size_target := CAMERA_SIZE_DEFAULT
 var _camera_zooming := false
@@ -141,6 +143,7 @@ func _ready() -> void:
 	if ambient.available(): $HUD/Help.text+=" · F11 ánh sáng trời / đất · Shift+F11 ánh sáng nhân vật dưới cây"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
+	_setup_heavy_landing_audio()
 	showcase.setup(self)
 	_setup_movement_dust()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
@@ -182,12 +185,28 @@ func _setup_movement_dust() -> void:
 		return
 	var dust := MovementDust.new()
 	dust.name = "MovementDust"
-	if dust.setup(player, null, _movement_dust_contact):
+	if dust.setup(player, null, terrain_contact_at):
 		add_child(dust)
 	else:
 		dust.free()
 
-func _movement_dust_contact(sole: Vector3) -> Dictionary:
+func _setup_heavy_landing_audio() -> void:
+	if player.get("primary_ready") != true:
+		return
+	heavy_landing_audio = CombatAudio.new()
+	heavy_landing_audio.name = "HeavyLandingAudio"
+	add_child(heavy_landing_audio)
+	player.heavy_jump_landed.connect(_play_heavy_landing)
+	player.presentation_reset.connect(heavy_landing_audio.reset)
+
+func _play_heavy_landing(point: Vector3, _forward: Vector3, _serial: int, _fall_height: float) -> void:
+	if not heavy_landing_audio.enabled:
+		return
+	var contact := terrain_contact_at(point)
+	if not contact.is_empty():
+		heavy_landing_audio.slam_landed(contact.position, contact.surface)
+
+func terrain_contact_at(sole: Vector3) -> Dictionary:
 	# Follow the support immediately below the foot, including slabs under a ledge.
 	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * 0.08, sole - Vector3.UP * 0.30, 1)
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)

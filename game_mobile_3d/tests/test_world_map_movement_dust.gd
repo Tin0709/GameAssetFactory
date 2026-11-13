@@ -47,7 +47,7 @@ func run() -> void:
 				break
 			check(found, "The authored map includes an exposed %s test surface" % block)
 		var lower_slab := Vector3(-37.5, 3.5, -35.5)
-		var slab_contact: Dictionary = world._movement_dust_contact(lower_slab + Vector3.UP * 0.08)
+		var slab_contact: Dictionary = world.terrain_contact_at(lower_slab + Vector3.UP * 0.08)
 		check(world.surface_height(lower_slab.x, lower_slab.z) > lower_slab.y
 			and slab_contact.get("surface") == "stone"
 			and lower_slab.is_equal_approx(slab_contact.get("position", Vector3.INF)),
