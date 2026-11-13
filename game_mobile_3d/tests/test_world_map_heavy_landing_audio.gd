@@ -83,6 +83,20 @@ func run() -> void:
 				and movement.last_sources.get(ordinary_cue, "").begins_with("sfx_player_land_" + surface + "_"),
 				"A real ordinary drop plays one MD2 %s landing sample" % surface)
 		check(audio._next_choice.size() == 3, "Grass, dirt and stone are independent playback groups")
+		var slab := Vector3(-37.5, 3.5, -35.5)
+		world.player.global_position = slab + Vector3.UP * 0.02
+		world.player.cancel_jump()
+		await ticks(12)
+		var event_count: int = movement.events.size()
+		check(world.player.drop_for_lab(1.0), "The ordinary landing fixture can drop below the ledge")
+		await ticks(90)
+		var slab_events: Array = movement.events.slice(event_count)
+		check(slab_events.size() == 1 and slab_events[0].key == "land_stone"
+			and is_equal_approx(float(slab_events[0].at[1]), slab.y),
+			"A real drop below the ledge plays stone audio at the lower slab")
+		var before_unsupported: int = movement.events.size()
+		world.player.surface_contact.emit(slab + Vector3.UP * 3.0, false)
+		check(movement.events.size() == before_unsupported, "An unsupported foot does not play terrain audio")
 		world.showcase.set_audio_enabled(false)
 		check(AudioServer.is_bus_mute(0) and audio._voices.all(func(v): return not v.playing and v.stream == null),
 			"Audio off stops landing tails and restores silence")
