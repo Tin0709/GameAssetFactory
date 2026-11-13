@@ -60,6 +60,7 @@ func run() -> void:
 	Input.action_press("move_backward")
 	await measure("chase", 120)
 	Input.action_release("move_backward")
+	await check_zombie_dust()
 	await check_crowd_melee(group)
 	await check_blocked_chase(group)
 	var packed := OS.get_cmdline_user_args().has("--packed-ragdolls")
@@ -91,6 +92,25 @@ func run() -> void:
 		" adapter=", RenderingServer.get_video_adapter_name())
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_zombie_dust() -> void:
+	var dust := lab.get_node_or_null("ZombieStepDust") as MultiMeshInstance3D
+	if dust == null:
+		failures.append("The Lab has one batched zombie step-dust renderer")
+		return
+	if dust.multimesh.visible_instance_count == 0:
+		failures.append("Actual chasing zombies emit dust on the grass")
+	dust.clear()
+	lab._on_zombie_step(Vector3(0.0, 2.0, 0.0))
+	lab._on_zombie_step(Vector3(51.0, 0.0, 0.0))
+	for i in COUNT:
+		lab._on_zombie_step(Vector3(i % 10 - 4.5, 0.0, i / 10.0 - 4.5))
+	dust._process(0.0)
+	if dust.multimesh.visible_instance_count != COUNT or dust.multimesh.mesh.get_surface_count() != 1:
+		failures.append("One batch draws 100 grounded steps and rejects unsupported steps")
+	dust._process(1.8)
+	if dust.multimesh.visible_instance_count != 0 or dust.is_processing():
+		failures.append("Zombie step dust stops after the source lifetime")
 
 func launch_ragdolls(group: Node, packed: bool) -> void:
 	if packed:

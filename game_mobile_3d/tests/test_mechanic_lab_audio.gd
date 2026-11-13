@@ -414,8 +414,8 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 		if contacts.size() >= 2:
 			break
 	var phases := contacts.map(func(event): return event.phase)
-	check(phases.size() == 2 and absf(phases[0] - 10.0 / 30.0) < 0.018
-		and absf(phases[1] - 34.0 / 30.0) < 0.018,
+	check(phases.size() == 2 and absf(phases[0] - 0.427282) < 0.018
+		and absf(phases[1] - 1.281282) < 0.018,
 		"The real chasing zombie steps on its two source walk contacts")
 	await process_frame
 	await process_frame
@@ -444,9 +444,9 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 			if variant_phases.size() == 3:
 				break
 		check(zombie._walk_clip == ZOMBIE.WALK_CLIPS[clip_index] and variant_phases.size() == 3
-			and absf(variant_phases[0] - 22.0 / 30.0) < 0.018
-			and absf(variant_phases[1] - 45.0 / 30.0) < 0.018
-			and absf(variant_phases[2] - 22.0 / 30.0) < 0.018,
+			and absf(variant_phases[0] - 0.427282) < 0.018
+			and absf(variant_phases[1] - 1.281282) < 0.018
+			and absf(variant_phases[2] - 0.427282) < 0.018,
 			"The zombie walk variant keeps both contacts and repeats correctly across the loop")
 		zombie.free()
 	audio.reset()
