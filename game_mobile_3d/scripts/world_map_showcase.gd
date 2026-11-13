@@ -295,8 +295,7 @@ func setup(world:Node3D)->void:
 	if not private_primary:
 		_build_basic_settings()
 		return
-	_point_kernel_owner=weakref(self)
-	RenderingServer.frame_pre_draw.connect(_sync_point_camera)
+	_setup_point_lighting()
 	projected_sun.setup()
 	RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
@@ -304,8 +303,6 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_replay_surface", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_replay_surface_field", null)
 	RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
-	get_tree().node_added.connect(_track_point_light)
-	for light in get_tree().root.find_children("*","Light3D",true,false):_track_point_light(light)
 	if level.player.get("primary_ready")!=true and unavailable_reason.is_empty():
 		unavailable_reason="Private A&S/MD2 + Sabre data missing. Set MD2_RESEARCH_ROOT to the private research folder and restart."
 	level.terrain_sky.set_enabled(false)
@@ -338,12 +335,21 @@ func setup_flat_lab(world: Node3D) -> void:
 	level = world
 	_flat_lab = true
 	process_priority = -10
+	if forest_active():
+		_setup_point_lighting()
 	_capture_day()
 	_setup_atmosphere()
 	_create_atmosphere_overlay(level.get_node("HUD"))
 	_refresh_lantern_glow()
 	apply_time()
 	_update_mist()
+
+func _setup_point_lighting() -> void:
+	_point_kernel_owner = weakref(self)
+	RenderingServer.frame_pre_draw.connect(_sync_point_camera)
+	get_tree().node_added.connect(_track_point_light)
+	for light in get_tree().root.find_children("*", "Light3D", true, false):
+		_track_point_light(light)
 
 func _setup_atmosphere() -> void:
 	if forest.available():
@@ -656,11 +662,12 @@ func _exit_tree()->void:
 	if RenderingServer.frame_pre_draw.is_connected(_sync_point_camera):
 		RenderingServer.frame_pre_draw.disconnect(_sync_point_camera)
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
-		projected_sun.release()
-		RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
-		RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
-		forest_replay.publish_bounce(0.0)
-		forest_replay.release_surface()
+		if not _flat_lab:
+			projected_sun.release()
+			RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
+			RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
+			forest_replay.publish_bounce(0.0)
+			forest_replay.release_surface()
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
 		RenderingServer.global_shader_parameter_set("gaf_point_soft",Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_point_mixed",false)
@@ -915,7 +922,8 @@ func _sync_point_camera() -> void:
 	if camera_position != _point_kernel_camera:
 		_point_kernel_camera = camera_position
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera", camera_position)
-	_sync_diffuse_opening()
+	if not _flat_lab:
+		_sync_diffuse_opening()
 
 func _sync_diffuse_opening() -> void:
 	var state := Vector4.ZERO
