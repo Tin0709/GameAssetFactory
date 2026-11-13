@@ -102,18 +102,24 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) 
 			skeleton.set_bone_pose(bone, source[bone].interpolate_with(idle[bone], idle_weight))
 		sample(sample_delta)
 		var shift := super._handoff_wall_clearance()
-		if idle_weight == 1.0 or _wall_handoff_is_clear(space, collision_mask, shift):
-			return _preserve_wall_handoff_arms(space, collision_mask, source, shift)
+		if _wall_handoff_is_clear(space, collision_mask, shift):
+			return _preserve_wall_handoff_branches(space, collision_mask, source, shift)
+		if idle_weight == 1.0:
+			sample(sample_delta)
+			return shift
 	return Vector3.ZERO
 
-func _preserve_wall_handoff_arms(space: PhysicsDirectSpaceState3D, collision_mask: int,
+func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		source: Array[Transform3D], shift: Vector3) -> Vector3:
-	# Restore as much local arm rotation as the resolved torso allows.
-	for name in ["Arm.L", "Arm.R"]:
+	# Keep source rotation on branches that can move without reopening the overlap.
+	for name in ["Head", "Arm.L", "Arm.R", "Leg.L", "Leg.R"]:
 		var bone: int = _sample_bone_ids[name]
 		var safe_pose := skeleton.get_bone_pose(bone)
 		for weight: float in [1.0, 0.5, 0.25]:
-			skeleton.set_bone_pose(bone, safe_pose.interpolate_with(source[bone], weight))
+			var rotation := safe_pose.basis.get_rotation_quaternion().slerp(
+				source[bone].basis.get_rotation_quaternion(), weight)
+			var basis := Basis(rotation) * Basis.from_scale(safe_pose.basis.get_scale())
+			skeleton.set_bone_pose(bone, Transform3D(basis, safe_pose.origin))
 			sample(sample_delta)
 			if _wall_handoff_is_clear(space, collision_mask, shift):
 				safe_pose = skeleton.get_bone_pose(bone)

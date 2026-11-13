@@ -145,7 +145,11 @@ func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame:
 	rig.reset_bone_poses()
 	zombie.animation.play(zombie.IDLE, 0.0)
 	zombie.animation.advance(0.0)
-	var idle_arm := rig.get_bone_pose(rig.find_bone("J_R_Arm"))
+	var tracked := [rig.find_bone("J_Head"), rig.find_bone("J_R_Arm"), rig.find_bone("J_L_Arm"),
+		rig.find_bone("J_R_Leg"), rig.find_bone("J_L_Leg")]
+	var idle_rotations: Array[Quaternion] = []
+	for bone: int in tracked:
+		idle_rotations.append(rig.get_bone_pose_rotation(bone))
 	zombie.animation.stop()
 	rig.reset_bone_poses()
 	zombie.animation.play(clip, 0.0)
@@ -155,7 +159,9 @@ func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame:
 	ragdoll.sample(1.0 / 60.0)
 	ragdoll.sample(1.0 / 60.0)
 	var torso: Transform3D = ragdoll.current.Chest
-	var source_arm := rig.get_bone_pose(rig.find_bone("J_R_Arm"))
+	var source_rotations: Array[Quaternion] = []
+	for bone: int in tracked:
+		source_rotations.append(rig.get_bone_pose_rotation(bone))
 	var limb: Transform3D = ragdoll.current[part]
 	check(torso.origin.x < 0.45 and limb.origin.x > 0.55,
 		"The source pose leaves a limb centre inside or across the wall")
@@ -168,11 +174,13 @@ func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame:
 		"The handoff places all linked bodies on the actor's side of the wall")
 	check(absf(ragdoll.skeleton.global_position.x) <= 0.12 + 0.0001,
 		"The handoff keeps the existing whole-pose translation limit")
-	var retained_arm := rig.get_bone_pose(rig.find_bone("J_R_Arm"))
-	var idle_distance := idle_arm.basis.get_rotation_quaternion().angle_to(source_arm.basis.get_rotation_quaternion())
-	var handoff_distance := retained_arm.basis.get_rotation_quaternion().angle_to(source_arm.basis.get_rotation_quaternion())
-	check(idle_distance > 0.02 and handoff_distance < idle_distance * 0.90,
-		"The right arm retains part of the evaluated source pose")
+	var idle_distance := 0.0
+	var handoff_distance := 0.0
+	for i in tracked.size():
+		idle_distance += idle_rotations[i].angle_to(source_rotations[i])
+		handoff_distance += rig.get_bone_pose_rotation(tracked[i]).angle_to(source_rotations[i])
+	check(handoff_distance < idle_distance * 0.90,
+		"The handoff retains more of the evaluated source pose than a full Idle reset")
 	var handoff_gap: float = ragdoll.max_anchor_error()
 	zombie.set_physics_process(true)
 	var escaped := false
@@ -184,7 +192,7 @@ func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame:
 			farthest = maxf(farthest, body.global_position.x)
 		escaped = escaped or farthest > 0.75
 	check(not escaped, "The launch keeps all six body centres on the near side through contact")
-	print("LAB_STRADDLED_WALL clip=", clip, " farthest=", farthest, " handoff_gap=", handoff_gap, " arm_change=", handoff_distance, " idle_change=", idle_distance)
+	print("LAB_STRADDLED_WALL clip=", clip, " farthest=", farthest, " handoff_gap=", handoff_gap, " branch_change=", handoff_distance, " idle_change=", idle_distance)
 	wall.free()
 	lab.free()
 
