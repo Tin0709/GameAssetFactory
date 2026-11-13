@@ -16,7 +16,9 @@ func run() -> void:
 	current_scene = world
 	await physics_frame
 	var dust := world.get_node_or_null("MovementDust") as Node3D
+	var wind := world.get_node_or_null("MovementWind") as Node3D
 	check(dust != null, "WorldMap installs the verified movement dust emitter")
+	check(wind != null, "WorldMap installs the verified running wind emitter")
 	if dust != null:
 		var site := Vector3(-0.5, 3.02, -0.5)
 		for block in ["grass", "dirt", "stone"]:
@@ -54,6 +56,8 @@ func run() -> void:
 			"A stone slab under a ledge uses its own surface and height")
 		world.player.surface_contact.emit(site + Vector3.UP * 4.0, false)
 		check(dust.get_children().all(func(sprite): return not sprite.visible), "An unsupported foot emits no dust")
+		if wind != null:
+			await check_running_wind(world, wind)
 		var saw_live_dust := false
 		Input.action_press("move_forward")
 		for i in 85:
@@ -100,3 +104,32 @@ func run() -> void:
 	print("WORLD_MAP_MOVEMENT_DUST failures=", failures)
 	world.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_running_wind(world: Node3D, wind: Node3D) -> void:
+	world.reset_player()
+	Input.action_press("move_forward")
+	Input.action_press("sprint")
+	var walked_with_wind := false
+	for i in 55:
+		await physics_frame
+		walked_with_wind = walked_with_wind or wind.get_children().any(func(wake): return wake.visible)
+	check(not walked_with_wind, "Ordinary walking emits no wind wake")
+	Input.action_release("sprint")
+	var visible: MeshInstance3D
+	for i in 65:
+		await physics_frame
+		for wake: MeshInstance3D in wind.get_children():
+			if wake.visible:
+				visible = wake
+				break
+		if visible != null:
+			break
+	Input.action_release("move_forward")
+	check(visible != null, "Actual WorldMap running emits a wind wake")
+	if visible != null:
+		var speed: Vector3 = world.player.get_real_velocity()
+		speed.y = 0.0
+		check(visible.global_basis.x.dot(speed.normalized()) < -0.99, "The wake trails the actual movement direction")
+	world.reset_player()
+	check(not wind.is_processing() and wind.get_children().all(func(wake): return not wake.visible),
+		"WorldMap reset clears all wind wakes immediately")
