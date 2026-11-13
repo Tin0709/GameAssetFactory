@@ -198,6 +198,8 @@ func run() -> void:
 	await check_sabre_fixed_pose_anchor(lab, group, 652, 0.095, "leg contact after the landing blend")
 	await check_sabre_fixed_pose_anchor(lab, group, 655, 0.105, "arm after the landing blend", 0.013)
 	await check_sabre_fixed_pose_anchor(lab, group, 703, 0.11, "arm sliding during the first roll", 0.013)
+	await check_sabre_fixed_pose_anchor(lab, group, 1044, 0.115, "early arm and core roll", 0.013, 0.035)
+	await check_sabre_fixed_pose_anchor(lab, group, 1064, 0.115, "early core landing", 0.013, 0.033)
 	await check_sabre_walking_arm_slide(lab, group)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
@@ -707,7 +709,7 @@ func check_flat_rest_after_tumble(lab, group) -> void:
 	zombie.free()
 
 func check_sabre_fixed_pose_anchor(lab, group, serial: int, gap_limit: float, impact: String,
-		overlap_limit := INF) -> void:
+		overlap_limit := INF, rise_limit := INF) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 120011 + serial
 	group._spawn_serial = serial
@@ -727,15 +729,29 @@ func check_sabre_fixed_pose_anchor(lab, group, serial: int, gap_limit: float, im
 	zombie.set_physics_process(true)
 	var peak := 0.0
 	var overlap := 0.0
+	var previous_y := INF
+	var peak_rise := 0.0
 	while not zombie._corpse_parked and zombie._corpse_age < 1.55:
 		await physics_frame
 		if zombie.ragdoll.running:
 			peak = maxf(peak, zombie.ragdoll.max_anchor_error())
 			overlap = maxf(overlap, -zombie.ragdoll.minimum_corner_y())
+			if rise_limit < INF:
+				var weighted_y := 0.0
+				var mass := 0.0
+				for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
+					weighted_y += body.global_position.y * body.mass
+					mass += body.mass
+				var centre_y := weighted_y / mass
+				if zombie._corpse_landed:
+					peak_rise = maxf(peak_rise, centre_y - previous_y)
+				previous_y = centre_y
 	check(peak > 0.0 and peak < gap_limit and overlap <= overlap_limit and zombie._corpse_parked,
 		"Fixed-pose Sabre %s keeps the joint connected, clears the floor and settles" % impact)
+	if rise_limit < INF:
+		check(peak_rise < rise_limit, "The early Sabre roll limits the upward step after landing (%d)" % serial)
 	print("SABRE_FIXED_IMPACT serial=", serial, " peak_gap_m=", peak,
-		" overlap_m=", overlap, " release_s=", zombie._corpse_age)
+		" rise_m=", peak_rise, " overlap_m=", overlap, " release_s=", zombie._corpse_age)
 	zombie.free()
 
 func check_sabre_walking_arm_slide(lab, group) -> void:

@@ -3,6 +3,10 @@ extends "res://scenes/dev/zombie_death_physics/ragdoll.gd"
 const DEEP_CONTACT_LIFT_START := 0.10
 const DEEP_CONTACT_LIFT_FULL := 0.112
 const DEEP_CONTACT_SHARED_LIFT := 0.065
+const EARLY_FLOOR_LIFT_START := 0.065
+const EARLY_FLOOR_LIFT_FULL := 0.095
+const EARLY_FLOOR_SHARED_LIFT := 0.045
+const EARLY_FLOOR_LIFT_BLEND_END := 0.16
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
@@ -229,14 +233,35 @@ func _limit_shared_first_contact_lift(lifts: Dictionary[PhysicalBone3D, float],
 		depths: Dictionary[PhysicalBone3D, float], shared_lift: float, slop: float) -> void:
 	if shared_lift <= DEEP_CONTACT_LIFT_START:
 		return
+	var weight := smoothstep(DEEP_CONTACT_LIFT_START, DEEP_CONTACT_LIFT_FULL, shared_lift)
+	var reduced_lift := lerpf(shared_lift, DEEP_CONTACT_SHARED_LIFT, weight)
+	_distribute_floor_lift(lifts, depths, shared_lift, slop, reduced_lift, FIRST_CONTACT_ANCHOR_LIMIT)
+
+func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
+		shared_lift: float, slop: float, anchor_limit: float) -> void:
+	super._limit_floor_anchor_stretch(lifts, depths, shared_lift, slop, anchor_limit)
+	if floor_landing_blended or floor_impact_blend <= 0.0 or floor_impact_blend >= EARLY_FLOOR_LIFT_BLEND_END \
+			or shared_lift <= EARLY_FLOOR_LIFT_START:
+		return
+	# Keep the correction local while the first roll still has floor support.
+	# An airborne frame between contacts can need the existing shared lift.
+	var floor_body := _flat_floor.get_parent()
+	for body: PhysicalBone3D in bodies.values():
+		if _body_supported_by(body, floor_body):
+			var weight := smoothstep(EARLY_FLOOR_LIFT_START, EARLY_FLOOR_LIFT_FULL, shared_lift)
+			weight *= 1.0 - smoothstep(EARLY_FLOOR_LIFT_BLEND_END * 0.5, EARLY_FLOOR_LIFT_BLEND_END, floor_impact_blend)
+			var reduced_lift := lerpf(shared_lift, EARLY_FLOOR_SHARED_LIFT, weight)
+			_distribute_floor_lift(lifts, depths, shared_lift, slop, reduced_lift, anchor_limit)
+			return
+
+func _distribute_floor_lift(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
+		shared_lift: float, slop: float, reduced_lift: float, anchor_limit: float) -> void:
 	# All five MD2 zombie joints share one spine body. Solve its minimum
 	# lift first, then raise only the limbs that need floor or joint clearance.
 	var chest: PhysicalBone3D = bodies.Chest
 	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
 	if chest_state == null:
 		return
-	var weight := smoothstep(DEEP_CONTACT_LIFT_START, DEEP_CONTACT_LIFT_FULL, shared_lift)
-	var reduced_lift := lerpf(shared_lift, DEEP_CONTACT_SHARED_LIFT, weight)
 	var chest_lift := maxf(reduced_lift, depths.get(chest, 0.0) - slop)
 	var old_chest_lift: float = lifts.get(chest, maxf(shared_lift, depths.get(chest, 0.0) - slop))
 	var limb_clearances: Dictionary[PhysicalBone3D, float] = {}
@@ -253,7 +278,7 @@ func _limit_shared_first_contact_lift(lifts: Dictionary[PhysicalBone3D, float],
 		var limb_anchor: Vector3 = (limb_state.transform * joint.child_frame).origin
 		var gap := chest_anchor - limb_anchor
 		var old_limb_lift: float = lifts.get(limb, maxf(shared_lift, depths.get(limb, 0.0) - slop))
-		var tolerance := maxf(FIRST_CONTACT_ANCHOR_LIMIT,
+		var tolerance := maxf(anchor_limit,
 			(gap + Vector3.UP * (old_chest_lift - old_limb_lift)).length())
 		var vertical_limit := sqrt(maxf(tolerance * tolerance - gap.x * gap.x - gap.z * gap.z, 0.0))
 		var limb_clearance := maxf(reduced_lift, depths.get(limb, 0.0) - slop)
