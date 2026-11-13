@@ -232,7 +232,7 @@ func check_health_bars(group: Node) -> void:
 	feedback._process(0.10)
 	feedback._process(0.05)
 	var after_delay: Color = batch._fills[first_slot]
-	if not is_equal_approx(after_delay.g, expected - 0.03 * 1.9):
+	if not is_equal_approx(after_delay.g, maxf(next_health, expected - 0.03 * 1.9)):
 		failures.append("The delayed fill drains only for the elapsed portion after the hold")
 	feedback._process(0.22)
 	var settled: Color = batch._fills[first_slot]
