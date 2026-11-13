@@ -15,6 +15,7 @@ var active_peak := 0
 var first_tick_ragdolls := 0
 var peak_damage_glyphs := 0
 var late_active_ragdolls := 0
+var chase_dust_peak := 0
 var failures: Array[String] = []
 
 func _initialize() -> void:
@@ -98,7 +99,7 @@ func check_zombie_dust() -> void:
 	if dust == null:
 		failures.append("The Lab has one batched zombie step-dust renderer")
 		return
-	if dust.multimesh.visible_instance_count == 0:
+	if chase_dust_peak == 0:
 		failures.append("Actual chasing zombies emit dust on the grass")
 	dust.clear()
 	lab._on_zombie_step(Vector3(0.0, 2.0, 0.0))
@@ -343,8 +344,11 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 	draws.clear()
 	active_peak = 0
 	var numbers := lab.get_node_or_null("CombatEffects/ZombieDamageNumbers") as MultiMeshInstance3D
+	var dust := lab.get_node_or_null("ZombieStepDust") as MultiMeshInstance3D
 	for i in ticks:
 		await physics_frame
+		if label == "chase" and dust != null:
+			chase_dust_peak = maxi(chase_dust_peak, dust.multimesh.visible_instance_count)
 		if group != null:
 			var active := 0
 			for zombie in group.get_children():
