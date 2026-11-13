@@ -91,7 +91,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grass_shade_color": ["Grass shade color", 1.],
 	&"diffuse_openings": ["Sunlit diffuse fill", 1.],
 	&"regional_sky": ["Local cliff skylight (preview)", 1.],
-	&"daylight_bounce": ["Daylight terrain bounce (preview)", 1.],
+	&"daylight_bounce": ["Ánh sáng hắt ban ngày", 1.],
 	&"stone_diffuse_contrast": ["Stone face lighting transition (preview)", 1.],
 	&"stone_detail_softness": ["Stone texture softness", 1.],
 	&"night_spatial_sky": ["Night terrain bounce (preview)", 1.],
@@ -176,7 +176,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 96
+const LIGHTING_MIX_VERSION := 97
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -197,6 +197,7 @@ const BALANCED_ATMOSPHERE := {
 	&"exposure": .9,
 	&"player_sky": 1.25,
 	&"player_bounce": 0.,
+	&"daylight_bounce": 0.,
 	&"grass_sky": 0.,
 	&"spruce_sky": 0.,
 	&"tree_shade": 0.,
@@ -1182,8 +1183,10 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .65
 	if effect == &"cool_shadow_detail":
 		return 0.
-	if effect in [&"daylight_bounce", &"stone_diffuse_contrast", &"stone_detail_softness", &"projected_sun_position", &"projected_sun_softness", &"bloom_diffusion"]:
+	if effect in [&"stone_diffuse_contrast", &"stone_detail_softness", &"projected_sun_position", &"projected_sun_softness", &"bloom_diffusion"]:
 		return 0.
+	if effect == &"daylight_bounce":
+		return .5
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
 	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"cliff_mist", &"night_spatial_sky"]:
@@ -1586,8 +1589,6 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 85 and effect == &"night_cliff_mist":
 			missing_value = 0.
-		if version < 47 and effect == &"daylight_bounce":
-			missing_value = 0.
 		if version < 48 and effect == &"stone_diffuse_contrast":
 			missing_value = 0.
 		if version < 49 and effect == &"stone_detail_softness":
@@ -1673,6 +1674,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 95 and effect == &"morning_depth_scatter":
 			missing_value = 0.
 		if version < 96 and effect == &"player_bounce":
+			missing_value = 0.
+		if version < 97 and effect == &"daylight_bounce":
 			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.

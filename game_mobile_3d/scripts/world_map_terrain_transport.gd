@@ -142,6 +142,9 @@ func _install()->bool:
 		_night_sky_ready = _regional_sky.has_night_field()
 		_day_bounce_ready = _regional_sky.has_sun_bounce_field()
 		_stone_diffuse_ready = _regional_sky.has_stone_diffuse_field()
+		if _day_bounce_ready and level.showcase._lighting_scale(&"daylight_bounce") > 0.0:
+			# Prepare the default field during map loading, before the first daylight transition.
+			_load_day_bounce()
 	return true
 
 func regional_sky_available() -> bool:
@@ -189,6 +192,10 @@ func night_sky_available() -> bool:
 func day_bounce_available() -> bool:
 	return _day_bounce_ready
 
+func _load_day_bounce() -> void:
+	day_bounce_texture = _regional_sky.load_sun_bounce_texture()
+	_day_bounce_ready = day_bounce_texture != null
+
 func stone_diffuse_available() -> bool:
 	return _stone_diffuse_ready
 
@@ -223,8 +230,7 @@ func _refresh_day_bounce() -> void:
 		var sample := _regional_sky.sun_bounce_sample(hour, sun.global_basis.z.normalized())
 		if sample.y > 0.0 and sun.is_visible_in_tree() and sun.shadow_enabled and sun.light_energy > 0.0:
 			if day_bounce_texture == null:
-				day_bounce_texture = _regional_sky.load_sun_bounce_texture()
-				_day_bounce_ready = day_bounce_texture != null
+				_load_day_bounce()
 			if day_bounce_texture != null:
 				var c := sun.light_color.srgb_to_linear()
 				var rgb := Vector3(c.r, c.g, c.b) * (sun.light_energy * sample.y * strength)
