@@ -231,6 +231,7 @@ func check_blocked_chase(group: Node) -> void:
 		failures.append("A crowd zombie blocked by another zombie retries at 15 Hz and samples every tick")
 	blocker.global_position.x += 3.0
 	await physics_frame
+	await process_frame
 	if zombie.global_position.z <= last_position.z + 0.01:
 		failures.append("Moving the blocking zombie wakes the chaser on the next tick")
 	for member in group.get_children():

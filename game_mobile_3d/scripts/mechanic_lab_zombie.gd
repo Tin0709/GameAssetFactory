@@ -76,7 +76,10 @@ const HEIGHT := 1.95
 const CHASE_SPEED := 3.1
 const CROWD_RETRY_MIN_ZOMBIES := 32
 const BLOCKED_CHASE_RETRY_HZ := 30.0
+const PACKED_CHASE_RETRY_HZ := 15.0
 const BLOCKED_CHASE_MAX_SPEED_SQUARED := 0.01
+const BLOCKER_MOVE_DISTANCE_SQUARED := 0.025 * 0.025
+const CHASE_TARGET_MOVE_DISTANCE_SQUARED := 0.10 * 0.10
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
 # Zombie overrides damage and attack speed. MeleeAttackMob supplies the range,
@@ -144,6 +147,9 @@ var _poise_recovery_wait := 0.0
 var _attack_cooldown := 0.0
 var _crowd_slot := 0
 var _blocked_chase := false
+var _blocking_zombie: CharacterBody3D
+var _blocking_position := Vector3.ZERO
+var _blocked_target_position := Vector3.ZERO
 var _skipped_blocked_step := false
 var _flash_left := 0.0
 var _corpse_age := 0.0
@@ -310,14 +316,31 @@ func _physics_process(delta: float) -> void:
 	if chasing and _blocked_chase and is_on_floor():
 		# Spread collision retries across zombies. Keep animation and pose history
 		# on the full physics clock, including frames without a movement query.
-		var stride := maxi(1, roundi(Engine.physics_ticks_per_second / BLOCKED_CHASE_RETRY_HZ))
-		_skipped_blocked_step = Engine.get_physics_frames() % stride != _crowd_slot % stride
+		_skipped_blocked_step = _wait_for_chase_retry()
 	if not _skipped_blocked_step:
 		move_and_slide()
 		_blocked_chase = chasing and is_on_floor() and is_on_wall() \
 			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
+		_blocking_zombie = null
+		if _blocked_chase:
+			var blocker := get_last_slide_collision().get_collider() as CharacterBody3D
+			if blocker != null and blocker.get_parent() == get_parent():
+				_blocking_zombie = blocker
+				_blocking_position = blocker.global_position
+				_blocked_target_position = target.global_position
 	_advance_animation(delta)
 	ragdoll.sample(delta)
+
+func _wait_for_chase_retry() -> bool:
+	var retry_hz := BLOCKED_CHASE_RETRY_HZ
+	if _blocking_zombie != null:
+		if (_blocking_zombie.is_queued_for_deletion() or _blocking_zombie.collision_layer == 0
+				or _blocking_zombie.global_position.distance_squared_to(_blocking_position) > BLOCKER_MOVE_DISTANCE_SQUARED
+				or target.global_position.distance_squared_to(_blocked_target_position) > CHASE_TARGET_MOVE_DISTANCE_SQUARED):
+			return false
+		retry_hz = PACKED_CHASE_RETRY_HZ
+	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / retry_hz))
+	return Engine.get_physics_frames() % stride != _crowd_slot % stride
 
 func _integrate_knockback(delta: float) -> Vector3:
 	var speed := _knockback.length()
