@@ -268,6 +268,7 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
 	check(peak > 0.001 and peak < 0.9, "The isolated zombie reaction pool reaches the mixer with headroom")
 	toggle.button_pressed = false
+	await create_timer(0.08).timeout
 	lab.free()
 
 func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
