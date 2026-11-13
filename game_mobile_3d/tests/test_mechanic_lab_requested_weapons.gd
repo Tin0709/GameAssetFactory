@@ -164,8 +164,11 @@ func run() -> void:
 	equip(menu, 0)
 	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
 		"Switching back restores the original Sabre")
+	sound.button_pressed = false
 	lab.queue_free()
-	await process_frame
-	await process_frame
+	# Let the audio server release stopped voices before a fixed-FPS test exits.
+	var audio_end := Time.get_ticks_msec() + 100
+	while Time.get_ticks_msec() < audio_end:
+		await process_frame
 	print("MECHANIC_LAB_REQUESTED_WEAPONS failures=", failures)
 	quit(1 if failures else 0)
