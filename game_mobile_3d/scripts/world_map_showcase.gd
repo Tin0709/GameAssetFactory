@@ -106,6 +106,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"twilight_grass_albedo": ["Độ dịu lá cỏ chạng vạng", 1.],
 	&"lantern_grass_tone": ["Sắc đèn hông trên cỏ", 1.],
 	&"grass_shadow_reach": ["Grass shadow reach", 1.],
+	&"day_grass_shadow_compactness": ["Day grass shadow compactness", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
 	&"cool_shadow_detail": ["Cool shadow detail", 1.],
@@ -183,7 +184,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 109
+const LIGHTING_MIX_VERSION := 110
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1439,6 +1440,15 @@ func _night_grass_weight() -> float:
 	return moonlight_weight(hour)
 
 func grass_shadow_height_scale() -> float:
+	var height := _twilight_grass_shadow_height_scale()
+	if not forest_active() or atmosphere_review != "combined" or _balanced_preview or not level.look.direct_clouds_active():
+		return height
+	# Keep the existing twilight reach correction and the approved Noon and Night.
+	var morning := smoothstep(5.5, 7.0, hour) * (1.0 - smoothstep(7.0, 12.0, hour))
+	var afternoon := smoothstep(12.0, 16.5, hour) * (1.0 - smoothstep(16.5, 19.0, hour))
+	return height * (1.0 - 0.15 * _lighting_scale(&"day_grass_shadow_compactness") * (morning + afternoon))
+
+func _twilight_grass_shadow_height_scale() -> float:
 	var strength := _lighting_scale(&"grass_shadow_reach") * twilight_color_weight()
 	if strength <= 0. or not key_direction_active or not direction_response.available() or _day.is_empty():
 		return 1.
@@ -1600,6 +1610,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 24 and effect == &"stone_twilight_color":
 			missing_value = 0.
 		if version < 25 and effect == &"twilight_shadow_color":
+			missing_value = 0.
+		if version < 110 and effect == &"day_grass_shadow_compactness":
 			missing_value = 0.
 		if version < 26 and effect == &"grass_shadow_reach":
 			missing_value = 0.
@@ -1954,7 +1966,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile"]:
 		_update_mist()
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"tree_shade"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"tree_shade"]:
 		return
 	if changed_effect in [&"player_sky", &"player_bounce", &"player_sun_shoulder", &"player_canopy_color"]:
 		if level.player_light != null:
