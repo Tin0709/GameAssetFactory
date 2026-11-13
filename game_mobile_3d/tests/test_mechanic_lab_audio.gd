@@ -349,6 +349,26 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 	check(reactions.all(func(voice): return voice.stream in audio._groups[&"death"] and voice.global_position in nearest)
 		and audio._next_choice.get(&"hurt", 0) == hurt_choice,
 		"The nearest deaths replace active hurts without selecting suppressed hurt samples")
+	# Model consecutive physics ticks delivering cues before a rendered frame.
+	audio.reset()
+	var onset_frame := Engine.get_physics_frames()
+	var near_death_points := [ear + Vector3.RIGHT, ear + Vector3.RIGHT * 2.0, ear + Vector3.RIGHT * 3.0]
+	for point: Vector3 in near_death_points:
+		audio.contact(point, 1100, true)
+	audio.flush_zombie_combat_cues()
+	var death_variant: int = audio._next_choice[&"death"]
+	await physics_frame
+	audio.contact(ear + Vector3.RIGHT * 20.0, 1101, true)
+	audio.flush_zombie_combat_cues()
+	check(Engine.get_physics_frames() > onset_frame
+		and reactions.all(func(voice): return voice.global_position in near_death_points)
+		and audio._next_choice[&"death"] == death_variant,
+		"A distant death on the next physics tick preserves the three nearby death onsets")
+	var closest := ear + Vector3.RIGHT * 0.5
+	audio.contact(closest, 1102, true)
+	audio.flush_zombie_combat_cues()
+	check(reactions.all(func(voice): return voice.global_position in [closest, near_death_points[0], near_death_points[1]]),
+		"A closer death can replace the farthest recent onset")
 	audio.reset()
 	var death_choice: int = audio._next_choice.get(&"death", 0)
 	audio.contact(ear + Vector3.RIGHT * 40.0, 1003, true)
