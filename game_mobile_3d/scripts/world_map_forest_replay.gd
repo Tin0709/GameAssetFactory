@@ -13,8 +13,11 @@ const SOURCES := {
 const MATERIAL := preload("res://materials/world_map_forest_replay.gdshader")
 
 var fixture: Node3D
+var surface_field: ImageTexture3D
 var _material: ShaderMaterial
 var _attempted := false
+var _surface_attempted := false
+var _submitted_surface_gain := 0.
 var _site := Vector2.INF
 var _submitted := Vector2.INF
 var _submitted_bounce := Vector4.ZERO
@@ -64,7 +67,57 @@ func publish_bounce(strength: float) -> void:
 	_submitted_bounce = state
 	RenderingServer.global_shader_parameter_set("gaf_replay_bounce",state)
 
-func _load(world) -> void:
+func surface_available(world) -> bool:
+	return available(world) and has_step_site(world) and not world.forest_replay_surface_path.is_empty() \
+		and (not _surface_attempted or surface_field != null)
+
+func publish_surface(world, strength: float) -> void:
+	var gain := 0.0
+	if strength > 0. and _submitted_bounce.w > 0. and _site == world.forest_replay_steps_site and surface_available(world):
+		if not _surface_attempted:
+			_surface_attempted = true
+			_load_surface(world)
+		if surface_field != null:
+			gain = strength
+	if gain == _submitted_surface_gain:
+		return
+	_submitted_surface_gain = gain
+	var origin: Vector3 = world.forest_replay_surface_origin
+	RenderingServer.global_shader_parameter_set("gaf_replay_surface", Vector4(origin.x, origin.y, origin.z, gain))
+
+func release_surface() -> void:
+	_submitted_surface_gain = 0.
+	RenderingServer.global_shader_parameter_set("gaf_replay_surface", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_replay_surface_field", null)
+	surface_field = null
+
+func _load_surface(world) -> void:
+	var root := _research_root()
+	var relative: String = world.forest_replay_surface_path.simplify_path()
+	var extent: Vector3i = world.forest_replay_surface_extent
+	if root.is_empty() or relative.is_absolute_path() or relative.begins_with("..") \
+			or mini(extent.x, mini(extent.y, extent.z)) < 2 or maxi(extent.x, maxi(extent.y * 6, extent.z)) > 256:
+		return
+	var path := root.path_join(relative)
+	if world.forest_replay_surface_sha256.length() != 64 or world.forest_replay_surface_map_sha256.length() != 64 \
+			or FileAccess.get_sha256(world.DATA) != world.forest_replay_surface_map_sha256 \
+			or FileAccess.get_sha256(path) != world.forest_replay_surface_sha256:
+		return
+	var width := extent.x
+	var height := extent.y * 6
+	var stride := width * height * 2
+	var data := FileAccess.get_file_as_bytes(path)
+	if data.size() != stride * extent.z:
+		return
+	var slices: Array[Image] = []
+	for i in extent.z:
+		slices.append(Image.create_from_data(width, height, false, Image.FORMAT_RG8, data.slice(i * stride, (i + 1) * stride)))
+	var texture := ImageTexture3D.new()
+	if texture.create(Image.FORMAT_RG8, width, height, extent.z, false, slices) == OK:
+		surface_field = texture
+		RenderingServer.global_shader_parameter_set("gaf_replay_surface_field", texture)
+
+func _research_root() -> String:
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	if root.is_empty():
 		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
@@ -72,6 +125,12 @@ func _load(world) -> void:
 	var project := ProjectSettings.globalize_path("res://").simplify_path().replace("\\", "/").trim_suffix("/").to_lower()
 	if not root.is_absolute_path() or root.begins_with("res://") or root.begins_with("user://") \
 		or root.to_lower() == project or root.to_lower().begins_with(project + "/"):
+		return ""
+	return root
+
+func _load(world) -> void:
+	var root := _research_root()
+	if root.is_empty():
 		return
 	var directory := root.path_join(SOURCE_DIR)
 	for source: String in SOURCES:

@@ -11,7 +11,6 @@ vec3 gaf_replay_incident(vec3 world_position, vec3 normal) {
 	float distance_squared = dot(toward, toward);
 	float fade = max(1.0 - distance_squared / (3.9 * 3.9), 0.0);
 	float facing = max(dot(normal, toward) * inversesqrt(max(distance_squared, 0.2)), 0.0);
-	float incident = fade * fade * (0.078 + 0.922 * facing);
 	float legacy = gaf_replay_bounce.w * fade * fade * (0.078 + 0.922 * facing);
 	if (gaf_replay_surface.w > 0.0 && distance_squared < 39.0625) {
 		ivec3 texels = textureSize(gaf_replay_surface_field, 0);
