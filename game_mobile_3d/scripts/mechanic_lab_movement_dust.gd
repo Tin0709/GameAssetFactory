@@ -278,7 +278,14 @@ func _update_source_landing(particle: Particle) -> void:
 
 func _process(delta: float) -> void:
 	var active := false
-	var tick := Engine.get_physics_frames()
+	# Match the player presenter: interpolate the previous completed physics
+	# interval, with the new particle at its origin for its contact tick.
+	var render_tick := 0.0
+	if _contact_clock:
+		render_tick = float(Engine.get_physics_frames())
+		if not Engine.is_in_physics_frame():
+			render_tick += Engine.get_physics_interpolation_fraction() - 1.0
+	var step := get_physics_process_delta_time() if _contact_clock else 0.0
 	for particle in _particles:
 		if not particle.sprite.visible:
 			continue
