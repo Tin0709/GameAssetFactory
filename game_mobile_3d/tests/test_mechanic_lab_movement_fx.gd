@@ -92,6 +92,7 @@ func run() -> void:
 	await check_non_grass_landing(lab, dust)
 	await check_non_grass_steps(lab, dust, wind)
 	await check_dust_contact_clock(lab, dust)
+	await check_zombie_dust_contact_clock(lab)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
 	lab.free()
@@ -396,6 +397,30 @@ func check_dust_contact_clock(lab, dust) -> void:
 		"Run and jump dust begin at the contact position, even after a delayed render")
 	print("MECHANIC_LAB_DUST_CONTACT_CLOCK drift=", peak_drift, " contacts=", contact_count)
 	lab.reset_player()
+
+func check_zombie_dust_contact_clock(lab) -> void:
+	var dust := lab.get_node_or_null("ZombieStepDust") as MultiMeshInstance3D
+	check(dust != null, "Zombie foot contacts use the batched source dust")
+	if dust == null:
+		return
+	lab._on_zombie_step(Vector3.ZERO)
+	dust._process(0.15)
+	check(dust.multimesh.visible_instance_count == 1 and is_zero_approx(dust._puffs[0].age),
+		"Zombie step dust starts at contact even when the first render interval is long")
+	var oldest = dust._puffs[0]
+	var first_tick := Engine.get_physics_frames()
+	while Engine.get_physics_frames() < first_tick + ceili(Engine.physics_ticks_per_second * 0.25):
+		await physics_frame
+	lab._on_zombie_step(Vector3.RIGHT)
+	dust._process(0.15)
+	check(oldest.age > 0.20 and oldest.age < 0.30 and is_zero_approx(dust._puffs[1].age),
+		"Existing zombie dust advances from its own step while a new puff starts at age zero")
+	var expiry := Engine.get_physics_frames() + ceili(Engine.physics_ticks_per_second * 1.80)
+	while Engine.get_physics_frames() < expiry:
+		await physics_frame
+	await process_frame
+	check(dust.multimesh.visible_instance_count == 0 and not dust.is_processing(),
+		"The zombie dust batch expires by its source lifetime")
 
 func start_heavy_drop(lab) -> void:
 	lab.get_node("HUD/DropMedium").pressed.emit()
