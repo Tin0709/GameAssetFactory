@@ -35,6 +35,9 @@ var _burst_point: Vector3
 var _burst_surface: String
 var _random := RandomNumberGenerator.new()
 
+func _ready() -> void:
+	set_physics_process(false)
+
 func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable(), heavy_delay := Callable()) -> bool:
 	var texture := _load_mask()
 	if texture == null:
@@ -60,7 +63,6 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 	actor.heavy_jump_landed.connect(_on_heavy_jump_landed)
 	actor.presentation_reset.connect(clear)
 	set_process(false)
-	set_physics_process(false)
 	return true
 
 static func _load_mask() -> Texture2D:
@@ -114,8 +116,9 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	_emit_dust(ground_point, surface, landed, heavy)
 
 func _physics_process(_delta: float) -> void:
-	if Engine.get_physics_frames() < _burst_frame:
+	if _burst_frame < 0 or Engine.get_physics_frames() < _burst_frame:
 		return
+	_burst_frame = -1
 	set_physics_process(false)
 	_emit_dust(_burst_point, _burst_surface, true, true)
 
@@ -172,6 +175,7 @@ func _process(delta: float) -> void:
 
 func clear() -> void:
 	_heavy_landing_frame = -1
+	_burst_frame = -1
 	set_physics_process(false)
 	for particle in _particles:
 		particle.sprite.hide()
