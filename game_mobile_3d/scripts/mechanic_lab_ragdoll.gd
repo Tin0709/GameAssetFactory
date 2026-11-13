@@ -5,7 +5,7 @@ const DEEP_CONTACT_LIFT_FULL := 0.112
 const DEEP_CONTACT_SHARED_LIFT := 0.065
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
-const WALL_HANDOFF_ARM_REBOUND_MAX_SHIFT := 0.045
+const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 
 var _sample_bone_ids: Dictionary[String, int]
@@ -305,37 +305,41 @@ func _project_source_anchors() -> void:
 	_recover_floor_blocked_hip()
 	var recent_handoff := _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _wall_handoff_frame \
 		<= roundi(WALL_HANDOFF_RECOVERY_SECONDS * Engine.physics_ticks_per_second)
-	var neck_flight := _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0 \
+	var sabre_flight := _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0 \
 		and is_instance_valid(_flat_floor) and not _flat_floor.disabled
-	if not recent_handoff and not neck_flight:
+	if not recent_handoff and not sabre_flight:
 		return
 
 	# All five source joints share the chest. A side contact can block a
 	# limb's projection, so check whether the chest has room to meet it.
 	var motion := Vector3.ZERO
 	var largest_gap := 2.0 * SOURCE_ANCHOR_TOLERANCE
-	var head_state: PhysicsDirectBodyState3D
-	if not recent_handoff:
-		var head: PhysicalBone3D = bodies.Head
-		head_state = PhysicsServer3D.body_get_direct_state(head.get_rid())
-		if head_state == null or head_state.get_contact_count() == 0:
-			return
 	var chest: PhysicalBone3D = bodies.Chest
 	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
 	if chest_state == null:
 		return
 	if not recent_handoff:
-		if chest_state.get_contact_count() > 0:
-			return
-		var neck: Dictionary = source_joints.Head
-		var neck_gap: Vector3 = (chest_state.transform * neck.parent_frame).origin \
-			- (head_state.transform * neck.child_frame).origin
-		if neck_gap.length_squared() <= largest_gap * largest_gap:
-			return
-		motion = _wall_anchor_motion(head_state, neck_gap, true)
+		# Outside the handoff window, respond only to an observed rebound.
+		for name in ["Head", "Arm.L", "Arm.R"]:
+			var is_arm: bool = name != "Head"
+			if not is_arm and chest_state.get_contact_count() > 0:
+				continue
+			var limb: PhysicalBone3D = bodies[name]
+			var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
+			if state == null or state.get_contact_count() == 0:
+				continue
+			var spec: Dictionary = source_joints[name]
+			var gap: Vector3 = (chest_state.transform * spec.parent_frame).origin \
+				- (state.transform * spec.child_frame).origin
+			var distance := gap.length()
+			if distance <= largest_gap:
+				continue
+			var shift := _wall_anchor_motion(state, gap, true, is_arm)
+			if not shift.is_zero_approx():
+				largest_gap = distance
+				motion = shift
 		if motion.is_zero_approx():
 			return
-		largest_gap = neck_gap.length()
 
 	var gaps: Array[Vector3] = []
 	for name: String in source_joint_rids:
@@ -361,7 +365,7 @@ func _project_source_anchors() -> void:
 		if not _test_projection_motion(chest, chest_state.transform, motion):
 			chest_state.transform = chest_state.transform.translated(motion)
 			return
-		if extended_arm_shift:
+		if extended_arm_shift and recent_handoff:
 			# The forward sweep reports the torso's existing wall overlap.
 			# The shared escape test checks clearance at the other end and
 			# sweeps back to rule out an intervening obstacle.
@@ -393,7 +397,7 @@ func _wall_anchor_motion(state: PhysicsDirectBodyState3D, gap: Vector3, require_
 			continue
 		var blocked_distance := -gap.dot(normal) - SOURCE_ANCHOR_TOLERANCE
 		if blocked_distance > 0.0:
-			var max_shift := WALL_HANDOFF_ARM_REBOUND_MAX_SHIFT if allow_extra_arm_shift and rebounding \
+			var max_shift := WALL_ARM_REBOUND_MAX_SHIFT if allow_extra_arm_shift and rebounding \
 				else WALL_CHEST_MAX_SHIFT
 			return normal * minf(blocked_distance, max_shift)
 	return Vector3.ZERO
