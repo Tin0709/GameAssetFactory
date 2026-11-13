@@ -370,6 +370,56 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 		" farthest=", farthest, " rebound=", rebounded, " overlap=", overlap)
 	lab.free()
 
+func check_corner_shoulder() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var first_wall := terrain(lab, Vector3(4.5, 1.5, -1.85), Vector3(0.30, 3.0, 12.4), 0.0)
+	var second_wall := terrain(lab, Vector3(-1.70, 1.5, 4.5), Vector3(12.7, 3.0, 0.30), 0.0)
+	var group := lab.get_node("Zombies")
+	group._spawn_serial = 1970
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 472201
+	var gap := rng.randf_range(0.47, 0.70)
+	zombie.global_position = Vector3(4.35 - gap, 0.02, 4.35 - gap + rng.randf_range(-0.035, 0.035))
+	zombie.rotation.y = rng.randf_range(-PI, PI)
+	zombie.animation.stop()
+	zombie.ragdoll.skeleton.reset_bone_poses()
+	zombie.animation.play(zombie.ATTACK)
+	zombie.animation.advance(0.0)
+	zombie.animation.seek(rng.randf_range(0.05, 0.40), true)
+	await ticks(2)
+	for i in 2:
+		zombie.ragdoll.sample(1.0 / 60.0)
+	var direction := Vector3(1, 0, 1).normalized().rotated(Vector3.UP, rng.randf_range(-0.18, 0.18))
+	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 1150.0, zombie.DeathStrike.SABRE_FINISHER)
+	zombie.set_physics_process(true)
+	var peak_gap := 0.0
+	var farthest := 0.0
+	var walls_hit := {}
+	for i in 120:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+		if not zombie.ragdoll.running:
+			continue
+		peak_gap = maxf(peak_gap, zombie.ragdoll.max_anchor_error())
+		for part: PhysicalBone3D in zombie.ragdoll.bodies.values():
+			farthest = maxf(farthest, maxf(part.global_position.x, part.global_position.z))
+			var state := PhysicsServer3D.body_get_direct_state(part.get_rid())
+			for index in state.get_contact_count():
+				var collider := state.get_contact_collider_object(index)
+				if collider == first_wall or collider == second_wall:
+					walls_hit[collider] = true
+	check(walls_hit.size() == 2 and farthest < 4.65 and zombie._corpse_parked,
+		"The Sabre ragdoll meets both faces of the closed corner and settles on the near side")
+	check(peak_gap > 0.0 and peak_gap < 0.23, "The shoulder can slide toward its anchor along the corner wall")
+	print("LAB_CORNER_SHOULDER gap=", peak_gap, " farthest=", farthest, " walls=", walls_hit.size())
+	lab.free()
+
 func run() -> void:
 	await run_case(true)
 	await run_case(false)
@@ -381,6 +431,7 @@ func run() -> void:
 	await check_wall_pinned_joint()
 	await check_wall_pinned_joint(true)
 	await check_edge_landing_gravity()
+	await check_corner_shoulder()
 	await check_wall_rebound(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,
