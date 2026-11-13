@@ -105,7 +105,24 @@ func run() -> void:
 	attack(true)
 	await ticks(2)
 	attack(false)
-	await ticks(64)
+	await ticks(10)
+	var embedded := lab._crossbow.get_node_or_null("EmbeddedArrows") as MultiMeshInstance3D
+	check(embedded != null and embedded.multimesh.visible_instance_count == 1,
+		"A travelling arrow leaves one embedded prop when it hits a wall")
+	if embedded != null and DisplayServer.get_name() != "headless":
+		var first_pose := embedded.multimesh.get_instance_transform(0)
+		await ticks(5)
+		var second_pose := embedded.multimesh.get_instance_transform(0)
+		check(first_pose.basis.get_scale().is_equal_approx(Vector3.ONE * 0.6)
+			and absf(first_pose.origin.z - 2.365) < 0.06,
+			"The wall prop uses the source mesh scale and impact offset")
+		check(first_pose.basis != second_pose.basis and first_pose.origin.is_equal_approx(second_pose.origin),
+			"The embedded arrow rotates around a fixed contact")
+		await ticks(49)
+	else:
+		await ticks(54)
+	check(embedded != null and embedded.multimesh.visible_instance_count == 0,
+		"The embedded arrow expires at the end of the short Lab display window")
 	check(target.health == 92 and contacts.size() == 1, "A wall blocks the bolt from hitting the zombie")
 	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 2, "A wall hit plays the next arrow impact")
 	check(combat_audio._next_choice.get(&"crossbow_fire", 0) == 2, "Two shots use two different firing samples")
@@ -125,6 +142,8 @@ func run() -> void:
 		"A wall inside muzzle reach stops the bolt and still spends the shot")
 	check(firing_choices_at_impact == [0] and flight_counts_at_impact == [0],
 		"A muzzle obstruction plays the third firing cue before impact and starts no flight cue")
+	check(embedded != null and embedded.multimesh.visible_instance_count == 0,
+		"A muzzle clearance block does not leave an embedded arrow")
 	barrier.position.z = 2.5
 	await ticks(2)
 	attack(true)
@@ -140,6 +159,8 @@ func run() -> void:
 
 	lab.reset_player()
 	await ticks(12)
+	check(embedded != null and embedded.multimesh.visible_instance_count == 0,
+		"Reset clears an embedded arrow immediately")
 	target.position = Vector3(2.5, 0.0, 3.0)
 	lab.player._q = true
 	attack(true)
