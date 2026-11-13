@@ -39,6 +39,9 @@ const CONE_OVERSHOOT_BIAS := 0.10
 const CONE_SUPPORT_OVERSHOOT_COS := cos(deg_to_rad(75.0))
 # SK_Zombie_PhysicsAsset enables linear projection with a 5 cm tolerance.
 const SOURCE_ANCHOR_TOLERANCE := 0.05
+# Limit extra separation from a deep first-contact correction without lifting the whole rig.
+const FIRST_CONTACT_ANCHOR_LIMIT := 0.09
+const FIRST_CONTACT_ANCHOR_MAX_LIFT := 0.04
 const PROJECTION_COLLISION_MARGIN := 0.001
 const CONTACT_ANCHOR_RECOVERY_MAX_SHIFT := 0.18
 @export var maximum_inherited_linear_speed := 3.0
@@ -68,6 +71,7 @@ var source_joint_rids: Dictionary[String, RID]
 var _flat_floor: CollisionShape3D
 var _floor_impact_limb_share := 0.0
 var _flat_floor_has_contact := false
+var _limit_first_contact_stretch := false
 var _pose_correction_frame := -1
 var _terrain_poses: Dictionary[String, Transform3D]
 var _terrain_query: PhysicsShapeQueryParameters3D
@@ -130,12 +134,13 @@ func sample(delta: float) -> void:
 	sample_count += 1
 
 func begin(profile: Resource, direction: Vector3, location: String, distance: float, gravity: float,
-		flat_floor: CollisionShape3D = null, floor_impact_limb_share := 0.0) -> bool:
+		flat_floor: CollisionShape3D = null, floor_impact_limb_share := 0.0, limit_first_contact_stretch := false) -> bool:
 	if running or sample_count < 2: return false
 	running = true
 	_flat_floor = flat_floor
 	_floor_impact_limb_share = floor_impact_limb_share if not source_joints.is_empty() else 0.0
 	_flat_floor_has_contact = false
+	_limit_first_contact_stretch = limit_first_contact_stretch and not source_joints.is_empty()
 	floor_landing_blended = false
 	floor_impact_blend = 0.0
 	if _flat_floor != null or not source_joints.is_empty():
@@ -810,8 +815,11 @@ func _project_floor_contact() -> void:
 			# During the roll, bound the extra local correction to limit joint separation.
 			var excess_lift := maxf(shared_lift - FLOOR_LANDING_LIFT_THRESHOLD, 0.0)
 			shared_lift -= minf(excess_lift * floor_impact_blend, FLOOR_LANDING_MAX_LIFT_REDUCTION)
+		var anchor_lifts: Dictionary[PhysicalBone3D, float] = {}
+		if _limit_first_contact_stretch and not landing_blended and floor_impact_blend <= 0.0 and not depths.is_empty():
+			_limit_floor_anchor_stretch(anchor_lifts, depths, shared_lift, slop)
 		for body: PhysicalBone3D in bodies.values():
-			var correction := maxf(shared_lift, depths.get(body, 0.0) - slop)
+			var correction: float = anchor_lifts.get(body, maxf(shared_lift, depths.get(body, 0.0) - slop))
 			if correction <= 0.0:
 				continue
 			var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
@@ -819,6 +827,34 @@ func _project_floor_contact() -> void:
 				state.transform = state.transform.translated(Vector3.UP * correction)
 	if _flat_floor_has_contact and not landing_blended and floor_impact_blend > 0.0:
 		_preempt_floor_penetration(floor_half, floor_inverse, floor_pose.origin.y + floor_half.y)
+
+func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
+		shared_lift: float, slop: float) -> void:
+	for name: String in source_joint_rids:
+		var joint: Dictionary = source_joints[name]
+		var child: PhysicalBone3D = bodies[name]
+		var parent: PhysicalBone3D = bodies[joint.parent]
+		var child_lift: float = lifts.get(child, maxf(shared_lift, depths.get(child, 0.0) - slop))
+		var parent_lift: float = lifts.get(parent, maxf(shared_lift, depths.get(parent, 0.0) - slop))
+		var offset := parent_lift - child_lift
+		if absf(offset) <= 0.00001:
+			continue
+		var child_state := PhysicsServer3D.body_get_direct_state(child.get_rid())
+		var parent_state := PhysicsServer3D.body_get_direct_state(parent.get_rid())
+		if child_state == null or parent_state == null:
+			continue
+		var parent_anchor: Vector3 = (parent_state.transform * joint.parent_frame).origin
+		var child_anchor: Vector3 = (child_state.transform * joint.child_frame).origin
+		var gap := parent_anchor - child_anchor
+		var tolerance := maxf(gap.length(), FIRST_CONTACT_ANCHOR_LIMIT)
+		var vertical_limit := sqrt(maxf(tolerance * tolerance - gap.x * gap.x - gap.z * gap.z, 0.0))
+		var excess := (gap.y + offset) * signf(offset) - vertical_limit
+		if excess > 0.0:
+			var extra_lift := minf(excess, minf(absf(offset), FIRST_CONTACT_ANCHOR_MAX_LIFT))
+			if offset > 0.0:
+				lifts[child] = child_lift + extra_lift
+			else:
+				lifts[parent] = parent_lift + extra_lift
 
 func _preempt_floor_penetration(floor_half: Vector3, floor_inverse: Transform3D, floor_y: float) -> void:
 	# During the Sabre roll, a rotating box can dig in again before the next

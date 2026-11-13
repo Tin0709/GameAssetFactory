@@ -446,7 +446,7 @@ func _update_death(delta: float) -> void:
 		elif _death_strike == DeathStrike.SABRE_GROUND:
 			floor_impact_limb_share = SABRE_GROUND_FLOOR_LIMB_SHARE
 		var flight_gravity := ZOMBIE_GRAVITY * ragdoll_gravity_multiplier
-		if ragdoll.begin(launch, direction, "Chest", 0.0, flight_gravity, _corpse_floor, floor_impact_limb_share):
+		if ragdoll.begin(launch, direction, "Chest", 0.0, flight_gravity, _corpse_floor, floor_impact_limb_share, sabre_finisher):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	var contact := ragdoll.contact_motion()
