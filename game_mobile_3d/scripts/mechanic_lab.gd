@@ -97,6 +97,9 @@ var _pending_player_damage := 0
 var _player_damage_tick := -1
 var _player_damage_origin: Vector3
 var _player_hit_serial := 0
+var _foot_contact_tick := -1
+var _foot_contact_sole: Vector3
+var _foot_contact: Dictionary
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
 @onready var _impact_light: OmniLight3D = $CombatImpactLight
@@ -161,13 +164,13 @@ func _ready() -> void:
 		_setup_movement_audio()
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
-		if dust.setup(player, null, _grass_contact_at, _heavy_debris_delay, _grass_landing_contact_at):
+		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _grass_landing_contact_at):
 			add_child(dust)
 		else:
 			dust.free()
 		var wind := MovementWind.new()
 		wind.name = "MovementWind"
-		if wind.setup(player, _grass_contact_at):
+		if wind.setup(player, _player_foot_contact_at):
 			add_child(wind)
 		else:
 			wind.free()
@@ -400,8 +403,17 @@ func _setup_movement_audio() -> void:
 	_movement_audio = MovementAudio.new()
 	_movement_audio.name = "MovementAudio"
 	add_child(_movement_audio)
-	_movement_audio.setup(player, null, bundle, _grass_contact_at)
+	_movement_audio.setup(player, null, bundle, _player_foot_contact_at)
 	_movement_audio.landing_contact = _grass_landing_contact_at
+
+func _player_foot_contact_at(sole: Vector3) -> Dictionary:
+	# Audio, dust and wind receive the same planted-foot event in the same tick.
+	var tick := Engine.get_physics_frames()
+	if tick != _foot_contact_tick or sole != _foot_contact_sole:
+		_foot_contact_tick = tick
+		_foot_contact_sole = sole
+		_foot_contact = _grass_contact_at(sole)
+	return _foot_contact
 
 func _grass_contact_at(sole: Vector3) -> Dictionary:
 	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * 0.08, sole - Vector3.UP * 0.30, 1)
@@ -718,6 +730,7 @@ func _clear_player_flash() -> void:
 	_player_flash_remaining = 0.0
 
 func reset_player() -> void:
+	_foot_contact_tick = -1
 	if player_health == 0:
 		player.is_dead = false
 		player.set_process_input(true)
