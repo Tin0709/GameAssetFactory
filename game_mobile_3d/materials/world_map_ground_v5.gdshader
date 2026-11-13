@@ -9,6 +9,9 @@ render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_source_terrain.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
 #include "res://materials/world_map_terrain_pbr.gdshaderinc"
+#ifdef GAF_WORLD_FLAT_TURF
+#include "res://materials/world_map_turf_ambient.gdshaderinc"
+#endif
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 #include "res://materials/world_map_regional_sky.gdshaderinc"
 #define GAF_TERRAIN_NIGHT_SKY
@@ -86,7 +89,7 @@ void fragment() {
 		ALBEDO = shade_world_surface(color.rgb, surface_world, surface_top);
 		ALBEDO = grade_stone_twilight(grade_night_path(ALBEDO, surface_top));
 	}
-#ifdef GAF_WORLD_SPATIAL_TERRAIN
+#if defined(GAF_WORLD_SPATIAL_TERRAIN) || defined(GAF_WORLD_FLAT_TURF)
 	float dawn_turf = 0.0;
 	if (gaf_dawn_turf_color > 0.0 && use_source_terrain && (ground_grade == 1 || ground_grade == 2) && surface_top > .998) {
 		dawn_turf = gaf_dawn_turf_weight(surface_world, CAMERA_POSITION_WORLD) * gaf_dawn_turf_coverage(ALBEDO);

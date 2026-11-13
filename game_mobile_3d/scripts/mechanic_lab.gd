@@ -31,6 +31,7 @@ const FINISHER_SHAKE_INNER_RADIUS := 1.5
 const FINISHER_SHAKE_OUTER_RADIUS := 3.0
 const FINISHER_SHAKE_HEIGHT_FRACTION := 0.008
 const PRIVATE_CONTROLS := "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E %s · R về giữa"
+const TIME_PRESETS := [2.5, 7.0, 12.0, 16.5, 18.5, 19.5, 22.0]
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD }
 
@@ -403,7 +404,12 @@ func _physics_process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.physical_keycode == KEY_T and event.pressed and not event.echo:
-		showcase.set_hour(showcase.next_shortcut_hour())
+		var next_hour: float = TIME_PRESETS[0]
+		for preset: float in TIME_PRESETS:
+			if preset > showcase.hour:
+				next_hour = preset
+				break
+		showcase.set_hour(next_hour)
 		_update_time_label()
 		get_viewport().set_input_as_handled()
 		return

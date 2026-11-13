@@ -341,6 +341,7 @@ func setup_flat_lab(world: Node3D) -> void:
 	process_priority = -10
 	if forest_active():
 		_setup_point_lighting()
+		projected_sun.setup()
 	_capture_day()
 	_setup_atmosphere()
 	_create_atmosphere_overlay(level.get_node("HUD"))
@@ -666,9 +667,9 @@ func _exit_tree()->void:
 	if RenderingServer.frame_pre_draw.is_connected(_sync_point_camera):
 		RenderingServer.frame_pre_draw.disconnect(_sync_point_camera)
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
+		projected_sun.release()
+		RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 		if not _flat_lab:
-			projected_sun.release()
-			RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 			forest_replay.publish_bounce(0.0)
 			forest_replay.release_surface()
@@ -1199,7 +1200,8 @@ func refresh_daylight_shading() -> void:
 	if forest_active() and atmosphere_review in ["lighting", "combined"] and level.look.direct_clouds_active():
 		phase = PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 	projected_sun.set_weight(_lighting_scale(&"projected_sun") * phase)
-	projected_sun.set_shift(level.projected_sun_shift * _lighting_scale(&"projected_sun_position"))
+	var shift := Vector2.ZERO if _flat_lab else level.projected_sun_shift as Vector2
+	projected_sun.set_shift(shift * _lighting_scale(&"projected_sun_position"))
 	projected_sun.set_softness(0. if _balanced_preview else _lighting_scale(&"projected_sun_softness"))
 	var gain := .64 * _lighting_scale(&"sun_opening") * phase if not _balanced_preview else 0.
 	if gain != _opening_gain:
@@ -1279,7 +1281,7 @@ func _publish_dawn_turf_color() -> void:
 	var strength := 0.0
 	if not _balanced_preview and atmosphere_review == "combined" and forest_spatial_sky_context() \
 			and captured_sky_response and sky_response.available() and moonlight_enabled \
-			and plants != null and plants.grass_light.active and is_instance_valid(_player_light):
+			and (_flat_lab or (plants != null and plants.grass_light.active)) and is_instance_valid(_player_light):
 		strength = _dawn_shadow_weight() * _lighting_scale(&"dawn_turf_color")
 	if strength != _dawn_turf_color:
 		_dawn_turf_color = strength
@@ -1912,6 +1914,7 @@ func end_environment_edit()->void:
 func set_hour(value:float)->void:
 	hour=fposmod(value,24.);apply_time()
 	if _flat_lab:
+		_publish_dawn_turf_color()
 		_update_mist()
 	elif level!=null:
 		level.look._refresh_ground_bounce()
@@ -1995,8 +1998,8 @@ func sync_world_outline() -> void:
 func apply_time()->void:
 	if (not private_primary and not _flat_lab) or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
+	refresh_daylight_shading()
 	if not _flat_lab:
-		refresh_daylight_shading()
 		_publish_night_path_chroma()
 		_publish_stone_twilight_color()
 		_sync_twilight_crown()

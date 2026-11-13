@@ -48,7 +48,7 @@ void light() {
 #endif
 		if (LIGHT_IS_DIRECTIONAL) incident *= cloud_transmission;
 		vec3 diffuse_incident = incident;
-#ifdef GAF_WORLD_SPATIAL_TERRAIN
+#if defined(GAF_WORLD_SPATIAL_TERRAIN) || defined(GAF_WORLD_FLAT_TURF)
 		if (gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && surface_top > 0.998 && ground_grade == 1
 			&& gaf_is_player_point(LIGHT_IS_DIRECTIONAL,LIGHT_COLOR.b)) {
 			// Only the green side of the grass/soil blend receives the turf correction.
