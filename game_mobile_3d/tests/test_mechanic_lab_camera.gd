@@ -42,6 +42,54 @@ func run() -> void:
 	check(lab._shake_age > age, "A second target in the same swing does not restart the camera pulse")
 	lab.reset_player()
 	check(is_zero_approx(contact(lab, Vector3(1, 0, 0), 104, "Attack2", 1)), "Sword ordinary strike has zero shake")
+	await check_sabre_dive(lab)
 	lab.free()
 	print("PAWN_SHAKE_RANGE failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_sabre_dive(lab) -> void:
+	var landings: Array[int] = []
+	lab.player.heavy_jump_landed.connect(func(_point, _forward, _serial, _height):
+		landings.append(Engine.get_physics_frames()))
+	for attempt in 2:
+		lab.reset_player()
+		for i in 8:
+			await physics_frame
+		lab.get_node("HUD/DropMedium").pressed.emit()
+		for i in 2:
+			await physics_frame
+		var event := InputEventKey.new()
+		event.physical_keycode = KEY_E
+		event.pressed = true
+		root.push_input(event, true)
+		for i in 2:
+			await physics_frame
+		event = InputEventKey.new()
+		event.physical_keycode = KEY_E
+		root.push_input(event, true)
+		for i in Engine.physics_ticks_per_second:
+			await physics_frame
+			if landings.size() > attempt:
+				break
+		check(landings.size() == attempt + 1, "A real Sabre dive lands on the empty floor")
+		if landings.size() != attempt + 1:
+			return
+		check(lab._shake_duration == 0.0, "Touchdown leaves the camera stable until the montage cue")
+		if attempt == 1:
+			lab.reset_player()
+		var onset := -1
+		for i in 8:
+			await physics_frame
+			if lab._shake_duration > 0.0 and onset < 0:
+				onset = Engine.get_physics_frames() - 1
+		if attempt == 1:
+			check(onset < 0 and is_zero_approx(lab.camera.h_offset), "Reset discards a queued aerial shake")
+			return
+		var delay := ceili(0.052268848 * Engine.physics_ticks_per_second)
+		check(onset == landings[0] + delay, "The Sabre camera pulse starts at its montage cue with no target")
+		lab._process(1.0 / 60.0)
+		check(not is_zero_approx(lab.camera.h_offset), "The aerial cue moves the actual camera")
+		for i in 15:
+			lab._process(1.0 / 60.0)
+		check(is_zero_approx(lab.camera.h_offset), "The pulse settles back to the original camera offset")
+		print("SABRE_DIVE_SHAKE touchdown=", landings[0], " onset=", onset)
