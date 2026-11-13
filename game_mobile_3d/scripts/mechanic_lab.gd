@@ -184,6 +184,7 @@ func _ready() -> void:
 		dust.name = "MovementDust"
 		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _grass_landing_contact_at,
 				player.source_step_dust_size):
+			dust.use_source_landing()
 			add_child(dust)
 		else:
 			dust.free()

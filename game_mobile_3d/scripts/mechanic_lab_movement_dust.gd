@@ -9,6 +9,9 @@ const CAPACITY := 16
 const HEAVY_PARTICLE_COUNT := 10
 const STEP_ALPHA_PATH := "reports/depth/vfx/step-dust-alpha.private.json"
 const STEP_ALPHA_HASH := "c2dae47cc6feaad21508e960739ab5451fcdd691bb194b70ffd85380285579ff"
+const LANDING_CURVES_PATH := "reports/depth/vfx/landing-dust-curves.private.json"
+const LANDING_CURVES_HASH := "c3144bc6635533a38f59e99fc7b63037beb00209fad19295ff0e37a8156151a3"
+const LANDING_STEP := 1.0 / 60.0
 # Keep the lab grass tint. The dirt and stone tints lift the source tile
 # medians toward a lighter, less saturated dust color.
 const SURFACE_DUST := {
@@ -25,6 +28,8 @@ class Particle:
 	var duration := 0.0
 	var opacity := 0.0
 	var run_drag := 0.0
+	var landing_tick := -1
+	var landing_position: Vector3
 
 var _actor: CharacterBody3D
 var _ground: CollisionShape3D
@@ -42,6 +47,9 @@ var _random := RandomNumberGenerator.new()
 var _run_profile: Callable
 var _run_alpha := PackedFloat32Array()
 var _run_alpha_duration := 1.0
+var _landing_alpha := PackedFloat32Array()
+var _landing_alpha_duration := 1.0
+var _landing_drag := PackedFloat32Array()
 
 func _ready() -> void:
 	set_physics_process(false)
@@ -81,6 +89,15 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 	actor.presentation_reset.connect(clear)
 	set_process(false)
 	return true
+
+func use_source_landing() -> void:
+	var path := WeaponSource.verified_path(WeaponSource.research_root(), LANDING_CURVES_PATH, LANDING_CURVES_HASH)
+	if path.is_empty():
+		return
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
+	_landing_alpha = PackedFloat32Array(data.alpha)
+	_landing_alpha_duration = float(data.alpha_duration)
+	_landing_drag = PackedFloat32Array(data.drag)
 
 static func _load_mask() -> Texture2D:
 	var atlas := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(128, 64))
@@ -136,6 +153,8 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 			return
 	if step_size > 0.0:
 		_emit_run_dust(ground_point, surface, step_size)
+	elif landed and not heavy and not _landing_alpha.is_empty():
+		_emit_source_landing(ground_point, surface)
 	else:
 		_emit_dust(ground_point, surface, landed, heavy)
 
@@ -167,6 +186,7 @@ func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: boo
 		particle.velocity = radial * _random.randf_range(0.18, 0.62) - motion * 0.065 + Vector3.UP * 0.25
 		particle.age = 0.0
 		particle.run_drag = 0.0
+		particle.landing_tick = -1
 		particle.duration = _random.randf_range(0.19, 0.28) if landed else _random.randf_range(0.14, 0.22)
 		particle.opacity = 0.58 if landed else (0.44 if running else 0.36)
 		particle.sprite.frame = FRAMES[_random.randi_range(0, FRAMES.size() - 1)]
@@ -192,13 +212,57 @@ func _emit_run_dust(ground_point: Vector3, surface: String, size: float) -> void
 	particle.age = 0.0
 	particle.duration = _random.randf_range(0.80, 1.75)
 	particle.run_drag = _random.randf_range(4.0, 10.0)
+	particle.landing_tick = -1
+	_show_source_particle(particle, surface, size, _run_alpha[0])
+	set_process(true)
+
+func _emit_source_landing(ground_point: Vector3, surface: String) -> void:
+	# NS_PlayerLanding_Medium_Dust at full scalability. The launch occupies
+	# the band from 85 to 90 degrees about the vertical axis.
+	for i in _random.randi_range(4, 6):
+		var particle := _particles[_next]
+		_next = (_next + 1) % _particles.size()
+		particle.origin = ground_point + Vector3.UP * 0.50
+		particle.landing_position = particle.origin
+		particle.landing_tick = 0
+		particle.age = 0.0
+		particle.duration = _random.randf_range(1.0, 2.0)
+		particle.run_drag = 0.0
+		var yaw := _random.randf_range(0.0, TAU)
+		var up := _random.randf_range(0.0, sin(deg_to_rad(5.0)))
+		var planar := sqrt(1.0 - up * up)
+		particle.velocity = Vector3(cos(yaw) * planar, up, sin(yaw) * planar) * _random.randf_range(20.0, 35.0)
+		_show_source_particle(particle, surface, 1.0, _landing_alpha[0])
+	set_process(true)
+
+func _show_source_particle(particle: Particle, surface: String, size: float, alpha: float) -> void:
 	particle.sprite.frame = FRAMES[_random.randi_range(0, FRAMES.size() - 1)]
 	particle.sprite.pixel_size = size / 16.0
 	particle.sprite.scale = Vector3.ONE
 	particle.sprite.global_position = particle.origin
-	particle.sprite.modulate = Color(SURFACE_DUST.get(surface, SURFACE_DUST.grass), _run_alpha[0])
+	particle.sprite.modulate = Color(SURFACE_DUST.get(surface, SURFACE_DUST.grass), alpha)
 	particle.sprite.show()
-	set_process(true)
+
+static func _sample_curve(curve: PackedFloat32Array, normalized_age: float) -> float:
+	var cursor := clampf(normalized_age, 0.0, 1.0) * (curve.size() - 1)
+	var index := floori(cursor)
+	return lerpf(curve[index], curve[mini(index + 1, curve.size() - 1)], cursor - index)
+
+func _update_source_landing(particle: Particle) -> void:
+	# Use the cooked semi-implicit velocity update on a fixed clock, with
+	# interpolation to the current render time between simulation ticks.
+	var tick := floori(particle.age / LANDING_STEP)
+	while particle.landing_tick < tick:
+		particle.landing_tick += 1
+		var progress := particle.landing_tick * LANDING_STEP / particle.duration
+		var drag := _sample_curve(_landing_drag, progress)
+		particle.velocity = (particle.velocity + Vector3.UP * 0.50 * LANDING_STEP) / (1.0 + drag * LANDING_STEP)
+		particle.landing_position += particle.velocity * LANDING_STEP
+	var remainder := particle.age - particle.landing_tick * LANDING_STEP
+	var next_drag := _sample_curve(_landing_drag, (particle.landing_tick + 1) * LANDING_STEP / particle.duration)
+	var next_velocity := (particle.velocity + Vector3.UP * 0.50 * LANDING_STEP) / (1.0 + next_drag * LANDING_STEP)
+	particle.sprite.global_position = particle.landing_position + next_velocity * remainder
+	particle.sprite.modulate.a = _sample_curve(_landing_alpha, particle.age / (particle.duration * _landing_alpha_duration))
 
 func _process(delta: float) -> void:
 	var active := false
@@ -210,15 +274,17 @@ func _process(delta: float) -> void:
 			particle.sprite.hide()
 			continue
 		var progress := particle.age / particle.duration
+		if particle.landing_tick >= 0:
+			_update_source_landing(particle)
+			active = true
+			continue
 		if particle.run_drag > 0.0:
 			# Closed form of upward acceleration with linear drag, sampled
 			# by age so the rendered path is independent of render cadence.
 			var drag := particle.run_drag
 			var height := (particle.age - (1.0 - exp(-drag * particle.age)) / drag) / drag
 			particle.sprite.global_position = particle.origin + Vector3.UP * height
-			var cursor := progress / _run_alpha_duration * (_run_alpha.size() - 1)
-			var index := floori(cursor)
-			particle.sprite.modulate.a = lerpf(_run_alpha[index], _run_alpha[index + 1], cursor - index)
+			particle.sprite.modulate.a = _sample_curve(_run_alpha, progress / _run_alpha_duration)
 			active = true
 			continue
 		particle.sprite.global_position = particle.origin + particle.velocity * particle.age * (1.0 - 0.4 * progress)
