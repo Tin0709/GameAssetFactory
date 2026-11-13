@@ -36,6 +36,10 @@ const AIR_STRIKE := {"damage": 24, "range_m": 2.5, "strength": 1150.0, "angle": 
 	"stagger": 42.0, "splash_stagger": 0.5}
 const AIR_OFFSET := 1.25
 const AIR_CONTACT := 24.0 / 30.0
+# The GLB has a separate edge surface but no export of its material instance
+# parameters. Use the two colors sampled from the verified MD2 inventory icon.
+const LEFT_GLOW := Color("#a9f4e6")
+const RIGHT_GLOW := Color("#faf474")
 
 static func icon() -> Texture2D:
 	return Source.icon(DIRECTORY, "T_UI_Gauntlets_Unique_Icon", ICON_HASH)
@@ -43,6 +47,20 @@ static func icon() -> Texture2D:
 static func load_mesh(actor: CharacterBody3D, root: String) -> Mesh:
 	return Source.load_mesh(actor, root, DIRECTORY, "SM_Gauntlet_RL", MESH_HASH,
 		"T_Gauntlet_Unique", TEXTURE_HASH)
+
+static func with_edge_color(mesh: Mesh, color: Color) -> Mesh:
+	var result := mesh.duplicate() as Mesh
+	for surface in result.get_surface_count():
+		var source := result.surface_get_material(surface) as BaseMaterial3D
+		if source == null or not source.resource_name.begins_with("MI_Gauntlet_EdgeHighlight"):
+			continue
+		var edge := source.duplicate() as BaseMaterial3D
+		edge.albedo_color = color
+		edge.emission_enabled = true
+		edge.emission = color
+		edge.emission_energy_multiplier = 0.45
+		result.surface_set_material(surface, edge)
+	return result
 
 static func combat_profile(root: String) -> Dictionary:
 	var result := Source.profile()

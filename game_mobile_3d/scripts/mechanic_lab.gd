@@ -446,10 +446,10 @@ func _load_gauntlets(root: String) -> bool:
 	player.skeleton.add_child(socket)
 	_left_gauntlet = MeshInstance3D.new()
 	_left_gauntlet.name = "LabLeftGauntlet"
-	_left_gauntlet.mesh = mesh
+	_left_gauntlet.mesh = Gauntlets.with_edge_color(mesh, Gauntlets.LEFT_GLOW)
 	_left_gauntlet.hide()
 	socket.add_child(_left_gauntlet)
-	_gauntlet_mesh = mesh
+	_gauntlet_mesh = Gauntlets.with_edge_color(mesh, Gauntlets.RIGHT_GLOW)
 	_gauntlet_profile = profile
 	_combat_audio.load_gauntlets(root)
 	return true
