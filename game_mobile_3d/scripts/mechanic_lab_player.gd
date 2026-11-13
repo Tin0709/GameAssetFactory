@@ -55,6 +55,9 @@ func _combat_stride_pose(phase: float, speed: float) -> Array[Transform3D]:
 		return hybrid_motion.run_pose(phase)
 	return super._combat_stride_pose(phase, speed)
 
+func _restart_combat_stride() -> bool:
+	return not crossbow_equipped and super._restart_combat_stride()
+
 func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 	if key not in GAITS or (key not in LabLocomotion.WALKS and not weapon_source_locomotion):
 		return super._outgoing_locomotion_sampler(key, phase)

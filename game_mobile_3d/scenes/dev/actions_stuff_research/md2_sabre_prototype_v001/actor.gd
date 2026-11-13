@@ -605,6 +605,9 @@ func _uses_native_jump_pose(key:String)->bool:
 func _combat_stride_pose(phase: float, speed: float) -> Array[Transform3D]:
 	return source_gait.compose(phase, speed)
 
+func _restart_combat_stride() -> bool:
+	return bool(runtime_locomotion_profile.combat.get("leg_restart_on_resume", false))
+
 func _animate(delta:float)->void:
 	if foot_placement!=null:foot_placement.restore()
 	var permission_before:bool=combo.movement_allowed()
@@ -642,7 +645,7 @@ func _animate(delta:float)->void:
 	if composed_gait:source_gait.apply(animation_player.current_animation_position/float(clips[selected].duration),motion_speed)
 	if layered_combat:
 		var leg_state:Dictionary=source_gait.state(motion_speed)
-		if moving_legs and not _combat_was_moving and bool(runtime_locomotion_profile.combat.get("leg_restart_on_resume",false)):_gait_resume_phase=0.
+		if moving_legs and not _combat_was_moving and _restart_combat_stride():_gait_resume_phase=0.
 		var before_phase:=_gait_resume_phase
 		var advance_phase:=delta/float(leg_state.period) if moving_legs else 0.
 		_gait_resume_phase=fposmod(before_phase+advance_phase,1.)
