@@ -27,6 +27,7 @@ const CROSSBOW_FLIGHT_HASHES := [
 const GAUNTLET_COMBO := "Items/Weapons/Weapon_Melee/6_weapons_melee_basicCombo/Attack%d/sfx_gauntlets_unique_attack_%s_%02d.ogg"
 const GAUNTLET_HIT := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_gauntlets_01.ogg"
 const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_%02d.ogg"
+const GAUNTLET_SLAM := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_attack_%02d.ogg"
 const GAUNTLET_SWING_HASHES := {
 	"light": [
 		"5ca970f981961963617c5903b5bb66505e76ceefc41ab0ad52286ecdd738e07f",
@@ -49,6 +50,12 @@ const GAUNTLET_JUMP_HASHES := [
 	"230dae33f21cd973a3067b847caa782f1ed8e31d13d11b7584a22a4f6b7aab03",
 	"db1d1e7820566272a5e1369020d2b3f916c94f404fe3b60f4393190759d38707",
 	"7044a9c787f1b5d3899af16cb54172a8206eb80798672a1394f41f4cb4b52f6c",
+]
+const GAUNTLET_SLAM_HASHES := [
+	"31648091805b06775cb500bc319a6d167d2f9b02c8fcc5101449c3bddd1042a0",
+	"e64bc9c59f7e1c7eb280dc410720abfc3cf7cc84e4d3f0bd7143b9650f971fe8",
+	"7460d1a1176685546fb4aa0881818c6c27bc72f68f0e1761dfc41730903b5304",
+	"3fa2cef3debb07c586fd84f11c280651a8233ab5050421f4aa6017482dc8cfdb",
 ]
 const MAULER_DIVE := "Items/Enchantments/3_Activate/sfx_enchantment_maulerDive-%03d.ogg"
 const MAULER_DIVE_HASHES := [
@@ -223,11 +230,12 @@ func _exit_tree() -> void:
 func contact(point: Vector3, serial: int, lethal: bool, clip := "") -> void:
 	if not enabled:
 		return
-	# Projectile collisions already play their own cue, including terrain hits.
-	if serial != _last_weapon_serial and clip != CrossPollinator.SHOT:
+	# Projectiles and the gauntlet slam play their impact at the collision itself.
+	var uses_collision_cue := clip == CrossPollinator.SHOT or (clip == "AirAttack" and gauntlets_equipped)
+	if serial != _last_weapon_serial and not uses_collision_cue:
 		_last_weapon_serial = serial
 		var group := _weapon_hit_group()
-		if clip.begins_with("NativeGauntlet") or (clip == "AirAttack" and gauntlets_equipped):
+		if clip.begins_with("NativeGauntlet"):
 			group = &"gauntlet_hit"
 		_play(group, point, HIT_GAIN_DB)
 	_play(&"death" if lethal else &"hurt", point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
@@ -257,6 +265,8 @@ func load_gauntlets(root: String) -> void:
 		"b5dd3f6184aec5dbaea52ae9e4b9b139487515f0b019004cc7523221ac1fa883")
 	for i in GAUNTLET_JUMP_HASHES.size():
 		_load_sample(root, &"gauntlet_jump", GAUNTLET_JUMP % (i + 1), GAUNTLET_JUMP_HASHES[i])
+	for i in GAUNTLET_SLAM_HASHES.size():
+		_load_sample(root, &"gauntlet_slam", GAUNTLET_SLAM % (i + 1), GAUNTLET_SLAM_HASHES[i])
 	for i in MAULER_DIVE_HASHES.size():
 		_load_sample(root, &"mauler_dive", MAULER_DIVE % (i + 1), MAULER_DIVE_HASHES[i])
 
@@ -293,8 +303,9 @@ func gauntlet_swung(point: Vector3, index: int, airborne: bool) -> void:
 	if enabled:
 		_play(&"gauntlet_jump" if airborne else StringName("gauntlet_swing_%d" % index), point, HIT_GAIN_DB)
 
-func mauler_dive_landed(point: Vector3) -> void:
+func gauntlet_slam_landed(point: Vector3) -> void:
 	if enabled:
+		_play(&"gauntlet_slam", point, SLAM_GAIN_DB)
 		_play(&"mauler_dive", point, SLAM_GAIN_DB)
 
 func slam_landed(point: Vector3, surface: String = "grass") -> void:
