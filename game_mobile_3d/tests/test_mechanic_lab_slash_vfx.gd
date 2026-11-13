@@ -57,6 +57,38 @@ func run() -> void:
 	lab.reset_player()
 	await physics_frame
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
-	print("MECHANIC_LAB_SLASH_VFX failures=", failures)
 	lab.free()
+	await check_world_map_slash()
+	print("SABRE_SLASH_VFX failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_world_map_slash() -> void:
+	var world := (load("res://scenes/WorldMap.tscn") as PackedScene).instantiate()
+	root.add_child(world)
+	current_scene = world
+	var ribbon: MeshInstance3D = world.player.effects.ribbon
+	var material := ribbon.material_override as ShaderMaterial
+	var source: Texture2D
+	if material != null:
+		source = material.get_shader_parameter(&"source_slash") as Texture2D
+	check(source != null and source.get_size() == Vector2(128, 128)
+		and material.get_shader_parameter(&"use_source_slash") == true,
+		"WorldMap equips the verified MD2 mask on the live Sabre ribbon")
+	for i in 20:
+		await physics_frame
+	attack(true)
+	var animated_uv := false
+	for i in 90:
+		await process_frame
+		if ribbon.mesh.get_surface_count() > 0:
+			var uvs: PackedVector2Array = ribbon.mesh.surface_get_arrays(0)[Mesh.ARRAY_TEX_UV]
+			for uv in uvs:
+				animated_uv = animated_uv or uv.y > 0.03
+		if animated_uv:
+			break
+	attack(false)
+	check(animated_uv, "WorldMap E input animates the mask on the live blade ribbon")
+	world.reset_player()
+	await physics_frame
+	check(ribbon.mesh.get_surface_count() == 0, "WorldMap reset clears the blade ribbon")
+	world.free()
