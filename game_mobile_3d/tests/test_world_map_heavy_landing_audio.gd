@@ -71,4 +71,6 @@ func run() -> void:
 			"Audio off stops landing tails and restores silence")
 	print("WORLD_MAP_HEAVY_LANDING_AUDIO failures=", failures)
 	world.free()
+	# Let the Dummy mixer release its retired stream playbacks.
+	await create_timer(0.20, true, false, true).timeout
 	quit(0 if failures.is_empty() else 1)
