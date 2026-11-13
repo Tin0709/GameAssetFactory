@@ -117,6 +117,9 @@ var _player_hit_serial := 0
 var _foot_contact_tick := -1
 var _foot_contact_sole: Vector3
 var _foot_contact: Dictionary
+var _landing_contact_tick := -1
+var _landing_contact_point: Vector3
+var _landing_contact: Dictionary
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
 @onready var _impact_light: OmniLight3D = $CombatImpactLight
@@ -622,23 +625,37 @@ func _grass_contact_at(sole: Vector3) -> Dictionary:
 	return {"position": hit.position, "surface": "grass"}
 
 func _grass_landing_contact_at(point: Vector3) -> Dictionary:
-	var contact := _grass_contact_at(point)
-	if not contact.is_empty():
-		return contact
+	var tick := Engine.get_physics_frames()
+	if tick != _landing_contact_tick or point != _landing_contact_point:
+		_landing_contact_tick = tick
+		_landing_contact_point = point
+		_landing_contact = _resolve_grass_landing_contact(point)
+	return _landing_contact
+
+func _resolve_grass_landing_contact(point: Vector3) -> Dictionary:
+	# A sole outside a ledge can raycast to the grass below. Prefer the
+	# actual floor contact from this move_and_slide, including non-grass.
 	var min_normal_y := cos(player.floor_max_angle)
 	var closest := INF
 	var nearest := Vector3.ZERO
+	var floor_body: CollisionObject3D
 	for i in player.get_slide_collision_count():
 		var collision := player.get_slide_collision(i)
 		for index in collision.get_collision_count():
-			if collision.get_collider(index) != $Ground or collision.get_normal(index).y < min_normal_y:
+			if collision.get_normal(index).y < min_normal_y:
+				continue
+			var collider := collision.get_collider(index) as CollisionObject3D
+			if collider == null or (collider.collision_layer & 1) == 0:
 				continue
 			var position := collision.get_position(index)
 			var distance := position.distance_squared_to(point)
 			if distance < closest:
 				closest = distance
 				nearest = position
-	return {"position": nearest, "surface": "grass"} if closest < INF else {}
+				floor_body = collider
+	if floor_body == null:
+		return _grass_contact_at(point)
+	return {"position": nearest, "surface": "grass"} if floor_body == $Ground else {}
 
 func _on_zombie_step(sole: Vector3) -> void:
 	var support: Variant = null
@@ -946,6 +963,7 @@ func _clear_player_flash() -> void:
 
 func reset_player() -> void:
 	_foot_contact_tick = -1
+	_landing_contact_tick = -1
 	if player_health == 0:
 		player.is_dead = false
 		player.set_process_input(true)
