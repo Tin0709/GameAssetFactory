@@ -214,9 +214,7 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 			toggle.button_pressed = false
 			toggle.button_pressed = true
 		elif attempt == 3:
-			var selector := lab.get_node("HUD/Weapon") as OptionButton
-			selector.select(1)
-			selector.item_selected.emit(1)
+			lab._on_player_hit(100)
 		var playback_frame := -1
 		var dust_frame := -1
 		var swing_frame := -1
@@ -249,7 +247,7 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 				" playback=", playback_frame, " peak=", peak)
 		else:
 			check(playback_frame == -1 and swing_frame == -1 and swing.played_count == before_swing,
-				"Reset, mute and weapon switching discard unplayed Sabre swing and grass cues")
+				"Reset, mute and defeat discard unplayed Sabre swing and grass cues")
 	check(movement.event_count.landing == 0, "The heavy attack does not also play ordinary landing audio")
 	toggle.button_pressed = false
 	lab.free()
