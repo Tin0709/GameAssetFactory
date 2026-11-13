@@ -3,6 +3,8 @@ extends Node3D
 
 const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
+const FILL_HOLD_SECONDS := 0.12
+const FILL_DRAIN_PER_SECOND := 1.9
 
 var digits: Array[Texture2D]
 var effects: Node3D
@@ -13,6 +15,7 @@ var bar_slot := -1
 var _health_ratio := 1.0
 var _delayed_ratio := 1.0
 var _delay := 0.0
+var _fill_pending := false
 var _serial := 0
 static var _bar_mesh: QuadMesh
 static var _bar_material: ShaderMaterial
@@ -45,15 +48,22 @@ func show_hit(amount: int, remaining: int, maximum: int) -> void:
 			bar.hide()
 	else:
 		_update_bar_fill()
-	_delay = 0.12
+	_delay = FILL_HOLD_SECONDS
+	_fill_pending = remaining > 0 and bar_slot >= 0
 	set_process(remaining > 0)
 	_spawn_number(amount)
 
 func _process(delta: float) -> void:
+	if _fill_pending:
+		# The first displayed hit already has the new red fill. Do not
+		# charge time before the hit to the yellow fill's hold.
+		_fill_pending = false
+		return
+	var drain_time := maxf(0.0, delta - _delay) if bar_slot >= 0 else delta
 	_delay = maxf(0.0, _delay - delta)
 	if _delay > 0.0:
 		return
-	_delayed_ratio = move_toward(_delayed_ratio, _health_ratio, delta * 1.9)
+	_delayed_ratio = move_toward(_delayed_ratio, _health_ratio, drain_time * FILL_DRAIN_PER_SECOND)
 	_update_bar_fill()
 	if is_equal_approx(_delayed_ratio, _health_ratio):
 		set_process(false)
