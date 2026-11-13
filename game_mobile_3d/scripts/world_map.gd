@@ -10,6 +10,7 @@ const CAMERA_ZOOM_STEP := 1.15
 const GAMEPLAY_CAMERA_NEAR := -8.0
 const GROVE_REVIEW := preload("res://scripts/world_map_grove.gd")
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
+const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 const LocalMistRegion = preload("res://scripts/local_mist_region.gd")
@@ -158,7 +159,7 @@ func _ready() -> void:
 	canopy_player_cue.name = "CanopyPlayerCue"
 	add_child(canopy_player_cue)
 	showcase.setup(self)
-	_setup_movement_dust()
+	_setup_movement_effects()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
 	terrain_light.name="TerrainColoredTransport";add_child(terrain_light);terrain_light.setup(self)
 	player_light=load("res://scripts/world_map_player_transport.gd").new()
@@ -193,7 +194,7 @@ func index_columns() -> void:
 		solid_intervals[column].append(Vector2(low,high))
 		if entry.category=="terrain":columns[column]=maxf(float(columns.get(column,-INF)),high)
 
-func _setup_movement_dust() -> void:
+func _setup_movement_effects() -> void:
 	if player.get("primary_ready") != true:
 		return
 	var dust := MovementDust.new()
@@ -202,6 +203,12 @@ func _setup_movement_dust() -> void:
 		add_child(dust)
 	else:
 		dust.free()
+	var wind := MovementWind.new()
+	wind.name = "MovementWind"
+	if wind.setup(player):
+		add_child(wind)
+	else:
+		wind.free()
 
 func _setup_heavy_landing_audio() -> void:
 	if player.get("primary_ready") != true:
