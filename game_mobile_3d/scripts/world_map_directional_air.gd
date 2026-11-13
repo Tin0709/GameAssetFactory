@@ -124,15 +124,31 @@ func sun_slots() -> Vector4:
 	gain *= smoothstep(0., .2, _sun.shadow_opacity)
 	if gain <= 0. or _sun.light_energy <= 0.:
 		return Vector4.ZERO
-	var high := clampi(_hours.bsearch(h), 1, _hours.size() - 1)
+	var sample_hour := h
+	if _review.sunrise_elevation_active:
+		sample_hour = _hour_for_elevation(_sun.global_basis.z.y, h)
+	var high := clampi(_hours.bsearch(sample_hour), 1, _hours.size() - 1)
 	var low := high - 1
-	var weight := inverse_lerp(_hours[low], _hours[high], h)
+	var weight := inverse_lerp(_hours[low], _hours[high], sample_hour)
 	var expected := _directions[low].slerp(_directions[high], weight)
 	var error := expected.angle_to(_sun.global_basis.z.normalized())
 	gain *= 1. - smoothstep(deg_to_rad(.45), deg_to_rad(1.35), error)
 	if gain <= 0. or not _geometry_current():
 		return Vector4.ZERO
 	return Vector4(_slots[low], _slots[high], weight, gain)
+
+func _hour_for_elevation(up: float, fallback: float) -> float:
+	# Find a morning bracket in the existing visibility atlas. The azimuth
+	# guard in sun_slots still rejects directions not supported by this bake.
+	for i in range(1, _directions.size()):
+		if _hours[i] > 12.0:
+			break
+		var low := _directions[i - 1].y
+		var high := _directions[i].y
+		if high > low and up >= low and up <= high:
+			return lerpf(_hours[i - 1], _hours[i], inverse_lerp(low, high, up))
+	return fallback
+
 
 func _geometry_current() -> bool:
 	for row: Dictionary in _casters:

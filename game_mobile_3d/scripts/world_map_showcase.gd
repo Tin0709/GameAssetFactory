@@ -38,6 +38,7 @@ var _key_response_toggle:CheckButton
 var direction_response=preload("res://scripts/world_map_light_direction.gd").new()
 var captured_key_direction:=true
 var key_direction_active:=false
+var sunrise_elevation_active := false
 var _direction_toggle:CheckButton
 var _player_source_toggle:CheckButton
 var sky_response=preload("res://scripts/world_map_sky_response.gd").new()
@@ -138,6 +139,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"evening_mist_profile": ["Sương hoàng hôn", 1.],
 	&"evening_key_response": ["Ánh trực tiếp lúc chạng vạng", 1.],
 	&"sunrise_key_response": ["Nắng chuyển lúc bình minh", 1.],
+	&"sunrise_elevation": ["Góc nắng rạng sáng", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"sculk_surface": ["Sculk phát sáng", 1.],
@@ -172,7 +174,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 92
+const LIGHTING_MIX_VERSION := 93
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -391,6 +393,7 @@ func set_audio_enabled(value:bool)->void:
 		actor.environment_audio.audio.footsteps_enabled=value;actor.environment_audio.audio.rustle_enabled=value
 
 func _restore_day()->void:
+	sunrise_elevation_active = false
 	key_response_active=false
 	key_direction_active=false
 	sky_response_active=false
@@ -613,6 +616,27 @@ func _apply_sunrise_key(sun: DirectionalLight3D) -> void:
 	if peak > 0.0:
 		sun.light_color = Color(rgb.x / peak, rgb.y / peak, rgb.z / peak).linear_to_srgb()
 		sun.light_energy = peak
+
+func _apply_sunrise_elevation(sun: DirectionalLight3D) -> void:
+	sunrise_elevation_active = false
+	if _balanced_preview or atmosphere_review != "combined" or not key_direction_active \
+			or not key_response.sunrise_elevation_available() or hour <= 4.5 or hour >= 8.5:
+		return
+	var weight := _lighting_scale(&"sunrise_elevation") * smoothstep(4.5, 5.5, hour)
+	weight *= lerpf(0.50, 0.30, smoothstep(6.0, 7.0, hour)) * (1.0 - smoothstep(7.0, 8.5, hour))
+	if weight <= 0.0:
+		return
+	var noon := Basis.from_euler(Vector3(_day.sun_rotation) * (PI / 180.0), sun.rotation_order).z
+	var target: float = key_response.sample_sunrise_up(hour) * noon.y / direction_response.anchors[-1].y
+	var direction := sun.basis.z
+	var up := lerpf(direction.y, clampf(target, 0.0, noon.y), weight)
+	if is_equal_approx(up, direction.y):
+		return
+	var horizontal := Vector3(direction.x, 0.0, direction.z).normalized()
+	var adjusted := horizontal * sqrt(1.0 - up * up) + Vector3.UP * up
+	sun.rotation = Basis.looking_at(-adjusted, Vector3.UP).get_euler(sun.rotation_order)
+	sunrise_elevation_active = true
+
 
 func set_source_bloom_shape(value:bool)->void:
 	source_bloom_shape=value;set_coupled_bloom(coupled_bloom)
@@ -1625,6 +1649,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 92 and effect == &"sunrise_key_response":
 			missing_value = 0.
+		if version < 93 and effect == &"sunrise_elevation":
+			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
 		if version < 84 and effect == &"night_stone_blue_softness":
@@ -1680,6 +1706,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
 		if effect == &"sunrise_key_response":
 			slider.editable = slider.editable and key_response.sunrise_available()
+		if effect == &"sunrise_elevation":
+			slider.editable = slider.editable and key_response.sunrise_elevation_available() and direction_response.available()
 		if effect == &"evening_key_response":
 			slider.editable = slider.editable and key_response.evening_available()
 		if effect == &"evening_lantern":
@@ -1863,6 +1891,7 @@ func terrain_ambient_matches(color:Color,source:Color)->bool:
 
 func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	key_response_active=false
+	sunrise_elevation_active = false
 	key_direction_active=false
 	sky_response_active=false
 	var p:=forest.sample(hour)
@@ -1894,6 +1923,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 			env.ambient_light_energy *= lerpf(1.0, .75, _lighting_scale(&"twilight_ambient") * twilight_finish_weight())
 		_apply_key_mix(sun)
 		_apply_sunrise_key(sun)
+		_apply_sunrise_elevation(sun)
 		# In full shade, block the direct beam and leave ambient fill to its own path.
 		_apply_direct_shadow_opacity(sun)
 		if _player_light!=null:

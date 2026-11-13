@@ -7,6 +7,9 @@ const EVENING_FILE := "graphics_vfx/forest_pix_capture_20261112/forest_evening_k
 const EVENING_SHA := "be941bfefe0c28784cd737c0e940b437ea590799c9298802ee6bc39f1e0eb4bd"
 const SUNRISE_FILE := "graphics_vfx/forest_pix_capture_20261112/forest_twilight_fixed_lights/sunrise_key_profile.private.json"
 const SUNRISE_SHA := "ef9c20acb4c6f6319c551b7c7d2bd0f699045465fd4c246489ef4469fec61a2e"
+const SUNRISE_ELEVATION_FILE := "graphics_vfx/forest_pix_capture_20261112/forest_twilight_fixed_lights/sunrise_elevation_profile.private.json"
+const SUNRISE_ELEVATION_SHA := "ae5f5c0a25393d064380cab38d046e6882388e593037f4a854ee48f5ab7850de"
+var _sunrise_up := PackedFloat32Array()
 var _sunrise_hours := PackedFloat32Array()
 var _sunrise_ratios := PackedVector3Array()
 var anchors:Array=[]
@@ -31,6 +34,7 @@ func _init()->void:
  anchors=rows;verified=true
  _load_evening(root.path_join(EVENING_FILE))
  _load_sunrise(root.path_join(SUNRISE_FILE))
+ _load_sunrise_elevation(root.path_join(SUNRISE_ELEVATION_FILE))
 func available()->bool:return verified and anchors.size()==HOURS.size()
 func sample(hour:float)->Vector3:
  if not available()or not is_finite(hour):return Vector3.ONE
@@ -94,3 +98,34 @@ func sample_sunrise(hour: float) -> Vector3:
    var weight := clampf(inverse_lerp(_sunrise_hours[i - 1], _sunrise_hours[i], hour), 0.0, 1.0)
    return _sunrise_ratios[i - 1].lerp(_sunrise_ratios[i], weight)
  return _sunrise_ratios[-1]
+
+
+func _load_sunrise_elevation(path: String) -> void:
+ if not sunrise_available() or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != SUNRISE_ELEVATION_SHA:
+  return
+ var profile: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+ if not profile is Dictionary or profile.get("schema") != "private-sunrise-elevation/1":
+  return
+ var rows: Variant = profile.get("anchors")
+ if not rows is Array or rows.size() != _sunrise_hours.size():
+  return
+ var values := PackedFloat32Array()
+ for i in rows.size():
+  var row: Variant = rows[i]
+  if not row is Dictionary or row.get("hour") != _sunrise_hours[i]:
+   return
+  var up: Variant = row.get("up")
+  if not (up is float or up is int) or not is_finite(up) or up < 0.0 or up >= 1.0:
+   return
+  values.append(up)
+ _sunrise_up = values
+
+func sunrise_elevation_available() -> bool:
+ return sunrise_available() and _sunrise_up.size() == _sunrise_hours.size()
+
+func sample_sunrise_up(hour: float) -> float:
+ for i in range(1, _sunrise_hours.size()):
+  if hour <= _sunrise_hours[i]:
+   var weight := clampf(inverse_lerp(_sunrise_hours[i - 1], _sunrise_hours[i], hour), 0.0, 1.0)
+   return lerpf(_sunrise_up[i - 1], _sunrise_up[i], weight)
+ return _sunrise_up[-1]
