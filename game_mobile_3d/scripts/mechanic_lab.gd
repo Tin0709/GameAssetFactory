@@ -435,8 +435,10 @@ func _load_crossbow(root: String) -> bool:
 	_crossbow.name = "CrossPollinator"
 	_crossbow.bolt_mesh = bolt
 	_crossbow.ammo_changed.connect(_set_crossbow_ammo)
+	_crossbow.shot_fired.connect(_combat_audio.crossbow_fired)
 	_crossbow.bolt_impact.connect(_on_crossbow_impact)
 	_crossbow.bolt_launched.connect(_combat_audio.crossbow_flight)
+	_crossbow.bolt_ended.connect(_combat_audio.stop_crossbow_flight)
 	$CombatEffects.add_child(_crossbow)
 	_set_crossbow_ammo(_crossbow.ammo)
 	_combat_audio.load_crossbow(root)
@@ -500,8 +502,7 @@ func _on_grounded_attack(index: int, clip: String, serial: int) -> void:
 	else:
 		direction = $Zombies.bolt_direction(muzzle, forward, serial)
 	var clearance_start := Vector3(player.global_position.x, muzzle.y, player.global_position.z)
-	if _crossbow.fire(muzzle, direction, serial, clearance_start):
-		_combat_audio.crossbow_fired(muzzle)
+	_crossbow.fire(muzzle, direction, serial, clearance_start)
 
 func _setup_world_look() -> void:
 	var viewport := get_viewport()

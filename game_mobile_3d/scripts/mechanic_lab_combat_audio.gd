@@ -303,6 +303,15 @@ func crossbow_flight(bolt: Node3D) -> void:
 		_flight_targets[voice] = bolt
 		set_process(true)
 
+func stop_crossbow_flight(bolt: Node3D) -> void:
+	var slot := _flight_targets.find_key(bolt) as AudioStreamPlayer3D
+	if slot == null:
+		return
+	slot.stop()
+	_flight_targets.erase(slot)
+	if _flight_targets.is_empty():
+		set_process(false)
+
 func _process(_delta: float) -> void:
 	for voice: AudioStreamPlayer3D in _flight_targets.keys():
 		var bolt: Variant = _flight_targets[voice]

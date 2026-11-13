@@ -3,7 +3,9 @@ extends Node3D
 
 signal ammo_changed(amount: int)
 signal bolt_impact(hit: Dictionary, direction: Vector3, serial: int)
+signal shot_fired(origin: Vector3)
 signal bolt_launched(bolt: Node3D)
+signal bolt_ended(bolt: Node3D)
 
 const Source := preload("res://scripts/mechanic_lab_weapon_source.gd")
 const SourceGait := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
@@ -114,6 +116,7 @@ func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vec
 	ammo -= 1
 	_recharge_remaining = RECHARGE_DELAY + RECHARGE_PERIOD
 	ammo_changed.emit(ammo)
+	shot_fired.emit(origin)
 	var clearance := PhysicsRayQueryParameters3D.create(clearance_start, origin, WORLD_MASK)
 	clearance.hit_from_inside = true
 	var obstruction := get_world_3d().direct_space_state.intersect_ray(clearance)
@@ -136,8 +139,7 @@ func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vec
 
 func reset() -> void:
 	for bolt: Dictionary in _bolts:
-		bolt.node.hide()
-		bolt.node.queue_free()
+		_remove_bolt(bolt.node)
 	_bolts.clear()
 	_recharge_remaining = 0.0
 	ammo = AMMO_MAX
@@ -163,11 +165,15 @@ func _physics_process(delta: float) -> void:
 		bolt.life -= delta
 		if not hit.is_empty() or bolt.life <= 0.000001:
 			_bolts.remove_at(index)
-			node.hide()
-			node.queue_free()
+			_remove_bolt(node)
 			if not hit.is_empty():
 				bolt_impact.emit(hit, bolt.direction, bolt.serial)
 		else:
 			node.global_position = end
 	if ammo == AMMO_MAX and _bolts.is_empty():
 		set_physics_process(false)
+
+func _remove_bolt(bolt: MeshInstance3D) -> void:
+	bolt.hide()
+	bolt.queue_free()
+	bolt_ended.emit(bolt)
