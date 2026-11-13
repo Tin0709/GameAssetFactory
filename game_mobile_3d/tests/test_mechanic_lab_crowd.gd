@@ -149,9 +149,8 @@ func check_health_bars(group: Node) -> void:
 	var first_slot: int = first._feedback.bar_slot
 	var second_slot: int = second._feedback.bar_slot
 	first.take_hit(1, Vector3.RIGHT, Vector2.ZERO, 0.0)
-	await process_frame
-	await process_frame
 	# The dummy renderer does not store the instance transforms or custom data.
+	# Read the hit state before a slow render frame can advance the delayed fill.
 	var headless := DisplayServer.get_name() == "headless"
 	var first_bar: Color = batch._fills[first_slot] if headless else batch.multimesh.get_instance_custom_data(first_slot)
 	var second_bar: Color = batch._fills[second_slot] if headless else batch.multimesh.get_instance_custom_data(second_slot)
@@ -159,6 +158,8 @@ func check_health_bars(group: Node) -> void:
 	if not is_equal_approx(first_bar.r, expected) or not is_equal_approx(first_bar.g, 1.0) \
 			or not is_equal_approx(second_bar.r, 1.0):
 		failures.append("Expected independent hit and delayed fills: got %s and %s" % [first_bar, second_bar])
+	await process_frame
+	await process_frame
 	var position: Vector3 = batch._positions[first_slot] if headless else batch.multimesh.get_instance_transform(first_slot).origin
 	var centre := batch.to_global(position)
 	if centre.distance_to(first.global_position + Vector3.UP * 2.16) > 0.15:
