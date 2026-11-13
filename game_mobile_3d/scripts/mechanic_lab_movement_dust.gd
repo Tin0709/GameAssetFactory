@@ -5,6 +5,8 @@ const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Smoke/T_SmokePi
 const SOURCE_SHA256 := "78d326787c4065d70e227ec386a7330f53621c8733ad114bc80eaea7f7f1b5fc"
 const FRAMES := [0, 9, 10, 16, 24, 25]
 const CAPACITY := 16
+# Keep the lab grass tint. The dirt and stone tints lift the source tile
+# medians toward a lighter, less saturated dust color.
 const SURFACE_DUST := {
 	"grass": Color("#c8b67b"),
 	"dirt": Color("#b1815d"),
@@ -82,7 +84,7 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		if absf(local.x) > half.x or absf(local.z) > half.z:
 			return
 		ground_point = _ground.to_global(Vector3(local.x, half.y, local.z))
-	var tint: Color = SURFACE_DUST[surface]
+	var tint: Color = SURFACE_DUST.get(surface, SURFACE_DUST.grass)
 	var motion := _actor.get_real_velocity()
 	motion.y = 0.0
 	var running := motion.length_squared() > 16.0

@@ -55,6 +55,22 @@ func run() -> void:
 			saw_live_dust = saw_live_dust or dust.get_children().any(func(sprite): return sprite.visible)
 		Input.action_release("move_forward")
 		check(saw_live_dust, "Actual WorldMap movement emits dust with default audio disabled")
+		world.reset_player()
+		for i in 12:
+			await physics_frame
+		var landing_bursts: Array[int] = []
+		world.player.surface_contact.connect(func(_point: Vector3, landed: bool):
+			if landed:
+				landing_bursts.append(dust.get_children().filter(func(sprite): return sprite.visible).size()))
+		Input.action_press("jump")
+		await physics_frame
+		await physics_frame
+		Input.action_release("jump")
+		for i in 85:
+			await physics_frame
+			if not landing_bursts.is_empty():
+				break
+		check(landing_bursts == [5], "An actual WorldMap jump emits exactly one burst on landing")
 	print("WORLD_MAP_MOVEMENT_DUST failures=", failures)
 	world.free()
 	quit(0 if failures.is_empty() else 1)
