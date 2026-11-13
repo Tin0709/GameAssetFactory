@@ -95,6 +95,7 @@ var _shake_serial := -1
 var _shake_age := 0.0
 var _shake_duration := 0.0
 var _shake_strength := 0.0
+var _shake_pending := false
 var _slam_shake_frame := -1
 var _slam_burst_frame := -1
 var _slam_burst_point: Vector3
@@ -102,6 +103,7 @@ var _slam_burst_serial := -1
 var _light_serial := -1
 var _light_remaining := 0.0
 var _light_peak := 0.0
+var _light_pending := false
 var _player_flash_remaining := 0.0
 var _player_flash_pending := false
 var _player_flash_material: ShaderMaterial
@@ -570,19 +572,24 @@ func _process(delta: float) -> void:
 				for mesh: MeshInstance3D in _player_overlays:
 					mesh.set_instance_shader_parameter(&"player_hit_flash", weight)
 	if _shake_duration > 0.0:
-		# Sample the hit at age zero on its first displayed frame.
+		# Begin at age zero and charge only intervals after the first frame.
+		if _shake_pending:
+			_shake_pending = false
+		else:
+			_shake_age = minf(_shake_age + delta, _shake_duration)
 		var decay := 1.0 - _shake_age / _shake_duration
 		var pulse := cos(TAU * 15.0 * _shake_age) * decay * decay
 		camera.h_offset = camera.size * _shake_strength * pulse
 		if _shake_age >= _shake_duration:
 			_shake_duration = 0.0
-		else:
-			_shake_age = minf(_shake_age + delta, _shake_duration)
 	if _impact_light.visible:
+		if _light_pending:
+			_light_pending = false
+		else:
+			_light_remaining = maxf(0.0, _light_remaining - delta)
 		var decay := _light_remaining / CONTACT_LIGHT_DURATION
 		_impact_light.light_energy = _light_peak * decay * decay
 		_impact_light.visible = _light_remaining > 0.0
-		_light_remaining = maxf(0.0, _light_remaining - delta)
 
 func _setup_movement_audio() -> void:
 	var manifest := PrivateOverworldBundle.default_path()
@@ -695,11 +702,13 @@ func _start_camera_shake(strength: float) -> void:
 	_shake_strength = strength
 	_shake_age = 0.0
 	_shake_duration = HEAVY_SHAKE_DURATION
+	_shake_pending = true
 
 func _clear_camera_shake() -> void:
 	_slam_shake_frame = -1
 	_shake_serial = -1
 	_shake_duration = 0.0
+	_shake_pending = false
 	camera.h_offset = 0.0
 	camera.v_offset = 0.0
 
@@ -771,6 +780,7 @@ func _start_contact_light(point: Vector3, serial: int, energy: float) -> void:
 	_light_serial = serial
 	_light_peak = energy
 	_light_remaining = CONTACT_LIGHT_DURATION
+	_light_pending = true
 	_impact_light.global_position = point
 	_impact_light.light_energy = _light_peak
 	_impact_light.show()
@@ -779,6 +789,7 @@ func _clear_contact_light() -> void:
 	_slam_burst_frame = -1
 	_light_serial = -1
 	_light_remaining = 0.0
+	_light_pending = false
 	_impact_light.light_energy = 0.0
 	_impact_light.hide()
 
