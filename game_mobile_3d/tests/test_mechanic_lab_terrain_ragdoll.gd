@@ -196,6 +196,49 @@ func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame:
 	wall.free()
 	lab.free()
 
+func check_wall_pinned_joint() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	await ticks(12)
+	var group := lab.get_node("Zombies")
+	group._spawn_serial = 29
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	if group.get_child_count() != 1:
+		check(false, "The wall-pinned joint fixture loads a source zombie")
+		lab.free()
+		return
+	var wall := terrain(lab, Vector3(4.5, 1.5, 0), Vector3(0.30, 3.0, 18.0), 0.0)
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	await ticks(2)
+	zombie.global_position = Vector3(4.05, 0.02, -2.25)
+	zombie.rotation.y = 2.913067
+	zombie.animation.stop()
+	zombie.ragdoll.skeleton.reset_bone_poses()
+	zombie.animation.play(&"Zombie_Walk_Variant2")
+	zombie.animation.advance(0.0)
+	zombie.animation.seek(0.30, true)
+	var ragdoll = zombie.ragdoll
+	for i in 2:
+		ragdoll.sample(1.0 / 60.0)
+	zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, zombie.DeathStrike.SABRE_FINISHER)
+	zombie.set_physics_process(true)
+	var peak := 0.0
+	var farthest := -INF
+	for i in 90:
+		await physics_frame
+		if not ragdoll.running:
+			continue
+		peak = maxf(peak, ragdoll.max_anchor_error())
+		for body: PhysicalBone3D in ragdoll.bodies.values():
+			farthest = maxf(farthest, body.global_position.x)
+	check(peak > 0.0 and peak < 0.15, "The wall-pinned shoulder stays within the Lab recovery limit")
+	check(farthest < 4.65, "Shoulder recovery keeps the ragdoll on the near side")
+	print("LAB_WALL_PINNED_JOINT peak=", peak, " farthest=", farthest)
+	wall.free()
+	lab.free()
+
 func check_edge_landing_gravity() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -241,6 +284,7 @@ func run() -> void:
 	await check_straddled_wall_handoff(&"Zombie_BasicAttack", 3, 17, "Arm.L")
 	await check_straddled_wall_handoff(&"Zombie_Walk", 2, 11, "Arm.L")
 	await check_straddled_wall_handoff(&"Zombie_Staggered", 11, 7, "Head")
+	await check_wall_pinned_joint()
 	await check_edge_landing_gravity()
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
