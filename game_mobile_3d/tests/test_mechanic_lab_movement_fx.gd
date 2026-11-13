@@ -86,6 +86,7 @@ func run() -> void:
 	check(visible_particles(dust) == 0 and visible_particles(wind) == 0, "Reset clears both movement effects")
 	await check_heavy_dust_timing(lab, dust)
 	await check_running_wake_support(lab, wind)
+	await check_floor_edge_landing(lab, dust)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
 	lab.free()
@@ -167,8 +168,41 @@ func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 	check(visible_particles(dust) == 0 and not dust.is_physics_processing(),
 		"Reset cancels heavy dust that has not appeared yet")
 
+func check_floor_edge_landing(lab, dust: Node3D) -> void:
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	var movement = lab.get_node("MovementAudio")
+	var audio = lab.get_node("CombatAudio")
+	for heavy in [false, true]:
+		lab.reset_player()
+		lab.player.global_position = Vector3(49.99, 0.03, 0.0)
+		for i in 12:
+			await physics_frame
+		var ordinary_before: int = movement.event_count.landing
+		var heavy_before: int = audio._next_choice.get(&"slam_grass", 0)
+		check(lab.player.drop_for_lab(5.0), "The edge fixture starts a real drop")
+		lab.player.global_position.x = 50.20
+		if heavy:
+			await press_heavy_attack()
+		var max_dust := 0
+		for i in 70:
+			await physics_frame
+			max_dust = maxi(max_dust, visible_particles(dust))
+		check(lab.player.is_on_floor() and lab.player.global_position.x > 50.0,
+			"The capsule lands while its centre is past the grass edge")
+		check(max_dust == (10 if heavy else 5), "The edge landing emits one full dust burst")
+		if heavy:
+			check(audio._next_choice.get(&"slam_grass", 0) == (heavy_before + 1) % 6
+				and movement.event_count.landing == ordinary_before, "The edge dive plays one heavy grass cue")
+		else:
+			check(movement.event_count.landing == ordinary_before + 1, "The ordinary edge landing plays grass audio once")
+	toggle.button_pressed = false
+
 func start_heavy_drop(lab) -> void:
 	lab.get_node("HUD/DropMedium").pressed.emit()
+	await press_heavy_attack()
+
+func press_heavy_attack() -> void:
 	for i in 2:
 		await physics_frame
 	var attack := InputEventKey.new()
