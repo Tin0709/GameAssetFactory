@@ -19,6 +19,7 @@ const FLOOR_LANDING_LIFT_THRESHOLD := 0.045
 const FLOOR_LANDING_MAX_LIFT_REDUCTION := 0.02
 const FLOOR_SUPPORTED_SHARED_LIFT := 0.03
 const FLOOR_ROLL_SHARED_LIFT := 0.04
+const FLOOR_SINGLE_PART_SHARED_LIFT := 0.024
 const FLOOR_PREDICTION_SLOP := 0.01
 const FLOOR_PREDICTION_MIN_CLOSING_SPEED := 0.6
 const FLOOR_PREDICTION_FRICTION := 0.15
@@ -852,7 +853,10 @@ func _project_floor_contact() -> void:
 				# Give a single support more clearance, while limiting the
 				# late lift that can make the whole body hop a second time.
 				var roll_blend := smoothstep(0.20, 0.36, floor_impact_blend)
-				shared_lift = lerpf(shared_lift, FLOOR_ROLL_SHARED_LIFT, roll_blend)
+				# When only one part penetrates, correct more of its depth
+				# locally instead of lifting the five parts above the floor.
+				var target_lift := FLOOR_SINGLE_PART_SHARED_LIFT if depths.size() == 1 else FLOOR_ROLL_SHARED_LIFT
+				shared_lift = lerpf(shared_lift, target_lift, roll_blend)
 		var anchor_lifts: Dictionary[PhysicalBone3D, float] = {}
 		if _limit_first_contact_stretch and (landing_blended or floor_impact_blend < EARLY_ROLL_ANCHOR_BLEND_END) \
 				and not depths.is_empty():
