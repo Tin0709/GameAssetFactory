@@ -239,6 +239,12 @@ func check_crossbow_fire_under_impact_burst(audio: Node, bus: int, capture: Audi
 	print("MECHANIC_LAB_CROSSBOW_FIRE peak=", peak)
 	fire.bus = &"Master"
 	audio.reset()
+	for i in 3:
+		audio.crossbow_impact(point)
+	audio.crossbow_fired(point)
+	check(audio._voices.any(func(voice): return voice.playing and voice.stream in fire_samples),
+		"Polaris can still fire when the impacts arrive first on the same tick")
+	audio.reset()
 
 func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
