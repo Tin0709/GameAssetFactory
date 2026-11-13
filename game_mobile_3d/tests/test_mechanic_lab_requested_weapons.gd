@@ -52,12 +52,19 @@ func run() -> void:
 
 	equip(menu, 3)
 	var ammo := lab.get_node("HUD/CrossbowAmmo") as Label
+	var sound := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	sound.button_pressed = true
+	var combat_audio = lab.get_node("CombatAudio")
+	var fire_samples: Array = combat_audio._groups.get(&"crossbow_fire", [])
+	var impact_samples: Array = combat_audio._groups.get(&"crossbow_hit", [])
+	check(fire_samples.size() == 3 and impact_samples.size() == 3, "All verified nỏ firing and impact samples load")
 	check(menu.selected == 3 and ammo.visible and ammo.text.contains("25 / 25"), "Crossbow equips with full ammo")
 	attack(true)
 	await ticks(2)
 	attack(false)
 	await ticks(24)
 	check(target.health == 92 and contacts.size() == 1, "A tap shoots one 8-damage bolt at a ranged target")
+	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 1, "A living hit plays exactly one arrow impact")
 	check(ammo.text.contains("24 / 25"), "One projectile consumes one arrow")
 	await ticks(115)
 	check(ammo.text.contains("25 / 25"), "Ammo refills")
@@ -76,6 +83,9 @@ func run() -> void:
 	attack(false)
 	await ticks(64)
 	check(target.health == 92 and contacts.size() == 1, "A wall blocks the bolt from hitting the zombie")
+	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 2, "A wall hit plays the next arrow impact")
+	check(combat_audio._next_choice.get(&"crossbow_fire", 0) == 2, "Two shots use two different firing samples")
+	sound.button_pressed = false
 	barrier.queue_free()
 
 	lab.reset_player()
@@ -139,9 +149,7 @@ func run() -> void:
 	check(target.health <= 65, "Gauntlet combo applies its own 10/11/14 damage")
 	lab.reset_player()
 	await ticks(12)
-	var sound := lab.get_node("HUD/CombatAudioToggle") as CheckButton
 	sound.button_pressed = true
-	var combat_audio = lab.get_node("CombatAudio")
 	var mauler_samples: Array = combat_audio._groups.get(&"mauler_dive", [])
 	check(mauler_samples.size() == 3, "All three verified MD2 Mauler Dive samples load")
 	lab.get_node("HUD/DropMedium").pressed.emit()
