@@ -58,6 +58,8 @@ var _rustle_index:=0
 var _nature_index:=0
 var _heavy_landing_frame := -1
 var landing_contact: Callable
+var protect_landing_voice := false
+var _step_landing: Array[bool] = []
 
 func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted, terrain_contact: Callable = Callable())->void:
 	actor=body;meadow=field;reader=bundle;config=reader.data.get("audio_config",{});_random.seed=281027
@@ -80,6 +82,7 @@ func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted, terrain_contact:
 		_make_bed("wind",float(config.get("wind_db",-19.)))
 	for i in 4:
 		step_voices.append(_voice("Footstep",float(config.get("footstep_radius_m",8.))))
+		_step_landing.append(false)
 		if meadow != null:
 			rustle_voices.append(_voice("Vegetation",float(config.get("environment_radius_m",7.))))
 	if meadow != null:
@@ -189,14 +192,32 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	if footsteps_enabled and not heavy:
 		var db := float(config.get("landing_db", -9.0)) if landed else float(config.get("footsteps_db", -14.0))
 		var cue := "land_" + key if landed and not groups.get("land_" + key, []).is_empty() else key
-		_play(cue, step_voices[_step_index % 4], point, db, 1.0)
-		_step_index += 1
-		if landed:
-			event_count.landing += 1
+		var slot := _choose_step_slot(landed)
+		if slot >= 0:
+			_play(cue, step_voices[slot], point, db, 1.0)
+			_step_landing[slot] = landed
+			_step_index = (slot + 1) % step_voices.size()
+			if landed:
+				event_count.landing += 1
 	if rustle_enabled and meadow != null and meadow.interactions_enabled and key != "stone" and meadow.has_foliage(point):
 		var rustle_db := float(config.get("rustle_db", -22.0)) - (3.0 if actor.current_speed < 4.0 else 0.0)
 		_play("rustle", rustle_voices[_rustle_index % 4], point + Vector3.UP * 0.3, rustle_db, 1.0)
 		_rustle_index += 1
+
+func _choose_step_slot(landed: bool) -> int:
+	if not protect_landing_voice:
+		return _step_index
+	# Playing includes cues waiting to start on the next physics tick.
+	var replace_step := -1
+	for offset in step_voices.size():
+		var slot := (_step_index + offset) % step_voices.size()
+		if not step_voices[slot].playing:
+			return slot
+		if replace_step < 0 and not _step_landing[slot]:
+			replace_step = slot
+	if replace_step < 0 and landed:
+		return _step_index
+	return replace_step
 
 func reset_contacts()->void:
 	for voice:AudioStreamPlayer3D in step_voices:voice.stop()

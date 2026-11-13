@@ -607,6 +607,7 @@ func _setup_movement_audio() -> void:
 	add_child(_movement_audio)
 	_movement_audio.setup(player, null, bundle, _player_foot_contact_at)
 	_movement_audio.landing_contact = _grass_landing_contact_at
+	_movement_audio.protect_landing_voice = true
 
 func _player_foot_contact_at(sole: Vector3) -> Dictionary:
 	# Audio, dust and wind receive the same planted-foot event in the same tick.
