@@ -311,21 +311,56 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		"A real Sabre dive applies all seven hits on the same physics frame")
 	check(audio._next_choice.get(&"hit", 0) == (hit_choice + 1) % 5,
 		"A crowd dive still plays one weapon hit")
+	await process_frame
+	await process_frame
+	var listener := lab.player.get_node("CombatAudioListener") as AudioListener3D
+	var ear := listener.global_position
+	deaths.sort_custom(func(a: Vector3, b: Vector3): return a.distance_squared_to(ear) < b.distance_squared_to(ear))
 	var audible_deaths: Array[Vector3] = []
 	for voice in reactions:
 		if voice.playing and voice.stream in audio._groups[&"death"]:
 			audible_deaths.append(voice.global_position)
 	check(audible_deaths.size() == 3 and audible_deaths.all(func(point): return point in deaths.slice(0, 3)),
-		"The first three death cues keep their spatial voices through same-frame overflow")
-	check(audio._next_choice.get(&"death", -1) == 0 and audio._next_choice.get(&"hurt", -1) == 1,
+		"The three nearest death cues play through same-frame overflow")
+	check(audio._next_choice.get(&"death", -1) == 0 and audio._next_choice.get(&"hurt", 0) == 0,
 		"Suppressed zombie reactions do not advance sample rotation")
 	await create_timer(0.2).timeout
 	var peak := 0.0
 	for sample in capture.get_buffer(capture.get_frames_available()):
 		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
 	check(peak > 0.001 and peak < 0.9, "The isolated zombie reaction pool reaches the mixer with headroom")
+	audio.reset()
+	var points: Array[Vector3] = []
+	for i in 100:
+		var point := ear + Vector3(2.0, 0.0, (100 - i) * 0.04)
+		points.append(point)
+		audio.contact(point, 1001, false)
+	await process_frame
+	await process_frame
+	var nearest := points.slice(-3)
+	check(reactions.all(func(voice): return voice.stream in audio._groups[&"hurt"]
+		and voice.global_position in nearest), "A far-first hurt burst plays the three nearest reactions")
+	var hurt_choice: int = audio._next_choice.get(&"hurt", 0)
+	for point in points:
+		audio.contact(point, 1002, false)
+		audio.contact(point, 1002, true)
+	await process_frame
+	await process_frame
+	check(reactions.all(func(voice): return voice.stream in audio._groups[&"death"]
+		and voice.global_position in nearest) and audio._next_choice.get(&"hurt", 0) == hurt_choice,
+		"The nearest deaths replace active hurts without selecting suppressed hurt samples")
+	audio.reset()
+	var death_choice: int = audio._next_choice.get(&"death", 0)
+	audio.contact(ear + Vector3.RIGHT * 40.0, 1003, true)
+	await process_frame
+	await process_frame
+	check(reactions.all(func(voice): return voice.stream == null)
+		and audio._next_choice.get(&"death", 0) == death_choice,
+		"An out-of-range death does not reserve a reaction voice")
+	audio.contact(nearest[0], 1004, true)
 	toggle.button_pressed = false
 	await create_timer(0.08).timeout
+	check(reactions.all(func(voice): return voice.stream == null), "Muting discards queued zombie reactions")
 	lab.free()
 
 func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
