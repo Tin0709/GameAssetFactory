@@ -46,6 +46,7 @@ func run() -> void:
 	check(menu.get_item_text(4) == "Prime Enchanter's Gauntlets", "Prime Enchanter's Gauntlets are named correctly")
 	await check_weapon_movement(lab, menu)
 	await check_crossbow_settle(lab, menu)
+	check_crossbow_equip_audio(lab, menu)
 	var group := lab.get_node("Zombies")
 	group.sabre_contact.connect(func(_p, _d, clip, _i, _s, _k): contacts.append(clip))
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
@@ -165,6 +166,9 @@ func run() -> void:
 
 	equip(menu, 4)
 	check(menu.selected == 4 and not ammo.visible, "Gauntlets equip and hide the ranged ammo")
+	var punch_hits: Array = combat_audio._groups.get(&"gauntlet_hit", [])
+	check(punch_hits.size() == 3 and punch_hits[0] != punch_hits[1] and punch_hits[1] != punch_hits[2],
+		"All three distinct MD2 gauntlet hitmarker variants load")
 	for i in 3:
 		var group_name := StringName("gauntlet_swing_%d" % i)
 		var samples: Array = combat_audio._groups.get(group_name, [])
@@ -317,3 +321,21 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 	equip(menu, 0)
 	lab.reset_player()
 	await ticks(12)
+
+func check_crossbow_equip_audio(lab: Node3D, menu: OptionButton) -> void:
+	var audio = lab.get_node("CombatAudio")
+	var sound := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var equip_samples: Array = audio._groups.get(&"crossbow_equip", [])
+	var unequip_samples: Array = audio._groups.get(&"crossbow_unequip", [])
+	check(equip_samples.size() == 1 and unequip_samples.size() == 1, "Both MD2 crossbow switch cues load")
+	sound.button_pressed = true
+	equip(menu, 3)
+	check(audio._voices.any(func(voice): return voice.playing and voice.stream in equip_samples),
+		"Equipping the crossbow plays its source cue")
+	equip(menu, 0)
+	check(audio._voices.any(func(voice): return voice.playing and voice.stream in unequip_samples),
+		"Switching away from the crossbow plays its source cue")
+	sound.button_pressed = false
+	equip(menu, 3)
+	equip(menu, 0)
+	check(not audio._voices.any(func(voice): return voice.playing), "Combat mute suppresses weapon switch cues")
