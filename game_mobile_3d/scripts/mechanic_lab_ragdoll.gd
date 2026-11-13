@@ -3,11 +3,14 @@ extends "res://scenes/dev/zombie_death_physics/ragdoll.gd"
 const DEEP_CONTACT_LIFT_START := 0.10
 const DEEP_CONTACT_LIFT_FULL := 0.112
 const DEEP_CONTACT_SHARED_LIFT := 0.065
+const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
+const WALL_HANDOFF_CHEST_MAX_SHIFT := 0.03
 
 var _sample_bone_ids: Dictionary[String, int]
 var _sample_body_offsets: Dictionary[String, Transform3D]
 var _sampled_skeleton_transform: Transform3D
 var _source_joint_biases: Dictionary[RID, float]
+var _wall_handoff_frame := -1
 var wall_handoff_animation: AnimationPlayer
 var wall_handoff_idle: StringName
 
@@ -80,6 +83,7 @@ func _handoff_wall_clearance() -> Vector3:
 	if space.intersect_shape(_handoff_bounds_query, 1).is_empty():
 		return Vector3.ZERO
 	if wall_handoff_animation != null and _handoff_straddles_wall(space, collision_mask):
+		_wall_handoff_frame = Engine.get_physics_frames()
 		return _blend_wall_handoff(space, collision_mask)
 	return super._handoff_wall_clearance()
 
@@ -267,6 +271,50 @@ func _constrain_free_anchor_motion(body: PhysicalBone3D, state: PhysicsDirectBod
 	var clearance := bounds.position.y - floor_half.y + FLOOR_REST_SLOP
 	motion.y = maxf(motion.y, -maxf(clearance, 0.0))
 	return motion
+
+func _project_source_anchors() -> void:
+	super._project_source_anchors()
+	if _wall_handoff_frame < 0 or Engine.get_physics_frames() - _wall_handoff_frame \
+			> roundi(WALL_HANDOFF_RECOVERY_SECONDS * Engine.physics_ticks_per_second):
+		return
+
+	# All five source joints share the chest. A side contact can block a
+	# limb's projection, so check whether the chest has room to meet it.
+	var chest: PhysicalBone3D = bodies.Chest
+	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if chest_state == null:
+		return
+	var motion := Vector3.ZERO
+	var largest_gap := 2.0 * SOURCE_ANCHOR_TOLERANCE
+	var gaps: Array[Vector3] = []
+	for name: String in source_joint_rids:
+		var spec: Dictionary = source_joints[name]
+		var limb: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
+		if state == null or spec.parent != "Chest":
+			return
+		var gap: Vector3 = (chest_state.transform * spec.parent_frame).origin \
+			- (state.transform * spec.child_frame).origin
+		gaps.append(gap)
+		var distance := gap.length()
+		if distance <= largest_gap:
+			continue
+		for index in state.get_contact_count():
+			var normal := state.get_contact_local_normal(index)
+			if absf(normal.y) >= MAX_WALL_NORMAL_Y or not state.get_contact_collider_object(index) is StaticBody3D:
+				continue
+			var blocked_distance := -gap.dot(normal) - SOURCE_ANCHOR_TOLERANCE
+			if blocked_distance > 0.0:
+				largest_gap = distance
+				motion = normal * minf(blocked_distance, WALL_HANDOFF_CHEST_MAX_SHIFT)
+				break
+	if motion.is_zero_approx():
+		return
+	for gap: Vector3 in gaps:
+		if (gap + motion).length() > largest_gap:
+			return
+	if not _test_projection_motion(chest, chest_state.transform, motion):
+		chest_state.transform = chest_state.transform.translated(motion)
 
 func _set_source_joint_bias(joint: RID, bias: float) -> void:
 	if _source_joint_biases.get(joint, -1.0) == bias:
