@@ -93,6 +93,7 @@ const TRUNK_HEIGHT := 2.6
 var _appearance := ShaderMaterial.new()
 var _canopy_appearance := ShaderMaterial.new()
 var player_cue_weight := 0.0
+var crown_ambient_depth := 0.0
 var _canopy_shadow := ShaderMaterial.new()
 var _direct_clouds := false
 var _mist_strength := -1.0
@@ -508,6 +509,14 @@ func set_crown_dusk_occlusion(value: float) -> void:
 	if spruce_available():
 		_spruce_appearance.set_shader_parameter("crown_dusk_occlusion", value)
 
+func set_crown_ambient_depth(value: float) -> void:
+	if crown_ambient_depth == value:
+		return
+	crown_ambient_depth = value
+	_canopy_appearance.set_shader_parameter("crown_ambient_depth", value)
+	if spruce_available():
+		_spruce_appearance.set_shader_parameter("crown_ambient_depth", value)
+
 func set_crown_detail(enabled: bool) -> void:
 	_canopy_appearance.set_shader_parameter("crown_detail", enabled)
 
@@ -531,7 +540,7 @@ func publish_crown_wind(enabled: bool, wind_phase: float, breeze_phase: float, t
 
 func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D, shape: Vector4, time: float) -> void:
 	if material.shader.get_meta("gaf_mist_base", material.shader) != shader:
-		var parameters := ["reveal_player", "player_view", "native_specular", "crown_dusk_occlusion"]
+		var parameters := ["reveal_player", "player_view", "native_specular", "crown_dusk_occlusion", "crown_ambient_depth"]
 		var values := parameters.map(material.get_shader_parameter)
 		material.shader = shader
 		for i in parameters.size():

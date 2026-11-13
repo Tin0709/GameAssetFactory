@@ -135,6 +135,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_replay_emission": ["Ánh bệ đá trong rừng", 1.],
 	&"forest_replay_bounce": ["Ánh hắt quanh bệ đá", 1.],
 	&"canopy_player_cue": ["Dáng nhân vật sau tán", 1.],
+	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
 	&"forest_path_placement": ["Vị trí đèn lối rừng", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
@@ -159,7 +160,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 80
+const LIGHTING_MIX_VERSION := 81
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1250,10 +1251,15 @@ func _sync_twilight_crown() -> void:
 	if level == null or level.grove == null:
 		return
 	var amount := 0.0
+	var depth := 0.0
 	if forest_active() and captured_sky_response:
 		# The sampled crown sky dropped to roughly 14% at the dusk anchor.
 		amount = .86 * twilight_finish_weight() * _lighting_scale(&"twilight_crown")
+		if level.grove.source_oaks and atmosphere_review == "combined" and not _balanced_preview:
+			var night := moonlight_weight(hour)
+			depth = lerpf(0.32 * twilight_finish_weight(), 0.62, night) * _lighting_scale(&"crown_ambient_depth")
 	level.grove.set_crown_dusk_occlusion(amount)
+	level.grove.set_crown_ambient_depth(depth)
 
 func _sync_oak_leaf_tint() -> void:
 	if level == null or level.grove == null:
@@ -1491,6 +1497,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 80 and effect == &"canopy_player_cue":
 			missing_value = 0.
+		if version < 81 and effect == &"crown_ambient_depth":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1636,7 +1644,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if plants != null:
 			plants.grass_light.sync()
 		return
-	if changed_effect == &"twilight_crown":
+	if changed_effect in [&"twilight_crown", &"crown_ambient_depth"]:
 		_sync_twilight_crown()
 		return
 	if changed_effect in [&"", &"oak_leaf_tint"]:

@@ -13,6 +13,7 @@ uniform float player_cue_weight = 0.0;
 global uniform float gaf_grove_sky_strength;
 varying float tree_sky;
 uniform float crown_dusk_occlusion = 0.0;
+uniform float crown_ambient_depth = 0.0;
 #endif
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/leaf_material_v001/leaf_material.gdshaderinc"
 #ifdef GAF_SHARED_MIST
@@ -167,8 +168,13 @@ void fragment() {
 		ambient_visibility = mix(1.0, tree_sky, amount);
 	}
 	// The validated tree atlases reserve the left half for leaf triangles.
-	if (use_source_atlas && UV.x < 0.5 && crown_dusk_occlusion > 0.0) {
+	if (use_source_atlas && UV.x < 0.5) {
 		ambient_visibility *= 1.0 - crown_dusk_occlusion;
+		if (crown_ambient_depth > 0.0) {
+			// Upper faces retain more sky fill than vertical and downward-facing leaves.
+			float up = clamp((mat3(INV_VIEW_MATRIX) * NORMAL).y, 0.0, 1.0);
+			ambient_visibility *= 1.0 - crown_ambient_depth * mix(1.0, 0.45, up);
+		}
 	}
 	AO = ambient_visibility;
 	AO_LIGHT_AFFECT = 0.0;
