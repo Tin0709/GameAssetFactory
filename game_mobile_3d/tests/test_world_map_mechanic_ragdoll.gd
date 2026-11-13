@@ -348,14 +348,16 @@ func check_supported_breakup(world: Node3D, group: Node3D, effects: Node3D) -> v
 	while zombie._corpse_age < 4.40:
 		await physics_frame
 	var mesh: MeshInstance3D = zombie._mesh
-	check(is_zero_approx(float(mesh.get_instance_shader_parameter("fragment_travel"))),
+	var travel: Variant = mesh.get_instance_shader_parameter("fragment_travel")
+	check(travel == null or is_zero_approx(float(travel)),
 		"The terrace corpse does not separate before its breakup window")
 	while zombie._corpse_age < 4.73:
 		await physics_frame
 	check(zombie._corpse_landed and zombie.ragdoll.running and zombie.ragdoll.contact_motion().supports > 0,
 		"The terrace fixture still has an active, supported ragdoll during breakup")
 	var directions: Variant = mesh.material_override.get_shader_parameter("fragment_directions")
-	check(float(mesh.get_instance_shader_parameter("fragment_travel")) > 0.0
+	travel = mesh.get_instance_shader_parameter("fragment_travel")
+	check(travel != null and float(travel) > 0.0
 		and directions is PackedVector3Array and directions.size() == mesh.skin.get_bind_count(),
 		"An active, supported corpse separates using its evaluated pose")
 	await ticks(20)
