@@ -463,7 +463,9 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	check(voices.size() == 3 and voices.all(func(voice): return voice.playing)
 		and audio._next_choice.get(&"zombie_step", 0) == (before_overflow + 3) % step_samples.size(),
 		"A 100-step burst uses only three voices without restarting them")
-	audio.zombie_attack(near, false)
+	group.zombie_attack_audio.emit(near, false)
+	await process_frame
+	await process_frame
 	check(audio._next_choice.get(&"zombie_windup", 0) == 1, "Step overflow leaves a telegraph voice available")
 	toggle.button_pressed = false
 	check(voices.all(func(voice): return not voice.playing and voice.stream == null),
@@ -520,25 +522,31 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 	await create_timer(0.12).timeout
 	var points: Array[Vector3] = []
 	for i in 100:
-		var point: Vector3 = lab.player.global_position + Vector3(2.0, 1.0, i * 0.01)
+		var point: Vector3 = lab.player.global_position + Vector3(2.0, 1.0, (100 - i) * 0.04)
 		points.append(point)
 		group.zombie_attack_audio.emit(point, false)
-	var leading_points := points.slice(0, 3)
+	await process_frame
+	await process_frame
+	var nearest_points := points.slice(-3)
 	check(audio._next_choice.get(&"zombie_windup", 0) == 3
-		and voices.all(func(voice): return voice.global_position in leading_points),
-		"A same-tick attack burst preserves the first three telegraphs")
+		and voices.all(func(voice): return voice.global_position in nearest_points),
+		"A same-tick attack burst plays the three nearest telegraphs")
 	# Let the real-time mixer start the telegraphs before the contact burst.
 	await create_timer(0.10).timeout
 	capture.clear_buffer()
 	for point in points:
 		group.zombie_attack_audio.emit(point, true)
+	await process_frame
+	await process_frame
 	var hit_voices := voices.filter(func(voice): return voice.stream in audio._groups[&"zombie_hit"])
 	check(audio._next_choice.get(&"zombie_hit", 0) == 3 and hit_voices.size() == voices.size()
-		and hit_voices.all(func(voice): return voice.global_position in leading_points),
-		"Confirmed contacts replace windups and preserve the first three contact cues")
+		and hit_voices.all(func(voice): return voice.global_position in nearest_points),
+		"Confirmed contacts replace windups with the three nearest contact cues")
 	var hit_streams := voices.map(func(voice): return voice.stream)
 	for point in points:
 		group.zombie_attack_audio.emit(point, false)
+	await process_frame
+	await process_frame
 	check(audio._next_choice.get(&"zombie_windup", 0) == 3
 		and hit_streams == voices.map(func(voice): return voice.stream),
 		"Overflow windups cannot cut off confirmed contact cues")
