@@ -174,7 +174,7 @@ func _ready() -> void:
 		$Zombies.setup_combat(player)
 		player.grounded_melee_aim = $Zombies.aim_sabre
 		player.connect("grounded_sabre_impact", $Zombies.strike_sabre)
-		player.connect("heavy_jump_landed", $Zombies.land_sabre)
+		player.connect("heavy_jump_landed", _on_heavy_jump_landed)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
 		player.presentation_reset.connect(_clear_camera_shake)
@@ -414,6 +414,16 @@ func _clear_camera_shake() -> void:
 	_shake_duration = 0.0
 	camera.h_offset = 0.0
 	camera.v_offset = 0.0
+
+func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_height: float) -> void:
+	# The capsule can stop slightly above support after a fast landing.
+	# Use the actual floor surface when evaluating the height thresholds.
+	var probe := Vector3.UP * 0.08
+	var ray := PhysicsRayQueryParameters3D.create(point + probe, point - probe, player.collision_mask, [player.get_rid()])
+	var support := get_world_3d().direct_space_state.intersect_ray(ray)
+	if not support.is_empty() and support.normal.y >= cos(player.floor_max_angle):
+		fall_height = maxf(0.0, fall_height + point.y - float(support.position.y))
+	$Zombies.land_sabre(point, facing, serial, fall_height)
 
 func _on_sabre_landing(point: Vector3, serial: int) -> void:
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
