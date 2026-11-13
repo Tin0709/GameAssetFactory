@@ -730,15 +730,18 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 	var two_parts: bool = motion.supports == 2
 	var flat_floor := is_instance_valid(_corpse_floor)
 	var speed_scale := 1.0 if flat_floor else 0.5
+	var intermittent_foot: bool = flat_floor and _death_strike == DeathStrike.SABRE_FINISHER \
+		and motion.supports == 1 and motion.leg_supported
 	var slow_support: bool = not normally_supported and not ragdoll.source_joints.is_empty() \
-		and motion.supports >= 2 \
+		and (motion.supports >= 2 or intermittent_foot) \
 		and motion.linear <= CORPSE_SETTLE_SPEED * speed_scale and motion.angular <= CORPSE_SETTLE_SPIN * speed_scale
 	if slow_support:
 		if flat_floor:
 			# A wall can carry the upper body while the floor carries the
 			# chest and legs, or both feet. Verify the pose stays put.
 			slow_support = motion.leg_supported and (not two_parts or motion.core_supports == 0) \
-				and ragdoll.has_flat_wall_rest_support(motion.core_supports > 0) \
+				and (ragdoll.has_wall_rest_with_near_foot() if intermittent_foot \
+					else ragdoll.has_flat_wall_rest_support(motion.core_supports > 0)) \
 				and ragdoll.max_anchor_error() <= Ragdoll.SOURCE_ANCHOR_TOLERANCE
 		else:
 			slow_support = motion.core_supports > 0 and (not two_parts or motion.leg_supported) \

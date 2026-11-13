@@ -387,7 +387,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 	zombie.set_physics_process(false)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 472031 + seed
-	var gap := rng.randf_range(0.47, 0.70) if seed < 64 else rng.randf_range(0.9, 3.0)
+	var gap := rng.randf_range(0.47, 0.70) if seed % 128 < 64 else rng.randf_range(0.9, 3.0)
 	zombie.global_position = Vector3(4.35 - gap, 0.02, 4.35 - gap + rng.randf_range(-0.035, 0.035))
 	zombie.rotation.y = rng.randf_range(-PI, PI)
 	zombie.animation.stop()

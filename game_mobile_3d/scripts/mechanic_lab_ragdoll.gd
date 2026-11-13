@@ -236,6 +236,30 @@ func has_flat_wall_rest_support(core_grounded: bool) -> bool:
 				return true
 	return false
 
+func has_wall_rest_with_near_foot() -> bool:
+	if _flat_floor.disabled or not has_flat_wall_rest_support(true):
+		return false
+	var floor_body := _flat_floor.get_parent()
+	var left: PhysicalBone3D = bodies["Leg.L"]
+	var right: PhysicalBone3D = bodies["Leg.R"]
+	var left_supported := _body_supported_by(left, floor_body)
+	var right_supported := _body_supported_by(right, floor_body)
+	if left_supported == right_supported:
+		return false
+	var floor_box := _flat_floor.shape as BoxShape3D
+	var floor_pose := _flat_floor.global_transform
+	if floor_box == null or not floor_pose.basis.y.is_equal_approx(Vector3.UP) \
+			or not floor_pose.basis.get_scale().is_equal_approx(Vector3.ONE):
+		return false
+	var foot := right if left_supported else left
+	var collider := foot.get_child(0) as CollisionShape3D
+	var size := (collider.shape as BoxShape3D).size
+	var box := (floor_pose.affine_inverse() * collider.global_transform) * AABB(-size * 0.5, size)
+	var half := floor_box.size * 0.5
+	return box.position.x >= -half.x and box.end.x <= half.x \
+		and box.position.z >= -half.z and box.end.z <= half.z \
+		and absf(box.position.y - half.y) <= FLOOR_CONTACT_SLOP
+
 func _limit_shared_first_contact_lift(lifts: Dictionary[PhysicalBone3D, float],
 		depths: Dictionary[PhysicalBone3D, float], shared_lift: float, slop: float) -> void:
 	if shared_lift <= DEEP_CONTACT_LIFT_START:
