@@ -4,11 +4,18 @@
 // Actor-only Burley/GGX direct response. Ambient/emission remain engine-owned.
 // Unlike the older matte-terrain helper, specular lobes are not clipped to 1.
 varying float player_cloud;
+uniform float player_sun_shoulder = 0.0;
 float player_fresnel(float c){float x=1.0-c;float s=x*x;return s*s*x;}
 void light(){
 	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
 	vec3 key_color = LIGHT_COLOR * gaf_opening_gain(LIGHT_IS_DIRECTIONAL, ATTENUATION * player_cloud);
 	float nl=max(dot(NORMAL,LIGHT),0.0);
+	if (LIGHT_IS_DIRECTIONAL && player_sun_shoulder > 0.0) {
+		// Ease strong direct sun on Valorie at the edge of a shadow.
+		// The local light, indirect light and surface material remain independent.
+		float beam = ATTENUATION * player_cloud * nl * dot(LIGHT_COLOR / PI, vec3(.2126,.7152,.0722));
+		key_color *= 1.0 - player_sun_shoulder * smoothstep(.12,.62,beam);
+	}
 	// Original selective wrap, not native screen-space diffusion. Integral of
 	// max(N.L+w,0)/(1+w)^2 over the sphere is PI: redistribute, do not add a lamp.
 	if(player_skin_weight>0.){

@@ -95,7 +95,8 @@ func refresh(force:bool=false)->void:
     key=Vector3(c.r,c.g,c.b)*(sun.light_energy*bounce_mix*slots.w*phase_bounce.fade(p))
     phase_bounce_active=true
  var skin_verified:bool=level.look.player_effects_available()
- var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if phase_bounce_active else null]
+ var sun_shoulder:float=level.showcase.player_sun_shoulder_weight()
+ var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if phase_bounce_active else null,sun_shoulder]
  if not force and bind_key==_last_bind_key:
   update_usec=Time.get_ticks_usec()-started;return
  _last_bind_key=bind_key
@@ -104,6 +105,7 @@ func refresh(force:bool=false)->void:
   var diffuse:bool=active and level.look.player_local_light_enabled
   m.set_shader_parameter("player_local_light",diffuse)
   m.set_shader_parameter("player_rough_reflection",active and level.look.player_reflection_enabled)
+  m.set_shader_parameter("player_sun_shoulder",sun_shoulder if m.get_meta("verified_valorie",false) else 0.)
   m.set_shader_parameter("skin_wrap_enabled",active and skin_verified and level.look.player_skin_enabled and m.get_meta("has_profile_mask",false))
   if active:
    m.set_shader_parameter("player_probe_sky",_sky);m.set_shader_parameter("player_probe_sun",bounce_sun)
