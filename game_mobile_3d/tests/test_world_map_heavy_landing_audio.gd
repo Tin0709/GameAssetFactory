@@ -69,8 +69,10 @@ func run() -> void:
 		world.showcase.set_audio_enabled(false)
 		check(AudioServer.is_bus_mute(0) and audio._voices.all(func(v): return not v.playing and v.stream == null),
 			"Audio off stops landing tails and restores silence")
+	# Finish teardown with wall-clock pacing for the audio thread.
+	Engine.max_fps = 60
 	print("WORLD_MAP_HEAVY_LANDING_AUDIO failures=", failures)
 	world.free()
 	# Let the Dummy mixer release its retired stream playbacks.
-	await create_timer(0.20, true, false, true).timeout
+	await create_timer(0.25, true, false, true).timeout
 	quit(0 if failures.is_empty() else 1)
