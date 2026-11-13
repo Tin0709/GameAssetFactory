@@ -322,7 +322,7 @@ func _physics_process(delta: float) -> void:
 		_blocked_chase = chasing and is_on_floor() and is_on_wall() \
 			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
 		_blocking_zombie = null
-		if _blocked_chase:
+		if _blocked_chase and get_slide_collision_count() > 0:
 			var blocker := get_last_slide_collision().get_collider() as CharacterBody3D
 			if blocker != null and blocker.get_parent() == get_parent():
 				_blocking_zombie = blocker
@@ -333,7 +333,11 @@ func _physics_process(delta: float) -> void:
 
 func _wait_for_chase_retry() -> bool:
 	var retry_hz := BLOCKED_CHASE_RETRY_HZ
-	if _blocking_zombie != null:
+	if not is_instance_valid(_blocking_zombie):
+		# A removed blocker is a freed reference. A wall retry has a null one.
+		if typeof(_blocking_zombie) == TYPE_OBJECT:
+			return false
+	else:
 		if (_blocking_zombie.is_queued_for_deletion() or _blocking_zombie.collision_layer == 0
 				or _blocking_zombie.global_position.distance_squared_to(_blocking_position) > BLOCKER_MOVE_DISTANCE_SQUARED
 				or target.global_position.distance_squared_to(_blocked_target_position) > CHASE_TARGET_MOVE_DISTANCE_SQUARED):
