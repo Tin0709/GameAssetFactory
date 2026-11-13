@@ -51,16 +51,14 @@ func _combat_entry_blend(key: String) -> float:
 	return seconds
 
 func _combat_stride_pose(phase: float, speed: float) -> Array[Transform3D]:
-	if not _run_requested:
-		return source_gait.sample("Walk", phase)
 	if crossbow_equipped and hybrid_motion != null:
-		return hybrid_motion.run_pose(phase)
+		return hybrid_motion.run_pose(phase) if _run_requested else source_gait.sample("Walk", phase)
 	return super._combat_stride_pose(phase, speed)
 
 func _combat_stride_period(speed: float, state: Dictionary) -> float:
-	if not _run_requested:
-		return float(clips.Walk.duration) * walk_stride_speed / maxf(speed, 0.001)
 	if crossbow_equipped and hybrid_motion != null:
+		if not _run_requested:
+			return float(clips.Walk.duration) * walk_stride_speed / maxf(speed, 0.001)
 		return hybrid_motion.period(speed, 1.0)
 	return super._combat_stride_period(speed, state)
 
