@@ -185,18 +185,31 @@ func check_floor_edge_landing(lab, dust: Node3D) -> void:
 		if heavy:
 			await press_heavy_attack()
 		var max_dust := 0
+		var dust_near_edge := false
 		for i in 70:
 			await physics_frame
-			max_dust = maxi(max_dust, visible_particles(dust))
+			var visible := visible_particles(dust)
+			if visible > max_dust:
+				max_dust = visible
+				dust_near_edge = dust.get_children().filter(func(sprite): return sprite.visible).all(
+					func(sprite): return absf(sprite.global_position.x - 50.0) < 0.45)
 		check(lab.player.is_on_floor() and lab.player.global_position.x > 50.0,
 			"The capsule lands while its centre is past the grass edge")
-		check(max_dust == (10 if heavy else 5), "The edge landing emits one full dust burst")
+		check(max_dust == (10 if heavy else 5) and dust_near_edge,
+			"The edge landing emits one full dust burst next to the grass contact")
 		if heavy:
 			check(audio._next_choice.get(&"slam_grass", 0) == (heavy_before + 1) % 6
 				and movement.event_count.landing == ordinary_before, "The edge dive plays one heavy grass cue")
+			var grass_voices: Array = audio._voices.filter(func(voice): return voice.stream in audio._groups[&"slam_grass"])
+			check(grass_voices.size() == 1 and absf(grass_voices[0].global_position.x - 50.0) < 0.03,
+				"The heavy debris cue plays at the grass edge")
 		else:
 			check(movement.event_count.landing == ordinary_before + 1, "The ordinary edge landing plays grass audio once")
+			if not movement.events.is_empty():
+				check(absf(movement.events.back().at[0] - 50.0) < 0.03, "The ordinary cue plays at the grass edge")
 	toggle.button_pressed = false
+	# Allow the real-time Ogg mixer to release stopped streams before teardown.
+	await create_timer(0.10, true, false, true).timeout
 
 func start_heavy_drop(lab) -> void:
 	lab.get_node("HUD/DropMedium").pressed.emit()
