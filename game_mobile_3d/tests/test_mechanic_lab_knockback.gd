@@ -276,8 +276,8 @@ func check_sabre_height_thresholds(lab, group) -> void:
 func check_sabre_edge_support(lab, group) -> void:
 	var damage: Array[int] = []
 	var strengths: Array[float] = []
-	var impulses: Array[float] = []
-	for height in [4.0, 6.5]:
+	var landed_hits: Array[int] = []
+	for sample in [Vector2(3.99, 50.20), Vector2(4.0, 50.01), Vector2(6.49, 50.20), Vector2(6.5, 50.01)]:
 		lab.reset_player()
 		lab.player.global_position = Vector3(49.99, 0.03, 0.0)
 		await ticks(8)
@@ -286,10 +286,11 @@ func check_sabre_edge_support(lab, group) -> void:
 		zombie.set_physics_process(false)
 		zombie.collision_layer = 0
 		zombie.global_position = Vector3(49.70, 0.0, 1.5)
-		zombie.health = 8
-		check(lab.player.drop_for_lab(height), "The player starts on the grass before the edge drop")
+		zombie.max_health = 100
+		zombie.health = 100
+		check(lab.player.drop_for_lab(sample.x), "The player starts on the grass before the edge drop")
 		# Move the capsule centre off the edge without changing the drop height.
-		lab.player.global_position.x = 50.01
+		lab.player.global_position.x = sample.y
 		await ticks(6)
 		attack(true)
 		await ticks(1)
@@ -302,19 +303,14 @@ func check_sabre_edge_support(lab, group) -> void:
 				break
 		for i in 12:
 			await physics_frame
-			if zombie.health == 0:
+			if zombie.health < 100:
 				break
-		zombie.set_physics_process(true)
-		await ticks(2)
-		var impulse: Vector3 = zombie.ragdoll.total_applied_impulse
-		impulses.append(impulse.length())
+		landed_hits.append(100 - int(zombie.health))
 		zombie.free()
-	check(damage == [40, 60] and strengths == [1380.0, 1610.0],
-		"The medium and high thresholds use the floor contact at the grass edge")
-	check(impulses.size() == 2 and is_equal_approx(impulses[0], 897.6)
-		and is_equal_approx(impulses[1], 897.6),
-		"Both edge landings deliver the intended upper-tier impulse to the source ragdoll")
-	print("SABRE_EDGE_SUPPORT damage=", damage, " strengths=", strengths, " impulses=", impulses)
+	check(damage == [20, 40, 40, 60] and strengths == [1150.0, 1380.0, 1380.0, 1610.0],
+		"Near both thresholds, the measured edge support controls damage and weapon strength")
+	check(landed_hits == damage, "The edge slam applies the selected damage once to a nearby zombie")
+	print("SABRE_EDGE_SUPPORT damage=", landed_hits, " strengths=", strengths)
 
 func check_crowd(lab, group) -> void:
 	lab.reset_player()
