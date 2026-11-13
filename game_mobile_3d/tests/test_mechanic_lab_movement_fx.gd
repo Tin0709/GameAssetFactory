@@ -122,6 +122,11 @@ func check_running_wake_support(lab, wind) -> void:
 		"After turning, the wake trails the actual movement on a supported foot contact")
 	check(is_equal_approx(wake.origin.y, 0.25 + 0.38),
 		"The wake's height is measured from the grass under the foot")
+	var age_before: float = wake.age
+	# A long render interval alone must not consume the first visible wake.
+	wind._process(0.10)
+	check(wake.mesh.visible and wake.age < age_before + 0.02,
+		"The run wake ages from the foot-contact clock instead of a long render interval")
 	var next: int = wind._next
 	var over_edge := Vector3(51.0, 0.25, 0.0)
 	lab.player.surface_contact.emit(over_edge, false)
