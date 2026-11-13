@@ -615,6 +615,10 @@ func _player_foot_contact_at(sole: Vector3) -> Dictionary:
 		_foot_contact_tick = tick
 		_foot_contact_sole = sole
 		_foot_contact = _grass_contact_at(sole)
+		if not _foot_contact.is_empty():
+			var support := _player_floor_support(sole)
+			if not support.is_empty() and support.body != $Ground:
+				_foot_contact = {}
 	return _foot_contact
 
 func _grass_contact_at(sole: Vector3) -> Dictionary:
@@ -629,10 +633,14 @@ func _grass_landing_contact_at(point: Vector3) -> Dictionary:
 	if tick != _landing_contact_tick or point != _landing_contact_point:
 		_landing_contact_tick = tick
 		_landing_contact_point = point
-		_landing_contact = _resolve_grass_landing_contact(point)
+		var support := _player_floor_support(point)
+		if support.is_empty():
+			_landing_contact = _grass_contact_at(point)
+		else:
+			_landing_contact = {"position": support.position, "surface": "grass"} if support.body == $Ground else {}
 	return _landing_contact
 
-func _resolve_grass_landing_contact(point: Vector3) -> Dictionary:
+func _player_floor_support(point: Vector3) -> Dictionary:
 	# A sole outside a ledge can raycast to the grass below. Prefer the
 	# actual floor contact from this move_and_slide, including non-grass.
 	var min_normal_y := cos(player.floor_max_angle)
@@ -653,9 +661,7 @@ func _resolve_grass_landing_contact(point: Vector3) -> Dictionary:
 				closest = distance
 				nearest = position
 				floor_body = collider
-	if floor_body == null:
-		return _grass_contact_at(point)
-	return {"position": nearest, "surface": "grass"} if floor_body == $Ground else {}
+	return {"position": nearest, "body": floor_body} if floor_body != null else {}
 
 func _on_zombie_step(sole: Vector3) -> void:
 	var support: Variant = null
