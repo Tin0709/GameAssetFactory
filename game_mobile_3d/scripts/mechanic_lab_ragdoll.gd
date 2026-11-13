@@ -10,8 +10,9 @@ const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
 
-var _sample_bone_ids: Dictionary[String, int]
-var _sample_body_offsets: Dictionary[String, Transform3D]
+var _sample_names: Array[String]
+var _sample_bone_ids: Array[int]
+var _sample_body_offsets: Array[Transform3D]
 var _sampled_skeleton_transform: Transform3D
 var _source_joint_biases: Dictionary[RID, float]
 var _wall_handoff_frame := -1
@@ -39,12 +40,14 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
 		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}) -> void:
 	super.setup(target, part_layout, bone_names, body_offsets, authored_joints)
+	_sample_names.clear()
 	_sample_bone_ids.clear()
 	_sample_body_offsets.clear()
 	for name: String in bodies:
 		var body: PhysicalBone3D = bodies[name]
-		_sample_bone_ids[name] = body.get_bone_id()
-		_sample_body_offsets[name] = body.body_offset
+		_sample_names.append(name)
+		_sample_bone_ids.append(body.get_bone_id())
+		_sample_body_offsets.append(body.body_offset)
 
 func sample(delta: float) -> void:
 	# Both dictionaries keep the same body keys, so the older buffer can be overwritten.
@@ -53,9 +56,9 @@ func sample(delta: float) -> void:
 	current = next
 	sample_delta = delta
 	_sampled_skeleton_transform = skeleton.global_transform
-	for name: String in _sample_bone_ids:
-		current[name] = (_sampled_skeleton_transform * skeleton.get_bone_global_pose(_sample_bone_ids[name])
-			* _sample_body_offsets[name])
+	for i in _sample_names.size():
+		current[_sample_names[i]] = (_sampled_skeleton_transform * skeleton.get_bone_global_pose(_sample_bone_ids[i])
+			* _sample_body_offsets[i])
 	sample_count += 1
 
 func prepare_handoff_samples(delta: float, verify_transform: bool) -> void:
@@ -127,7 +130,7 @@ func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision
 		source: Array[Transform3D], shift: Vector3) -> Vector3:
 	# Keep source rotation on branches that can move without reopening the overlap.
 	for name in ["Head", "Arm.L", "Arm.R", "Leg.L", "Leg.R"]:
-		var bone: int = _sample_bone_ids[name]
+		var bone: int = bodies[name].get_bone_id()
 		var safe_pose := skeleton.get_bone_pose(bone)
 		for weight: float in [1.0, 0.5, 0.25]:
 			var rotation := safe_pose.basis.get_rotation_quaternion().slerp(
@@ -502,5 +505,6 @@ func _set_source_joint_bias(joint: RID, bias: float) -> void:
 func release(visible_world_pose: Array[Transform3D] = []) -> void:
 	super.release(visible_world_pose)
 	_source_joint_biases.clear()
+	_sample_names.clear()
 	_sample_bone_ids.clear()
 	_sample_body_offsets.clear()
