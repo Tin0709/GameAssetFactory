@@ -113,10 +113,53 @@ func run() -> void:
 		check(actor.hybrid_motion.owns_pose, "Live gait owns the pose on Run entry" + label)
 		check(resume_seconds <= 0.05 + 1.0 / hz + 0.00001,
 			"Running landing hands back promptly%s (%.3f s)" % [label, resume_seconds])
+		await check_sabre_landing_movement(lab, hz)
 	check(oracle.get("native_jump_pose_enabled") != true, "Shared actor defaults to the existing hybrid jump")
 	print("MECHANIC_LAB_MD2_JUMP ", JSON.stringify({"checks": checks, "failures": failures, "moving_resume_seconds": moving_resume_seconds}))
 	lab.free()
 	oracle.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_sabre_landing_movement(lab, hz: int) -> void:
+	var actor = lab.player
+	actor.requested_direction = Vector2.ZERO
+	lab.reset_player()
+	for i in 8:
+		await physics_frame
+	check(actor.drop_for_lab(5.0), "Sabre movement fixture starts a drop at %d Hz" % hz)
+	for i in 2:
+		await physics_frame
+	var event := InputEventKey.new()
+	event.physical_keycode = KEY_E
+	event.pressed = true
+	root.push_input(event, true)
+	await physics_frame
+	event = InputEventKey.new()
+	event.physical_keycode = KEY_E
+	root.push_input(event, true)
+	for i in hz:
+		await physics_frame
+		if actor.is_on_floor():
+			break
+	check(actor.is_on_floor() and actor.active_clip == "AirAttack", "Sabre enters the landing animation at %d Hz" % hz)
+	if not actor.is_on_floor():
+		return
+	var origin: Vector3 = actor.global_position
+	var touchdown_tick := Engine.get_physics_frames()
+	actor.requested_direction = Vector2(0.0, -1.0)
+	var first_step := -1
+	for i in hz:
+		await physics_frame
+		if absf(actor.global_position.z - origin.z) > 0.00001:
+			first_step = Engine.get_physics_frames() - touchdown_tick
+			break
+	var delay := 0.410354003
+	check(first_step == ceili(delay * hz) and actor.active_clip == "AirAttack",
+		"Sabre moves on the first physics step containing AN_ResumeMovement at %d Hz" % hz)
+	var expected_travel: float = actor.run_speed * (float(first_step) / hz - delay)
+	check(absf(absf(actor.global_position.z - origin.z) - expected_travel) < 0.001,
+		"Sabre only moves during the open fraction of that step at %d Hz" % hz)
+	print("SABRE_LANDING_MOVEMENT hz=", hz, " first_step=", first_step, " clip=", actor.active_clip)
+	actor.requested_direction = Vector2.ZERO
 
 
