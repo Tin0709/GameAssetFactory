@@ -156,7 +156,7 @@ var _physics_profile: Dictionary
 var _corpse_floor: CollisionShape3D
 static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
-static var _corpse_material: ShaderMaterial
+static var _corpse_base_material: ShaderMaterial
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D],
 		serial: int, physics_profile: Dictionary = {}, corpse_floor: CollisionShape3D = null) -> void:
@@ -669,14 +669,14 @@ func _apply_death_tumble(spin: Vector3, mass: float) -> void:
 
 func _update_corpse_material(remaining: float) -> void:
 	if _mesh.material_override == null:
-		if _corpse_material == null:
+		if _corpse_base_material == null:
 			var skin := _mesh.get_active_material(0) as StandardMaterial3D
 			if skin == null:
 				return
-			_corpse_material = ShaderMaterial.new()
-			_corpse_material.shader = CORPSE_SHADER
-			_corpse_material.set_shader_parameter("skin", skin.albedo_texture)
-		_mesh.material_override = _corpse_material
+			_corpse_base_material = ShaderMaterial.new()
+			_corpse_base_material.shader = CORPSE_SHADER
+			_corpse_base_material.set_shader_parameter("skin", skin.albedo_texture)
+		_mesh.material_override = _corpse_base_material
 	var gray := smoothstep(CORPSE_DESATURATION_START, CORPSE_DESATURATION_END, _corpse_age) * 0.80
 	_mesh.set_instance_shader_parameter("desaturation", gray)
 	_mesh.set_instance_shader_parameter("dissolve", _corpse_breakup_threshold(remaining))
@@ -721,7 +721,11 @@ func _set_corpse_fragment_directions() -> void:
 		var radial := (position - centre).slide(Vector3.UP).normalized()
 		var lift := 0.17 if skeleton.get_bone_name(bone) == &"J_Head" else 0.11
 		directions[bind] = world_to_mesh * (radial * 0.15 + Vector3.UP * lift)
-	_corpse_material.set_shader_parameter("fragment_directions", directions)
+	# The vector array belongs to this pose. Share the shader and texture, but
+	# keep separate material parameters when more than one corpse breaks up.
+	var material := _corpse_base_material.duplicate() as ShaderMaterial
+	material.set_shader_parameter("fragment_directions", directions)
+	_mesh.material_override = material
 
 static func _corpse_breakup_threshold(remaining: float) -> float:
 	var elapsed := CORPSE_DISSOLVE_DURATION - remaining

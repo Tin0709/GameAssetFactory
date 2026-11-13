@@ -157,7 +157,7 @@ func run() -> void:
 	var travel: Variant = zombie._mesh.get_instance_shader_parameter("fragment_travel")
 	check(travel != null and float(travel) > 0.0,
 		"The source body parts move during the dissolve")
-	var directions: Variant = zombie._corpse_material.get_shader_parameter("fragment_directions")
+	var directions: Variant = zombie._mesh.material_override.get_shader_parameter("fragment_directions")
 	check(directions is PackedVector3Array and directions.size() == zombie._mesh.skin.get_bind_count()
 		and directions[2].distance_to(directions[15]) > 0.05
 		and directions[15].is_equal_approx(directions[18]),
@@ -230,10 +230,10 @@ func check_independent_corpse_breakup(lab, group) -> void:
 	while first._corpse_age < 4.65:
 		await physics_frame
 	var first_material := first._mesh.material_override as ShaderMaterial
-	var second_material := second._mesh.material_override as ShaderMaterial
 	var first_directions: Variant = first_material.get_shader_parameter("fragment_directions")
 	while second._corpse_age < 4.63:
 		await physics_frame
+	var second_material := second._mesh.material_override as ShaderMaterial
 	var second_directions: Variant = second_material.get_shader_parameter("fragment_directions")
 	check(first._corpse_parked and second._corpse_parked and first._corpse_fragment_directions_ready
 		and second._corpse_fragment_directions_ready and first_directions is PackedVector3Array
