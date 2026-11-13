@@ -149,6 +149,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"dawn_mist_source": ["Ánh sáng sương rạng sáng", 1.],
 	&"evening_mist_profile": ["Sương hoàng hôn", 1.],
 	&"pre_twilight_air": ["Ánh sương xa trước chạng vạng", 1.],
+	&"pre_twilight_midair": ["Sương trung cảnh chiều muộn", 1.],
 	&"evening_key_response": ["Ánh trực tiếp lúc chạng vạng", 1.],
 	&"sunrise_key_response": ["Nắng chuyển lúc bình minh", 1.],
 	&"sunrise_elevation": ["Góc nắng rạng sáng", 1.],
@@ -189,7 +190,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 116
+const LIGHTING_MIX_VERSION := 117
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -809,7 +810,9 @@ func _update_mist()->void:
 		if evening > 0.0:
 			# Existing volume: change only the illumination of distant air.
 			sample.depth_scatter = 5.6 * evening
-			sample.depth_scatter_offset = 30.0 - NEAR_HAZE_ENTRY_M
+			var midair := _lighting_scale(&"pre_twilight_midair")
+			sample.depth_scatter_offset = lerpf(30.0, 26.0, midair) - NEAR_HAZE_ENTRY_M
+			sample.depth_scatter_ramp = lerpf(6.0, 8.0, midair)
 			var cooler := linear * Vector3(.76, .85, 1.44)
 			sample.depth_scatter_color = (cooler * (linear.dot(luma) / maxf(cooler.dot(luma), .000001)) - linear) * evening
 		var morning := _morning_depth_weight()
@@ -1737,6 +1740,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 72 and effect == &"evening_lantern":
 			missing_value = 0.
+		if version < 117 and effect == &"pre_twilight_midair":
+			missing_value = 0.
 		if version < 116 and effect == &"stone_twilight_sky":
 			missing_value = 0.
 		if version < 115 and effect == &"pre_twilight_receiver":
@@ -1848,7 +1853,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.available()
 		if effect in [&"dawn_mist_source", &"morning_depth_scatter", &"morning_depth_optical"]:
 			slider.editable = slider.editable and not phase_air.anchors.is_empty()
-		if effect in [&"evening_mist_profile", &"pre_twilight_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical"]:
+		if effect in [&"evening_mist_profile", &"pre_twilight_air", &"pre_twilight_midair", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical"]:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
 		if effect == &"sunrise_key_response":
 			slider.editable = slider.editable and key_response.sunrise_available()
@@ -2018,7 +2023,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile", &"pre_twilight_air"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile", &"pre_twilight_air", &"pre_twilight_midair"]:
 		_update_mist()
 		return
 	if changed_effect == &"pre_twilight_receiver":
