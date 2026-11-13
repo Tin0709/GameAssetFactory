@@ -3,6 +3,7 @@ global uniform vec3 gaf_spruce_sky_extent;
 global uniform vec3 gaf_spruce_sky_camera;
 global uniform sampler3D gaf_spruce_sky_volume : filter_linear, repeat_disable;
 global uniform float gaf_canopy_edge_fill;
+global uniform float gaf_canopy_sky_color;
 
 float gaf_spruce_sky(vec3 point, vec3 camera_position) {
 	if (gaf_spruce_sky_region.w <= 0.0 || distance(camera_position, gaf_spruce_sky_camera) > 0.01) {
@@ -17,12 +18,20 @@ float gaf_spruce_sky(vec3 point, vec3 camera_position) {
 	return 1.0 - gaf_spruce_sky_region.w * occlusion;
 }
 
-float gaf_ground_canopy_sky(vec3 point, vec3 camera_position) {
-	float current = gaf_spruce_sky(point, camera_position);
+float gaf_ground_canopy_sky(float current) {
 	if (gaf_canopy_edge_fill <= 0.0 || current >= 1.0) {
 		return current;
 	}
 	// Restore some sky at the edge of the canopy. Keep the dense core dark.
 	float cover = clamp((1.0 - current) / gaf_spruce_sky_region.w, 0.0, 1.0);
 	return mix(current, 1.0, gaf_canopy_edge_fill * (1.0 - smoothstep(0.18, 0.60, cover)));
+}
+
+vec3 gaf_canopy_diffuse_color(vec3 rgb, float visibility) {
+	float weight = gaf_canopy_sky_color * (1.0 - smoothstep(.72, .96, visibility));
+	if (weight <= 0.0) return rgb;
+	const vec3 luma = vec3(.2126, .7152, .0722);
+	vec3 cool = rgb * vec3(.72, 1.0, 1.48);
+	cool *= dot(rgb, luma) / max(dot(cool, luma), .000001);
+	return mix(rgb, cool, weight);
 }

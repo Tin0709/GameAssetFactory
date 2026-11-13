@@ -1,6 +1,7 @@
 // Original baked GAF irradiance, terrain-only. No native source coefficients.
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
 varying vec3 terrain_sky_light;
+varying float terrain_canopy_sky;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 varying vec3 terrain_night_sky_light;
 varying vec3 terrain_day_bounce;
@@ -45,6 +46,7 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 	if (ground_grade == 3 && stone_diffuse_strength > 0.0) sky *= exp2(stone_diffuse_log * stone_diffuse_strength);
 #endif
 	vec3 sky_fill = sky * terrain_ambient_scale * terrain_ambient_tint * visibility;
+	sky_fill = gaf_canopy_diffuse_color(sky_fill, terrain_canopy_sky);
 	if (turf_ambient_color != vec3(1.0) && (ground_grade == 1 || ground_grade == 2) && face_y > 0.998) {
 		// The authored path shares the terrain shader. Ease out the effect as the albedo crosses into soil.
 		float turf = smoothstep(1.04, 1.18, color.g / max(color.r, 0.0001)) *

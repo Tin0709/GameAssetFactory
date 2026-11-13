@@ -24,6 +24,7 @@ uniform float study_grass_night_albedo = 0.0;
 uniform float study_grass_shadow_height = 1.0;
 varying flat vec4 study_ground_sky_at_root;
 varying flat float study_canopy_sky_at_root;
+varying flat float study_raw_canopy_sky;
 varying flat vec3 study_day_bounce_at_root;
 
 vec3 grass_day_bounce(vec2 world_position) {
@@ -90,7 +91,8 @@ void vertex(){
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 	// The patch origin stays in its own cell while the blades bend.
 	study_ground_sky_at_root = study_ground_sky_mix > 0.0 ? grass_ground_sky(MODEL_MATRIX[3].xz) : vec4(0.0);
-	study_canopy_sky_at_root = gaf_ground_canopy_sky(MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz);
+	study_raw_canopy_sky = gaf_spruce_sky(MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz);
+	study_canopy_sky_at_root = gaf_ground_canopy_sky(study_raw_canopy_sky);
 	study_day_bounce_at_root = grass_day_bounce(MODEL_MATRIX[3].xz);
 #endif
 	// Full float custom attribute: normalized height, blade height, phase, response.
@@ -196,6 +198,7 @@ void fragment(){
 	AO = (1.0 - ground_mix) * study_canopy_sky_at_root;
 	AO_LIGHT_AFFECT = 0.0;
 	EMISSION = color * (1.0 - METALLIC) * study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix * study_canopy_sky_at_root;
+	vec3 shared_sky = gaf_canopy_diffuse_color(EMISSION, study_raw_canopy_sky);
 	// The canopy field weights the color change without altering sky irradiance.
 	float shade_mix = study_grass_shade_color.z * (1.0 - smoothstep(0.73, 0.96, study_canopy_sky_at_root));
 	if (shade_mix > 0.0) {
@@ -203,6 +206,10 @@ void fragment(){
 		vec3 cool_fill = EMISSION * vec3(study_grass_shade_color.x, 1.0, study_grass_shade_color.y);
 		cool_fill *= dot(EMISSION, luma) / max(dot(cool_fill, luma), 0.000001);
 		EMISSION = mix(EMISSION, cool_fill, shade_mix);
+	}
+	if (gaf_canopy_sky_color > 0.0) {
+		// Fade out the old grass-only treatment as the common sky color takes over.
+		EMISSION = mix(EMISSION, shared_sky, gaf_canopy_sky_color);
 	}
 	float sole = gaf_player_contact(foliage_world, CAMERA_POSITION_WORLD);
 	AO *= sole * study_twilight_ground_ambient;

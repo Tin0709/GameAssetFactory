@@ -13,11 +13,11 @@ render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
 #endif
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
+#include "res://materials/world_map_spruce_sky.gdshaderinc"
 #include "res://materials/world_map_regional_sky.gdshaderinc"
 #define GAF_TERRAIN_NIGHT_SKY
 #include "res://materials/world_map_terrain_transport.gdshaderinc"
 #include "res://materials/world_map_replay_bounce.gdshaderinc"
-#include "res://materials/world_map_spruce_sky.gdshaderinc"
 #include "res://materials/world_map_player_contact.gdshaderinc"
 #endif
 #ifdef GAF_WORLD_GROUND_BOUNCE
@@ -46,7 +46,8 @@ void vertex() {
 	vec3 world_point = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	int receiver = int(CUSTOM1.a);
 	vec3 sky = gaf_regional_sky(CUSTOM1.rgb, terrain_ambient_tint, world_point.xz, receiver);
-	float canopy = gaf_ground_canopy_sky(world_point, INV_VIEW_MATRIX[3].xyz);
+	terrain_canopy_sky = gaf_spruce_sky(world_point, INV_VIEW_MATRIX[3].xyz);
+	float canopy = gaf_ground_canopy_sky(terrain_canopy_sky);
 	terrain_sky_light = sky * canopy;
 	terrain_night_sky_light = gaf_night_sky(sky, receiver) * canopy;
 	terrain_day_bounce = gaf_day_bounce(receiver);
