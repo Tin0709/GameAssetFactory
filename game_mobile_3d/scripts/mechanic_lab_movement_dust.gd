@@ -27,7 +27,8 @@ var _ground: CollisionShape3D
 var _terrain_contact: Callable
 var _particles: Array[Particle] = []
 var _next := 0
-var _heavy_landing_point := Vector3.INF
+var _heavy_landing_point := Vector3.ZERO
+var _heavy_landing_frame := -1
 var _random := RandomNumberGenerator.new()
 
 func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable()) -> bool:
@@ -72,12 +73,13 @@ static func _load_mask() -> Texture2D:
 func _on_heavy_jump_landed(point: Vector3, _forward: Vector3, _serial: int, _fall_height: float) -> void:
 	# The player posts this immediately before the ordinary surface event.
 	_heavy_landing_point = point
+	_heavy_landing_frame = Engine.get_physics_frames()
 
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
-	var heavy := landed and _heavy_landing_point.is_finite()
+	var heavy := landed and _heavy_landing_frame == Engine.get_physics_frames()
 	if heavy:
 		point = _heavy_landing_point
-	_heavy_landing_point = Vector3.INF
+	_heavy_landing_frame = -1
 	var ground_point: Vector3
 	var surface := "grass"
 	if _terrain_contact.is_valid():
@@ -146,7 +148,7 @@ func _process(delta: float) -> void:
 	set_process(active)
 
 func clear() -> void:
-	_heavy_landing_point = Vector3.INF
+	_heavy_landing_frame = -1
 	for particle in _particles:
 		particle.sprite.hide()
 	set_process(false)
