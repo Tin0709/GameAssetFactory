@@ -27,9 +27,13 @@ const WORLD_MASK := 1
 const BOLT_MASK := WORLD_MASK | 4
 const STRIKE := {"damage": 8, "strength": 400.0, "angle": 25.0, "stagger": 8.1}
 const ACTION_HASH := "09471c7fa549624245482513aefd2e2f8fa35a18152dfb9b23b04baabd4e65d0"
-# Points on SM_RapidCrossbow_Unique_F0, in imported mesh coordinates.
-const GRIP := Vector3(0.0, -0.055, -0.06)
+# BP_AlexCharacter: both Polaris meshes have +16 cm on UE Z at their
+# respective left-weapon sockets. The GLB coordinate conversion maps it to +Y.
+const MESH_OFFSET := Vector3(0.0, 0.16, 0.0)
 const MUZZLE := Vector3(0.0, 0.075, 0.65)
+# AM_Player_CrossBow_Action blend-out duration. The Lab blends from its
+# interrupted recovery pose so the lowering starts promptly after firing.
+const IDLE_BLEND_SECONDS := 0.25
 const LOCOMOTION := {
 	"Idle": ["Player_Crossbow_Idle", 80, "5efd6e1c0d15066ab98c1bd31262b499435e125512a75a972ee87f1a74bd222a"],
 	"Walk": ["Player_Crossbow_Walk", 26, "a291db024a4b3d10ec01ecc66b068c364fb8bc22d8a245150cbd69dce1af2e9c"],
@@ -48,21 +52,17 @@ static func icon() -> Texture2D:
 	return Source.icon(DIRECTORY, "T_UI_RapidCrossbow_Unique_Icon",
 		"0e457446c6ee40d65f7da6cc302602d7b96ac49f5f54bcbb38a7a20fbe77ae18")
 
-static func load_mesh(actor: CharacterBody3D, root: String) -> Mesh:
-	return Source.load_mesh(actor, root, DIRECTORY, "SM_RapidCrossbow_Unique_F0",
-		"2a6f17f938b81f9c91a072b37dcbf6dabbed15999f7521437706fbe06037a6bc", "T_RapidCrossbow_Unique",
+static func load_mesh(actor: CharacterBody3D, root: String, recoil: bool) -> Mesh:
+	var name := "SM_RapidCrossbow_Unique_F0" if recoil else "SM_RapidCrossbow_Unique_F1"
+	var hash_value := "2a6f17f938b81f9c91a072b37dcbf6dabbed15999f7521437706fbe06037a6bc" if recoil \
+		else "189bc26ff1e69cbe3175003c4e655d0dd3b659df85c99a14ecbf0124fb10b3af"
+	return Source.load_mesh(actor, root, DIRECTORY, name, hash_value, "T_RapidCrossbow_Unique",
 		"fcd97771bd152d8f3f1c772984de98eca0c68d0d48b9de0e8ac1a3bc4d64e501")
 
 static func load_bolt(actor: CharacterBody3D, root: String) -> Mesh:
 	return Source.load_mesh(actor, root, Source.SOURCE + "Actors/Equipment/RangedWeapons/Projectiles/",
 		"SM_Arrow", "b68f888b24264d7db5b1fc1fe48852f33761cccc44e71ba7a65820f148cb33c3",
 		"T_Arrow", "f0bf1ee4c8f45d2361fc73d0635bd8ac5ff9a10d0f63e5759959bef5e77bbd5d")
-
-static func grip_transform() -> Transform3D:
-	# Fit the imported stock to the MD2 wrist once so the authored idle,
-	# carry and shot can each control the angle of the crossbow.
-	var basis := Basis(Vector3.RIGHT, PI) * Basis(Vector3.UP, -0.32)
-	return Transform3D(basis, -(basis * GRIP))
 
 static func combat_profile(root: String) -> Dictionary:
 	var result := Source.profile()

@@ -8,6 +8,39 @@ const LabLocomotion := preload("res://scripts/mechanic_lab_locomotion.gd")
 var crossbow_equipped := false
 var gauntlets_equipped := false
 var _crossbow_pose_serial := -1
+var _crossbow_mount: MeshInstance3D
+var _crossbow_carry_mesh: Mesh
+var _crossbow_recoil_mesh: Mesh
+var _crossbow_hand := -1
+var _crossbow_carry_bone := -1
+var _crossbow_recoil_bone := -1
+
+func configure_crossbow_mount(mount: MeshInstance3D, carry_mesh: Mesh, recoil_mesh: Mesh) -> void:
+	_crossbow_mount = mount
+	_crossbow_carry_mesh = carry_mesh
+	_crossbow_recoil_mesh = recoil_mesh
+	_crossbow_hand = skeleton.find_bone(&"J_L_Hand")
+	_crossbow_carry_bone = skeleton.find_bone(&"J_L_Weapon")
+	_crossbow_recoil_bone = skeleton.find_bone(&"J_L_Weapon1")
+
+func _refresh_markers() -> void:
+	super._refresh_markers()
+	if not crossbow_equipped or _crossbow_mount == null:
+		return
+	var hand := skeleton.get_bone_global_pose(_crossbow_hand)
+	var carry := skeleton.get_bone_global_pose(_crossbow_carry_bone)
+	var recoil := skeleton.get_bone_global_pose(_crossbow_recoil_bone)
+	var recoiling := recoil.basis.x.length_squared() > carry.basis.x.length_squared()
+	var weapon := recoil if recoiling else carry
+	# The source switches models by collapsing one weapon branch. Use a
+	# single full-size instance so transitions never interpolate that scale.
+	var relative := (hand.affine_inverse() * weapon).orthonormalized()
+	var socket := _crossbow_mount.get_parent() as BoneAttachment3D
+	socket.transform = hand
+	_crossbow_mount.transform = relative * Transform3D(Basis.IDENTITY, CrossPollinator.MESH_OFFSET)
+	var mesh := _crossbow_recoil_mesh if recoiling else _crossbow_carry_mesh
+	if _crossbow_mount.mesh != mesh:
+		_crossbow_mount.mesh = mesh
 
 func _create_hybrid_motion() -> RefCounted:
 	return LabLocomotion.new()
@@ -98,10 +131,13 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
 
 func _begin_pose_transition(key: String, seconds: float) -> void:
-	if (crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY]
-			and key in ["Idle", "CombatReady", "InspectWeapon"]):
-		source_transition.begin_evaluated(0.24, Callable(), &"smoothstep")
-		return
+	if crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY]:
+		if key in ["Idle", "CombatReady", "InspectWeapon"]:
+			source_transition.begin_evaluated(CrossPollinator.IDLE_BLEND_SECONDS, Callable(), &"smoothstep")
+			return
+		if key in GAITS:
+			source_transition.begin_evaluated(0.16, Callable(), &"smoothstep")
+			return
 	super._begin_pose_transition(key, seconds)
 
 func begin_gauntlet_landing() -> void:

@@ -410,9 +410,10 @@ func _load_weapon(index: int) -> bool:
 func _load_crossbow(root: String) -> bool:
 	if _crossbow != null:
 		return true
-	var mesh := CrossPollinator.load_mesh(player, root)
+	var carry_mesh := CrossPollinator.load_mesh(player, root, false)
+	var recoil_mesh := CrossPollinator.load_mesh(player, root, true)
 	var bolt := CrossPollinator.load_bolt(player, root)
-	if mesh == null or bolt == null:
+	if carry_mesh == null or recoil_mesh == null or bolt == null:
 		return false
 	var profile := CrossPollinator.combat_profile(root)
 	if not player.animation_player.has_animation_library(CrossPollinator.LIBRARY):
@@ -422,8 +423,13 @@ func _load_crossbow(root: String) -> bool:
 	_crossbow_locomotion = CrossPollinator.load_locomotion(player, root)
 	if _crossbow_locomotion.is_empty():
 		return false
-	var socket := player._weapon_attachment as BoneAttachment3D
-	_crossbow_mount = _mount_weapon(mesh, socket, "LabCrossbow", CrossPollinator.grip_transform(), CrossPollinator.GRIP)
+	var socket := BoneAttachment3D.new()
+	socket.name = "LabCrossbowSocket"
+	socket.bone_name = &"J_L_Hand"
+	player.skeleton.add_child(socket)
+	_crossbow_mount = _mount_weapon(carry_mesh, socket, "LabCrossbow",
+		Transform3D(Basis.IDENTITY, CrossPollinator.MESH_OFFSET), -CrossPollinator.MESH_OFFSET)
+	player.configure_crossbow_mount(_crossbow_mount, carry_mesh, recoil_mesh)
 	_crossbow_profile = profile
 	_crossbow = CrossPollinator.new()
 	_crossbow.name = "CrossPollinator"
