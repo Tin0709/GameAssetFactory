@@ -30,8 +30,11 @@ func run() -> void:
 	var weapons := [&"Sabre", &"Sword", &"Curved Greatsword"]
 	for slot in weapons.size():
 		lab.reset_player()
+		for i in 8:
+			await physics_frame
 		selector.select(slot)
 		selector.item_selected.emit(slot)
+		check(selector.selected == slot, "The ground fixture equips %s" % weapons[slot])
 		for i in 20:
 			await physics_frame
 		attack(true)
