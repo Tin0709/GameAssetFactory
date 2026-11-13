@@ -52,7 +52,7 @@ func run() -> void:
 		"per_spawn_ms": stats(spawn_us), "first_ms": spawn_us[0],
 		"nodes": Performance.get_monitor(Performance.OBJECT_NODE_COUNT)}))
 	await measure("spawn_animation", 70)
-		Input.action_press("move_backward")
+	Input.action_press("move_backward")
 	await measure("chase", 120)
 	Input.action_release("move_backward")
 	await check_blocked_chase(group)
