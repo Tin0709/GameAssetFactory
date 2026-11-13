@@ -27,6 +27,12 @@ const BOLT_SPEED := 35.0
 # The live Polaris movement component sweeps a SphereComponent of 10 cm.
 const BOLT_RADIUS := 0.10
 const BOLT_MESH_SCALE := 0.7
+# NS_ArrowTrail's Trail emitter initializes a world-space ribbon.
+const TRAIL_SHADER := preload("res://materials/mechanic_lab_polaris_trail.gdshader")
+const TRAIL_LIFETIME := 0.30
+const TRAIL_WIDTH := 0.08
+const TRAIL_WIDTH_END_AGE := 0.60 * TRAIL_LIFETIME
+const TRAIL_SAMPLE_SECONDS := 1.0 / 60.0
 # BP_ArrowProp uses the same source mesh, scaled to 0.6 with a -6 cm offset.
 const EMBEDDED_SCALE := 0.6
 const EMBEDDED_OFFSET := 0.06
@@ -59,6 +65,9 @@ var ammo := AMMO_MAX
 var bolt_mesh: Mesh
 var _recharge_remaining := 0.0
 var _bolts: Array[Dictionary] = []
+var _trails: Array[Dictionary] = []
+var _trail_mesh := ImmediateMesh.new()
+var _trail_renderer: MeshInstance3D
 var _sweep_query := PhysicsShapeQueryParameters3D.new()
 var _embedded: MultiMesh
 var _embedded_arrows: Array[Dictionary] = []
@@ -140,6 +149,15 @@ func _ready() -> void:
 	var sphere := SphereShape3D.new()
 	sphere.radius = BOLT_RADIUS
 	_sweep_query.shape = sphere
+	var trail_material := ShaderMaterial.new()
+	trail_material.shader = TRAIL_SHADER
+	_trail_renderer = MeshInstance3D.new()
+	_trail_renderer.name = "ArrowTrail"
+	_trail_renderer.mesh = _trail_mesh
+	_trail_renderer.material_override = trail_material
+	_trail_renderer.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_trail_renderer.hide()
+	add_child(_trail_renderer)
 	if bolt_mesh != null:
 		_embedded = MultiMesh.new()
 		_embedded.transform_format = MultiMesh.TRANSFORM_3D
@@ -174,7 +192,9 @@ func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vec
 	bolt.rotate_object_local(Vector3.UP, -PI * 0.5)
 	bolt.scale = Vector3.ONE * BOLT_MESH_SCALE
 	bolt.reset_physics_interpolation()
-	_bolts.append({"node": bolt, "direction": direction, "life": BOLT_LIFETIME, "serial": serial})
+	var trail := {"origin": origin, "direction": direction, "distance": 0.0, "stopped": false, "tail_age": 0.0}
+	_trails.append(trail)
+	_bolts.append({"node": bolt, "direction": direction, "life": BOLT_LIFETIME, "serial": serial, "trail": trail})
 	set_physics_process(true)
 	bolt_launched.emit(bolt)
 	return true
@@ -183,6 +203,9 @@ func reset() -> void:
 	for bolt: Dictionary in _bolts:
 		_remove_bolt(bolt.node)
 	_bolts.clear()
+	_trails.clear()
+	_trail_mesh.clear_surfaces()
+	_trail_renderer.hide()
 	_embedded_arrows.clear()
 	if _embedded != null:
 		_embedded.visible_instance_count = 0
@@ -201,14 +224,24 @@ func _physics_process(delta: float) -> void:
 			ammo += 1
 			ammo_changed.emit(ammo)
 	var space := get_world_3d().direct_space_state
+	for trail in _trails:
+		if trail.stopped:
+			trail.tail_age += delta
 	for index in range(_bolts.size() - 1, -1, -1):
 		var bolt := _bolts[index]
 		var node: MeshInstance3D = bolt.node
 		var start := node.global_position
 		var end := start + Vector3(bolt.direction) * BOLT_SPEED * minf(delta, bolt.life)
 		var hit := _sweep_bolt(space, start, end, BOLT_MASK)
+		var trail: Dictionary = bolt.trail
+		var direction: Vector3 = bolt.direction
 		bolt.life -= delta
 		if not hit.is_empty() or bolt.life <= 0.000001:
+			var endpoint: Vector3 = hit.get("position", end)
+			var travel := (endpoint - start).dot(direction)
+			trail.distance += clampf(travel, 0.0, start.distance_to(end) + BOLT_RADIUS)
+			trail.stopped = true
+			trail.tail_age = maxf(0.0, delta - travel / BOLT_SPEED)
 			_bolts.remove_at(index)
 			_remove_bolt(node)
 			if not hit.is_empty():
@@ -216,8 +249,45 @@ func _physics_process(delta: float) -> void:
 				bolt_impact.emit(hit, bolt.direction, bolt.serial)
 		else:
 			node.global_position = end
-	if ammo == AMMO_MAX and _bolts.is_empty() and _embedded_arrows.is_empty():
+			trail.distance += start.distance_to(end)
+	if not _trails.is_empty():
+		_update_trails()
+	if ammo == AMMO_MAX and _bolts.is_empty() and _embedded_arrows.is_empty() and _trails.is_empty():
 		set_physics_process(false)
+
+func _update_trails() -> void:
+	_trail_mesh.clear_surfaces()
+	_trail_renderer.hide()
+	var camera := get_viewport().get_camera_3d()
+	var to_local_space := global_transform.affine_inverse()
+	for index in range(_trails.size() - 1, -1, -1):
+		var trail := _trails[index]
+		var age: float = trail.tail_age
+		if age >= TRAIL_LIFETIME:
+			_trails.remove_at(index)
+			continue
+		var duration := minf(float(trail.distance) / BOLT_SPEED, TRAIL_WIDTH_END_AGE - age)
+		if camera == null or duration <= 0.00001:
+			continue
+		var direction: Vector3 = trail.direction
+		var head := Vector3(trail.origin) + direction * float(trail.distance)
+		var sideways := direction.cross(camera.global_basis.z).normalized()
+		if sideways.is_zero_approx():
+			sideways = camera.global_basis.x
+		var segments := ceili(duration / TRAIL_SAMPLE_SECONDS)
+		_trail_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
+		for sample in range(segments + 1):
+			var seconds_back := duration * float(sample) / segments
+			var normalized_age := (age + seconds_back) / TRAIL_LIFETIME
+			# Analytic segments match the cooked width and opacity LUT samples.
+			var width := TRAIL_WIDTH * maxf(0.0, maxf(1.0 - 4.0 * normalized_age, 0.3 - 0.5 * normalized_age))
+			var opacity := 1.0 - 0.5 * normalized_age
+			var point := head - direction * BOLT_SPEED * seconds_back
+			_trail_mesh.surface_set_color(Color(1.0, 1.0, 1.0, opacity))
+			_trail_mesh.surface_add_vertex(to_local_space * (point - sideways * width * 0.5))
+			_trail_mesh.surface_add_vertex(to_local_space * (point + sideways * width * 0.5))
+		_trail_mesh.surface_end()
+		_trail_renderer.show()
 
 func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
 	var collider := hit.collider as StaticBody3D
