@@ -84,7 +84,47 @@ func run() -> void:
 	lab.reset_player()
 	await physics_frame
 	check(visible_particles(dust) == 0 and visible_particles(wind) == 0, "Reset clears both movement effects")
+	await check_heavy_dust_timing(lab, dust)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_heavy_dust_timing(lab, dust: Node3D) -> void:
+	for i in 8:
+		await physics_frame
+	var landings: Array[Dictionary] = []
+	lab.player.surface_contact.connect(func(_point: Vector3, landed: bool):
+		if landed:
+			landings.append({"frame": Engine.get_physics_frames(), "particles": visible_particles(dust)}))
+	lab.get_node("HUD/DropMedium").pressed.emit()
+	for i in 2:
+		await physics_frame
+	var attack := InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	attack.pressed = true
+	root.push_input(attack, true)
+	for i in 2:
+		await physics_frame
+	attack = InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	root.push_input(attack, true)
+	var burst_frame := -1
+	var counts: Array[int] = []
+	for i in Engine.physics_ticks_per_second:
+		await physics_frame
+		var visible := visible_particles(dust)
+		if not landings.is_empty() and visible > 0:
+			if burst_frame < 0:
+				burst_frame = Engine.get_physics_frames() - 1
+			if counts.is_empty() or counts.back() != visible:
+				counts.append(visible)
+	check(landings.size() == 1 and landings[0].particles == 0,
+		"The actual Sabre dive suppresses the ordinary dust burst on touchdown")
+	var delay_ticks := ceili(0.045126423 * Engine.physics_ticks_per_second)
+	check(not landings.is_empty() and burst_frame == int(landings[0].frame) + delay_ticks,
+		"The first visible heavy dust appears at the Sabre debris notify")
+	check(not counts.is_empty() and counts[0] == 10, "The first burst is the ten heavy puffs")
+	for i in range(1, counts.size()):
+		check(counts[i] < counts[i - 1], "The dive emits a single burst")
+	print("MECHANIC_LAB_HEAVY_DUST landings=", landings, " burst_frame=", burst_frame, " counts=", counts)
