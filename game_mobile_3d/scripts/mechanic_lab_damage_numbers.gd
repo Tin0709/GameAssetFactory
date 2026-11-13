@@ -18,6 +18,7 @@ class DamageNumber:
 	var origin: Vector3
 	var travel: Vector3
 	var age := 0.0
+	var pending := true
 	var centre: Vector3
 	var depth: float
 
@@ -57,7 +58,11 @@ func _process(delta: float) -> void:
 	var glyph_count := 0
 	for i in range(_numbers.size() - 1, -1, -1):
 		var number := _numbers[i]
-		number.age += delta
+		# The first render delta can include time before this hit.
+		if number.pending:
+			number.pending = false
+		else:
+			number.age += delta
 		if number.age >= NUMBER_DURATION:
 			_numbers.remove_at(i)
 		else:
