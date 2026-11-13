@@ -66,6 +66,7 @@ const DEATH_LANDING_LINEAR_DAMP := 3.0
 const DEATH_LANDING_ANGULAR_DAMP := 4.0
 const DEATH_SUPPORTED_ANGULAR_DAMP := 12.0
 const SABRE_LATE_ROLL_ANGULAR_DAMP := 6.0
+const SABRE_GROUNDED_SLIDE_DRAG := 4.0
 const SABRE_ROLL_BLEND_END := 0.35
 const SABRE_BRACE_MIN_AGE := 0.82
 const SABRE_BRACE_GRAVITY_SHARE := 0.65
@@ -168,6 +169,7 @@ var _late_roll_damping := 0.0
 var _wall_brace_age := 0.0
 var _wall_gravity := false
 var _flat_brace_weight := 0.0
+var _had_upper_body_brace := false
 var _landing_gravity_sent := NAN
 var _landing_linear_damp_sent := NAN
 var _terrain_rest_age := 0.0
@@ -592,12 +594,17 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var roll_weight := 1.0 if damp_supported_roll else 0.0
 	if flat_sabre_finisher and not ragdoll.source_joints.is_empty():
 		roll_weight = _sabre_roll_weight(delta, contact_age, motion, damp_supported_roll) if supported else 0.0
-	var wall_gravity := _update_wall_brace(delta, motion)
+	if flat_sabre_finisher and damp_supported_roll and roll_weight > 0.9 and not _had_upper_body_brace:
+		# Keep the existing fall from an upper-body brace through its roll.
+		var drag := smoothstep(0.78, 1.00, _corpse_age) * (1.0 - smoothstep(0.9, 2.0, motion.linear))
+		if drag > 0.0:
+			_resist_grounded_slide(drag * SABRE_GROUNDED_SLIDE_DRAG)	var wall_gravity := _update_wall_brace(delta, motion)
 	# A slow corpse propped on its upper body can take seconds for its
 	# feet to come down. Restore some flight gravity until it rolls off.
 	var braced: bool = flat_sabre_finisher and not ragdoll.source_joints.is_empty() \
 		and contact_age >= gravity_blend_end - 0.00001 and _corpse_age >= SABRE_BRACE_MIN_AGE \
 		and motion.core_supports > 0 and motion.supports == 2 and not motion.leg_supported
+	_had_upper_body_brace = _had_upper_body_brace or braced
 	var brace_target := 1.0 - smoothstep(0.6, 1.6, motion.linear) if braced else 0.0
 	var flat_brace_weight := move_toward(_flat_brace_weight, brace_target, delta / SABRE_BRACE_BLEND_TIME)
 	var late_roll_damping := 0.0
@@ -644,6 +651,21 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		body.angular_damp = angular_damp
 	_landing_gravity_sent = final_gravity
 	_landing_linear_damp_sent = linear_damp
+
+func _resist_grounded_slide(drag: float) -> void:
+	# A uniform horizontal acceleration opposes whole-body drift. Leave
+	# the downward motion and the relative motion at each joint to the solver.
+	var momentum := Vector3.ZERO
+	var mass := 0.0
+	for body: PhysicalBone3D in ragdoll.bodies.values():
+		momentum += body.linear_velocity * body.mass
+		mass += body.mass
+	momentum.y = 0.0
+	var acceleration := -momentum * (drag / mass)
+	if acceleration.length_squared() <= 0.0001:
+		return
+	for body: PhysicalBone3D in ragdoll.bodies.values():
+		PhysicsServer3D.body_apply_central_force(body.get_rid(), acceleration * body.mass)
 
 func _sabre_roll_weight(delta: float, contact_age: float, motion: Dictionary, fully_supported: bool) -> float:
 	var target := 0.0
