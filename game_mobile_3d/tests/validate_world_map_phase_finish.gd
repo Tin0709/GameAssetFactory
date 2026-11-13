@@ -63,6 +63,13 @@ func run():
   check(air.air_bloom_weight==0. and is_equal_approx(air.humid_light_weight,.4),"Humid diffusion works without Bloom")
   if f.DepthDiffusion.supported(root):
    check(is_equal_approx(air.daylight_haze_weight,.65),"Daylight haze works without Bloom")
+   root.msaa_3d=Viewport.MSAA_4X;await settle()
+   air=w.look._exposure_effect.snapshot()
+   check(f.DepthDiffusion.supported(root) and is_equal_approx(air.daylight_haze_weight,.65),"4× MSAA preserves daylight haze")
+   check(f.active and f.last_error.is_empty(),"4× MSAA retains the Forest finish")
+   root.msaa_3d=Viewport.MSAA_2X;await settle()
+   air=w.look._exposure_effect.snapshot()
+   check(is_equal_approx(air.daylight_haze_weight,.65),"Returning to 2× MSAA restores sampleable haze depth")
   w.showcase.set_lighting_scale(&"bloom",1.)
   w.showcase.set_lighting_scale(&"humid_light",0.)
   await settle()
