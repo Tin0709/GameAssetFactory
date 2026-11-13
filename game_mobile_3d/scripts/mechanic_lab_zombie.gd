@@ -7,6 +7,7 @@ signal melee_audio(point: Vector3, contact: bool)
 
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
+const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
 const Ragdoll := preload("res://scenes/dev/zombie_death_physics/ragdoll.gd")
 const DeathProfile := preload("res://scenes/dev/zombie_death_physics/death_profile.gd")
 const CORPSE_SHADER := preload("res://materials/mechanic_lab_zombie_corpse.gdshader")
@@ -159,7 +160,7 @@ static var _corpse_base_material: ShaderMaterial
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D],
 		serial: int, physics_profile: Dictionary = {}, corpse_floor: CollisionShape3D = null,
-		health_bars: HealthBars = null) -> void:
+		health_bars: HealthBars = null, damage_numbers: DamageNumbers = null) -> void:
 	target = player
 	_physics_profile = physics_profile
 	_corpse_floor = corpse_floor
@@ -174,6 +175,7 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 	_feedback.digits = digits
 	_feedback.effects = effects
 	_feedback.health_bars = health_bars
+	_feedback.damage_numbers = damage_numbers
 	add_child(_feedback)
 	var capsule := CapsuleShape3D.new()
 	capsule.radius = 0.43

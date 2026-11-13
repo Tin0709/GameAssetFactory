@@ -2,15 +2,13 @@ extends Node3D
 ## The digit silhouettes come from the external MD2 cue atlas. Timing and colors are lab settings.
 
 const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
-const DIGIT_SIZE := 32
-const DIGIT_ADVANCE := 24.5
-const NUMBER_DURATION := 0.68
-const NUMBER_PIXEL_SIZE := 0.0144
+const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
 
 var digits: Array[Texture2D]
 var effects: Node3D
 var bar: MeshInstance3D
 var health_bars: HealthBars
+var damage_numbers: DamageNumbers
 var bar_slot := -1
 var _health_ratio := 1.0
 var _delayed_ratio := 1.0
@@ -80,11 +78,15 @@ func _spawn_number(amount: int) -> void:
 	var side := camera.global_basis.x if camera != null else Vector3.RIGHT
 	var lateral := side * (1.0 if _serial % 2 == 0 else -1.0)
 	_serial += 1
-	spawn_number(amount, digits, effects, global_position + Vector3.UP * 2.40, lateral)
+	var origin := global_position + Vector3.UP * 2.40
+	if damage_numbers != null:
+		damage_numbers.add_number(amount, origin, lateral)
+	else:
+		spawn_number(amount, digits, effects, origin, lateral)
 
 static func spawn_number(amount: int, glyphs: Array[Texture2D], parent: Node3D,
 		origin: Vector3, lateral: Vector3, tint: Color = Color.WHITE) -> void:
-	if glyphs.size() != 10:
+	if glyphs.size() != DamageNumbers.DIGIT_COUNT:
 		return
 	var number := Node3D.new()
 	number.name = "DamageNumber"
@@ -95,29 +97,33 @@ static func spawn_number(amount: int, glyphs: Array[Texture2D], parent: Node3D,
 		var sprite := Sprite3D.new()
 		sprite.texture = glyphs[text.unicode_at(i) - 48]
 		sprite.modulate = tint
-		sprite.pixel_size = NUMBER_PIXEL_SIZE
+		sprite.pixel_size = DamageNumbers.NUMBER_PIXEL_SIZE
 		sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 		sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		sprite.render_priority = 1
-		sprite.offset.x = (i - (text.length() - 1) * 0.5) * DIGIT_ADVANCE
+		sprite.offset.x = (i - (text.length() - 1) * 0.5) * DamageNumbers.DIGIT_ADVANCE
 		number.add_child(sprite)
 		sprites.append(sprite)
 	parent.add_child(number, true)
 	number.global_position = origin + lateral * 0.12
 	number.scale = Vector3.ONE * 0.85
 	var tween := number.create_tween().set_parallel()
-	tween.tween_property(number, "global_position", number.global_position + Vector3.UP * 0.74 + lateral * 0.32, NUMBER_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(number, "scale", Vector3.ONE * 1.13, 0.11).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(number, "global_position", number.global_position + Vector3.UP * 0.74 + lateral * 0.32,
+		DamageNumbers.NUMBER_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(number, "scale", Vector3.ONE * 1.13,
+		DamageNumbers.POP_DURATION).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	for sprite in sprites:
-		tween.tween_property(sprite, "modulate:a", 0.0, 0.28).set_delay(NUMBER_DURATION - 0.28)
+		tween.tween_property(sprite, "modulate:a", 0.0, DamageNumbers.FADE_DURATION).set_delay(
+			DamageNumbers.NUMBER_DURATION - DamageNumbers.FADE_DURATION)
 	tween.chain().tween_callback(number.queue_free)
 
 static func load_digits(path: String) -> Array[Texture2D]:
+	const DIGIT_SIZE := DamageNumbers.DIGIT_SIZE
 	var textures: Array[Texture2D] = []
 	var atlas := Image.load_from_file(path)
-	if atlas == null or atlas.get_size() != Vector2i(10 * DIGIT_SIZE, DIGIT_SIZE):
+	if atlas == null or atlas.get_size() != Vector2i(DamageNumbers.DIGIT_COUNT * DIGIT_SIZE, DIGIT_SIZE):
 		return textures
-	for digit in 10:
+	for digit in DamageNumbers.DIGIT_COUNT:
 		var image := atlas.get_region(Rect2i(digit * DIGIT_SIZE, 0, DIGIT_SIZE, DIGIT_SIZE))
 		for y in DIGIT_SIZE:
 			for x in DIGIT_SIZE:

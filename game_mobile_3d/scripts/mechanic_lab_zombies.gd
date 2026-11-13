@@ -9,6 +9,7 @@ signal zombie_attack_audio(point: Vector3, contact: bool)
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
+const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
 const SOURCE_DIR := "extracted/2026-10-25 19-26-25/Game/Spicewood"
 const ZOMBIE_DIR := "Art/Characters/Enemies/Zombie"
 const PHYSICS_PROFILE_PATH := "reports/combat/observations/zombie_physics_asset_20261112.private.json"
@@ -91,6 +92,7 @@ const MELEE_CONTACT_HEIGHT := Vector3.UP * (Zombie.HEIGHT * 0.5)
 
 var _visual: PackedScene
 var health_bars: HealthBars
+var damage_numbers: DamageNumbers
 var sword_equipped := false
 var curved_equipped := false
 var ragdoll_launch_multiplier := 1.0
@@ -131,7 +133,7 @@ func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie:
 	zombie.max_health = Zombie.BASE_HEALTH if base_zombie else Zombie.TRAINING_HEALTH
 	var corpse_floor := get_node_or_null("../Ground/Collision") as CollisionShape3D
 	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial, _physics_profile,
-		corpse_floor, health_bars)
+		corpse_floor, health_bars, damage_numbers)
 	zombie.melee_hit.connect(player_hit.emit)
 	zombie.melee_audio.connect(zombie_attack_audio.emit)
 	_spawn_serial += 1
