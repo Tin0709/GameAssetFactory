@@ -83,6 +83,14 @@ gaf_replay_bounce={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 0)
 }
+gaf_replay_surface={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
+gaf_replay_surface_field={
+"type": "sampler3D",
+"value": ""
+}
 gaf_sun_opening_gain={
 "type": "float",
 "value": 0.0

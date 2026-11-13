@@ -29,6 +29,12 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 ## Optional position for the editor-only decorative Forest emission reference.
 @export var forest_replay_site := Vector2.INF
 @export var forest_replay_steps_site := Vector2.INF
+## Optional, map-specific terrain-light bake relative to the private research folder.
+@export var forest_replay_surface_path := ""
+@export var forest_replay_surface_sha256 := ""
+@export var forest_replay_surface_map_sha256 := ""
+@export var forest_replay_surface_origin := Vector3.ZERO
+@export var forest_replay_surface_extent := Vector3i.ZERO
 ## Optional translation in the two axes of the projected sunlight plane.
 @export var projected_sun_shift := Vector2.ZERO
 var runtime: Dictionary

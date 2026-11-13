@@ -29,6 +29,11 @@ sculk_surface_sites = PackedVector2Array(-22, 15, -23, 19, -24, 23, -24, 26)
 forest_path_light_offset = Vector2(-9.6, 2.3)
 forest_replay_site = Vector2(-27.5, 8.5)
 forest_replay_steps_site = Vector2(-24.5, -42.5)
+forest_replay_surface_path = "graphics_vfx/forest_pix_capture_20261112/forest_twilight_fixed_lights/replay_diffuse_mobile.private.rg"
+forest_replay_surface_sha256 = "1302ac24afebf42551bdae8d6686cf986fda61cc33d0c86c2150ac85278e14c7"
+forest_replay_surface_map_sha256 = "53e243bb23f95f17990d02d8871393fa1a26c5aa67ae79314361b5cdc1c6f805"
+forest_replay_surface_origin = Vector3(-30.5, 2.75, -48.5)
+forest_replay_surface_extent = Vector3i(48, 27, 47)
 
 [node name="Ground" parent="."]
 collision_layer = 0
