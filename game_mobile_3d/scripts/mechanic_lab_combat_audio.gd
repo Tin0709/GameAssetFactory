@@ -356,7 +356,7 @@ func zombie_attack(point: Vector3, contact: bool) -> void:
 		_play(&"zombie_hit" if contact else &"zombie_windup", point,
 			ZOMBIE_HIT_GAIN_DB if contact else ZOMBIE_WINDUP_GAIN_DB)
 
-func queue_zombie_step(sole: Vector3, listener: Vector3, find_support: Callable) -> void:
+func queue_zombie_step(sole: Vector3, listener: Vector3, find_support: Callable, known_support: Variant = null) -> void:
 	if not enabled or not _groups.has(&"zombie_step"):
 		return
 	var frame := Engine.get_physics_frames()
@@ -376,7 +376,7 @@ func queue_zombie_step(sole: Vector3, listener: Vector3, find_support: Callable)
 		index -= 1
 	if index >= available:
 		return
-	var support: Dictionary = find_support.call(sole)
+	var support: Dictionary = find_support.call(sole) if known_support == null else known_support
 	if support.is_empty():
 		return
 	_step_distances.insert(index, distance)

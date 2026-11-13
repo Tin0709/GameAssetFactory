@@ -9,6 +9,7 @@ const WorldAmbient := preload("res://scripts/world_map_ambient.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const MovementAudio := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/environment_audio.gd")
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
+const ZombieStepDust := preload("res://scripts/mechanic_lab_zombie_step_dust.gd")
 const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
 const PrivateOverworldBundle := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/private_bundle.gd")
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
@@ -61,6 +62,7 @@ var _crowd_spawns_left := 0
 var _crowd_base_health := false
 var _previous_msaa: Viewport.MSAA
 var _combat_audio: CombatAudio
+var _zombie_step_dust: ZombieStepDust
 var _slam_swing_frame := -1
 var _slam_swing_serial := -1
 var _slam_audio_frame := -1
@@ -186,6 +188,13 @@ func _ready() -> void:
 				player.source_step_dust_size):
 			dust.use_source_landing()
 			add_child(dust)
+			var zombie_dust := ZombieStepDust.new()
+			zombie_dust.name = "ZombieStepDust"
+			if zombie_dust.setup(dust._particles[0].sprite.texture, dust._run_alpha, dust._run_alpha_duration):
+				_zombie_step_dust = zombie_dust
+				add_child(zombie_dust)
+			else:
+				zombie_dust.free()
 		else:
 			dust.free()
 		var wind := MovementWind.new()
@@ -617,7 +626,12 @@ func _grass_landing_contact_at(point: Vector3) -> Dictionary:
 	return {"position": nearest, "surface": "grass"} if closest < INF else {}
 
 func _on_zombie_step(sole: Vector3) -> void:
-	_combat_audio.queue_zombie_step(sole, player.global_position, _grass_contact_at)
+	var support: Variant = null
+	if _zombie_step_dust != null:
+		support = _grass_contact_at(sole)
+		if not support.is_empty():
+			_zombie_step_dust.burst(support.position)
+	_combat_audio.queue_zombie_step(sole, player.global_position, _grass_contact_at, support)
 
 func _heavy_debris_delay() -> float:
 	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
@@ -929,6 +943,8 @@ func reset_player() -> void:
 	_clear_contact_light()
 	if _combat_audio != null:
 		_combat_audio.reset()
+	if _zombie_step_dust != null:
+		_zombie_step_dust.clear()
 	if _crossbow != null:
 		_crossbow.reset()
 	player.position = SPAWN

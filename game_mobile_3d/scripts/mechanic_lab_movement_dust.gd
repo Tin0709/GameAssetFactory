@@ -248,6 +248,9 @@ static func _sample_curve(curve: PackedFloat32Array, normalized_age: float) -> f
 	var index := floori(cursor)
 	return lerpf(curve[index], curve[mini(index + 1, curve.size() - 1)], cursor - index)
 
+static func source_step_height(age: float, drag: float) -> float:
+	return (age - (1.0 - exp(-drag * age)) / drag) / drag
+
 func _update_source_landing(particle: Particle) -> void:
 	# Use the cooked semi-implicit velocity update on a fixed clock, with
 	# interpolation to the current render time between simulation ticks.
@@ -281,8 +284,7 @@ func _process(delta: float) -> void:
 		if particle.run_drag > 0.0:
 			# Closed form of upward acceleration with linear drag, sampled
 			# by age so the rendered path is independent of render cadence.
-			var drag := particle.run_drag
-			var height := (particle.age - (1.0 - exp(-drag * particle.age)) / drag) / drag
+			var height := source_step_height(particle.age, particle.run_drag)
 			particle.sprite.global_position = particle.origin + Vector3.UP * height
 			particle.sprite.modulate.a = _sample_curve(_run_alpha, progress / _run_alpha_duration)
 			active = true
