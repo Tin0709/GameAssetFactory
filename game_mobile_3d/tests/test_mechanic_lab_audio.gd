@@ -122,9 +122,43 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 	toggle.button_pressed = false
 	check(not movement.footsteps_enabled and not movement.step_voices.any(func(voice): return voice.playing),
 		"Turning off lab audio stops movement voices immediately")
+	await check_movement_support(lab, movement, toggle)
 	print("MECHANIC_LAB_MOVEMENT_AUDIO steps=", steps, " landing=", movement.event_count.landing,
 		" step_peak=", peak, " landing_peak=", landing_peak)
 	lab.free()
+
+func check_movement_support(lab, movement, toggle: CheckButton) -> void:
+	lab.reset_player()
+	toggle.button_pressed = true
+	var dust := lab.get_node("MovementDust") as Node3D
+	var floor_body := lab.get_node("Ground") as StaticBody3D
+	floor_body.position.y += 0.25
+	lab.player.global_position += Vector3.UP * 0.75
+	for i in 45:
+		await physics_frame
+	check(lab.player.is_on_floor(), "The raised grass floor physically supports the player")
+	var landing_count: int = movement.event_count.landing
+	check(lab.player.drop_for_lab(0.25), "The grass floor fixture starts a real ordinary drop")
+	for i in 45:
+		await physics_frame
+		if movement.event_count.landing > landing_count:
+			break
+	var landed_at: Vector3 = lab.player.global_position
+	var last_event: Dictionary = movement.events.back()
+	check(movement.event_count.landing == landing_count + 1 and last_event.key == "land_grass"
+		and is_equal_approx(float(last_event.at[1]), 0.25),
+		"Ordinary landing audio uses the raised floor height instead of the posed soles")
+	check(dust.get_children().any(func(particle): return particle.visible),
+		"The supported ordinary landing still emits dust")
+	for i in 30:
+		await physics_frame
+	var before: int = movement.events.size()
+	lab.player.surface_contact.emit(landed_at + Vector3.UP * 2.0, false)
+	lab.player.surface_contact.emit(Vector3(51.0, 0.25, 0.0), false)
+	check(movement.events.size() == before and not dust.get_children().any(func(particle): return particle.visible),
+		"Feet in the air or past the grass edge start neither steps nor grass dust")
+	toggle.button_pressed = false
+	await create_timer(0.08).timeout
 
 func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
@@ -138,8 +172,12 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	for voice: AudioStreamPlayer3D in audio._voices:
 		voice.bus = AudioServer.get_bus_name(bus)
 	var landings: Array[int] = []
+	var touchdown := Vector3.INF
 	lab.player.heavy_jump_landed.connect(func(_point, _forward, _serial, _height):
 		landings.append(Engine.get_physics_frames()))
+	var touchdown_points: Array[Vector3] = []
+	lab.player.heavy_jump_landed.connect(func(point, _forward, _serial, _height):
+		touchdown_points.append(point))
 	for attempt in 3:
 		for i in 20:
 			await physics_frame
@@ -180,6 +218,11 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 			if dust_frame < 0 and dust.get_children().any(func(particle): return particle.visible):
 				dust_frame = Engine.get_physics_frames() - 1
 		if attempt == 0:
+			touchdown = touchdown_points[attempt]
+			var grass_voices: Array = audio._voices.filter(func(voice): return voice.stream in audio._groups[&"slam_grass"])
+			check(grass_voices.size() == 1 and grass_voices[0].global_position.is_equal_approx(
+				Vector3(touchdown.x, 0.0, touchdown.z)),
+				"The Sabre debris sample is positioned at the physical touchdown")
 			var delay_ticks := ceili(0.045126423 * Engine.physics_ticks_per_second)
 			check(playback_frame == landings[attempt] + delay_ticks and playback_frame == dust_frame
 				and audio._next_choice.get(&"slam_grass", 0) == 1 and audio._next_choice.get(&"slam", 0) == 0,
