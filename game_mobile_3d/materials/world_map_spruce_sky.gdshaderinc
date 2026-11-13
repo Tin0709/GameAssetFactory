@@ -4,6 +4,7 @@ global uniform vec3 gaf_spruce_sky_camera;
 global uniform sampler3D gaf_spruce_sky_volume : filter_linear, repeat_disable;
 global uniform float gaf_canopy_edge_fill;
 global uniform float gaf_canopy_sky_color;
+global uniform float gaf_pre_twilight_receiver;
 
 float gaf_spruce_sky(vec3 point, vec3 camera_position) {
 	if (gaf_spruce_sky_region.w <= 0.0 || distance(camera_position, gaf_spruce_sky_camera) > 0.01) {
@@ -25,6 +26,15 @@ float gaf_ground_canopy_sky(float current) {
 	// Restore some sky at the edge of the canopy. Keep the dense core dark.
 	float cover = clamp((1.0 - current) / gaf_spruce_sky_region.w, 0.0, 1.0);
 	return mix(current, 1.0, gaf_canopy_edge_fill * (1.0 - smoothstep(0.18, 0.60, cover)));
+}
+
+vec3 gaf_pre_twilight_diffuse(vec3 rgb) {
+	if (gaf_pre_twilight_receiver <= 0.0) return rgb;
+	const vec3 luma = vec3(.2126, .7152, .0722);
+	// Original chroma adjustment at fixed incident luminance.
+	vec3 target = rgb * vec3(1.15, 1.0, 1.20);
+	target *= dot(rgb, luma) / max(dot(target, luma), .000001);
+	return mix(rgb, target, gaf_pre_twilight_receiver);
 }
 
 vec3 gaf_canopy_diffuse_color(vec3 rgb, float visibility, float gain) {

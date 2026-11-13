@@ -77,10 +77,11 @@ void fragment(){
 #endif
 		if(player_local_light){
 			vec3 incident = player_cube_light(wn,height,cloud,actor_canopy_sky);
-			if (actor_canopy_color_mix > 0.0 && actor_canopy_sky < 0.96) {
+			if ((actor_canopy_color_mix > 0.0 && actor_canopy_sky < 0.96) || gaf_pre_twilight_receiver > 0.0) {
 				// Retint only the diffuse sky contribution. The probe's sun bounce and reflection are separate.
 				vec3 sky = player_cube_sky(wn, height, actor_canopy_sky);
-				incident += gaf_canopy_diffuse_color(sky, actor_canopy_sky, actor_canopy_color_mix) - sky;
+				vec3 diffuse_sky = gaf_canopy_diffuse_color(sky, actor_canopy_sky, actor_canopy_color_mix);
+				incident += gaf_pre_twilight_diffuse(diffuse_sky) - sky;
 			}
 			EMISSION+=ALBEDO*(1.-METALLIC)*incident*visible_sky;
 			AO=0.; // Replace engine diffuse sky instead of stacking two ambient terms.

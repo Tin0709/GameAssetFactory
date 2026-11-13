@@ -113,6 +113,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"spruce_sky": ["Forest canopy sky", 1.],
 	&"canopy_edge_fill": ["Ánh trời rìa tán", 1.],
 	&"canopy_sky_color": ["Sắc ánh trời dưới tán", 1.],
+	&"pre_twilight_receiver": ["Sắc ánh hắt trước chạng vạng", 1.],
 	&"tree_shade": ["Tree shade depth", 1.],
 	&"twilight_ground_ambient": ["Ánh hắt mặt đất lúc chạng vạng", 1.],
 	&"twilight_crown": ["Ánh hắt trên tán lúc chạng vạng", 1.],
@@ -187,7 +188,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 114
+const LIGHTING_MIX_VERSION := 115
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1371,6 +1372,14 @@ func player_sun_shoulder_weight() -> float:
 		return 0.
 	return _lighting_scale(&"player_sun_shoulder") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 
+func pre_twilight_receiver_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() \
+			or not captured_sky_response or not sky_response.available() or phase_air.evening_anchors.is_empty() \
+			or level.view_mode != "gameplay":
+		return 0.0
+	var phase := smoothstep(17.0, 18.25, hour) * (1.0 - smoothstep(18.5, 19.5, hour))
+	return phase * _lighting_scale(&"pre_twilight_receiver")
+
 func player_canopy_color_weight() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context():
 		return 0.
@@ -1727,6 +1736,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 72 and effect == &"evening_lantern":
 			missing_value = 0.
+		if version < 115 and effect == &"pre_twilight_receiver":
+			missing_value = 0.
 		if version < 114 and effect == &"pre_twilight_air":
 			missing_value = 0.
 		if version < 113 and effect == &"afternoon_lantern":
@@ -1844,6 +1855,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and key_response.evening_available()
 		if effect in [&"evening_lantern", &"afternoon_lantern"]:
 			slider.editable = slider.editable and point_response.evening_available()
+		if effect == &"pre_twilight_receiver":
+			slider.editable = slider.editable and sky_response.available() and not phase_air.evening_anchors.is_empty()
 		if effect in [&"twilight_sky_chroma", &"twilight_ambient", &"twilight_crown"]:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"crown_ambient_depth":
@@ -1999,6 +2012,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile", &"pre_twilight_air"]:
 		_update_mist()
+		return
+	if changed_effect == &"pre_twilight_receiver":
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"tree_shade"]:
 		return

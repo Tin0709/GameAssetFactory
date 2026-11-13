@@ -237,6 +237,7 @@ void fragment(){
 		EMISSION = gaf_turf_ambient(EMISSION);
 		EMISSION = gaf_dawn_turf_chroma(EMISSION, vec3(1.65, 1.0, .81), .55 * dawn_turf);
 	}
+	EMISSION = gaf_pre_twilight_diffuse(EMISSION);
 	EMISSION += color * (1.0 - METALLIC) * study_day_bounce_at_root;
 	EMISSION *= sole;
 	EMISSION += color * (1.0 - METALLIC) * gaf_replay_incident(foliage_world,vec3(0.0,1.0,0.0)) * (0.64 * sole);

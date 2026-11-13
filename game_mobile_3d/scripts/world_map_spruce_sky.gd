@@ -11,6 +11,7 @@ var applied_strength := 0.
 var applied_tree_strength := 0.
 var applied_edge_fill := 0.
 var applied_sky_color := 0.
+var applied_pre_twilight := 0.
 var _level: Node3D
 var _camera: Camera3D
 var _texture: ImageTexture3D
@@ -77,6 +78,7 @@ func setup(level: Node3D) -> void:
 	RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", 0.)
+	RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_extent", Vector3(_dimensions))
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", _texture)
 	proof_ready = true
@@ -101,6 +103,7 @@ func refresh() -> void:
 		applied_tree_strength = 0.
 		applied_edge_fill = 0.
 		applied_sky_color = 0.
+		applied_pre_twilight = 0.
 		return
 	var strength := 0.
 	var review = _level.showcase
@@ -129,6 +132,10 @@ func refresh() -> void:
 	if sky_color != applied_sky_color:
 		applied_sky_color = sky_color
 		RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", sky_color)
+	var receiver: float = review.pre_twilight_receiver_weight()
+	if receiver != applied_pre_twilight:
+		applied_pre_twilight = receiver
+		RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", receiver)
 	if strength > 0. and _published_camera != _camera.global_position:
 		_published_camera = _camera.global_position
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_camera", _published_camera)
@@ -139,5 +146,6 @@ func _exit_tree() -> void:
 		RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", 0.)
+		RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", null)
 		_owner = null
