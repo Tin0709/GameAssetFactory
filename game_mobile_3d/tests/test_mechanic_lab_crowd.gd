@@ -60,11 +60,13 @@ func run() -> void:
 		zombie.velocity = Vector3.ZERO
 		zombie.reset_physics_interpolation()
 		zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
+	var bars := group.get_node_or_null("../ZombieHealthBars") as MultiMeshInstance3D
+	if bars != null and bars.multimesh.visible_instance_count != 0:
+		failures.append("A lethal hit immediately removes the zombie's overhead bar")
 	await measure("simultaneous_ragdolls", 120, group)
 	if active_peak != COUNT:
 		failures.append("Expected all 100 ragdolls to run together")
 	await measure("corpse_cleanup", 200, group)
-	var bars := group.get_node_or_null("../ZombieHealthBars") as MultiMeshInstance3D
 	if bars != null and bars.multimesh.visible_instance_count != 0:
 		failures.append("The batch drops the bars of despawned zombies")
 	var clean := group.get_child_count() == 0
@@ -135,15 +137,24 @@ func check_health_bars(group: Node) -> void:
 	var second_slot: int = second._feedback.bar_slot
 	first.take_hit(1, Vector3.RIGHT, Vector2.ZERO, 0.0)
 	await process_frame
-	var first_bar := batch.multimesh.get_instance_custom_data(first_slot)
-	var second_bar := batch.multimesh.get_instance_custom_data(second_slot)
+	await process_frame
+	# The dummy renderer does not store the instance transforms or custom data.
+	var headless := DisplayServer.get_name() == "headless"
+	var first_bar: Color = batch._fills[first_slot] if headless else batch.multimesh.get_instance_custom_data(first_slot)
+	var second_bar: Color = batch._fills[second_slot] if headless else batch.multimesh.get_instance_custom_data(second_slot)
 	var expected := float(first.health) / float(first.max_health)
 	if not is_equal_approx(first_bar.r, expected) or not is_equal_approx(first_bar.g, 1.0) \
 			or not is_equal_approx(second_bar.r, 1.0):
-		failures.append("A hit changes only the target bar while preserving its delayed fill")
-	var centre := batch.to_global(batch.multimesh.get_instance_transform(first_slot).origin)
+		failures.append("Expected independent hit and delayed fills: got %s and %s" % [first_bar, second_bar])
+	var position: Vector3 = batch._positions[first_slot] if headless else batch.multimesh.get_instance_transform(first_slot).origin
+	var centre := batch.to_global(position)
 	if centre.distance_to(first.global_position + Vector3.UP * 2.16) > 0.15:
-		failures.append("The batched bar follows the zombie above its head")
+		failures.append("Expected the bar to follow the zombie: got %s above %s" % [centre, first.global_position])
+	for i in 20:
+		await process_frame
+	first_bar = batch._fills[first_slot] if headless else batch.multimesh.get_instance_custom_data(first_slot)
+	if not is_equal_approx(first_bar.g, expected):
+		failures.append("The delayed fill catches up to the target's current health")
 
 func check_blocked_chase(group: Node) -> void:
 	lab.reset_player()
