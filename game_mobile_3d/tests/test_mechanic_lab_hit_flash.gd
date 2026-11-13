@@ -1,5 +1,7 @@
 extends SceneTree
 
+const ContactSparks := preload("res://scripts/mechanic_lab_contact_sparks.gd")
+
 class FlashMonitor extends Node:
 	var zombie: CharacterBody3D
 	var hit := false
@@ -75,5 +77,40 @@ func check_hit(fatal: bool) -> void:
 func run() -> void:
 	await check_hit(false)
 	await check_hit(true)
+	await check_crowd_sparks()
 	print("MECHANIC_LAB_HIT_FLASH failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_crowd_sparks() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	await ticks(12)
+	var sparks := lab.get_node("ContactSparks") as ContactSparks
+	var renderer := sparks.get_node("Streaks") as MultiMeshInstance3D
+	var group := lab.get_node("Zombies")
+	var origin: Vector3 = lab.player.global_position + Vector3.UP
+	var nearest: Array[Vector3] = []
+	# Feed the normal contact signal in near-first order, then flood it with distant contacts.
+	for i in 100:
+		var point := origin + Vector3.RIGHT * (0.8 * (i + 1))
+		if i < 5:
+			nearest.append(point)
+		group.sabre_contact.emit(point, Vector3.RIGHT, "Attack3", 2, 1700, false)
+	await process_frame
+	await process_frame
+	var counts := [0, 0, 0, 0, 0]
+	for particle in sparks._particles:
+		if particle.age >= particle.lifetime:
+			continue
+		for i in nearest.size():
+			if particle.origin.distance_squared_to(nearest[i]) < 0.22 ** 2:
+				counts[i] += 1
+	check(counts == [9, 9, 9, 9, 9] and renderer.multimesh.visible_instance_count == 45,
+		"A 100-contact burst shows five complete groups of streaks at the nearest hits")
+	lab.reset_player()
+	await process_frame
+	await process_frame
+	check(renderer.multimesh.visible_instance_count == 0 and not sparks.is_processing(),
+		"Reset clears the crowd sparks and stops their frame callback")
+	lab.free()
