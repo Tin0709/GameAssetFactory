@@ -80,25 +80,56 @@ func _handoff_wall_clearance() -> Vector3:
 	if space.intersect_shape(_handoff_bounds_query, 1).is_empty():
 		return Vector3.ZERO
 	if wall_handoff_animation != null and _handoff_straddles_wall(space, collision_mask):
-		# Keep the authored body offsets and joints together when an animated
-		# limb is already across a wall. Starting those bodies as captured can
-		# send the limb and torso in opposite directions on the first solve.
-		wall_handoff_animation.stop()
-		skeleton.reset_bone_poses()
-		wall_handoff_animation.play(wall_handoff_idle)
-		wall_handoff_animation.advance(0.0)
-		wall_handoff_animation.pause()
-		sample(sample_delta)
-		sample(sample_delta)
+		return _blend_wall_handoff(space, collision_mask)
 	return super._handoff_wall_clearance()
 
-func _handoff_straddles_wall(space: PhysicsDirectSpaceState3D, collision_mask: int) -> bool:
+func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) -> Vector3:
+	var source: Array[Transform3D] = []
+	for bone in skeleton.get_bone_count():
+		source.append(skeleton.get_bone_pose(bone))
+	wall_handoff_animation.stop()
+	skeleton.reset_bone_poses()
+	wall_handoff_animation.play(wall_handoff_idle)
+	wall_handoff_animation.advance(0.0)
+	wall_handoff_animation.pause()
+	var idle: Array[Transform3D] = []
+	for bone in source.size():
+		idle.append(skeleton.get_bone_pose(bone))
+	# Search from the least visible correction. Interpolating bone-local
+	# transforms retains the source hierarchy while retracting the limbs.
+	for idle_weight: float in [0.25, 0.50, 0.75, 1.0]:
+		for bone in source.size():
+			skeleton.set_bone_pose(bone, source[bone].interpolate_with(idle[bone], idle_weight))
+		sample(sample_delta)
+		var shift := super._handoff_wall_clearance()
+		if idle_weight == 1.0 or _wall_handoff_is_clear(space, collision_mask, shift):
+			# The chosen pose has no observed velocity. Both snapshots must
+			# agree so the correction itself doesn't become a launch impulse.
+			sample(sample_delta)
+			return shift
+	return Vector3.ZERO
+
+func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: int, shift: Vector3) -> bool:
+	if _handoff_straddles_wall(space, collision_mask, shift, 0.0):
+		return false
+	for name: String in current:
+		var pose: Transform3D = current[name]
+		var points := _terrain_contacts_at(bodies[name], space, pose.translated(shift))
+		for i in range(0, points.size(), 2):
+			var separation := points[i + 1] - points[i]
+			var depth := separation.length()
+			if depth > HANDOFF_WALL_REST_OVERLAP and absf(separation.y) < depth * 0.7:
+				return false
+	return true
+
+func _handoff_straddles_wall(space: PhysicsDirectSpaceState3D, collision_mask: int,
+		shift := Vector3.ZERO, tolerance := SOURCE_ANCHOR_TOLERANCE) -> bool:
 	var ray := PhysicsRayQueryParameters3D.new()
 	ray.collision_mask = collision_mask
-	var origin := skeleton.global_position
+	var origin := skeleton.global_position + shift
 	for pose: Transform3D in current.values():
 		ray.from = Vector3(origin.x, pose.origin.y, origin.z)
-		ray.to = pose.origin
+		ray.to = pose.origin + shift
 		if ray.from.distance_squared_to(ray.to) <= SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
 			continue
 		var hit := space.intersect_ray(ray)
@@ -106,7 +137,7 @@ func _handoff_straddles_wall(space: PhysicsDirectSpaceState3D, collision_mask: i
 			continue
 		var normal: Vector3 = hit.normal
 		var point: Vector3 = hit.position
-		if absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - ray.to) > SOURCE_ANCHOR_TOLERANCE:
+		if absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - ray.to) > tolerance:
 			return true
 	return false
 
