@@ -307,7 +307,9 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	var radial := air_attack or sabre_finisher
 	var direction := zombie.global_position - origin if radial else forward
 	direction.y = 0.0
-	direction = direction.normalized()
+	# A target on the strike origin has no radial heading. Preserve the
+	# attack's facing so the ragdoll does not default to world forward.
+	direction = forward if direction.is_zero_approx() else direction.normalized()
 	var damage := roundi(float(strike.damage) * SPLASH_MULTIPLIER) if splash else int(strike.damage)
 	var angle := deg_to_rad(float(strike.angle))
 	var impulse := Vector2(cos(angle), sin(angle)) * float(strike.strength) * IMPULSE_PER_STRENGTH
