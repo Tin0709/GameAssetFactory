@@ -31,6 +31,7 @@ func run() -> void:
 	current_scene = lab
 	await ticks(12)
 	var menu := lab.get_node("HUD/Weapon") as OptionButton
+	var original_air: Dictionary = lab.player.clips.AirAttack
 	check(not menu.disabled and menu.item_count == 5, "Both requested weapons appear in the live selector")
 	if menu.item_count != 5:
 		quit(1)
@@ -75,7 +76,7 @@ func run() -> void:
 	], "Held input plays all three gauntlet strikes in order")
 	check(target.health <= 65, "Gauntlet combo applies its own 10/11/14 damage")
 	equip(menu, 0)
-	check(menu.selected == 0 and lab.player.clips.AirAttack.source_name.contains("1H_Medium"),
+	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
 		"Switching back restores the original Sabre")
 	print("MECHANIC_LAB_REQUESTED_WEAPONS failures=", failures)
 	quit(1 if failures else 0)

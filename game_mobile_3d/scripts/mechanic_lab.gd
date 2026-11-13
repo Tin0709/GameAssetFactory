@@ -123,10 +123,12 @@ func _enter_tree() -> void:
 	add_child(presentation)
 	presentation.begin(self)
 	var using_private := PlayerFactory.uses_private_player()
-	var actor := PlayerFactory.create(using_private)
-	if using_private and OS.has_feature("editor") and "primary_ready" in actor:
-		actor.free()
-		actor = load("res://scripts/mechanic_lab_player.gd").new()
+	var actor: CharacterBody3D
+	const LAB_PLAYER := "res://scripts/mechanic_lab_player.gd"
+	if using_private and OS.has_feature("editor") and ResourceLoader.exists(LAB_PLAYER):
+		actor = load(LAB_PLAYER).new()
+	else:
+		actor = PlayerFactory.create(using_private)
 	if "native_jump_pose_enabled" in actor:
 		actor.native_jump_pose_enabled = true
 	actor.name = "Player"
@@ -315,7 +317,7 @@ func _select_weapon(index: int) -> void:
 		Weapon.GAUNTLETS:
 			mesh = _gauntlet_mesh
 			blade_tip = blade_base
-			aliases = {"AirAttack": Gauntlets.AIR}
+			aliases = {}
 			rates = {}
 	_weapon_mesh.mesh = mesh
 	_weapon_mesh.rotation.y = rotation_y
@@ -334,6 +336,8 @@ func _select_weapon(index: int) -> void:
 	var curved_equipped := index == Weapon.CURVED_GREATSWORD
 	var crossbow_equipped := index == Weapon.CROSS_POLLINATOR
 	var gauntlets_equipped := index == Weapon.GAUNTLETS
+	player.active_clip = ""
+	# Switching out of a special locomotion profile restores the source slots first.
 	player.crossbow_equipped = crossbow_equipped
 	player.gauntlets_equipped = gauntlets_equipped
 	player.clips.AirAttack = player.clips[Gauntlets.AIR] if gauntlets_equipped else _sabre_air_clip
@@ -407,7 +411,8 @@ func _load_crossbow(root: String) -> bool:
 	if mesh == null or bolt == null:
 		return false
 	var profile := CrossPollinator.combat_profile(root)
-	player._load_private_combat_clips(profile, CrossPollinator.LIBRARY)
+	if not player.animation_player.has_animation_library(CrossPollinator.LIBRARY):
+		player._load_private_combat_clips(profile, CrossPollinator.LIBRARY)
 	if not player.animation_player.has_animation_library(CrossPollinator.LIBRARY):
 		return false
 	_crossbow_locomotion = CrossPollinator.load_locomotion(player, root)
@@ -457,7 +462,8 @@ func _on_grounded_attack(index: int, clip: String, serial: int) -> void:
 		$Zombies.strike_sabre(index, clip, serial)
 		return
 	var forward: Vector3 = player.visual.global_basis.z.normalized()
-	var muzzle: Vector3 = player._weapon_attachment.global_position + forward * 0.25
+	# The exported model and local shot use the same right-hand origin.
+	var muzzle: Vector3 = player._weapon_attachment.global_position + player.visual.global_basis * Vector3(-0.05, 0.25, 0.25)
 	var direction: Vector3 = $Zombies.bolt_direction(muzzle, forward, serial)
 	if _crossbow.fire(muzzle, direction, serial):
 		_combat_audio.crossbow_fired(muzzle)
