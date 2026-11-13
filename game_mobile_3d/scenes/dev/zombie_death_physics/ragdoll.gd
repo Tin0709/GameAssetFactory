@@ -430,7 +430,7 @@ func _project_source_anchors() -> void:
 					overshot = true
 					break
 		var bias := CONE_OVERSHOOT_BIAS if overshot else CONE_DEFAULT_BIAS
-		PhysicsServer3D.cone_twist_joint_set_param(source_joint_rids[name], PhysicsServer3D.CONE_TWIST_JOINT_BIAS, bias)
+		_set_source_joint_bias(source_joint_rids[name], bias)
 		var contacting := state.get_contact_count() > 0
 		var correction := parent_frame.origin - child_frame.origin
 		var distance := correction.length()
@@ -462,6 +462,9 @@ func _project_source_anchors() -> void:
 			motion *= safe_fraction
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
+
+func _set_source_joint_bias(joint: RID, bias: float) -> void:
+	PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_BIAS, bias)
 
 func _slide_supported_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState3D,
 		gap: Vector3, distance: float, floor_rid: RID) -> void:

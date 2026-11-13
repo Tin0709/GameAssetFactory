@@ -2,6 +2,7 @@ extends "res://scenes/dev/zombie_death_physics/ragdoll.gd"
 
 var _sample_bone_ids: Dictionary[String, int]
 var _sample_body_offsets: Dictionary[String, Transform3D]
+var _source_joint_biases: Dictionary[RID, float]
 
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
 		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}) -> void:
@@ -25,7 +26,14 @@ func sample(delta: float) -> void:
 			* _sample_body_offsets[name])
 	sample_count += 1
 
+func _set_source_joint_bias(joint: RID, bias: float) -> void:
+	if _source_joint_biases.get(joint, -1.0) == bias:
+		return
+	super._set_source_joint_bias(joint, bias)
+	_source_joint_biases[joint] = bias
+
 func release(visible_world_pose: Array[Transform3D] = []) -> void:
 	super.release(visible_world_pose)
+	_source_joint_biases.clear()
 	_sample_bone_ids.clear()
 	_sample_body_offsets.clear()
