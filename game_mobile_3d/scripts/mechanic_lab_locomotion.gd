@@ -8,6 +8,7 @@ const CROSSBOW_RUN_PHASE_OFFSET := 0.05
 const CROSSBOW_ARM_SWAY_WEIGHT := 0.58
 var _left_arm := -1
 var _right_arm := -1
+var _crossbow_carry: Array[Transform3D] = []
 
 func setup(skeleton: Skeleton3D, path: String, target_path: String) -> bool:
 	if not super.setup(skeleton, path, target_path):
@@ -15,6 +16,9 @@ func setup(skeleton: Skeleton3D, path: String, target_path: String) -> bool:
 	_left_arm = rig.find_bone("J_L_Arm")
 	_right_arm = rig.find_bone("J_R_Arm")
 	return _left_arm >= 0 and _right_arm >= 0
+
+func set_crossbow_carry(pose: Array[Transform3D]) -> void:
+	_crossbow_carry = pose
 
 func apply(actor, key: String, delta: float) -> void:
 	if actor.review_clip.is_empty() and key in WALKS:
@@ -54,6 +58,11 @@ func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transf
 	var spine := parents[_body_bone]
 	native[spine] = native[spine].interpolate_with(actions_and_stuff[spine], 0.7)
 	native[_body_bone] = native[_body_bone].interpolate_with(actions_and_stuff[_body_bone], 0.7)
+	# Start from the MD2 walk's authored two-handed hold. Sampling two
+	# independently animated run arms on top of this swing made the support
+	# hand travel across the stock.
+	native[_left_arm] = _crossbow_carry[_left_arm]
+	native[_right_arm] = _crossbow_carry[_right_arm]
 	# Transfer the alternating A&S arm swing to the paired MD2 grip.
 	# Rotate around the line through both shoulders. Each shoulder stays
 	# seated and the two hands share one rigid rotation with the weapon.

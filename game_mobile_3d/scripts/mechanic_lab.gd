@@ -435,6 +435,8 @@ func _load_crossbow(root: String) -> bool:
 	_crossbow_locomotion = CrossPollinator.load_locomotion(player, root)
 	if _crossbow_locomotion.is_empty():
 		return false
+	if player.hybrid_motion != null:
+		player.hybrid_motion.set_crossbow_carry(_crossbow_locomotion.gait.sample("Walk", 0.0))
 	var socket := BoneAttachment3D.new()
 	socket.name = "LabCrossbowSocket"
 	socket.bone_name = &"J_L_Hand"
