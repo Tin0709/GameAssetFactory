@@ -14,6 +14,7 @@ const NAMED := {
 	"SettingsKeysHelp": "keys-help",
 	"SettingsPlayerNote": "player-note",
 	"SettingsTerrainNote": "terrain-note",
+	"GrassEdgeSampling": "grass-edge-sampling",
 	"SettingsPresetMessage": "preset-message",
 }
 const PHASES := ["morning", "day", "golden", "night"]
