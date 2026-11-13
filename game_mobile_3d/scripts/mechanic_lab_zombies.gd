@@ -11,6 +11,8 @@ const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
+const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd")
+const Gauntlets := preload("res://scripts/mechanic_lab_gauntlets.gd")
 const SOURCE_DIR := "extracted/2026-10-25 19-26-25/Game/Spicewood"
 const ZOMBIE_DIR := "Art/Characters/Enemies/Zombie"
 const PHYSICS_PROFILE_PATH := "reports/combat/observations/zombie_physics_asset_20261112.private.json"
@@ -96,6 +98,8 @@ var health_bars: HealthBars
 var damage_numbers: DamageNumbers
 var sword_equipped := false
 var curved_equipped := false
+var crossbow_equipped := false
+var gauntlets_equipped := false
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
 var _physics_profile: Dictionary
@@ -192,7 +196,8 @@ func aim_sabre(index: int, serial: int, movement: Vector3) -> Vector3:
 		_aim_serial = serial
 		_aim_target = null
 	if not is_instance_valid(_aim_target) or _aim_target.health <= 0 or _aim_target.is_queued_for_deletion():
-		_aim_target = _find_melee_target(float(_strikes()[index].range_m), movement)
+		var reach := CrossPollinator.AIM_RANGE if crossbow_equipped else float(_strikes()[index].range_m)
+		_aim_target = _find_melee_target(reach, movement)
 		if _aim_target == null:
 			return Vector3.ZERO
 	var direction := _aim_target.global_position - _attacker.global_position
@@ -227,9 +232,29 @@ func _melee_ray(origin: Vector3) -> PhysicsRayQueryParameters3D:
 	return ray
 
 func _strikes() -> Array:
+	if gauntlets_equipped:
+		return Gauntlets.STRIKES
 	if curved_equipped:
 		return CURVED_STRIKES
 	return SWORD_STRIKES if sword_equipped else SABRE_STRIKES
+
+func bolt_direction(muzzle: Vector3, forward: Vector3, serial: int) -> Vector3:
+	var target: Zombie
+	if serial == _aim_serial and is_instance_valid(_aim_target) and _aim_target.health > 0:
+		target = _aim_target
+	else:
+		target = _find_melee_target(CrossPollinator.AIM_RANGE, forward)
+	if target == null:
+		return forward
+	return (target.global_position + MELEE_CONTACT_HEIGHT - muzzle).normalized()
+
+func strike_bolt(hit: Dictionary, direction: Vector3, serial: int) -> void:
+	var zombie := hit.get("collider") as Zombie
+	if zombie == null or zombie.health <= 0 or zombie.is_queued_for_deletion():
+		return
+	var horizontal := Vector3(direction.x, 0.0, direction.z).normalized()
+	_apply_contact(zombie, hit.position, CrossPollinator.SHOT, 0, serial,
+		CrossPollinator.STRIKE, horizontal, false, hit.position)
 
 func strike_sabre(index: int, clip: String, serial: int) -> void:
 	if serial == _attack_serial:
@@ -295,15 +320,20 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 		return
 	_landing_serial = serial
 	var forward := Vector3(facing.x, 0.0, facing.z).normalized()
-	sabre_landing.emit(position + forward * AIR_CENTRE_OFFSET, serial)
-	var strike := (SWORD_AIR_STRIKE if sword_equipped else AIR_STRIKE).duplicate()
+	var offset := Gauntlets.AIR_OFFSET if gauntlets_equipped else AIR_CENTRE_OFFSET
+	sabre_landing.emit(position + forward * offset, serial)
+	var strike := AIR_STRIKE.duplicate()
+	if sword_equipped:
+		strike = SWORD_AIR_STRIKE.duplicate()
+	elif gauntlets_equipped:
+		strike = Gauntlets.AIR_STRIKE.duplicate()
 	if fall_height >= HIGH_FALL_HEIGHT:
 		strike.damage *= 3
 		strike.strength *= 1.4
 	elif fall_height >= MEDIUM_FALL_HEIGHT:
 		strike.damage *= 2
 		strike.strength *= 1.2
-	if sword_equipped or curved_equipped:
+	if sword_equipped or curved_equipped or gauntlets_equipped:
 		_resolve_landing(position, forward, serial, strike)
 		return
 	var delay_ticks := ceili(SABRE_LANDING_NOTIFY_DELAY * Engine.physics_ticks_per_second)
@@ -311,7 +341,7 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 		"origin": position, "forward": forward, "serial": serial, "strike": strike})
 
 func _resolve_landing(position: Vector3, forward: Vector3, serial: int, strike: Dictionary) -> void:
-	var centre := position + forward * AIR_CENTRE_OFFSET
+	var centre := position + forward * (Gauntlets.AIR_OFFSET if gauntlets_equipped else AIR_CENTRE_OFFSET)
 	var space := get_world_3d().direct_space_state
 	var ray := PhysicsRayQueryParameters3D.create(position + Vector3.UP * 0.65, position, LEVEL_COLLISION_MASK)
 	ray.hit_from_inside = true
@@ -330,7 +360,8 @@ func _resolve_landing(position: Vector3, forward: Vector3, serial: int, strike: 
 
 func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool, origin: Vector3) -> void:
 	var air_attack := clip == "AirAttack"
-	var sabre_ground := not sword_equipped and not curved_equipped and not air_attack
+	var sabre_ground := clip != CrossPollinator.SHOT and not sword_equipped \
+		and not curved_equipped and not gauntlets_equipped and not air_attack
 	var sabre_finisher := index == 2 and sabre_ground
 	var radial := air_attack or sabre_finisher
 	var direction := zombie.global_position - origin if radial else forward
@@ -349,7 +380,8 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	if damage >= zombie.health:
 		zombie.ragdoll_launch_multiplier = ragdoll_launch_multiplier
 		zombie.ragdoll_gravity_multiplier = ragdoll_gravity_multiplier
-	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger),
+	var stagger := float(strike.stagger) * float(strike.get("splash_stagger", 0.0)) if splash else float(strike.stagger)
+	zombie.take_hit(damage, direction, impulse, stagger,
 		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)))
 	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
 

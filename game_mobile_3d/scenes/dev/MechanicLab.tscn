@@ -176,7 +176,20 @@ offset_top = 69.0
 offset_right = 977.0
 offset_bottom = 103.0
 focus_mode = 0
-tooltip_text = "Chọn vũ khí để thử combo."
+fit_to_longest_item = false
+text_overrun_behavior = 3
+tooltip_text = "Chọn vũ khí để thử trong MechanicLab."
+
+[node name="CrossbowAmmo" type="Label" parent="HUD"]
+visible = false
+offset_left = 794.0
+offset_top = 109.0
+offset_right = 970.0
+offset_bottom = 138.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 16
 
 [node name="RagdollTuning" type="HBoxContainer" parent="HUD"]
 offset_left = 18.0

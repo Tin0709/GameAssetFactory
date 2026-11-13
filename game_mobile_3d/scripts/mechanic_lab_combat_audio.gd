@@ -6,6 +6,10 @@ const SOURCE := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events
 const SABRE := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_sabre_hitmarker_%02d.ogg"
 const SWORD := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_sword_%02d.ogg"
 const CURVED := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_hitmarker_curvedGreatsword-%03d.ogg"
+const CROSSBOW := "Items/Weapons/Weapon_Ranged/RapidCrossbow/RapidCrossbowUnique/sfx_item_rapidCrossbowUnique_"
+const GAUNTLET_COMBO := "Items/Weapons/Weapon_Melee/6_weapons_melee_basicCombo/Attack%d/sfx_gauntlets_unique_attack_%s_01.ogg"
+const GAUNTLET_HIT := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_gauntlets_01.ogg"
+const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_01.ogg"
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
 const SURFACE_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttackDebris/sfx_HJA_impact debris_%s_%02d.ogg"
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
@@ -113,6 +117,7 @@ const ZOMBIE_STEP_HASHES := [
 var enabled := false
 var sword_equipped := false
 var curved_equipped := false
+var gauntlets_equipped := false
 var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _player_hurt_voice: AudioStreamPlayer
@@ -163,18 +168,51 @@ func _restore_master() -> void:
 func _exit_tree() -> void:
 	_restore_master()
 
-func contact(point: Vector3, serial: int, lethal: bool) -> void:
+func contact(point: Vector3, serial: int, lethal: bool, clip := "") -> void:
 	if not enabled:
 		return
 	if serial != _last_weapon_serial:
 		_last_weapon_serial = serial
-		_play(_weapon_hit_group(), point, HIT_GAIN_DB)
+		var group := _weapon_hit_group()
+		if clip == "NativeCrossPollinatorShot":
+			group = &"crossbow_hit"
+		elif clip.begins_with("NativeGauntlet") or (clip == "AirAttack" and gauntlets_equipped):
+			group = &"gauntlet_hit"
+		_play(group, point, HIT_GAIN_DB)
 	_play(&"death" if lethal else &"hurt", point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
 
 func _weapon_hit_group() -> StringName:
 	if curved_equipped:
 		return &"curved_hit"
 	return &"sword_hit" if sword_equipped else &"hit"
+
+func load_crossbow(root: String) -> void:
+	_load_sample(root, &"crossbow_fire", CROSSBOW + "fire_01.ogg",
+		"500b59e16faf185c10a4ef8b7a22b4f6f40c21a1884aafbf3e328e4e1b169157")
+	_load_sample(root, &"crossbow_hit", CROSSBOW + "arrow_impact_01.ogg",
+		"22693848bc6767c7c60454f5a0cfc3959f96f1d53d0021c357f8e18b5d9c4760")
+
+func load_gauntlets(root: String) -> void:
+	var weights := ["light", "medium", "heavy"]
+	var hashes := [
+		"5ca970f981961963617c5903b5bb66505e76ceefc41ab0ad52286ecdd738e07f",
+		"46eef63fa11387a9361eaf8bc7142267f392143de9eec35fe227d5ac6fdf0ccf",
+		"560425504d85ca0b56e20f4ad07ec7a370aff34e5d90105fc365e7b83005a108",
+	]
+	for i in weights.size():
+		_load_sample(root, StringName("gauntlet_swing_%d" % i), GAUNTLET_COMBO % [i + 1, weights[i]], hashes[i])
+	_load_sample(root, &"gauntlet_hit", GAUNTLET_HIT,
+		"b5dd3f6184aec5dbaea52ae9e4b9b139487515f0b019004cc7523221ac1fa883")
+	_load_sample(root, &"gauntlet_jump", GAUNTLET_JUMP,
+		"230dae33f21cd973a3067b847caa782f1ed8e31d13d11b7584a22a4f6b7aab03")
+
+func crossbow_fired(point: Vector3) -> void:
+	if enabled:
+		_play(&"crossbow_fire", point, HIT_GAIN_DB)
+
+func gauntlet_swung(point: Vector3, index: int, airborne: bool) -> void:
+	if enabled:
+		_play(&"gauntlet_jump" if airborne else StringName("gauntlet_swing_%d" % index), point, HIT_GAIN_DB)
 
 func slam_landed(point: Vector3, surface: String = "grass") -> void:
 	if not enabled:

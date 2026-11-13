@@ -341,6 +341,7 @@ func _select_weapon(index: int) -> void:
 	player.combo.use_sabre_air_sections = index == Weapon.SABRE
 	_combat_audio.sword_equipped = sword_equipped
 	_combat_audio.curved_equipped = curved_equipped
+	_combat_audio.gauntlets_equipped = gauntlets_equipped
 	$Zombies.sword_equipped = sword_equipped
 	$Zombies.curved_equipped = curved_equipped
 	$Zombies.gauntlets_equipped = gauntlets_equipped

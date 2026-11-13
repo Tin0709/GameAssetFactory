@@ -28,7 +28,7 @@ func run() -> void:
 	current_scene = lab
 	await ticks(12)
 	var weapon := lab.get_node("HUD/Weapon") as OptionButton
-	if weapon.disabled or weapon.item_count != 3:
+	if weapon.disabled or weapon.item_count < 3:
 		check(false, "MechanicLab offers Curved Greatsword alongside Sabre and Sword")
 		finish(lab)
 		return
