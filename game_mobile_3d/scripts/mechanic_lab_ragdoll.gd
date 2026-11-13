@@ -304,7 +304,8 @@ func _project_source_anchors() -> void:
 	_recover_floor_blocked_hip()
 	var recent_handoff := _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _wall_handoff_frame \
 		<= roundi(WALL_HANDOFF_RECOVERY_SECONDS * Engine.physics_ticks_per_second)
-	var neck_flight := _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0
+	var neck_flight := _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0 \
+		and is_instance_valid(_flat_floor) and not _flat_floor.disabled
 	if not recent_handoff and not neck_flight:
 		return
 
@@ -312,14 +313,18 @@ func _project_source_anchors() -> void:
 	# limb's projection, so check whether the chest has room to meet it.
 	var motion := Vector3.ZERO
 	var largest_gap := 2.0 * SOURCE_ANCHOR_TOLERANCE
+	var head_state: PhysicsDirectBodyState3D
+	if not recent_handoff:
+		var head: PhysicalBone3D = bodies.Head
+		head_state = PhysicsServer3D.body_get_direct_state(head.get_rid())
+		if head_state == null or head_state.get_contact_count() == 0:
+			return
 	var chest: PhysicalBone3D = bodies.Chest
 	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
 	if chest_state == null:
 		return
 	if not recent_handoff:
-		var head: PhysicalBone3D = bodies.Head
-		var head_state := PhysicsServer3D.body_get_direct_state(head.get_rid())
-		if chest_state.get_contact_count() > 0 or head_state == null or head_state.get_contact_count() == 0:
+		if chest_state.get_contact_count() > 0:
 			return
 		var neck: Dictionary = source_joints.Head
 		var neck_gap: Vector3 = (chest_state.transform * neck.parent_frame).origin \
