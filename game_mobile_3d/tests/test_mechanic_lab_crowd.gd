@@ -36,15 +36,17 @@ func run() -> void:
 		draws.append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
 	await measure("empty", 90)
 	var group := lab.get_node("Zombies")
+	var verify_spawn := func(zombie: Node): check_spawn_spacing(group, zombie)
+	group.child_entered_tree.connect(verify_spawn)
 	if OS.get_cmdline_user_args().has("--sync-spawn"):
 		spawn_synchronously(group)
 	else:
 		await spawn_crowd(group)
+	group.child_entered_tree.disconnect(verify_spawn)
 	if group.get_child_count() != COUNT:
 		printerr("Could not spawn all ", COUNT, " zombies: ", failures)
 		quit(1)
 		return
-	check_spawn_spacing(group)
 	await measure("spawn_animation", 70)
 	Input.action_press("move_backward")
 	await measure("chase", 120)
@@ -168,22 +170,34 @@ func check_reset_during_spawn(group: Node) -> void:
 		await process_frame
 	if partial <= 0 or partial >= COUNT or group.get_child_count() != partial or button.disabled:
 		failures.append("Reset cancels pending spawns and preserves zombies already created")
+	button.pressed.emit()
+	for i in 3:
+		await process_frame
+	partial = group.get_child_count()
+	lab._on_player_hit(100)
+	for i in 5:
+		await process_frame
+	if group.get_child_count() != partial or not button.disabled:
+		failures.append("Defeat stops the crowd and disables spawning another crowd")
+	lab.reset_player()
+	if button.disabled:
+		failures.append("Retry re-enables crowd spawning")
 	var single := lab.get_node("HUD/SpawnZombie") as Button
 	single.pressed.emit()
 	if group.get_child_count() != partial + 1:
 		failures.append("The single-spawn button still creates exactly one zombie immediately")
 
-func check_spawn_spacing(group: Node) -> void:
-	var zombies := group.get_children()
-	for i in zombies.size():
-		var point: Vector3 = zombies[i].position
-		if absf(point.x) > 49.0 or absf(point.z) > 49.0:
-			failures.append("Zombie spawned outside the lab bounds")
+func check_spawn_spacing(group: Node, zombie: Node3D) -> void:
+	var point := zombie.position
+	if absf(point.x) > 49.0 or absf(point.z) > 49.0:
+		failures.append("Zombie spawned outside the lab bounds")
+		return
+	for other in group.get_children():
+		if other == zombie or other.health <= 0:
+			continue
+		if point.distance_squared_to(other.position) < 1.25 * 1.25:
+			failures.append("Zombie spawned too close to another living zombie")
 			return
-		for j in i:
-			if point.distance_squared_to(zombies[j].position) < 1.25 * 1.25:
-				failures.append("Zombie spawn positions overlap the 1.25 m spacing")
-				return
 
 func measure(label: String, ticks: int, group: Node = null) -> void:
 	frame_ms.clear()
