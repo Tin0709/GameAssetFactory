@@ -97,18 +97,7 @@ func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 	lab.player.surface_contact.connect(func(_point: Vector3, landed: bool):
 		if landed:
 			landings.append({"frame": Engine.get_physics_frames(), "particles": visible_particles(dust)}))
-	lab.get_node("HUD/DropMedium").pressed.emit()
-	for i in 2:
-		await physics_frame
-	var attack := InputEventKey.new()
-	attack.physical_keycode = KEY_E
-	attack.pressed = true
-	root.push_input(attack, true)
-	for i in 2:
-		await physics_frame
-	attack = InputEventKey.new()
-	attack.physical_keycode = KEY_E
-	root.push_input(attack, true)
+	await start_heavy_drop(lab)
 	var burst_frame := -1
 	var counts: Array[int] = []
 	for i in Engine.physics_ticks_per_second:
@@ -128,3 +117,29 @@ func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 	for i in range(1, counts.size()):
 		check(counts[i] < counts[i - 1], "The dive emits a single burst")
 	print("MECHANIC_LAB_HEAVY_DUST landings=", landings, " burst_frame=", burst_frame, " counts=", counts)
+	landings.clear()
+	await start_heavy_drop(lab)
+	for i in Engine.physics_ticks_per_second:
+		await physics_frame
+		if not landings.is_empty():
+			break
+	check(landings.size() == 1 and dust.is_physics_processing(), "The repeat dive schedules a heavy dust burst")
+	lab.reset_player()
+	for i in delay_ticks + 2:
+		await physics_frame
+	check(visible_particles(dust) == 0 and not dust.is_physics_processing(),
+		"Reset cancels heavy dust that has not appeared yet")
+
+func start_heavy_drop(lab) -> void:
+	lab.get_node("HUD/DropMedium").pressed.emit()
+	for i in 2:
+		await physics_frame
+	var attack := InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	attack.pressed = true
+	root.push_input(attack, true)
+	for i in 2:
+		await physics_frame
+	attack = InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	root.push_input(attack, true)
