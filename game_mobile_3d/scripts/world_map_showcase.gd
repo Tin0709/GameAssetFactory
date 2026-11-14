@@ -196,6 +196,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"actor_view_fill_chroma": ["Hòa màu ánh bù trên Valorie", 1.],
 	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
 	&"canopy_direct_softness": ["Dịu nắng trên tán cao", 1.],
+	&"late_canopy_sun": ["Dịu nắng còn lại khi lên đèn", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
 	&"forest_path_placement": ["Vị trí đèn lối rừng", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
@@ -221,7 +222,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 144
+const LIGHTING_MIX_VERSION := 145
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1752,6 +1753,10 @@ func _sync_canopy_direct() -> void:
 		var time := fposmod(hour, 24.)
 		var afternoon := smoothstep(14.5, 16.5, time) * (1. - smoothstep(18.5, 19.5, time))
 		var gain := .34 * afternoon * _lighting_scale(&"canopy_direct_softness")
+		# Keep the afternoon response and lower the remaining high-leaf highlights
+		# only during the handoff to the local lamps.
+		var transition := smoothstep(18.5, 19.25, time) * (1. - smoothstep(19.25, 19.5, time))
+		gain += .42 * transition * _lighting_scale(&"late_canopy_sun")
 		if gain > 0.:
 			var direction: Vector3 = level.get_node("Sun").global_basis.z.normalized()
 			state = Vector4(direction.x, direction.y, direction.z, gain)
@@ -2093,6 +2098,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 144 and effect == &"twilight_ground_transition":
 			missing_value = 0.
+		if version < 145 and effect == &"late_canopy_sun":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -2156,7 +2163,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"crown_ambient_depth":
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
-		if effect == &"canopy_direct_softness":
+		if effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks
 		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma"]:
 			slider.editable = slider.editable and level.look.player_material.available()
@@ -2302,7 +2309,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"twilight_crown", &"crown_ambient_depth"]:
 		_sync_twilight_crown()
 		return
-	if changed_effect == &"canopy_direct_softness":
+	if changed_effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
 		_sync_canopy_direct()
 		return
 	if changed_effect == &"stone_sunset_beam":
