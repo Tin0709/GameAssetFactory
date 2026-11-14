@@ -18,6 +18,8 @@ const DayNight = preload("res://scripts/biome_day_night.gd")
 @export_range(0., 4.) var noon_sun_energy := 1.5
 @export var noon_ambient_color := Color(.56, .72, .84)
 @export_range(0., 2.) var noon_ambient_energy := .32
+@export_range(0., 4., .05) var shadow_blur := 1.25
+@export_range(0., 1., .01) var shadow_opacity := .782
 ## Local diffuse response around a map-authored opening.
 @export_range(0., .65, .01) var local_diffuse_strength := 0.
 @export var local_diffuse_by_hour: Curve
@@ -27,6 +29,9 @@ const DayNight = preload("res://scripts/biome_day_night.gd")
 @export var noon_fog_color := Color(.64, .72, .73)
 @export var fog_depth_m := Vector2(23., 47.)
 @export_range(0., 1.) var noon_fog_density := .16
+## Shape of the distance ramp, retained on every quality tier.
+@export_range(.1, 4., .05) var fog_depth_curve := 1.7
+@export_range(0., 2., .01) var fog_light_energy := .75
 
 @export_subgroup("Spatial mist")
 @export var spatial_mist := false

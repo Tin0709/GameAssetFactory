@@ -1102,7 +1102,7 @@ func _apply_directional_shadow_review(sun: DirectionalLight3D) -> void:
 	RenderingServer.directional_soft_shadow_filter_set_quality(quality as RenderingServer.ShadowQuality)
 
 func refresh_directional_shadow_blur(sun: DirectionalLight3D) -> void:
-	if stage != 2:
+	if stage != 2 or level.get("biome_controller") != null:
 		return
 	var blur: float = PRESET.sun_settings.shadow_blur
 	if directional_shadow_review_active():

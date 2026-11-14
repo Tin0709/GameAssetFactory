@@ -167,13 +167,13 @@ func _ready() -> void:
 	terrain_sky.name="TerrainSkyVisibility"
 	add_child(terrain_sky);terrain_sky.setup(self)
 	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu · F4 nắng qua mây · F3 bóng mây chỉ chặn nắng · F2 bóng tiếp xúc dưới tán"
-	if RenderingServer.get_rendering_device()!=null:$HUD/Help.text+="\nF1 bóng nắng mềm"
+	if not _uses_portable_biome() and RenderingServer.get_rendering_device()!=null:$HUD/Help.text+="\nF1 bóng nắng mềm"
 	if look.ground_bounce_available():$HUD/Help.text+=" · Shift+F1 nắng hắt từ nền"
 	if terrain_sky.available():$HUD/Help.text+=" · F12 độ che ánh trời ở vách đá"
 	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ · Shift+H chiều sâu không khí"
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
-	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
-	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu · Shift+P màu cân bằng"
+	if not _uses_portable_biome() and look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
+	if not _uses_portable_biome() and look.day_palette_available():$HUD/Help.text+=" · P bảng màu · Shift+P màu cân bằng"
 	if look.day_palette_available():$HUD/Help.text+=" · F8 so tổng thể"
 	if look.leaf_sampling_available():$HUD/Help.text+="\nF9 so mép lá · Shift+F9 MSAA 2× / 4×"
 	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá\nShift+F2 đất quanh gốc sồi · Alt+N gió tán sồi · F10 nội suy hiển thị"
@@ -531,10 +531,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			elif look.stage == 2:
 				look.toggle_leaf_sampling()
 			get_viewport().set_input_as_handled()
-		if event.physical_keycode == KEY_U and look.stage == 2 and look.atmosphere_review_available():
+		if event.physical_keycode == KEY_U and biome_controller == null and look.stage == 2 and look.atmosphere_review_available():
 			look.toggle_day_composition()
 			get_viewport().set_input_as_handled()
-		if event.physical_keycode == KEY_P and look.stage == 2 and look.day_palette_available():
+		if event.physical_keycode == KEY_P and biome_controller == null and look.stage == 2 and look.day_palette_available():
 			look.set_day_palette(not look.day_palette_active(event.shift_pressed), event.shift_pressed)
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_Y and look.stage == 2:
@@ -550,7 +550,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.physical_keycode==KEY_F1 and look.stage==2:
 			if event.shift_pressed:
 				look.set_ground_bounce(not look.ground_bounce_active())
-			else:
+			elif biome_controller == null:
 				look.set_directional_shadow_review(not look.directional_shadow_review_active())
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_F12:

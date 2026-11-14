@@ -131,6 +131,8 @@ func refresh() -> void:
 	var p := _palette.sample(hour)
 	apply_lighting(sun, env, p, _noon, _profile.noon_sun_rotation, _profile.noon_sun_color,
 		_profile.noon_sun_energy, _profile.noon_ambient_color, _profile.noon_ambient_energy)
+	sun.shadow_blur = _profile.shadow_blur
+	sun.shadow_opacity = _profile.shadow_opacity
 	var sky := _profile.noon_sky_color * Color(p.sky) / Color(_noon.sky)
 	var fog_color := _profile.noon_fog_color * Color(p.fog) / Color(_noon.fog)
 	var time := hour / 24.
@@ -170,6 +172,8 @@ func refresh() -> void:
 	env.background_color = sky
 	env.fog_enabled = _fog_enabled
 	env.fog_mode = Environment.FOG_MODE_DEPTH
+	env.fog_depth_curve = _profile.fog_depth_curve
+	env.fog_light_energy = _profile.fog_light_energy
 	apply_depth_fog(env, fog_color, clampf(fog_density, 0., 1.), _profile.fog_depth_m.x,
 		maxf(_profile.fog_depth_m.y, _profile.fog_depth_m.x + .1))
 	env.tonemap_mode = _profile.tonemap
