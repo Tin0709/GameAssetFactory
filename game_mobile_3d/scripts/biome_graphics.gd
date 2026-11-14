@@ -51,6 +51,7 @@ func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> voi
 	world.get_node("HUD").add_child(_label)
 	_label.hide()
 	set_profile(profile)
+	set_weather(profile.start_overcast, 0.)
 	_world.showcase.set_hour(profile.start_hour)
 	_cycle = profile.auto_cycle
 
@@ -124,6 +125,12 @@ func refresh() -> void:
 	var sky := _profile.noon_sky_color * Color(p.sky) / Color(_noon.sky)
 	var fog_color := _profile.noon_fog_color * Color(p.fog) / Color(_noon.fog)
 	var time := hour / 24.
+	var day_night := _profile.day_night
+	if day_night != null:
+		sun.light_color = day_night.sample_color(day_night.sun_color, time, sun.light_color)
+		env.ambient_light_color = day_night.sample_color(day_night.ambient_color, time, env.ambient_light_color)
+		sky = day_night.sample_color(day_night.sky_color, time, sky)
+		fog_color = day_night.sample_color(day_night.fog_color, time, fog_color)
 	if _profile.key_energy_by_hour != null:
 		sun.light_energy *= maxf(0., _profile.key_energy_by_hour.sample(time))
 	var fog_density := _profile.noon_fog_density * float(p.fog_amount) / float(_noon.fog_amount)

@@ -1,6 +1,7 @@
 extends Resource
 
 const Weather = preload("res://scripts/biome_weather_profile.gd")
+const DayNight = preload("res://scripts/biome_day_night.gd")
 ## Map-independent art settings. Geometry-derived lighting fields live on each map.
 
 @export var display_name := "Temperate meadow"
@@ -60,6 +61,8 @@ const Weather = preload("res://scripts/biome_weather_profile.gd")
 @export_range(0., 24.) var start_hour := 12.
 @export_range(1., 60.) var cycle_minutes := 20.
 @export var auto_cycle := false
+## Assign phase color tracks independently of the map and weather response.
+@export var day_night: DayNight
 ## Maps normalized time (0 to 1) to a multiplier. Match the midnight endpoints.
 @export var key_energy_by_hour: Curve
 @export var fog_density_by_hour: Curve
@@ -72,3 +75,4 @@ const Weather = preload("res://scripts/biome_weather_profile.gd")
 
 @export_group("Weather")
 @export var overcast: Weather
+@export_range(0., 1., .01) var start_overcast := 0.
