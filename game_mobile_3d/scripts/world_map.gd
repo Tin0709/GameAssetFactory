@@ -26,6 +26,8 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var comparison_biomes: Array[BiomeGraphicsProfile] = []
 ## Graphics budget for portable biomes. The Forest reference keeps its existing settings.
 @export var biome_quality: BiomeGraphics.Quality = BiomeGraphics.Quality.FULL
+## Optional world XZ. The light seats itself on the imported terrain.
+@export var biome_path_fixture_xz := Vector2.INF
 var biome_controller: BiomeGraphics
 
 @export var local_mist_region: LocalMistRegion

@@ -210,7 +210,6 @@ const LIGHTING_MIX_CONTROLS := {
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
 const LIGHTING_MIX_VERSION := 130
 const NIGHT_MIST_MAX_GAIN := 4.0
-const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
@@ -1196,17 +1195,11 @@ func air_field()->Dictionary:
 	return result
 
 func _path_air_source() -> PackedFloat32Array:
-	var gain := _lighting_scale(&"forest_path_air")
-	var lamp: OmniLight3D = forest_path_light.light
-	if gain <= 0.0 or not forest_active() or atmosphere_review != "combined" \
-		or not is_instance_valid(lamp) or not lamp.is_visible_in_tree() or lamp.light_energy <= 0.0:
+	if not forest_active() or atmosphere_review != "combined":
 		return PackedFloat32Array()
-	var position := lamp.global_position
-	var rgb := lamp.light_color.srgb_to_linear()
 	var beam := path_beam_state
-	return PackedFloat32Array([position.x, position.y, position.z, lamp.omni_range,
-		rgb.r, rgb.g, rgb.b, lamp.light_energy * PATH_AIR_MAX_SCALE * gain,
-		beam.x, beam.y, beam.z, beam.w * _lighting_scale(&"forest_path_air_beam")])
+	beam.w *= _lighting_scale(&"forest_path_air_beam")
+	return forest_path_light.air_parameters(_lighting_scale(&"forest_path_air"), beam)
 
 func _mist_state(ready:bool,error:String)->void:
 	if mist==null or not mist.visible or _mist_sample.is_empty():return

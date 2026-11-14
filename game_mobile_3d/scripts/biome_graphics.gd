@@ -5,6 +5,7 @@ const Profile = preload("res://scripts/biome_graphics_profile.gd")
 const Palette = preload("res://scripts/world_map_showcase_palette.gd")
 const MistVolume = preload("res://scripts/world_map_atmosphere_volume.gd")
 const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
+const PathFixture = preload("res://scripts/world_map_forest_path_light.gd")
 const HOURS := [7., 12., 16.5, 18.5, 22.]
 enum Quality { ESSENTIAL, BALANCED, FULL }
 const QUALITY_LABELS := ["Nhẹ", "Cân bằng", "Đầy đủ"]
@@ -26,6 +27,8 @@ var _choices: Array[Profile] = []
 var _label: Label
 var _mist: MistVolume
 var _allow_spatial_mist := true
+var _path_fixture := PathFixture.new()
+var _allow_fixture_scatter := true
 var _mist_sample: Dictionary
 var _allow_adaptive_bloom := true
 var _finish_effect: LocalExposure
@@ -107,9 +110,10 @@ func _process(delta: float) -> void:
 func refresh() -> void:
 	var hour: float = _world.showcase.hour
 	if _label != null:
-		_label.text = "%s · %s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · F7 hậu kỳ · Shift+F7 chất lượng · B đối chiếu" % [
+		_label.text = "%s · %s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · Shift+J tán xạ đèn · F7 hậu kỳ · Shift+F7 chất lượng · B đối chiếu" % [
 			_profile.display_name, QUALITY_LABELS[quality], int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
 	if _world.look.stage != 2:
+		_update_fixture(0.)
 		_update_finish()
 		return
 	var env: Environment = _world.get_node("WorldEnvironment").environment
@@ -149,6 +153,7 @@ func refresh() -> void:
 	env.adjustment_color_correction = _profile.color_correction
 	apply_finish(env, _profile.contrast, saturation, _profile.glow_intensity > 0.,
 		_profile.glow_intensity, _profile.glow_bloom, _profile.glow_hdr_threshold)
+	_update_fixture(time)
 	_prepare_spatial_mist(env)
 	_update_finish()
 
@@ -212,6 +217,19 @@ func _exit_tree() -> void:
 		_finish_camera.compositor = _previous_compositor
 	RenderingServer.call_on_render_thread(effect.release_on_render_thread)
 
+func _update_fixture(time: float) -> void:
+	var anchor: Vector2 = _world.biome_path_fixture_xz
+	if not anchor.is_finite():
+		return
+	var curve := _profile.path_fixture_by_hour
+	var phase := clampf(curve.sample(time), 0., 1.) if curve != null and _world.look.stage == 2 else 0.
+	_path_fixture.update(_world, phase, _profile.path_fixture_energy, Vector2.ZERO, anchor)
+
+func _fixture_air() -> PackedFloat32Array:
+	if not _allow_fixture_scatter or not is_instance_valid(_mist) or not _mist.visible:
+		return PackedFloat32Array()
+	return _path_fixture.air_parameters(_profile.path_fixture_scatter)
+
 func _prepare_spatial_mist(env: Environment) -> void:
 	var active := quality != Quality.ESSENTIAL and _profile.spatial_mist and RenderingServer.get_current_rendering_method() == "mobile" \
 		and RenderingServer.get_rendering_device() != null
@@ -225,6 +243,7 @@ func _prepare_spatial_mist(env: Environment) -> void:
 		_mist.setup()
 		_mist.material_provider = _world.showcase._mist_materials
 		_mist.compositor_owned = _owns_finish_compositor
+		_mist.path_light_provider = _fixture_air
 		_mist.noise_strength = .28
 	_mist.screen_tile_pixels = 32 if quality == Quality.BALANCED else 16
 	var tint := Vector3(env.fog_light_color.r, env.fog_light_color.g, env.fog_light_color.b)
@@ -309,8 +328,11 @@ func handle_key(event: InputEventKey) -> bool:
 				_allow_adaptive_bloom = not _allow_adaptive_bloom
 				_update_finish()
 		KEY_J:
-			_allow_spatial_mist = not _allow_spatial_mist
-			_update_spatial_mist()
+			if event.shift_pressed:
+				_allow_fixture_scatter = not _allow_fixture_scatter
+			else:
+				_allow_spatial_mist = not _allow_spatial_mist
+				_update_spatial_mist()
 		KEY_F8:
 			_profile_index = (_profile_index + 1) % _choices.size()
 			set_profile(_choices[_profile_index])

@@ -64,5 +64,11 @@ const Weather = preload("res://scripts/biome_weather_profile.gd")
 @export var key_energy_by_hour: Curve
 @export var fog_density_by_hour: Curve
 
+@export_group("Local path fixture")
+## A missing curve disables the private fixture. Both ends of the curve should match.
+@export var path_fixture_by_hour: Curve
+@export_range(0., 1., .01) var path_fixture_energy := .70
+@export_range(0., 1., .01) var path_fixture_scatter := .50
+
 @export_group("Weather")
 @export var overcast: Weather

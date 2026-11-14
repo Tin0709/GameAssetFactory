@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=6 format=3]
+[gd_resource type="Resource" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -15,6 +15,10 @@ point_count = 5
 
 [sub_resource type="Curve" id="AdaptiveBloomPhase"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.29166666, 1), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.5625, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 6
+
+[sub_resource type="Curve" id="FixtureDusk"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.14583333, 1), 0.0, 0.0, 0, 0, Vector2(0.1875, 0), 0.0, 0.0, 0, 0, Vector2(0.8125, 0), 0.0, 0.0, 0, 0, Vector2(0.875, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 6
 
 [resource]
@@ -46,4 +50,5 @@ adaptive_bloom_prefilter = 0.72
 adaptive_bloom_spread = 0.82
 key_energy_by_hour = SubResource("WoodlandKey")
 fog_density_by_hour = SubResource("WoodlandFog")
+path_fixture_by_hour = SubResource("FixtureDusk")
 overcast = ExtResource("weather")

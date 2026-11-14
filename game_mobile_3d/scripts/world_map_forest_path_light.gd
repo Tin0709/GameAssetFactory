@@ -10,6 +10,7 @@ const ATLAS_SHA := "5a6695a156d73eda0bc6920173c2a32f743a5344b821364fe1c0b59ce55e
 const ANCHOR := Vector2(-21.4, 20.2)
 const RANGE_M := 10.0
 const ENERGY := 3.0
+const AIR_ENERGY_SCALE := .24
 
 var fixture: Node3D
 var light: OmniLight3D
@@ -18,23 +19,23 @@ var _attempted := false
 var _submitted := Vector2.ZERO
 var _submitted_offset := Vector2.ZERO
 
-func update(world: Node3D, phase: float, strength: float, offset := Vector2.ZERO) -> bool:
+func update(world: Node3D, phase: float, strength: float, offset := Vector2.ZERO, anchor := ANCHOR) -> bool:
 	var state := Vector2(phase, ENERGY * strength * phase) if strength > 0.0 else Vector2.ZERO
 	if state.y > 0.0 and not _attempted:
 		_attempted = true
-		_load(world)
+		_load(world, anchor)
 	if not is_instance_valid(fixture):
 		return false
 	var moved := false
 	if offset.is_finite() and offset != _submitted_offset:
 		_submitted_offset = offset
-		var anchor := ANCHOR + offset
-		var ground: float = world.surface_height(anchor.x, anchor.y)
+		var at := anchor + offset
+		var ground: float = world.surface_height(at.x, at.y)
 		if not is_finite(ground):
-			anchor = ANCHOR
-			ground = world.surface_height(anchor.x, anchor.y)
+			at = anchor
+			ground = world.surface_height(at.x, at.y)
 		if is_finite(ground):
-			var position := Vector3(anchor.x + 1.0, ground, anchor.y + 1.0)
+			var position := Vector3(at.x + 1.0, ground, at.y + 1.0)
 			moved = fixture.position != position
 			fixture.position = position
 	if state == _submitted:
@@ -49,7 +50,15 @@ func update(world: Node3D, phase: float, strength: float, offset := Vector2.ZERO
 func is_compatible_secondary(candidate: Light3D) -> bool:
 	return candidate == light and candidate.light_color.b == 0.0
 
-func _load(world: Node3D) -> void:
+func air_parameters(gain: float, beam: Vector4 = Vector4.ZERO) -> PackedFloat32Array:
+	if gain <= 0.0 or not is_instance_valid(light) or not light.is_visible_in_tree() or light.light_energy <= 0.0:
+		return PackedFloat32Array()
+	var position := light.global_position
+	var rgb := light.light_color.srgb_to_linear()
+	return PackedFloat32Array([position.x, position.y, position.z, light.omni_range,
+		rgb.r, rgb.g, rgb.b, light.light_energy * AIR_ENERGY_SCALE * gain, beam.x, beam.y, beam.z, beam.w])
+
+func _load(world: Node3D, anchor: Vector2) -> void:
 	if not OS.has_feature("editor") or RenderingServer.get_current_rendering_method() != "mobile":
 		return
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
@@ -68,7 +77,7 @@ func _load(world: Node3D) -> void:
 	if FileAccess.get_sha256(mesh_path) != MESH_SHA or FileAccess.get_sha256(atlas_path) != ATLAS_SHA:
 		return
 	var image := Image.load_from_file(atlas_path)
-	var ground: float = world.surface_height(ANCHOR.x, ANCHOR.y)
+	var ground: float = world.surface_height(anchor.x, anchor.y)
 	if image == null or image.is_empty() or not is_finite(ground):
 		return
 	var document := GLTFDocument.new()
@@ -90,7 +99,7 @@ func _load(world: Node3D) -> void:
 	meshes[0].cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	fixture = imported
 	fixture.name = "PrivateForestPathFixture"
-	fixture.position = Vector3(ANCHOR.x + 1.0, ground, ANCHOR.y + 1.0)
+	fixture.position = Vector3(anchor.x + 1.0, ground, anchor.y + 1.0)
 	fixture.hide()
 	light = OmniLight3D.new()
 	light.name = "ForestPathLight"
