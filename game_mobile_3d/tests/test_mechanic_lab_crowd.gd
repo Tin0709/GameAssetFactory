@@ -448,7 +448,8 @@ func check_crowd_windup_range(group: Node) -> void:
 			windups.append(point)
 	zombie.melee_audio.connect(listen)
 	var stride := roundi(Engine.physics_ticks_per_second / ZOMBIE.LAB_CROWD_SIGHT_HZ)
-	for escape in [Vector3.BACK * 1.0, Vector3.UP * 2.05, Vector3.RIGHT * 0.75]:
+	# The sidestep stays within horizontal reach but leaves the swing cone.
+	for escape in [Vector3.BACK * 1.0, Vector3.UP * 2.05, Vector3(0.65, 0.0, -0.22)]:
 		player.global_position = player_origin
 		zombie.global_position = player_origin + Vector3.FORWARD * 1.34
 		zombie.velocity = Vector3.ZERO
