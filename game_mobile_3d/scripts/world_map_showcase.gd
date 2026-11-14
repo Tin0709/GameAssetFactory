@@ -1666,7 +1666,7 @@ func _remember_mix_edit(before: Dictionary) -> void:
 		_settings.remember_edit(_restore_mix_snapshot.bind(before))
 
 func _restore_mix_snapshot(snapshot: Dictionary) -> void:
-	_lighting_mix = snapshot.strengths
+	_lighting_mix = snapshot.strengths.duplicate()
 	_balanced_preview = snapshot.balanced
 	_refresh_lighting_mix()
 
