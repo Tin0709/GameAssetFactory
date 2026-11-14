@@ -25,6 +25,11 @@ regional_sky_region = ExtResource("regional_sky")
 scene_lighting_mix = ExtResource("forest_mix")
 additional_lighting_mixes = Array[ExtResource("mix_type")]([ExtResource("night_mix"), ExtResource("soft_cliff_mix"), ExtResource("forest_air_mix"), ExtResource("humid_forest_mix"), ExtResource("forest_sun_shadow_mix"), ExtResource("forest_dawn_mix"), ExtResource("forest_dawn_reference_mix")])
 projected_sun_shift = Vector2(0, 6)
+directional_air_region_profile = "graphics_vfx/forest_pix_capture_20261112/forest_morning_depth/replay_basin_single_vulkan/compact_existing_layout/directional.private.json"
+directional_air_region_sha256 = "6374be05f4dcda22e1a03df44bead9fb84a3bec79e8af18ddb6d2b2fa793f9a5"
+forest_basin_layout_profile = "graphics_vfx/forest_pix_capture_20261112/forest_morning_depth/basin_day_layout/composed/layout.private.json"
+forest_basin_layout_sha256 = "ffd6ceabe4beb5fcbbfcbdbde38bae99f5c2b70ffc05fc057c574d17d6171c54"
+
 sculk_surface_sites = PackedVector2Array(-22, 15, -23, 19, -24, 23, -24, 26)
 forest_path_light_offset = Vector2(-9.6, 2.3)
 forest_replay_site = Vector2(-27.5, 8.5)

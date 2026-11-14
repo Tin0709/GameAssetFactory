@@ -148,6 +148,7 @@ static func load_locomotion(actor: CharacterBody3D, root: String) -> Dictionary:
 	return {"clips": slots, "gait": gait}
 
 func _ready() -> void:
+	ammo = _ammo_capacity()
 	var sphere := SphereShape3D.new()
 	sphere.radius = BOLT_RADIUS
 	_sweep_query.shape = sphere
@@ -181,15 +182,19 @@ func _ready() -> void:
 	set_physics_process(false)
 
 func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vector3) -> bool:
+	return _fire_projectile(origin, direction, serial, clearance_start, BOLT_SPEED)
+
+func _fire_projectile(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vector3,
+		speed: float, strike: Dictionary = STRIKE) -> bool:
 	if ammo == 0:
 		return false
 	ammo -= 1
-	_recharge_remaining = RECHARGE_DELAY + RECHARGE_PERIOD
+	_recharge_remaining = RECHARGE_DELAY + _ammo_recharge_period()
 	ammo_changed.emit(ammo)
 	shot_fired.emit(origin)
 	var obstruction := _sweep_bolt(get_world_3d().direct_space_state, clearance_start, origin, WORLD_MASK)
 	if not obstruction.is_empty():
-		_report_impact(obstruction, direction, serial)
+		_report_impact(obstruction, direction, serial, strike)
 		set_physics_process(true)
 		return true
 	var bolt := MeshInstance3D.new()
@@ -201,9 +206,11 @@ func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vec
 	bolt.rotate_object_local(Vector3.UP, -PI * 0.5)
 	bolt.scale = Vector3.ONE * BOLT_MESH_SCALE
 	bolt.reset_physics_interpolation()
-	var trail := {"origin": origin, "direction": direction, "distance": 0.0, "stopped": false, "tail_age": 0.0}
+	var trail := {"origin": origin, "direction": direction, "distance": 0.0, "speed": speed,
+		"stopped": false, "tail_age": 0.0}
 	_trails.append(trail)
-	_bolts.append({"node": bolt, "direction": direction, "life": BOLT_LIFETIME, "serial": serial, "trail": trail})
+	_bolts.append({"node": bolt, "direction": direction, "speed": speed, "life": BOLT_LIFETIME,
+		"serial": serial, "trail": trail, "strike": strike})
 	set_physics_process(true)
 	bolt_launched.emit(bolt)
 	return true
@@ -221,17 +228,18 @@ func reset() -> void:
 	if _embedded != null:
 		_embedded.visible_instance_count = 0
 	_recharge_remaining = 0.0
-	ammo = AMMO_MAX
+	ammo = _ammo_capacity()
 	ammo_changed.emit(ammo)
 	set_physics_process(false)
 
 func _physics_process(delta: float) -> void:
 	if not _embedded_arrows.is_empty():
 		_update_embedded_arrows(delta)
-	if ammo < AMMO_MAX:
+	var capacity := _ammo_capacity()
+	if ammo < capacity:
 		_recharge_remaining -= delta
 		if _recharge_remaining <= 0.000001:
-			_recharge_remaining += RECHARGE_PERIOD
+			_recharge_remaining += _ammo_recharge_period()
 			ammo += 1
 			ammo_changed.emit(ammo)
 	var space := get_world_3d().direct_space_state
@@ -242,7 +250,8 @@ func _physics_process(delta: float) -> void:
 		var bolt := _bolts[index]
 		var node: MeshInstance3D = bolt.node
 		var start := node.global_position
-		var end := start + Vector3(bolt.direction) * BOLT_SPEED * minf(delta, bolt.life)
+		var speed: float = bolt.speed
+		var end := start + Vector3(bolt.direction) * speed * minf(delta, bolt.life)
 		var hit := _sweep_bolt(space, start, end, BOLT_MASK)
 		var trail: Dictionary = bolt.trail
 		var direction: Vector3 = bolt.direction
@@ -252,22 +261,28 @@ func _physics_process(delta: float) -> void:
 			var travel := (endpoint - start).dot(direction)
 			trail.distance += clampf(travel, 0.0, start.distance_to(end) + BOLT_RADIUS)
 			trail.stopped = true
-			trail.tail_age = maxf(0.0, delta - travel / BOLT_SPEED)
+			trail.tail_age = maxf(0.0, delta - travel / speed)
 			_bolts.remove_at(index)
 			_remove_bolt(node)
 			if not hit.is_empty():
 				_embed_on_terrain(hit, bolt.direction)
-				_report_impact(hit, direction, bolt.serial)
+				_report_impact(hit, direction, bolt.serial, bolt.strike)
 		else:
 			node.global_position = end
 			trail.distance += start.distance_to(end)
 	if not _trails.is_empty():
 		_update_trails()
 	var sparks_active := impact_sparks != null and impact_sparks.advance(delta)
-	if ammo == AMMO_MAX and _bolts.is_empty() and _embedded_arrows.is_empty() and _trails.is_empty() and not sparks_active:
+	if ammo == capacity and _bolts.is_empty() and _embedded_arrows.is_empty() and _trails.is_empty() and not sparks_active:
 		set_physics_process(false)
 
-func _report_impact(hit: Dictionary, direction: Vector3, serial: int) -> void:
+func _ammo_capacity() -> int:
+	return AMMO_MAX
+
+func _ammo_recharge_period() -> float:
+	return RECHARGE_PERIOD
+
+func _report_impact(hit: Dictionary, direction: Vector3, serial: int, _strike: Dictionary) -> void:
 	if impact_sparks != null:
 		impact_sparks.burst(hit.position, direction, hit.normal)
 	bolt_impact.emit(hit, direction, serial)
@@ -283,7 +298,8 @@ func _update_trails() -> void:
 		if age >= TRAIL_LIFETIME:
 			_trails.remove_at(index)
 			continue
-		var duration := minf(float(trail.distance) / BOLT_SPEED, TRAIL_FADE_END_AGE - age)
+		var speed: float = trail.speed
+		var duration := minf(float(trail.distance) / speed, TRAIL_FADE_END_AGE - age)
 		if camera == null or duration <= 0.00001:
 			continue
 		var direction: Vector3 = trail.direction
@@ -304,7 +320,7 @@ func _update_trails() -> void:
 			var normalized_age := (age + seconds_back) / TRAIL_LIFETIME
 			var width := TRAIL_WIDTH * 0.5 * (1.0 - 0.5 * normalized_age)
 			var opacity := _trail_opacity(normalized_age)
-			var point := to_local_space * (head - direction * BOLT_SPEED * seconds_back)
+			var point := to_local_space * (head - direction * speed * seconds_back)
 			var near_left := previous_point - lateral * previous_width
 			var near_right := previous_point + lateral * previous_width
 			var far_left := point - lateral * width

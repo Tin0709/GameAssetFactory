@@ -29,7 +29,11 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 directional_rgb_gain;
  vec4 directional_slots;
  vec4 directional_origin_step;
- vec4 directional_tile;
+ vec4 directional_tile; // original tile XYZ, optional region strength
+#ifdef GAF_DIRECTIONAL_REGION
+ vec4 region_origin_offset; // region world origin XYZ, Z offset in atlas
+ vec4 region_tile_columns; // tile dimensions XYZ, atlas columns
+#endif
 #endif
  vec4 local_center_strength; // authored world XYZ and peak extinction per meter
  vec4 local_radii;
@@ -71,22 +75,34 @@ vec3 path_light(vec3 point){
  return p.path_rgb_gain.rgb*response;
 }
 #ifdef GAF_DIRECTIONAL_AIR
-float directional_visibility(vec3 cell, int slot, int columns){
- vec2 offset=vec2(slot%columns,slot/columns)*p.directional_tile.xy;
+float directional_visibility(vec3 cell, int slot, int columns, vec2 tile, float z_offset){
+ vec2 offset=vec2(slot%columns,slot/columns)*tile;
  vec3 dimensions=vec3(textureSize(directional_field,0));
- return textureLod(directional_field,(cell+vec3(offset,0.)+.5)/dimensions,0.).r;
+ return textureLod(directional_field,(cell+vec3(offset,z_offset)+.5)/dimensions,0.).r;
 }
 vec3 directional_air(vec3 point){
  if(p.directional_rgb_gain.w<=0.)return vec3(0.);
  vec3 cell=(point-p.directional_origin_step.xyz)/p.directional_origin_step.w;
- if(any(lessThan(cell,vec3(0)))||any(greaterThan(cell,p.directional_tile.xyz-1.)))return vec3(0.);
- int a=int(p.directional_slots.x), b=int(p.directional_slots.y), columns=int(p.directional_slots.w);
+ vec3 tile=p.directional_tile.xyz;
+ int columns=int(p.directional_slots.w);
+ float offset=0., gain=p.directional_rgb_gain.w;
+#ifdef GAF_DIRECTIONAL_REGION
+ if(cell.z<0. && p.directional_tile.w>0.){
+  cell=(point-p.region_origin_offset.xyz)/p.directional_origin_step.w;
+  tile=p.region_tile_columns.xyz;
+  columns=int(p.region_tile_columns.w);
+  offset=p.region_origin_offset.w;
+  gain*=p.directional_tile.w;
+ }
+#endif
+ if(any(lessThan(cell,vec3(0)))||any(greaterThan(cell,tile-1.)))return vec3(0.);
+ int a=int(p.directional_slots.x), b=int(p.directional_slots.y);
  float weight=p.directional_slots.z;
  float visibility;
- if(a==b||weight<=0.)visibility=directional_visibility(cell,a,columns);
- else if(weight>=1.)visibility=directional_visibility(cell,b,columns);
- else visibility=mix(directional_visibility(cell,a,columns),directional_visibility(cell,b,columns),weight);
- return p.directional_rgb_gain.rgb*(p.directional_rgb_gain.w*visibility);
+ if(a==b||weight<=0.)visibility=directional_visibility(cell,a,columns,tile.xy,offset);
+ else if(weight>=1.)visibility=directional_visibility(cell,b,columns,tile.xy,offset);
+ else visibility=mix(directional_visibility(cell,a,columns,tile.xy,offset),directional_visibility(cell,b,columns,tile.xy,offset),weight);
+ return p.directional_rgb_gain.rgb*(gain*visibility);
 }
 #endif
 float distant_optical_gain(float depth_m) {

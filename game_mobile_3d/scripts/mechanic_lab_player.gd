@@ -4,6 +4,14 @@ extends "res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/world_
 const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd")
 const Gauntlets := preload("res://scripts/mechanic_lab_gauntlets.gd")
 const LabLocomotion := preload("res://scripts/mechanic_lab_locomotion.gd")
+const Bow := preload("res://scripts/mechanic_lab_bow.gd")
+
+signal bow_drawn
+signal bow_released(serial: int, charged: bool, target: Variant)
+
+const BOW_MIN_DRAW_SECONDS := 0.10
+const BOW_DRAW_BLEND_SECONDS := 0.12
+const IDLE_GESTURE_BLEND_SECONDS := 0.18
 
 var crossbow_equipped := false
 var gauntlets_equipped := false
@@ -14,6 +22,24 @@ var _crossbow_recoil_mesh: Mesh
 var _crossbow_socket: BoneAttachment3D
 var _crossbow_carry_bone := -1
 var _crossbow_recoil_bone := -1
+var tool_air_hold := -1.0
+var tool_air_loop := -1.0
+var tool_air_landing := -1.0
+var bow_equipped := false
+var bow_target: Callable
+var bow_can_draw: Callable
+var _bow_mount: MeshInstance3D
+var _bow_socket: BoneAttachment3D
+var _bow_meshes: Array[Mesh]
+var _bow_grip_from := Transform3D.IDENTITY
+var _bow_down := false
+var _bow_drawing := false
+var _bow_held_seconds := 0.0
+var _bow_draw_seconds := 0.0
+var _bow_recovery := 0.0
+var _bow_action_time := 0.0
+var _bow_aim_tick := -1
+var _bow_aim: Variant
 
 func source_step_dust_size() -> float:
 	var source: String = clips.get(active_clip, {}).get("source_name", "")
@@ -32,8 +58,25 @@ func configure_crossbow_mount(mount: MeshInstance3D, carry_mesh: Mesh, recoil_me
 	_crossbow_carry_bone = skeleton.find_bone(&"J_L_Weapon")
 	_crossbow_recoil_bone = skeleton.find_bone(&"J_L_Weapon1")
 
+func configure_bow_mount(mount: MeshInstance3D, meshes: Array[Mesh]) -> void:
+	_bow_mount = mount
+	_bow_socket = mount.get_parent() as BoneAttachment3D
+	_bow_meshes = meshes
+
+func bow_busy() -> bool:
+	return _bow_down or _bow_drawing or _bow_recovery > 0.0
+
 func _refresh_markers() -> void:
 	super._refresh_markers()
+	if bow_equipped and _bow_mount != null:
+		var in_action := active_clip == Bow.ACTION
+		var state := Bow.mesh_state(_bow_action_time) if in_action else 0
+		var hand := skeleton.get_bone_global_pose(_bow_socket.bone_idx)
+		_bow_socket.transform = hand
+		var grip := Bow.ACTION_GRIP if in_action else Transform3D.IDENTITY
+		_bow_mount.transform = _bow_grip_from.interpolate_with(grip, source_transition.incoming_weight)
+		if _bow_mount.mesh != _bow_meshes[state]:
+			_bow_mount.mesh = _bow_meshes[state]
 	if not crossbow_equipped or _crossbow_mount == null:
 		return
 	var hand := skeleton.get_bone_global_pose(_crossbow_socket.bone_idx)
@@ -54,12 +97,43 @@ func _create_hybrid_motion() -> RefCounted:
 	return LabLocomotion.new()
 
 func _physics_process(delta: float) -> void:
+	var planted_bow := _bow_locks_ground_movement()
+	var direction_before := requested_direction
+	var jump_before := requested_jump
+	if planted_bow:
+		requested_direction = Vector2.ZERO
+		requested_jump = false
+		velocity.x = 0.0
+		velocity.z = 0.0
 	super._physics_process(delta)
+	if planted_bow:
+		requested_direction = direction_before
+		requested_jump = jump_before
 	if crossbow_equipped and not is_dead and (_left or _e) and not combo.held:
 		# The shared jump cancels melee. Keep a physically held ranged trigger.
 		attack(true)
 
+func _bow_locks_ground_movement() -> bool:
+	# The MD2 controller input tree runs ranged aim instead of PlayerMove
+	# while the ranged input is held. Release hands control back to movement.
+	return bow_equipped and _bow_down and _bow_drawing and is_on_floor()
+
+func _live_movement_input_enabled() -> bool:
+	return not _bow_locks_ground_movement() and super._live_movement_input_enabled()
+
 func attack(value: bool) -> void:
+	if bow_equipped:
+		if value and not bow_busy() and not is_dead and bow_can_draw.is_valid() and bow_can_draw.call():
+			resume_gameplay()
+			_bow_drawing = true
+			_bow_held_seconds = 0.0
+			_bow_draw_seconds = 0.0
+			_bow_action_time = Bow.DRAW_START
+			if novelty_jump != null:
+				novelty_jump.cancel()
+			bow_drawn.emit()
+		_bow_down = value
+		return
 	if crossbow_equipped:
 		if value:
 			resume_gameplay()
@@ -71,7 +145,19 @@ func attack(value: bool) -> void:
 		return
 	super.attack(value)
 
+func release_inputs() -> void:
+	_bow_down = false
+	_bow_drawing = false
+	_bow_recovery = 0.0
+	super.release_inputs()
+
 func _play(key: String, blend: float = 0.04) -> void:
+	if bow_equipped and _bow_mount != null and active_clip != key:
+		_bow_grip_from = _bow_mount.transform if not active_clip.is_empty() else Transform3D.IDENTITY
+	if key == Bow.ACTION and review_clip.is_empty():
+		super._play(key, blend)
+		animation_player.seek(_bow_action_time)
+		return
 	if crossbow_equipped and combo.active() and review_clip.is_empty():
 		if key == CrossPollinator.SHOT and _crossbow_pose_serial != combo.serial:
 			_crossbow_pose_serial = combo.serial
@@ -83,7 +169,12 @@ func _play(key: String, blend: float = 0.04) -> void:
 			return
 	super._play(key, blend)
 
+func _combat_entry(key: String) -> bool:
+	return (bow_equipped and key == Bow.ACTION) or super._combat_entry(key)
+
 func _combat_entry_blend(key: String) -> float:
+	if key == Bow.ACTION:
+		return BOW_DRAW_BLEND_SECONDS
 	var seconds := super._combat_entry_blend(key)
 	if key == CrossPollinator.SHOT and active_clip in GAITS:
 		# Blend the running stride into the authored shot within one shot period.
@@ -114,6 +205,11 @@ func _composed_gait_period(key: String, speed: float, state: Dictionary) -> floa
 	return super._composed_gait_period(key, speed, state)
 
 func _select_clip() -> String:
+	if bow_equipped and (_bow_drawing or _bow_recovery > 0.0) and review_clip.is_empty():
+		_idle_wait = 0.0
+		_inspect_age = 0.0
+		_inspecting = false
+		return Bow.ACTION
 	var key := super._select_clip()
 	if key in LabLocomotion.WALKS and weapon_source_locomotion and review_clip.is_empty():
 		# These profiles have a dedicated armed Walk, shared across directions.
@@ -139,6 +235,12 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
 
 func _begin_pose_transition(key: String, seconds: float) -> void:
+	if bow_equipped and active_clip == Bow.ACTION:
+		source_transition.begin_evaluated(0.25, Callable(), &"smoothstep")
+		return
+	if key == "InspectWeapon" or (active_clip == "InspectWeapon" and key == "Idle"):
+		source_transition.begin_evaluated(IDLE_GESTURE_BLEND_SECONDS, Callable(), &"smoothstep")
+		return
 	if crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY]:
 		if key in GAITS or key in ["Idle", "CombatReady", "InspectWeapon"]:
 			source_transition.begin_evaluated(CrossPollinator.BLEND_OUT_SECONDS, Callable(), &"smoothstep")
@@ -152,6 +254,38 @@ func begin_gauntlet_landing() -> void:
 		animation_player.seek(combo.time, true)
 
 func _animate(delta: float) -> void:
+	var release_bow := false
+	var target: Variant = null
+	if bow_equipped and review_clip.is_empty():
+		if _bow_recovery > 0.0:
+			_bow_recovery = maxf(0.0, _bow_recovery - delta)
+			_bow_action_time = minf(Bow.RELEASE_END, _bow_action_time + delta)
+		if _bow_drawing:
+			_bow_draw_seconds += delta
+			if _bow_down:
+				_bow_held_seconds += delta
+			_bow_action_time = lerpf(Bow.DRAW_START, Bow.DRAW_HOLD, clampf(_bow_draw_seconds / Bow.CHARGE_TIME, 0.0, 1.0))
+			if not _bow_down and _bow_draw_seconds >= BOW_MIN_DRAW_SECONDS:
+				_bow_drawing = false
+				_bow_recovery = Bow.ATTACK_PERIOD_SECONDS
+				_bow_action_time = Bow.RELEASE_START
+				release_bow = true
+		if _bow_drawing or release_bow:
+			if combat_requested and has_aim_point:
+				target = aim_point
+			elif not combat_requested and bow_target.is_valid():
+				var frame := Engine.get_physics_frames()
+				if _bow_aim_tick != frame:
+					_bow_aim_tick = frame
+					_bow_aim = bow_target.call(Bow.AIM_RANGE, Vector3(velocity.x, 0.0, velocity.z))
+				target = _bow_aim
+			if target is Vector3:
+				var aim: Vector3 = target - global_position
+				if Vector2(aim.x, aim.z).length_squared() > 0.01:
+					var heading := atan2(aim.x, aim.z)
+					visual.rotation.y = heading if release_bow else rotate_toward(visual.rotation.y, heading, ground_turn_rate * delta)
+					if hybrid_motion != null:
+						hybrid_motion.facing.reset(visual.rotation.y)
 	if gauntlets_equipped and combo.phase == &"air_attack" and active_clip == "AirAttack":
 		if not combo.air_landing_started and combo.time >= 18.0 / 30.0:
 			# Hold the airborne pose until physics reports support.
@@ -161,4 +295,20 @@ func _animate(delta: float) -> void:
 			# The export contains a long static segment between impact and recovery.
 			combo.time = 71.0 / 30.0
 			animation_player.seek(combo.time, true)
+	elif tool_air_hold >= 0.0 and combo.phase == &"air_attack" and active_clip == "AirAttack" \
+			and not combo.air_landing_started and combo.time >= tool_air_hold:
+		combo.time = tool_air_loop if tool_air_hold - tool_air_loop > 1.0 / 30.0 \
+			else tool_air_hold - delta * combo.playback_rate()
+		animation_player.seek(combo.time, true)
 	super._animate(delta)
+	if release_bow:
+		combo.serial += 1
+		bow_released.emit(combo.serial, _bow_held_seconds >= Bow.CHARGE_TIME - 0.00001, target)
+
+func begin_tool_landing() -> void:
+	if tool_air_landing < 0.0 or combo.phase != &"air_attack":
+		return
+	combo.air_landing_started = true
+	combo.time = tool_air_landing
+	if active_clip == "AirAttack":
+		animation_player.seek(combo.time, true)

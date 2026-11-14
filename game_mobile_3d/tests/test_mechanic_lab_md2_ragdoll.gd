@@ -61,7 +61,12 @@ func run() -> void:
 	zombie._death_rng.seed = seed_before
 	check(twirls >= 70 and twirls <= 130 and left_twirls > 0 and left_twirls < twirls,
 		"Seeded death variants produce occasional twirls in both directions")
-	await ticks(56)
+	# Keep the lethal strike in the same attack phase after the sight delay.
+	for frame in 100:
+		await physics_frame
+		if zombie.animation.current_animation == ZOMBIE.ATTACK and zombie.animation.current_animation_position >= 0.82:
+			break
+	check(zombie.animation.current_animation == ZOMBIE.ATTACK, "The live Sabre fixture reaches the zombie attack pose")
 	var attack := InputEventKey.new()
 	attack.physical_keycode = KEY_E
 	attack.pressed = true
@@ -110,6 +115,7 @@ func run() -> void:
 			last_physical_pose.append(skeleton.get_bone_global_pose(bone)))
 	var fastest_descent := 0.0
 	var landing_time := INF
+	var low_pose_time := INF
 	var landing_speed := 0.0
 	var follow_through_speed := -INF
 	var lowest_corner := 0.0
@@ -125,6 +131,8 @@ func run() -> void:
 			momentum += body.linear_velocity * body.mass
 		var velocity := momentum / launch_mass
 		if zombie._corpse_landed:
+			if low_pose_time == INF and absf(zombie._corpse_axis().normalized().y) <= 0.25:
+				low_pose_time = zombie._corpse_age
 			if landing_time == INF:
 				landing_time = zombie._corpse_age
 				landing_speed = velocity.dot(zombie._death_direction)
@@ -133,7 +141,10 @@ func run() -> void:
 			continue
 		fastest_descent = maxf(fastest_descent, -velocity.y)
 	check(fastest_descent > 5.0, "The corpse falls faster than 5 m/s before head or chest contact")
-	check(landing_time > 0.38 and landing_time < 0.55, "A grounded Sabre strike brings the torso down within 550 ms")
+	# A tilted pose can find support before it rolls into the visible low pose.
+	check(landing_time >= 0.33 and landing_time <= low_pose_time and low_pose_time < 0.55,
+		"A grounded Sabre strike reaches support and then a low pose within 550 ms")
+	print("SABRE_GROUNDED_LANDING support_s=", landing_time, " low_pose_s=", low_pose_time)
 	check(landing_speed > 0.0 and follow_through_speed > landing_speed * 0.55,
 		"The corpse retains forward momentum through its first 100 ms on the floor")
 	check(lowest_corner >= -0.013, "The grounded strike stays within the floor contact tolerance")
@@ -182,6 +193,7 @@ func run() -> void:
 	check(not is_instance_valid(zombie), "The intact corpse is released at the end of its lifetime")
 	for slot in 3:
 		await check_combo_finisher(lab, group, slot)
+	await check_combo_finisher(lab, group, 1, true)
 	await check_sabre_landing_reversal(lab, group)
 	await check_sabre_landing_reversal(lab, group, true)
 	await check_sabre_first_contact_anchors(lab, group)
@@ -313,20 +325,25 @@ func check_spawn_dive_handoff(lab, group) -> void:
 	print("SPAWN_DIVE_HANDOFF peak_gap_m=", gap, " landing_s=", first_support)
 	zombie.free()
 
-func check_combo_finisher(lab, group, slot: int) -> void:
+func check_combo_finisher(lab, group, slot: int, check_sword_roll := false) -> void:
 	lab.reset_player()
 	var selector := lab.get_node("HUD/Weapon") as OptionButton
 	selector.select(slot)
 	selector.item_selected.emit(slot)
 	lab.get_node("HUD/BaseZombieToggle").button_pressed = false
+	if check_sword_roll:
+		group._spawn_serial = 16
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
+	if check_sword_roll:
+		zombie.global_position += Vector3(-0.30, 0.0, -0.18)
+		zombie.reset_physics_interpolation()
 	var lethal_clips: Array[String] = []
 	var record_lethal := func(_point, _direction, clip, _index, _serial, lethal):
 		if lethal:
 			lethal_clips.append(clip)
 	group.sabre_contact.connect(record_lethal)
-	await ticks(56)
+	await ticks(44 if check_sword_roll else 56)
 	var attack := InputEventKey.new()
 	attack.physical_keycode = KEY_E
 	attack.pressed = true
@@ -362,7 +379,7 @@ func check_combo_finisher(lab, group, slot: int) -> void:
 		if not zombie._corpse_landed:
 			continue
 		landing_time = minf(landing_time, zombie._corpse_age)
-		if slot == 1 and zombie._corpse_age - landing_time >= ZOMBIE.DEATH_LANDING_BLEND_TIME - 0.00001:
+		if slot == 1 and not check_sword_roll and zombie._corpse_age - landing_time >= ZOMBIE.DEATH_LANDING_BLEND_TIME - 0.00001:
 			# Rebound from the landed state while the bodies are still simulated.
 			break
 		if slot != 0:
@@ -378,16 +395,19 @@ func check_combo_finisher(lab, group, slot: int) -> void:
 			var head_to_legs: Vector3 = bodies.Head.global_position - feet
 			vertical_axis = absf(head_to_legs.normalized().y)
 	check(landing_time > 0.25 and landing_time < 0.50, weapon + "'s finisher makes prompt core contact")
-	check(lowest_corner >= -0.013, weapon + "'s finisher stays within the floor contact tolerance")
+	var floor_tolerance := 0.015 if check_sword_roll else 0.013
+	check(lowest_corner >= -floor_tolerance, weapon + "'s finisher stays within the floor contact tolerance")
+	if check_sword_roll:
+		print("SWORD_ROLL_FLOOR lowest_corner_m=", lowest_corner)
 	if slot == 0:
 		check(vertical_axis < 0.34, "Sabre's finisher rolls out of its inverted pose within 300 ms")
 		check(lower_contact_time < 0.40, "Sabre's chest or legs reach the floor within 400 ms of head contact")
 		while zombie.ragdoll.running and zombie._corpse_age < 1.35 - 0.00001:
 			await physics_frame
 		check(zombie._corpse_parked, "Sabre's finisher releases the fully supported corpse within 1.35 seconds")
-	elif slot == 1:
+	elif slot == 1 and not check_sword_roll:
 		await check_rebound(zombie)
-	else:
+	elif slot == 2:
 		check(is_equal_approx(flight_gravity, -50.0), "Curved Greatsword uses the Overworld flight gravity")
 	zombie.free()
 

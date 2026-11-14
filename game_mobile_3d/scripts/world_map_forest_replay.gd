@@ -52,7 +52,6 @@ func update(world, phase: float, strength: float, use_steps: bool, halo: float) 
 	_submitted_halo = halo_mix
 	fixture.visible = state.y > 0.
 	_material.set_shader_parameter("radiant_strength", lerpf(3.0, 6.0, halo_mix) * state.y)
-	_material.set_shader_parameter("phase_coverage", state.x)
 
 func has_step_site(world) -> bool:
 	if world == null or not world.forest_replay_steps_site.is_finite():

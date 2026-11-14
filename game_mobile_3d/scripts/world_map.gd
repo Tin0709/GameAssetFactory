@@ -39,6 +39,13 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var forest_replay_surface_source := Vector3.INF
 ## Optional translation in the two axes of the projected sunlight plane.
 @export var projected_sun_shift := Vector2.ZERO
+## Optional verified, editor-only extension of the directional fog atlas.
+@export var directional_air_region_profile := ""
+@export var directional_air_region_sha256 := ""
+## Optional placement and matched lighting fields for the private Forest.
+@export var forest_basin_layout_profile := ""
+@export var forest_basin_layout_sha256 := ""
+
 var runtime: Dictionary
 var geometry
 var columns: Dictionary = {}
@@ -170,6 +177,8 @@ func _ready() -> void:
 	spruce_sky.name = "SpruceSkyVisibility"
 	add_child(spruce_sky)
 	spruce_sky.setup(self)
+	if spruce_sky.proof_ready:
+		spruce_sky.apply_layout(forest_basin_layout_profile, forest_basin_layout_sha256)
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func abort_map(message: String) -> void:

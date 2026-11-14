@@ -89,10 +89,39 @@ func run() -> void:
 		failures.append("Corpses remain after the cleanup window")
 	if not OS.get_cmdline_user_args().has("--sync-spawn"):
 		await check_reset_during_spawn(group)
+		if OS.get_cmdline_user_args().has("--roam"):
+			await check_crowd_roam(group)
 	print("CROWD_END failures=", failures, " renderer=", RenderingServer.get_current_rendering_method(),
 		" adapter=", RenderingServer.get_video_adapter_name())
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_crowd_roam(group: Node) -> void:
+	for child in group.get_children():
+		child.free()
+	lab.reset_player()
+	lab.player.set_physics_process(false)
+	lab.get_node("HUD/SpawnCrowd").pressed.emit()
+	for frame in 180:
+		await process_frame
+		if group.get_child_count() == COUNT:
+			break
+	lab.player.global_position = Vector3(34.0, 0.02, 34.0)
+	var starts: PackedVector3Array = []
+	for zombie: ZOMBIE in group.get_children():
+		starts.append(zombie.global_position)
+	await measure("crowd_roam", 300)
+	var moved := 0
+	var peak_radius := 0.0
+	var outside := 0
+	for i in group.get_child_count():
+		var zombie := group.get_child(i) as ZOMBIE
+		moved += int(zombie.global_position.distance_to(starts[i]) > 0.5)
+		peak_radius = maxf(peak_radius, zombie.global_position.distance_to(zombie._roam_origin))
+		outside += int(zombie._target_aggressive or not zombie.is_on_floor())
+	if group.get_child_count() != COUNT or moved < 90 or peak_radius > 10.05 or outside != 0:
+		failures.append("The 100-zombie patrol stays on the floor and moves within its spawn radius")
+	print("CROWD_ROAM moved=", moved, " max_radius=", peak_radius, " chasing_or_off_floor=", outside)
 
 func check_zombie_dust() -> void:
 	var dust := lab.get_node_or_null("ZombieStepDust") as MultiMeshInstance3D

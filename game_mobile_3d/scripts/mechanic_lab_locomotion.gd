@@ -7,9 +7,11 @@ const RUNS := ["Run", "CombatRun"]
 const CROSSBOW_RUN_PHASE_OFFSET := 0.05
 const CROSSBOW_ARM_SWAY_WEIGHT := 0.40
 const CROSSBOW_TORSO_SWAY_WEIGHT := 0.60
+const Bow := preload("res://scripts/mechanic_lab_bow.gd")
 var _left_arm := -1
 var _right_arm := -1
 var _crossbow_carry: Array[Transform3D] = []
+var _bow_leg_weight := 0.0
 
 func setup(skeleton: Skeleton3D, path: String, target_path: String) -> bool:
 	if not super.setup(skeleton, path, target_path):
@@ -21,7 +23,15 @@ func setup(skeleton: Skeleton3D, path: String, target_path: String) -> bool:
 func set_crossbow_carry(pose: Array[Transform3D]) -> void:
 	_crossbow_carry = pose
 
+func reset() -> void:
+	super.reset()
+	_bow_leg_weight = 0.0
+
 func apply(actor, key: String, delta: float) -> void:
+	if actor.bow_equipped and actor.review_clip.is_empty() and key == Bow.ACTION and actor.combat_legs != null:
+		_apply_bow_stride(actor, delta)
+		return
+	_bow_leg_weight = 0.0
 	if actor.review_clip.is_empty() and key in WALKS:
 		phase_advanced = 0.0
 		phase_hz = 0.0
@@ -49,6 +59,47 @@ func apply(actor, key: String, delta: float) -> void:
 		phase = fposmod(actor.animation_player.current_animation_position / float(actor.clips[key].duration), 1.0)
 		run_weight = 1.0
 	super.apply(actor, key, delta)
+
+func _apply_bow_stride(actor, delta: float) -> void:
+	phase_advanced = 0.0
+	phase_hz = 0.0
+	owns_pose = false
+	last_kind = "BowAction"
+	_last_stage = actor._jump_stage
+	if not actor._grounded:
+		_bow_leg_weight = 0.0
+		return
+	var moving: bool = actor._move_requested and actor.current_speed > 0.025
+	if not moving and _bow_leg_weight <= 0.0:
+		return
+	run_weight = move_toward(run_weight, 1.0 if actor._run_requested else 0.0, delta / 0.22)
+	var speed: float = actor.current_speed
+	var walk_stride: float = float(actor.clips.Walk.duration) * actor.walk_stride_speed
+	var cycle_distance := lerpf(walk_stride, period(1.0, 1.0), run_weight)
+	var before: float = actor._gait_resume_phase
+	phase_hz = speed / cycle_distance if moving else 0.0
+	phase_advanced = delta * phase_hz
+	phase = fposmod(before + phase_advanced, 1.0)
+	actor._gait_resume_phase = phase
+	actor._gait_cycles_this_tick += phase_advanced
+	var pose: Array[Transform3D] = []
+	if run_weight < 1.0:
+		pose = actor.source_gait.sample("Walk", phase)
+	if run_weight > 0.0:
+		var run := _locals(_sample("Run", phase * float(streams.Run.duration)))
+		if pose.is_empty():
+			pose = run
+		else:
+			for bone: int in actor.combat_legs.bones:
+				pose[bone] = pose[bone].interpolate_with(run[bone], run_weight)
+	# Use the existing leg mask and raw-pose restoration. The Bow owns
+	# the rest of the skeleton, including its draw and release clocks.
+	actor.combat_legs.weight = _bow_leg_weight
+	actor.combat_legs.apply(pose, moving, delta)
+	_bow_leg_weight = actor.combat_legs.weight
+	if moving and run_weight < 0.5:
+		var duration: float = actor.clips.Walk.duration
+		actor._dispatch_locomotion_events("Walk", before * duration, phase_advanced * duration, delta)
 
 func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transform3D]:
 	var actions_and_stuff := run_pose(cycle)

@@ -22,6 +22,7 @@ var _origin: Vector3
 var _tile: Vector3
 var _step: float
 var _columns: int
+var _region: PackedFloat32Array
 
 func setup(level: Node3D, review: Node) -> void:
 	if not OS.has_feature("editor") or RenderingServer.get_current_rendering_method() != "mobile" \
@@ -72,14 +73,21 @@ func setup(level: Node3D, review: Node) -> void:
 		return
 	var shape := Vector3i(_vector(proof.dimensions))
 	var data := FileAccess.get_file_as_bytes(path)
-	var slice_size := shape.x * shape.y
-	if data.size() != slice_size * shape.z:
+	if data.size() != shape.x * shape.y * shape.z:
 		return
-	var slices: Array[Image] = []
-	for z in shape.z:
-		slices.append(Image.create_from_data(shape.x, shape.y, false, Image.FORMAT_R8, data.slice(z * slice_size, (z + 1) * slice_size)))
-	var image := ImageTexture3D.new()
-	if image.create(Image.FORMAT_R8, shape.x, shape.y, shape.z, false, slices) != OK:
+	_origin = _vector(proof.origin)
+	_tile = _vector(proof.size)
+	_step = proof.step
+	_columns = int(proof.columns)
+	var extension := _load_region(level, root, proof, data, shape)
+	if not extension.is_empty():
+		var extended: ImageTexture3D = _make_texture(extension.data, extension.shape)
+		if extended != null:
+			texture = extended
+			_region = extension.parameters
+	if texture == null:
+		texture = _make_texture(data, shape)
+	if texture == null:
 		return
 	_hours.assign(proof.hours)
 	_slots.assign(proof.slots)
@@ -88,16 +96,61 @@ func setup(level: Node3D, review: Node) -> void:
 	_level = level
 	_review = review
 	_sun = level.get_node("Sun")
-	_origin = _vector(proof.origin)
-	_tile = _vector(proof.size)
-	_step = proof.step
-	_columns = int(proof.columns)
 	research_root = root
 	payload_sha256 = proof.sha256
-	texture = image
+
+func _load_region(level: Node3D, root: String, proof: Dictionary, base: PackedByteArray, base_shape: Vector3i) -> Dictionary:
+	var relative: String = level.get("directional_air_region_profile") if level.get("directional_air_region_profile") is String else ""
+	var digest: String = level.get("directional_air_region_sha256") if level.get("directional_air_region_sha256") is String else ""
+	if relative.is_empty() or relative.is_absolute_path() or not digest.is_valid_hex_number() or digest.length() != 64:
+		return {}
+	var path := root.path_join(relative).simplify_path()
+	if not path.begins_with(root + "/") or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != digest:
+		return {}
+	var profile: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not profile is Dictionary or profile.get("schema") != "private_directional_air_region/1" or profile.get("base_sha256") != proof.sha256:
+		return {}
+	var shape := Vector3i(_vector(profile.dimensions))
+	var local := Vector3i(_vector(profile.local_tile))
+	var origin := _vector(profile.local_origin)
+	var offset := int(profile.local_z_offset)
+	var columns := int(profile.local_columns)
+	if shape.x != base_shape.x or shape.y != base_shape.y or shape.z != offset + local.z or offset != base_shape.z \
+			or shape.z > 256 or local.x < 2 or local.y < 2 or local.z < 2 or columns < 1 or columns * local.x > shape.x \
+			or ceili(float(proof.unique) / columns) * local.y > shape.y or not origin.is_finite():
+		return {}
+	# The two volumes may share an atlas but their world-space samples must be disjoint.
+	if origin.z + (local.z - 1) * _step >= _origin.z:
+		return {}
+	var payload := path.get_base_dir().path_join("directional.private.r8")
+	if not FileAccess.file_exists(payload) or FileAccess.get_sha256(payload) != profile.sha256:
+		return {}
+	var bytes := FileAccess.get_file_as_bytes(payload)
+	if bytes.size() != shape.x * shape.y * shape.z or bytes.slice(0, base.size()) != base:
+		return {}
+	return {"data": bytes, "shape": shape, "parameters": PackedFloat32Array([
+		origin.x, origin.y, origin.z, offset, local.x, local.y, local.z, columns])}
+
+func _make_texture(data: PackedByteArray, shape: Vector3i) -> ImageTexture3D:
+	var slice_size := shape.x * shape.y
+	var slices: Array[Image] = []
+	for z in shape.z:
+		slices.append(Image.create_from_data(shape.x, shape.y, false, Image.FORMAT_R8, data.slice(z * slice_size, (z + 1) * slice_size)))
+	var image := ImageTexture3D.new()
+	return image if image.create(Image.FORMAT_R8, shape.x, shape.y, shape.z, false, slices) == OK else null
 
 func available() -> bool:
 	return texture != null
+
+func region_available() -> bool:
+	return _region.size() == 8
+
+func volume_parameters() -> PackedFloat32Array:
+	var values := parameters()
+	if region_available():
+		values[15] = _review._lighting_scale(&"basin_sunlit_mist")
+		values.append_array(_region)
+	return values
 
 func parameters() -> PackedFloat32Array:
 	if not available() or not is_instance_valid(_review):

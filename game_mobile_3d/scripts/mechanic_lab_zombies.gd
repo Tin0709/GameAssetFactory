@@ -100,6 +100,10 @@ var sword_equipped := false
 var curved_equipped := false
 var crossbow_equipped := false
 var gauntlets_equipped := false
+var equipped_strikes: Array = []
+var equipped_air_strike: Dictionary = {}
+var equipped_air_offset := 0.0
+var equipped_air_delay := 0.0
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
 var _ragdoll_layout: Dictionary
@@ -232,6 +236,8 @@ func _melee_ray(origin: Vector3) -> PhysicsRayQueryParameters3D:
 	return ray
 
 func _strikes() -> Array:
+	if not equipped_strikes.is_empty():
+		return equipped_strikes
 	if gauntlets_equipped:
 		return Gauntlets.STRIKES
 	if curved_equipped:
@@ -248,13 +254,17 @@ func bolt_direction(muzzle: Vector3, forward: Vector3, serial: int) -> Vector3:
 		return forward
 	return (target.global_position + MELEE_CONTACT_HEIGHT - muzzle).normalized()
 
-func strike_bolt(hit: Dictionary, direction: Vector3, serial: int) -> void:
+func bow_aim_point(reach: float, movement: Vector3) -> Variant:
+	var target := _find_attack_target(reach, movement, true)
+	return target.global_position + MELEE_CONTACT_HEIGHT if target != null else null
+
+func strike_bolt(hit: Dictionary, direction: Vector3, serial: int,
+		strike := CrossPollinator.STRIKE, clip := CrossPollinator.SHOT) -> void:
 	var zombie := hit.get("collider") as Zombie
 	if zombie == null or zombie.health <= 0 or zombie.is_queued_for_deletion():
 		return
 	var horizontal := Vector3(direction.x, 0.0, direction.z).normalized()
-	_apply_contact(zombie, hit.position, CrossPollinator.SHOT, 0, serial,
-		CrossPollinator.STRIKE, horizontal, false, hit.position)
+	_apply_contact(zombie, hit.position, clip, 0, serial, strike, horizontal, false, hit.position, true)
 
 func strike_sabre(index: int, clip: String, serial: int) -> void:
 	if serial == _attack_serial:
@@ -313,35 +323,50 @@ func _physics_process(_delta: float) -> void:
 	var frame := Engine.get_physics_frames()
 	while not _pending_landings.is_empty() and _pending_landings[0].frame <= frame:
 		var landing: Dictionary = _pending_landings.pop_front()
-		_resolve_landing(landing.origin, landing.forward, landing.serial, landing.strike)
+		if landing.get("emit_contact", false):
+			sabre_landing.emit(landing.origin + landing.forward * landing.offset, landing.serial)
+		_resolve_landing(landing.origin, landing.forward, landing.serial, landing.strike, landing.offset)
 
 func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: float) -> void:
 	if serial == _landing_serial:
 		return
 	_landing_serial = serial
 	var forward := Vector3(facing.x, 0.0, facing.z).normalized()
-	var offset := Gauntlets.AIR_OFFSET if gauntlets_equipped else AIR_CENTRE_OFFSET
-	sabre_landing.emit(position + forward * offset, serial)
+	var offset := _air_offset()
+	if equipped_air_delay <= 0.0:
+		sabre_landing.emit(position + forward * offset, serial)
 	var strike := AIR_STRIKE.duplicate()
 	if sword_equipped:
 		strike = SWORD_AIR_STRIKE.duplicate()
 	elif gauntlets_equipped:
 		strike = Gauntlets.AIR_STRIKE.duplicate()
+	if not equipped_air_strike.is_empty():
+		strike = equipped_air_strike.duplicate()
 	if fall_height >= HIGH_FALL_HEIGHT:
 		strike.damage *= 3
 		strike.strength *= 1.4
 	elif fall_height >= MEDIUM_FALL_HEIGHT:
 		strike.damage *= 2
 		strike.strength *= 1.2
-	if sword_equipped or curved_equipped or gauntlets_equipped:
-		_resolve_landing(position, forward, serial, strike)
+	if equipped_air_delay > 0.0:
+		var delay := ceili(equipped_air_delay * Engine.physics_ticks_per_second)
+		_pending_landings.append({"frame": Engine.get_physics_frames() + delay, "origin": position,
+			"forward": forward, "serial": serial, "strike": strike, "offset": offset, "emit_contact": true})
+		return
+	if sword_equipped or curved_equipped or gauntlets_equipped or not equipped_air_strike.is_empty():
+		_resolve_landing(position, forward, serial, strike, offset)
 		return
 	var delay_ticks := ceili(SABRE_LANDING_NOTIFY_DELAY * Engine.physics_ticks_per_second)
 	_pending_landings.append({"frame": Engine.get_physics_frames() + delay_ticks,
-		"origin": position, "forward": forward, "serial": serial, "strike": strike})
+		"origin": position, "forward": forward, "serial": serial, "strike": strike, "offset": offset})
 
-func _resolve_landing(position: Vector3, forward: Vector3, serial: int, strike: Dictionary) -> void:
-	var centre := position + forward * (Gauntlets.AIR_OFFSET if gauntlets_equipped else AIR_CENTRE_OFFSET)
+func _air_offset() -> float:
+	if not equipped_air_strike.is_empty():
+		return equipped_air_offset
+	return Gauntlets.AIR_OFFSET if gauntlets_equipped else AIR_CENTRE_OFFSET
+
+func _resolve_landing(position: Vector3, forward: Vector3, serial: int, strike: Dictionary, offset_m: float) -> void:
+	var centre := position + forward * offset_m
 	var space := get_world_3d().direct_space_state
 	var ray := PhysicsRayQueryParameters3D.create(position + Vector3.UP * 0.65, position, LEVEL_COLLISION_MASK)
 	ray.hit_from_inside = true
@@ -356,14 +381,17 @@ func _resolve_landing(position: Vector3, forward: Vector3, serial: int, strike: 
 		ray.to = contact
 		if not space.intersect_ray(ray).is_empty():
 			continue
-		_apply_contact(zombie, contact, "AirAttack", 0, serial, strike, forward, distance > AIR_PRIMARY_RANGE, position)
+		_apply_contact(zombie, contact, "AirAttack", 0, serial, strike, forward,
+			distance > float(strike.get("primary_range", AIR_PRIMARY_RANGE)), position)
 
-func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool, origin: Vector3) -> void:
+func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary,
+		forward: Vector3, splash: bool, origin: Vector3, projectile := false) -> void:
 	var air_attack := clip == "AirAttack"
-	var sabre_ground := clip != CrossPollinator.SHOT and not sword_equipped \
-		and not curved_equipped and not gauntlets_equipped and not air_attack
+	var sabre_ground := not projectile and not sword_equipped \
+		and not curved_equipped and not gauntlets_equipped and not air_attack \
+		and equipped_strikes.is_empty()
 	var sabre_finisher := index == 2 and sabre_ground
-	var radial := air_attack or sabre_finisher
+	var radial := bool(strike.get("radial", air_attack or sabre_finisher))
 	var direction := zombie.global_position - origin if radial else forward
 	direction.y = 0.0
 	# A target on the strike origin has no radial heading. Preserve the

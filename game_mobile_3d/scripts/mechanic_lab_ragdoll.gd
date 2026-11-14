@@ -41,9 +41,10 @@ func _make_body_shape(size: Vector3) -> BoxShape3D:
 	return _body_shapes[size]
 
 func begin(profile: Resource, direction: Vector3, location: String, distance: float, gravity: float,
-		flat_floor: CollisionShape3D = null, floor_impact_limb_share := 0.0, limit_first_contact_stretch := false) -> bool:
+		flat_floor: CollisionShape3D = null, floor_impact_limb_share := 0.0, limit_first_contact_stretch := false,
+		linear_override := INF, upward_override := INF) -> bool:
 	if not super.begin(profile, direction, location, distance, gravity,
-			flat_floor, floor_impact_limb_share, limit_first_contact_stretch):
+			flat_floor, floor_impact_limb_share, limit_first_contact_stretch, linear_override, upward_override):
 		return false
 	_launch_frame = Engine.get_physics_frames()
 	return true
@@ -107,12 +108,35 @@ func _handoff_wall_clearance() -> Vector3:
 	_handoff_bounds_query.transform = Transform3D(Basis.IDENTITY, bounds.get_center())
 	_handoff_bounds_query.collision_mask = collision_mask
 	var space := skeleton.get_world_3d().direct_space_state
-	if space.intersect_shape(_handoff_bounds_query, 1).is_empty():
+	var overlaps := space.intersect_shape(_handoff_bounds_query, 2)
+	if overlaps.is_empty():
+		return Vector3.ZERO
+	if overlaps.size() == 1 and _is_floor_top_overlap(overlaps[0].rid, bounds):
 		return Vector3.ZERO
 	if wall_handoff_animation != null and _handoff_straddles_wall(space, collision_mask):
 		_wall_handoff_frame = Engine.get_physics_frames()
 		return _blend_wall_handoff(space, collision_mask)
 	return super._handoff_wall_clearance()
+
+func _is_floor_top_overlap(hit: RID, bounds: AABB) -> bool:
+	var floor_body := _flat_floor.get_parent() as StaticBody3D
+	var floor_shape := _flat_floor.shape as BoxShape3D
+	if floor_body == null or floor_shape == null or _flat_floor.disabled or hit != floor_body.get_rid() \
+			or PhysicsServer3D.body_get_shape_count(hit) != 1:
+		return false
+	var pose := _flat_floor.global_transform
+	if pose.basis != Basis.IDENTITY:
+		return false
+	var half := floor_shape.size * 0.5
+	var low := pose.origin - half
+	var high := pose.origin + half
+	# Only skip a shallow top overlap with enough room that a box cannot
+	# contact a side. Floor penetration is still resolved by the solver.
+	var depth := high.y - bounds.position.y
+	if depth < 0.0 or depth > floor_shape.size.y * 0.5 or bounds.end.y <= high.y:
+		return false
+	return bounds.position.x > low.x + depth and bounds.end.x < high.x - depth \
+		and bounds.position.z > low.z + depth and bounds.end.z < high.z - depth
 
 func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) -> Vector3:
 	var source: Array[Transform3D] = []
@@ -260,6 +284,29 @@ func has_wall_rest_with_near_foot() -> bool:
 		and box.position.z >= -half.z and box.end.z <= half.z \
 		and absf(box.position.y - half.y) <= FLOOR_CONTACT_SLOP
 
+func has_flat_corner_brace() -> bool:
+	var floor_body := _flat_floor.get_parent()
+	if not _body_supported_by(bodies["Leg.L"], floor_body) and not _body_supported_by(bodies["Leg.R"], floor_body):
+		return false
+	var normal := Vector3.ZERO
+	var wall := RID()
+	for name in ["Head", "Chest"]:
+		var body: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			continue
+		for i in state.get_contact_count():
+			var next := state.get_contact_local_normal(i)
+			if absf(next.y) >= MAX_WALL_NORMAL_Y or not state.get_contact_collider_object(i) is StaticBody3D:
+				continue
+			var collider := state.get_contact_collider(i)
+			if not wall.is_valid():
+				wall = collider
+				normal = next
+			elif collider != wall and absf(normal.dot(next)) < 0.25:
+				return true
+	return false
+
 func _limit_shared_first_contact_lift(lifts: Dictionary[PhysicalBone3D, float],
 		depths: Dictionary[PhysicalBone3D, float], shared_lift: float, slop: float) -> void:
 	if shared_lift <= DEEP_CONTACT_LIFT_START:
@@ -323,7 +370,7 @@ func _distribute_floor_lift(lifts: Dictionary[PhysicalBone3D, float], depths: Di
 
 func _constrain_free_anchor_motion(body: PhysicalBone3D, state: PhysicsDirectBodyState3D,
 		motion: Vector3) -> Vector3:
-	if (motion.y >= 0.0 or not _limit_first_contact_stretch or not floor_landing_blended
+	if (motion.y >= 0.0 or not floor_landing_blended
 			or not is_instance_valid(_flat_floor) or _flat_floor.disabled):
 		return motion
 	var floor_box := _flat_floor.shape as BoxShape3D
@@ -342,10 +389,11 @@ func _constrain_free_anchor_motion(body: PhysicalBone3D, state: PhysicsDirectBod
 	if (target.x < -floor_half.x or target.x + bounds.size.x > floor_half.x
 			or target.z < -floor_half.z or target.z + bounds.size.z > floor_half.z):
 		return motion
-	# Keep the preceding floor recovery when the free limb is already at
-	# the resting clearance. The wall sweep still handles the lateral move.
+	# Keep the preceding floor recovery when the joint would move a limb
+	# below the resting clearance. Keep the tighter Sabre roll behavior.
 	var clearance := bounds.position.y - floor_half.y + FLOOR_REST_SLOP
-	motion.y = maxf(motion.y, -maxf(clearance, 0.0))
+	if _limit_first_contact_stretch or clearance + motion.y < -FLOOR_REST_SLOP:
+		motion.y = maxf(motion.y, -maxf(clearance, 0.0))
 	return motion
 
 func _recover_early_floor_arm_gap() -> void:

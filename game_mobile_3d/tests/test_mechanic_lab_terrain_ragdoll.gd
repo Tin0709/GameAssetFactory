@@ -81,7 +81,7 @@ func run_case(wall_case: bool) -> void:
 		" landing=", first_landing, " side_gravity=", side_gravity)
 	lab.free()
 
-func check_wall_handoff(repositioned: bool = false) -> void:
+func check_wall_handoff(repositioned: bool = false, overlaps_floor: bool = false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -94,7 +94,7 @@ func check_wall_handoff(repositioned: bool = false) -> void:
 		return
 	var zombie = group.get_child(0)
 	zombie.set_physics_process(false)
-	zombie.global_position = Vector3(0.0, 0.02, 0.0)
+	zombie.global_position = Vector3(0.0, -0.04 if overlaps_floor else 0.02, 0.0)
 	zombie.rotation.y = 5.0 * PI / 4.0
 	zombie.animation.play(zombie.IDLE, 0.0)
 	zombie.animation.advance(0.40)
@@ -109,6 +109,12 @@ func check_wall_handoff(repositioned: bool = false) -> void:
 	var arm: PhysicalBone3D = zombie.ragdoll.bodies["Arm.R"]
 	var rig: Skeleton3D = zombie.ragdoll.skeleton
 	var pose := rig.global_transform * rig.get_bone_global_pose(arm.get_bone_id()) * arm.body_offset
+	if overlaps_floor:
+		var leg: PhysicalBone3D = zombie.ragdoll.bodies["Leg.L"]
+		var leg_shape := (leg.get_child(0) as CollisionShape3D).shape as BoxShape3D
+		var leg_pose := rig.global_transform * rig.get_bone_global_pose(leg.get_bone_id()) * leg.body_offset
+		check((leg_pose * AABB(-leg_shape.size * 0.5, leg_shape.size)).position.y < 0.0,
+			"The wall-handoff fixture also overlaps the top of the floor")
 	zombie.take_hit(100, Vector3.RIGHT)
 	zombie._update_death(1.0 / 60.0)
 	var shift := arm.global_position - pose.origin
@@ -119,7 +125,7 @@ func check_wall_handoff(repositioned: bool = false) -> void:
 		var inherited: Dictionary = zombie.ragdoll.inherited["Arm.R"]
 		check(Vector3(inherited.linear).is_zero_approx() and Vector3(inherited.angular).is_zero_approx(),
 			"Repositioning does not supply motion to the ragdoll")
-	print("LAB_WALL_HANDOFF repositioned=", repositioned, " shift=", shift,
+	print("LAB_WALL_HANDOFF repositioned=", repositioned, " floor_overlap=", overlaps_floor, " shift=", shift,
 		" error=", zombie.ragdoll.handoff_error)
 	wall.free()
 	lab.free()
@@ -370,7 +376,7 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 		" farthest=", farthest, " rebound=", rebounded, " overlap=", overlap)
 	lab.free()
 
-func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true) -> void:
+func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true, landing_gravity := -1.0) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -401,6 +407,13 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 	var direction := Vector3(1, 0, 1).normalized().rotated(Vector3.UP, rng.randf_range(-0.18, 0.18))
 	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 1150.0, zombie.DeathStrike.SABRE_FINISHER)
 	zombie.set_physics_process(true)
+	var last_simulated: Array[Transform3D] = []
+	var skeleton: Skeleton3D = zombie.ragdoll.skeleton
+	skeleton.skeleton_updated.connect(func() -> void:
+		if zombie.ragdoll.running:
+			last_simulated.clear()
+			for bone in skeleton.get_bone_count():
+				last_simulated.append(skeleton.get_bone_global_pose(bone)))
 	var peak_gap := 0.0
 	var farthest := 0.0
 	var walls_hit := {}
@@ -422,8 +435,16 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		"The Sabre ragdoll meets both faces of the closed corner and stays on the near side")
 	check(zombie._corpse_parked == should_settle and (not should_settle or zombie.ragdoll.bodies.is_empty()),
 		"The corner ragdoll %d has the expected rest state" % seed)
+	if should_settle and zombie._corpse_parked:
+		var pose_matches := last_simulated.size() == skeleton.get_bone_count()
+		for bone in last_simulated.size():
+			pose_matches = pose_matches and last_simulated[bone].is_equal_approx(skeleton.get_bone_global_pose(bone))
+		check(pose_matches, "The corner ragdoll %d retains its final simulated pose" % seed)
 	if seed == 170:
 		check(peak_gap > 0.0 and peak_gap < 0.23, "The shoulder can slide toward its anchor along the corner wall")
+	if landing_gravity >= 0.0 and not zombie._corpse_parked:
+		var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
+		check(is_equal_approx(head.gravity_scale, landing_gravity), "The corner ragdoll %d uses the expected gravity" % seed)
 	print("LAB_CORNER seed=", seed, " gap=", peak_gap, " farthest=", farthest, " walls=", walls_hit.size(),
 		" parked=", zombie._corpse_parked, " seconds=", zombie._corpse_age)
 	lab.free()
@@ -433,6 +454,7 @@ func run() -> void:
 	await run_case(false)
 	await check_wall_handoff()
 	await check_wall_handoff(true)
+	await check_wall_handoff(false, true)
 	await check_straddled_wall_handoff(&"Zombie_BasicAttack", 3, 17, "Arm.L")
 	await check_straddled_wall_handoff(&"Zombie_Walk", 2, 11, "Arm.L")
 	await check_straddled_wall_handoff(&"Zombie_Staggered", 11, 7, "Head")
@@ -441,7 +463,10 @@ func run() -> void:
 	await check_edge_landing_gravity()
 	await check_corner_ragdoll(170, 2.0)
 	await check_corner_ragdoll(65, 4.25)
-	await check_corner_ragdoll(29, 4.25, false)
+	await check_corner_ragdoll(29, 4.25, false, 50.0 / float(ProjectSettings.get_setting("physics/3d/default_gravity")))
+	await check_corner_ragdoll(101, 4.05, false, 1.0)
+	await check_corner_ragdoll(113, 4.95)
+	await check_corner_ragdoll(238, 4.90, false, 1.0)
 	await check_wall_rebound(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,

@@ -6,6 +6,7 @@ const LEGACY_PATH_SOURCE_BYTES := 32
 const PATH_SOURCE_BYTES := 48
 const GPU_PARAMETER_BYTES := 224 + PATH_SOURCE_BYTES
 const DIRECTIONAL_PARAMETER_BYTES := 64
+const DIRECTIONAL_REGION_BYTES := 32
 const LOCAL_MIST_BYTES := 48
 const DEPTH_SCATTER_BYTES := 32
 const MAX_DEPTH_SCATTER_GAIN := 6.0
@@ -13,6 +14,7 @@ const MAX_DEPTH_OPTICAL_GAIN := .85
 const DEPTH_SCATTER_START_M := 2.0
 const DEPTH_SCATTER_RAMP_M := 6.0
 var directional_grid: ImageTexture3D
+var directional_region := false
 var directional_provider: Callable
 var _directional_parameters := PackedByteArray()
 var _parameters:=PackedByteArray()
@@ -61,8 +63,9 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		if directional_provider.is_valid():
 			var values: PackedFloat32Array = directional_provider.call()
 			directional_bytes = values.to_byte_array()
-		if directional_bytes.size() != DIRECTIONAL_PARAMETER_BYTES:
-			directional_bytes.resize(DIRECTIONAL_PARAMETER_BYTES)
+		var expected := DIRECTIONAL_PARAMETER_BYTES + (DIRECTIONAL_REGION_BYTES if directional_region else 0)
+		if directional_bytes.size() != expected:
+			directional_bytes.resize(expected)
 			directional_bytes.fill(0)
 	var local_bytes := local_mist.to_byte_array()
 	if local_bytes.size() != LOCAL_MIST_BYTES:
@@ -120,12 +123,14 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	var source:=RDShaderSource.new();source.source_compute=FileAccess.get_file_as_string("res://materials/world_map_mist_field.glsl").replace("#[compute]","")
 	if directional_grid != null:
 		source.source_compute = source.source_compute.replace("#version 450", "#version 450\n#define GAF_DIRECTIONAL_AIR")
+		if directional_region:
+			source.source_compute = source.source_compute.replace("#define GAF_DIRECTIONAL_AIR", "#define GAF_DIRECTIONAL_AIR\n#define GAF_DIRECTIONAL_REGION")
 	var spirv:=rd.shader_compile_spirv_from_source(source)
 	var error:=spirv.get_stage_compile_error(RenderingDevice.SHADER_STAGE_COMPUTE)
 	if not error.is_empty():_report("error",error);return false
 	var shader:=_keep(rd.shader_create_from_spirv(spirv));_pipeline=_keep(rd.compute_pipeline_create(shader))
 	var parameter_size := GPU_PARAMETER_BYTES + 2 * LOCAL_MIST_BYTES + DEPTH_SCATTER_BYTES \
-		+ (DIRECTIONAL_PARAMETER_BYTES if directional_grid != null else 0)
+		+ ((DIRECTIONAL_PARAMETER_BYTES + (DIRECTIONAL_REGION_BYTES if directional_region else 0)) if directional_grid != null else 0)
 	_buffer=_keep(rd.uniform_buffer_create(parameter_size))
 	var sampler_state:=RDSamplerState.new();sampler_state.min_filter=RenderingDevice.SAMPLER_FILTER_LINEAR;sampler_state.mag_filter=RenderingDevice.SAMPLER_FILTER_LINEAR
 	var sampler:=_keep(rd.sampler_create(sampler_state));var noise_rd:=RenderingServer.texture_get_rd_texture(noise)

@@ -76,6 +76,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
+	&"noon_sky_chroma": ["Sắc ánh trời buổi trưa", 1.],
 	&"twilight_sky_chroma": ["Sắc ánh sáng hắt chạng vạng", 1.],
 	&"twilight_ambient": ["Hạ ánh nền chạng vạng", 1.],
 	&"night_sky_fill": ["Ánh sáng hắt ban đêm", 1.],
@@ -95,6 +96,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_diffuse_contrast": ["Stone face lighting transition (preview)", 1.],
 	&"stone_day_face_fill": ["Ánh hắt mặt đá ban ngày", 1.],
 	&"stone_twilight_sky": ["Ánh trời trên vách đá chiều muộn", 1.],
+	&"stone_dusk_sky_chroma": ["Sắc đá trong râm chiều muộn", 1.],
 	&"stone_detail_softness": ["Stone texture softness", 1.],
 	&"night_spatial_sky": ["Night terrain bounce (preview)", 1.],
 	&"night_stone_blue_softness": ["Dịu sắc lam trên đá ban đêm", 1.],
@@ -136,6 +138,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_cliff_mist": ["Night cliff mist", 1.],
 	&"forest_near_scatter": ["Forest mist depth light", 1.],
 	&"sunlit_mist": ["Canopy sunlight in mist", DirectionalAir.MAX_GAIN],
+	&"basin_sunlit_mist": ["Nắng trong sương bậc đá", 1.],
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
 	&"night_depth_scatter": ["Ánh xanh trong sương xa", 1.],
@@ -192,7 +195,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 119
+const LIGHTING_MIX_VERSION := 122
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -206,9 +209,11 @@ var _night_reference_toggle: CheckButton
 const BALANCED_ATMOSPHERE := {
 	&"projected_sun": 0.,
 	&"sunlit_mist": 0.,
+	&"basin_sunlit_mist": 0.,
 	&"daylight_haze": 0.,
 	&"daylight_haze_spill": 0.,
 	&"sky_chroma": .65,
+	&"noon_sky_chroma": 0.,
 	&"grade": .55,
 	&"exposure": .9,
 	&"player_sky": 1.25,
@@ -348,7 +353,8 @@ func setup(world:Node3D)->void:
 		directional_air.setup(level, self)
 		if directional_air.available():
 			mist.effect.directional_grid = directional_air.texture
-			mist.effect.directional_provider = directional_air.parameters
+			mist.effect.directional_region = directional_air.region_available()
+			mist.effect.directional_provider = directional_air.volume_parameters
 	player_contact = PlayerContact.new()
 	add_child(player_contact)
 	player_contact.setup(level)
@@ -529,6 +535,21 @@ func _apply_sky_chroma(env: Environment) -> void:
 	var rgb := env.ambient_light_color.srgb_to_linear()
 	var luma := Vector3(rgb.r, rgb.g, rgb.b).dot(Vector3(.2126, .7152, .0722))
 	env.ambient_light_color = Color(luma, luma, luma).lerp(rgb, scale).linear_to_srgb()
+
+func _apply_noon_sky_chroma(env: Environment) -> void:
+	var noon_weight := smoothstep(10., 12., hour) * (1. - smoothstep(12., 15., hour))
+	var amount := _lighting_scale(&"noon_sky_chroma") * noon_weight
+	if amount <= 0.:
+		return
+	var color := env.ambient_light_color.srgb_to_linear()
+	var source := Vector3(color.r, color.g, color.b)
+	# Forest PIX establishes the cool fill target. Calibrate its strength in Godot's diffuse light.
+	var tint := Vector3.ONE.lerp(Vector3(.83, 1., 1.42), amount)
+	var rgb := source * tint
+	rgb *= source.dot(KEY_LUMA) / maxf(rgb.dot(KEY_LUMA), .000001)
+	var peak := maxf(1., rgb[rgb.max_axis_index()])
+	env.ambient_light_color = Color(rgb.x / peak, rgb.y / peak, rgb.z / peak).linear_to_srgb()
+	env.ambient_light_energy *= peak
 
 func _apply_twilight_sky(env: Environment) -> void:
 	if not sky_response_active or _balanced_preview or hour <= 19.0 or hour >= 20.0:
@@ -1196,6 +1217,8 @@ func set_full_direct_shadows(value:bool)->void:
 func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"world_outline_width":
 		return 1.
+	if effect == &"stone_dusk_sky_chroma":
+		return .5
 	if effect == &"world_outline_strength":
 		return 0.
 	if effect == &"dawn_sky_transition":
@@ -1752,6 +1775,12 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 72 and effect == &"evening_lantern":
 			missing_value = 0.
+		if version < 122 and effect == &"noon_sky_chroma":
+			missing_value = 0.
+		if version < 121 and effect == &"stone_dusk_sky_chroma":
+			missing_value = 0.
+		if version < 120 and effect == &"basin_sunlit_mist":
+			missing_value = 0.
 		if version < 119 and effect == &"canopy_cue_day_tone":
 			missing_value = 0.
 		if version < 118 and effect == &"player_sun_specular":
@@ -1865,6 +1894,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
+		if effect == &"basin_sunlit_mist":
+			slider.editable = slider.editable and directional_air.region_available()
 		if effect in [&"dawn_sky_transition", &"night_sky_fill"]:
 			slider.editable = slider.editable and sky_response.available()
 		if effect in [&"dawn_mist_source", &"morning_depth_scatter", &"morning_depth_optical"]:
@@ -1926,6 +1957,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.available() and level.terrain_light.installed
 		if effect == &"stone_twilight_sky":
 			slider.editable = level.terrain_light.stone_twilight_available()
+		if effect == &"stone_dusk_sky_chroma":
+			slider.editable = _stone_day_sky_editable()
 		if effect == &"stone_diffuse_contrast":
 			slider.editable = _stone_diffuse_editable()
 		if effect == &"stone_day_face_fill":
@@ -1961,9 +1994,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color", &"stone_day_sky"]:
 		level.terrain_light.bind()
 		return
-	if changed_effect == &"stone_twilight_sky":
+	if changed_effect in [&"", &"stone_twilight_sky", &"stone_dusk_sky_chroma"]:
 		level.terrain_light._refresh_stone_diffuse()
-		return
+		if changed_effect != &"":
+			return
 	if changed_effect in [&"regional_sky", &"daylight_bounce", &"stone_diffuse_contrast", &"stone_day_face_fill", &"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
 		return # Terrain transport refreshes both receivers together.
 	if changed_effect in [&"night_soft_bloom", &"twilight_soft_bloom"] and level != null:
@@ -1979,7 +2013,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"forest_path_beam", &"lantern_grass_tone"]:
 		_publish_point_cutoff()
 		return
-	if changed_effect in [&"forest_path_air", &"forest_path_air_beam", &"sunlit_mist"]:
+	if changed_effect in [&"forest_path_air", &"forest_path_air_beam", &"sunlit_mist", &"basin_sunlit_mist"]:
 		return # The volume reads the live fixture and mix immediately before dispatch.
 	if changed_effect in [&"", &"foot_contact"] and player_contact != null:
 		player_contact.refresh()
@@ -2055,6 +2089,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
+	if changed_effect == &"noon_sky_chroma" and (hour <= 10. or hour >= 15.):
+		return
 	# Re-evaluate the authored preset before applying scales to prevent compounding.
 	_forest_hour = INF
 	apply_time()
@@ -2109,6 +2145,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		env.ambient_light_energy*=p.ambient_energy_scale
 		_apply_captured_sky(env)
 		_apply_sky_chroma(env)
+		_apply_noon_sky_chroma(env)
 		_apply_twilight_sky(env)
 		var key:=sun.light_color.srgb_to_linear();var rgb:Vector3=Vector3(key.r,key.g,key.b)*p.key_color_scale
 		var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
@@ -2386,6 +2423,9 @@ func _process(delta:float)->void:
 	var stone_twilight_slider: HSlider = _lighting_sliders.get(&"stone_twilight_sky")
 	if stone_twilight_slider != null:
 		stone_twilight_slider.editable = level.terrain_light.stone_twilight_available()
+	var stone_dusk_slider: HSlider = _lighting_sliders.get(&"stone_dusk_sky_chroma")
+	if stone_dusk_slider != null:
+		stone_dusk_slider.editable = _stone_day_sky_editable()
 	var stone_day_face_slider: HSlider = _lighting_sliders.get(&"stone_day_face_fill")
 	if stone_day_face_slider != null:
 		stone_day_face_slider.editable = _stone_diffuse_editable() and _stone_detail_editable()
@@ -2583,6 +2623,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Adds a thin layer of cool air around the northwest cliff at night. Try 65–100% at 22:00 in Combined mode."
 		if effect == &"forest_near_scatter":
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
+		if effect == &"basin_sunlit_mist":
+			slider.editable = directional_air.region_available()
 		if effect == &"sunlit_mist":
 			slider.editable = directional_air.available()
 			slider.tooltip_text = "Compare the 33% default against 24% at 07:00 or 16:30. Adds scattered sunlight behind canopy gaps; fades to zero at noon and night." if slider.editable else "Requires the verified private canopy field and the Mobile renderer."

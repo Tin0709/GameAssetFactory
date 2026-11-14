@@ -69,12 +69,27 @@ const SABRE_LATE_ROLL_ANGULAR_DAMP := 6.0
 const SABRE_GROUNDED_SLIDE_DRAG := 4.0
 const SABRE_ROLL_BLEND_END := 0.35
 const SABRE_BRACE_MIN_AGE := 0.82
+const SABRE_CORNER_LANDING_MIN_AGE := 1.5
+const SABRE_CORNER_LANDING_MAX_SPEED := 0.60
 const SABRE_BRACE_GRAVITY_SHARE := 0.65
 const SABRE_BRACE_BLEND_TIME := 0.10
 const SABRE_ROLL_RESPONSE_TIME := 0.10
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
 const HEIGHT := 1.95
 const CHASE_SPEED := 3.1
+# SW.Mob.Zombie specializes the hostile mob's AI attributes, with a 360°
+# cone. The controller's generic engine sight defaults are broader.
+const LAB_SIGHT_RADIUS_SQUARED := 10.0 * 10.0
+const LAB_SIGHT_DELAY := 0.4
+const LAB_SIGHT_LOSS_DELAY := 2.0
+const LAB_CROWD_SIGHT_HZ := 15.0
+const LAB_LAST_SEEN_STOP_DISTANCE := 0.10
+const LAB_ROAM_RADIUS := 10.0
+const LAB_ROAM_DELAY := 1.0
+const LAB_ROAM_SPEED := 3.0
+const LAB_ROAM_ARRIVAL := 0.10
+const LAB_ROAM_BLOCKED_TIME := 0.25
+const LAB_ROAM_ATTEMPTS := 4
 const CROWD_RETRY_MIN_ZOMBIES := 32
 const BLOCKED_CHASE_RETRY_HZ := 30.0
 const PACKED_CHASE_RETRY_HZ := 15.0
@@ -84,7 +99,7 @@ const CHASE_TARGET_MOVE_DISTANCE_SQUARED := 0.10 * 0.10
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
 # Zombie overrides damage and attack speed. MeleeAttackMob supplies the range,
-# cone and cooldown. The two source times are landmarks on Zombie_BasicAttack.
+# cone and cooldown. The Lab uses AM_Zombie_BasicAttack's section and notify.
 const MELEE_DAMAGE := 6
 const MELEE_REACH := 2.0
 const MELEE_HEIGHT_LIMIT := 2.0
@@ -92,6 +107,8 @@ const MELEE_HALF_ANGLE_COS := 0.9659258263 # cos(30 degrees / 2).
 const MELEE_COOLDOWN := 0.5
 const TELEGRAPH_RATE := 1.5
 const TELEGRAPH_END := 15.0 / 30.0
+const LAB_ATTACK_HIT_SECTION := 13.0 / 30.0
+const LAB_MELEE_MONTAGE_RATE := 1.1
 const MELEE_CONTACT_TIME := 17.0 / 30.0
 const LEVEL_COLLISION_MASK := 1
 const CORPSE_COLLISION_LAYER := 8
@@ -149,6 +166,16 @@ var _death_rng := RandomNumberGenerator.new()
 var _poise := MAX_POISE
 var _poise_recovery_wait := 0.0
 var _attack_cooldown := 0.0
+var _windup_target_start := Vector3.ZERO
+var _target_visible := false
+var _target_aggressive := false
+var _sight_state_seconds := 0.0
+var _last_seen_position := Vector3.ZERO
+var _roam_origin := Vector3.ZERO
+var _roam_destination := Vector3.INF
+var _roam_wait := LAB_ROAM_DELAY
+var _roam_blocked_seconds := 0.0
+var _roam_rng := RandomNumberGenerator.new()
 var _crowd_slot := 0
 var _blocked_chase := false
 var _blocking_zombie_id := 0
@@ -174,6 +201,7 @@ var _landing_gravity_sent := NAN
 var _landing_linear_damp_sent := NAN
 var _terrain_rest_age := 0.0
 var _terrain_rest_duration := 0.0
+var _terrain_rest_corner := false
 var _terrain_rest_poses: Dictionary[String, Transform3D]
 var _ragdoll_layout: Dictionary
 var _corpse_floor: CollisionShape3D
@@ -190,6 +218,7 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 	_corpse_floor = corpse_floor
 	_crowd_slot = serial
 	_death_rng.seed = hash(Vector2i(serial, 1709))
+	_roam_rng.seed = hash(Vector2i(serial, 4021))
 	_walk_clip = WALK_CLIPS[serial % WALK_CLIPS.size()]
 	add_child(model)
 	animation = model.get_node("AnimationPlayer")
@@ -214,6 +243,7 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 
 func _ready() -> void:
 	set_process(false)
+	_roam_origin = global_position
 	health = max_health
 	animation.play(SPAWN)
 	animation.advance(0)
@@ -313,20 +343,27 @@ func _physics_process(delta: float) -> void:
 	_poise_recovery_wait = maxf(0.0, _poise_recovery_wait - delta)
 	_poise = minf(MAX_POISE, _poise + POISE_RECOVERY_PER_SECOND * recovery_time)
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
+	var in_lab := is_instance_valid(_corpse_floor)
+	var crowd := in_lab and get_parent().get_child_count() >= CROWD_RETRY_MIN_ZOMBIES
+	var sample_ai := true
+	if crowd:
+		var stride := maxi(1, roundi(Engine.physics_ticks_per_second / LAB_CROWD_SIGHT_HZ))
+		sample_ai = Engine.get_physics_frames() % stride == _crowd_slot % stride
+	if in_lab:
+		_update_target_sight(delta, sample_ai)
 	var controlled_time := maxf(0.0, delta - _knockback_control_left)
 	_knockback_control_left = maxf(0.0, _knockback_control_left - delta)
 	var pushed := not _knockback.is_zero_approx()
 	var travel := _integrate_knockback(delta)
 	if controlled_time > 0.000001:
-		travel += _chase_velocity(controlled_time) * (controlled_time / delta)
+		travel += _chase_velocity(controlled_time, in_lab, sample_ai) * (controlled_time / delta)
 	velocity.x = travel.x
 	velocity.z = travel.z
 	if is_on_floor():
 		velocity.y = 0.0
 	else:
 		velocity += get_gravity() * _gravity_scale(ZOMBIE_GRAVITY) * delta
-	var crowd := is_instance_valid(_corpse_floor) and get_parent().get_child_count() >= CROWD_RETRY_MIN_ZOMBIES
-	var chasing := crowd and not pushed and controlled_time == delta and not travel.is_zero_approx() \
+	var chasing := crowd and _target_aggressive and not pushed and controlled_time == delta and not travel.is_zero_approx() \
 		and animation.current_animation in WALK_CLIPS
 	_skipped_blocked_step = false
 	if chasing and _blocked_chase and is_on_floor():
@@ -391,8 +428,19 @@ func _advance_animation(delta: float) -> void:
 			_emit_walk_step(clip, previous_phase)
 		return
 	var before := animation.current_animation_position
-	var telegraph_seconds := clampf((TELEGRAPH_END - before) / TELEGRAPH_RATE, 0.0, delta)
-	var advance_seconds := delta + telegraph_seconds * (TELEGRAPH_RATE - 1.0)
+	var lab := is_instance_valid(_corpse_floor)
+	var montage_rate := LAB_MELEE_MONTAGE_RATE if lab else 1.0
+	var hit_section := LAB_ATTACK_HIT_SECTION if lab else TELEGRAPH_END
+	var windup_rate := TELEGRAPH_RATE * montage_rate
+	var telegraph_seconds := clampf((hit_section - before) / windup_rate, 0.0, delta)
+	if lab and telegraph_seconds > 0.0 and _target_visible:
+		var target_position := _last_seen_position
+		var target_travel := target_position - _windup_target_start
+		# Keep the entry heading for a stationary target. AN_FocusOnTarget
+		# disables any tracking at the start of Attack_Hit.
+		if Vector2(target_travel.x, target_travel.z).length_squared() > 0.0001:
+			_face_target(target_position - global_position, telegraph_seconds)
+	var advance_seconds := telegraph_seconds * windup_rate + (delta - telegraph_seconds) * montage_rate
 	animation.advance(advance_seconds)
 	if before < MELEE_CONTACT_TIME and before + advance_seconds >= MELEE_CONTACT_TIME:
 		_check_melee_contact()
@@ -416,33 +464,120 @@ func _check_melee_contact() -> void:
 	if offset.length_squared() > MELEE_REACH * MELEE_REACH or not _is_in_melee_cone(offset):
 		return
 	var height := Vector3.UP * (HEIGHT * 0.5)
-	var ray := PhysicsRayQueryParameters3D.create(global_position + height, target.global_position + height, LEVEL_COLLISION_MASK)
-	ray.hit_from_inside = true
-	if get_world_3d().direct_space_state.intersect_ray(ray).is_empty():
+	if _clear_sight_to(target.global_position):
 		melee_audio.emit(global_position + height, true)
 		melee_hit.emit(MELEE_DAMAGE)
+
+func _clear_sight_to(point: Vector3) -> bool:
+	var height := Vector3.UP * (HEIGHT * 0.5)
+	var ray := PhysicsRayQueryParameters3D.create(global_position + height, point + height, LEVEL_COLLISION_MASK)
+	ray.hit_from_inside = true
+	return get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
+
+func _update_target_sight(delta: float, sample_ai: bool) -> void:
+	if target.get("is_dead") == true:
+		if _target_aggressive:
+			_reset_roam()
+		_target_visible = false
+		_target_aggressive = false
+		_sight_state_seconds = 0.0
+		return
+	var point := target.global_position
+	if global_position.distance_squared_to(point) > LAB_SIGHT_RADIUS_SQUARED:
+		_target_visible = false
+	elif sample_ai:
+		_target_visible = _clear_sight_to(point)
+		if _target_visible:
+			_last_seen_position = point
+	if _target_visible == _target_aggressive:
+		_sight_state_seconds = 0.0
+	else:
+		_sight_state_seconds += delta
+		var delay := LAB_SIGHT_DELAY if _target_visible else LAB_SIGHT_LOSS_DELAY
+		if _sight_state_seconds >= delay - 0.000001:
+			_target_aggressive = _target_visible
+			_sight_state_seconds = 0.0
+			_reset_roam()
+
+func _reset_roam() -> void:
+	_roam_destination = Vector3.INF
+	_roam_wait = LAB_ROAM_DELAY
+	_roam_blocked_seconds = 0.0
+
+func _roam_velocity(delta: float, sample_ai: bool) -> Vector3:
+	if not is_on_floor() or _corpse_floor.disabled:
+		_play_loop(IDLE)
+		return Vector3.ZERO
+	if not _roam_destination.is_finite():
+		_roam_wait = maxf(0.0, _roam_wait - delta)
+		if sample_ai and _roam_wait <= 0.000001:
+			_roam_destination = _pick_roam_destination()
+			if not _roam_destination.is_finite():
+				_reset_roam()
+		if not _roam_destination.is_finite():
+			_play_loop(IDLE)
+			return Vector3.ZERO
+	var offset := (_roam_destination - global_position).slide(Vector3.UP)
+	var distance := offset.length()
+	var stalled := is_on_wall() and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
+	_roam_blocked_seconds = _roam_blocked_seconds + delta if stalled else 0.0
+	if distance <= LAB_ROAM_ARRIVAL or _roam_blocked_seconds >= LAB_ROAM_BLOCKED_TIME:
+		_reset_roam()
+		_play_loop(IDLE)
+		return Vector3.ZERO
+	_face_target(offset, delta)
+	_play_loop(_walk_clip)
+	return offset * (minf(LAB_ROAM_SPEED, (distance - LAB_ROAM_ARRIVAL) / delta) / distance)
+
+func _pick_roam_destination() -> Vector3:
+	# MechanicLab has a single rectangular floor. Use a direct level check
+	# and keep the capsule inside its edges when choosing a patrol leg.
+	var bounds := _corpse_floor.shape as BoxShape3D
+	if bounds == null:
+		return Vector3.INF
+	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
+	for i in LAB_ROAM_ATTEMPTS:
+		var angle := _roam_rng.randf_range(0.0, TAU)
+		var radius := sqrt(_roam_rng.randf()) * LAB_ROAM_RADIUS
+		var point := _roam_origin + Vector3(cos(angle), 0.0, sin(angle)) * radius
+		var local := _corpse_floor.to_local(point)
+		local.x = clampf(local.x, -extent.x, extent.x)
+		local.z = clampf(local.z, -extent.z, extent.z)
+		point = _corpse_floor.to_global(local)
+		if global_position.distance_squared_to(point) > 1.0 and _clear_sight_to(point):
+			return point
+	return Vector3.INF
 
 func _is_in_melee_cone(planar_offset: Vector3) -> bool:
 	return global_basis.z.dot(planar_offset) >= planar_offset.length() * MELEE_HALF_ANGLE_COS
 
-func _chase_velocity(delta: float) -> Vector3:
+func _face_target(offset: Vector3, delta: float) -> void:
+	if Vector2(offset.x, offset.z).length_squared() > 0.0001:
+		rotation.y = lerp_angle(rotation.y, atan2(offset.x, offset.z), minf(delta * 10.0, 1.0))
+
+func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	if animation.current_animation in [SPAWN, ATTACK, STAGGER]:
 		return Vector3.ZERO
-	if target.get("is_dead") == true:
+	if in_lab and not _target_aggressive:
+		return _roam_velocity(delta, sample_ai)
+	if not in_lab and target.get("is_dead") == true:
 		_play_loop(IDLE)
 		return Vector3.ZERO
-	var offset := target.global_position - global_position
+	var target_visible := not in_lab or _target_visible
+	var point := _last_seen_position if in_lab else target.global_position
+	var offset := point - global_position
 	var height_delta := absf(offset.y)
 	offset.y = 0.0
 	var distance := offset.length()
-	if distance > 0.01:
-		rotation.y = lerp_angle(rotation.y, atan2(offset.x, offset.z), minf(delta * 10.0, 1.0))
-	if distance > MELEE_RANGE + MELEE_RANGE_TOLERANCE:
+	_face_target(offset, delta)
+	var stop_distance := MELEE_RANGE if target_visible else LAB_LAST_SEEN_STOP_DISTANCE
+	if distance > stop_distance + MELEE_RANGE_TOLERANCE:
 		_play_loop(_walk_clip)
-		return offset.normalized() * minf(CHASE_SPEED, (distance - MELEE_RANGE) / delta)
+		return offset.normalized() * minf(CHASE_SPEED, (distance - stop_distance) / delta)
 	# Complete the approach turn before locking the swing's heading.
 	var facing_target := _is_in_melee_cone(offset)
-	if height_delta <= MELEE_HEIGHT_LIMIT and facing_target and _attack_cooldown <= 0.0:
+	if target_visible and height_delta <= MELEE_HEIGHT_LIMIT and facing_target and _attack_cooldown <= 0.0:
+		_windup_target_start = target.global_position
 		animation.play(ATTACK, 0.1)
 		_attack_cooldown = MELEE_COOLDOWN
 		melee_audio.emit(global_position + Vector3.UP * (HEIGHT * 0.5), false)
@@ -533,11 +668,8 @@ func _update_death(delta: float) -> void:
 			var head: PhysicalBone3D = ragdoll.bodies.Head
 			head.friction = DEATH_SOURCE_FRICTION
 			head.bounce = DEATH_SOURCE_RESTITUTION
-		var launch := _death_profile.duplicate() as DeathProfile
 		var angle := deg_to_rad(DEATH_LAUNCH_ANGLE)
 		var launch_impulse := _death_launch_speed(_death_strength) * mass * ragdoll_launch_multiplier
-		launch.linear_impulse = cos(angle) * launch_impulse
-		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
 		var floor_impact_limb_share := 0.0
 		if sabre_finisher:
@@ -545,7 +677,8 @@ func _update_death(delta: float) -> void:
 		elif _death_strike == DeathStrike.SABRE_GROUND:
 			floor_impact_limb_share = SABRE_GROUND_FLOOR_LIMB_SHARE
 		var flight_gravity := ZOMBIE_GRAVITY * ragdoll_gravity_multiplier
-		if ragdoll.begin(launch, direction, "Chest", 0.0, flight_gravity, _corpse_floor, floor_impact_limb_share, sabre_finisher):
+		if ragdoll.begin(_death_profile, direction, "Chest", 0.0, flight_gravity,
+				_corpse_floor, floor_impact_limb_share, sabre_finisher, cos(angle) * launch_impulse, sin(angle) * launch_impulse):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	var contact := ragdoll.contact_motion()
@@ -553,6 +686,13 @@ func _update_death(delta: float) -> void:
 		# On a terrace, limbs can carry the body before the core reaches a surface.
 		# Require sustained support so a brief grazing hit keeps its flight response.
 		var limbs_supporting: bool = contact.supports >= 2 and contact.linear < DEATH_LIMB_SUPPORT_MAX_SPEED
+		# An upright corpse can stop on one foot when the corner carries its
+		# upper body. Give it the same sustained-support landing transition.
+		if not limbs_supporting and sabre_finisher and source_rig and is_instance_valid(_corpse_floor) \
+				and not _corpse_floor.disabled and _corpse_age >= SABRE_CORNER_LANDING_MIN_AGE \
+				and contact.supports == 1 and contact.leg_supported \
+				and contact.linear < SABRE_CORNER_LANDING_MAX_SPEED and contact.angular < CORPSE_SETTLE_SPIN:
+			limbs_supporting = ragdoll.has_flat_corner_brace()
 		_limb_support_age = _limb_support_age + delta if limbs_supporting else 0.0
 	if not _corpse_landed and (contact.core_supports > 0 or _limb_support_age >= DEATH_LIMB_SUPPORT_DURATION - 0.00001):
 		_corpse_landed = true
@@ -735,14 +875,23 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 	var slow_support: bool = not normally_supported and not ragdoll.source_joints.is_empty() \
 		and (motion.supports >= 2 or intermittent_foot) \
 		and motion.linear <= CORPSE_SETTLE_SPEED * speed_scale and motion.angular <= CORPSE_SETTLE_SPIN * speed_scale
+	var corner_support := false
 	if slow_support:
 		if flat_floor:
 			# A wall can carry the upper body while the floor carries the
 			# chest and legs, or both feet. Verify the pose stays put.
-			slow_support = motion.leg_supported and (not two_parts or motion.core_supports == 0) \
-				and (ragdoll.has_wall_rest_with_near_foot() if intermittent_foot \
-					else ragdoll.has_flat_wall_rest_support(motion.core_supports > 0)) \
-				and ragdoll.max_anchor_error() <= Ragdoll.SOURCE_ANCHOR_TOLERANCE
+			slow_support = motion.leg_supported and (not two_parts or motion.core_supports == 0)
+			if slow_support and intermittent_foot:
+				slow_support = ragdoll.has_wall_rest_with_near_foot()
+				# Two wall faces can carry the torso even with the second leg
+				# off the floor. Require the tighter terrain pose envelope.
+				corner_support = not slow_support and not _corpse_floor.disabled \
+					and _corpse_age >= SABRE_CORNER_LANDING_MIN_AGE \
+					and ragdoll.floor_landing_blended and ragdoll.has_flat_corner_brace()
+				slow_support = slow_support or corner_support
+			elif slow_support:
+				slow_support = ragdoll.has_flat_wall_rest_support(motion.core_supports > 0)
+			slow_support = slow_support and ragdoll.max_anchor_error() <= Ragdoll.SOURCE_ANCHOR_TOLERANCE
 		else:
 			slow_support = motion.core_supports > 0 and (not two_parts or motion.leg_supported) \
 				and ragdoll.terrain_support_margin(two_parts) > CORPSE_TERRAIN_SUPPORT_MARGIN
@@ -753,8 +902,9 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 	# Solver velocities can oscillate on a supported edge. Check that each
 	# body stays near the same pose throughout the whole rest window.
 	var duration := CORPSE_WALL_REST_TIME if flat_floor or two_parts else CORPSE_TERRAIN_REST_TIME
-	var shift_limit := CORPSE_FLAT_WALL_REST_SHIFT if flat_floor else CORPSE_TERRAIN_REST_SHIFT
-	var turn_limit := CORPSE_FLAT_WALL_REST_TURN if flat_floor else CORPSE_TERRAIN_REST_TURN
+	var flat_wall_support := flat_floor and not corner_support
+	var shift_limit := CORPSE_FLAT_WALL_REST_SHIFT if flat_wall_support else CORPSE_TERRAIN_REST_SHIFT
+	var turn_limit := CORPSE_FLAT_WALL_REST_TURN if flat_wall_support else CORPSE_TERRAIN_REST_TURN
 	var moved := false
 	for name in _terrain_rest_poses:
 		var body: PhysicalBone3D = ragdoll.bodies[name]
@@ -764,10 +914,11 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 				or pose.basis.get_rotation_quaternion().angle_to(start.basis.get_rotation_quaternion()) > turn_limit:
 			moved = true
 			break
-	if moved or _terrain_rest_poses.is_empty() or duration != _terrain_rest_duration:
+	if moved or _terrain_rest_poses.is_empty() or duration != _terrain_rest_duration or corner_support != _terrain_rest_corner:
 		for name: String in ragdoll.bodies:
 			_terrain_rest_poses[name] = ragdoll.bodies[name].global_transform
 		_terrain_rest_duration = duration
+		_terrain_rest_corner = corner_support
 		_terrain_rest_age = 0.0
 		return false
 	_terrain_rest_age += delta

@@ -5,6 +5,7 @@ const WALK_SOURCES := [
 	"Player_Master_Walk", "Player_Master_Walk", "Player_2H_Medium_Walk",
 	"Player_Crossbow_Walk", "Player_Master_Walk",
 ]
+const NEW_WEAPON_NAMES := ["Meat Cleaver", "Bow", "Gauntlets", "Pickaxe", "Shovel"]
 
 var failures := 0
 var contacts: Array[String] = []
@@ -27,9 +28,82 @@ func attack(pressed: bool) -> void:
 	event.pressed = pressed
 	root.push_input(event, true)
 
+func tap_attack() -> void:
+	attack(true)
+	await ticks(2)
+	attack(false)
+
 func equip(menu: OptionButton, index: int) -> void:
 	menu.select(index)
 	menu.item_selected.emit(index)
+
+func check_new_weapons(lab: Node3D, menu: OptionButton, target: Node3D) -> void:
+	var weapon_mesh := lab._weapon_mesh as MeshInstance3D
+	for sample: Array in [[5, 13, "NativeCleaverAttack1", 20, 0.0], [7, 9, "NativeGauntletAttack1", 22, 1.25],
+			[8, 16, "NativePickaxeAttack1", 28, 1.5], [9, 15, "NativeShovelAttack1", 30, 0.25]]:
+		var index: int = sample[0]
+		equip(menu, index)
+		await ticks(10)
+		var label := menu.get_item_text(index)
+		var visible: bool = weapon_mesh.visible if index != 7 else lab._basic_gauntlet_mounts.size() == 2
+		check(menu.selected == index and visible, "%s equips its MD2 mesh" % label)
+		if menu.selected != index:
+			continue
+		if index != 7:
+			check(weapon_mesh.get_active_material(0) == weapon_mesh.mesh.surface_get_material(0),
+				"%s renders its own texture on the shared socket" % label)
+		if index == 7:
+			check(lab._basic_gauntlet_mounts.all(func(mount): return mount.visible and mount.mesh.get_surface_count() == 1),
+				"Both fists wear the regular Gauntlets model")
+		if index == 9:
+			check(lab.player.clips.Walk.source_name == "Player_Shovel_Walk", "Shovel uses the native walking clip")
+		target.health = 100
+		target.global_position = lab.player.global_position + Vector3(0.0, 0.0, 1.6)
+		await tap_attack()
+		await ticks(100)
+		check(target.health == 100 - sample[1] and contacts.has(sample[2]),
+			"%s makes one grounded contact with its own source damage" % label)
+		lab.reset_player()
+		await ticks(12)
+		var player = lab.player
+		target.health = 100
+		target.global_position = player.global_position + Vector3(0.0, 0.0, float(sample[4]) + 0.8)
+		check(player.drop_for_lab(3.0), "%s can enter the air attack fixture" % label)
+		await ticks(5)
+		await tap_attack()
+		check(target.health == 100, "%s waits for the landing before applying damage" % label)
+		await ticks(115)
+		check(target.health == 100 - sample[3], "%s applies its source jump-attack damage on landing (%d HP)" % [label, target.health])
+	equip(menu, 6)
+	await ticks(10)
+	check(menu.selected == 6 and is_instance_valid(lab._bow) and lab._bow_mount.visible, "Bow equips its MD2 model")
+	if menu.selected == 6:
+		var bow = lab._bow
+		var mounted := lab._bow_mount as MeshInstance3D
+		var relaxed := mounted.mesh
+		target.global_position = lab.player.global_position + Vector3(0.0, 0.0, 4.0)
+		target.health = 100
+		attack(true)
+		await ticks(42)
+		check(bow.ammo == 15 and target.health == 100 and mounted.mesh != relaxed,
+			"Holding Bow draws its mesh and spends no ammo")
+		attack(false)
+		await ticks(22)
+		check(bow.ammo == 14 and target.health == 46 and mounted.mesh == relaxed,
+			"Releasing a fully drawn Bow fires one charged arrow for 54 damage")
+		await ticks(12)
+		await tap_attack()
+		await ticks(28)
+		check(bow.ammo == 13 and target.health == 28, "A short Bow tap fires one regular arrow for 18 damage")
+		await ticks(12)
+		attack(true)
+		await ticks(12)
+		lab.reset_player()
+		attack(false)
+		await ticks(25)
+		check(bow.ammo == 15 and target.health == 28, "Reset cancels a draw before it fires")
+	target.health = 100
+	target.position = Vector3(0.0, 0.0, 5.0)
 
 func run() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
@@ -38,13 +112,18 @@ func run() -> void:
 	await ticks(12)
 	var menu := lab.get_node("HUD/Weapon") as OptionButton
 	var original_air: Dictionary = lab.player.clips.AirAttack
-	check(not menu.disabled and menu.item_count == 5, "Both requested weapons appear in the live selector")
-	if menu.item_count != 5:
+	check(not menu.disabled and menu.item_count == 10, "All ten weapons appear in the live selector")
+	if menu.item_count != 10:
 		quit(1)
 		return
 	check(menu.get_item_text(3) == "The Cross Pollinator", "The Cross Pollinator is named correctly")
 	check(menu.get_item_text(4) == "Prime Enchanter's Gauntlets", "Prime Enchanter's Gauntlets are named correctly")
+	for i in NEW_WEAPON_NAMES.size():
+		check(menu.get_item_text(5 + i) == NEW_WEAPON_NAMES[i] and menu.get_item_icon(5 + i) != null,
+			"%s has its own selector entry and MD2 icon" % NEW_WEAPON_NAMES[i])
 	await check_weapon_movement(lab, menu)
+	await check_weapon_idle(lab, menu)
+	await check_bow_movement(lab, menu)
 	await check_crossbow_settle(lab, menu)
 	check_crossbow_equip_audio(lab, menu)
 	var group := lab.get_node("Zombies")
@@ -58,6 +137,8 @@ func run() -> void:
 	target.set_physics_process(false)
 	target.health = 100
 	target.position = Vector3(0.0, 0.0, 5.0)
+	await check_new_weapons(lab, menu, target)
+	contacts.clear()
 
 	equip(menu, 3)
 	var ammo := lab.get_node("HUD/CrossbowAmmo") as Label
@@ -426,6 +507,9 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 			and not player._use_composed_gait(player.active_clip) and not player.hybrid_motion.owns_pose,
 			"Shift walk uses the MD2 source for weapon %d" % index)
 		if index == 3:
+			check(player.clips.has("NativeLabCrossbowLook") and not player.clips.has("NativeLabBowLook")
+				and not player.clips.has("NativeLabFistsInspect"),
+				"Crossbow loads its idle gesture independently of other weapons")
 			player.requested_run = true
 			await ticks(25)
 			check(player.active_clip == "Run" and player.hybrid_motion.last_kind == "CrossbowRun"
@@ -485,6 +569,177 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 	player.scripted_input = false
 	lab.reset_player()
 	await ticks(12)
+
+func check_bow_movement(lab: Node3D, menu: OptionButton) -> void:
+	equip(menu, 6)
+	await ticks(12)
+	if menu.selected != 6:
+		check(false, "Bow equips for moving draw")
+		return
+	var player = lab.player
+	var bow = lab._bow
+	var rig: Skeleton3D = player.skeleton
+	var left_leg := rig.find_bone("J_L_Leg")
+	var left_arm := rig.find_bone("J_L_Arm")
+	player.scripted_input = true
+	player.requested_run = true
+	player.requested_direction = Vector2(0, 1)
+	await ticks(24)
+	var draw_start: Vector3 = player.global_position
+	attack(true)
+	await ticks(25)
+	check(player.global_position.distance_to(draw_start) < 0.02,
+		"Starting a Bow draw stops the running player at once")
+	for running in [false, true]:
+		player.requested_run = running
+		player.requested_direction = Vector2(0, 1)
+		await ticks(18)
+		var start_leg := rig.get_bone_pose_rotation(left_leg)
+		var start_arm := rig.get_bone_pose_rotation(left_arm)
+		var start_position: Vector3 = player.global_position
+		var leg_swing := 0.0
+		var arm_drift := 0.0
+		for i in 32:
+			await physics_frame
+			leg_swing = maxf(leg_swing, start_leg.angle_to(rig.get_bone_pose_rotation(left_leg)))
+			arm_drift = maxf(arm_drift, start_arm.angle_to(rig.get_bone_pose_rotation(left_arm)))
+		check(player.global_position.distance_to(start_position) < 0.02 and leg_swing < 0.01,
+			"Holding a charged Bow stays planted with %s input" % ["run" if running else "walk"])
+		check(arm_drift < 0.03 and bow.ammo == 15,
+			"The full draw holds the arms and ammo despite movement input")
+	player.requested_direction = Vector2.ZERO
+	await ticks(20)
+	var stopped_leg := rig.get_bone_pose_rotation(left_leg)
+	await ticks(12)
+	check(stopped_leg.angle_to(rig.get_bone_pose_rotation(left_leg)) < 0.01,
+		"Stopping while drawing returns to a stationary Bow pose")
+	player.requested_direction = Vector2(0, 1)
+	await ticks(18)
+	var release_leg := rig.get_bone_pose_rotation(left_leg)
+	var release_position: Vector3 = player.global_position
+	attack(false)
+	var release_swing := 0.0
+	for i in 20:
+		await physics_frame
+		release_swing = maxf(release_swing, release_leg.angle_to(rig.get_bone_pose_rotation(left_leg)))
+	check(release_swing > 0.25 and bow.ammo == 14 and player.global_position.distance_to(release_position) > 0.5,
+		"Releasing while running advances the stride and fires one arrow")
+	await ticks(15)
+	bow.ammo = 0
+	var empty_position: Vector3 = player.global_position
+	attack(true)
+	await ticks(10)
+	check(player.global_position.distance_to(empty_position) > 0.3,
+		"A failed draw with no arrows leaves movement available")
+	attack(false)
+	lab.reset_player()
+	player.scripted_input = false
+	await ticks(12)
+	Input.action_press("move_backward")
+	await ticks(20)
+	var live_position: Vector3 = player.global_position
+	attack(true)
+	await ticks(28)
+	check(player.global_position.distance_to(live_position) < 0.02,
+		"Live movement input cannot move a grounded Bow draw")
+	attack(false)
+	await ticks(12)
+	Input.action_release("move_backward")
+	check(player.global_position.distance_to(live_position) > 0.3 and bow.ammo == 14,
+		"Still-held live movement resumes after the shot")
+	lab.reset_player()
+	await ticks(12)
+	equip(menu, 0)
+	await ticks(3)
+
+func check_weapon_idle(lab: Node3D, menu: OptionButton) -> void:
+	var idle_sources := [
+		"Player_Master_Idle", "Player_Master_Idle", "Player_2H_Medium_Idle",
+		"Player_Crossbow_Idle", "Player_Master_Idle", "Player_Master_Idle",
+		"Player_Master_Idle", "Player_Master_Idle", "Player_Master_Idle", "Player_Shovel_Idle",
+	]
+	var expected := [
+		"Player_Idle_Novelty_ExamineWeapon", "Player_Idle_Novelty_ExamineWeapon",
+		"Player_Idle_Novelty_ExamineWeapon_2HMedium", "Player_Idle_Novelty_LookAround_Crossbow",
+		"Player_Idle_Novelty_ExamineWeapon_Fists", "Player_Idle_Novelty_ExamineWeapon",
+		"Player_Idle_Novelty_LookAround", "Player_Idle_Novelty_ExamineWeapon_Fists",
+		"Player_Idle_Novelty_ExamineWeapon", "Player_Idle_Novelty_ExamineWeapon_Shovel",
+	]
+	for index in expected.size():
+		equip(menu, index)
+		await ticks(3)
+		var player = lab.player
+		check(player.active_clip == "Idle" and player.clips.Idle.source_name == idle_sources[index]
+			and player.animation_player.get_animation(player.clips.Idle.action).loop_mode == Animation.LOOP_LINEAR,
+			"%s starts in its looping source idle" % menu.get_item_text(index))
+		check(player.clips.InspectWeapon.source_name == expected[index],
+			"%s uses the right source idle variant" % menu.get_item_text(index))
+		for i in 373:
+			await physics_frame
+			if player.active_clip == "InspectWeapon":
+				break
+		check(player.active_clip == "InspectWeapon" and player.source_transition.incoming_weight < 0.05
+			and player.source_transition.duration >= 0.16,
+			"%s eases into the idle gesture" % menu.get_item_text(index))
+		await ticks(12)
+		check(player.active_clip == "InspectWeapon" and player.animation_player.current_animation_position > 0.05
+			and is_equal_approx(player.source_transition.incoming_weight, 1.0),
+			"%s actually plays its idle variant" % menu.get_item_text(index))
+		if index == 6:
+			await check_bow_idle_recovery(lab)
+			await ticks(373)
+			check(player.active_clip == "InspectWeapon", "Bow can play the idle gesture again after shooting")
+		for i in 170:
+			await physics_frame
+			if player.active_clip == "Idle":
+				break
+		check(player.active_clip == "Idle" and player.source_transition.incoming_weight < 0.05
+			and player.source_transition.duration >= 0.16,
+			"%s eases back to the idle loop after the gesture" % menu.get_item_text(index))
+		await ticks(24)
+		check(player.active_clip == "Idle" and player._idle_wait < 0.0,
+			"The idle gesture resumes the loop with a cooldown")
+		player._idle_wait = 6.1
+		await ticks(2)
+		check(player.active_clip == "InspectWeapon", "The weapon is mid-gesture before movement")
+		player.scripted_input = true
+		player.requested_direction = Vector2(0, 1)
+		await ticks(8)
+		check(player.active_clip in ["Walk", "Run"], "Movement interrupts the idle variant")
+		player.scripted_input = false
+		lab.reset_player()
+		await ticks(12)
+	equip(menu, 0)
+	await ticks(3)
+
+func check_bow_idle_recovery(lab: Node3D) -> void:
+	var player = lab.player
+	var handoffs: Dictionary = player.combat_handoffs
+	player.combat_handoffs = {}
+	var mount := lab._bow_mount as MeshInstance3D
+	var idle_grip := mount.transform
+	var ammo: int = lab._bow.ammo
+	attack(true)
+	await ticks(2)
+	check(player.active_clip == "NativeBowAction" and not player._inspecting,
+		"Drawing interrupts Bow's idle gesture")
+	check(mount.position.distance_to(idle_grip.origin) < 0.025 and player.source_transition.duration >= 0.12,
+		"The Bow grip blends from idle even without the optional combat handoff profile")
+	await ticks(49)
+	attack(false)
+	var last_grip := mount.transform
+	var max_drop := 0.0
+	var recovered := false
+	for i in 55:
+		await physics_frame
+		max_drop = maxf(max_drop, mount.position.distance_to(last_grip.origin))
+		last_grip = mount.transform
+		recovered = recovered or player.active_clip == "Idle"
+	check(recovered and player.active_clip == "Idle" and player._idle_wait < 1.0 and lab._bow.ammo == ammo - 1,
+		"Shooting from an idle gesture returns to ordinary idle and restarts the wait")
+	check(max_drop < 0.025 and mount.transform.is_equal_approx(idle_grip),
+		"The Bow grip returns smoothly to its relaxed position (%.3f m)" % max_drop)
+	player.combat_handoffs = handoffs
 
 func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 	equip(menu, 3)

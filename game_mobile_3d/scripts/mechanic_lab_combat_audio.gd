@@ -35,6 +35,41 @@ const GAUNTLET_HIT_HASHES := [
 ]
 const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_%02d.ogg"
 const GAUNTLET_SLAM := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_attack_%02d.ogg"
+const TOOL_AUDIO := "Items/Weapons/Weapon_Melee/"
+const TOOL_SWING_AUDIO := "6_weapons_melee_basicCombo/Attack%d/"
+const TOOL_AIR_AUDIO := "7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/"
+const TOOL_SAMPLES := {
+	&"cleaver": [
+		["sfx_cleaver_attack1_01", "a5c93722ef4eadbe6764d08d300deab01a7760232d1b485c98e926af8c65b152"],
+		["sfx_cleaver_attack2_01", "5f16fcbc14c5bd7de9882d0cbfde5fa981742a38c84ce88b3f3be43c46cbcee5"],
+		["sfx_cleaver_attack3_01", "2b8c40a503378fd04f1d9aad2549ec3d6907b64ffc320f362326df4cc39cbb53"],
+		[], ["sfx_cleaver_HJA_01", "45a8f478c1d583be77d7ad91e0edce7ceb006a508c549f0828ca77ef51fe7ebb"], [],
+	],
+	&"gauntlet": [
+		["sfx_gauntlet_attack_combo2_light_01", "218f1dadb43722675b3d5a4883a539d18f03e9631fbfcbec074ccad253e1dec0"],
+		["sfx_gauntlet_attack_combo2_mid_01", "1fb81a7b84c1fc590df8db448a2645f2b77054f303cb1b826fb819834a9b563f"],
+		["sfx_gauntlet_attack_combo2_heavy_01", "481cc404977d9f0e0dceddae00277c19d0da5efa59ed4e6545801bb3d8b82bb9"],
+		["sfx_gauntlet_HJA_start_01", "3481d1af85e89dec658a34e234c04ec684b87a2c0d220ed90eb65b2d5db16237"],
+		["sfx_gauntlet_HJA_hit_01", "dfe9012b79877af6c4f5ed76bc5838df1f2b2f5c7e10cd4f40e5a9deceacdb8a"],
+		["sfx_weapon_hitmarker_gauntlets_01", GAUNTLET_HIT_HASHES[0]],
+	],
+	&"pickaxe": [
+		["sfx_pickaxe_attack_light_01", "528918dca461fb901e0879484cdf4caf94849db40365a74270838ea5d1694dc4"],
+		["sfx_pickaxe_attack_medium_01", "a070a153337e7d2ad13bae9bf23e41cfb88463a47e620a76df592b836300464c"],
+		["sfx_pickaxe_attack_heavy_01", "ef31d6f07ecfe34df7cf701c431fd4eab06507c7348c1465f15dbe463b6e7d3c"],
+		["sfx_pickaxe_HJA_start_01", "e8e913bb5589730e09e8ae741c8a40284edd33e844ba19ea759364029d12774e"],
+		["sfx_pickaxe_jump_attack_01", "ed9e8c6b6bca74c3cba8ea718c6297b2595b4473ba8e384647ede2295e506fd5"],
+		["sfx_weapon_hitmarker_pickaxe_01", "be899f24da74a5463b02ef7eda01f27db723118091bd9b97dfcb52a250add2db"],
+	],
+	&"shovel": [
+		["sfx_shovel_attack1", "068fc26cf43f010435cc4c19e8bf204a5d9281cd33e675dab8b302a5fe04a94d"],
+		["sfx_shovel_attack2_01", "a825cb79c2985ab7d5615369a185fc4501cacac9dd3cd0eeda82ad10cc2d1bdb"],
+		["sfx_shovel_attack3_01", "5d7d66541a8e9c240b5ae55ca445e0882386db11016d9116857e3281b0fbe304"],
+		["sfx_shovel_HJA_whoosh", "45f1af854a05e277a7a97f5ff03eb1d65fbcd7e9214c4069833454424decf695"],
+		["sfx_shovel_HJA_hit_02", "275f098f77c8191adfda4e4aa18decd64be0485ea389d26ff49337a4ee6a6749"],
+		["sfx_weapon_hitmarker_shovel_01", "4453bb081a04947d98270b92b3ca5fd40b7425e47446289c81d7b61c06baa09b"],
+	],
+}
 const GAUNTLET_SWING_HASHES := {
 	"light": [
 		"5ca970f981961963617c5903b5bb66505e76ceefc41ab0ad52286ecdd738e07f",
@@ -247,15 +282,18 @@ func _restore_master() -> void:
 func _exit_tree() -> void:
 	_restore_master()
 
-func contact(point: Vector3, serial: int, lethal: bool, clip := "") -> void:
+func contact(point: Vector3, serial: int, lethal: bool, clip := "", tool := &"") -> void:
 	if not enabled:
 		return
 	# Projectiles and the gauntlet slam play their impact at the collision itself.
-	var uses_collision_cue := clip == CrossPollinator.SHOT or (clip == "AirAttack" and gauntlets_equipped)
+	var uses_collision_cue := clip in [CrossPollinator.SHOT, "NativeBowAction"] \
+		or (clip == "AirAttack" and (gauntlets_equipped or tool != &""))
 	if serial != _last_weapon_serial and not uses_collision_cue:
 		_last_weapon_serial = serial
 		var group := _weapon_hit_group()
-		if clip.begins_with("NativeGauntlet"):
+		if tool != &"":
+			group = _tool_group(tool, 5)
+		elif clip.begins_with("NativeGauntlet"):
 			group = &"gauntlet_hit"
 		_play(group, point, HIT_GAIN_DB)
 	var reaction := &"death" if lethal else &"hurt"
@@ -280,7 +318,10 @@ func load_crossbow(root: String) -> void:
 	for i in CROSSBOW_FLIGHT_HASHES.size():
 		_load_sample(root, &"crossbow_flight", CROSSBOW + ("arrow_whoosh_%02d.ogg" % (i + 1)), CROSSBOW_FLIGHT_HASHES[i])
 
-func load_gauntlets(root: String) -> void:
+func load_gauntlets(root: String, basic := false) -> void:
+	if basic:
+		load_melee_tool(root, &"gauntlet")
+		return
 	var weights := ["light", "medium", "heavy"]
 	for i in weights.size():
 		var weight: String = weights[i]
@@ -296,6 +337,28 @@ func load_gauntlets(root: String) -> void:
 		_load_sample(root, &"gauntlet_slam", GAUNTLET_SLAM % (i + 1), GAUNTLET_SLAM_HASHES[i])
 	for i in MAULER_DIVE_HASHES.size():
 		_load_sample(root, &"mauler_dive", MAULER_DIVE % (i + 1), MAULER_DIVE_HASHES[i])
+
+func load_melee_tool(root: String, tool: StringName) -> void:
+	var samples: Array = TOOL_SAMPLES[tool]
+	for slot in samples.size():
+		var sample: Array = samples[slot]
+		if sample.is_empty():
+			continue
+		var folder := TOOL_SWING_AUDIO % (slot + 1) if slot < 3 else TOOL_AIR_AUDIO
+		if slot == 5:
+			folder = "5_weapons_melee_hitmarkers/"
+		_load_sample(root, _tool_group(tool, slot), TOOL_AUDIO + folder + sample[0] + ".ogg", sample[1])
+
+static func _tool_group(tool: StringName, slot: int) -> StringName:
+	return StringName("tool_%s_%d" % [tool, slot])
+
+func tool_swung(tool: StringName, point: Vector3, index: int, airborne: bool) -> void:
+	if enabled:
+		_play(_tool_group(tool, 3 if airborne else index), point, HIT_GAIN_DB)
+
+func tool_landed(tool: StringName, point: Vector3) -> void:
+	if enabled:
+		_play(_tool_group(tool, 4), point, SLAM_GAIN_DB)
 
 func crossbow_switched(equipped: bool, point: Vector3) -> void:
 	if enabled:

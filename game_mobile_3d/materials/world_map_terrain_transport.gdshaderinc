@@ -11,6 +11,7 @@ uniform sampler2D stone_diffuse_field : filter_nearest, repeat_disable;
 uniform float stone_diffuse_strength = 0.0;
 uniform sampler2D stone_twilight_field : filter_nearest, repeat_disable;
 uniform float stone_twilight_strength = 0.0;
+uniform float stone_dusk_sky_chroma = 0.0;
 varying float stone_twilight_factor;
 
 float gaf_stone_twilight_sample(int receiver, float face_y) {
@@ -74,7 +75,18 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 			smoothstep(1.13, 1.27, color.g / max(color.b, 0.0001));
 		sky_fill = mix(sky_fill, gaf_turf_ambient(sky_fill), turf);
 	}
-	vec3 irradiance = gaf_pre_twilight_diffuse(sky_fill, camera_position) + terrain_sun_bounce * terrain_key_radiance * cloud;
+	vec3 diffuse_sky = gaf_pre_twilight_diffuse(sky_fill, camera_position);
+#ifdef GAF_TERRAIN_NIGHT_SKY
+	if (ground_grade == 3 && stone_dusk_sky_chroma > 0.0) {
+		// Calibrated on direct-free Forest receivers. Retain the diffuse sky's luminance.
+		const vec3 luma = vec3(.2126, .7152, .0722);
+		vec3 ratios = mix(vec3(1.30, 1.0, 1.32), vec3(1.26, 1.0, 1.29), clamp(face_y, 0.0, 1.0));
+		vec3 target = diffuse_sky * ratios;
+		target *= dot(diffuse_sky, luma) / max(dot(target, luma), .000001);
+		diffuse_sky = mix(diffuse_sky, target, stone_dusk_sky_chroma);
+	}
+#endif
+	vec3 irradiance = diffuse_sky + terrain_sun_bounce * terrain_key_radiance * cloud;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (ground_grade == 3 && night_sky_state.y > 0.0) {
 		float luma = dot(irradiance, vec3(.2126, .7152, .0722));

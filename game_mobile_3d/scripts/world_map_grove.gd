@@ -297,6 +297,23 @@ func spruce_available() -> bool:
 func spruce_visible() -> bool:
 	return spruce_available() and _spruce_root.visible
 
+func place_additional_spruce(source: Node3D, position_world: Vector3) -> Array[MeshInstance3D]:
+	var tree := source.duplicate() as Node3D
+	tree.name = "BasinDaySpruce"
+	_spruce_root.add_child(tree)
+	tree.global_position = position_world
+	var casters: Array[MeshInstance3D] = []
+	for mesh: MeshInstance3D in tree.find_children("*", "MeshInstance3D", true, false):
+		var original: MeshInstance3D = source.get_node(tree.get_path_to(mesh))
+		mesh.set_instance_shader_parameter("source_crown_mask_base", original.get_instance_shader_parameter("source_crown_mask_base"))
+		if original in _spruce_casters:
+			casters.append(mesh)
+	_spruce_casters.append_array(casters)
+	var trunk := tree.get_node("Trunk") as StaticBody3D
+	trunk.collision_layer = 1 if spruce_visible() else 0
+	_spruce_trunks.append(trunk)
+	return casters
+
 func set_spruce_visible(value: bool, player_position: Vector3, capsule: CapsuleShape3D) -> bool:
 	if not spruce_available():
 		return false

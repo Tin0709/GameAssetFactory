@@ -5,7 +5,6 @@ render_mode cull_back;
 uniform sampler2D base_atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D packed_atlas : filter_nearest, repeat_disable;
 uniform float radiant_strength = 0.0;
-uniform float phase_coverage = 0.0;
 varying vec3 world_position;
 
 void vertex() {
@@ -13,11 +12,6 @@ void vertex() {
 }
 
 void fragment() {
-	if (phase_coverage < 1.0) {
-		vec3 cell = floor(world_position * 40.0);
-		float threshold = fract(sin(dot(cell, vec3(19.19, 41.13, 93.71))) * 4375.13);
-		if (threshold >= phase_coverage) discard;
-	}
 	ALBEDO = texture(base_atlas, UV).rgb;
 	ROUGHNESS = 1.0;
 	// Blue is the recovered emission mask. Color and level are calibrated for Mobile HDR.

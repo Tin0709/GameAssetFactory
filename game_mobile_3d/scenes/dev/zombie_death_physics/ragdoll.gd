@@ -143,7 +143,8 @@ func sample(delta: float) -> void:
 	sample_count += 1
 
 func begin(profile: Resource, direction: Vector3, location: String, distance: float, gravity: float,
-		flat_floor: CollisionShape3D = null, floor_impact_limb_share := 0.0, limit_first_contact_stretch := false) -> bool:
+		flat_floor: CollisionShape3D = null, floor_impact_limb_share := 0.0, limit_first_contact_stretch := false,
+		linear_override := INF, upward_override := INF) -> bool:
 	if running or sample_count < 2: return false
 	running = true
 	_flat_floor = flat_floor
@@ -181,7 +182,7 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 		body.angular_velocity = angular
 	if not source_joints.is_empty():
 		_build_source_joints()
-		apply_impact(profile, direction, location, distance)
+		apply_impact(profile, direction, location, distance, linear_override, upward_override)
 		return true
 	# Rebuild frames only AFTER every body has the current pose. Native parent frame
 	# is computed from this exact pose, accommodating animated bone translations.
@@ -206,7 +207,7 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 		joint_rest_rotations[part[0]] = (parent.global_basis.inverse() * body.global_basis).get_rotation_quaternion()
 	resistance_gain = profile.joint_resistance
 	set_physics_process(resistance_gain > 0.0)
-	apply_impact(profile, direction, location, distance)
+	apply_impact(profile, direction, location, distance, linear_override, upward_override)
 	return true
 
 func _handoff_wall_clearance() -> Vector3:
@@ -305,7 +306,8 @@ func _physics_process(delta: float) -> void:
 		PhysicsServer3D.body_apply_torque_impulse(child.get_rid(),impulse)
 		PhysicsServer3D.body_apply_torque_impulse(parent.get_rid(),-impulse)
 
-func apply_impact(profile: Resource, direction: Vector3, location: String, distance: float) -> void:
+func apply_impact(profile: Resource, direction: Vector3, location: String, distance: float,
+		linear_override := INF, upward_override := INF) -> void:
 	var dir := direction.normalized()
 	if dir.is_zero_approx(): dir = Vector3.FORWARD
 	var target_name := "Chest"
@@ -318,7 +320,9 @@ func apply_impact(profile: Resource, direction: Vector3, location: String, dista
 	elif location == "Left shoulder": side = 0.24
 	var hit := target.global_position + target.global_basis * Vector3(side, 0.24 if side != 0.0 else 0.08, 0.10)
 	last_strength = profile.strength_at(distance)
-	var total: Vector3 = (dir * profile.linear_impulse + Vector3.UP * profile.upward_impulse) * last_strength
+	var linear: float = profile.linear_impulse if linear_override == INF else linear_override
+	var upward: float = profile.upward_impulse if upward_override == INF else upward_override
+	var total := (dir * linear + Vector3.UP * upward) * last_strength
 	total_applied_impulse = total
 	impact_distribution.clear()
 	# A common added velocity carries the 60kg assembly together. The remaining

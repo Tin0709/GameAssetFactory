@@ -3,6 +3,7 @@ extends RefCounted
 
 const Source := preload("res://scripts/mechanic_lab_weapon_source.gd")
 const DIRECTORY := Source.EQUIPMENT + "Gauntlet/Gauntlet_Unique/"
+const BASE_DIRECTORY := Source.EQUIPMENT + "Gauntlet/"
 const CLIPS := Source.ANIMATIONS + "Weapons_Melee/Fists/Combat/"
 const LIBRARY := &"private_prime_gauntlets"
 const AIR := "NativeGauntletAir"
@@ -34,6 +35,16 @@ const STRIKES := [
 ]
 const AIR_STRIKE := {"damage": 24, "range_m": 2.5, "strength": 1150.0, "angle": 25.0,
 	"stagger": 42.0, "splash_stagger": 0.5}
+const BASE_STRIKES := [
+	{"damage": 9, "range_m": 2.4, "strength": 300.0, "angle": 15.0, "stagger": 14.0,
+		"cone_degrees": 30.0, "cone_offset": -1.2, "cone_cutoff": 1.2, "splash_stagger": 0.5},
+	{"damage": 9, "range_m": 2.4, "strength": 300.0, "angle": 15.0, "stagger": 14.0,
+		"cone_degrees": 30.0, "cone_offset": -1.2, "cone_cutoff": 1.2, "splash_stagger": 0.5},
+	{"damage": 12, "range_m": 2.75, "strength": 850.0, "angle": 35.0, "stagger": 20.0,
+		"cone_degrees": 30.0, "cone_offset": -1.2, "cone_cutoff": 1.2, "splash_stagger": 0.5},
+]
+const BASE_AIR_STRIKE := {"damage": 22, "range_m": 2.5, "strength": 1150.0, "angle": 25.0,
+	"stagger": 42.0, "splash_stagger": 0.5, "primary_range": 1.5}
 const AIR_OFFSET := 1.25
 const AIR_CONTACT := 24.0 / 30.0
 # The GLB has a separate edge surface but no export of its material instance
@@ -41,17 +52,27 @@ const AIR_CONTACT := 24.0 / 30.0
 const LEFT_GLOW := Color("#a9f4e6")
 const RIGHT_GLOW := Color("#faf474")
 
-static func mount_transform(left: bool) -> Transform3D:
+static func mount_transform(left: bool, basic := false) -> Transform3D:
 	# In this rig the visible fist is the end of J_*_Arm, weighted to that
 	# bone. J_*_Hand and J_*_Weapon are independently animated prop helpers.
 	var outside := 1.0 if left else -1.0
+	if basic:
+		# The ordinary mesh is symmetric across the grip and shorter than the unique pair.
+		return Transform3D(Basis.IDENTITY, Vector3(0, 0, 0.65))
 	var basis := Basis.IDENTITY if left else Basis(Vector3.BACK, PI)
 	return Transform3D(basis, Vector3(outside * 0.065, 0.0, 0.68))
 
-static func icon() -> Texture2D:
+static func icon(basic := false) -> Texture2D:
+	if basic:
+		return Source.icon(BASE_DIRECTORY, "T_UI_Gauntlets_Icon",
+			"07b735722243e04a8cd34e4f832fb38b3dd0f4c29387800c6a4391e504fbe386")
 	return Source.icon(DIRECTORY, "T_UI_Gauntlets_Unique_Icon", ICON_HASH)
 
-static func load_mesh(actor: CharacterBody3D, root: String) -> Mesh:
+static func load_mesh(actor: CharacterBody3D, root: String, basic := false) -> Mesh:
+	if basic:
+		return Source.load_mesh(actor, root, BASE_DIRECTORY, "SM_Gauntlet",
+			"e74f3024044cc771a205db2adb4bcb2145afe0239c4d1b1b332b757cf85d94a9", "T_Gauntlet",
+			"a6d42bdb3cf95450da14660f9a05bccb8fa6b2339982fe21b56f1af4bda85993")
 	return Source.load_mesh(actor, root, DIRECTORY, "SM_Gauntlet_RL", MESH_HASH,
 		"T_Gauntlet_Unique", TEXTURE_HASH)
 
@@ -69,7 +90,7 @@ static func with_edge_color(mesh: Mesh, color: Color) -> Mesh:
 		result.surface_set_material(surface, edge)
 	return result
 
-static func combat_profile(root: String) -> Dictionary:
+static func combat_profile(root: String, basic := false) -> Dictionary:
 	var result := Source.profile()
 	for i in ATTACK_FRAMES.size():
 		var stem := "Player_GauntletsCombo_Attack%d" % (i + 1)
@@ -79,7 +100,7 @@ static func combat_profile(root: String) -> Dictionary:
 			RECOVERY_FRAMES[i], RECOVERY_HASHES[i], "recovery")
 		result.additional_clips.append_array([attack, recovery])
 		var duration: float = attack.duration
-		result.windows.append(Source.window(attack, recovery, RATES[i], CONTACT_FRAMES[i] / 30.0,
+		result.windows.append(Source.window(attack, recovery, 2.0 if basic else RATES[i], CONTACT_FRAMES[i] / 30.0,
 			duration - 4.0 / 30.0, duration - 2.0 / 30.0))
 	result.additional_clips.append(Source.clip(root, CLIPS, "Player_Jump_Gauntlet-Attack_Heavy", AIR, 85,
 		"71d4f86676b810fe68524fbe9e2a29dfd3ae51421d219f684b69392621fd16fe", "attack"))

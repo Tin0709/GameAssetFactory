@@ -65,7 +65,11 @@ func run() -> void:
 	for zombie in lab.get_node("Zombies").get_children():
 		zombie.free()
 	await check_turned_zombie(lab)
+	await check_melee_montage_clock(lab)
+	await check_melee_focus(lab)
 	await check_melee_height(lab)
+	await check_zombie_perception(lab)
+	await check_zombie_roam(lab)
 	await check_simultaneous_damage(lab, numbers)
 	lab._on_player_hit(6)
 	lab._process(0.12)
@@ -101,6 +105,67 @@ func check_turned_zombie(lab) -> void:
 		" attacks=", openings.size(), " hp=", lab.player_health)
 	zombie.free()
 
+func check_melee_montage_clock(lab) -> void:
+	lab.reset_player()
+	await ticks(3)
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie := lab.get_node("Zombies").get_child(0) as ZOMBIE
+	zombie.global_position = Vector3(0.0, 0.02, -1.34)
+	zombie.rotation.y = 0.0
+	zombie.animation.play(ZOMBIE.IDLE, 0.0)
+	zombie.animation.advance(0.0)
+	var attack_ticks: Array[int] = []
+	var source_positions: Array[float] = []
+	zombie.melee_audio.connect(func(_point, contact: bool):
+		attack_ticks.append(Engine.get_physics_frames())
+		if contact:
+			source_positions.append(zombie.animation.current_animation_position))
+	await ticks(56)
+	check(attack_ticks.size() == 2 and attack_ticks[1] - attack_ticks[0] == 23 and lab.player_health == 94,
+		"The native zombie montage reaches its first melee contact on the expected 60 Hz tick")
+	check(source_positions.size() == 1 and absf(source_positions[0] - 0.584444) < 0.001,
+		"The zombie leaves the accelerated telegraph at frame 13 and advances at the montage rate")
+	print("MECHANIC_LAB_ZOMBIE_MONTAGE ticks=", attack_ticks, " contact_source=", source_positions)
+	zombie.free()
+	lab.reset_player()
+
+func check_melee_focus(lab) -> void:
+	var player: CharacterBody3D = lab.player
+	player.set_physics_process(false)
+	for fixture in ["early sidestep", "late sidestep", "retreat"]:
+		lab.reset_player()
+		await ticks(3)
+		lab.get_node("HUD/SpawnZombie").pressed.emit()
+		var zombie := lab.get_node("Zombies").get_child(0) as ZOMBIE
+		zombie.global_position = Vector3(0.0, 0.02, -1.34)
+		zombie.rotation.y = 0.0
+		zombie.animation.play(ZOMBIE.IDLE, 0.0)
+		zombie.animation.advance(0.0)
+		for frame in 30:
+			await physics_frame
+			if zombie.animation.current_animation == ZOMBIE.ATTACK:
+				break
+		check(zombie.animation.current_animation == ZOMBIE.ATTACK, "The focus fixture begins a real windup")
+		await ticks(4)
+		if fixture == "late sidestep":
+			await ticks(14)
+			check(zombie.animation.current_animation_position > 13.0 / 30.0,
+				"The late sidestep starts after the montage releases focus")
+		var initial_yaw := zombie.rotation.y
+		player.global_position += Vector3(0.0, 0.0, 0.95) if fixture == "retreat" else Vector3(0.78, 0.0, 0.0)
+		await ticks(22)
+		var turned := absf(angle_difference(initial_yaw, zombie.rotation.y))
+		if fixture == "early sidestep":
+			check(turned > 0.30 and lab.player_health == 94, "The telegraph tracks an early sidestep and hits once")
+		elif fixture == "late sidestep":
+			check(turned < 0.001 and lab.player_health == 100, "The hit section keeps its heading and misses a late sidestep")
+		else:
+			check(lab.player_health == 100, "A retreat outside the reach avoids the strike")
+		print("MECHANIC_LAB_ZOMBIE_FOCUS ", fixture, " yaw_change=", turned, " hp=", lab.player_health)
+		zombie.free()
+	player.set_physics_process(true)
+	lab.reset_player()
+
 func check_melee_height(lab) -> void:
 	var group: Node = lab.get_node("Zombies")
 	lab.player.set_physics_process(false)
@@ -117,6 +182,11 @@ func check_melee_height(lab) -> void:
 		zombie.animation.advance(0.0)
 		var wall: StaticBody3D
 		if blocked:
+			for frame in 36:
+				await physics_frame
+				if zombie.animation.current_animation == ZOMBIE.ATTACK:
+					break
+			check(zombie.animation.current_animation == ZOMBIE.ATTACK, "The wall fixture starts with a real windup")
 			wall = StaticBody3D.new()
 			var collider := CollisionShape3D.new()
 			var box := BoxShape3D.new()
@@ -131,10 +201,126 @@ func check_melee_height(lab) -> void:
 		if height > 2.0:
 			check(zombie.animation.current_animation != ZOMBIE.ATTACK, "Targets beyond the height limit do not start a windup")
 		if wall != null:
-			check(zombie.animation.current_animation == ZOMBIE.ATTACK, "The wall blocks the hit after a real windup")
 			wall.free()
 		zombie.free()
 	lab.player.set_physics_process(true)
+	lab.reset_player()
+	await ticks(2)
+
+func check_zombie_perception(lab) -> void:
+	var group: Node = lab.get_node("Zombies")
+	var player: CharacterBody3D = lab.player
+	player.set_physics_process(false)
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie := group.get_child(0) as ZOMBIE
+	player.global_position = Vector3(0.0, 0.02, 10.25)
+	await ticks(2)
+	zombie.global_position = Vector3(0.0, 0.02, 0.0)
+	zombie.rotation.y = PI
+	zombie.animation.play(ZOMBIE.IDLE, 0.0)
+	zombie.animation.advance(0.0)
+	await ticks(29)
+	check(absf(zombie.position.z) < 0.02, "An unseen target outside the 10 m radius does not cause pursuit")
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(16.0, 4.0, 0.25)
+	collider.shape = box
+	wall.add_child(collider)
+	wall.position = Vector3(0.0, 2.0, 5.0)
+	lab.add_child(wall)
+	player.global_position.z = 9.5
+	await ticks(7)
+	check(absf(zombie.position.z) < 0.02, "A wall prevents first detection inside the radius")
+	lab.remove_child(wall)
+	await ticks(23)
+	check(absf(zombie.position.z) < 0.02, "A new sighting needs 0.4 seconds before pursuit")
+	await ticks(9)
+	check(zombie.position.z > 0.2, "The zombie detects the player from behind inside 10 m")
+	lab.add_child(wall)
+	await ticks(12)
+	var before_shift := zombie.position
+	player.global_position.x = 4.0
+	await ticks(36)
+	check(zombie.position.z > before_shift.z + 1.0 and absf(zombie.position.x) < 0.10,
+		"During the sight-loss grace period the zombie pursues the last seen location")
+	lab.remove_child(wall)
+	var before_reveal := zombie.position
+	await ticks(8)
+	check(zombie.position.x > before_reveal.x + 0.08,
+		"A target revealed during the grace period is pursued immediately")
+	lab.add_child(wall)
+	for frame in 4:
+		await physics_frame
+		if not zombie._target_visible:
+			break
+	check(not zombie._target_visible and zombie._target_aggressive, "Losing sight starts the grace period")
+	await ticks(117)
+	check(zombie._target_aggressive, "The zombie keeps its target through the two-second grace period")
+	await ticks(4)
+	check(not zombie._target_aggressive, "The zombie drops its target after the grace period")
+	var lost_position := zombie.position
+	lab.remove_child(wall)
+	await ticks(17)
+	check(zombie.position.distance_to(lost_position) < 0.02,
+		"After two seconds out of sight the zombie needs a fresh detection")
+	await ticks(16)
+	check(zombie.position.distance_to(lost_position) > 0.15, "Reacquiring the target resumes pursuit")
+	print("MECHANIC_LAB_ZOMBIE_PERCEPTION last_seen=", before_shift, " dropped=", lost_position, " reacquired=", zombie.position)
+	wall.free()
+	zombie.free()
+	player.set_physics_process(true)
+	lab.reset_player()
+	await ticks(2)
+
+func check_zombie_roam(lab) -> void:
+	var player: CharacterBody3D = lab.player
+	var group: Node = lab.get_node("Zombies")
+	player.set_physics_process(false)
+	player.global_position = Vector3(47.0, 0.02, 47.0)
+	await ticks(2)
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie := group.get_child(0) as ZOMBIE
+	var origin := zombie.position
+	player.global_position = Vector3(-22.0, 0.02, -22.0)
+	var reached_idle := false
+	for frame in 30:
+		await physics_frame
+		if zombie.animation.current_animation == ZOMBIE.IDLE:
+			reached_idle = true
+			break
+	check(reached_idle, "A patrol starts from the ordinary spawned idle")
+	await ticks(57)
+	check(zombie.position.distance_to(origin) < 0.025, "An idle zombie first waits for one second")
+	await ticks(27)
+	check(zombie.position.distance_to(origin) > 0.5 and zombie.animation.current_animation in ZOMBIE.WALK_CLIPS,
+		"An unalerted zombie roams on its native walking clip")
+	var peak_distance := 0.0
+	var peak_speed := 0.0
+	var saw_pause := false
+	var saw_second_walk := false
+	for frame in 350:
+		await physics_frame
+		peak_distance = maxf(peak_distance, zombie.position.distance_to(origin))
+		peak_speed = maxf(peak_speed, zombie.get_real_velocity().slide(Vector3.UP).length())
+		if zombie.animation.current_animation == ZOMBIE.IDLE:
+			saw_pause = true
+		elif saw_pause and zombie.animation.current_animation in ZOMBIE.WALK_CLIPS:
+			saw_second_walk = true
+	check(saw_pause and saw_second_walk and peak_distance <= 10.025,
+		"Patrol pauses before a new leg and stays within ten metres of the spawn")
+	check(peak_speed > 2.95 and peak_speed <= 3.03 and zombie.is_on_floor(),
+		"Edge patrol uses the 3 m/s movement attribute and stays on the platform")
+	var target_position := zombie.position - Vector3(3.0, 0.0, 3.0)
+	player.global_position = target_position
+	await ticks(27)
+	var start_chase := zombie.position.distance_to(target_position)
+	await ticks(26)
+	check(zombie._target_aggressive and zombie.position.distance_to(target_position) < start_chase - 1.0,
+		"Seeing the player interrupts the patrol and starts pursuit")
+	print("MECHANIC_LAB_ZOMBIE_ROAM peak_range=", peak_distance, " peak_speed=", peak_speed, " second_walk=", saw_second_walk)
+	zombie.free()
+	player.set_physics_process(true)
 	lab.reset_player()
 	await ticks(2)
 
