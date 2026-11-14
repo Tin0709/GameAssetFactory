@@ -3,6 +3,7 @@ extends SceneTree
 const MAP := preload("res://scenes/maps/m2_v1/MeadowBiomeReview.tscn")
 const MEADOW := preload("res://assets/graphics/biomes/meadow.tres")
 const PROFILE := preload("res://scripts/biome_graphics_profile.gd")
+const FOREST := preload("res://assets/graphics/biomes/forest_reference.tres")
 var failures: Array[String] = []
 
 func _initialize() -> void:
@@ -18,6 +19,8 @@ func verify() -> void:
 	if not failures.is_empty():
 		finish()
 		return
+	check(FOREST.get("ground_haze") != null and FOREST.get("twilight_ground_haze") != null,
+		"Forest authors both low-air envelopes in its biome preset")
 	var world = MAP.instantiate()
 	var profile = world.biome_graphics.duplicate()
 	profile.start_overcast = .25
@@ -29,7 +32,24 @@ func verify() -> void:
 	var light: DirectionalLight3D = world.get_node("Sun")
 	var env: Environment = world.get_node("WorldEnvironment").environment
 	check(world.map_ready and world.geometry.cells.size() == 5632, "Load actual second Litematica map")
-	check(not world.showcase.forest_active() and world.grove == null, "No Forest route on the portable map")
+	check(not world.showcase.forest_active() and world.grove == null and world.showcase.forest.phases.is_empty(),
+		"Portable map skips even reading the private Forest atmosphere")
+	check(profile.get("twilight_ground_haze") != null,
+		"Woodland profile loads its own twilight envelope")
+	if profile.has_method("sample_ground_haze"):
+		var noon_haze: PackedFloat32Array = profile.sample_ground_haze(12., 20., 3.)
+		var twilight_haze: PackedFloat32Array = profile.sample_ground_haze(19.5, 20., 3.)
+		check(noon_haze.is_empty() and twilight_haze.size() == 8 and twilight_haze[4] > 0.,
+			"Woodland only publishes low-air scattering at twilight")
+		check(profile.sample_ground_haze(19.5, 20., 3., 1., 0.).is_empty()
+			and MEADOW.sample_ground_haze(19.5, 20., 3.).is_empty(),
+			"Layer controls and Meadow leave the shared payload neutral")
+		if twilight_haze.size() == 8:
+			var moved: PackedFloat32Array = profile.sample_ground_haze(19.5, 24., 10.)
+			check(is_equal_approx(moved[0] - twilight_haze[0], 4.) and is_equal_approx(moved[2] - twilight_haze[2], 7.),
+				"Moving the subject or changing map elevation moves the depth or height envelope")
+	else:
+		check(false, "Both maps need the same low-air sampling function")
 	check(profile.day_night != null and is_equal_approx(graphics.weather_weight, .25),
 		"Woodland profile must load with its own day/night colors and starting weather")
 	if profile.day_night == null:

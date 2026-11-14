@@ -2,6 +2,7 @@ extends SceneTree
 
 const FOREST_SCENE := preload("res://scenes/WorldMap.tscn")
 const PORTABLE_SCENE := preload("res://scenes/maps/m2_v1/MeadowBiomeReview.tscn")
+const MEADOW := preload("res://assets/graphics/biomes/meadow.tres")
 var failures: Array[String] = []
 var checks := 0
 
@@ -96,6 +97,33 @@ func run() -> void:
 				and graphics._finish_effect.snapshot().frames > 0,
 				"A map opened at noon adds bloom at dusk on the same compositor as the warmed medium")
 			check(env.fog_density > 0., "Ordinary materials keep valid native fog while custom receivers substitute the medium")
+			var full_bytes: int = graphics._mist.effect.snapshot().bytes
+			graphics.set_quality(1)
+			for index in 8:
+				await process_frame
+				await RenderingServer.frame_post_draw
+			var balanced_bytes: int = graphics._mist.effect.snapshot().bytes
+			check(graphics._mist.visible and balanced_bytes > 0 and balanced_bytes < full_bytes,
+				"Changing from Full to Balanced rebuilds a smaller mist grid")
+			check(not graphics._finish_effect.enabled, "Balanced skips adaptive bloom")
+			graphics.set_quality(2)
+			map.showcase.set_hour(19.5)
+			for index in 8:
+				await process_frame
+				await RenderingServer.frame_post_draw
+			check(graphics._mist.effect.snapshot().bytes == full_bytes and graphics._finish_effect.enabled,
+				"Switching back to Full restores the larger grid and adaptive bloom")
+			check(not graphics._mist_sample.get("ground_haze", PackedFloat32Array()).is_empty(),
+				"Woodland twilight reaches the shared mist renderer")
+			map.showcase.set_hour(12.)
+			check(graphics._mist_sample.get("ground_haze", PackedFloat32Array()).is_empty(),
+				"Returning to Noon clears twilight parameters")
+			map.showcase.set_hour(19.5)
+			var woodland = map.biome_graphics
+			graphics.set_profile(MEADOW)
+			check(not graphics._mist.visible and graphics._mist_sample.is_empty(),
+				"Switching preset cannot leave the previous medium active")
+			graphics.set_profile(woodland)
 			graphics.set_quality(0)
 			await process_frame
 			await RenderingServer.frame_post_draw
