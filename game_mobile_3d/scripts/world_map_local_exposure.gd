@@ -101,7 +101,7 @@ void main() {
 const AIR_PREFILTER := """
 vec3 prefilter_air(vec3 scene_color) {
  if (finish.x <= 0.0) return scene_color;
- // Keep an unfiltered base for the existing humid-light treatment.
+ // Preserve diffuse haze below the knee instead of cutting it to black.
  // Threshold in physical luminance, independently of packed target encoding.
  float value = dot(scene_color, vec3(0.2126, 0.7152, 0.0722)) * (air.z > .5 ? 1. : 2.);
  float highlights = smoothstep(0.025, 0.15, value);

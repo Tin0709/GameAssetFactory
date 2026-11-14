@@ -1278,7 +1278,7 @@ func set_full_direct_shadows(value:bool)->void:
 
 func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"night_bloom_prefilter":
-		return 0.
+		return .25
 	if effect == &"bloom_local_response":
 		return .65
 	if effect == &"world_outline_width":
