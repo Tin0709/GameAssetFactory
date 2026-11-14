@@ -187,6 +187,38 @@ class ImportWorldMapTests(unittest.TestCase):
                         importer.main()
                 self.assertFalse(new_scene.exists())
 
+    def test_import_accepts_custom_portable_profile_without_changing_importer(self):
+        source = REPO / "game_mobile_3d/assets/maps/meadow_biome_review/World Map.litematic"
+        with tempfile.TemporaryDirectory() as temporary:
+            project = Path(temporary) / "game_mobile_3d"
+            presets = project / "assets/graphics/biomes"
+            presets.mkdir(parents=True)
+            template = '[gd_resource type="Resource" load_steps=2 format=3]\n\n' \
+                '[ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]\n\n' \
+                '[resource]\nscript = ExtResource("profile")\n'
+            (presets / "custom_valley.tres").write_text(template, encoding="utf-8")
+            (presets / "private_valley.tres").write_text(
+                template + "use_forest_reference = true\n", encoding="utf-8")
+            (presets / "fake_profile.tres").write_text(
+                template.replace("biome_graphics_profile", "biome_weather_profile"), encoding="utf-8")
+            for biome in ("custom_valley", "private_valley", "fake_profile", "../custom_valley"):
+                with self.subTest(biome=biome), patch.object(importer, "GODOT_PROJECT", project), \
+                        patch("sys.stdout", new_callable=io.StringIO), patch("sys.stderr", new_callable=io.StringIO):
+                    output = project / "assets/maps" / ("accepted_valley" if biome == "custom_valley" else "rejected_valley")
+                    scene = project / "scenes/maps/Valley.tscn"
+                    args = ["import_world_map.py", str(source), "--border", "bounds", "--output", str(output),
+                            "--scene", str(scene), "--biome", biome]
+                    with patch.object(sys, "argv", args):
+                        if biome == "custom_valley":
+                            importer.main()
+                            self.assertIn('res://assets/graphics/biomes/custom_valley.tres', scene.read_text())
+                            self.assertIn('res://assets/graphics/biomes/meadow.tres', scene.read_text())
+                            self.assertTrue(output.joinpath("runtime.json").exists())
+                        else:
+                            with self.assertRaises(SystemExit):
+                                importer.main()
+                            self.assertFalse(output.exists())
+
     def test_scene_rejects_nonportable_biome_and_paths_before_import(self):
         with tempfile.TemporaryDirectory() as temporary:
             project = Path(temporary) / "game_mobile_3d"
