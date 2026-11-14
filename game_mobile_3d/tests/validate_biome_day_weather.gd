@@ -35,8 +35,25 @@ func verify() -> void:
 	if profile.day_night == null:
 		finish(world)
 		return
+	profile.set("shadow_blur", 2.1)
+	profile.set("shadow_opacity", .66)
+	profile.set("fog_depth_curve", 2.2)
+	profile.set("fog_light_energy", .81)
 	graphics.set_weather(0., 0.)
 	world.showcase.set_hour(12.)
+	check(is_equal_approx(light.shadow_blur, 2.1) and is_equal_approx(light.shadow_opacity, .66),
+		"Directional shadow softness and opacity come from the selected biome")
+	check(is_equal_approx(env.fog_depth_curve, 2.2) and is_equal_approx(env.fog_light_energy, .81),
+		"Depth fog shape and lighting come from the selected biome")
+	for code in [KEY_U, KEY_P]:
+		var event := InputEventKey.new()
+		event.pressed = true
+		event.physical_keycode = code
+		world._unhandled_input(event)
+	check(env.adjustment_color_correction == profile.color_correction, "Legacy grading shortcut cannot override the biome")
+	check(is_equal_approx(env.fog_depth_curve, 2.2), "Legacy fog shortcut cannot override the biome")
+	world.look.refresh_directional_shadow_blur(light)
+	check(is_equal_approx(light.shadow_blur, 2.1), "Shadow refresh retains the active biome radius")
 	check(light.light_color.is_equal_approx(profile.noon_sun_color), "Authored Noon remains unchanged")
 	check(env.fog_light_color.is_equal_approx(profile.noon_fog_color), "Noon fog retains its anchor")
 	world.showcase.set_hour(7.)
@@ -78,16 +95,27 @@ func verify() -> void:
 	check(before_midnight.is_equal_approx(env.fog_light_color) or (Vector3(before_midnight.r,before_midnight.g,before_midnight.b) - Vector3(env.fog_light_color.r,env.fog_light_color.g,env.fog_light_color.b)).length() < .001, "No color discontinuity at midnight")
 	world.showcase.set_hour(7.)
 	graphics.set_profile(MEADOW)
+	check(is_equal_approx(light.shadow_blur, 1.25) and is_equal_approx(light.shadow_opacity, .782),
+		"Switching biome restores legacy shadow defaults")
+	check(is_equal_approx(env.fog_depth_curve, 1.7) and is_equal_approx(env.fog_light_energy, .75),
+		"Switching biome restores legacy fog defaults")
 	check(not light.light_color.is_equal_approx(morning), "Another profile on the same map resolves different lighting")
 	check(is_equal_approx(world.showcase.hour, 7.) and MEADOW.day_night == null, "Switch keeps current hour and supports older presets")
 	graphics.set_profile(profile)
 	check(light.light_color.is_equal_approx(morning), "Switching back restores color without editing the map")
 	world.set_reference_look(false)
+	env = world.get_node("WorldEnvironment").environment
+	check(is_equal_approx(light.shadow_blur, 1.1) and not is_equal_approx(env.fog_depth_curve, 2.2),
+		"Baseline retains its own sun and fog")
 	world.set_reference_look(true)
 	env = world.get_node("WorldEnvironment").environment
 	check(env.fog_light_color.is_equal_approx(morning_fog), "Baseline toggle restores biome values")
 	graphics.set_quality(0)
 	check(env.fog_light_color.is_equal_approx(morning_fog), "Mobile quality fallback retains biome tint")
+	check(is_equal_approx(env.fog_depth_curve, 2.2) and is_equal_approx(env.fog_light_energy, .81),
+		"Essential fallback keeps authored fog shape and lighting")
+	check(is_equal_approx(light.shadow_blur, 2.1) and is_equal_approx(light.shadow_opacity, .66),
+		"Baseline restore reapplies the same biome shadows")
 	check(world.map_ready and world.player.is_physics_processing(), "Gameplay controller remains active")
 	finish(world)
 
