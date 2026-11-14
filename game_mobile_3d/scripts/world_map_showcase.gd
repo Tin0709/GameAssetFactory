@@ -897,7 +897,7 @@ func _update_mist()->void:
 			if gain > 0.0:
 				sample.near_scatter = Vector3(FOREST_NEAR_SCATTER_CENTER.x, FOREST_NEAR_SCATTER_CENTER.y, gain)
 	var emitter:Vector3=level.presentation.player_position()
-	if level.ground_haze_profile != null and not _balanced_preview and atmosphere_review == "combined" \
+	if not _flat_lab and level.ground_haze_profile != null and not _balanced_preview and atmosphere_review == "combined" \
 			and level.view_mode == "gameplay" and sample.has("near_layer"):
 		var subject_depth: float = -camera.global_basis.z.dot(emitter - camera.global_position)
 		sample.ground_haze = level.ground_haze_profile.sample(hour, subject_depth, level.spawn_position.y,
