@@ -14,12 +14,15 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import re
 import shutil
 
 
 REPO = Path(__file__).resolve().parents[1]
+GODOT_PROJECT = REPO / "game_mobile_3d"
 DEFAULT_SOURCE = REPO / "game_mobile_3d/assets/maps/world_map/World Map.litematic"
 DEFAULT_OUTPUT = REPO / "game_mobile_3d/assets/maps/world_map"
+PORTABLE_BIOMES = ("meadow", "humid_woodland")
 AIR = {"minecraft:air", "minecraft:cave_air", "minecraft:void_air"}
 MASK64 = (1 << 64) - 1
 FULL_BLOCKS = {"stone": "stone_block", "dirt": "dirt_block", "coarse_dirt": "dirt_block",
@@ -342,16 +345,54 @@ def import_source(source, output, *, border_mode="markers"):
     return runtime, manifest
 
 
+def map_scene_source(scene_name, runtime_path, biome):
+    runtime_resource = "res://" + runtime_path.relative_to(GODOT_PROJECT).as_posix()
+    return (
+        '[gd_scene load_steps=4 format=3]\n\n'
+        '[ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]\n'
+        '[ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]\n'
+        f'[ext_resource type="Resource" path="res://assets/graphics/biomes/{biome}.tres" id="biome"]\n\n'
+        f'[node name="{scene_name}" instance=ExtResource("base")]\n'
+        'script = ExtResource("map")\n'
+        f'map_layout_path = {json.dumps(runtime_resource, ensure_ascii=False)}\n'
+        'biome_graphics = ExtResource("biome")\n'
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", nargs="?", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--border", choices=("markers", "bounds"), default="markers")
+    parser.add_argument("--scene", type=Path, help="Create a new playable Godot scene under game_mobile_3d/scenes/maps")
+    parser.add_argument("--biome", choices=PORTABLE_BIOMES, help="Preset for --scene (default: meadow)")
     args = parser.parse_args()
-    if args.border == "bounds" and args.output.resolve() == DEFAULT_OUTPUT.resolve():
+    output = args.output.resolve()
+    if args.border == "bounds" and output == DEFAULT_OUTPUT.resolve():
         parser.error("--border bounds requires a separate map --output")
-    runtime, manifest = import_source(args.source, args.output, border_mode=args.border)
-    print(json.dumps({"output": str(args.output), "source_sha256": runtime["source_sha256"],
+    if args.biome and not args.scene:
+        parser.error("--biome requires --scene")
+    scene_info = {}
+    if args.scene:
+        scene = args.scene.resolve()
+        if (not scene.is_relative_to(GODOT_PROJECT / "scenes/maps")
+                or scene.suffix != ".tscn"
+                or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", scene.stem)):
+            parser.error("--scene must be a .tscn under game_mobile_3d/scenes/maps with a simple node name")
+        maps = GODOT_PROJECT / "assets/maps"
+        if output == maps or not output.is_relative_to(maps):
+            parser.error("--scene requires a new --output directory under game_mobile_3d/assets/maps")
+        if scene.exists() or output.exists():
+            parser.error("--scene and --output must both be new to preserve any existing map work")
+        biome = args.biome or PORTABLE_BIOMES[0]
+        scene_source = map_scene_source(scene.stem, output / "runtime.json", biome)
+        scene_info = {"scene": str(scene), "biome": biome}
+    runtime, manifest = import_source(args.source, output, border_mode=args.border)
+    if args.scene:
+        scene.parent.mkdir(parents=True, exist_ok=True)
+        with scene.open("x", encoding="utf-8", newline="\n") as handle:
+            handle.write(scene_source)
+    print(json.dumps({"output": str(args.output), **scene_info, "source_sha256": runtime["source_sha256"],
                       "cells": len(runtime["cells"]), "border": runtime["border"],
                       "counts_by_kind": manifest["counts_by_kind"],
                       "terrain_area_m2": manifest["expected_terrain_faces"]["area_m2"],

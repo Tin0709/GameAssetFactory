@@ -1,9 +1,9 @@
 """Behavioral fixtures for exact schematic decoding and geometry audit."""
 import hashlib
 import importlib.util
+import io
 import json
 from pathlib import Path
-import subprocess
 import sys
 import tempfile
 import unittest
@@ -162,7 +162,7 @@ class ImportWorldMapTests(unittest.TestCase):
             scene = project / "scenes/maps/NewMeadow.tscn"
             args = ["import_world_map.py", str(source), "--border", "bounds",
                     "--output", str(output), "--scene", str(scene), "--biome", "humid_woodland"]
-            with patch.object(importer, "GODOT_PROJECT", project, create=True):
+            with patch.object(importer, "GODOT_PROJECT", project), patch("sys.stdout", new_callable=io.StringIO), patch("sys.stderr", new_callable=io.StringIO):
                 with patch.object(sys, "argv", args):
                     importer.main()
                 original = scene.read_bytes()
@@ -190,7 +190,7 @@ class ImportWorldMapTests(unittest.TestCase):
             project = Path(temporary) / "game_mobile_3d"
             scene = project / "scenes/maps/TestMap.tscn"
             output = project / "assets/maps/test"
-            with patch.object(importer, "GODOT_PROJECT", project, create=True):
+            with patch.object(importer, "GODOT_PROJECT", project), patch("sys.stderr", new_callable=io.StringIO):
                 for overrides in (["--scene", str(scene), "--biome", "forest_reference"],
                                   ["--scene", str(project / "WrongFolder.tscn")],
                                   ["--scene", str(scene.with_name("Invalid Scene.tscn"))],
