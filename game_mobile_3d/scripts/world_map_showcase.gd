@@ -1215,6 +1215,8 @@ func _mist_materials()->Array:
 		return result
 	if plants!=null:result.append_array(plants.materials)
 	for chunk:Dictionary in level.geometry._cutaway_chunks:result.append_array(chunk.materials)
+	if forest_path_light.material != null:
+		result.append(forest_path_light.material)
 	if grove_mist_enabled and level.grove != null:
 		result.append_array(level.grove.mist_receivers(PHASE_FINISH.phase_weight(hour)))
 	return result

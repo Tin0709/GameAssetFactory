@@ -241,7 +241,7 @@ func _prepare_spatial_mist(env: Environment) -> void:
 		_mist = MistVolume.new()
 		_world.get_node("Camera3D").add_child(_mist)
 		_mist.setup()
-		_mist.material_provider = _world.showcase._mist_materials
+		_mist.material_provider = _mist_materials
 		_mist.compositor_owned = _owns_finish_compositor
 		_mist.path_light_provider = _fixture_air
 		_mist.noise_strength = .28
@@ -264,6 +264,12 @@ func _prepare_spatial_mist(env: Environment) -> void:
 	_mist.set_local_region(_world.local_mist_region, local_strength)
 	_mist.set_additional_local_region(_world.additional_mist_region, local_strength)
 	_update_spatial_mist()
+
+func _mist_materials() -> Array:
+	var receivers: Array = _world.showcase._mist_materials()
+	if _path_fixture.material != null:
+		receivers.append(_path_fixture.material)
+	return receivers
 
 func _owns_finish_compositor(compositor: Compositor) -> bool:
 	return compositor == _finish_compositor

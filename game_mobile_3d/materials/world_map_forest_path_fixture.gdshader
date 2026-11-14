@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode cull_back;
+#ifdef GAF_SHARED_MIST
 #include "res://materials/world_map_mist.gdshaderinc"
+#endif
 
 uniform sampler2D fixture_atlas : source_color, filter_nearest, repeat_disable;
 uniform float phase_coverage = 0.0;
@@ -18,6 +20,8 @@ void fragment() {
 	}
 	ALBEDO = texture(fixture_atlas, UV).rgb;
 	ROUGHNESS = 1.0;
+#ifdef GAF_SHARED_MIST
 	FOG = gaf_surface_mist(SCREEN_UV, -VERTEX.z, INV_VIEW_MATRIX[3].xyz, -INV_VIEW_MATRIX[2].xyz,
 		vec2(PROJECTION_MATRIX[0][0], PROJECTION_MATRIX[1][1]));
+#endif
 }

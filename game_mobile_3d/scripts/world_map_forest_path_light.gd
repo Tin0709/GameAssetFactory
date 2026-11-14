@@ -14,7 +14,7 @@ const AIR_ENERGY_SCALE := .24
 
 var fixture: Node3D
 var light: OmniLight3D
-var _material: ShaderMaterial
+var material: ShaderMaterial
 var _attempted := false
 var _submitted := Vector2.ZERO
 var _submitted_offset := Vector2.ZERO
@@ -44,7 +44,7 @@ func update(world: Node3D, phase: float, strength: float, offset := Vector2.ZERO
 	fixture.visible = state.y > 0.0
 	light.light_energy = state.y
 	# Finish the fixture reveal before the light finishes its dusk ramp.
-	_material.set_shader_parameter("phase_coverage", smoothstep(0.0, 0.25, state.x))
+	material.set_shader_parameter("phase_coverage", smoothstep(0.0, 0.25, state.x))
 	return true
 
 func is_compatible_secondary(candidate: Light3D) -> bool:
@@ -91,10 +91,11 @@ func _load(world: Node3D, anchor: Vector2) -> void:
 	if meshes.size() != 1 or meshes[0].mesh == null or meshes[0].mesh.get_surface_count() != 1:
 		imported.free()
 		return
-	_material = ShaderMaterial.new()
-	_material.shader = FIXTURE_SHADER
-	_material.set_shader_parameter("fixture_atlas", ImageTexture.create_from_image(image))
-	meshes[0].mesh.surface_set_material(0, _material)
+	material = ShaderMaterial.new()
+	material.shader = FIXTURE_SHADER
+	material.set_shader_parameter("fixture_atlas", ImageTexture.create_from_image(image))
+	meshes[0].material_override = material
+	meshes[0].mesh.surface_set_material(0, null)
 	meshes[0].cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	fixture = imported
 	fixture.name = "PrivateForestPathFixture"
