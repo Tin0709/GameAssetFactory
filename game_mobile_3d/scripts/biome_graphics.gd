@@ -88,6 +88,7 @@ func refresh() -> void:
 		_label.text = "%s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · F7 hậu kỳ · B đối chiếu" % [
 			_profile.display_name, int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
 	if _world.look.stage != 2:
+		_update_finish()
 		return
 	var env: Environment = _world.get_node("WorldEnvironment").environment
 	var sun: DirectionalLight3D = _world.get_node("Sun")
@@ -131,7 +132,10 @@ func _update_finish() -> void:
 	var camera := _world.get_node("Camera3D") as Camera3D
 	var env: Environment = _world.get_node("WorldEnvironment").environment
 	var combined: bool = _world.look.stage == 2
-	var wanted: bool = combined and _allow_adaptive_bloom and _profile.adaptive_bloom \
+	var weight := 1.
+	if _profile.adaptive_bloom_by_hour != null:
+		weight = clampf(_profile.adaptive_bloom_by_hour.sample(_world.showcase.hour / 24.), 0., 1.)
+	var wanted: bool = combined and _allow_adaptive_bloom and _profile.adaptive_bloom and weight > 0. \
 		and _world.view_mode == "gameplay" and camera.is_current() \
 		and (_profile.local_exposure > 0. or _profile.adaptive_bloom_gain > 0.) \
 		and RenderingServer.get_current_rendering_method() == "mobile" \
@@ -155,16 +159,21 @@ func _update_finish() -> void:
 		wanted = wanted and camera.compositor == _finish_compositor and _finish_effect.failure().is_empty()
 		_finish_effect.enabled = wanted
 		if wanted:
-			_finish_effect.set_review_strength(_profile.local_exposure)
+			var strength := _profile.local_exposure * weight
+			if not is_equal_approx(_finish_effect._review_strength, strength):
+				_finish_effect.set_review_strength(strength)
 			_finish_effect.set_air_bloom(_profile.adaptive_bloom_gain > 0.)
-			_finish_effect.set_air_bloom_response(_profile.adaptive_bloom_gain)
+			_finish_effect.set_air_bloom_response(_profile.adaptive_bloom_gain * weight)
 			_finish_effect.set_bloom_local_response(_profile.adaptive_bloom_response)
 			_finish_effect.set_bloom_prefilter(_profile.adaptive_bloom_prefilter)
 			_finish_effect.set_air_bloom_spread(_profile.adaptive_bloom_spread)
 	if combined:
 		# Keep native glow until the custom pass has completed one successful frame.
 		var custom_bloom: bool = wanted and _profile.adaptive_bloom_gain > 0. and _finish_effect.snapshot().frames > 0
-		env.glow_enabled = _profile.glow_intensity > 0. and not custom_bloom
+		var native_weight := 1. - weight if custom_bloom else 1.
+		env.glow_enabled = _profile.glow_intensity > 0. and native_weight > 0.
+		env.glow_intensity = _profile.glow_intensity * native_weight
+		env.glow_bloom = _profile.glow_bloom * native_weight
 
 func _exit_tree() -> void:
 	if _finish_effect == null:

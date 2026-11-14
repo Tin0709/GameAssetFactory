@@ -46,6 +46,8 @@ const Weather = preload("res://scripts/biome_weather_profile.gd")
 
 @export_subgroup("Adaptive bloom")
 @export var adaptive_bloom := false
+## Blend weight by normalized biome hour; a missing curve uses full weight.
+@export var adaptive_bloom_by_hour: Curve
 @export_range(0., .23, .01) var local_exposure := .08
 @export_range(0., 4., .01) var adaptive_bloom_gain := .5
 @export_range(0., 1., .01) var adaptive_bloom_response := .65

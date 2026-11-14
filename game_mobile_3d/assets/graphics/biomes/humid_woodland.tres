@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=5 format=3]
+[gd_resource type="Resource" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -12,6 +12,10 @@ point_count = 5
 max_value = 1.5
 _data = [Vector2(0, 1.16), 0.0, 0.0, 0, 0, Vector2(0.29166666, 1.13), 0.0, 0.0, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(0.6875, 1.07), 0.0, 0.0, 0, 0, Vector2(1, 1.16), 0.0, 0.0, 0, 0]
 point_count = 5
+
+[sub_resource type="Curve" id="AdaptiveBloomPhase"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.29166666, 1), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.5625, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 6
 
 [resource]
 script = ExtResource("profile")
@@ -34,8 +38,9 @@ saturation = 0.95
 contrast = 1.06
 glow_bloom = 0.028
 adaptive_bloom = true
-local_exposure = 0.08
-adaptive_bloom_gain = 0.5
+adaptive_bloom_by_hour = SubResource("AdaptiveBloomPhase")
+local_exposure = 0.045
+adaptive_bloom_gain = 0.45
 adaptive_bloom_response = 0.65
 adaptive_bloom_prefilter = 0.72
 adaptive_bloom_spread = 0.82
