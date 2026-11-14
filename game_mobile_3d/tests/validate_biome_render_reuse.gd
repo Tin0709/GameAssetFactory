@@ -122,7 +122,14 @@ func run() -> void:
 	check(Vector2(camera.position.x, camera.position.z).is_equal_approx(
 		Vector2((low[0] + high[0]) * .5, (low[2] + high[2]) * .5)),
 		"An imported overview centers on its boundary")
-	check(camera.size >= 50. and camera.size < 80., "The 50 m map fills its overview at the default aspect")
+	var overview_frame := root.get_visible_rect()
+	for x: float in [low[0], high[0]]:
+		for z: float in [low[2], high[2]]:
+			check(overview_frame.has_point(camera.unproject_position(Vector3(x, high[1], z))),
+				"Every imported boundary corner fits inside the overview")
+	var aspect := overview_frame.size.aspect()
+	var tight_fit := maxf(50., 50. / aspect) if camera.keep_aspect == Camera3D.KEEP_HEIGHT else maxf(50., 50. * aspect)
+	check(camera.size >= tight_fit and camera.size < tight_fit * 1.25, "The 50 m map fills its overview")
 	map.set_review_view("gameplay")
 	check(is_equal_approx(camera.size, gameplay_size), "Leaving the overview restores play zoom")
 	check(not map.biome_graphics.use_forest_reference and not map.showcase.projected_sun.available(),
