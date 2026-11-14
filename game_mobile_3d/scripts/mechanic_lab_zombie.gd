@@ -89,6 +89,7 @@ const LAB_ROAM_DELAY := 1.0
 const LAB_ROAM_SPEED := 3.0
 const LAB_ROAM_ARRIVAL := 0.10
 const LAB_ROAM_BLOCKED_TIME := 0.25
+const LAB_ROAM_MIN_PROGRESS_SPEED := LAB_ROAM_SPEED * 0.10
 const LAB_ROAM_ATTEMPTS := 4
 const CROWD_RETRY_MIN_ZOMBIES := 32
 const BLOCKED_CHASE_RETRY_HZ := 30.0
@@ -521,7 +522,8 @@ func _roam_velocity(delta: float, sample_ai: bool) -> Vector3:
 			return Vector3.ZERO
 	var offset := (_roam_destination - global_position).slide(Vector3.UP)
 	var distance := offset.length()
-	var stalled := is_on_wall() and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
+	# A wall slide can have speed without making meaningful progress to the goal.
+	var stalled := is_on_wall() and get_real_velocity().dot(offset) < LAB_ROAM_MIN_PROGRESS_SPEED * distance
 	_roam_blocked_seconds = _roam_blocked_seconds + delta if stalled else 0.0
 	if distance <= LAB_ROAM_ARRIVAL or _roam_blocked_seconds >= LAB_ROAM_BLOCKED_TIME:
 		_reset_roam()

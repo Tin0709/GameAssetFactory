@@ -412,8 +412,9 @@ func check_zombie_roam_stalled_slide(lab) -> void:
 		if zombie.is_on_wall():
 			if slide_ticks == 0:
 				slide_position = zombie.global_position
+			else:
+				slide_speed = maxf(slide_speed, zombie.get_real_velocity().slide(Vector3.UP).length())
 			slide_ticks += 1
-			slide_speed = maxf(slide_speed, zombie.get_real_velocity().slide(Vector3.UP).length())
 	var remaining := (zombie.global_position - destination).slide(Vector3.UP).length()
 	var first_remaining := (slide_position - destination).slide(Vector3.UP).length()
 	check(slide_ticks > 0 and slide_speed > 0.15 and first_remaining - remaining < 0.18,
