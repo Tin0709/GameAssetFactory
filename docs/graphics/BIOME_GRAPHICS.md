@@ -15,7 +15,7 @@
 
 Map portable dùng chung các pass sương và bloom với WorldMap. Preset Forest tham chiếu còn nạp LUT riêng và các trường ánh sáng gắn với hình học, được xác minh theo map trước khi dùng.
 
-WorldMap có thêm **Local Diffuse Region** để đặt vùng nhận ánh hắt từ một khoảng mở. Tâm, hai bán kính và tọa độ khoảng mở thuộc về scene. Shader dùng chung cho terrain, cỏ và vật liệu nhân vật đã hỗ trợ. Cường độ hiện được điều khiển qua preset và menu L của route Forest tham chiếu. Route portable chưa cấp tín hiệu này cho các vật liệu.
+Đặt **Local Diffuse Region** trong Inspector của map để chọn tâm, hai bán kính và tọa độ khoảng mở. Trong **Biome Graphics → Lighting**, chỉnh **Local Diffuse Strength** và **Local Diffuse By Hour**. Resource thời tiết có **Local Diffuse Scale** để giảm chênh ánh hắt khi nhiều mây. Cả Forest và map portable dùng cùng hàm shader cho đá, địa hình, cỏ và vật liệu nhân vật hỗ trợ. Forest dùng dữ liệu ánh sáng đã dựng theo hình học. Map portable dùng màu và cường độ ambient của biome hiện tại. Cân bằng và Đầy đủ có hiệu ứng, mức Nhẹ tắt. Trên MeadowBiomeReview, đi tới cụm đá lúc 07:00 hoặc 16:30 rồi bấm **Alt+J** để so sánh.
 
 ## Import map tiếp theo
 

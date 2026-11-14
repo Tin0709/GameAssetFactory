@@ -45,6 +45,8 @@ static var _diffuse_owner: WeakRef
 func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> void:
 	_world = world
 	_diffuse_owner = weakref(self)
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_ambient", Vector3.ZERO)
 	quality = world.biome_quality
 	_choices.append(profile)
 	for choice in alternatives:
@@ -119,7 +121,7 @@ func _process(delta: float) -> void:
 func refresh() -> void:
 	var hour: float = _world.showcase.hour
 	if _label != null:
-		_label.text = "%s · %s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · Shift+J tán xạ đèn · F7 hậu kỳ · Shift+F7 chất lượng · B đối chiếu" % [
+		_label.text = "%s · %s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · Shift+J tán xạ đèn · Alt+J ánh hắt · F7 hậu kỳ · Shift+F7 chất lượng · B đối chiếu" % [
 			_profile.display_name, QUALITY_LABELS[quality], int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
 	if _world.look.stage != 2:
 		_update_local_diffuse()
