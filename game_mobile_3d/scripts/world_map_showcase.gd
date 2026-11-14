@@ -898,7 +898,6 @@ func _update_mist()->void:
 	var scatter_chroma := _lighting_scale(&"scatter_chroma")
 	if scatter_chroma < 1.:
 		# Change only the hue of the depth source and its signed depth correction.
-		var luma := Vector3(.2126, .7152, .0722)
 		var source: Vector3 = sample.linear_scatter_rgb
 		sample.linear_scatter_rgb = (Vector3.ONE * source.dot(luma)).lerp(source, scatter_chroma)
 		if sample.has("depth_scatter_color"):
