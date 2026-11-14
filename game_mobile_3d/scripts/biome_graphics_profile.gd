@@ -26,6 +26,8 @@ const Weather = preload("res://scripts/biome_weather_profile.gd")
 
 @export_subgroup("Spatial mist")
 @export var spatial_mist := false
+## Depth-fog strength when using the Essential budget instead of the spatial volume.
+@export_range(0., 1., .01) var essential_fog_scale := .45
 ## Extinction in inverse metres. The shared volume uses the map's spawn elevation as reference.
 @export_range(0., .06, .001) var mist_extinction := .011
 @export_range(0., 1., .01) var mist_height_falloff := .25

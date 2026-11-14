@@ -137,7 +137,7 @@ func refresh() -> void:
 		saturation *= lerpf(1., weather.saturation_scale, weather_weight)
 	# Depth fog covers more of the view than the height-limited spatial medium.
 	if quality == Quality.ESSENTIAL and _profile.spatial_mist:
-		fog_density *= .45
+		fog_density *= _profile.essential_fog_scale
 	env.background_color = sky
 	env.fog_enabled = _fog_enabled
 	env.fog_mode = Environment.FOG_MODE_DEPTH
