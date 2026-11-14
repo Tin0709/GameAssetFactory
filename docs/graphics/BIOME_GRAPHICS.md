@@ -19,9 +19,14 @@ Map portable dùng chung các pass sương và bloom với WorldMap. Preset Fore
 
 ## Import map tiếp theo
 
-1. Từ thư mục `GameAssetFactory`, chạy `python scripts/import_world_map.py "D:/Maps/MapMoi.litematic" --border bounds --output game_mobile_3d/assets/maps/map_moi`. Với bounds, cạnh ngoài lấy từ vùng chọn của schematic. Vùng đệm rỗng vẫn được giữ theo kích thước vùng chọn. Chế độ `markers` giữ hợp đồng vòng Red Wool 100 × 100 cho WorldMap. Cả hai dùng cùng mapping block và kiểm tra slab, tall grass, vùng chồng lấn và block chưa hỗ trợ.
-2. Tạo một scene kế thừa `scenes/GameplayMap.tscn`, gắn `scripts/world_map.gd` lên node gốc và điền **Map Layout Path** đến `res://assets/maps/map_moi/runtime.json`.
-3. Chọn **Biome Graphics** trong Inspector. Dùng `assets/graphics/biomes/meadow.tres` hoặc `humid_woodland.tres` làm điểm xuất phát. Thêm preset so sánh vào **Comparison Biomes**. Để chỉnh riêng một map, duplicate preset thành file .tres mới và gán cho map đó. Mây dùng một Weather resource riêng, có thể chia sẻ giữa các biome. Giờ khởi động, vòng ngày/đêm và thời tiết có thể điều khiển độc lập. Trong preset, các Curve theo giờ dùng trục X từ 0 đến 1 cho 00:00 đến 24:00. Giữ hai đầu bằng nhau để không nhảy khi qua nửa đêm. Giá trị 1 tại 0,5 giữ mức đã đặt cho buổi trưa.
+1. Từ thư mục `GameAssetFactory`, chạy lệnh dưới đây để tạo dữ liệu map và scene chơi thử. Với `bounds`, cạnh ngoài lấy từ vùng chọn của schematic và giữ cả vùng đệm rỗng. Chế độ `markers` dùng vòng Red Wool 100 × 100 của WorldMap. Cả hai kiểm tra slab, tall grass, vùng chồng lấn và block chưa hỗ trợ.
+
+   ```powershell
+   python scripts/import_world_map.py "D:/Maps/MapMoi.litematic" --border bounds --output game_mobile_3d/assets/maps/map_moi --scene game_mobile_3d/scenes/maps/MapMoi.tscn --biome humid_woodland
+   ```
+
+2. Trong Godot, mở `scenes/maps/MapMoi.tscn` và bấm **F6**. Chọn `--biome meadow` cho Đồng cỏ ven rừng hoặc `--biome humid_woodland` cho Rìa rừng ẩm. Nếu bỏ `--biome`, scene dùng Đồng cỏ ven rừng. Cả thư mục đầu ra và file scene phải là đường dẫn mới khi dùng `--scene` để giữ các chỉnh sửa trên map đã có. Để chỉ xuất dữ liệu như trước, bỏ `--scene` và `--biome`.
+3. Đổi **Biome Graphics** trong Inspector bất kỳ lúc nào. Thêm preset vào **Comparison Biomes** để so bằng **F8**. Để tinh chỉnh riêng một map, duplicate preset thành file .tres mới rồi gán cho map đó. Nhiều biome có thể dùng chung một Weather resource. Giờ khởi động, vòng ngày/đêm và thời tiết điều khiển độc lập. Curve theo giờ dùng trục X từ 0 đến 1 cho 00:00 đến 24:00. Giữ hai đầu bằng nhau để chuyển mượt qua nửa đêm. Giá trị 1 tại 0,5 giữ mức đã đặt cho buổi trưa.
 4. Giữ nguyên asset registry và kiểm tra các block mới, mép map, chỗ spawn và đường đi sau import. Dùng F6 để test scene vừa chọn. Mặc định nếu bản đồ mới không có preset riêng, runtime chọn Đồng cỏ ven rừng.
 
 ## Phạm vi tích hợp hiện tại
