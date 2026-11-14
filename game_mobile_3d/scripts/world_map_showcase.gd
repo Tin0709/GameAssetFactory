@@ -12,6 +12,8 @@ const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 # User-directed art adjustment; recovered Forest profiles stay untouched.
 const GENTLE_NOON_DIRECT_SCALE:=.82
+const PREVIEW_DAY_SECONDS := 300.
+const FOREST_DAY_SECONDS := 1200.
 const TIME_SHORTCUT_HOURS := [7.0, 12.0, 16.5, 22.0]
 ## Original WorldMap entry distance and reference height. Extinction is fitted
 ## to three captured actor rays, normalized by their relative phase density.
@@ -68,6 +70,7 @@ var _opening_gain := 0.0
 var _diffuse_opening := Vector4.ZERO
 var _stone_shade_fill := Vector4.ZERO
 const LIGHTING_MIX_CONTROLS := {
+	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
 	&"sun": ["Direct sunlight", 2.],
 	&"sun_pockets": ["Sunlight pockets", 1.5],
 	&"sun_opening": ["Sunlit openings", 1.],
@@ -199,7 +202,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 125
+const LIGHTING_MIX_VERSION := 126
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1831,6 +1834,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 125 and effect == &"noon_depth_haze":
 			missing_value = 0.
+		if version < 126 and effect == &"day_cycle_pacing":
+			missing_value = 0.
 		if version < 121 and effect == &"stone_dusk_sky_chroma":
 			missing_value = 0.
 		if version < 120 and effect == &"basin_sunlit_mist":
@@ -2042,6 +2047,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			return
 	if changed_effect in [&"projected_sun", &"noon_projected_sun", &"projected_sun_position", &"projected_sun_softness", &"sun_opening"]:
 		refresh_daylight_shading()
+		return
+	if changed_effect == &"day_cycle_pacing":
 		return
 	if changed_effect in [&"diffuse_openings", &"stone_shade_fill"]:
 		return # Published with the final camera and sun before drawing.
@@ -2496,7 +2503,8 @@ func _process(delta:float)->void:
 		_fps_elapsed=0.
 		_fps_label.text="FPS: %d"%Engine.get_frames_per_second()
 	_elapsed+=delta
-	if cycle_enabled and level.look.stage==2:hour=fposmod(hour+delta*.08,24.)
+	if cycle_enabled and level.look.stage == 2:
+		hour = fposmod(hour + delta * 24. / _day_cycle_seconds(_lighting_scale(&"day_cycle_pacing")), 24.)
 	apply_time()
 	_update_mist()
 	_sync_oak_leaf_tint()
@@ -2513,7 +2521,14 @@ func _process(delta:float)->void:
 		var msaa:String=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
 		status.text="%s · %02d:%02d · %s · %d FPS · %s · MSAA %s"%["Tổng hợp" if level.look.stage==2 else "Bản gốc",int(hour),int(fmod(hour,1.)*60.),"Tự chuyển" if cycle_enabled else "Cố định",Engine.get_frames_per_second(),RenderingServer.get_current_rendering_method(),msaa]
 
+static func _day_cycle_seconds(value: float) -> float:
+	return lerpf(PREVIEW_DAY_SECONDS, FOREST_DAY_SECONDS, value)
+
 static func _mix_readout(effect: StringName, value: float) -> String:
+	if effect == &"day_cycle_pacing":
+		var seconds := roundi(_day_cycle_seconds(value))
+		var minutes := seconds / 60
+		return "%d phút" % minutes if seconds % 60 == 0 else "%d phút %02d giây" % [minutes, seconds % 60]
 	if effect == &"world_outline_width":
 		return "%d px" % roundi(value)
 	if effect == &"forest_path_placement":

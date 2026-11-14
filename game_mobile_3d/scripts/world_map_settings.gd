@@ -403,6 +403,7 @@ func _build_quick() -> void:
 	_add_row(time, "twilight")
 	_add_row(time, "dawn")
 	_add_row(time, "original-gaf-day-night-preview")
+	_add_row(time, "day_cycle_pacing")
 	var mix := _section("Preset ánh sáng")
 	_add_row_buttons(mix, ["preset"] + PRESETS)
 	_add_row_buttons(mix, ["apply-forest"] + _map_mix_ids.slice(0, 1))
