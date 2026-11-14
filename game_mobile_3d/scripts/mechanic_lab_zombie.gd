@@ -532,12 +532,22 @@ func _roam_velocity(delta: float, sample_ai: bool) -> Vector3:
 	return offset * (minf(LAB_ROAM_SPEED, (distance - LAB_ROAM_ARRIVAL) / delta) / distance)
 
 func _pick_roam_destination() -> Vector3:
-	# MechanicLab has a single rectangular floor. Use a direct level check
-	# and keep the capsule inside its edges when choosing a patrol leg.
+	# Keep the capsule inside the flat Lab floor and test the body along
+	# each proposed leg. A chest ray can clear low or narrow obstacles.
 	var bounds := _corpse_floor.shape as BoxShape3D
 	if bounds == null:
 		return Vector3.INF
 	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
+	var space := get_world_3d().direct_space_state
+	var sweep := PhysicsShapeQueryParameters3D.new()
+	sweep.shape = _live_capsule
+	sweep.collision_mask = LEVEL_COLLISION_MASK
+	sweep.transform = Transform3D(Basis.IDENTITY, global_position + Vector3.UP * (HEIGHT * 0.5))
+	# The support plane already bounds the patrol. Other terrain still
+	# participates in both the sweep and the destination overlap check.
+	var floor_body := _corpse_floor.get_parent() as StaticBody3D
+	if floor_body != null:
+		sweep.exclude = [floor_body.get_rid()]
 	for i in LAB_ROAM_ATTEMPTS:
 		var angle := _roam_rng.randf_range(0.0, TAU)
 		var radius := sqrt(_roam_rng.randf()) * LAB_ROAM_RADIUS
@@ -546,8 +556,18 @@ func _pick_roam_destination() -> Vector3:
 		local.x = clampf(local.x, -extent.x, extent.x)
 		local.z = clampf(local.z, -extent.z, extent.z)
 		point = _corpse_floor.to_global(local)
-		if global_position.distance_squared_to(point) > 1.0 and _clear_sight_to(point):
+		var travel := (point - global_position).slide(Vector3.UP)
+		if travel.length_squared() <= 1.0:
+			continue
+		sweep.motion = travel
+		var fractions := space.cast_motion(sweep)
+		if fractions.is_empty() or fractions[0] < 1.0:
+			continue
+		var start := sweep.transform
+		sweep.transform = start.translated(travel)
+		if space.intersect_shape(sweep, 1).is_empty():
 			return point
+		sweep.transform = start
 	return Vector3.INF
 
 func _is_in_melee_cone(planar_offset: Vector3) -> bool:
