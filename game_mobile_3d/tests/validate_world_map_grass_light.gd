@@ -37,6 +37,24 @@ func run()->void:
 		w.set_reference_look(true)
 		await process_frame
 		check(material.get_shader_parameter(STEP_COVERAGE) == 1., "Returning to Combined restores stepped-terrain coverage")
+		check(w.showcase._lighting_sliders.has(StringName(STEP_COVERAGE)), "Terrain step coverage has a settings slider")
+		var preset_path := "user://grass_step_%d.cfg" % OS.get_process_id()
+		w.showcase.set_lighting_scale(&"grass_step_coverage", .4)
+		check(w.showcase.save_lighting_mix(preset_path) == OK, "Coverage can be saved with the other graphics settings")
+		w.showcase.set_lighting_scale(&"grass_step_coverage", 0.)
+		check(w.showcase.load_lighting_mix(preset_path) == OK, "Saved coverage preset loads")
+		p.grass_light.sync()
+		check(material.get_shader_parameter(STEP_COVERAGE) == .4, "Saved preset reapplies the coverage strength")
+		var preset := ConfigFile.new()
+		if preset.load(preset_path) == OK:
+			preset.set_value("recipe", "version", 151)
+			preset.erase_section_key("strengths", STEP_COVERAGE)
+			check(preset.save(preset_path) == OK and w.showcase.load_lighting_mix(preset_path) == OK,
+				"Previous recipe format still loads")
+			p.grass_light.sync()
+			check(material.get_shader_parameter(STEP_COVERAGE) == 0., "Previous saved recipes retain original coverage")
+		DirAccess.remove_absolute(preset_path)
+		w.showcase.reset_lighting_mix()
 		for mat:ShaderMaterial in p.materials:
 			check(mat.shader!=original[mat],"Only shader changes for reference lighting")
 			check(mat.get_shader_parameter("study_grass_up_weight")==1.,"Captured world normal uniform applied")
