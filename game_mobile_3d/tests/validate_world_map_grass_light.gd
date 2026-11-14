@@ -20,6 +20,20 @@ func run()->void:
 	for node:Node in p.get_children():check(node.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,"Legacy casts restored")
 	p.set_grass_lighting(true)
 	if native:
+		const STEP_COVERAGE := "grass_step_coverage"
+		var material: ShaderMaterial = p.materials[0]
+		check(material.get_shader_parameter(STEP_COVERAGE) == 1., "Dense grass uses the stepped-terrain coverage correction by default")
+		w.showcase.set_lighting_scale(&"grass_step_coverage", .4)
+		check(material.get_shader_parameter(STEP_COVERAGE) == .4, "Grass coverage responds to the live slider without rebuilding plants")
+		w.showcase.set_lighting_scale(&"grass_step_coverage", 0.)
+		check(material.get_shader_parameter(STEP_COVERAGE) == 0., "Zero coverage restores the original alpha path")
+		w.showcase.set_lighting_scale(&"grass_step_coverage", 1.)
+		w.set_reference_look(false)
+		await process_frame
+		check(material.get_shader_parameter(STEP_COVERAGE) in [null, 0.], "Original graphics comparison bypasses the coverage correction")
+		w.set_reference_look(true)
+		await process_frame
+		check(material.get_shader_parameter(STEP_COVERAGE) == 1., "Returning to Combined restores stepped-terrain coverage")
 		for mat:ShaderMaterial in p.materials:
 			check(mat.shader!=original[mat],"Only shader changes for reference lighting")
 			check(mat.get_shader_parameter("study_grass_up_weight")==1.,"Captured world normal uniform applied")
