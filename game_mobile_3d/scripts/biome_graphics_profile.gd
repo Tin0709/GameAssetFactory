@@ -18,6 +18,9 @@ const DayNight = preload("res://scripts/biome_day_night.gd")
 @export_range(0., 4.) var noon_sun_energy := 1.5
 @export var noon_ambient_color := Color(.56, .72, .84)
 @export_range(0., 2.) var noon_ambient_energy := .32
+## Local diffuse response around a map-authored opening.
+@export_range(0., .65, .01) var local_diffuse_strength := 0.
+@export var local_diffuse_by_hour: Curve
 
 @export_group("Atmosphere and fog")
 @export var noon_sky_color := Color(.57, .68, .69)

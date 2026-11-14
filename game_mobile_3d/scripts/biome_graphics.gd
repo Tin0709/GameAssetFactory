@@ -36,9 +36,15 @@ var _finish_effect: LocalExposure
 var _finish_camera: Camera3D
 var _finish_compositor: Compositor
 var _previous_compositor: Compositor
+var _local_diffuse_source := Vector4.ZERO
+var _local_diffuse_bounds := Vector4.ZERO
+var _local_diffuse_ambient := Vector3.ZERO
+var _allow_local_diffuse := true
+static var _diffuse_owner: WeakRef
 
 func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> void:
 	_world = world
+	_diffuse_owner = weakref(self)
 	quality = world.biome_quality
 	_choices.append(profile)
 	for choice in alternatives:
@@ -100,6 +106,7 @@ func set_weather(overcast: float, seconds: float = 2.5) -> void:
 		refresh()
 
 func _process(delta: float) -> void:
+	_update_local_diffuse()
 	_update_finish()
 	_update_spatial_mist()
 	if _cycle and _world.look.stage == 2:
@@ -115,6 +122,7 @@ func refresh() -> void:
 		_label.text = "%s · %s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · Shift+J tán xạ đèn · F7 hậu kỳ · Shift+F7 chất lượng · B đối chiếu" % [
 			_profile.display_name, QUALITY_LABELS[quality], int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
 	if _world.look.stage != 2:
+		_update_local_diffuse()
 		_update_fixture(0.)
 		_update_finish()
 		return
@@ -170,8 +178,38 @@ func refresh() -> void:
 		_profile.glow_intensity, _profile.glow_bloom, _profile.glow_hdr_threshold)
 	_update_fixture(time)
 	_prepare_spatial_mist(env, time)
+	_update_local_diffuse()
 	_update_finish()
 
+func _update_local_diffuse() -> void:
+	if _diffuse_owner == null or _diffuse_owner.get_ref() != self:
+		return
+	var source := Vector4.ZERO
+	var bounds := Vector4.ZERO
+	var ambient := Vector3.ZERO
+	var region = _world.local_diffuse_region
+	if _allow_local_diffuse and quality != Quality.ESSENTIAL and _world.look.stage == 2 \
+			and _world.view_mode == "gameplay" and region != null and region.is_valid() \
+			and _profile.local_diffuse_strength > 0. and RenderingServer.get_current_rendering_method() == "mobile":
+		var time: float = _world.showcase.hour / 24.
+		var gain := _profile.local_diffuse_strength * clampf(DayNight.sample_curve(_profile.local_diffuse_by_hour, time, 1.), 0., 1.)
+		if _profile.overcast != null:
+			gain *= lerpf(1., _profile.overcast.local_diffuse_scale, weather_weight)
+		if gain > 0.:
+			source = region.source(gain)
+			bounds = region.bounds()
+			var env: Environment = _world.get_node("WorldEnvironment").environment
+			var linear := env.ambient_light_color.srgb_to_linear()
+			ambient = Vector3(linear.r, linear.g, linear.b) * env.ambient_light_energy
+	if bounds != _local_diffuse_bounds:
+		_local_diffuse_bounds = bounds
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_region", bounds)
+	if ambient != _local_diffuse_ambient:
+		_local_diffuse_ambient = ambient
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_ambient", ambient)
+	if source != _local_diffuse_source:
+		_local_diffuse_source = source
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", source)
 
 func _update_finish() -> void:
 	var camera := _world.get_node("Camera3D") as Camera3D
@@ -224,6 +262,10 @@ func _update_finish() -> void:
 		env.glow_bloom = _profile.glow_bloom * native_weight
 
 func _exit_tree() -> void:
+	if _diffuse_owner != null and _diffuse_owner.get_ref() == self:
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_ambient", Vector3.ZERO)
+		_diffuse_owner = null
 	if _finish_effect == null:
 		return
 	var effect := _finish_effect
@@ -351,7 +393,10 @@ func handle_key(event: InputEventKey) -> bool:
 				_allow_adaptive_bloom = not _allow_adaptive_bloom
 				_update_finish()
 		KEY_J:
-			if event.shift_pressed:
+			if event.alt_pressed:
+				_allow_local_diffuse = not _allow_local_diffuse
+				_update_local_diffuse()
+			elif event.shift_pressed:
 				_allow_fixture_scatter = not _allow_fixture_scatter
 			else:
 				_allow_spatial_mist = not _allow_spatial_mist

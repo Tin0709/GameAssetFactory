@@ -9,6 +9,7 @@ render_mode cull_disabled, diffuse_lambert, specular_disabled;
 #include "res://materials/world_map_canopy.gdshaderinc"
 #endif
 #include "res://materials/world_map_surface_v5.gdshaderinc"
+#include "res://materials/world_map_local_diffuse.gdshaderinc"
 uniform bool ground_blending = false;
 uniform int plant_kind = 0; // short blades / flower / golden tall stems
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
@@ -108,6 +109,7 @@ void fragment() {
 	NORMAL=normalize(mix(face,up,soft));
 	ROUGHNESS=1.0;
 	SPECULAR=0.0;
+	EMISSION += gaf_local_environment_delta(ALBEDO, 0.0, plant_root, vec3(0., 1., 0.)) * AO;
 #ifdef GAF_SHARED_MIST
 	FOG = gaf_surface_mist(SCREEN_UV, -VERTEX.z, INV_VIEW_MATRIX[3].xyz, -INV_VIEW_MATRIX[2].xyz,
 		vec2(PROJECTION_MATRIX[0][0], PROJECTION_MATRIX[1][1]));

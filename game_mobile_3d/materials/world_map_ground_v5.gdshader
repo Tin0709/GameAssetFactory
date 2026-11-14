@@ -17,9 +17,9 @@ render_mode cull_disabled, diffuse_burley;
 #define GAF_TERRAIN_NIGHT_SKY
 #include "res://materials/world_map_terrain_transport.gdshaderinc"
 #include "res://materials/world_map_replay_bounce.gdshaderinc"
-#include "res://materials/world_map_local_diffuse.gdshaderinc"
 #include "res://materials/world_map_player_contact.gdshaderinc"
 #endif
+#include "res://materials/world_map_local_diffuse.gdshaderinc"
 #ifdef GAF_WORLD_GROUND_BOUNCE
 #include "res://materials/world_map_ground_bounce.gdshaderinc"
 #endif
@@ -127,6 +127,7 @@ void fragment() {
 	}
 #else
 	ALBEDO*=receiver_contact;
+	EMISSION += gaf_local_environment_delta(ALBEDO, METALLIC, surface_world, surface_normal) * AO;
 #endif
 #ifdef GAF_SHARED_MIST
 	FOG=gaf_surface_mist(SCREEN_UV,-VERTEX.z,INV_VIEW_MATRIX[3].xyz,-INV_VIEW_MATRIX[2].xyz,vec2(PROJECTION_MATRIX[0][0],PROJECTION_MATRIX[1][1]));
