@@ -207,6 +207,7 @@ func _ready() -> void:
 		if profile == null or profile.use_forest_reference:
 			profile = preload("res://assets/graphics/biomes/meadow.tres")
 		biome_controller.setup(self, profile, comparison_biomes)
+		get_viewport().size_changed.connect(_fit_imported_overview)
 	_setup_movement_effects()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
 	terrain_light.name="TerrainColoredTransport";add_child(terrain_light);terrain_light.setup(self)
@@ -411,9 +412,12 @@ func set_review_view(mode: String) -> void:
 		camera.rotation_degrees=Vector3(-36.315886,36.869898,0)
 		camera.position=Vector3(player.global_position.x,_camera_ground_y,player.global_position.z)+CAMERA_OFFSET
 	else:
-		camera.far=300.0;camera.size=150.0
-		camera.position=Vector3(-8.5,140,-1)
 		camera.rotation_degrees=Vector3(-90,0,0)
+		if _uses_portable_biome():
+			_fit_imported_overview()
+		else:
+			camera.far=300.0;camera.size=150.0
+			camera.position=Vector3(-8.5,140,-1)
 		# Zero-length cutaway corridor restores native materials for overview.
 		geometry.update_cutaway(Vector3.ZERO,Vector3.ZERO)
 	_update_camera_near(camera)
@@ -421,6 +425,22 @@ func set_review_view(mode: String) -> void:
 	if biome_controller != null:biome_controller.refresh()
 	if grove != null and (grove.visible or grove.spruce_visible()):grove.update_focus(camera,player.global_position,mode=="gameplay")
 	if showcase!=null:showcase.end_environment_edit()
+
+func _fit_imported_overview() -> void:
+	if not map_ready or view_mode == "gameplay":
+		return
+	var camera: Camera3D = $Camera3D
+	var low := Vector3(runtime.border.min[0], runtime.border.min[1], runtime.border.min[2])
+	var high := Vector3(runtime.border.max[0], runtime.border.max[1], runtime.border.max[2])
+	var center := (low + high) * .5
+	var extent := high - low
+	var viewport_size := get_viewport().get_visible_rect().size
+	var aspect := maxf(viewport_size.x, 1.) / maxf(viewport_size.y, 1.)
+	var fit := maxf(extent.z, extent.x / aspect) if camera.keep_aspect == Camera3D.KEEP_HEIGHT \
+		else maxf(extent.x, extent.z * aspect)
+	camera.size = fit * 1.12
+	camera.position = Vector3(center.x, high.y + 12., center.z)
+	camera.far = extent.y + 24.
 
 func _update_camera_near(camera: Camera3D) -> void:
 	var extend := _extended_camera_depth and view_mode == "gameplay" and camera.projection == Camera3D.PROJECTION_ORTHOGONAL

@@ -851,6 +851,9 @@ func _exit_tree()->void:
 	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
 
 func set_weather(overcast: float, seconds: float = 2.5) -> void:
+	if level != null and level.get("biome_controller") != null:
+		level.biome_controller.set_weather(overcast, seconds)
+		return
 	if _weather_profile == null:
 		return
 	var old_weight := _weather.weight

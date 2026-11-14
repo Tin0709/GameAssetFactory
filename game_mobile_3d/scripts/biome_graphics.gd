@@ -374,7 +374,7 @@ func handle_key(event: InputEventKey) -> bool:
 			else:
 				_world.showcase.set_hour(DayNight.next_hour(_world.showcase.hour, HOURS))
 		KEY_F6:
-			set_weather(0. if _weather.target > 0. else 1.)
+			_world.showcase.set_weather(0. if _weather.target > 0. else 1.)
 		KEY_H:
 			_fog_enabled = not _fog_enabled
 			refresh()
