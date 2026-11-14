@@ -158,6 +158,10 @@ class ImportWorldMapTests(unittest.TestCase):
         source = REPO / "game_mobile_3d/assets/maps/meadow_biome_review/World Map.litematic"
         with tempfile.TemporaryDirectory() as temporary:
             project = Path(temporary) / "game_mobile_3d"
+            presets = project / "assets/graphics/biomes"
+            presets.mkdir(parents=True)
+            source_presets = REPO / "game_mobile_3d/assets/graphics/biomes"
+            (presets / "humid_woodland.tres").write_bytes((source_presets / "humid_woodland.tres").read_bytes())
             output = project / "assets/maps/new_meadow"
             scene = project / "scenes/maps/NewMeadow.tscn"
             args = ["import_world_map.py", str(source), "--border", "bounds",
@@ -201,7 +205,10 @@ class ImportWorldMapTests(unittest.TestCase):
                 template + "use_forest_reference = true\n", encoding="utf-8")
             (presets / "fake_profile.tres").write_text(
                 template.replace("biome_graphics_profile", "biome_weather_profile"), encoding="utf-8")
-            for biome in ("custom_valley", "private_valley", "fake_profile", "../custom_valley"):
+            (presets / "private_lookup.tres").write_text(
+                template + 'finish_reference_path = "old/private.json"\n', encoding="utf-8")
+            for biome in ("custom_valley", "private_valley", "private_lookup", "fake_profile",
+                          "missing_profile", "../custom_valley"):
                 with self.subTest(biome=biome), patch.object(importer, "GODOT_PROJECT", project), \
                         patch("sys.stdout", new_callable=io.StringIO), patch("sys.stderr", new_callable=io.StringIO):
                     output = project / "assets/maps" / ("accepted_valley" if biome == "custom_valley" else "rejected_valley")

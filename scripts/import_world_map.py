@@ -22,7 +22,9 @@ REPO = Path(__file__).resolve().parents[1]
 GODOT_PROJECT = REPO / "game_mobile_3d"
 DEFAULT_SOURCE = REPO / "game_mobile_3d/assets/maps/world_map/World Map.litematic"
 DEFAULT_OUTPUT = REPO / "game_mobile_3d/assets/maps/world_map"
-PORTABLE_BIOMES = ("meadow", "humid_woodland")
+DEFAULT_BIOME = "meadow"
+BIOME_DIRECTORY = "assets/graphics/biomes"
+BIOME_PROFILE_SCRIPT = "res://scripts/biome_graphics_profile.gd"
 AIR = {"minecraft:air", "minecraft:cave_air", "minecraft:void_air"}
 MASK64 = (1 << 64) - 1
 FULL_BLOCKS = {"stone": "stone_block", "dirt": "dirt_block", "coarse_dirt": "dirt_block",
@@ -345,16 +347,42 @@ def import_source(source, output, *, border_mode="markers", new_output=False):
     return runtime, manifest
 
 
+def require_portable_biome(biome):
+    if not re.fullmatch(r"[A-Za-z0-9_]+", biome):
+        raise ValueError("--biome requires a preset file name without .tres or a directory")
+    directory = (GODOT_PROJECT / BIOME_DIRECTORY).resolve()
+    path = directory / f"{biome}.tres"
+    if path.resolve().parent != directory:
+        raise ValueError(f"Biome preset must stay in {BIOME_DIRECTORY}")
+    loader = re.compile(
+        rf'^\[ext_resource\b[^\n]*\bpath="{re.escape(BIOME_PROFILE_SCRIPT)}"'
+        r'[^\n]*\bid="([^"]+)"[^\n]*\]$', re.MULTILINE)
+    try:
+        source = path.read_text(encoding="utf-8-sig")
+    except (OSError, UnicodeError) as error:
+        raise ValueError(f"Cannot read biome preset {path}") from error
+    declarations, section, properties = source.partition("\n[resource]")
+    match = loader.search(declarations)
+    if not section or not match or not re.search(
+            rf'^script\s*=\s*ExtResource\("{re.escape(match[1])}"\)\s*$',
+            properties, re.MULTILINE):
+        raise ValueError(f"{path.name} must use BiomeGraphicsProfile")
+    if re.search(r'^use_forest_reference\s*=\s*true\b', properties, re.MULTILINE) or re.search(
+            r'^(?:atmosphere|finish)_reference_(?:path|sha256)\s*=\s*"[^"\n]+',
+            properties, re.MULTILINE):
+        raise ValueError(f"{path.name} requires private reference data and cannot be used on an imported map")
+
+
 def map_scene_source(scene_name, runtime_path, biome):
     runtime_resource = "res://" + runtime_path.relative_to(GODOT_PROJECT).as_posix()
-    comparison = next(candidate for candidate in PORTABLE_BIOMES if candidate != biome)
+    comparison = "humid_woodland" if biome == DEFAULT_BIOME else DEFAULT_BIOME
     return (
         '[gd_scene load_steps=6 format=3]\n\n'
         '[ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]\n'
         '[ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]\n'
         '[ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]\n'
-        f'[ext_resource type="Resource" path="res://assets/graphics/biomes/{biome}.tres" id="biome"]\n'
-        f'[ext_resource type="Resource" path="res://assets/graphics/biomes/{comparison}.tres" id="comparison"]\n\n'
+        f'[ext_resource type="Resource" path="res://{BIOME_DIRECTORY}/{biome}.tres" id="biome"]\n'
+        f'[ext_resource type="Resource" path="res://{BIOME_DIRECTORY}/{comparison}.tres" id="comparison"]\n\n'
         f'[node name="{scene_name}" instance=ExtResource("base")]\n'
         'script = ExtResource("map")\n'
         f'map_layout_path = {json.dumps(runtime_resource, ensure_ascii=False)}\n'
@@ -369,7 +397,7 @@ def main():
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--border", choices=("markers", "bounds"), default="markers")
     parser.add_argument("--scene", type=Path, help="Create a new playable Godot scene under game_mobile_3d/scenes/maps")
-    parser.add_argument("--biome", choices=PORTABLE_BIOMES, help="Preset for --scene (default: meadow)")
+    parser.add_argument("--biome", metavar="PRESET", help=f"Portable .tres file name in {BIOME_DIRECTORY} (default: meadow)")
     args = parser.parse_args()
     output = args.output.resolve()
     if args.border == "bounds" and output == DEFAULT_OUTPUT.resolve():
@@ -388,7 +416,11 @@ def main():
             parser.error("--scene requires a new --output directory under game_mobile_3d/assets/maps")
         if scene.exists() or output.exists():
             parser.error("--scene and --output must both be new to preserve any existing map work")
-        biome = args.biome or PORTABLE_BIOMES[0]
+        biome = args.biome or DEFAULT_BIOME
+        try:
+            require_portable_biome(biome)
+        except ValueError as error:
+            parser.error(str(error))
         scene_source = map_scene_source(scene.stem, output / "runtime.json", biome)
         scene_info = {"scene": str(scene), "biome": biome}
     runtime, manifest = import_source(args.source, output, border_mode=args.border, new_output=bool(args.scene))
