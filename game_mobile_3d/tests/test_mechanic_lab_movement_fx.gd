@@ -92,6 +92,7 @@ func run() -> void:
 	await check_non_grass_landing(lab, dust)
 	await check_non_grass_steps(lab, dust, wind)
 	await check_dust_contact_clock(lab, dust)
+	await check_zombie_steps_on_slab(lab)
 	await check_zombie_dust_contact_clock(lab)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
@@ -397,6 +398,66 @@ func check_dust_contact_clock(lab, dust) -> void:
 		"Run and jump dust begin at the contact position, even after a delayed render")
 	print("MECHANIC_LAB_DUST_CONTACT_CLOCK drift=", peak_drift, " contacts=", contact_count)
 	lab.reset_player()
+
+func check_zombie_steps_on_slab(lab) -> void:
+	var group := lab.get_node("Zombies")
+	var dust = lab.get_node("ZombieStepDust")
+	var audio = lab.get_node("CombatAudio")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var slab := StaticBody3D.new()
+	slab.position.y = 0.09
+	var collision := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(1.0, 0.18, 20.0)
+	collision.shape = box
+	slab.add_child(collision)
+	lab.add_child(slab)
+	lab.player.global_position = Vector3(0.45, 0.18, 3.7)
+	lab.player.set_physics_process(false)
+	toggle.button_pressed = true
+	for i in 3:
+		await physics_frame
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	if group.get_child_count() != 1:
+		check(false, "The zombie spawns for the slab step fixture")
+	else:
+		var zombie := group.get_child(0) as CharacterBody3D
+		zombie.global_position = Vector3(0.45, 0.185, -5.1)
+		zombie.rotation.y = 0.0
+		var exposed_steps: Array[Vector3] = []
+		zombie.step_audio.connect(func(point: Vector3):
+			if point.x > 0.5 and zombie.is_on_floor() and point.y > 0.16:
+				exposed_steps.append(point))
+		var before_audio: int = audio._next_choice.get(&"zombie_step", 0)
+		for i in 130:
+			await physics_frame
+			if not exposed_steps.is_empty():
+				break
+		audio.flush_zombie_steps()
+		var slab_audio: int = audio._next_choice.get(&"zombie_step", 0)
+		check(not exposed_steps.is_empty() and zombie.global_position.y > 0.16,
+			"A grounded zombie emits an authored contact beyond the slab edge")
+		check(slab_audio == before_audio and dust._puffs.is_empty(),
+			"A zombie step past the slab edge does not play audio or spawn dust in the grass below")
+		print("MECHANIC_LAB_ZOMBIE_SLAB_STEP outside=", exposed_steps, " audio_changed=", slab_audio != before_audio,
+			" puffs=", dust._puffs.size())
+		slab.queue_free()
+		lab.player.global_position = Vector3(0.45, 0.0, 6.0)
+		dust.clear()
+		for i in 100:
+			await physics_frame
+			if not dust._puffs.is_empty():
+				break
+		audio.flush_zombie_steps()
+		check(zombie.is_on_floor() and absf(zombie.global_position.y) < 0.05
+			and audio._next_choice.get(&"zombie_step", 0) != slab_audio and not dust._puffs.is_empty(),
+			"A zombie resumes emitting its grass step, with sound and dust, after returning to grass")
+	if is_instance_valid(slab) and not slab.is_queued_for_deletion():
+		slab.queue_free()
+	lab.player.set_physics_process(true)
+	toggle.button_pressed = false
+	lab.reset_player()
+	await process_frame
 
 func check_zombie_dust_contact_clock(lab) -> void:
 	var dust := lab.get_node_or_null("ZombieStepDust") as MultiMeshInstance3D
