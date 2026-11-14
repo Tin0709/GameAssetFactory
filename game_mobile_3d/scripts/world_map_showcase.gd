@@ -148,6 +148,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_far_air": ["Chiều sâu sương đêm", 1.],
 	&"twilight_depth_scatter": ["Ánh tán xạ xa chạng vạng", 1.],
 	&"morning_depth_scatter": ["Tán xạ trung cảnh buổi sáng", 1.],
+	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
 	&"twilight_far_air_color": ["Sắc lạnh của sương xa", 1.],
@@ -198,7 +199,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 124
+const LIGHTING_MIX_VERSION := 125
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -212,6 +213,7 @@ var _night_reference_toggle: CheckButton
 const BALANCED_ATMOSPHERE := {
 	&"projected_sun": 0.,
 	&"noon_projected_sun": 0.,
+	&"noon_depth_haze": 0.,
 	&"sunlit_mist": 0.,
 	&"basin_sunlit_mist": 0.,
 	&"daylight_haze": 0.,
@@ -856,13 +858,22 @@ func _update_mist()->void:
 	sample.player_light_weight *= _lighting_scale(&"lantern") * _lighting_scale(&"lantern_air")
 	var near_scale := _lighting_scale(&"near_haze")
 	if near_scale > 0. and not measured.is_empty() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
-		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * PHASE_FINISH.phase_weight(hour) * near_scale
-		strength *= _lighting_scale(&"fog")
+		var phase := PHASE_FINISH.phase_weight(hour)
+		var noon := 0.
+		if not _flat_lab and not _balanced_preview and atmosphere_review == "combined":
+			noon = _lighting_scale(&"noon_depth_haze") * _noon_lighting_weight()
+		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * (phase + .46 * noon)
+		strength *= near_scale * _lighting_scale(&"fog")
 		sample.near_layer = Vector3(NEAR_HAZE_ENTRY_M, strength, level.spawn_position.y + NEAR_HAZE_REFERENCE_HEIGHT_M)
+		if noon > 0.:
+			# Calibrated from the Foreground/Midground split seen in the Forest captures.
+			sample.depth_scatter = 1.65 * noon
+			var cooler := linear * Vector3(.76, .85, 1.44)
+			sample.depth_scatter_color = (cooler * (linear.dot(luma) / maxf(cooler.dot(luma), .000001)) - linear) * noon
 		var depth_mix := _lighting_scale(&"near_haze_depth")
 		if depth_mix > 0.:
 			sample.near_fade_start = lerpf(.4, NEAR_HAZE_FADE_START, depth_mix)
-		if strength > 0.0 and not _flat_lab and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
+		if phase > 0.0 and strength > 0.0 and not _flat_lab and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
 			var gain := _lighting_scale(&"forest_near_scatter") * FOREST_NEAR_SCATTER_MAX_GAIN
 			if gain > 0.0:
 				sample.near_scatter = Vector3(FOREST_NEAR_SCATTER_CENTER.x, FOREST_NEAR_SCATTER_CENTER.y, gain)
@@ -1814,6 +1825,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 124 and effect == &"noon_projected_sun":
 			missing_value = 0.
+		if version < 125 and effect == &"noon_depth_haze":
+			missing_value = 0.
 		if version < 121 and effect == &"stone_dusk_sky_chroma":
 			missing_value = 0.
 		if version < 120 and effect == &"basin_sunlit_mist":
@@ -1935,7 +1948,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and directional_air.region_available()
 		if effect in [&"dawn_sky_transition", &"night_sky_fill"]:
 			slider.editable = slider.editable and sky_response.available()
-		if effect in [&"dawn_mist_source", &"morning_depth_scatter", &"morning_depth_optical"]:
+		if effect in [&"dawn_mist_source", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze"]:
 			slider.editable = slider.editable and not phase_air.anchors.is_empty()
 		if effect in [&"evening_mist_profile", &"pre_twilight_air", &"pre_twilight_midair", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical"]:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
@@ -2061,7 +2074,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_sync_forest_night_lights()
 		set_coupled_bloom(coupled_bloom)
 		return
-	if changed_effect in [&"morning_depth_scatter", &"morning_depth_optical"]:
+	if changed_effect in [&"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze"]:
 		_update_mist()
 		return
 	if changed_effect == &"night_path_chroma":
