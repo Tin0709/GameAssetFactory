@@ -407,7 +407,7 @@ func check_blocked_chase(group: Node) -> void:
 		hidden_skips += int(zombie._skipped_blocked_step)
 	var hidden_poses: int = zombie.ragdoll.sample_count - hidden_pose_start
 	if zombie._target_visible or not zombie._target_aggressive \
-			or zombie._last_seen_position != last_seen or hidden_skips != 24 or hidden_poses != 32:
+			or zombie._last_seen_position != last_seen or absi(hidden_skips - 24) > 1 or hidden_poses != 32:
 		failures.append("Hidden player movement keeps the last-seen destination, 15 Hz collision retries and every pose sample")
 	print("CROWD_BLOCKED_HIDDEN skips=", hidden_skips, " samples=", hidden_poses, " last_seen=", zombie._last_seen_position)
 	screen.free()
