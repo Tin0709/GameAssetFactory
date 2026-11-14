@@ -436,13 +436,14 @@ func _project_source_anchors() -> void:
 	var sabre_floor := _limit_first_contact_stretch and not floor_landing_blended \
 		and is_instance_valid(_flat_floor) and not _flat_floor.disabled
 	var sabre_flight := sabre_floor and floor_impact_blend <= 0.0
+	var first_wall_window := sabre_flight and Engine.get_physics_frames() - _launch_frame \
+		<= roundi(WALL_SHOULDER_SLIDE_WINDOW * Engine.physics_ticks_per_second)
 	var early_wall_landing := sabre_floor and floor_impact_blend > 0.0 \
 		and floor_impact_blend <= WALL_NECK_LANDING_BLEND_END
 	if sabre_flight:
 		_recover_leading_head_wall_overlap()
 	super._project_source_anchors()
-	if sabre_flight and Engine.get_physics_frames() - _launch_frame \
-			<= roundi(WALL_SHOULDER_SLIDE_WINDOW * Engine.physics_ticks_per_second):
+	if first_wall_window:
 		_slide_wall_shoulder_anchors()
 	_recover_early_floor_arm_gap()
 	_recover_floor_blocked_hip()
@@ -513,6 +514,13 @@ func _project_source_anchors() -> void:
 				largest_gap = distance
 				motion = shift
 				neck_wall = wall
+				handoff_arm = null
+				# A clean launch can pin both the chest and arm to the same
+				# face. Let the existing overlap-checked retreat handle it.
+				if is_arm and first_wall_window and distance > WALL_ARM_HANDOFF_MIN_GAP \
+						and chest_state.get_contact_count() > 0 \
+						and _shared_wall_contact(chest_state, state, shift).is_valid():
+					handoff_arm = state
 		if motion.is_zero_approx():
 			return
 
