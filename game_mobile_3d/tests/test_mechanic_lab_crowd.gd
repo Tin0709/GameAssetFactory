@@ -96,6 +96,7 @@ func run() -> void:
 		await check_reset_during_spawn(group)
 		if OS.get_cmdline_user_args().has("--roam"):
 			await check_crowd_roam(group)
+		check_spawn_batch_order(group)
 	print("CROWD_END failures=", failures, " renderer=", RenderingServer.get_current_rendering_method(),
 		" adapter=", RenderingServer.get_video_adapter_name())
 	lab.free()
@@ -232,6 +233,38 @@ func spawn_synchronously(group: Node) -> void:
 		spawn.pressed.emit()
 	print("CROWD_SPAWN_SYNC ", JSON.stringify({"count": group.get_child_count(),
 		"burst_ms": (Time.get_ticks_usec() - started) / 1000.0}))
+
+func check_spawn_batch_order(group: Node) -> void:
+	var expected: Array[Vector3] = []
+	for batched in [false, true]:
+		for child in group.get_children():
+			child.free()
+		var positions: Array[Vector3] = []
+		for frame in 6:
+			# Repeat the same corner spawn, including a new player heading
+			# and an existing zombie that moved between batches.
+			lab.player.global_position = Vector3(48.9 - 0.02 * frame, 0.0, 48.9 - 0.05 * frame)
+			lab.player.visual.rotation.y = 0.37 + 0.01 * frame
+			if frame > 0:
+				group.get_child(0).position.z -= 0.025
+			if batched:
+				var facing := Basis(Vector3.UP, lab.player.visual.rotation.y)
+				var result: Dictionary = group.spawn_batch(lab.player, facing, lab.get_node("CombatEffects"),
+					false, 5, Time.get_ticks_usec() + 1000000)
+				if result.blocked or result.count != 5:
+					failures.append("A corner batch with free slots creates all five zombies")
+					return
+			else:
+				for i in 5:
+					if not lab._spawn_one_zombie(false):
+						failures.append("The reference single-spawn path finds a free slot")
+						return
+		for zombie in group.get_children():
+			positions.append(zombie.position)
+		if batched and positions != expected:
+			failures.append("Batch search preserves individual spawn positions and order at the corner")
+		expected = positions
+	print("CROWD_CORNER_PARITY samples=", expected.size())
 
 func spawn_crowd(group: Node) -> void:
 	var button := lab.get_node_or_null("HUD/SpawnCrowd") as Button
