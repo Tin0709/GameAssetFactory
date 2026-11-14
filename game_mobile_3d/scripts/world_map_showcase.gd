@@ -2,6 +2,7 @@ extends Node
 ## Owns the unified review, not the private assets or the original controller.
 const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
 const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
+const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
 const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
@@ -361,8 +362,8 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_fill", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
-	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
-	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_ambient", Vector3.ZERO)
+	if not _flat_lab:
+		DiffuseRegion.claim(self)
 	RenderingServer.global_shader_parameter_set("gaf_replay_bounce", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_replay_surface", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_replay_surface_field", null)
@@ -785,6 +786,7 @@ func _update_hdr_air()->void:
 		viewport.use_hdr_2d=_hdr_saved;_hdr_owned=false
 
 func _exit_tree()->void:
+	DiffuseRegion.release(self)
 	if RenderingServer.frame_pre_draw.is_connected(_sync_point_camera):
 		RenderingServer.frame_pre_draw.disconnect(_sync_point_camera)
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
@@ -794,7 +796,6 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_fill", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
-			RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
 			forest_replay.publish_bounce(0.0)
 			forest_replay.release_surface()
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
@@ -1125,6 +1126,8 @@ func _sync_point_camera() -> void:
 		_sync_local_diffuse_return()
 
 func _sync_local_diffuse_return() -> void:
+	if not DiffuseRegion.owns(self):
+		return
 	var source := Vector4.ZERO
 	if not _balanced_preview and atmosphere_review == "combined" and forest_active() \
 			and level.view_mode == "gameplay" and level.local_diffuse_region != null \

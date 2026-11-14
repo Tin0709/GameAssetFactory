@@ -3,6 +3,7 @@ extends Node
 
 const Profile = preload("res://scripts/biome_graphics_profile.gd")
 const DayNight = preload("res://scripts/biome_day_night.gd")
+const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const Palette = preload("res://scripts/world_map_showcase_palette.gd")
 const MistVolume = preload("res://scripts/world_map_atmosphere_volume.gd")
 const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
@@ -40,13 +41,10 @@ var _local_diffuse_source := Vector4.ZERO
 var _local_diffuse_bounds := Vector4.ZERO
 var _local_diffuse_ambient := Vector3.ZERO
 var _allow_local_diffuse := true
-static var _diffuse_owner: WeakRef
 
 func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> void:
 	_world = world
-	_diffuse_owner = weakref(self)
-	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
-	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_ambient", Vector3.ZERO)
+	DiffuseRegion.claim(self)
 	quality = world.biome_quality
 	_choices.append(profile)
 	for choice in alternatives:
@@ -184,7 +182,7 @@ func refresh() -> void:
 	_update_finish()
 
 func _update_local_diffuse() -> void:
-	if _diffuse_owner == null or _diffuse_owner.get_ref() != self:
+	if not DiffuseRegion.owns(self):
 		return
 	var source := Vector4.ZERO
 	var bounds := Vector4.ZERO
@@ -264,10 +262,7 @@ func _update_finish() -> void:
 		env.glow_bloom = _profile.glow_bloom * native_weight
 
 func _exit_tree() -> void:
-	if _diffuse_owner != null and _diffuse_owner.get_ref() == self:
-		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
-		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_ambient", Vector3.ZERO)
-		_diffuse_owner = null
+	DiffuseRegion.release(self)
 	if _finish_effect == null:
 		return
 	var effect := _finish_effect
