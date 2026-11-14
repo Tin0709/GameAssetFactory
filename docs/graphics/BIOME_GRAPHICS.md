@@ -15,6 +15,8 @@
 
 Map portable dùng chung các pass sương và bloom với WorldMap. Preset Forest tham chiếu còn nạp LUT riêng và các trường ánh sáng gắn với hình học, được xác minh theo map trước khi dùng.
 
+WorldMap có thêm **Local Diffuse Region** để đặt vùng nhận ánh hắt từ một khoảng mở. Tâm, hai bán kính và tọa độ khoảng mở thuộc về scene. Shader dùng chung cho terrain, cỏ và vật liệu nhân vật đã hỗ trợ. Cường độ hiện được điều khiển qua preset và menu L của route Forest tham chiếu. Route portable chưa cấp tín hiệu này cho các vật liệu.
+
 ## Import map tiếp theo
 
 1. Từ thư mục `GameAssetFactory`, chạy `python scripts/import_world_map.py "D:/Maps/MapMoi.litematic" --border bounds --output game_mobile_3d/assets/maps/map_moi`. Với bounds, cạnh ngoài lấy từ vùng chọn của schematic. Vùng đệm rỗng vẫn được giữ theo kích thước vùng chọn. Chế độ `markers` giữ hợp đồng vòng Red Wool 100 × 100 cho WorldMap. Cả hai dùng cùng mapping block và kiểm tra slab, tall grass, vùng chồng lấn và block chưa hỗ trợ.
