@@ -198,6 +198,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"canopy_direct_softness": ["Dịu nắng trên tán cao", 1.],
 	&"late_canopy_sun": ["Dịu nắng còn lại khi lên đèn", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
+	&"forest_path_dusk": ["Đèn lối rừng lúc chạng vạng", 1.],
 	&"forest_path_placement": ["Vị trí đèn lối rừng", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
 	&"forest_path_air": ["Path light in mist", 1.],
@@ -222,7 +223,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 145
+const LIGHTING_MIX_VERSION := 146
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2100,6 +2101,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 145 and effect == &"late_canopy_sun":
 			missing_value = 0.
+		if version < 146 and effect == &"forest_path_dusk":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -2290,7 +2293,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
-	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce", &"forest_replay_placement", &"forest_replay_surface_bounce", &"forest_replay_halo"]:
+	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_dusk", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce", &"forest_replay_placement", &"forest_replay_surface_bounce", &"forest_replay_halo"]:
 		_sync_forest_night_lights()
 		return
 	if changed_effect in [&"canopy_player_cue", &"canopy_cue_day_tone", &"canopy_cue_clarity"]:
@@ -2526,13 +2529,16 @@ func _sync_forest_night_lights() -> void:
 	var phase := 0.0
 	var day := 0.0
 	var replay_phase := 0.0
+	var path_phase := 0.0
 	var night_strength := _lighting_scale(&"forest_accents")
 	var day_strength := _lighting_scale(&"forest_daylight_accents")
 	if forest_active() and unavailable_reason.is_empty() and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
 		phase = moonlight_weight(hour)
 		day = PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+		path_phase = phase
 		if not _balanced_preview:
 			replay_phase = forest_replay.evening_weight(hour)
+			path_phase = forest_path_light.dusk_phase(hour, phase, _lighting_scale(&"forest_path_dusk"))
 	if day > 0.0 and day_strength > 0.0:
 		forest_accents.update(level, day, day_strength)
 	else:
@@ -2544,7 +2550,7 @@ func _sync_forest_night_lights() -> void:
 		forest_replay.publish_bounce(_lighting_scale(&"forest_replay_bounce"))
 		forest_replay.publish_surface(level, _lighting_scale(&"forest_replay_surface_bounce"))
 	var offset: Vector2 = level.forest_path_light_offset if _lighting_scale(&"forest_path_placement") == 1. else Vector2.ZERO
-	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light"), offset):
+	if forest_path_light.update(level, path_phase, _lighting_scale(&"forest_path_light"), offset):
 		_publish_point_cutoff()
 
 func sync_world_outline() -> void:

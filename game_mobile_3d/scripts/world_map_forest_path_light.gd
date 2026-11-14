@@ -19,6 +19,10 @@ var _attempted := false
 var _submitted := Vector2.ZERO
 var _submitted_offset := Vector2.ZERO
 
+static func dusk_phase(hour: float, moon_phase: float, strength: float) -> float:
+	var dusk := .42 * strength * smoothstep(18.55, 20.5, hour) if hour >= 12. else 0.
+	return maxf(moon_phase, dusk)
+
 func update(world: Node3D, phase: float, strength: float, offset := Vector2.ZERO, anchor := ANCHOR) -> bool:
 	var state := Vector2(phase, ENERGY * strength * phase) if strength > 0.0 else Vector2.ZERO
 	if state.y > 0.0 and not _attempted:
