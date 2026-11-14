@@ -94,8 +94,7 @@ func _load(world: Node3D, anchor: Vector2) -> void:
 	_material = ShaderMaterial.new()
 	_material.shader = FIXTURE_SHADER
 	_material.set_shader_parameter("fixture_atlas", ImageTexture.create_from_image(image))
-	meshes[0].material_override = _material
-	meshes[0].mesh.surface_set_material(0, null)
+	meshes[0].mesh.surface_set_material(0, _material)
 	meshes[0].cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	fixture = imported
 	fixture.name = "PrivateForestPathFixture"
