@@ -380,9 +380,8 @@ def require_portable_biome(biome):
             raise ValueError(f"{path.name} has an unavailable dependency: res://{dependency}")
 
 
-def map_scene_source(scene_name, runtime_path, biome):
+def map_scene_source(scene_name, runtime_path, biome, comparison):
     runtime_resource = "res://" + runtime_path.relative_to(GODOT_PROJECT).as_posix()
-    comparison = "humid_woodland" if biome == DEFAULT_BIOME else DEFAULT_BIOME
     return (
         '[gd_scene load_steps=6 format=3]\n\n'
         '[ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]\n'
@@ -426,9 +425,11 @@ def main():
         biome = DEFAULT_BIOME if args.biome is None else args.biome
         try:
             require_portable_biome(biome)
+            comparison = "humid_woodland" if biome == DEFAULT_BIOME else DEFAULT_BIOME
+            require_portable_biome(comparison)
         except ValueError as error:
             parser.error(str(error))
-        scene_source = map_scene_source(scene.stem, output / "runtime.json", biome)
+        scene_source = map_scene_source(scene.stem, output / "runtime.json", biome, comparison)
         scene_info = {"scene": str(scene), "biome": biome}
     runtime, manifest = import_source(args.source, output, border_mode=args.border, new_output=bool(args.scene))
     if args.scene:

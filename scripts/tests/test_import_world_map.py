@@ -161,7 +161,7 @@ class ImportWorldMapTests(unittest.TestCase):
             presets = project / "assets/graphics/biomes"
             presets.mkdir(parents=True)
             source_presets = REPO / "game_mobile_3d/assets/graphics/biomes"
-            for name in ("humid_woodland", "humid_woodland_day_night", "woodland_overcast"):
+            for name in ("humid_woodland", "humid_woodland_day_night", "woodland_overcast", "meadow", "meadow_overcast"):
                 (presets / f"{name}.tres").write_bytes((source_presets / f"{name}.tres").read_bytes())
             (project / "scripts").mkdir()
             (project / "scripts/biome_graphics_profile.gd").touch()
@@ -204,6 +204,7 @@ class ImportWorldMapTests(unittest.TestCase):
                 '[ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]\n\n' \
                 '[resource]\nscript = ExtResource("profile")\n'
             (presets / "custom_valley.tres").write_text(template, encoding="utf-8")
+            (presets / "meadow.tres").write_text(template, encoding="utf-8")
             (presets / "private_valley.tres").write_text(
                 template + "use_forest_reference = true\n", encoding="utf-8")
             (presets / "fake_profile.tres").write_text(
