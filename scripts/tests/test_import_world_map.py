@@ -164,7 +164,8 @@ class ImportWorldMapTests(unittest.TestCase):
             for name in ("humid_woodland", "humid_woodland_day_night", "woodland_overcast", "meadow", "meadow_overcast"):
                 (presets / f"{name}.tres").write_bytes((source_presets / f"{name}.tres").read_bytes())
             (project / "scripts").mkdir()
-            (project / "scripts/biome_graphics_profile.gd").touch()
+            for name in ("biome_graphics_profile.gd", "ground_haze_profile.gd"):
+                (project / "scripts" / name).touch()
             output = project / "assets/maps/new_meadow"
             scene = project / "scenes/maps/NewMeadow.tscn"
             args = ["import_world_map.py", str(source), "--border", "bounds",
