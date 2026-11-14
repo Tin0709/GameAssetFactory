@@ -24,6 +24,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Local diffuse response around a map-authored opening.
 @export_range(0., .65, .01) var local_diffuse_strength := 0.
 @export var local_diffuse_by_hour: Curve
+## Optional normalized-hour blend towards stronger sunlight in openings of a map's projection.
+@export var projected_opening_recovery_by_hour: Curve
 
 @export_group("Atmosphere and fog")
 @export var noon_sky_color := Color(.57, .68, .69)

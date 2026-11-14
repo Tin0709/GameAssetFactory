@@ -27,6 +27,27 @@ func run() -> void:
 	var forest_settings = forest.biome_graphics
 	check(forest.map_ready and forest_settings.use_forest_reference, "F5 uses Forest preset")
 	check(forest_settings.overcast != null, "Forest needs its own overcast resource")
+	check(forest_settings.get("projected_opening_recovery_by_hour") is Curve,
+		"Forest sunlight opening response comes from the biome preset")
+	if showcase.projected_sun.available():
+		showcase.set_lighting_scale(&"projected_sun", .40)
+		showcase.set_lighting_scale(&"projected_sun_openings", .60)
+		for hour: float in [9.5, 14.25]:
+			showcase.set_hour(hour)
+			check(is_equal_approx(showcase.projected_sun._opening_recovery, .30),
+				"Protected daytime shoulders keep projected openings visible")
+		showcase.set_hour(12.)
+		check(is_zero_approx(showcase.projected_sun._opening_recovery), "Noon has no extra opening recovery")
+		showcase.set_hour(19.5)
+		check(is_zero_approx(showcase.projected_sun._opening_recovery), "Twilight has no extra sunlight opening")
+		showcase.set_hour(9.5)
+		showcase.set_weather(1., 0.)
+		check(is_equal_approx(showcase.projected_sun._opening_recovery, .15),
+			"Overcast keeps only the original opening response")
+		showcase.set_weather(0., 0.)
+		showcase.set_lighting_scale(&"projected_sun", 0.)
+		check(is_zero_approx(showcase.projected_sun._opening_recovery), "Opening recovery needs the map's valid projection")
+		showcase.set_lighting_scale(&"projected_sun", .40)
 	check(showcase.has_method("set_weather"), "Forest needs the same weather interface as imported maps")
 	if forest_settings.overcast != null and showcase.has_method("set_weather"):
 		var sun: DirectionalLight3D = forest.get_node("Sun")
@@ -70,6 +91,8 @@ func run() -> void:
 	var opened_compositor := camera.compositor
 	check(map.map_ready and map.geometry.cells.size() == 5632 and graphics != null,
 		"Second map uses imported geometry and portable controller")
+	check(not map.biome_graphics.use_forest_reference and not map.showcase.projected_sun.available(),
+		"An imported map never binds the private Forest projection")
 	if graphics != null:
 		var sun: DirectionalLight3D = map.get_node("Sun")
 		var env: Environment = map.get_node("WorldEnvironment").environment

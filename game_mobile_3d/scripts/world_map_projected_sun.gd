@@ -80,8 +80,11 @@ func set_weight(weight: float) -> void:
 	_weight = weight
 	RenderingServer.global_shader_parameter_set(STRENGTH, weight)
 
-func set_opening_recovery(amount: float) -> void:
-	var applied := clampf(amount, 0., 1.) * clampf(_weight / .40, 0., 1.) if is_finite(amount) else 0.
+func set_opening_recovery(amount: float, phase_response: float = 0.) -> void:
+	var projection_weight := clampf(_weight / .40, 0., 1.)
+	var full_recovery := clampf(_weight / .20, 0., 1.)
+	var factor := lerpf(projection_weight, full_recovery, clampf(phase_response, 0., 1.))
+	var applied := clampf(amount, 0., 1.) * factor if is_finite(amount) else 0.
 	if applied == _opening_recovery:
 		return
 	_opening_recovery = applied

@@ -51,7 +51,7 @@ Khi muốn đổi đặc tính ánh sáng, sương, hậu kỳ hoặc vòng ngà
 
 Tại **Biome Graphics → Day and night**, mở **Day Night**. Preset Rìa rừng ẩm đã có resource riêng. Duplicate resource này trước khi chỉnh màu nắng, ánh trời, bầu trời hoặc sương cho biome khác. Có thể để trống từng track để dùng đường màu chung. Các màu là giá trị tuyệt đối. Track góc pitch/yaw tính bằng độ và track Exposure dùng giá trị exposure của môi trường. Các curve cường độ nắng, ánh môi trường và mật độ sương ở profile là hệ số nhân. **Ambient Energy By Hour** được áp dụng trước mức mây, với hệ số 1 nếu để trống. Preset Rìa rừng ẩm giảm ánh môi trường khi trời vừa tối và về mức cũ sau 21:15. Map có đèn cục bộ vẫn dùng đường đèn riêng.
 
-Điểm 0,5 là 12:00. Giữ điểm 0/1 bằng nhau cho các track vòng lặp và chọn nội suy tuyến tính hoặc cubic để màu chuyển dần giữa các mốc. Với yaw qua ±180°, nhập các giá trị liên tục như 170° → 190° để hướng nắng đi qua góc ngắn. **Weather → Start Overcast** đặt mức mây lúc mở map. F8 giữ giờ và mức mây hiện tại khi hai preset đều có cấu hình Overcast. Không cần đổi shader để đổi những thông số này.
+Điểm 0,5 là 12:00. Giữ điểm 0/1 bằng nhau cho các track vòng lặp và chọn nội suy tuyến tính hoặc cubic để màu chuyển dần giữa các mốc. Với yaw qua ±180°, nhập các giá trị liên tục như 170° → 190° để hướng nắng đi qua góc ngắn. Curve cường độ nắng hay mật độ sương vừa tạo mà chưa đặt điểm giữ hệ số 1. **Weather → Start Overcast** đặt mức mây lúc mở map. F8 giữ giờ và mức mây hiện tại khi hai preset đều có cấu hình Overcast. Không cần đổi shader để đổi những thông số này.
 
 Trong **Atmosphere and fog → Spatial mist**, **Local Mist By Hour** và **Additional Mist By Hour** điều khiển hai vùng sương độc lập. Curve dùng cùng trục 0–1 theo giờ và nhân với cường độ đã chọn trong preset và mức mây. Curve để trống giữ hệ số 1. Đặt **Local Mist Region** và **Additional Mist Region** ở node map theo địa hình thực tế. Trong scene Đồng cỏ, đi tới cụm đá gần X = 4,5, Z = −11,5, bấm **T** đến 07:00 hoặc 16:30 và **J** để đối chiếu. Túi sương ở cụm đá bật theo preset Rìa rừng ẩm, về 0 trong khung quanh 12:00.
 
@@ -64,6 +64,8 @@ Forest lưu thông số hai lớp sương thấp trong preset tham chiếu. **S�
 Map import nạp khí quyển từ preset portable. Dữ liệu khí quyển Forest theo hash chỉ được đọc trên đường chạy tham chiếu. Quy trình dựng map mới dùng cùng controller và shader. Vùng sương cục bộ, vị trí đèn và các trường ánh sáng theo hình học vẫn thuộc từng scene.
 
 **Grove Mist By Hour** đặt độ nhận sương của thân và tán cho những map dùng hệ thống cây Grove. Forest chuyển mượt về cách đã duyệt quanh 12:00 và dùng độ nhận sương đầy đủ như terrain ở 09:30 và 14:15. Curve trống giữ cách cũ. Trong WorldMap, **Sương & hiệu ứng → Sương cục bộ → Sương đồng nhất trên cây** điều chỉnh mức pha trộn với curve. Map Meadow hiện dùng hệ cây khác.
+
+**Projected Opening Recovery By Hour** đặt mức phục hồi vệt nắng qua khe trong preset Forest tham chiếu. Forest dùng mạnh nhất lúc 09:30 và 14:15 trời quang, rồi giảm qua các mốc lân cận. **Ánh sáng → Mặt trời và bầu trời → Nắng qua khe tán** điều chỉnh cường độ trong game. Mẫu chiếu Forest thuộc WorldMap. Các scene import dùng ánh nắng, bóng hình học và phản ứng thời tiết của preset portable.
 
 ## Mức chất lượng theo map và thiết bị
 

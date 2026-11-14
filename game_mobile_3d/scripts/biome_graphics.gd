@@ -149,13 +149,13 @@ func refresh() -> void:
 		if day_night.sun_pitch_degrees != null or day_night.sun_yaw_degrees != null:
 			sun.rotation_degrees = rotation
 		exposure = day_night.sample_curve(day_night.exposure, time, exposure)
-	if _profile.key_energy_by_hour != null:
-		sun.light_energy *= maxf(0., _profile.key_energy_by_hour.sample(time))
+	var key_scale := DayNight.sample_curve(_profile.key_energy_by_hour, time, 1.)
+	sun.light_energy *= maxf(0., key_scale)
 	var ambient_scale := DayNight.sample_curve(_profile.ambient_energy_by_hour, time, 1.)
 	env.ambient_light_energy *= maxf(0., ambient_scale)
 	var fog_density := _profile.noon_fog_density * float(p.fog_amount) / float(_noon.fog_amount)
-	if _profile.fog_density_by_hour != null:
-		fog_density *= maxf(0., _profile.fog_density_by_hour.sample(time))
+	var fog_scale := DayNight.sample_curve(_profile.fog_density_by_hour, time, 1.)
+	fog_density *= maxf(0., fog_scale)
 	var saturation := _profile.saturation * float(p.saturation) / float(_noon.saturation)
 	env.background_color = sky
 	env.fog_enabled = _fog_enabled

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=8 format=3]
+[gd_resource type="Resource" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -28,10 +28,15 @@ point_count = 6
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.452083333, 1), 0.0, 0.0, 0, 0, Vector2(0.4925, 0), 0.0, 0.0, 0, 0, Vector2(0.5075, 0), 0.0, 0.0, 0, 0, Vector2(0.547916667, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 6
 
+[sub_resource type="Curve" id="ProjectedOpeningRecovery"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0), 0.0, 0.0, 0, 0, Vector2(0.395833333, 1), 0.0, 0.0, 0, 0, Vector2(0.447916667, 0), 0.0, 0.0, 0, 0, Vector2(0.552083333, 0), 0.0, 0.0, 0, 0, Vector2(0.59375, 1), 0.0, 0.0, 0, 0, Vector2(0.6875, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 8
+
 [resource]
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
 use_forest_reference = true
+projected_opening_recovery_by_hour = SubResource("ProjectedOpeningRecovery")
 ground_haze = SubResource("ForestGroundHaze")
 ground_haze_strength = 1.0
 grove_mist_by_hour = SubResource("GroveMistPhase")

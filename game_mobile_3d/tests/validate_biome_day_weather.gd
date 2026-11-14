@@ -65,6 +65,21 @@ func verify() -> void:
 		"Directional shadow softness and opacity come from the selected biome")
 	check(is_equal_approx(env.fog_depth_curve, 2.2) and is_equal_approx(env.fog_light_energy, .81),
 		"Depth fog shape and lighting come from the selected biome")
+	var key_track: Curve = profile.key_energy_by_hour
+	var fog_track: Curve = profile.fog_density_by_hour
+	profile.key_energy_by_hour = null
+	profile.fog_density_by_hour = null
+	graphics.refresh()
+	var key_without_track := light.light_energy
+	var fog_without_track := env.fog_density
+	profile.key_energy_by_hour = Curve.new()
+	profile.fog_density_by_hour = Curve.new()
+	graphics.refresh()
+	check(is_equal_approx(light.light_energy, key_without_track), "Empty sun energy track uses the inherited energy")
+	check(is_equal_approx(env.fog_density, fog_without_track), "Empty fog density track uses the inherited density")
+	profile.key_energy_by_hour = key_track
+	profile.fog_density_by_hour = fog_track
+	graphics.refresh()
 	for code in [KEY_U, KEY_P]:
 		var event := InputEventKey.new()
 		event.pressed = true

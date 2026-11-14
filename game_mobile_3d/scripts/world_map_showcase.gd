@@ -1588,8 +1588,12 @@ func refresh_daylight_shading() -> void:
 	projected_sun.set_shift(shift * _lighting_scale(&"projected_sun_position"))
 	projected_sun.set_softness(0. if _balanced_preview else _lighting_scale(&"projected_sun_softness"))
 	var opening_phase := phase * (1. - smoothstep(16.5, 18.5, hour))
+	var opening_response := 0.
+	if opening_phase > 0. and _biome_profile != null:
+		opening_response = DayNight.sample_curve(_biome_profile.projected_opening_recovery_by_hour, hour / 24., 0.)
+		opening_response *= 1. - _weather.weight
 	projected_sun.set_opening_recovery(0. if _balanced_preview or _flat_lab else
-		_lighting_scale(&"projected_sun_openings") * opening_phase)
+		_lighting_scale(&"projected_sun_openings") * opening_phase, opening_response)
 	var gain := .64 * _lighting_scale(&"sun_opening") * phase if not _balanced_preview else 0.
 	if gain != _opening_gain:
 		_opening_gain = gain
