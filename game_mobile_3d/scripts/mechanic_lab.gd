@@ -1117,15 +1117,15 @@ func _start_crowd_spawn() -> void:
 
 func _spawn_crowd_frame() -> void:
 	var deadline := Time.get_ticks_usec() + CROWD_SPAWN_BUDGET_USEC
-	for i in mini(_crowd_spawns_left, CROWD_SPAWN_LIMIT_PER_FRAME):
-		if not _spawn_one_zombie(_crowd_base_health):
-			var created := CROWD_SPAWN_COUNT - _crowd_spawns_left
-			_stop_crowd_spawn()
-			$HUD/SpawnStatus.text = "Đã tạo %d/%d zombie. Hãy kiểm tra chỗ trống hoặc dữ liệu MD2." % [created, CROWD_SPAWN_COUNT]
-			return
-		_crowd_spawns_left -= 1
-		if Time.get_ticks_usec() >= deadline:
-			break
+	var facing := Basis(Vector3.UP, player.visual.rotation.y)
+	var limit := mini(_crowd_spawns_left, CROWD_SPAWN_LIMIT_PER_FRAME)
+	var batch: Dictionary = $Zombies.spawn_batch(player, facing, $CombatEffects, _crowd_base_health, limit, deadline)
+	_crowd_spawns_left -= int(batch.count)
+	if batch.blocked:
+		var created := CROWD_SPAWN_COUNT - _crowd_spawns_left
+		_stop_crowd_spawn()
+		$HUD/SpawnStatus.text = "Đã tạo %d/%d zombie. Hãy kiểm tra chỗ trống hoặc dữ liệu MD2." % [created, CROWD_SPAWN_COUNT]
+		return
 	if _crowd_spawns_left == 0:
 		_stop_crowd_spawn()
 		$HUD/SpawnStatus.text = "Đã tạo %d zombie." % CROWD_SPAWN_COUNT

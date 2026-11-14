@@ -93,6 +93,11 @@ const SPLASH_MULTIPLIER := 0.3
 const IMPULSE_PER_STRENGTH := 0.43
 const MELEE_CONTACT_HEIGHT := Vector3.UP * (Zombie.HEIGHT * 0.5)
 
+class SpawnSearch:
+	var occupied: Dictionary[Vector2i, PackedVector3Array] = {}
+	var ring := 0
+	var slot := 0
+
 var _visual: PackedScene
 var health_bars: HealthBars
 var damage_numbers: DamageNumbers
@@ -132,10 +137,34 @@ func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie:
 	if _visual == null:
 		return false
 	var floor_position := Vector3(player.global_position.x, 0.0, player.global_position.z)
-	var point := _find_spawn_point(floor_position, facing)
+	var point := _find_spawn_point(floor_position, facing, _build_spawn_search())
 	if not point.is_finite():
 		return false
+	_spawn_at(point, floor_position, player, effects, base_zombie)
+	return true
 
+func spawn_batch(player: CharacterBody3D, facing: Basis, effects: Node3D,
+		base_zombie: bool, limit: int, deadline: int) -> Dictionary:
+	if _visual == null:
+		_load_assets()
+	if _visual == null:
+		return {"count": 0, "blocked": true}
+	var search := _build_spawn_search()
+	var floor_position := Vector3(player.global_position.x, 0.0, player.global_position.z)
+	var count := 0
+	for i in limit:
+		var point := _find_spawn_point(floor_position, facing, search)
+		if not point.is_finite():
+			return {"count": count, "blocked": true}
+		_spawn_at(point, floor_position, player, effects, base_zombie)
+		_mark_spawn_position(search, point)
+		count += 1
+		if Time.get_ticks_usec() >= deadline:
+			break
+	return {"count": count, "blocked": false}
+
+func _spawn_at(point: Vector3, floor_position: Vector3, player: CharacterBody3D,
+		effects: Node3D, base_zombie: bool) -> void:
 	var zombie := Zombie.new()
 	zombie.name = "Zombie"
 	zombie.position = point
@@ -150,32 +179,41 @@ func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie:
 	_spawn_serial += 1
 	add_child(zombie, true)
 	zombie.look_at(floor_position, Vector3.UP, true)
-	return true
 
-func _find_spawn_point(player_position: Vector3, facing: Basis) -> Vector3:
+func _build_spawn_search() -> SpawnSearch:
+	var search := SpawnSearch.new()
+	for zombie: Zombie in get_children():
+		if zombie.health > 0:
+			_mark_spawn_position(search, zombie.position)
+	return search
+
+static func _mark_spawn_position(search: SpawnSearch, point: Vector3) -> void:
+	var cell := _spawn_cell(point)
+	var positions: PackedVector3Array = search.occupied.get(cell, PackedVector3Array())
+	positions.append(point)
+	search.occupied[cell] = positions
+
+static func _find_spawn_point(player_position: Vector3, facing: Basis, search: SpawnSearch) -> Vector3:
 	var preferred := player_position + facing * Vector3(0.42, 0.0, 1.78)
 	preferred.x = clampf(preferred.x, -FLOOR_LIMIT, FLOOR_LIMIT)
 	preferred.z = clampf(preferred.z, -FLOOR_LIMIT, FLOOR_LIMIT)
-	var occupied: Dictionary[Vector2i, PackedVector3Array] = {}
-	# Snapshot live positions once per search. Every candidate only needs to
-	# inspect its own cell and the eight neighbours for the spacing check.
-	for zombie: Zombie in get_children():
-		if zombie.health <= 0:
-			continue
-		var position := zombie.position
-		var cell := _spawn_cell(position)
-		var positions: PackedVector3Array = occupied.get(cell, PackedVector3Array())
-		positions.append(position)
-		occupied[cell] = positions
-	if _spawn_point_clear(preferred, player_position, occupied):
-		return preferred
-	for ring in range(1, 80):
-		for slot in 8 * ring:
+	# Occupancy only grows inside a batch. Continue after the last checked
+	# candidate and rebuild the snapshot when physics can move the crowd.
+	if search.ring == 0:
+		search.ring = 1
+		if _spawn_point_clear(preferred, player_position, search.occupied):
+			return preferred
+	for ring in range(search.ring, 80):
+		for slot in range(search.slot, 8 * ring):
 			var angle := TAU * slot / (8 * ring)
 			var offset := Vector3(cos(angle), 0.0, sin(angle)) * SPACING * ring
 			var point := preferred + facing * offset
-			if absf(point.x) <= FLOOR_LIMIT and absf(point.z) <= FLOOR_LIMIT and _spawn_point_clear(point, player_position, occupied):
+			if absf(point.x) <= FLOOR_LIMIT and absf(point.z) <= FLOOR_LIMIT \
+					and _spawn_point_clear(point, player_position, search.occupied):
+				search.ring = ring
+				search.slot = slot + 1
 				return point
+		search.slot = 0
 	return Vector3.INF
 
 static func _spawn_cell(point: Vector3) -> Vector2i:
