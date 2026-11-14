@@ -16,6 +16,7 @@ var first_tick_ragdolls := 0
 var peak_damage_glyphs := 0
 var late_active_ragdolls := 0
 var chase_dust_peak := 0
+var checked_corpse_fade := false
 var failures: Array[String] = []
 
 func _initialize() -> void:
@@ -72,6 +73,8 @@ func run() -> void:
 	await measure("simultaneous_ragdolls", 120, group)
 	if active_peak != COUNT or first_tick_ragdolls != COUNT:
 		failures.append("Expected all 100 ragdolls to run together")
+	if not checked_corpse_fade:
+		failures.append("The crowd never reached the corpse fade sample")
 	var numbers := lab.get_node_or_null("CombatEffects/ZombieDamageNumbers") as MultiMeshInstance3D
 	if numbers == null or peak_damage_glyphs != COUNT * 3:
 		failures.append("The batched numbers render all 300 glyphs of the simultaneous hits")
@@ -402,6 +405,8 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 			for zombie in group.get_children():
 				if zombie.ragdoll.running:
 					active += 1
+			if label == "simultaneous_ragdolls" and i == 30:
+				check_crowd_corpse_fade(group)
 			if label == "simultaneous_ragdolls" and i == 1:
 				first_tick_ragdolls = active
 			if label == "corpse_cleanup" and i == 149:
@@ -412,6 +417,22 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 	print("CROWD_PHASE ", JSON.stringify({"phase": label, "frame_ms": stats(frame_ms),
 		"physics_to_process_ms": stats(physics_ms), "gpu_ms": stats(render_gpu_ms),
 		"draws": stats(draws), "samples": frame_ms.size(), "active_ragdolls_peak": active_peak}))
+
+func check_crowd_corpse_fade(group: Node) -> void:
+	checked_corpse_fade = true
+	var shared: Material
+	var fading := 0
+	for zombie: ZOMBIE in group.get_children():
+		var mesh: MeshInstance3D = zombie._mesh
+		var material := mesh.material_override
+		if shared == null:
+			shared = material
+		var fade: Variant = mesh.get_instance_shader_parameter("desaturation")
+		if material is ShaderMaterial and material == shared and fade is float and fade > 0.0:
+			fading += 1
+	if fading != COUNT:
+		failures.append("All 100 corpses fade with one shared material before their first second")
+	print("CROWD_CORPSE_FADE shared_material_instances=", fading)
 
 func stats(samples: Array[float]) -> Dictionary:
 	if samples.is_empty():
