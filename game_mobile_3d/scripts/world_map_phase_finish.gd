@@ -20,6 +20,7 @@ var toggle:CheckButton
 var source_toggle:CheckButton
 var edge_toggle:CheckButton
 var _profile_path:=""
+var _profile_sha:=""
 var _verified:=false
 var _native:CompositorEffect
 var _effect:CompositorEffect
@@ -40,12 +41,12 @@ func setup(value:Node)->void:
  if root.is_empty():root="C:/Users/ADMIN/Desktop/MD2 Research"
  var profile=showcase.level.get("biome_graphics")
  var relative_path: String=PROFILE
- var expected_hash: String=SHA
+ _profile_sha=SHA
  if profile!=null and profile.use_forest_reference:
   relative_path=profile.finish_reference_path
-  expected_hash=profile.finish_reference_sha256
+  _profile_sha=profile.finish_reference_sha256
  _profile_path=root.path_join(relative_path)
- _verified=FileAccess.file_exists(_profile_path)and FileAccess.get_sha256(_profile_path)==expected_hash
+ _verified=not _profile_sha.is_empty()and FileAccess.file_exists(_profile_path)and FileAccess.get_sha256(_profile_path)==_profile_sha
 func available()->bool:
  if not _verified or showcase==null or showcase.level==null or not showcase.unavailable_reason.is_empty():return false
  var effect=showcase.level.look._exposure_effect
@@ -100,7 +101,7 @@ func refresh()->void:
  if source_toggle!=null:source_toggle.disabled=_grade_owned or not showcase.grade_review.available()
  if not wanted:return
  if _native==null:
-  if FileAccess.get_sha256(_profile_path)!=SHA:_fail("Private phase-finishing profile changed");return
+  if FileAccess.get_sha256(_profile_path)!=_profile_sha:_fail("Private phase-finishing profile changed");return
   _native=SOURCE_REFERENCE.new()
   if not _native.configure_external(_profile_path):_fail(_native.snapshot().error);return
   _native.set_strength(0.)
