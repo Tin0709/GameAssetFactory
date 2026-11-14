@@ -336,6 +336,34 @@ func check_blocked_chase(group: Node) -> void:
 		packed_skips += int(zombie.get("_skipped_blocked_step") == true)
 	if packed_skips < 29 or packed_skips > 31 or zombie.ragdoll.sample_count - samples != 40:
 		failures.append("A crowd zombie blocked by another zombie retries at 15 Hz and samples every tick")
+	# Put a screen behind the blocker. Movement behind it should never
+	# change the chaser's destination or wake its packed collision retries.
+	var screen := StaticBody3D.new()
+	var screen_shape := CollisionShape3D.new()
+	screen_shape.shape = shape
+	screen.add_child(screen_shape)
+	screen.position = Vector3(0, 1, -1.0)
+	lab.add_child(screen)
+	var player: CharacterBody3D = lab.player
+	var player_origin := player.global_position
+	player.set_physics_process(false)
+	for i in 8:
+		await physics_frame
+	var last_seen: Vector3 = zombie._last_seen_position
+	var hidden_skips := 0
+	for i in 32:
+		player.global_position.x -= 0.15 if i < 16 else -0.15
+		await physics_frame
+		hidden_skips += int(zombie._skipped_blocked_step)
+	if zombie._target_visible or not zombie._target_aggressive \
+			or zombie._last_seen_position != last_seen or hidden_skips < 23 or hidden_skips > 25:
+		failures.append("Hidden player movement leaves the blocked pursuit on its last-seen destination and keeps 15 Hz collision retries")
+	print("CROWD_BLOCKED_HIDDEN skips=", hidden_skips, " samples=32 last_seen=", zombie._last_seen_position)
+	screen.free()
+	player.global_position = player_origin
+	player.set_physics_process(true)
+	for i in 8:
+		await physics_frame
 	blocker.global_position.x += 3.0
 	await physics_frame
 	await physics_frame
