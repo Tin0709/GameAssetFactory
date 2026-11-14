@@ -2515,8 +2515,6 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		if _weather.weight > 0.:
 			_weather.apply_air(_weather_profile, env, _lighting_scale(&"fog"))
 			p.fog_opacity = env.fog_density
-			var weather_tint := env.fog_light_color
-			p.fog_color = Vector3(weather_tint.r, weather_tint.g, weather_tint.b)
 		if spatial_mist and mist != null and mist.failure().is_empty() and mist.effect.snapshot().ready:
 			env.fog_density = 0.
 	_applied_weather_weight = _weather.weight
@@ -3106,7 +3104,7 @@ func _build_ui()->void:
 	var box:=VBoxContainer.new();panel.add_child(box)
 	status=Label.new();box.add_child(status)
 	var controls:=Label.new();controls.name="SettingsKeysHelp"
-	controls.text="WASD di chuyển · Shift đi chậm · Space nhảy\nChuột trái / E đánh combo · Trên không: đánh xuống\nChuột phải ngắm / đi ngang · Q / C xoay · R về điểm đầu\nLăn chuột thu phóng · V xem toàn bản đồ\nL ẩn / hiện HUD · B so sánh đồ họa gốc\nT chuyển thời điểm · Shift+T tự chuyển ngày / đêm\nF1 bóng mềm · F2 bóng tiếp xúc · F3 bóng mây\nF7 exposure cục bộ · F8 màu ban ngày · F9 mép lá\nF10 nội suy · F11 ánh sáng môi trường · F12 cache địa hình"
+	controls.text="WASD di chuyển · Shift đi chậm · Space nhảy\nChuột trái / E đánh combo · Trên không: đánh xuống\nChuột phải ngắm / đi ngang · Q / C xoay · R về điểm đầu\nLăn chuột thu phóng · V xem toàn bản đồ\nL ẩn / hiện HUD · B so sánh đồ họa gốc\nT chuyển thời điểm · Shift+T tự chuyển ngày / đêm · F6 trời nhiều mây\nF1 bóng mềm · F2 bóng tiếp xúc · F3 bóng mây\nF7 exposure cục bộ · F8 màu ban ngày · F9 mép lá\nF10 nội suy · F11 ánh sáng môi trường · F12 cache địa hình"
 	box.add_child(controls)
 	var atmosphere:=OptionButton.new();atmosphere.name="AtmosphereComparison";atmosphere.focus_mode=Control.FOCUS_NONE
 	_atmosphere_picker=atmosphere
