@@ -218,13 +218,14 @@ const LIGHTING_MIX_CONTROLS := {
 	&"humid_depth": ["Diffusion by depth (preview)", 1.],
 	&"tree_wind": ["Tree canopy wind", CrownWind.MAX_STRENGTH],
 	&"night_path_chroma": ["Night path color", 1.],
+	&"source_path_chroma": ["Dịu sắc đất lối rừng", 1.],
 	&"exposure": ["Local exposure", 1.],
 	&"daylight_shadow_lift": ["Daylight shadow lift", 1.],
 	&"twilight_shadow_lift": ["Giữ chiều sâu vùng râm", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 147
+const LIGHTING_MIX_VERSION := 148
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1448,6 +1449,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .40
 	if effect == &"night_path_chroma":
 		return .75
+	if effect == &"source_path_chroma":
+		return .45
 	if effect == &"grass_root_tone":
 		return .85
 	if effect == &"forest_path_beam":
@@ -2111,6 +2114,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 147 and effect == &"twilight_ground_haze":
 			missing_value = 0.
+		if version < 148 and effect == &"source_path_chroma":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -2293,7 +2298,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze"]:
 		_update_mist()
 		return
-	if changed_effect == &"night_path_chroma":
+	if changed_effect in [&"night_path_chroma", &"source_path_chroma"]:
 		_publish_night_path_chroma()
 		return
 	if changed_effect == &"stone_twilight_color":
@@ -2510,6 +2515,10 @@ func _publish_night_path_chroma() -> void:
 	if forest_active() and atmosphere_review in ["lighting", "combined"]:
 		strength = moonlight_weight(hour) * _lighting_scale(&"night_path_chroma")
 	level.look.set_night_path_chroma(strength)
+	var atlas_gain := 0.0
+	if forest_active() and atmosphere_review == "combined" and not _balanced_preview:
+		atlas_gain = maxf(moonlight_weight(hour), _twilight_window()) * _lighting_scale(&"source_path_chroma")
+	level.look.set_source_path_chroma(atlas_gain)
 
 func twilight_color_weight() -> float:
 	if not forest_active() or atmosphere_review != "combined" or _balanced_preview:

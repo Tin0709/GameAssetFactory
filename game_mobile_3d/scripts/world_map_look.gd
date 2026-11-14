@@ -50,6 +50,7 @@ var oak_crown_wind := true
 var segment_passage_height := true
 var terrain_materials: Array[Array]=[]
 var _night_path_chroma := 0.0
+var _source_path_chroma := 0.0
 var _stone_twilight_color := 0.0
 var _stone_detail_softness := 0.0
 var _terrain_outline := Vector2(0.0, 1.0)
@@ -526,6 +527,12 @@ func set_night_path_chroma(strength: float) -> void:
 		return
 	_night_path_chroma = strength
 	_set_terrain_color(&"night_path_chroma", strength)
+
+func set_source_path_chroma(strength: float) -> void:
+	if _source_path_chroma == strength:
+		return
+	_source_path_chroma = strength
+	_set_terrain_color(&"source_path_chroma", strength)
 
 func set_stone_twilight_color(strength: float) -> void:
 	if _stone_twilight_color == strength:

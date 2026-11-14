@@ -2,6 +2,7 @@
 uniform bool use_source_terrain = false;
 uniform sampler2DArray source_terrain_tiles : source_color, filter_linear_mipmap, repeat_enable;
 uniform float night_path_chroma = 0.0;
+uniform float source_path_chroma = 0.0;
 uniform float stone_twilight_color = 0.0;
 uniform float stone_detail_mip = 0.0;
 
@@ -37,6 +38,14 @@ vec3 source_terrain_sample(vec2 uv, float layer) {
 	return texture(source_terrain_tiles, vec3(uv, layer)).rgb;
 }
 
+vec3 grade_source_path(vec3 albedo) {
+	if (source_path_chroma <= 0.0) return albedo;
+	const vec3 luminance = vec3(.2126, .7152, .0722);
+	vec3 target = albedo * vec3(.80, 1.0, 2.20);
+	target *= dot(albedo, luminance) / max(dot(target, luminance), .000001);
+	return mix(albedo, target, source_path_chroma);
+}
+
 vec3 source_terrain_color(vec3 world, vec3 normal) {
 	bool horizontal = abs(normal.y) > 0.9;
 	vec2 uv = horizontal ? vec2(world.x, -world.z) :
@@ -51,6 +60,7 @@ vec3 source_terrain_color(vec3 world, vec3 normal) {
 		}
 	}
 	vec3 base = source_terrain_sample(uv, layer);
+	if (layer == 3.0) base = grade_source_path(base);
 	if (!path_blending || normal.y < 0.9 || ground_grade == 3) return base;
 
 	// Follow the existing layout's shoulder coverage with source albedo on both sides.
@@ -77,5 +87,5 @@ vec3 source_terrain_color(vec3 world, vec3 normal) {
 		float worn_soil = 1.0 - 0.26 * (1.0 - smoothstep(0.0, 0.52, abs(signed_distance)));
 		dirt = mix(dirt, feather * worn_soil, path_verge);
 	}
-	return mix(source_terrain_sample(uv, 0.0), source_terrain_sample(uv, 3.0), dirt);
+	return mix(source_terrain_sample(uv, 0.0), grade_source_path(source_terrain_sample(uv, 3.0)), dirt);
 }
