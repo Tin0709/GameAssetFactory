@@ -465,6 +465,7 @@ func run() -> void:
 	await check_edge_landing_gravity()
 	await check_corner_ragdoll(170, 2.0, true, -1.0, 0.23)
 	await check_corner_ragdoll(287, 2.0, true, -1.0, 0.17)
+	await check_corner_ragdoll(433, 2.0, true, -1.0, 0.20)
 	await check_corner_ragdoll(65, 4.25)
 	await check_corner_ragdoll(29, 4.25, false, 50.0 / float(ProjectSettings.get_setting("physics/3d/default_gravity")))
 	await check_corner_ragdoll(101, 4.05, false, 1.0)
