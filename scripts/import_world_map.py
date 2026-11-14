@@ -347,15 +347,19 @@ def import_source(source, output, *, border_mode="markers", new_output=False):
 
 def map_scene_source(scene_name, runtime_path, biome):
     runtime_resource = "res://" + runtime_path.relative_to(GODOT_PROJECT).as_posix()
+    comparison = next(candidate for candidate in PORTABLE_BIOMES if candidate != biome)
     return (
-        '[gd_scene load_steps=4 format=3]\n\n'
+        '[gd_scene load_steps=6 format=3]\n\n'
         '[ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]\n'
         '[ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]\n'
-        f'[ext_resource type="Resource" path="res://assets/graphics/biomes/{biome}.tres" id="biome"]\n\n'
+        '[ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]\n'
+        f'[ext_resource type="Resource" path="res://assets/graphics/biomes/{biome}.tres" id="biome"]\n'
+        f'[ext_resource type="Resource" path="res://assets/graphics/biomes/{comparison}.tres" id="comparison"]\n\n'
         f'[node name="{scene_name}" instance=ExtResource("base")]\n'
         'script = ExtResource("map")\n'
         f'map_layout_path = {json.dumps(runtime_resource, ensure_ascii=False)}\n'
         'biome_graphics = ExtResource("biome")\n'
+        'comparison_biomes = Array[ExtResource("profile")]([ExtResource("comparison")])\n'
     )
 
 
