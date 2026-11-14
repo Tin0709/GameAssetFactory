@@ -832,7 +832,8 @@ func _player_foot_contact_at(sole: Vector3) -> Dictionary:
 	if tick != _foot_contact_tick or sole != _foot_contact_sole:
 		_foot_contact_tick = tick
 		_foot_contact_sole = sole
-		_foot_contact = _grass_step_contact_at(sole, player)
+		# Wall slides can move the capsule sideways without an advancing step.
+		_foot_contact = _grass_step_contact_at(sole, player) if player.accepts_step_during_wall_contact() else {}
 	return _foot_contact
 
 func _grass_step_contact_at(sole: Vector3, actor: CharacterBody3D) -> Dictionary:

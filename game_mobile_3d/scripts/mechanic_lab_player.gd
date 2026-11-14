@@ -12,6 +12,7 @@ signal bow_released(serial: int, charged: bool, target: Variant)
 const BOW_MIN_DRAW_SECONDS := 0.10
 const BOW_DRAW_BLEND_SECONDS := 0.12
 const IDLE_GESTURE_BLEND_SECONDS := 0.18
+const MIN_WALL_STEP_PROGRESS := 0.10
 
 var crossbow_equipped := false
 var gauntlets_equipped := false
@@ -120,6 +121,22 @@ func _bow_locks_ground_movement() -> bool:
 
 func _live_movement_input_enabled() -> bool:
 	return not _bow_locks_ground_movement() and super._live_movement_input_enabled()
+
+func accepts_step_during_wall_contact() -> bool:
+	if not is_on_wall() or not _move_requested:
+		return true
+	var direction := requested_direction
+	if not scripted_input:
+		var stick := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+		direction = _movement_right * stick.x + _movement_back * stick.y
+	direction = direction.limit_length()
+	var strength := direction.length()
+	if is_zero_approx(strength):
+		return true
+	var motion := get_real_velocity()
+	var forward_speed := Vector2(motion.x, motion.z).dot(direction / strength)
+	var requested_speed := (run_speed if _run_requested else walk_speed) * strength
+	return forward_speed >= requested_speed * MIN_WALL_STEP_PROGRESS
 
 func attack(value: bool) -> void:
 	if bow_equipped:
