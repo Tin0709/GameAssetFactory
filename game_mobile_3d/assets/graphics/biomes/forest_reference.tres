@@ -6,3 +6,7 @@
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
 use_forest_reference = true
+atmosphere_reference_path = "godot_lab/world_map_unified_showcase_v001/deepdark_entrance_v001/appearance.private.json"
+atmosphere_reference_sha256 = "741d37edf0740caac71bae975cc715b6e42d2a0a074f4dfda54a91eb211abb5c"
+finish_reference_path = "godot_lab/world_map_unified_showcase_v001/native_exposure_transfer_v001/parameters_v002.private.json"
+finish_reference_sha256 = "c82d5489028813cdd1a2061d845fabca43789112e2a96e67dfe8eba80f8c71a3"

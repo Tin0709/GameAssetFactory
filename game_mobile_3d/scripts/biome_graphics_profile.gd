@@ -6,6 +6,11 @@ const Weather = preload("res://scripts/biome_weather_profile.gd")
 @export var display_name := "Temperate meadow"
 ## The existing reference route requires matching private Forest data.
 @export var use_forest_reference := false
+@export_group("Private reference data")
+@export var atmosphere_reference_path := ""
+@export var atmosphere_reference_sha256 := ""
+@export var finish_reference_path := ""
+@export var finish_reference_sha256 := ""
 @export_group("Lighting")
 @export var noon_sun_rotation := Vector3(-50., -38., 0.)
 @export var noon_sun_color := Color(1., .975, .925)

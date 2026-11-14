@@ -6,12 +6,12 @@ const FLOATS=["key_scale","ambient_energy_scale","fog_begin","fog_end","fog_opac
 const VECTORS=["key_color_scale","ambient_tint","fog_color","player_light_color"]
 var phases:Array=[]
 var player_range:=0.
-func _init():
+func _init(reference_path: String = FILE, reference_hash: String = SHA):
 	if not OS.has_feature("editor"):return
 	var research:=OS.get_environment("MD2_RESEARCH_ROOT")
 	if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
-	var path:=research.path_join(FILE)
-	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path)!=SHA:return
+	var path:=research.path_join(reference_path)
+	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path)!=reference_hash:return
 	var data=JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not data is Dictionary or data.get("schema")!="gaf-private-forest-atmosphere/1":return
 	var rows=data.get("phases",[])

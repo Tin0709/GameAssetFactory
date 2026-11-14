@@ -343,6 +343,9 @@ func make_player(use_private: bool = true)->Node3D:
 
 func setup(world:Node3D)->void:
 	level=world;process_priority=-10
+	var profile = world.get("biome_graphics")
+	if private_primary and profile != null and profile.use_forest_reference:
+		forest = FOREST.new(profile.atmosphere_reference_path, profile.atmosphere_reference_sha256)
 	if not private_primary:
 		_build_basic_settings()
 		return

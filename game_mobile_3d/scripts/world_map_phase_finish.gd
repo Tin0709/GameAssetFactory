@@ -38,8 +38,14 @@ func setup(value:Node)->void:
  if not OS.has_feature("editor"):return
  var root:=OS.get_environment("MD2_RESEARCH_ROOT")
  if root.is_empty():root="C:/Users/ADMIN/Desktop/MD2 Research"
- _profile_path=root.path_join(PROFILE)
- _verified=FileAccess.file_exists(_profile_path)and FileAccess.get_sha256(_profile_path)==SHA
+ var profile=showcase.level.get("biome_graphics")
+ var relative_path: String=PROFILE
+ var expected_hash: String=SHA
+ if profile!=null and profile.use_forest_reference:
+  relative_path=profile.finish_reference_path
+  expected_hash=profile.finish_reference_sha256
+ _profile_path=root.path_join(relative_path)
+ _verified=FileAccess.file_exists(_profile_path)and FileAccess.get_sha256(_profile_path)==expected_hash
 func available()->bool:
  if not _verified or showcase==null or showcase.level==null or not showcase.unavailable_reason.is_empty():return false
  var effect=showcase.level.look._exposure_effect
