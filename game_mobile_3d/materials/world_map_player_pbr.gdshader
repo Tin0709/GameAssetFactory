@@ -31,6 +31,7 @@ uniform bool recovered_self_light = false;
 uniform vec3 roughness_transform = vec3(1.0,0.0,1.0);
 uniform float self_light_scale = 0.0;
 uniform float actor_view_fill_chroma = 0.0;
+uniform float actor_twilight_view_fill = 0.0;
 varying vec3 actor_world;
 varying float actor_canopy_sky;
 #ifdef GAF_PLAYER_DIRECT
@@ -59,11 +60,14 @@ void fragment(){
 	if(recovered_self_light){
 		float facing=max(dot(normalize(NORMAL),normalize(VIEW))*self_light_scale,0.0);
 		vec3 view_fill = ALBEDO*facing*facing*facing;
-		if (player_local_light && actor_view_fill_chroma > 0.0 && METALLIC < 1.0) {
+		if (player_local_light && max(actor_view_fill_chroma, actor_twilight_view_fill) > 0.0 && METALLIC < 1.0) {
 			vec3 normal_world = normalize(mat3(INV_VIEW_MATRIX) * NORMAL);
 			vec3 sky = player_cube_sky(normal_world, actor_world.y - player_probe_base, actor_canopy_sky);
 			const vec3 luma = vec3(.2126, .7152, .0722);
 			float sky_luma = dot(sky, luma);
+			float sky_shade = 1.0 - smoothstep(.018, .075, sky_luma);
+			float top = smoothstep(.15, .95, normal_world.y);
+			view_fill *= 1.0 - .48 * actor_twilight_view_fill * (1.0 - .65 * top) * sky_shade;
 			if (sky_luma > .0001) {
 				// Adapt the view-facing fill to the local sky without adding a light.
 				vec3 tint = clamp(sky / sky_luma, vec3(.60), vec3(1.55));

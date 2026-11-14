@@ -206,6 +206,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"player_sun_specular": ["Dịu phản sáng nắng trên Valorie", 1.],
 	&"player_canopy_color": ["Sắc ánh trời trên nhân vật", 1.],
 	&"actor_view_fill_chroma": ["Hòa màu ánh bù trên Valorie", 1.],
+	&"actor_twilight_view_fill": ["Dịu ánh bù trên Valorie lúc chạng vạng", 1.],
 	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
 	&"canopy_direct_softness": ["Dịu nắng trên tán cao", 1.],
 	&"late_canopy_sun": ["Dịu nắng còn lại khi lên đèn", 1.],
@@ -236,7 +237,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 150
+const LIGHTING_MIX_VERSION := 151
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1421,7 +1422,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .65
 	if effect == &"night_bloom_prefilter":
 		return .25
-	if effect == &"actor_view_fill_chroma":
+	if effect in [&"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 		return .60
 	if effect == &"bloom_local_response":
 		return .65
@@ -1670,6 +1671,13 @@ func player_canopy_color_weight() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context():
 		return 0.
 	return _lighting_scale(&"player_canopy_color") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+
+func actor_twilight_view_fill_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() \
+			or not level.look.player_effects_available():
+		return 0.
+	var dusk := smoothstep(18.35, 19., hour) * (1. - smoothstep(20.15, 21.35, hour))
+	return dusk * _lighting_scale(&"actor_twilight_view_fill")
 
 func grass_sky_fill_mix_scale() -> float:
 	if forest_spatial_sky_context():
@@ -2062,6 +2070,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 129 and effect == &"actor_view_fill_chroma":
 			missing_value = 0.
+		if version < 151 and effect == &"actor_twilight_view_fill":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2241,7 +2251,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
 		if effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks
-		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma"]:
+		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 			slider.editable = slider.editable and level.look.player_material.available()
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
 			slider.editable = slider.editable and sky_response.available() and plants != null and plants.grass_light.active
@@ -2422,7 +2432,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"canopy_edge_return", &"tree_shade"]:
 		return
-	if changed_effect in [&"player_sky", &"player_bounce", &"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma"]:
+	if changed_effect in [&"player_sky", &"player_bounce", &"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 		if level.player_light != null:
 			level.player_light.refresh()
 		return
