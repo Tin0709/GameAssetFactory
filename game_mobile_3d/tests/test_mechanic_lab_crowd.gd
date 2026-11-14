@@ -65,6 +65,7 @@ func run() -> void:
 	await check_zombie_dust()
 	await check_crowd_melee(group)
 	await check_blocked_chase(group)
+	await check_crowd_windup_occlusion(group)
 	var packed := OS.get_cmdline_user_args().has("--packed-ragdolls")
 	await launch_ragdolls(group, packed)
 	var bars := group.get_node_or_null("../ZombieHealthBars") as MultiMeshInstance3D
@@ -377,6 +378,61 @@ func check_blocked_chase(group: Node) -> void:
 	for member in group.get_children():
 		member.set_physics_process(true)
 	print("CROWD_BLOCKED wall_skips=", skipped_ticks, " samples=", pose_steps, " packed_skips=", packed_skips)
+
+func check_crowd_windup_occlusion(group: Node) -> void:
+	var player: CharacterBody3D = lab.player
+	player.set_physics_process(false)
+	for member in group.get_children():
+		member.set_physics_process(false)
+	var zombie := group.get_child(0) as ZOMBIE
+	zombie.global_position = player.global_position + Vector3.FORWARD * 1.34
+	zombie.velocity = Vector3.ZERO
+	zombie.rotation.y = 0.0
+	zombie.animation.play(ZOMBIE.IDLE, 0.0)
+	zombie.animation.advance(0.0)
+	zombie._attack_cooldown = 1.0
+	zombie.set_physics_process(true)
+	for i in 5:
+		await physics_frame
+	if not zombie._target_visible or not zombie._target_aggressive:
+		failures.append("The crowd windup fixture starts with a visible aggressive target")
+	zombie.set_physics_process(false)
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(3.0, 3.0, 0.15)
+	collider.shape = box
+	wall.add_child(collider)
+	wall.position = Vector3(player.global_position.x, 1.5, player.global_position.z - 0.67)
+	lab.add_child(wall)
+	for i in 3:
+		await physics_frame
+	var windups: Array[Vector3] = []
+	var listen := func(point: Vector3, contact: bool):
+		if not contact:
+			windups.append(point)
+	zombie.melee_audio.connect(listen)
+	# Give the zombie one physics tick before its next scheduled sight ray.
+	var stride := roundi(Engine.physics_ticks_per_second / ZOMBIE.LAB_CROWD_SIGHT_HZ)
+	zombie._crowd_slot = (Engine.get_physics_frames() + 2) % stride
+	zombie._attack_cooldown = 0.0
+	zombie.set_physics_process(true)
+	await physics_frame
+	var hidden_windups := windups.size()
+	if hidden_windups != 0 or zombie.animation.current_animation == ZOMBIE.ATTACK or zombie._attack_cooldown > 0.0:
+		failures.append("A wall inserted between crowd sight checks prevents the windup and its sound")
+	wall.free()
+	for i in 12:
+		await physics_frame
+		if windups.size() > hidden_windups:
+			break
+	if windups.size() - hidden_windups != 1 or zombie.animation.current_animation != ZOMBIE.ATTACK:
+		failures.append("The zombie starts one windup when the player's path is clear again")
+	print("CROWD_OCCLUDED_WINDUP hidden=", hidden_windups, " visible=", windups.size() - hidden_windups)
+	zombie.melee_audio.disconnect(listen)
+	player.set_physics_process(true)
+	for member in group.get_children():
+		member.set_physics_process(true)
 
 func check_reset_during_spawn(group: Node) -> void:
 	var button := lab.get_node("HUD/SpawnCrowd") as Button
