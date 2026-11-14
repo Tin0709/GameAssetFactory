@@ -6,6 +6,7 @@ render_mode cull_disabled, diffuse_burley, specular_schlick_ggx;
 #include "res://materials/world_map_clouds.gdshaderinc"
 #include "res://materials/world_map_player_transport.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
+#include "res://materials/world_map_local_diffuse.gdshaderinc"
 #ifdef GAF_PLAYER_SKY
 #include "res://materials/world_map_actor_sky.gdshaderinc"
 #endif
@@ -98,6 +99,7 @@ void fragment(){
 				vec3 diffuse_sky = gaf_canopy_diffuse_color(sky, actor_canopy_sky, actor_canopy_color_mix);
 				incident += gaf_pre_twilight_diffuse(diffuse_sky, CAMERA_POSITION_WORLD) - sky;
 			}
+			if (recovered_roughness) incident = gaf_local_diffuse(incident, actor_world, wn);
 			EMISSION+=ALBEDO*(1.-METALLIC)*incident*visible_sky;
 			AO=0.; // Replace engine diffuse sky instead of stacking two ambient terms.
 			AO_LIGHT_AFFECT=0.;

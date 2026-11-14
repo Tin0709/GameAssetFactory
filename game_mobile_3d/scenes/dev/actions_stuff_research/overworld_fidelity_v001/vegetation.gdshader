@@ -11,6 +11,7 @@ render_mode cull_disabled, diffuse_burley, specular_disabled;
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_wind.gdshaderinc"
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 #include "res://materials/world_map_replay_bounce.gdshaderinc"
+#include "res://materials/world_map_local_diffuse.gdshaderinc"
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
@@ -230,6 +231,7 @@ void fragment(){
 		vec3 shared_sky = gaf_canopy_diffuse_color(ungraded_sky, study_raw_canopy_sky, 1.0);
 		EMISSION = mix(EMISSION, shared_sky, gaf_canopy_sky_color);
 	}
+	EMISSION = gaf_local_diffuse(EMISSION, foliage_world, vec3(0., 1., 0.));
 	float sole = gaf_player_contact(foliage_world, CAMERA_POSITION_WORLD);
 	AO *= sole * study_twilight_ground_ambient;
 	EMISSION *= study_twilight_ground_ambient;
