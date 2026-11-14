@@ -376,7 +376,7 @@ func check_wall_slide_steps(lab, dust, wind) -> void:
 	toggle.button_pressed = true
 	for case: Dictionary in [
 		{"yaw": 0.31, "camera_yaw": 0.0, "live": false, "progress": false},
-		{"yaw": 0.31, "camera_yaw": 0.7, "live": true, "progress": false},
+		{"yaw": 0.27, "camera_yaw": 0.7, "live": true, "progress": false},
 		{"yaw": 1.20, "camera_yaw": 0.7, "live": true, "progress": true},
 	]:
 		var camera_basis := Basis(Vector3.UP, case.camera_yaw)
