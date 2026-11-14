@@ -26,6 +26,11 @@ func run() -> void:
 	var showcase = forest.showcase
 	var forest_settings = forest.biome_graphics
 	check(forest.map_ready and forest_settings.use_forest_reference, "F5 uses Forest preset")
+	forest.set_review_view("overview")
+	var forest_camera := forest.get_node("Camera3D") as Camera3D
+	check(forest_camera.position == Vector3(-8.5, 140., -1.) and forest_camera.size == 150.,
+		"The reference overview keeps its approved framing")
+	forest.set_review_view("gameplay")
 	check(forest_settings.overcast != null, "Forest needs its own overcast resource")
 	check(forest_settings.get("projected_opening_recovery_by_hour") is Curve,
 		"Forest sunlight opening response comes from the biome preset")
@@ -110,6 +115,16 @@ func run() -> void:
 	var opened_compositor := camera.compositor
 	check(map.map_ready and map.geometry.cells.size() == 5632 and graphics != null,
 		"Second map uses imported geometry and portable controller")
+	var gameplay_size := camera.size
+	map.set_review_view("overview")
+	var low: Array = map.runtime.border.min
+	var high: Array = map.runtime.border.max
+	check(Vector2(camera.position.x, camera.position.z).is_equal_approx(
+		Vector2((low[0] + high[0]) * .5, (low[2] + high[2]) * .5)),
+		"An imported overview centers on its boundary")
+	check(camera.size >= 50. and camera.size < 80., "The 50 m map fills its overview at the default aspect")
+	map.set_review_view("gameplay")
+	check(is_equal_approx(camera.size, gameplay_size), "Leaving the overview restores play zoom")
 	check(not map.biome_graphics.use_forest_reference and not map.showcase.projected_sun.available(),
 		"An imported map never binds the private Forest projection")
 	if graphics != null:
