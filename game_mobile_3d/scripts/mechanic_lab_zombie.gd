@@ -579,6 +579,12 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	# Complete the approach turn before locking the swing's heading.
 	var facing_target := _is_in_melee_cone(offset)
 	if target_visible and height_delta <= MELEE_HEIGHT_LIMIT and facing_target and _attack_cooldown <= 0.0:
+		# Crowd sight is staggered. Confirm the path on the commitment tick
+		# when this zombie hasn't sampled sight yet.
+		if in_lab and not sample_ai and not _clear_sight_to(target.global_position):
+			_target_visible = false
+			_play_loop(IDLE)
+			return Vector3.ZERO
 		_windup_target_start = target.global_position
 		animation.play(ATTACK, 0.1)
 		_attack_cooldown = MELEE_COOLDOWN
