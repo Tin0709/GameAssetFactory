@@ -125,12 +125,19 @@ func refresh() -> void:
 	var sky := _profile.noon_sky_color * Color(p.sky) / Color(_noon.sky)
 	var fog_color := _profile.noon_fog_color * Color(p.fog) / Color(_noon.fog)
 	var time := hour / 24.
+	var exposure := _profile.exposure * float(p.exposure) / float(_noon.exposure)
 	var day_night := _profile.day_night
 	if day_night != null:
 		sun.light_color = day_night.sample_color(day_night.sun_color, time, sun.light_color)
 		env.ambient_light_color = day_night.sample_color(day_night.ambient_color, time, env.ambient_light_color)
 		sky = day_night.sample_color(day_night.sky_color, time, sky)
 		fog_color = day_night.sample_color(day_night.fog_color, time, fog_color)
+		var rotation := sun.rotation_degrees
+		rotation.x = day_night.sample_curve(day_night.sun_pitch_degrees, time, rotation.x)
+		rotation.y = day_night.sample_curve(day_night.sun_yaw_degrees, time, rotation.y)
+		if day_night.sun_pitch_degrees != null or day_night.sun_yaw_degrees != null:
+			sun.rotation_degrees = rotation
+		exposure = day_night.sample_curve(day_night.exposure, time, exposure)
 	if _profile.key_energy_by_hour != null:
 		sun.light_energy *= maxf(0., _profile.key_energy_by_hour.sample(time))
 	var fog_density := _profile.noon_fog_density * float(p.fog_amount) / float(_noon.fog_amount)
@@ -155,7 +162,7 @@ func refresh() -> void:
 	apply_depth_fog(env, fog_color, clampf(fog_density, 0., 1.), _profile.fog_depth_m.x,
 		maxf(_profile.fog_depth_m.y, _profile.fog_depth_m.x + .1))
 	env.tonemap_mode = _profile.tonemap
-	env.tonemap_exposure = _profile.exposure * float(p.exposure) / float(_noon.exposure)
+	env.tonemap_exposure = clampf(exposure, .1, 4.)
 	env.adjustment_enabled = true
 	env.adjustment_color_correction = _profile.color_correction
 	apply_finish(env, _profile.contrast, saturation, _profile.glow_intensity > 0.,
