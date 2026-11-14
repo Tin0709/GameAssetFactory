@@ -167,8 +167,8 @@ func run() -> void:
 	check(held_still, "The parked corpse holds every bone still across later physics frames")
 	while zombie._corpse_age < 1.85:
 		await physics_frame
-	var mid_fade: float = zombie._mesh.get_instance_shader_parameter("desaturation")
-	check(absf(mid_fade - 0.4) < 0.02, "The corpse progresses through the existing color fade")
+	var mid_fade: Variant = zombie._mesh.get_instance_shader_parameter("desaturation")
+	check(mid_fade is float and absf(mid_fade - 0.4) < 0.02, "The corpse progresses through the Lab color fade")
 	while zombie._corpse_age < 3.60:
 		await physics_frame
 	var final_fade: float = zombie._mesh.get_instance_shader_parameter("desaturation")
