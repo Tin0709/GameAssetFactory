@@ -385,7 +385,7 @@ func _wait_for_chase_retry() -> bool:
 		var blocker := instance_from_id(_blocking_zombie_id) as CharacterBody3D
 		if (blocker == null or blocker.is_queued_for_deletion() or blocker.collision_layer == 0
 				or blocker.global_position.distance_squared_to(_blocking_position) > BLOCKER_MOVE_DISTANCE_SQUARED
-				or target.global_position.distance_squared_to(_blocked_target_position) > CHASE_TARGET_MOVE_DISTANCE_SQUARED):
+				or _last_seen_position.distance_squared_to(_blocked_target_position) > CHASE_TARGET_MOVE_DISTANCE_SQUARED):
 			return false
 		retry_hz = PACKED_CHASE_RETRY_HZ
 	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / retry_hz))
@@ -404,7 +404,8 @@ func _update_chase_blocker() -> void:
 	var collider_transform: Transform3D = PhysicsServer3D.body_get_state(
 		blocker.get_rid(), PhysicsServer3D.BODY_STATE_TRANSFORM)
 	_blocking_position = collider_transform.origin
-	_blocked_target_position = target.global_position
+	# Retry when the pursuit destination moves, including on a new sighting.
+	_blocked_target_position = _last_seen_position
 
 func _integrate_knockback(delta: float) -> Vector3:
 	var speed := _knockback.length()
