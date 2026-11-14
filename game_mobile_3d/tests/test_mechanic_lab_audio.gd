@@ -246,6 +246,57 @@ func check_crossbow_fire_under_impact_burst(audio: Node, bus: int, capture: Audi
 		"Polaris can still fire when the impacts arrive first on the same tick")
 	audio.reset()
 
+func check_bow_fire_during_crossbow_impacts(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	for i in 12:
+		await physics_frame
+	var menu := lab.get_node("HUD/Weapon") as OptionButton
+	for weapon in [3, 6]:
+		menu.select(weapon)
+		menu.item_selected.emit(weapon)
+	var audio = lab.get_node("CombatAudio")
+	var samples: Array = audio._groups.get(&"bow_fire", [])
+	check(lab._bow != null and samples.size() == 3, "Standard Bow loads its three source firing samples")
+	if lab._bow == null or samples.is_empty():
+		lab.free()
+		return
+	var point: Vector3 = lab.player.global_position + Vector3.UP
+	audio.set_enabled(true, point)
+	var burst := func(_origin: Vector3) -> void:
+		for i in 25:
+			audio.crossbow_impact(point + Vector3.RIGHT * float(i) * 0.1)
+	lab._bow.shot_fired.connect(burst)
+	audio.reset()
+	var impact_before: int = audio._next_choice.get(&"crossbow_hit", 0)
+	lab._bow.fire_arrow(point, Vector3.FORWARD, 1, point, true)
+	var firing: AudioStreamPlayer3D
+	for voice: AudioStreamPlayer3D in audio._voices:
+		if voice.playing and voice.stream in samples:
+			firing = voice
+			break
+	check(firing != null and audio._next_choice.get(&"crossbow_hit", 0) == (impact_before + 2) % 3,
+		"A Bow release keeps its pinned sample through simultaneous impacts from old crossbow bolts")
+	if firing != null:
+		firing.bus = AudioServer.get_bus_name(bus)
+		capture.clear_buffer()
+		await create_timer(0.18).timeout
+		var peak := 0.0
+		for value in capture.get_buffer(capture.get_frames_available()):
+			peak = maxf(peak, maxf(absf(value.x), absf(value.y)))
+		check(peak > 0.001 and peak < 0.9, "Standard Bow's firing onset reaches the isolated mixer")
+		print("MECHANIC_LAB_BOW_FIRE peak=", peak)
+	lab._bow.shot_fired.disconnect(burst)
+	audio.reset()
+	for i in 3:
+		audio.crossbow_impact(point)
+	lab._bow.fire_arrow(point, Vector3.FORWARD, 2, point, false)
+	check(audio._voices.any(func(voice): return voice.playing and voice.stream in samples),
+		"Bow can fire when old crossbow impacts fill the shared voices first")
+	audio.set_enabled(false, point)
+	lab.free()
+
 func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -842,6 +893,7 @@ func run() -> void:
 	await check_crossbow_fire_under_impact_burst(audio, bus, capture)
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
+	await check_bow_fire_during_crossbow_impacts(bus, capture)
 	await check_local_hurt(bus, capture)
 	await check_movement_audio(bus, capture)
 	await check_landing_voice_under_step_burst(bus, capture)
