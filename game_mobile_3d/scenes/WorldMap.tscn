@@ -46,6 +46,8 @@ forest_basin_layout_sha256 = "ffd6ceabe4beb5fcbbfcbdbde38bae99f5c2b70ffc05fc057c
 
 sculk_surface_sites = PackedVector2Array(-22, 15, -23, 19, -24, 23, -24, 26)
 forest_path_light_offset = Vector2(-9.6, 2.3)
+biome_path_lamp_xz = Vector2(-27.5, 21.5)
+biome_path_lamp_yaw_degrees = 45.0
 forest_replay_site = Vector2(-27.5, 8.5)
 forest_replay_steps_site = Vector2(-24.5, -42.5)
 forest_replay_surface_path = "graphics_vfx/forest_pix_capture_20261112/forest_twilight_fixed_lights/replay_diffuse_mobile.private.rg"

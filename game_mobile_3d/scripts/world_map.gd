@@ -28,6 +28,9 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var biome_quality: BiomeGraphics.Quality = BiomeGraphics.Quality.FULL
 ## Optional world XZ. The light seats itself on the imported terrain.
 @export var biome_path_fixture_xz := Vector2.INF
+## Optional private ForestA1 lamppost placement and rotation. The biome controls the light phase.
+@export var biome_path_lamp_xz := Vector2.INF
+@export var biome_path_lamp_yaw_degrees := 0.
 @export_group("Biome map overrides", "biome_")
 ## Starting hour on portable maps. Use -1 to inherit the preset.
 @export_range(-1., 24., .25) var biome_start_hour := -1.
@@ -471,6 +474,8 @@ func set_reference_look(enabled: bool) -> void:
 	look.set_stage(2 if enabled else 0)
 	if biome_controller != null:
 		biome_controller.refresh()
+	elif showcase.private_primary:
+		showcase._sync_forest_night_lights()
 
 func _input(event: InputEvent) -> void:
 	if map_ready and event is InputEventKey and event.pressed and not event.echo:

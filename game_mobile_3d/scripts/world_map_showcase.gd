@@ -71,6 +71,7 @@ var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_replay := preload("res://scripts/world_map_forest_replay.gd").new()
 var forest_path_light := preload("res://scripts/world_map_forest_path_light.gd").new()
+var path_lamppost := preload("res://scripts/world_map_path_lamppost.gd").new()
 var atmosphere_review:="combined"
 var _forest_expected:Dictionary={}
 var _forest_hour:=INF
@@ -216,6 +217,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_path_light": ["Forest path light", 1.],
 	&"forest_path_dusk": ["Đèn lối rừng lúc chạng vạng", 1.],
 	&"forest_path_placement": ["Vị trí đèn lối rừng", 1.],
+	&"forest_path_lamppost": ["Cột đèn lối rừng", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
 	&"forest_path_air": ["Path light in mist", 1.],
 	&"forest_path_air_beam": ["Hướng đèn trong sương", 1.],
@@ -240,7 +242,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 152
+const LIGHTING_MIX_VERSION := 153
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1141,7 +1143,8 @@ func _point_scope_supported() -> bool:
 		if light == _player_light or not light.is_inside_tree() or light.get_world_3d() != level.get_world_3d() \
 			or not light.is_visible_in_tree() or light.light_energy <= 0.0 or (light.light_cull_mask & 1) == 0:
 			continue
-		if not forest_path_light.is_compatible_secondary(light) or _player_light.light_color.b <= 0.0:
+		if (not forest_path_light.is_compatible_secondary(light) and not path_lamppost.is_compatible_secondary(light)) \
+				or _player_light.light_color.b <= 0.0:
 			return false
 	return true
 
@@ -1158,7 +1161,8 @@ func _publish_point_cutoff()->void:
 	var eligible:bool=receiver_scope and source_point_cutoff and noninverse_player_light and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and is_equal_approx(_player_light.omni_range,point_response.radius_m)
 	var point:Vector3=_player_light.global_position if _player_light!=null else Vector3.ZERO
 	point_kernel_state=Vector4(point.x,point.y,point.z,_player_light.omni_range if eligible else 0.)
-	var secondary: OmniLight3D = forest_path_light.light
+	var lamp_active := is_instance_valid(path_lamppost.fixture) and path_lamppost.fixture.visible
+	var secondary: OmniLight3D = path_lamppost.light if lamp_active else forest_path_light.light
 	var secondary_active := receiver_scope and is_instance_valid(secondary) and secondary.is_visible_in_tree() \
 		and secondary.light_energy > 0.0 and (secondary.light_cull_mask & 1) != 0
 	RenderingServer.global_shader_parameter_set("gaf_point_kernel",point_kernel_state)
@@ -1167,7 +1171,7 @@ func _publish_point_cutoff()->void:
 	if tone != _lantern_grass_tone:
 		_lantern_grass_tone = tone
 		RenderingServer.global_shader_parameter_set("gaf_lantern_grass_tone",tone)
-	var beam_strength := _lighting_scale(&"forest_path_beam") if secondary_active else 0.0
+	var beam_strength := _lighting_scale(&"forest_path_beam") if secondary_active and not lamp_active else 0.0
 	var beam := Vector4.ZERO
 	if beam_strength > 0.0:
 		# PIX establishes the inclination. Aim its horizontal component along
@@ -1330,6 +1334,8 @@ func air_field()->Dictionary:
 func _path_air_source() -> PackedFloat32Array:
 	if not forest_active() or atmosphere_review != "combined":
 		return PackedFloat32Array()
+	if is_instance_valid(path_lamppost.fixture) and path_lamppost.fixture.visible:
+		return path_lamppost.air_parameters(_lighting_scale(&"forest_path_air"))
 	var beam := path_beam_state
 	beam.w *= _lighting_scale(&"forest_path_air_beam")
 	return forest_path_light.air_parameters(_lighting_scale(&"forest_path_air"), beam)
@@ -1350,6 +1356,8 @@ func _mist_materials()->Array:
 	for chunk:Dictionary in level.geometry._cutaway_chunks:result.append_array(chunk.materials)
 	if forest_path_light.material != null:
 		result.append(forest_path_light.material)
+	if path_lamppost.material != null:
+		result.append(path_lamppost.material)
 	if distant_terrain.visible():
 		result.append(distant_terrain.material)
 	if grove_mist_enabled and level.grove != null:
@@ -1857,7 +1865,7 @@ func set_lighting_scale(effect: StringName, value: float) -> void:
 	var scale := clampf(value, 0., LIGHTING_MIX_CONTROLS[effect][1])
 	if effect == &"world_outline_width":
 		scale = clampf(roundf(scale), 1., 4.)
-	if effect in [&"forest_path_placement", &"forest_replay_placement"]:
+	if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost"]:
 		scale = roundf(scale)
 	if scale == float(_lighting_mix.get(effect, _lighting_scale_default(effect))):
 		return
@@ -1901,7 +1909,7 @@ func apply_scene_lighting_mix(preset: SceneLightingMix) -> bool:
 		if not LIGHTING_MIX_CONTROLS.has(effect) or not is_finite(strength) \
 				or strength < 0. or strength > float(LIGHTING_MIX_CONTROLS[effect][1]):
 			return false
-		if effect in [&"forest_path_placement", &"forest_replay_placement"] and strength != roundf(strength):
+		if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost"] and strength != roundf(strength):
 			return false
 	_lighting_mix.merge(preset.strengths, true)
 	_refresh_lighting_mix()
@@ -2075,6 +2083,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 152 and effect == &"grass_step_coverage":
 			missing_value = 0.
+		if version < 153 and effect == &"forest_path_lamppost":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2199,7 +2209,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			return ERR_INVALID_DATA
 		if effect == &"world_outline_width" and (value < 1. or value != roundf(value)):
 			return ERR_INVALID_DATA
-		if effect in [&"forest_path_placement", &"forest_replay_placement"] and value != roundf(value):
+		if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost"] and value != roundf(value):
 			return ERR_INVALID_DATA
 		restored[effect] = float(value)
 	_lighting_mix = restored
@@ -2281,6 +2291,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if effect == &"forest_path_placement":
 			slider.editable = slider.editable and level.forest_path_light_offset.is_finite() \
 				and not level.forest_path_light_offset.is_zero_approx()
+		if effect == &"forest_path_lamppost":
+			slider.editable = slider.editable and level.biome_path_lamp_xz.is_finite()
 		if effect == &"foot_contact":
 			slider.editable = slider.editable and player_contact.available()
 		if effect in [&"projected_sun", &"noon_projected_sun", &"projected_sun_openings"]:
@@ -2386,7 +2398,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
-	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_dusk", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce", &"forest_replay_placement", &"forest_replay_surface_bounce", &"forest_replay_halo"]:
+	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_dusk", &"forest_path_placement", &"forest_path_lamppost", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce", &"forest_replay_placement", &"forest_replay_surface_bounce", &"forest_replay_halo"]:
 		_sync_forest_night_lights()
 		return
 	if changed_effect in [&"canopy_player_cue", &"canopy_cue_day_tone", &"canopy_cue_clarity"]:
@@ -2670,7 +2682,17 @@ func _sync_forest_night_lights() -> void:
 		forest_replay.publish_bounce(_lighting_scale(&"forest_replay_bounce"))
 		forest_replay.publish_surface(level, _lighting_scale(&"forest_replay_surface_bounce"))
 	var offset: Vector2 = level.forest_path_light_offset if _lighting_scale(&"forest_path_placement") == 1. else Vector2.ZERO
-	if forest_path_light.update(level, path_phase, _lighting_scale(&"forest_path_light"), offset):
+	var lamp_wanted: bool = private_primary and level.look.stage == 2 and forest.available() and atmosphere_review == "combined" \
+		and unavailable_reason.is_empty() and _lighting_scale(&"forest_path_lamppost") == 1. and level.biome_path_lamp_xz.is_finite()
+	var lamp_phase := 0.
+	if lamp_wanted and _biome_profile != null:
+		var curve_phase := DayNight.sample_curve(_biome_profile.path_fixture_by_hour, hour / 24., 0.)
+		lamp_phase = maxf(phase, curve_phase * _lighting_scale(&"forest_path_dusk"))
+	var strength := _lighting_scale(&"forest_path_light")
+	var prior_lamp_lit := is_instance_valid(path_lamppost.light) and path_lamppost.light.light_energy > 0.
+	var lamp_active := path_lamppost.update(level, lamp_wanted, lamp_phase, strength)
+	var old_fixture_changed := forest_path_light.update(level, 0. if lamp_active else path_phase, strength, offset)
+	if old_fixture_changed or prior_lamp_lit != (lamp_active and path_lamppost.light.light_energy > 0.):
 		_publish_point_cutoff()
 
 func sync_world_outline() -> void:
@@ -3102,7 +3124,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"world_outline_width":
 			slider.min_value = 1.
 			slider.step = 1.
-		if effect in [&"forest_path_placement", &"forest_replay_placement"]:
+		if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost"]:
 			slider.step = 1.
 		slider.value = _lighting_scale(effect)
 		slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL

@@ -5,6 +5,8 @@ render_mode cull_back;
 #endif
 
 uniform sampler2D fixture_atlas : source_color, filter_nearest, repeat_disable;
+uniform sampler2D lamp_atlas : filter_nearest, repeat_disable;
+uniform float lamp_emission = 0.0;
 uniform float phase_coverage = 0.0;
 varying vec3 world_position;
 
@@ -19,6 +21,9 @@ void fragment() {
 		if (threshold >= phase_coverage) discard;
 	}
 	ALBEDO = texture(fixture_atlas, UV).rgb;
+	if (lamp_emission > 0.0) {
+		EMISSION = vec3(1.0, 0.42, 0.105) * lamp_emission * texture(lamp_atlas, UV).b;
+	}
 	ROUGHNESS = 1.0;
 #ifdef GAF_SHARED_MIST
 	FOG = gaf_surface_mist(SCREEN_UV, -VERTEX.z, INV_VIEW_MATRIX[3].xyz, -INV_VIEW_MATRIX[2].xyz,

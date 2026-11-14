@@ -10,6 +10,7 @@ const Palette = preload("res://scripts/world_map_showcase_palette.gd")
 const MistVolume = preload("res://scripts/world_map_atmosphere_volume.gd")
 const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
 const PathFixture = preload("res://scripts/world_map_forest_path_light.gd")
+const PathLamppost = preload("res://scripts/world_map_path_lamppost.gd")
 const HOURS := [7., 12., 16.5, 18.5, 22.]
 enum Quality { ESSENTIAL, BALANCED, FULL }
 const QUALITY_LABELS := ["Nhẹ", "Cân bằng", "Đầy đủ"]
@@ -30,6 +31,7 @@ var _label: Label
 var _mist: MistVolume
 var _allow_spatial_mist := true
 var _path_fixture := PathFixture.new()
+var _path_lamppost := PathLamppost.new()
 var _allow_fixture_scatter := true
 var _mist_sample: Dictionary
 var _allow_adaptive_bloom := true
@@ -103,6 +105,8 @@ func set_weather(overcast: float, seconds: float = 2.5) -> void:
 		refresh()
 
 func _process(delta: float) -> void:
+	if _path_lamppost.support != null and _path_lamppost.fixture.visible and _path_lamppost.support.collision_layer == 0:
+		_update_fixture(_world.showcase.hour / 24.)
 	_update_local_diffuse()
 	_update_finish()
 	_update_spatial_mist()
@@ -275,16 +279,20 @@ func _exit_tree() -> void:
 		RenderingServer.call_on_render_thread(_finish_effect.release_on_render_thread)
 
 func _update_fixture(time: float) -> void:
+	var curve := _profile.path_fixture_by_hour
+	var phase := clampf(curve.sample(time), 0., 1.) if curve != null and _world.look.stage == 2 else 0.
+	var lamp_wanted: bool = _world.biome_path_lamp_xz.is_finite() and curve != null and _world.look.stage == 2
+	var lamp_active := _path_lamppost.update(_world, lamp_wanted, phase, _profile.path_fixture_energy)
 	var anchor: Vector2 = _world.biome_path_fixture_xz
 	if not anchor.is_finite():
 		return
-	var curve := _profile.path_fixture_by_hour
-	var phase := clampf(curve.sample(time), 0., 1.) if curve != null and _world.look.stage == 2 else 0.
-	_path_fixture.update(_world, phase, _profile.path_fixture_energy, Vector2.ZERO, anchor)
+	_path_fixture.update(_world, 0. if lamp_active else phase, _profile.path_fixture_energy, Vector2.ZERO, anchor)
 
 func _fixture_air() -> PackedFloat32Array:
 	if not _allow_fixture_scatter or not is_instance_valid(_mist) or not _mist.visible:
 		return PackedFloat32Array()
+	if is_instance_valid(_path_lamppost.fixture) and _path_lamppost.fixture.visible:
+		return _path_lamppost.air_parameters(_profile.path_fixture_scatter)
 	return _path_fixture.air_parameters(_profile.path_fixture_scatter)
 
 func _prepare_spatial_mist(env: Environment, time: float) -> void:
@@ -334,6 +342,8 @@ func _mist_materials() -> Array:
 	var receivers: Array = _world.showcase._mist_materials()
 	if _path_fixture.material != null:
 		receivers.append(_path_fixture.material)
+	if _path_lamppost.material != null:
+		receivers.append(_path_lamppost.material)
 	return receivers
 
 func _owns_finish_compositor(compositor: Compositor) -> bool:

@@ -62,9 +62,9 @@ func air_parameters(gain: float, beam: Vector4 = Vector4.ZERO) -> PackedFloat32A
 	return PackedFloat32Array([position.x, position.y, position.z, light.omni_range,
 		rgb.r, rgb.g, rgb.b, light.light_energy * AIR_ENERGY_SCALE * gain, beam.x, beam.y, beam.z, beam.w])
 
-func _load(world: Node3D, anchor: Vector2) -> void:
+static func research_root() -> String:
 	if not OS.has_feature("editor") or RenderingServer.get_current_rendering_method() != "mobile":
-		return
+		return ""
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	if root.is_empty():
 		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
@@ -72,6 +72,12 @@ func _load(world: Node3D, anchor: Vector2) -> void:
 	var project := ProjectSettings.globalize_path("res://").simplify_path().replace("\\", "/").trim_suffix("/").to_lower()
 	if not root.is_absolute_path() or root.begins_with("res://") or root.begins_with("user://") \
 		or root.to_lower() == project or root.to_lower().begins_with(project + "/"):
+		return ""
+	return root
+
+func _load(world: Node3D, anchor: Vector2) -> void:
+	var root := research_root()
+	if root.is_empty():
 		return
 	var directory := root.path_join(FOLDER)
 	var mesh_path := directory.path_join(MESH_NAME)
