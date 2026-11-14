@@ -36,6 +36,7 @@ float gaf_stone_diffuse_sample(int receiver, vec3 world_normal) {
 varying vec3 terrain_sun_bounce;
 varying float terrain_direct_contact;
 varying vec3 terrain_opening_incident;
+global uniform vec4 gaf_stone_shade_fill;
 uniform vec3 terrain_key_radiance=vec3(0);
 uniform float terrain_ambient_scale=1.0;
 uniform vec3 terrain_ambient_tint=vec3(1);

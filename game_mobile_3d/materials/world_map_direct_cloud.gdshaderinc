@@ -30,6 +30,17 @@ void light() {
 #endif
 	float nl = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
+	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_shade_fill.w > 0.0 &&
+		max(LIGHT_COLOR.r, max(LIGHT_COLOR.g, LIGHT_COLOR.b)) > 0.0 &&
+		dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_shade_fill.xyz) > 0.9999 &&
+		distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
+		// Use the receiver's existing sky and contact terms on sun-facing rock in shadow.
+		float shade = 1.0 - smoothstep(.04, .68, ATTENUATION);
+		float facing = smoothstep(.03, .38, nl);
+		vec3 sky = terrain_opening_incident;
+		vec3 fill = mix(sky, vec3(dot(sky, vec3(.2126, .7152, .0722))), .40);
+		DIFFUSE_LIGHT += fill * (facing * shade * gaf_stone_shade_fill.w);
+	}
 	float opening_fill = gaf_diffuse_opening_weight(LIGHT_IS_DIRECTIONAL, LIGHT, LIGHT_COLOR, INV_VIEW_MATRIX, ATTENUATION * cloud_transmission);
 	if (opening_fill > 0.0) {
 		DIFFUSE_LIGHT += terrain_opening_incident * (opening_fill * smoothstep(0.0, 0.22, nl));

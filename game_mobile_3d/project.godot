@@ -99,6 +99,10 @@ gaf_diffuse_opening={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 0)
 }
+gaf_stone_shade_fill={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
 gaf_projected_sun_strength={
 "type": "float",
 "value": 0.0

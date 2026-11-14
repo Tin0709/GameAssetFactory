@@ -113,7 +113,7 @@ void fragment() {
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	terrain_direct_contact=terrain_colored_visibility ? 1.0 : receiver_contact;
 	float sole = surface_top > 0.9 ? gaf_player_contact(surface_world, CAMERA_POSITION_WORLD) : 1.0;
-	if (gaf_diffuse_opening.w > 0.0) {
+	if (gaf_diffuse_opening.w > 0.0 || (ground_grade == 3 && gaf_stone_shade_fill.w > 0.0)) {
 		terrain_opening_incident = terrain_opening_fill(ALBEDO, receiver_contact, sole);
 	}
 	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top,CAMERA_POSITION_WORLD)*sole;
