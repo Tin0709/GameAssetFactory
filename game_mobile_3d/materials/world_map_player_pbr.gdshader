@@ -29,6 +29,7 @@ uniform bool recovered_self_light = false;
 // Values supplied only by the validated external reference profile.
 uniform vec3 roughness_transform = vec3(1.0,0.0,1.0);
 uniform float self_light_scale = 0.0;
+uniform float actor_view_fill_chroma = 0.0;
 varying vec3 actor_world;
 varying float actor_canopy_sky;
 #ifdef GAF_PLAYER_DIRECT
@@ -56,7 +57,21 @@ void fragment(){
 	}
 	if(recovered_self_light){
 		float facing=max(dot(normalize(NORMAL),normalize(VIEW))*self_light_scale,0.0);
-		EMISSION+=ALBEDO*facing*facing*facing;
+		vec3 view_fill = ALBEDO*facing*facing*facing;
+		if (player_local_light && actor_view_fill_chroma > 0.0 && METALLIC < 1.0) {
+			vec3 normal_world = normalize(mat3(INV_VIEW_MATRIX) * NORMAL);
+			vec3 sky = player_cube_sky(normal_world, actor_world.y - player_probe_base, actor_canopy_sky);
+			const vec3 luma = vec3(.2126, .7152, .0722);
+			float sky_luma = dot(sky, luma);
+			if (sky_luma > .0001) {
+				// Adapt the view-facing fill to the local sky without adding a light.
+				vec3 tint = clamp(sky / sky_luma, vec3(.60), vec3(1.55));
+				tint /= dot(tint, luma);
+				float weight = actor_view_fill_chroma * (1.0 - METALLIC) * (.40 + .45 * max(normal_world.y, 0.0));
+				view_fill *= mix(vec3(1.0), tint, weight);
+			}
+		}
+		EMISSION += view_fill;
 	}
 #ifdef GAF_PLAYER_CUTOUT
 	ALPHA*=albedo_tint.a*base.a;
