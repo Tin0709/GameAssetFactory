@@ -402,6 +402,9 @@ func check_zombie_roam_stalled_slide(lab) -> void:
 	wall.position = Vector3(0.0, 1.5, 1.7)
 	wall.rotation.y = 0.31
 	lab.add_child(wall)
+	var dust = lab.get_node("ZombieStepDust")
+	var step_events: Array[Vector3] = []
+	zombie.step_audio.connect(func(point: Vector3): step_events.append(point))
 	var slide_speed := 0.0
 	var slide_position := Vector3.ZERO
 	var slide_ticks := 0
@@ -415,14 +418,21 @@ func check_zombie_roam_stalled_slide(lab) -> void:
 			else:
 				slide_speed = maxf(slide_speed, zombie.get_real_velocity().slide(Vector3.UP).length())
 			slide_ticks += 1
+			if slide_ticks == 3:
+				step_events.clear()
+				dust.clear()
+				var clip := zombie.animation.current_animation
+				zombie.animation.seek(ZOMBIE.WALK_STEP_NOTIFIES[clip][0].x - 0.005, true)
 	var remaining := (zombie.global_position - destination).slide(Vector3.UP).length()
 	var first_remaining := (slide_position - destination).slide(Vector3.UP).length()
 	check(slide_ticks > 0 and slide_speed > 0.15 and first_remaining - remaining < 0.18,
 		"The inserted wall causes a sideways slide with almost no progress toward the destination")
 	check(slide_ticks <= 18 and not zombie._roam_destination.is_finite() and zombie.animation.current_animation == ZOMBIE.IDLE,
 		"A sideways scrape does not keep the obstructed patrol leg active")
+	check(step_events.is_empty() and dust._puffs.is_empty(),
+		"The authored foot contact emits neither a step nor a grass puff while only sliding along a wall")
 	print("MECHANIC_LAB_ROAM_STALLED_SLIDE speed=", slide_speed, " wall_ticks=", slide_ticks,
-		" active=", zombie._roam_destination.is_finite())
+		" active=", zombie._roam_destination.is_finite(), " steps=", step_events.size(), " puffs=", dust._puffs.size())
 	wall.free()
 	var retry_origin := zombie.global_position
 	await ticks(50)
@@ -430,6 +440,14 @@ func check_zombie_roam_stalled_slide(lab) -> void:
 	await ticks(30)
 	check(zombie._roam_destination.is_finite() and zombie.global_position.distance_to(retry_origin) > 0.5,
 		"The zombie picks a new patrol leg and walks again after the wait")
+	step_events.clear()
+	dust.clear()
+	var clip := zombie.animation.current_animation
+	if clip in ZOMBIE.WALK_STEP_NOTIFIES:
+		zombie.animation.seek(ZOMBIE.WALK_STEP_NOTIFIES[clip][0].x - 0.005, true)
+	await ticks(2)
+	check(step_events.size() == 1 and dust._puffs.size() == 1,
+		"A normal grass step again produces one cue and one puff when patrol resumes")
 	zombie.free()
 	player.set_physics_process(true)
 	lab.reset_player()
