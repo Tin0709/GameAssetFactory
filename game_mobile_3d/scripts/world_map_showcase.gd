@@ -2003,7 +2003,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"ground_haze":
-			slider.editable = slider.editable and level.ground_haze_profile != null
+			slider.editable = slider.editable and not _flat_lab and level.ground_haze_profile != null
 		if effect == &"basin_sunlit_mist":
 			slider.editable = slider.editable and directional_air.region_available()
 		if effect in [&"dawn_sky_transition", &"night_sky_fill"]:
@@ -2749,7 +2749,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"forest_near_scatter":
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
 		if effect == &"ground_haze":
-			slider.editable = slider.editable and level.ground_haze_profile != null
+			slider.editable = slider.editable and not _flat_lab and level.ground_haze_profile != null
 		if effect == &"basin_sunlit_mist":
 			slider.editable = directional_air.region_available()
 		if effect == &"sunlit_mist":

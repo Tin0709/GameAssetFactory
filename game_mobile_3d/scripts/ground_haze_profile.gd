@@ -13,7 +13,12 @@ func _window(hours: Vector4, time: float) -> float:
 	return smoothstep(hours.x, hours.y, time) * (1. - smoothstep(hours.z, hours.w, time))
 
 func sample(hour: float, subject_depth_m: float, map_base_y: float, mix_strength: float) -> PackedFloat32Array:
-	if not is_finite(hour) or not is_finite(subject_depth_m) or not is_finite(map_base_y) or not is_finite(mix_strength) or not is_finite(max_gain) 			or not depth_behind_subject_m.is_finite() or depth_behind_subject_m.x < 0. or depth_behind_subject_m.y <= depth_behind_subject_m.x 			or not height_above_map_base_m.is_finite() or height_above_map_base_m.y <= height_above_map_base_m.x:
+	if not is_finite(hour) or not is_finite(subject_depth_m) or not is_finite(map_base_y) \
+			or not is_finite(mix_strength) or not is_finite(max_gain) \
+			or not depth_behind_subject_m.is_finite() or depth_behind_subject_m.x < 0. \
+			or depth_behind_subject_m.y <= depth_behind_subject_m.x \
+			or not height_above_map_base_m.is_finite() \
+			or height_above_map_base_m.y <= height_above_map_base_m.x:
 		return PackedFloat32Array()
 	var weight := maxf(_window(morning_hours, hour), _window(evening_hours, hour)) * clampf(mix_strength, 0., 1.)
 	var gain := clampf(max_gain, 0., 2.) * weight
