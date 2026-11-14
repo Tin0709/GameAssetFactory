@@ -1704,7 +1704,6 @@ func _sync_twilight_crown() -> void:
 			depth = lerpf(0.32 * twilight_finish_weight(), 0.62, night) * _lighting_scale(&"crown_ambient_depth")
 	level.grove.set_crown_dusk_occlusion(amount)
 	level.grove.set_crown_ambient_depth(depth)
-	_sync_canopy_direct()
 
 func _sync_canopy_direct() -> void:
 	if level == null or not is_instance_valid(level.grove):
@@ -2396,6 +2395,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	_forest_sun=sun.light_color;_forest_energy=sun.light_energy;_forest_hour=hour
 	_forest_shadow_opacity=sun.shadow_opacity
 	_mist_sample=p
+	_sync_canopy_direct()
 
 func begin_environment_edit()->void:
 	if not private_primary or _day.is_empty():return
@@ -2510,6 +2510,7 @@ func apply_time()->void:
 		_publish_dawn_turf_color()
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
+		_sync_canopy_direct()
 		key_response_active=false
 		key_direction_active=false
 		sky_response_active=false
@@ -2542,7 +2543,10 @@ func apply_time()->void:
 	env.adjustment_saturation=float(_day.adjustment_saturation)*float(p.saturation)/float(noon.saturation)
 	env.fog_light_color=p.fog
 	env.fog_density=float(_day.fog_density)*float(p.fog_amount)/float(noon.fog_amount)
-	if use_forest:_apply_forest(env,sun)
+	if use_forest:
+		_apply_forest(env,sun)
+	else:
+		_sync_canopy_direct()
 	_time_applied=true
 
 func compare_baseline()->void:
