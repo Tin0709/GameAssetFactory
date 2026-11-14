@@ -160,7 +160,8 @@ func verify() -> void:
 		var sample: Dictionary = graphics._mist_sample
 		var near_layer: Vector3 = sample.get("near_layer", Vector3.ZERO)
 		var haze: PackedFloat32Array = sample.get("ground_haze", PackedFloat32Array())
-		check(is_equal_approx(near_layer.z, 6.) and haze.size() == 8 and is_equal_approx(haze[2], 6.25),
+		check(is_equal_approx(near_layer.z, 6.) and is_equal_approx(graphics._mist._base, 6.)
+			and haze.size() == 8 and is_equal_approx(haze[2], 6.4),
 			"Near transmission and twilight scattering use the same map-authored height")
 	finish(world)
 
