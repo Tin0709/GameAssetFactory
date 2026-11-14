@@ -165,6 +165,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"near_haze": ["Near haze density", 2.],
 	&"near_haze_depth": ["Near haze depth", 1.],
 	&"local_mist": ["Local mist volume (preview)", 1.],
+	&"alternate_local_mist": ["Sương chân cây sau chạng vạng", 1.],
 	&"cliff_mist": ["Cliff mist depth (preview)", 1.],
 	&"night_cliff_mist": ["Night cliff mist", 1.],
 	&"forest_near_scatter": ["Forest mist depth light", 1.],
@@ -243,7 +244,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 154
+const LIGHTING_MIX_VERSION := 155
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -910,7 +911,11 @@ func _update_mist()->void:
 	# These daylight and night windows meet at 19:30 with zero strength.
 	var night_weight := moonlight_weight(hour) if local_phase > 0. else 0.
 	if not _flat_lab:
-		mist.set_local_region(level.local_mist_region, _lighting_scale(&"local_mist") * local_phase * daylight * fog_gain)
+		var alternate_weight := 0.
+		if local_phase > 0. and _biome_profile != null:
+			alternate_weight = clampf(DayNight.sample_curve(_biome_profile.alternate_mist_by_hour, hour / 24., 0.), 0., 1.)
+		mist.set_local_region_for_phase(level.local_mist_region, _lighting_scale(&"local_mist") * local_phase * daylight * fog_gain,
+			level.alternate_mist_region, _lighting_scale(&"alternate_local_mist") * alternate_weight * fog_gain)
 		if night_weight > 0.:
 			mist.set_additional_local_region(level.night_mist_region, _lighting_scale(&"night_cliff_mist") * night_weight * fog_gain)
 		else:
@@ -1432,6 +1437,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"alternate_local_mist":
+		return .42
 	if effect == &"ground_haze":
 		return .65
 	if effect == &"night_bloom_prefilter":
@@ -2096,6 +2103,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 154 and effect == &"grove_mist_coherence":
 			missing_value = 0.
+		if version < 155 and effect == &"alternate_local_mist":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2243,6 +2252,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
+		if effect == &"alternate_local_mist":
+			slider.editable = slider.editable and _biome_profile != null and _biome_profile.alternate_mist_by_hour != null \
+				and level.alternate_mist_region != null
 		if effect == &"ground_haze":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
 		if effect == &"grove_mist_coherence":
@@ -2456,7 +2468,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile", &"pre_twilight_air", &"pre_twilight_midair"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"alternate_local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile", &"pre_twilight_air", &"pre_twilight_midair"]:
 		_update_mist()
 		return
 	if changed_effect == &"pre_twilight_receiver":
@@ -3362,6 +3374,12 @@ func _build_ui()->void:
 	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Sunset",18.5],["Lantern onset",19.25],["Twilight",19.5],["Night",22.],["Dawn",2.5]]:
 		var button:=Button.new();button.text=entry[0];button.focus_mode=Control.FOCUS_NONE;times.add_child(button)
 		button.pressed.connect(_choose_hour.bind(float(entry[1])))
+	if level.alternate_mist_region != null:
+		var low_mist_time := Button.new()
+		low_mist_time.text = "Low mist"
+		low_mist_time.focus_mode = Control.FOCUS_NONE
+		times.add_child(low_mist_time)
+		low_mist_time.pressed.connect(_choose_hour.bind(20.25))
 	if _weather_profile != null:
 		_weather_button = CheckButton.new()
 		_weather_button.name = "ForestWeather"

@@ -47,6 +47,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., 1., .01) var local_mist_strength := .65
 ## Multiplies the first map region by normalized hour. A missing or empty curve uses 1.
 @export var local_mist_by_hour: Curve
+## Uses the first slot during hours when its primary region is idle. A missing curve disables it.
+@export var alternate_mist_by_hour: Curve
 ## Independent multiplier for the second map region. Match the midnight endpoints.
 @export var additional_mist_by_hour: Curve
 ## Optional tree-receiver weight by normalized hour. A missing track keeps the existing tree envelope.

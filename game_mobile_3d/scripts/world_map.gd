@@ -46,6 +46,7 @@ var biome_controller: BiomeGraphics
 @export var distant_terrain_layout_sha := ""
 
 @export var local_mist_region: LocalMistRegion
+@export var alternate_mist_region: LocalMistRegion
 @export var additional_mist_region: LocalMistRegion
 @export var night_mist_region: LocalMistRegion
 @export var regional_sky_region: RegionalSkyRegion

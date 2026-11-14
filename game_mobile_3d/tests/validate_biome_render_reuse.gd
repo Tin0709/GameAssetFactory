@@ -29,6 +29,25 @@ func run() -> void:
 	check(forest_settings.overcast != null, "Forest needs its own overcast resource")
 	check(forest_settings.get("projected_opening_recovery_by_hour") is Curve,
 		"Forest sunlight opening response comes from the biome preset")
+	check(forest_settings.get("alternate_mist_by_hour") is Curve,
+		"Forest's low mist has a biome-authored schedule")
+	if showcase.mist != null:
+		showcase.set_hour(20.25)
+		showcase._update_mist()
+		var late_region = forest.get("alternate_mist_region")
+		check(late_region != null and showcase.mist._local_region == late_region
+			and is_equal_approx(showcase.mist._local_gain, .42),
+			"Forest uses the new pocket after the daylight region fades out")
+		check(showcase.mist._additional_region == forest.night_mist_region,
+			"The cliff still uses its own night mist")
+		showcase.set_lighting_scale(&"alternate_local_mist", 0.)
+		check(is_zero_approx(showcase.mist._local_gain), "The live slider restores the previous mist")
+		showcase.set_lighting_scale(&"alternate_local_mist", .42)
+		showcase.set_hour(12.)
+		showcase._update_mist()
+		check(is_zero_approx(showcase.mist._local_gain), "The authored pocket is absent at approved Noon")
+		check(showcase._settings._widgets.has("low-mist") and showcase._lighting_sliders.has(&"alternate_local_mist"),
+			"The settings menu exposes both the quick hour and the live comparison")
 	if showcase.projected_sun.available():
 		showcase.set_lighting_scale(&"projected_sun", .40)
 		showcase.set_lighting_scale(&"projected_sun_openings", .60)
@@ -113,6 +132,26 @@ func run() -> void:
 				await RenderingServer.frame_post_draw
 			check(graphics._mist.visible and graphics._mist.effect.snapshot().ready and graphics._mist.failure().is_empty(),
 				"Spatial fog runs on the second map")
+			var selected_profile = map.biome_graphics
+			var alternate_profile = selected_profile.duplicate()
+			var alternate_track := Curve.new()
+			alternate_track.add_point(Vector2(0., .8))
+			alternate_track.add_point(Vector2(1., .8))
+			var primary_track := Curve.new()
+			primary_track.add_point(Vector2(0., 1.))
+			primary_track.add_point(Vector2(.5, 0.))
+			primary_track.add_point(Vector2(1., 1.))
+			alternate_profile.local_mist_by_hour = primary_track
+			alternate_profile.alternate_mist_by_hour = alternate_track
+			map.alternate_mist_region = map.local_mist_region.duplicate()
+			graphics.set_profile(alternate_profile)
+			check(graphics._mist._local_region == map.local_mist_region,
+				"A live primary region keeps its slot on an imported map")
+			map.showcase.set_hour(12.)
+			check(graphics._mist._local_region == map.alternate_mist_region and graphics._mist._local_gain > 0.,
+				"The alternate curve can fill the same slot on the imported map")
+			graphics.set_profile(selected_profile)
+			map.showcase.set_hour(7.)
 			var attached_compositor := camera.compositor
 			check(attached_compositor == opened_compositor, "Adaptive bloom keeps the camera compositor used at Noon")
 			check(attached_compositor.compositor_effects.has(graphics._mist.effect) \

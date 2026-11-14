@@ -333,8 +333,10 @@ func _prepare_spatial_mist(env: Environment, time: float) -> void:
 	_weather.apply_medium(_profile.overcast, _mist_sample)
 	var local_strength := _profile.local_mist_strength * lerpf(.55, 1., weather_weight)
 	var local_weight := clampf(DayNight.sample_curve(_profile.local_mist_by_hour, time, 1.), 0., 1.)
+	var alternate_weight := clampf(DayNight.sample_curve(_profile.alternate_mist_by_hour, time, 0.), 0., 1.)
 	var additional_weight := clampf(DayNight.sample_curve(_profile.additional_mist_by_hour, time, 1.), 0., 1.)
-	_mist.set_local_region(_world.local_mist_region, local_strength * local_weight)
+	_mist.set_local_region_for_phase(_world.local_mist_region, local_strength * local_weight,
+		_world.alternate_mist_region, local_strength * alternate_weight)
 	_mist.set_additional_local_region(_world.additional_mist_region, local_strength * additional_weight)
 	_update_spatial_mist()
 

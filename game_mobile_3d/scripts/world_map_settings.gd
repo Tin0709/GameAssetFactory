@@ -403,6 +403,7 @@ func _build_quick() -> void:
 	_add_row(time, "sunset")
 	_add_row(time, "lantern-onset")
 	_add_row(time, "twilight")
+	_add_row(time, "low-mist")
 	_add_row(time, "dawn")
 	_add_row(time, "original-gaf-day-night-preview")
 	_add_row(time, "day_cycle_pacing")

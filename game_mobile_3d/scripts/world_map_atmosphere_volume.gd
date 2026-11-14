@@ -47,6 +47,11 @@ func publish(p:Dictionary,actor:Vector3,base:float,time:float,_ortho:bool,radius
  _profile=p;_actor=actor;_base=base;_clock=time;_radius=radius
 func set_local_region(region:LocalMistRegion,gain:float)->void:
  _local_region=region;_local_gain=gain
+func set_local_region_for_phase(region:LocalMistRegion,gain:float,alternate:LocalMistRegion,alternate_gain:float)->void:
+ if alternate!=null and alternate_gain>0. and (region==null or gain<=0.):
+  set_local_region(alternate,alternate_gain)
+ else:
+  set_local_region(region,gain)
 func set_additional_local_region(region:LocalMistRegion,gain:float)->void:
  _additional_region=region;_additional_gain=gain
 func set_warm_emitter(point:Vector3)->void:
