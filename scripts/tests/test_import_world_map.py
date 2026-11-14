@@ -169,8 +169,10 @@ class ImportWorldMapTests(unittest.TestCase):
                 self.assertIn(b'res://scenes/GameplayMap.tscn', original)
                 self.assertIn(b'res://scripts/world_map.gd', original)
                 self.assertIn(b'res://assets/graphics/biomes/humid_woodland.tres', original)
+                self.assertIn(b'res://assets/graphics/biomes/meadow.tres', original)
                 self.assertIn(b'map_layout_path = "res://assets/maps/new_meadow/runtime.json"', original)
                 self.assertIn(b'biome_graphics = ExtResource("biome")', original)
+                self.assertIn(b'comparison_biomes = Array[ExtResource("profile")]([ExtResource("comparison")])', original)
                 self.assertIn(b'[node name="NewMeadow" instance=ExtResource("base")]', original)
                 existing_runtime = output.joinpath("runtime.json").read_bytes()
                 with patch.object(sys, "argv", args):
