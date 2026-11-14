@@ -58,8 +58,11 @@ func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> voi
 	world.get_node("HUD").add_child(_label)
 	_label.hide()
 	set_profile(profile)
-	set_weather(profile.start_overcast, 0.)
-	_world.showcase.set_hour(profile.start_hour)
+	var start_overcast: float = world.biome_start_overcast
+	var start_hour: float = world.biome_start_hour
+	var initial_hour := start_hour if 0. <= start_hour and start_hour <= 24. else profile.start_hour
+	set_weather(start_overcast if 0. <= start_overcast and start_overcast <= 1. else profile.start_overcast, 0.)
+	_world.showcase.set_hour(initial_hour)
 	_cycle = profile.auto_cycle
 
 func set_profile(profile: Profile) -> void:
@@ -305,12 +308,15 @@ func _prepare_spatial_mist(env: Environment, time: float) -> void:
 	var tint := Vector3(env.fog_light_color.r, env.fog_light_color.g, env.fog_light_color.b)
 	var phase_density := env.fog_density / maxf(_profile.noon_fog_density, .05)
 	var density := _profile.mist_extinction * phase_density
+	var base_y: float = _world.biome_atmosphere_base_y
+	if not is_finite(base_y):
+		base_y = _world.spawn_position.y
 	_mist_sample = {
 		"fog_begin": env.fog_depth_end,
 		"fog_color": tint,
 		"volume_density": density,
 		"height_falloff": _profile.mist_height_falloff,
-		"near_layer": Vector3(env.fog_depth_begin, density, _world.spawn_position.y),
+		"near_layer": Vector3(env.fog_depth_begin, density, base_y),
 		"near_fade_start": .8,
 		"scatter_energy": _profile.mist_scatter,
 		"player_light_color": Vector3.ZERO,
@@ -344,8 +350,9 @@ func _update_spatial_mist() -> void:
 	if _mist.visible:
 		var position: Vector3 = _world.presentation.player_position()
 		var subject_depth := -camera.global_basis.z.dot(position - camera.global_position)
-		_mist_sample.ground_haze = _profile.sample_ground_haze(_world.showcase.hour, subject_depth, _world.spawn_position.y)
-		_mist.publish(_mist_sample, position, _world.spawn_position.y, _world.look.elapsed, true, 0.)
+		var near_layer: Vector3 = _mist_sample.near_layer
+		_mist_sample.ground_haze = _profile.sample_ground_haze(_world.showcase.hour, subject_depth, near_layer.z)
+		_mist.publish(_mist_sample, position, near_layer.z, _world.look.elapsed, true, 0.)
 
 func handle_key(event: InputEventKey) -> bool:
 	match event.physical_keycode:

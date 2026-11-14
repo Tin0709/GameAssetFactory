@@ -28,6 +28,14 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var biome_quality: BiomeGraphics.Quality = BiomeGraphics.Quality.FULL
 ## Optional world XZ. The light seats itself on the imported terrain.
 @export var biome_path_fixture_xz := Vector2.INF
+@export_group("Biome map overrides", "biome_")
+## Starting hour on portable maps. Use -1 to inherit the preset.
+@export_range(-1., 24., .25) var biome_start_hour := -1.
+## Starting cloud coverage on portable maps. Use -1 to inherit the preset.
+@export_range(-1., 1., .01) var biome_start_overcast := -1.
+## World Y in metres for height-based air on portable maps. INF uses the spawn elevation.
+@export var biome_atmosphere_base_y := INF
+@export_group("")
 var biome_controller: BiomeGraphics
 
 ## Scene placement only. The renderer skips this layer when the map layout changes.
