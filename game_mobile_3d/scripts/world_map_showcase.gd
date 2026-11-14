@@ -191,6 +191,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"player_canopy_color": ["Sắc ánh trời trên nhân vật", 1.],
 	&"actor_view_fill_chroma": ["Hòa màu ánh bù trên Valorie", 1.],
 	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
+	&"canopy_direct_softness": ["Dịu nắng trên tán cao", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
 	&"forest_path_placement": ["Vị trí đèn lối rừng", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
@@ -216,7 +217,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 141
+const LIGHTING_MIX_VERSION := 142
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1703,6 +1704,20 @@ func _sync_twilight_crown() -> void:
 			depth = lerpf(0.32 * twilight_finish_weight(), 0.62, night) * _lighting_scale(&"crown_ambient_depth")
 	level.grove.set_crown_dusk_occlusion(amount)
 	level.grove.set_crown_ambient_depth(depth)
+	_sync_canopy_direct()
+
+func _sync_canopy_direct() -> void:
+	if level == null or not is_instance_valid(level.grove):
+		return
+	var state := Vector4.ZERO
+	if level.grove.source_oaks and forest_active() and atmosphere_review == "combined" and not _balanced_preview:
+		var time := fposmod(hour, 24.)
+		var afternoon := smoothstep(14.5, 16.5, time) * (1. - smoothstep(18.5, 19.5, time))
+		var gain := .34 * afternoon * _lighting_scale(&"canopy_direct_softness")
+		if gain > 0.:
+			var direction: Vector3 = level.get_node("Sun").global_basis.z.normalized()
+			state = Vector4(direction.x, direction.y, direction.z, gain)
+	level.grove.set_canopy_direct(state, Vector2(2.5, 6.0) + Vector2.ONE * level.spawn_position.y)
 
 func _sync_oak_leaf_tint() -> void:
 	if level == null or level.grove == null:
@@ -2034,6 +2049,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 81 and effect == &"crown_ambient_depth":
 			missing_value = 0.
+		if version < 142 and effect == &"canopy_direct_softness":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -2097,6 +2114,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"crown_ambient_depth":
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
+		if effect == &"canopy_direct_softness":
+			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks
 		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma"]:
 			slider.editable = slider.editable and level.look.player_material.available()
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
@@ -2236,6 +2255,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"twilight_crown", &"crown_ambient_depth"]:
 		_sync_twilight_crown()
+		return
+	if changed_effect == &"canopy_direct_softness":
+		_sync_canopy_direct()
 		return
 	if changed_effect in [&"", &"oak_leaf_tint"]:
 		_sync_oak_leaf_tint()

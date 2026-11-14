@@ -2,6 +2,10 @@
 #include "res://materials/world_map_sun_opening.gdshaderinc"
 // Original WorldMap direct-light response. Godot still resolves ambient, fog and shadows.
 varying float cloud_transmission;
+#ifdef GAF_WORLD_CANOPY_DIRECT_SOFTNESS
+uniform vec4 canopy_direct = vec4(0.0);
+varying float canopy_direct_coverage;
+#endif
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 global uniform float gaf_stone_shade_reach;
 #endif
@@ -23,6 +27,12 @@ void light() {
 	float point_transfer=gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
 	float point_attenuation=ATTENUATION*point_transfer;
 	vec3 key_color = LIGHT_COLOR * gaf_opening_gain(LIGHT_IS_DIRECTIONAL, ATTENUATION * cloud_transmission);
+#ifdef GAF_WORLD_CANOPY_DIRECT_SOFTNESS
+	if (LIGHT_IS_DIRECTIONAL && canopy_direct_coverage > 0.0 &&
+			dot(mat3(INV_VIEW_MATRIX) * LIGHT, canopy_direct.xyz) > 0.9999) {
+		key_color *= 1.0 - canopy_direct.w * canopy_direct_coverage;
+	}
+#endif
 #ifdef GAF_WORLD_GROUND_BOUNCE
 	vec3 source_direction = normalize((INV_VIEW_MATRIX * vec4(LIGHT, 0.0)).xyz);
 	if (LIGHT_IS_DIRECTIONAL && dot(source_direction, ground_bounce_direction) > 0.9999) {

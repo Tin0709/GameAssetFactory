@@ -92,6 +92,8 @@ void vertex() {
 
 #if defined(GAF_WORLD_DIRECT_CLOUD) || defined(GAF_WORLD_FOLIAGE_LIGHT)
 #define GAF_WORLD_BURLEY
+#define GAF_WORLD_CANOPY_DIRECT_SOFTNESS
+uniform vec2 canopy_direct_height = vec2(0.0, 1.0);
 #ifdef GAF_WORLD_FOLIAGE_LIGHT
 #define GAF_WORLD_OPAQUE_FOLIAGE
 #endif
@@ -190,6 +192,13 @@ void fragment() {
 	AO_LIGHT_AFFECT = 0.0;
 #endif
 	ALBEDO = albedo;
+#ifdef GAF_WORLD_CANOPY_DIRECT_SOFTNESS
+	canopy_direct_coverage = 0.0;
+	if (canopy_direct.w > 0.0 && use_source_atlas && atlas_uv.x < 0.5) {
+		float elevation = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).y;
+		canopy_direct_coverage = smoothstep(canopy_direct_height.x, canopy_direct_height.y, elevation);
+	}
+#endif
 	ROUGHNESS = 0.95;
 	SPECULAR = native_specular;
 #ifdef GAF_SHARED_MIST
