@@ -17,6 +17,8 @@ Map portable dùng chung các pass sương và bloom với WorldMap. Preset Fore
 
 `biome_render_settings.gd` áp cấu hình ánh sáng, depth fog, bloom và color grading trên cả hai map. `biome_day_night.gd` điều khiển đồng hồ và mốc giờ, `biome_weather.gd` điều khiển chuyển tiếp và phối hiệu ứng thời tiết lên pha ánh sáng hiện tại. `forest_overcast.tres`, `woodland_overcast.tres` và `meadow_overcast.tres` đặt độ dịu nắng, thay đổi ánh hắt, màu sương và mức bão hòa riêng. Forest mặc định trời quang. Ba preset mây là thiết kế của GameAssetFactory.
 
+Gameplay và công cụ chạy kịch bản dùng chung `world.showcase.set_hour(hour)` và `world.showcase.set_weather(overcast, seconds)` cho cả Forest và map import. `overcast` đi từ `0` (quang) đến `1` (nhiều mây). Dùng `seconds = 0` để đổi tức thì khi chụp ảnh đối chiếu. Chuyển thời tiết giữ giờ hiện tại. Đổi preset bằng **F8** giữ giờ và mức mây nếu cả hai preset có Overcast.
+
 Map portable dùng một compositor cho camera. Sương chạy trước khi vẽ vật thể và adaptive bloom chạy ở giai đoạn hậu kỳ. Các vật liệu hỗ trợ spatial mist nhận sương từ volume. Vật liệu thông thường tiếp tục nhận depth fog. Mức Nhẹ, chế độ toàn cảnh và chế độ so sánh có đường dự phòng riêng. Các cache ánh sáng kiểm tra hình học, đèn cục bộ và vùng sương đặt theo tọa độ của map.
 
 Đặt **Local Diffuse Region** trong Inspector của map để chọn tâm, hai bán kính và tọa độ khoảng mở. Trong **Biome Graphics → Lighting**, chỉnh **Local Diffuse Strength** và **Local Diffuse By Hour**. Resource thời tiết có **Local Diffuse Scale** để giảm chênh ánh hắt khi nhiều mây. Cả Forest và map portable dùng cùng hàm shader cho đá, địa hình, cỏ và vật liệu nhân vật hỗ trợ. Forest dùng dữ liệu ánh sáng đã dựng theo hình học. Map portable dùng màu và cường độ ambient của biome hiện tại. Cân bằng và Đầy đủ có hiệu ứng, mức Nhẹ tắt. Trên MeadowBiomeReview, đi tới cụm đá lúc 07:00 hoặc 16:30 rồi bấm **Alt+J** để so sánh.
@@ -26,12 +28,14 @@ Map portable dùng một compositor cho camera. Sương chạy trước khi vẽ
 1. Từ thư mục `GameAssetFactory`, chạy lệnh dưới đây để tạo dữ liệu map và scene chơi thử. Với `bounds`, cạnh ngoài lấy từ vùng chọn của schematic và giữ cả vùng đệm rỗng. Chế độ `markers` dùng vòng Red Wool 100 × 100 của WorldMap. Cả hai kiểm tra slab, tall grass, vùng chồng lấn và block chưa hỗ trợ.
 
    ```powershell
-   python scripts/import_world_map.py "D:/Maps/MapMoi.litematic" --border bounds --output game_mobile_3d/assets/maps/map_moi --scene game_mobile_3d/scenes/maps/MapMoi.tscn --biome humid_woodland
+   python scripts/import_world_map.py "C:/Maps/MapMoi.litematic" --border bounds --output game_mobile_3d/assets/maps/map_moi --scene game_mobile_3d/scenes/maps/MapMoi.tscn --biome humid_woodland
    ```
 
 2. Trong Godot, mở `scenes/maps/MapMoi.tscn` và bấm **F6**. Chọn `--biome meadow` cho Đồng cỏ ven rừng hoặc `--biome humid_woodland` cho Rìa rừng ẩm. Muốn thêm biome, lưu một bản sao của preset portable dưới `assets/graphics/biomes/ten_biome.tres`, rồi truyền `--biome ten_biome`. Importer kiểm tra đây là resource `BiomeGraphicsProfile` và từ chối preset tham chiếu private trước khi ghi map. Nếu bỏ `--biome`, scene dùng Đồng cỏ ven rừng. Cả thư mục đầu ra và file scene phải là đường dẫn mới khi dùng `--scene` để giữ các chỉnh sửa trên map đã có. Để chỉ xuất dữ liệu như trước, bỏ `--scene` và `--biome`.
 3. Bấm **F8** để so hai preset ngay trên scene vừa tạo. Đổi **Biome Graphics** và **Comparison Biomes** trong Inspector để dùng preset khác. Mục **Biome Map Overrides** ở node gốc cho phép đặt **Start Hour** (giờ thập phân, ví dụ `19.5` là 19:30), **Start Overcast** (`0` quang đến `1` nhiều mây) và **Atmosphere Base Y** (cao độ mốc theo hệ tọa độ Godot, tính bằng mét). `-1` kế thừa giờ hoặc mây từ preset. `inf` lấy cao độ điểm xuất phát. Các giá trị khởi đầu áp dụng khi mở map. F8 giữ giờ và, nếu hai preset đều có Overcast, mức mây đang chạy.
-4. Giữ nguyên asset registry và kiểm tra các block mới, mép map, chỗ spawn và đường đi sau import. Dùng F6 để test scene vừa chọn. Mặc định nếu bản đồ mới không có preset riêng, runtime chọn Đồng cỏ ven rừng.
+4. Giữ nguyên asset registry và kiểm tra các block mới, mép map, chỗ spawn và đường đi sau import. Trong cửa sổ game, **V** mở góc nhìn từ trên xuống và tự căn theo ranh giới của map import. Bấm **V** lần nữa để về góc chơi và mức zoom trước đó.
+
+Quy trình trên đã chạy với `Testing.litematic` (50 × 50 m, 5.632 cell) trên Godot Forward Mobile/D3D12. Cùng scene chạy Rìa rừng ẩm và Đồng cỏ với cùng shader. Đã kiểm tra năm mốc giờ, trời quang/nhiều mây, đi lại, mức Nhẹ và góc toàn cảnh. OpenGL Compatibility đã qua bài kiểm tra depth fog dự phòng. Kiểm thử điện thoại và các kiểu thời tiết ngoài quang/nhiều mây còn mở.
 
 ## Phạm vi tích hợp hiện tại
 
