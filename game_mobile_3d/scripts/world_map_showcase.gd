@@ -136,6 +136,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"pre_twilight_receiver": ["Sắc ánh hắt trước chạng vạng", 1.],
 	&"tree_shade": ["Tree shade depth", 1.],
 	&"twilight_ground_ambient": ["Ánh hắt mặt đất lúc chạng vạng", 1.],
+	&"twilight_ground_transition": ["Hạ ánh hắt sớm khi lên đèn", 1.],
 	&"twilight_crown": ["Ánh hắt trên tán lúc chạng vạng", 1.],
 	&"oak_leaf_tint": ["MD2 oak leaf tint", 1.],
 	&"shadow": ["Shadow strength", 1.],
@@ -220,7 +221,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 143
+const LIGHTING_MIX_VERSION := 144
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1673,7 +1674,14 @@ func twilight_ground_ambient_scale() -> float:
 	if not forest_spatial_sky_context() or not captured_sky_response or plants == null or not plants.grass_light.active:
 		return 1.0
 	# Calibrated on the same three WorldMap views, with fog and direct lights fixed.
-	return lerpf(1.0, .55, twilight_finish_weight() * _lighting_scale(&"twilight_ground_ambient"))
+	var weight := twilight_finish_weight()
+	if weight > 0.0 and hour < 19.5:
+		# Adjust the approach to the same peak. Both ends have zero added slope.
+		# These are WorldMap review hours, not the original game clock.
+		var travel := clampf(inverse_lerp(19.0, 19.5, hour), 0.0, 1.0)
+		var shoulder := sin(PI * travel)
+		weight = minf(1.0, weight + .38 * shoulder * shoulder * _lighting_scale(&"twilight_ground_transition"))
+	return lerpf(1.0, .55, weight * _lighting_scale(&"twilight_ground_ambient"))
 
 func grass_root_tone_mix() -> float:
 	return _lighting_scale(&"grass_root_tone") * _night_grass_weight()
@@ -2083,6 +2091,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 143 and effect == &"stone_sunset_beam":
 			missing_value = 0.
+		if version < 144 and effect == &"twilight_ground_transition":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -2152,7 +2162,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and level.look.player_material.available()
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
 			slider.editable = slider.editable and sky_response.available() and plants != null and plants.grass_light.active
-		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"turf_ambient_color"]:
+		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
 		if effect == &"twilight_shadow_lift":
 			slider.editable = slider.editable and phase_finish != null and phase_finish.available() and sky_response.twilight_available()
@@ -2282,7 +2292,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"dawn_turf_color":
 		_publish_dawn_turf_color()
 		return
-	if changed_effect in [&"twilight_ground_ambient", &"turf_ambient_color", &"dawn_turf_ambient"]:
+	if changed_effect in [&"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color", &"dawn_turf_ambient"]:
 		level.terrain_light.bind()
 		if plants != null:
 			plants.grass_light.sync()
