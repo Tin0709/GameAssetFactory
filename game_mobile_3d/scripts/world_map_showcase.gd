@@ -2292,6 +2292,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"dawn_turf_color":
 		_publish_dawn_turf_color()
 		return
+	if changed_effect == &"twilight_ground_transition" and (hour <= 19.0 or hour >= 19.5 or twilight_finish_weight() <= 0.0):
+		return
 	if changed_effect in [&"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color", &"dawn_turf_ambient"]:
 		level.terrain_light.bind()
 		if plants != null:
