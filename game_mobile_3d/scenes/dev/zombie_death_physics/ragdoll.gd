@@ -162,12 +162,15 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	simulator.active = true
 	# This refreshes all cached animated poses, sets all body transforms and changes mode.
 	simulator.physical_bones_start_simulation()
+	var gravity_scale := gravity / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+	var linear_damping: float = profile.linear_damping
+	var angular_damping: float = profile.angular_damping
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		handoff_error = maxf(handoff_error, body.global_position.distance_to(current[part[0]].origin + handoff_shift))
-		body.gravity_scale = gravity / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
-		body.linear_damp = profile.linear_damping
-		body.angular_damp = profile.angular_damping
+		body.gravity_scale = gravity_scale
+		body.linear_damp = linear_damping
+		body.angular_damp = angular_damping
 		var a: Transform3D = previous[part[0]]
 		var b: Transform3D = current[part[0]]
 		var velocity := ((b.origin - a.origin) / sample_delta).limit_length(maximum_inherited_linear_speed)
@@ -329,9 +332,9 @@ func apply_impact(profile: Resource, direction: Vector3, location: String, dista
 	# event impulse hits the selected region/pellet pattern and supplies asymmetry.
 	# Both shares add to ONE event J; no per-limb copy of the full weapon impulse.
 	var mass := 0.0
-	for body in bodies.values(): mass += body.mass
+	for body: PhysicalBone3D in bodies.values(): mass += body.mass
 	var transport: Vector3 = total * clampf(profile.transport_fraction, 0.0, 0.98)
-	for body in bodies.values():
+	for body: PhysicalBone3D in bodies.values():
 		var impulse: Vector3 = transport * body.mass / mass
 		body.apply_central_impulse(impulse)
 		impact_distribution[body.name] = impulse
