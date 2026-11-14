@@ -43,6 +43,8 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 additional_scatter_multiplier;
  vec4 depth_scatter; // World metres along the ray: start, full effect, source gain, extinction gain (negative selects the bounded morning band).
  vec4 depth_scatter_color; // Linear change to ambient source RGB, enabled in w.
+ vec4 ground_haze_band; // view-depth start/end and lower/upper world Y
+ vec4 ground_haze; // ambient source gain in x, independent of extinction
 } p;
 const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
 const float FOREST_SCATTER_END_RADIUS_M = 15.0;
@@ -141,12 +143,18 @@ vec4 local_intersection(vec3 origin,vec3 ray,vec4 center_strength,vec3 radii){
  float ceiling=max(1.-dot(nearest,nearest),0.);
  return vec4(midpoint,curvature,ceiling,sqrt(ceiling/curvature));
 }
-vec3 ambient_depth_source(float depth_m){
+vec3 ambient_depth_source(float depth_m, float view_depth, float world_y){
  float amount=0.;
  if(p.depth_scatter.z>0.)amount=smoothstep(p.depth_scatter.x,p.depth_scatter.y,depth_m);
  vec3 source=p.scatter.rgb;
  if(p.depth_scatter_color.w>0.)source+=p.depth_scatter_color.rgb*amount;
- return source*p.scatter.w*(1.+p.depth_scatter.z*amount);
+ float low_air = 0.0;
+ if (p.ground_haze.x > 0.0) {
+  float behind = smoothstep(p.ground_haze_band.x, p.ground_haze_band.y, view_depth);
+  float height = 1.0 - smoothstep(p.ground_haze_band.z, p.ground_haze_band.w, world_y);
+  low_air = p.ground_haze.x * behind * height;
+ }
+ return source*p.scatter.w*(1.+p.depth_scatter.z*amount+low_air);
 }
 float local_optical(vec4 chord,float start,float end,float ray_length,float extinction){
  if(chord.z<=0.)return 0.;
@@ -191,7 +199,7 @@ void main(){
    nearby*=distant_optical_gain(middle*ray_length);
    vec3 point=origin+ray*middle;
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
-   vec3 light=ambient_depth_source(middle*ray_length)+p.warm.rgb*(warmth*.25);
+   vec3 light=ambient_depth_source(middle*ray_length,middle,point.y)+p.warm.rgb*(warmth*.25);
    if(p.ray.w>0.0){
     vec2 delta=point.xz-vec2(p.ray_dx.w,p.ray_dy.w);
     float region=1.0-smoothstep(FOREST_SCATTER_FULL_RADIUS_M*FOREST_SCATTER_FULL_RADIUS_M,
@@ -224,7 +232,7 @@ void main(){
    float bank=smoothstep(.30,.68,n);float variation=mix(1.0,bank*bank*1.8,p.integration.z);
    float tau=p.medium.x*height*variation*(d-start)*ray_length*distant_optical_gain((start+d)*.5*ray_length);
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
-   vec3 light=ambient_depth_source((start+d)*.5*ray_length)+p.warm.rgb*(warmth*.25);
+   vec3 light=ambient_depth_source((start+d)*.5*ray_length,(start+d)*.5,point.y)+p.warm.rgb*(warmth*.25);
    light=light*scatter_visibility(point)+path_light(point);
 #ifdef GAF_DIRECTIONAL_AIR
    light+=directional_air(point);

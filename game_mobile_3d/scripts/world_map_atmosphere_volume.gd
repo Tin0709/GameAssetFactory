@@ -132,7 +132,8 @@ func _process(_delta:float)->void:
     var depth_offset := float(_profile.get("depth_scatter_offset", effect.DEPTH_SCATTER_START_M)) if near_layer.y>0. else float(effect.DEPTH_SCATTER_START_M)
     var morning_optical := float(_profile.get("morning_optical",0.)) if near_layer.y>0. else 0.
     var depth_ramp := float(_profile.get("depth_scatter_ramp", effect.DEPTH_SCATTER_RAMP_M))
-    effect.configure_with_depth_scatter(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional,depth_scatter,depth_color,depth_optical,depth_offset,morning_optical,depth_ramp)
+    effect.configure_with_depth_scatter(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional,depth_scatter,depth_color,depth_optical,depth_offset,morning_optical,depth_ramp,
+     _profile.get("ground_haze", PackedFloat32Array()) if near_layer.y > 0. else PackedFloat32Array())
    else:
     effect.configure_with_mist_regions(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional)
   else:

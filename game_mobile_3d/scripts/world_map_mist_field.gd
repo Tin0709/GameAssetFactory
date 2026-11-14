@@ -9,6 +9,7 @@ const DIRECTIONAL_PARAMETER_BYTES := 64
 const DIRECTIONAL_REGION_BYTES := 32
 const LOCAL_MIST_BYTES := 48
 const DEPTH_SCATTER_BYTES := 32
+const GROUND_HAZE_BYTES := 32
 const MAX_DEPTH_SCATTER_GAIN := 6.0
 const MAX_DEPTH_OPTICAL_GAIN := .85
 const DEPTH_SCATTER_START_M := 2.0
@@ -22,6 +23,7 @@ var _path_parameters := PackedByteArray()
 var _local_mist_parameters := PackedByteArray()
 var _additional_mist_parameters := PackedByteArray()
 var _depth_scatter_parameters := PackedByteArray()
+var _ground_haze_parameters := PackedByteArray()
 var _size:=Vector2i.ZERO
 var _noise:=RID()
 var _light:=RID()
@@ -51,7 +53,7 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		path_light: PackedFloat32Array, local_mist: PackedFloat32Array, additional_mist: PackedFloat32Array,
 		depth_scatter: float, depth_color: Vector3 = Vector3.ZERO, depth_optical: float = 0.0,
 		depth_scatter_offset: float = DEPTH_SCATTER_START_M, morning_optical: float = 0.0,
-		depth_scatter_ramp: float = DEPTH_SCATTER_RAMP_M) -> void:
+		depth_scatter_ramp: float = DEPTH_SCATTER_RAMP_M, ground_haze := PackedFloat32Array()) -> void:
 	var path_bytes := path_light.to_byte_array()
 	if path_bytes.size() == LEGACY_PATH_SOURCE_BYTES:
 		path_bytes.resize(PATH_SOURCE_BYTES)
@@ -86,6 +88,8 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 	var ramp := maxf(depth_scatter_ramp, 0.001) if is_finite(depth_scatter_ramp) else DEPTH_SCATTER_RAMP_M
 	var depth_bytes := PackedFloat32Array([entry + offset, entry + offset + ramp,
 		gain, optical_gain, color.x, color.y, color.z, 1.0 if color != Vector3.ZERO else 0.0]).to_byte_array()
+	var ground_haze_bytes := ground_haze.to_byte_array() if ground_haze.size() == 8 else PackedByteArray()
+	ground_haze_bytes.resize(GROUND_HAZE_BYTES)
 	_mutex.lock()
 	_parameters=parameters.duplicate()
 	_path_parameters = path_bytes
@@ -93,6 +97,7 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 	_local_mist_parameters = local_bytes
 	_additional_mist_parameters = additional_bytes
 	_depth_scatter_parameters = depth_bytes
+	_ground_haze_parameters = ground_haze_bytes
 	if _parameters.size()==176:_parameters.resize(224) # Legacy fixtures: neutral new-light branch.
 	_state.point_kernel=_parameters.size()==224 and _parameters.decode_float(172)>.5
 	_size=size;_noise=noise;_light=light
@@ -129,7 +134,7 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	var error:=spirv.get_stage_compile_error(RenderingDevice.SHADER_STAGE_COMPUTE)
 	if not error.is_empty():_report("error",error);return false
 	var shader:=_keep(rd.shader_create_from_spirv(spirv));_pipeline=_keep(rd.compute_pipeline_create(shader))
-	var parameter_size := GPU_PARAMETER_BYTES + 2 * LOCAL_MIST_BYTES + DEPTH_SCATTER_BYTES \
+	var parameter_size := GPU_PARAMETER_BYTES + 2 * LOCAL_MIST_BYTES + DEPTH_SCATTER_BYTES + GROUND_HAZE_BYTES \
 		+ ((DIRECTIONAL_PARAMETER_BYTES + (DIRECTIONAL_REGION_BYTES if directional_region else 0)) if directional_grid != null else 0)
 	_buffer=_keep(rd.uniform_buffer_create(parameter_size))
 	var sampler_state:=RDSamplerState.new();sampler_state.min_filter=RenderingDevice.SAMPLER_FILTER_LINEAR;sampler_state.mag_filter=RenderingDevice.SAMPLER_FILTER_LINEAR
@@ -160,7 +165,7 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	return true
 func _render_callback(kind:int,data:RenderData)->void:
 	if kind!=effect_callback_type:return
-	_mutex.lock();var parameters:=_parameters.duplicate();var path_parameters:=_path_parameters;var directional_parameters:=_directional_parameters;var local_parameters:=_local_mist_parameters;var additional_parameters:=_additional_mist_parameters;var depth_scatter_parameters:=_depth_scatter_parameters;var size:=_size;var noise:=_noise;var light:=_light;var error:String=_state.error;_mutex.unlock()
+	_mutex.lock();var parameters:=_parameters.duplicate();var path_parameters:=_path_parameters;var directional_parameters:=_directional_parameters;var local_parameters:=_local_mist_parameters;var additional_parameters:=_additional_mist_parameters;var depth_scatter_parameters:=_depth_scatter_parameters;var ground_haze_parameters:=_ground_haze_parameters;var size:=_size;var noise:=_noise;var light:=_light;var error:String=_state.error;_mutex.unlock()
 	if parameters.size()!=224 or size.x<=0 or not error.is_empty():return
 	var rd:=RenderingServer.get_rendering_device();var buffers:=data.get_render_scene_buffers() as RenderSceneBuffersRD
 	if rd==null or buffers==null or buffers.get_view_count()!=1:return
@@ -174,6 +179,7 @@ func _render_callback(kind:int,data:RenderData)->void:
 	parameters.append_array(local_parameters)
 	parameters.append_array(additional_parameters)
 	parameters.append_array(depth_scatter_parameters)
+	parameters.append_array(ground_haze_parameters)
 	rd.buffer_update(_buffer,0,parameters.size(),parameters)
 	var list:=rd.compute_list_begin();rd.compute_list_bind_compute_pipeline(list,_pipeline);rd.compute_list_bind_uniform_set(list,_uniform,0)
 	rd.compute_list_dispatch(list,ceili(size.x/8.),ceili(size.y/8.),1);rd.compute_list_end()
