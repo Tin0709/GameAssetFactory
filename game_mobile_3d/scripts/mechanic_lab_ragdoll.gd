@@ -434,10 +434,10 @@ func _recover_early_floor_arm_gap() -> void:
 			_slide_supported_anchor(arm, state, gap, gap.length(), floor_body.get_rid())
 
 func _project_source_anchors() -> void:
-	var sabre_floor := _limit_first_contact_stretch and not floor_landing_blended \
-		and is_instance_valid(_flat_floor) and not _flat_floor.disabled
+	var lab_floor := not floor_landing_blended and is_instance_valid(_flat_floor) and not _flat_floor.disabled
+	var sabre_floor := _limit_first_contact_stretch and lab_floor
 	var sabre_flight := sabre_floor and floor_impact_blend <= 0.0
-	var first_wall_window := sabre_flight and Engine.get_physics_frames() - _launch_frame \
+	var first_wall_window := lab_floor and floor_impact_blend <= 0.0 and Engine.get_physics_frames() - _launch_frame \
 		<= roundi(WALL_SHOULDER_SLIDE_WINDOW * Engine.physics_ticks_per_second)
 	var early_wall_landing := sabre_floor and floor_impact_blend > 0.0 \
 		and floor_impact_blend <= WALL_NECK_LANDING_BLEND_END
