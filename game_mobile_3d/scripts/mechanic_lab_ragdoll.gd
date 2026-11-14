@@ -446,6 +446,8 @@ func _project_source_anchors() -> void:
 	super._project_source_anchors()
 	if first_wall_window:
 		_slide_wall_shoulder_anchors()
+	elif lab_floor and floor_impact_blend <= 0.0:
+		_slide_rebounding_legs()
 	_recover_early_floor_arm_gap()
 	_recover_floor_blocked_hip()
 	var recent_handoff := _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _wall_handoff_frame \
@@ -664,14 +666,50 @@ func _slide_wall_shoulder_anchors() -> void:
 				continue
 			# Sweep against the other geometry, then verify that sliding along
 			# the contact face does not deepen the starting overlap.
-			var motion := gap.slide(normal).limit_length(WALL_SHOULDER_SLIDE_MAX)
-			if not _test_projection_motion(limb, state.transform, motion, wall_rid):
-				var start := _deepest_contact(_terrain_contact_points(limb, state, Vector3.ZERO))
-				var end := _deepest_contact(_terrain_contact_points(limb, state, motion))
-				var mid := _deepest_contact(_terrain_contact_points(limb, state, motion * 0.5))
-				if maxf(mid, end) <= maxf(start, PROJECTION_COLLISION_MARGIN) + PROJECTION_COLLISION_MARGIN:
-					state.transform = state.transform.translated(motion)
+			_slide_along_wall(limb, state, gap, normal, wall_rid)
 			break
+
+func _slide_rebounding_legs() -> void:
+	var torso: PhysicalBone3D = bodies.Chest
+	var core := PhysicsServer3D.body_get_direct_state(torso.get_rid())
+	if core == null or core.get_contact_count() != 0 or core.linear_velocity.y >= 0.0:
+		return
+	# A falling leg can rebound before the rest of the body reaches the
+	# wall. Close the large tangential gap without altering its rebound.
+	for name in ["Leg.L", "Leg.R"]:
+		var limb: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
+		if state == null or state.get_contact_count() == 0 or state.linear_velocity.y >= 0.0:
+			continue
+		var spec: Dictionary = source_joints[name]
+		var gap: Vector3 = (core.transform * spec.parent_frame).origin - (state.transform * spec.child_frame).origin
+		var distance := gap.length()
+		if distance <= WALL_SHOULDER_SLIDE_MIN_GAP:
+			continue
+		for i in state.get_contact_count():
+			var wall := state.get_contact_collider_object(i) as StaticBody3D
+			var normal := state.get_contact_local_normal(i)
+			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y or state.linear_velocity.dot(normal) <= 0.0:
+				continue
+			var normal_gap := gap.dot(normal)
+			if normal_gap >= 0.0 or -normal_gap > distance * REBOUND_SHOULDER_SLIDE_MAX_NORMAL_FRACTION:
+				continue
+			var wall_rid := wall.get_rid()
+			if _is_single_box(wall_rid) and _slide_along_wall(limb, state, gap, normal, wall_rid):
+				break
+
+func _slide_along_wall(limb: PhysicalBone3D, state: PhysicsDirectBodyState3D,
+		gap: Vector3, normal: Vector3, wall: RID) -> bool:
+	var motion := gap.slide(normal).limit_length(WALL_SHOULDER_SLIDE_MAX)
+	if _test_projection_motion(limb, state.transform, motion, wall):
+		return false
+	var start := _deepest_contact(_terrain_contact_points(limb, state, Vector3.ZERO))
+	var end := _deepest_contact(_terrain_contact_points(limb, state, motion))
+	var mid := _deepest_contact(_terrain_contact_points(limb, state, motion * 0.5))
+	if maxf(mid, end) > maxf(start, PROJECTION_COLLISION_MARGIN) + PROJECTION_COLLISION_MARGIN:
+		return false
+	state.transform = state.transform.translated(motion)
+	return true
 
 func _slide_at_wall_intersection(limb: PhysicalBone3D, state: PhysicsDirectBodyState3D, vertical_gap: float) -> bool:
 	var walls: Array[RID] = []
