@@ -376,7 +376,8 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 		" farthest=", farthest, " rebound=", rebounded, " overlap=", overlap)
 	lab.free()
 
-func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true, landing_gravity := -1.0) -> void:
+func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true, landing_gravity := -1.0,
+		max_anchor_gap := INF) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -440,8 +441,9 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		for bone in last_simulated.size():
 			pose_matches = pose_matches and last_simulated[bone].is_equal_approx(skeleton.get_bone_global_pose(bone))
 		check(pose_matches, "The corner ragdoll %d retains its final simulated pose" % seed)
-	if seed == 170:
-		check(peak_gap > 0.0 and peak_gap < 0.23, "The shoulder can slide toward its anchor along the corner wall")
+	if max_anchor_gap < INF:
+		check(peak_gap > 0.0 and peak_gap < max_anchor_gap,
+			"The shoulder stays near its anchor during the corner collision (%d, %.3f m)" % [seed, peak_gap])
 	if landing_gravity >= 0.0 and not zombie._corpse_parked:
 		var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
 		check(is_equal_approx(head.gravity_scale, landing_gravity), "The corner ragdoll %d uses the expected gravity" % seed)
@@ -461,7 +463,8 @@ func run() -> void:
 	await check_wall_pinned_joint()
 	await check_wall_pinned_joint(true)
 	await check_edge_landing_gravity()
-	await check_corner_ragdoll(170, 2.0)
+	await check_corner_ragdoll(170, 2.0, true, -1.0, 0.23)
+	await check_corner_ragdoll(287, 2.0, true, -1.0, 0.17)
 	await check_corner_ragdoll(65, 4.25)
 	await check_corner_ragdoll(29, 4.25, false, 50.0 / float(ProjectSettings.get_setting("physics/3d/default_gravity")))
 	await check_corner_ragdoll(101, 4.05, false, 1.0)
