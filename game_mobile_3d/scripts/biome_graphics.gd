@@ -45,6 +45,9 @@ func set_profile(profile: Profile) -> void:
 	if profile == null or profile.use_forest_reference:
 		return
 	_profile = profile
+	var slot := _choices.find(profile)
+	if slot >= 0:
+		_profile_index = slot
 	if _profile.overcast == null:
 		_weather_target = 0.
 		weather_weight = 0.

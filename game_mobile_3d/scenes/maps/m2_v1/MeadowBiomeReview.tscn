@@ -20,5 +20,5 @@ scatter_multiplier = Vector3(0.9, 1.04, 1.23)
 script = ExtResource("map")
 map_layout_path = "res://assets/maps/meadow_biome_review/runtime.json"
 local_mist_region = SubResource("LowWesternMist")
-biome_graphics = ExtResource("look")
-comparison_biomes = Array[ExtResource("profile")]([ExtResource("woodland")])
+biome_graphics = ExtResource("woodland")
+comparison_biomes = Array[ExtResource("profile")]([ExtResource("look")])
