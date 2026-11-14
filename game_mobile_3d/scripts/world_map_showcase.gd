@@ -1274,7 +1274,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"projected_sun_position":
 		return 1.
 	if effect == &"projected_sun_softness":
-		return .75
+		return .40
 	if effect == &"daylight_bounce":
 		return .75
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
