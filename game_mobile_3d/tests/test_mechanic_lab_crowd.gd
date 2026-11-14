@@ -127,6 +127,53 @@ func check_crowd_roam(group: Node) -> void:
 	if group.get_child_count() != COUNT or moved < 90 or peak_radius > 10.05 or outside != 0:
 		failures.append("The 100-zombie patrol stays on the floor and moves within its spawn radius")
 	print("CROWD_ROAM moved=", moved, " max_radius=", peak_radius, " chasing_or_off_floor=", outside)
+	await check_packed_patrol(group)
+
+func check_packed_patrol(group: Node) -> void:
+	for zombie: ZOMBIE in group.get_children():
+		zombie.set_physics_process(false)
+	var follower := group.get_child(0) as ZOMBIE
+	var blocker := group.get_child(1) as ZOMBIE
+	var start := Vector3(-25.0, 0.02, -25.0)
+	var destination := start + Vector3.BACK * 6.0
+	for keep_blocked in [false, true]:
+		follower.global_position = start
+		blocker.global_position = start + Vector3.BACK * 1.20
+		follower.velocity = Vector3.ZERO
+		follower._roam_destination = destination
+		follower._roam_blocked_seconds = 0.0
+		follower.set_physics_process(true)
+		for i in 35:
+			await physics_frame
+			if follower.is_on_wall() and follower.get_real_velocity().length_squared() < 0.01:
+				break
+		var skipped := 0
+		var samples := follower.ragdoll.sample_count
+		for i in 8:
+			await physics_frame
+			skipped += int(follower._skipped_blocked_step)
+		if skipped != 6 or follower.ragdoll.sample_count - samples != 8 or not follower._roam_destination.is_finite():
+			failures.append("A packed patrol retries at 15 Hz while retaining its route and every pose sample")
+		var blocked_position := follower.global_position
+		if keep_blocked:
+			for i in 16:
+				await physics_frame
+				if not follower._roam_destination.is_finite():
+					break
+			if follower._roam_destination.is_finite() or follower.animation.current_animation != ZOMBIE.IDLE:
+				failures.append("A sustained blockage ends the patrol leg even when collision retries are staggered")
+		else:
+			blocker.global_position += Vector3.RIGHT * 2.0
+			await physics_frame
+			if follower._skipped_blocked_step:
+				failures.append("A moving blocker wakes the patrol collision check on the first tick")
+			for i in 4:
+				await physics_frame
+			if follower.global_position.z - blocked_position.z < 0.12 or follower._roam_destination != destination:
+				failures.append("The patrol resumes its original leg when the blocking zombie moves away")
+		print("CROWD_PACKED_PATROL persistent=", keep_blocked, " skipped=", skipped,
+			" active=", follower._roam_destination.is_finite())
+		follower.set_physics_process(false)
 
 func check_zombie_dust() -> void:
 	var dust := lab.get_node_or_null("ZombieStepDust") as MultiMeshInstance3D
