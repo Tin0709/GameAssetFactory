@@ -350,15 +350,17 @@ func check_blocked_chase(group: Node) -> void:
 	for i in 8:
 		await physics_frame
 	var last_seen: Vector3 = zombie._last_seen_position
+	var hidden_pose_start: int = zombie.ragdoll.sample_count
 	var hidden_skips := 0
 	for i in 32:
-		player.global_position.x -= 0.15 if i < 16 else -0.15
+		player.global_position.x += -0.15 if i < 16 else 0.15
 		await physics_frame
 		hidden_skips += int(zombie._skipped_blocked_step)
+	var hidden_poses: int = zombie.ragdoll.sample_count - hidden_pose_start
 	if zombie._target_visible or not zombie._target_aggressive \
-			or zombie._last_seen_position != last_seen or hidden_skips < 23 or hidden_skips > 25:
-		failures.append("Hidden player movement leaves the blocked pursuit on its last-seen destination and keeps 15 Hz collision retries")
-	print("CROWD_BLOCKED_HIDDEN skips=", hidden_skips, " samples=32 last_seen=", zombie._last_seen_position)
+			or zombie._last_seen_position != last_seen or hidden_skips != 24 or hidden_poses != 32:
+		failures.append("Hidden player movement keeps the last-seen destination, 15 Hz collision retries and every pose sample")
+	print("CROWD_BLOCKED_HIDDEN skips=", hidden_skips, " samples=", hidden_poses, " last_seen=", zombie._last_seen_position)
 	screen.free()
 	player.global_position = player_origin
 	player.set_physics_process(true)
