@@ -71,6 +71,7 @@ var _opening_gain := 0.0
 var _diffuse_opening := Vector4.ZERO
 var _stone_shade_fill := Vector4.ZERO
 var _stone_shade_reach := 0.
+var _local_diffuse_source := Vector4.ZERO
 const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
 	&"sun": ["Direct sunlight", 2.],
@@ -105,6 +106,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_day_face_fill": ["Ánh hắt mặt đá ban ngày", 1.],
 	&"stone_shade_fill": ["Ánh hắt trong bóng đá", .55],
 	&"stone_shade_reach": ["Ánh hắt tới mặt đá khuất nắng", 1.],
+	&"local_diffuse_return": ["Ánh hắt cục bộ theo địa hình", .65],
 	&"stone_twilight_sky": ["Ánh trời trên vách đá chiều muộn", 1.],
 	&"stone_dusk_sky_chroma": ["Sắc đá trong râm chiều muộn", 1.],
 	&"stone_detail_softness": ["Stone texture softness", 1.],
@@ -212,7 +214,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 139
+const LIGHTING_MIX_VERSION := 140
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -359,6 +361,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_fill", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_replay_bounce", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_replay_surface", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_replay_surface_field", null)
@@ -790,6 +793,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_fill", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
+			RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
 			forest_replay.publish_bounce(0.0)
 			forest_replay.release_surface()
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
@@ -1117,6 +1121,24 @@ func _sync_point_camera() -> void:
 	if not _flat_lab:
 		_sync_diffuse_opening()
 		_sync_stone_shade_fill()
+		_sync_local_diffuse_return()
+
+func _sync_local_diffuse_return() -> void:
+	var source := Vector4.ZERO
+	if not _balanced_preview and atmosphere_review == "combined" and forest_active() \
+			and level.view_mode == "gameplay" and level.local_diffuse_region != null \
+			and level.local_diffuse_region.is_valid() and level.terrain_light != null and level.terrain_light.is_active():
+		var morning := smoothstep(5.5, 7., hour) * (1. - smoothstep(7., 11.5, hour))
+		var afternoon := smoothstep(12.5, 16.5, hour) * (1. - smoothstep(16.5, 18.5, hour))
+		var gain := _lighting_scale(&"local_diffuse_return") * (morning + afternoon)
+		if gain > 0.:
+			source = level.local_diffuse_region.source(gain)
+	if source == _local_diffuse_source:
+		return
+	_local_diffuse_source = source
+	if source.w > 0.:
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_region", level.local_diffuse_region.bounds())
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", source)
 
 func _sync_stone_shade_fill() -> void:
 	var state := Vector4.ZERO
@@ -1372,6 +1394,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .30
 	if effect == &"stone_shade_reach":
 		return .50
+	if effect == &"local_diffuse_return":
+		return .35
 	if effect == &"morning_depth_optical":
 		return .35
 	if effect == &"projected_sun":
@@ -1832,6 +1856,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 44 and effect == &"cliff_mist":
 			missing_value = 0.
+		if version < 140 and effect == &"local_diffuse_return":
+			missing_value = 0.
 		if version < 45 and effect in [&"night_spatial_sky", &"night_stone_fill_balance"]:
 			missing_value = 0.
 		if version < 85 and effect == &"night_cliff_mist":
@@ -2033,6 +2059,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"ground_haze":
 			slider.editable = slider.editable and not _flat_lab and level.ground_haze_profile != null
+		if effect == &"local_diffuse_return":
+			slider.editable = slider.editable and not _flat_lab and level.local_diffuse_region != null
 		if effect == &"basin_sunlit_mist":
 			slider.editable = slider.editable and directional_air.region_available()
 		if effect in [&"dawn_sky_transition", &"night_sky_fill"]:
@@ -2130,7 +2158,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"day_cycle_pacing":
 		return
-	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach"]:
+	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach", &"local_diffuse_return"]:
 		return # Published with the final camera and sun before drawing.
 	if changed_effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color", &"stone_day_sky"]:
 		level.terrain_light.bind()
