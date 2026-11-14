@@ -125,6 +125,9 @@ void fragment() {
 	EMISSION=terrain_emission(UV);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	float sole = surface_normal.y > 0.9 ? gaf_player_contact(cutaway_world, CAMERA_POSITION_WORLD) : 1.0;
+#ifdef GAF_WORLD_DIRECT_CLOUD
+	stone_sunset_position = cutaway_world.xz;
+#endif
 	if (gaf_diffuse_opening.w > 0.0 || (ground_grade == 3 && gaf_stone_shade_fill.w > 0.0)) {
 		terrain_opening_incident = terrain_opening_fill(ALBEDO, receiver_contact, sole);
 	}
