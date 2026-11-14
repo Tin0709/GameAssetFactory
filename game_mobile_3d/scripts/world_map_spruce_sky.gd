@@ -37,7 +37,7 @@ func setup(level: Node3D) -> void:
 	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != PROOF_SHA:
 		return
 	var proof: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if proof.map_sha256 != FileAccess.get_sha256(level.DATA) or proof.sources_sha256 != grove.SPRUCE_MANIFEST_SHA:
+	if proof.map_sha256 != FileAccess.get_sha256(level.map_layout_path) or proof.sources_sha256 != grove.SPRUCE_MANIFEST_SHA:
 		return
 	for row: Dictionary in proof.trees:
 		var tree: Node3D = grove._spruce_root.get_node_or_null(row.name)
@@ -97,7 +97,7 @@ func apply_layout(relative: String, digest: String) -> void:
 		return
 	var profile: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not profile is Dictionary or profile.schema != "private_spruce_layout/1" \
-			or profile.map_sha256 != FileAccess.get_sha256(_level.DATA) or profile.base_sky_profile_sha256 != PROOF_SHA \
+			or profile.map_sha256 != FileAccess.get_sha256(_level.map_layout_path) or profile.base_sky_profile_sha256 != PROOF_SHA \
 			or profile.base_air_profile_sha256 != _level.directional_air_region_sha256:
 		return
 	var position_world := _vector(profile.root)

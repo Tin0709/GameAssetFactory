@@ -43,7 +43,7 @@ func setup(level: Node3D, review: Node) -> void:
 		return
 	var proof: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(proof_path))
 	var geometry_path := folder.path_join("geometry.private.json")
-	if proof.map_sha256 != FileAccess.get_sha256(level.DATA) or FileAccess.get_sha256(geometry_path) != proof.geometry_sha256 \
+	if proof.map_sha256 != FileAccess.get_sha256(level.map_layout_path) or FileAccess.get_sha256(geometry_path) != proof.geometry_sha256 \
 		or FileAccess.get_sha256(root.path_join(level.grove.SOURCE_MANIFEST)) != OAK_MANIFEST_SHA:
 		return
 	var geometry: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(geometry_path))

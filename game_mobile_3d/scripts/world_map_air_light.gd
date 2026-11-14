@@ -30,7 +30,7 @@ func setup(world:Node3D):
  if RenderingServer.get_current_rendering_method()!="mobile"or RenderingServer.get_rendering_device()==null or not ResourceLoader.exists(GRID):return
  cache=load(GRID)
  if cache.get_meta("scope","")!="Original GAF static sun visibility, not native light shafts":return
- if cache.get_meta("source_runtime_sha256","")!=FileAccess.get_sha256(level.DATA)or not context_matches():return
+ if cache.get_meta("source_runtime_sha256","")!=FileAccess.get_sha256(level.map_layout_path)or not context_matches():return
  for key in ["origin","step","dimensions"]:
   var a=cache.get_meta(key,[])
   if not a is Array or a.size()!=3:return

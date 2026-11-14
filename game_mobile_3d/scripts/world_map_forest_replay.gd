@@ -106,7 +106,7 @@ func _load_surface(world) -> void:
 		return
 	var path := root.path_join(relative)
 	if world.forest_replay_surface_sha256.length() != 64 or world.forest_replay_surface_map_sha256.length() != 64 \
-			or FileAccess.get_sha256(world.DATA) != world.forest_replay_surface_map_sha256 \
+			or FileAccess.get_sha256(world.map_layout_path) != world.forest_replay_surface_map_sha256 \
 			or FileAccess.get_sha256(path) != world.forest_replay_surface_sha256:
 		return
 	var width := extent.x

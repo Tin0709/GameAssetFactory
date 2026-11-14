@@ -137,7 +137,7 @@ func setup(map: Node3D) -> void:
 	process_physics_priority=3
 	baseline_environment=level.get_node("WorldEnvironment").environment.duplicate()
 	build_path_map()
-	_ground_bounce_layout_matches = FileAccess.get_sha256(level.DATA) == GROUND_RADIANCE.get_meta("source_runtime_sha256", "")
+	_ground_bounce_layout_matches = FileAccess.get_sha256(level.map_layout_path) == GROUND_RADIANCE.get_meta("source_runtime_sha256", "")
 	build_cloud_field()
 	_capture_shadow_settings()
 	for property: String in PRESET.sun_settings:

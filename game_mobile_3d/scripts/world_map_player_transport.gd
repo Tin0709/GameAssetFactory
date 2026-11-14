@@ -28,7 +28,7 @@ func setup(world:Node3D)->void:
  if RenderingServer.get_current_rendering_method()!="mobile"or RenderingServer.get_rendering_device()==null or not level.showcase.private_primary:return
  if ResourceLoader.exists(PATH):
   cache=load(PATH)
-  cache_ready=cache.get_meta("scope","")=="Original GAF actor incident field; not MD2 radiance" and cache.get_meta("source_runtime_sha256","")==FileAccess.get_sha256(level.DATA) and context_matches() and field.initialize(cache)
+  cache_ready=cache.get_meta("scope","")=="Original GAF actor incident field; not MD2 radiance" and cache.get_meta("source_runtime_sha256","")==FileAccess.get_sha256(level.map_layout_path) and context_matches() and field.initialize(cache)
   if cache_ready:source_field.prepare(field)
   if cache_ready:phase_bounce.setup(level,PATH,level.showcase._lighting_scale(&"player_bounce")>0.)
  refresh(true)

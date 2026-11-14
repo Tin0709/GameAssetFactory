@@ -25,7 +25,7 @@ func setup(level: Node3D, base_path: String, warm_cache: bool = false) -> void:
 	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != PROOF_SHA or FileAccess.get_sha256(base_path) != BASE_SHA:
 		return
 	var proof: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if proof.map_sha256 != FileAccess.get_sha256(level.DATA) or proof.input_atlas_sha256 != air.payload_sha256:
+	if proof.map_sha256 != FileAccess.get_sha256(level.map_layout_path) or proof.input_atlas_sha256 != air.payload_sha256:
 		return
 	_origin = _vector(proof.origin)
 	_step = _vector(proof.step)

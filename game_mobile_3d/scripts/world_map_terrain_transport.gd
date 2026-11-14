@@ -73,7 +73,7 @@ func _install()->bool:
 			if key=="ambient_srgb" and (float(x)<=0. or float(x)>1.):return reject("Invalid normalization profile")
 	var d:Array=cache.get_meta("sun_direction")
 	if absf(Vector3(d[0],d[1],d[2]).length()-1.)>.0001:return reject("Invalid normalization profile")
-	if cache.get_meta("source_runtime_sha256","")!=FileAccess.get_sha256(level.DATA):return reject("Map changed")
+	if cache.get_meta("source_runtime_sha256","")!=FileAccess.get_sha256(level.map_layout_path):return reject("Map changed")
 	if cache.get_meta("surface_recipe_sha256","")!=FileAccess.get_sha256("res://materials/world_map_surface_v5.gdshaderinc"):return reject("Albedo recipe changed")
 	if cache.get_meta("ambient_recipe_identity","")!=FileAccess.get_sha256("res://scripts/world_map_ambient.gd")+":"+FileAccess.get_sha256("res://materials/world_map_ambient.gdshader"):return reject("Ambient recipe changed")
 	var fingerprints:Dictionary=cache.get_meta("material_fingerprints",{})

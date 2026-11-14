@@ -190,8 +190,18 @@ def validate_tall_pairs(cells, palette):
     return pairs
 
 
-def derive_border(cells, palette, source_bounds):
+def derive_border(cells, palette, source_bounds, mode="markers"):
     markers = [tuple(cell[:3]) for cell in cells if palette[cell[3]]["category"] == "marker"]
+    if mode not in {"bounds", "markers"}:
+        raise ValueError(f"Unknown boundary mode: {mode}")
+    if mode == "bounds":
+        low, high = source_bounds["min"], source_bounds["max"]
+        offset = [-(low[0] + high[0] + 1) // 2, 0, -(low[2] + high[2] + 1) // 2]
+        return {
+            "min": [low[0] + offset[0], low[1] - 2, low[2] + offset[2]],
+            "max": [high[0] + 1 + offset[0], high[1] + 9, high[2] + 1 + offset[2]],
+            "source_min": low, "source_max": high, "marker_count": len(markers),
+        }, offset
     if not markers:
         raise ValueError("No red-wool boundary markers")
     heights = {cell[1] for cell in markers}
@@ -273,13 +283,13 @@ def centre_ground_candidates(cells, palette, offset):
     return sorted(candidates, key=lambda row: (row["centre_distance_squared"], -row["ground_y"], row["source_cell_xz"]))[:16]
 
 
-def import_source(source, output):
+def import_source(source, output, *, border_mode="markers"):
     source, output = Path(source).resolve(), Path(output).resolve()
     root, source_hash = read_source(source)
     decoded = decode_regions(root)
     cells, palette = decoded["cells"], decoded["palette"]
     pair_count = validate_tall_pairs(cells, palette)
-    border, offset = derive_border(cells, palette, decoded["source_bounds"])
+    border, offset = derive_border(cells, palette, decoded["source_bounds"], border_mode)
     runtime = {"schema_version": 1, "source_sha256": source_hash, "source_bounds": decoded["source_bounds"],
                "offset": offset, "border": border, "palette": palette, "cells": cells}
     counts = Counter(cell[3] for cell in cells)
@@ -313,6 +323,13 @@ def import_source(source, output):
         "expected_terrain_faces": terrain_face_audit(cells, palette),
         "centre_ground_candidates": centre_ground_candidates(cells, palette, offset),
     }
+    if border_mode == "bounds":
+        manifest["border_validation"] = {
+            "mode": "bounds", "complete_perimeter": False,
+            "outer_face_width_m": border["max"][0] - border["min"][0],
+            "outer_face_depth_m": border["max"][2] - border["min"][2],
+            "vertical_clearance_above_source_m": 8, "extends_below_source_m": 2,
+        }
     # Complete validation before making a package, and preserve the original bytes.
     output.mkdir(parents=True, exist_ok=True)
     destination = output / "World Map.litematic"
@@ -329,8 +346,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", nargs="?", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--border", choices=("markers", "bounds"), default="markers")
     args = parser.parse_args()
-    runtime, manifest = import_source(args.source, args.output)
+    if args.border == "bounds" and args.output.resolve() == DEFAULT_OUTPUT.resolve():
+        parser.error("--border bounds requires a separate map --output")
+    runtime, manifest = import_source(args.source, args.output, border_mode=args.border)
     print(json.dumps({"output": str(args.output), "source_sha256": runtime["source_sha256"],
                       "cells": len(runtime["cells"]), "border": runtime["border"],
                       "counts_by_kind": manifest["counts_by_kind"],

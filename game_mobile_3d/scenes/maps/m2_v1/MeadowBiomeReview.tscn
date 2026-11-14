@@ -1,0 +1,10 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
+[ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
+[ext_resource type="Resource" path="res://assets/graphics/biomes/meadow.tres" id="look"]
+
+[node name="MeadowBiomeReview" instance=ExtResource("base")]
+script = ExtResource("map")
+map_layout_path = "res://assets/maps/meadow_biome_review/runtime.json"
+biome_graphics = ExtResource("look")

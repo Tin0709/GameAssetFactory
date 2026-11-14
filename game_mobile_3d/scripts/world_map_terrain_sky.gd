@@ -33,7 +33,7 @@ func setup(world:Node3D)->void:
     refresh()
 
 func _install(cache:Resource=CACHE)->bool:
-    if cache.get_meta("source_runtime_sha256","")!=FileAccess.get_sha256(level.DATA):
+    if cache.get_meta("source_runtime_sha256","")!=FileAccess.get_sha256(level.map_layout_path):
         validation_errors.append("Source map changed; retain original terrain lighting");return false
     var values:PackedFloat32Array=cache.get_meta("values",PackedFloat32Array())
     var records:Array=cache.get_meta("rows",[])

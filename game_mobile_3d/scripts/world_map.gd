@@ -16,8 +16,15 @@ const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV
 const LocalMistRegion = preload("res://scripts/local_mist_region.gd")
 const RegionalSkyRegion = preload("res://scripts/regional_sky_region.gd")
 const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
+const BiomeGraphicsProfile = preload("res://scripts/biome_graphics_profile.gd")
+const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
 const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
+@export_file("*.json") var map_layout_path := DATA
+## Leave empty to use the existing Forest showcase. Choose a resource for a portable biome.
+@export var biome_graphics: BiomeGraphicsProfile
+var biome_controller: BiomeGraphics
+
 @export var local_mist_region: LocalMistRegion
 @export var additional_mist_region: LocalMistRegion
 @export var night_mist_region: LocalMistRegion
@@ -87,7 +94,7 @@ func _enter_tree() -> void:
 	var index:=previous.get_index()
 	showcase=load("res://scripts/world_map_showcase.gd").new()
 	showcase.name="UnifiedShowcase";add_child(showcase)
-	var replacement: Node3D=showcase.make_player()
+	var replacement: Node3D=showcase.make_player(biome_graphics == null)
 	if showcase.private_primary:
 		for service:String in ["Combat","SpawnDirector"]:
 			var old:=get_node_or_null(service)
@@ -109,9 +116,9 @@ func _ready() -> void:
 	if player.has_node("Pistol"):player.get_node("Pistol").enabled=false
 	$HUD/Status.hide()
 	get_viewport().msaa_3d=Viewport.MSAA_2X
-	if not FileAccess.file_exists(DATA):
+	if not FileAccess.file_exists(map_layout_path):
 		abort_map("Missing World Map package");return
-	var parsed=JSON.parse_string(FileAccess.get_file_as_string(DATA))
+	var parsed=JSON.parse_string(FileAccess.get_file_as_string(map_layout_path))
 	if not parsed is Dictionary or parsed.get("schema_version")!=1:
 		abort_map("Unsupported World Map package");return
 	runtime=parsed
@@ -130,15 +137,16 @@ func _ready() -> void:
 	presentation.setup()
 	reset_player()
 	set_review_view("gameplay")
-	if build_grove():
+	if biome_graphics == null and build_grove():
 		if not grove.source_oaks:
 			grove.build_understory(self)
 		set_grove_visible(true, player.global_position)
 	look=load("res://scripts/world_map_look.gd").new()
 	look.name="ReferenceLook"
 	add_child(look);look.setup(self)
-	if look.atmosphere_review_available(): look.toggle_day_composition()
-	if look.day_palette_available(): look.toggle_day_finish()
+	if biome_graphics == null:
+		if look.atmosphere_review_available(): look.toggle_day_composition()
+		if look.day_palette_available(): look.toggle_day_finish()
 	ambient=load("res://scripts/world_map_ambient.gd").new()
 	ambient.name="DirectionalAmbient"
 	add_child(ambient);ambient.setup(self)
@@ -168,6 +176,11 @@ func _ready() -> void:
 	canopy_player_cue.name = "CanopyPlayerCue"
 	add_child(canopy_player_cue)
 	showcase.setup(self)
+	if biome_graphics != null:
+		biome_controller = BiomeGraphics.new()
+		biome_controller.name = "BiomeGraphics"
+		add_child(biome_controller)
+		biome_controller.setup(self, biome_graphics)
 	_setup_movement_effects()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
 	terrain_light.name="TerrainColoredTransport";add_child(terrain_light);terrain_light.setup(self)
@@ -274,7 +287,9 @@ func find_spawn() -> Vector3:
 		var height: float=columns[column]
 		var point:=source_to_world(Vector3i(column.x,0,column.y))
 		point.y=height+float(runtime.offset[1])+.02
-		if absf(point.x)>47 or absf(point.z)>47:continue
+		if point.x < float(runtime.border.min[0]) + 3. or point.x > float(runtime.border.max[0]) - 3. \
+				or point.z < float(runtime.border.min[2]) + 3. or point.z > float(runtime.border.max[2]) - 3.:
+			continue
 		if not clear_standing_space(column,height):continue
 		var exits:=0
 		for direction in [Vector2i.LEFT,Vector2i.RIGHT,Vector2i.UP,Vector2i.DOWN]:
@@ -427,6 +442,8 @@ func update_status() -> void:
 
 func set_reference_look(enabled: bool) -> void:
 	look.set_stage(2 if enabled else 0)
+	if biome_controller != null:
+		biome_controller.refresh()
 
 func _input(event: InputEvent) -> void:
 	if map_ready and event is InputEventKey and event.pressed and not event.echo:
@@ -446,6 +463,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and event.pressed and not event.echo:
+		if biome_controller != null and biome_controller.handle_key(event):
+			get_viewport().set_input_as_handled()
+			return
 		if showcase.handle_key(event):
 			get_viewport().set_input_as_handled();return
 		showcase.begin_environment_edit()
