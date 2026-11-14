@@ -207,16 +207,24 @@ class ImportWorldMapTests(unittest.TestCase):
                 template.replace("biome_graphics_profile", "biome_weather_profile"), encoding="utf-8")
             (presets / "private_lookup.tres").write_text(
                 template + 'finish_reference_path = "old/private.json"\n', encoding="utf-8")
-            for biome in ("custom_valley", "private_valley", "private_lookup", "fake_profile",
-                          "missing_profile", "../custom_valley"):
+            cases = {
+                "custom_valley": None,
+                "private_valley": "requires private reference data",
+                "private_lookup": "requires private reference data",
+                "fake_profile": "must use BiomeGraphicsProfile",
+                "missing_profile": "Cannot read biome preset",
+                "../custom_valley": "requires a preset file name",
+                "": "requires a preset file name",
+            }
+            for index, (biome, expected_error) in enumerate(cases.items()):
                 with self.subTest(biome=biome), patch.object(importer, "GODOT_PROJECT", project), \
-                        patch("sys.stdout", new_callable=io.StringIO), patch("sys.stderr", new_callable=io.StringIO):
-                    output = project / "assets/maps" / ("accepted_valley" if biome == "custom_valley" else "rejected_valley")
-                    scene = project / "scenes/maps/Valley.tscn"
+                        patch("sys.stdout", new_callable=io.StringIO), patch("sys.stderr", new_callable=io.StringIO) as errors:
+                    output = project / "assets/maps" / f"valley_{index}"
+                    scene = project / "scenes/maps" / f"Valley{index}.tscn"
                     args = ["import_world_map.py", str(source), "--border", "bounds", "--output", str(output),
                             "--scene", str(scene), "--biome", biome]
                     with patch.object(sys, "argv", args):
-                        if biome == "custom_valley":
+                        if expected_error is None:
                             importer.main()
                             self.assertIn('res://assets/graphics/biomes/custom_valley.tres', scene.read_text())
                             self.assertIn('res://assets/graphics/biomes/meadow.tres', scene.read_text())
@@ -224,7 +232,9 @@ class ImportWorldMapTests(unittest.TestCase):
                         else:
                             with self.assertRaises(SystemExit):
                                 importer.main()
+                            self.assertIn(expected_error, errors.getvalue())
                             self.assertFalse(output.exists())
+                            self.assertFalse(scene.exists())
 
     def test_scene_rejects_nonportable_biome_and_paths_before_import(self):
         with tempfile.TemporaryDirectory() as temporary:
