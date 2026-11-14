@@ -6,6 +6,7 @@ const DayNight = preload("res://scripts/biome_day_night.gd")
 const Weather = preload("res://scripts/biome_weather.gd")
 const DistantTerrain = preload("res://scripts/world_map_distant_terrain.gd")
 const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
+const BiomeProfile = preload("res://scripts/biome_graphics_profile.gd")
 const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
@@ -63,7 +64,8 @@ var _grove_mist_toggle: CheckButton
 var _spruce_toggle: CheckButton
 var _source_terrain_tiles: Texture2DArray
 var _source_terrain_toggle: CheckButton
-var forest:=FOREST.new()
+var forest := FOREST.new("", "")
+var _biome_profile: BiomeProfile
 var distant_terrain := DistantTerrain.new()
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
@@ -372,14 +374,14 @@ func make_player(use_private: bool = true)->Node3D:
 
 func setup(world:Node3D)->void:
 	level=world;process_priority=-10
-	var profile = world.get("biome_graphics")
-	if private_primary and profile != null and profile.use_forest_reference:
-		forest = FOREST.new(profile.atmosphere_reference_path, profile.atmosphere_reference_sha256)
-		_weather_profile = profile.overcast
+	_biome_profile = world.get("biome_graphics")
+	if private_primary and _biome_profile != null and _biome_profile.use_forest_reference:
+		forest = FOREST.new(_biome_profile.atmosphere_reference_path, _biome_profile.atmosphere_reference_sha256)
+		_weather_profile = _biome_profile.overcast
 		if _weather_profile != null:
-			_weather.set_target(profile.start_overcast, 0.)
-		hour = fposmod(profile.start_hour, 24.)
-		cycle_enabled = profile.auto_cycle
+			_weather.set_target(_biome_profile.start_overcast, 0.)
+		hour = fposmod(_biome_profile.start_hour, 24.)
+		cycle_enabled = _biome_profile.auto_cycle
 	if not private_primary:
 		_build_basic_settings()
 		return
@@ -431,6 +433,8 @@ func setup_flat_lab(world: Node3D) -> void:
 	level = world
 	_flat_lab = true
 	process_priority = -10
+	if private_primary:
+		forest = FOREST.new()
 	if forest_active():
 		_setup_point_lighting()
 		projected_sun.setup()
@@ -977,15 +981,10 @@ func _update_mist()->void:
 				sample.near_scatter = Vector3(FOREST_NEAR_SCATTER_CENTER.x, FOREST_NEAR_SCATTER_CENTER.y, gain)
 	var emitter:Vector3=level.presentation.player_position()
 	if not _flat_lab and not _balanced_preview and atmosphere_review == "combined" \
-			and level.view_mode == "gameplay" and sample.has("near_layer"):
+			and _biome_profile != null and level.view_mode == "gameplay" and sample.has("near_layer"):
 		var subject_depth: float = -camera.global_basis.z.dot(emitter - camera.global_position)
-		var map_height: float = level.spawn_position.y
-		var haze: PackedFloat32Array
-		if level.ground_haze_profile != null:
-			haze = level.ground_haze_profile.sample(hour, subject_depth, map_height, _lighting_scale(&"ground_haze"))
-		if haze.is_empty() and level.twilight_ground_haze_profile != null:
-			haze = level.twilight_ground_haze_profile.sample(hour, subject_depth, map_height, _lighting_scale(&"twilight_ground_haze"))
-		sample.ground_haze = haze
+		sample.ground_haze = _biome_profile.sample_ground_haze(hour, subject_depth, level.spawn_position.y,
+			_lighting_scale(&"ground_haze"), _lighting_scale(&"twilight_ground_haze"))
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
 		var origin := _lantern_light_origin(lantern.emitter_position())
@@ -2220,9 +2219,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"ground_haze":
-			slider.editable = slider.editable and not _flat_lab and level.ground_haze_profile != null
+			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
 		if effect == &"twilight_ground_haze":
-			slider.editable = slider.editable and not _flat_lab and level.twilight_ground_haze_profile != null
+			slider.editable = slider.editable and _biome_profile != null and _biome_profile.twilight_ground_haze != null
 		if effect == &"distant_terrain":
 			slider.editable = slider.editable and is_instance_valid(distant_terrain.visual)
 		if effect == &"local_diffuse_return":
@@ -3034,7 +3033,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"forest_near_scatter":
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
 		if effect == &"ground_haze":
-			slider.editable = slider.editable and not _flat_lab and level.ground_haze_profile != null
+			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
 		if effect == &"basin_sunlit_mist":
 			slider.editable = directional_air.region_available()
 		if effect == &"sunlit_mist":

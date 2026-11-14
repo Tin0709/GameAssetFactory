@@ -18,7 +18,6 @@ const RegionalSkyRegion = preload("res://scripts/regional_sky_region.gd")
 const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 const BiomeGraphicsProfile = preload("res://scripts/biome_graphics_profile.gd")
 const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
-const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 const LocalDiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export_file("*.json") var map_layout_path := DATA
@@ -39,8 +38,6 @@ var biome_controller: BiomeGraphics
 @export var additional_mist_region: LocalMistRegion
 @export var night_mist_region: LocalMistRegion
 @export var regional_sky_region: RegionalSkyRegion
-@export var ground_haze_profile: GroundHazeProfile
-@export var twilight_ground_haze_profile: GroundHazeProfile
 @export var local_diffuse_region: LocalDiffuseRegion
 ## Centre X/Z and radius X/Z of the late-day stone highlight adjustment.
 @export var stone_sunset_region := Vector4.ZERO

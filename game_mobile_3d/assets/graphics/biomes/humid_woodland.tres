@@ -1,10 +1,20 @@
-[gd_resource type="Resource" load_steps=11 format=3]
+[gd_resource type="Resource" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
 [ext_resource type="Resource" path="res://assets/graphics/biomes/woodland_overcast.tres" id="weather"]
 
 [ext_resource type="Resource" path="res://assets/graphics/biomes/humid_woodland_day_night.tres" id="day_night"]
+
+[ext_resource type="Script" path="res://scripts/ground_haze_profile.gd" id="haze"]
+
+[sub_resource type="Resource" id="WoodlandTwilightHaze"]
+script = ExtResource("haze")
+depth_behind_subject_m = Vector2(2.5, 7.5)
+height_above_map_base_m = Vector2(0.4, 4.8)
+max_gain = 2.0
+morning_hours = Vector4(0, 0, 0, 0)
+evening_hours = Vector4(18.75, 19.5, 20, 21.15)
 
 [sub_resource type="Curve" id="WoodlandKey"]
 _data = [Vector2(0, 0.78), 0.0, 0.0, 0, 0, Vector2(0.29166666, 0.92), 0.0, 0.0, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.95), 0.0, 0.0, 0, 0, Vector2(1, 0.78), 0.0, 0.0, 0, 0]
@@ -58,6 +68,8 @@ mist_height_falloff = 0.25
 mist_scatter = 0.42
 local_mist_strength = 0.58
 additional_mist_by_hour = SubResource("SecondaryMistHours")
+twilight_ground_haze = SubResource("WoodlandTwilightHaze")
+twilight_ground_haze_strength = 1.0
 exposure = 0.96
 saturation = 0.95
 contrast = 1.06

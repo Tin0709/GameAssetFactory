@@ -7,7 +7,7 @@ const VECTORS=["key_color_scale","ambient_tint","fog_color","player_light_color"
 var phases:Array=[]
 var player_range:=0.
 func _init(reference_path: String = FILE, reference_hash: String = SHA):
-	if not OS.has_feature("editor"):return
+	if reference_path.is_empty() or reference_hash.is_empty() or not OS.has_feature("editor"):return
 	var research:=OS.get_environment("MD2_RESEARCH_ROOT")
 	if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
 	var path:=research.path_join(reference_path)

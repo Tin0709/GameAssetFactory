@@ -50,6 +50,9 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Optional light scattered into low areas behind the player.
 @export var ground_haze: GroundHazeProfile
 @export_range(0., 1., .01) var ground_haze_strength := 0.
+## Used when the earlier low-air layer is outside its phase or disabled.
+@export var twilight_ground_haze: GroundHazeProfile
+@export_range(0., 1., .01) var twilight_ground_haze_strength := 0.
 
 @export_group("Color grading")
 @export var tonemap := Environment.TONE_MAPPER_FILMIC
@@ -94,3 +97,12 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_group("Weather")
 @export var overcast: Weather
 @export_range(0., 1., .01) var start_overcast := 0.
+
+func sample_ground_haze(hour: float, subject_depth_m: float, map_base_y: float,
+		day_mix: float = 1., twilight_mix: float = 1.) -> PackedFloat32Array:
+	var haze := PackedFloat32Array()
+	if ground_haze != null and ground_haze_strength > 0. and day_mix > 0.:
+		haze = ground_haze.sample(hour, subject_depth_m, map_base_y, ground_haze_strength * day_mix)
+	if haze.is_empty() and twilight_ground_haze != null and twilight_ground_haze_strength > 0. and twilight_mix > 0.:
+		haze = twilight_ground_haze.sample(hour, subject_depth_m, map_base_y, twilight_ground_haze_strength * twilight_mix)
+	return haze

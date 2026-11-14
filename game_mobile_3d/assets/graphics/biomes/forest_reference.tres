@@ -1,13 +1,33 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
 [ext_resource type="Resource" path="res://assets/graphics/biomes/forest_overcast.tres" id="weather"]
 
+[ext_resource type="Script" path="res://scripts/ground_haze_profile.gd" id="haze"]
+
+[sub_resource type="Resource" id="ForestGroundHaze"]
+script = ExtResource("haze")
+depth_behind_subject_m = Vector2(1.5, 6.5)
+height_above_map_base_m = Vector2(1.5, 7)
+max_gain = 2.0
+
+[sub_resource type="Resource" id="ForestTwilightGroundHaze"]
+script = ExtResource("haze")
+depth_behind_subject_m = Vector2(1.5, 6.5)
+height_above_map_base_m = Vector2(1.5, 14)
+max_gain = 7.0
+morning_hours = Vector4(0, 0, 0, 0)
+evening_hours = Vector4(19, 19.5, 20, 21)
+
 [resource]
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
 use_forest_reference = true
+ground_haze = SubResource("ForestGroundHaze")
+ground_haze_strength = 1.0
+twilight_ground_haze = SubResource("ForestTwilightGroundHaze")
+twilight_ground_haze_strength = 1.0
 overcast = ExtResource("weather")
 atmosphere_reference_path = "godot_lab/world_map_unified_showcase_v001/deepdark_entrance_v001/appearance.private.json"
 atmosphere_reference_sha256 = "741d37edf0740caac71bae975cc715b6e42d2a0a074f4dfda54a91eb211abb5c"
