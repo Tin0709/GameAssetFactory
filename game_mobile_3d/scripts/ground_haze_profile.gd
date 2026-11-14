@@ -4,8 +4,6 @@ extends Resource
 @export var depth_behind_subject_m := Vector2(4., 12.)
 @export var height_above_map_base_m := Vector2(0., 4.)
 @export_range(0., 2., .01) var max_gain := 1.2
-## Optional optical gain per metre of supported elevation. The map owns the reference height.
-@export_range(0., .16, .01) var terrace_optical_gain_per_m := 0.
 @export var morning_hours := Vector4(5.5, 7.0, 8.3, 10.5)
 @export var evening_hours := Vector4(14.5, 16.5, 18.3, 19.0)
 
@@ -14,8 +12,7 @@ func _window(hours: Vector4, time: float) -> float:
 		return 0.
 	return smoothstep(hours.x, hours.y, time) * (1. - smoothstep(hours.z, hours.w, time))
 
-func sample(hour: float, subject_depth_m: float, map_base_y: float, mix_strength: float,
-		supported_ground_y := NAN, terrace_strength := 0.) -> PackedFloat32Array:
+func sample(hour: float, subject_depth_m: float, map_base_y: float, mix_strength: float) -> PackedFloat32Array:
 	if not is_finite(hour) or not is_finite(subject_depth_m) or not is_finite(map_base_y) \
 			or not is_finite(mix_strength) or not is_finite(max_gain) \
 			or not depth_behind_subject_m.is_finite() or depth_behind_subject_m.x < 0. \
@@ -23,16 +20,12 @@ func sample(hour: float, subject_depth_m: float, map_base_y: float, mix_strength
 			or not height_above_map_base_m.is_finite() \
 			or height_above_map_base_m.y <= height_above_map_base_m.x:
 		return PackedFloat32Array()
-	var phase := maxf(_window(morning_hours, hour), _window(evening_hours, hour))
-	var gain := clampf(max_gain, 0., 2.) * phase * clampf(mix_strength, 0., 1.)
-	var optical := 0.
-	if is_finite(supported_ground_y) and is_finite(terrace_strength) and is_finite(terrace_optical_gain_per_m):
-		var rise := clampf(supported_ground_y - map_base_y, 0., 6.)
-		optical = phase * clampf(terrace_strength, 0., 1.) * clampf(terrace_optical_gain_per_m, 0., .16) * (rise if rise > .05 else 0.)
-	if maxf(gain, optical) <= 0.:
+	var weight := maxf(_window(morning_hours, hour), _window(evening_hours, hour)) * clampf(mix_strength, 0., 1.)
+	var gain := clampf(max_gain, 0., 2.) * weight
+	if gain <= 0.:
 		return PackedFloat32Array()
 	return PackedFloat32Array([
 		subject_depth_m + depth_behind_subject_m.x, subject_depth_m + depth_behind_subject_m.y,
 		map_base_y + height_above_map_base_m.x, map_base_y + height_above_map_base_m.y,
-		gain, optical, 0., 0.,
+		gain, 0., 0., 0.,
 	])

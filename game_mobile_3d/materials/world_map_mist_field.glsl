@@ -44,7 +44,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 depth_scatter; // World metres along the ray: start, full effect, source gain, extinction gain (negative selects the bounded morning band).
  vec4 depth_scatter_color; // Linear change to ambient source RGB, enabled in w.
  vec4 ground_haze_band; // view-depth start/end and lower/upper world Y
- vec4 ground_haze; // ambient source gain in x, bounded terrace extinction in y
+ vec4 ground_haze; // ambient source gain in x, independent of extinction
 } p;
 const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
 const float FOREST_SCATTER_END_RADIUS_M = 15.0;
@@ -197,11 +197,6 @@ void main(){
   if(nearby>0.){
    float middle=(max(previous,entry)+min(d,near_z))*.5;
    nearby*=distant_optical_gain(middle*ray_length);
-   if (p.ground_haze.y > 0.0) {
-    float above_terrace = smoothstep(p.ground_haze_band.z - 0.8, p.ground_haze_band.w + 3.8, origin.y + ray.y * middle);
-    float behind = smoothstep(p.ground_haze_band.x, p.ground_haze_band.y, middle);
-    nearby *= 1.0 + p.ground_haze.y * above_terrace * behind;
-   }
    vec3 point=origin+ray*middle;
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
    vec3 light=ambient_depth_source(middle*ray_length,middle,point.y)+p.warm.rgb*(warmth*.25);
