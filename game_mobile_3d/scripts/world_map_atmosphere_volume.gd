@@ -14,6 +14,7 @@ var _radius:=8.
 var _bound_generation:=-1
 var _gate:=false
 var noise_strength:=1.
+var screen_tile_pixels := 16
 var recovered_point_kernel:=false
 var material_provider:Callable
 var compositor_owned:Callable
@@ -76,7 +77,8 @@ func _process(_delta:float)->void:
    _owned_compositor=compositor;_camera.compositor=compositor
   var effects=compositor.compositor_effects.duplicate();effects.append(effect);compositor.compositor_effects=effects
  var viewport_size:=_camera.get_viewport().get_visible_rect().size
- var size:=Vector2i(clampi(ceili(viewport_size.x/16.),16,128),clampi(ceili(viewport_size.y/16.),16,96))
+ var tile := float(screen_tile_pixels)
+ var size:=Vector2i(clampi(ceili(viewport_size.x/tile),16,128),clampi(ceili(viewport_size.y/tile),16,96))
  var is_ortho:=_camera.projection==Camera3D.PROJECTION_ORTHOGONAL
  var origin:=_camera.global_position
  var tl:=_camera.project_position(Vector2.ZERO,1.)
@@ -161,6 +163,10 @@ func _process(_delta:float)->void:
   _publish_region(&"gaf_local_mist_center",&"gaf_local_mist_radii",local)
   _publish_region(&"gaf_additional_mist_center",&"gaf_additional_mist_radii",additional)
  _set_gate(ready);_sync_materials(ready)
+func suspend() -> void:
+	hide()
+	_process(0.)
+
 func _publish_region(center: StringName, radii: StringName, parameters: PackedFloat32Array) -> void:
  if parameters.size()!=12:
   RenderingServer.global_shader_parameter_set(center,Vector4.ZERO)

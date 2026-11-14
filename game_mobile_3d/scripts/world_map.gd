@@ -24,6 +24,8 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 ## Assign a graphics resource independently of the imported layout.
 @export var biome_graphics: BiomeGraphicsProfile
 @export var comparison_biomes: Array[BiomeGraphicsProfile] = []
+## Graphics budget for portable biomes. The Forest reference keeps its existing settings.
+@export var biome_quality: BiomeGraphics.Quality = BiomeGraphics.Quality.FULL
 var biome_controller: BiomeGraphics
 
 @export var local_mist_region: LocalMistRegion

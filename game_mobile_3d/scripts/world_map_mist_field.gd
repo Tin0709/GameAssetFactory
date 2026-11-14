@@ -196,4 +196,4 @@ func _release(rd:RenderingDevice):
 	texture.texture_rd_rid=RID()
 	_resources.reverse()
 	for rid in _resources:rd.free_rid(rid)
-	_resources.clear();_mutex.lock();_allocated=Vector2i.ZERO;_allocated_light=RID();_state.ready=false;_mutex.unlock()
+	_resources.clear();_mutex.lock();_allocated=Vector2i.ZERO;_allocated_light=RID();_state.ready=false;_state.bytes=0;_mutex.unlock()

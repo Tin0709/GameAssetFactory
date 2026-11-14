@@ -6,7 +6,10 @@ const Palette = preload("res://scripts/world_map_showcase_palette.gd")
 const MistVolume = preload("res://scripts/world_map_atmosphere_volume.gd")
 const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
 const HOURS := [7., 12., 16.5, 18.5, 22.]
+enum Quality { ESSENTIAL, BALANCED, FULL }
+const QUALITY_LABELS := ["Nhẹ", "Cân bằng", "Đầy đủ"]
 
+var quality := Quality.FULL
 var weather_weight := 0.
 var _weather_target := 0.
 var _weather_from := 0.
@@ -32,6 +35,7 @@ var _previous_compositor: Compositor
 
 func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> void:
 	_world = world
+	quality = world.biome_quality
 	_choices.append(profile)
 	for choice in alternatives:
 		if choice != null and not choice.use_forest_reference and not _choices.has(choice):
@@ -60,6 +64,24 @@ func set_profile(profile: Profile) -> void:
 		_weather_progress = 1.
 	refresh()
 
+func set_quality(value: Quality) -> void:
+	if value == quality or value < Quality.ESSENTIAL or value > Quality.FULL:
+		return
+	quality = value
+	refresh()
+	if quality < Quality.FULL and _finish_effect != null:
+		_release_inactive(_finish_effect)
+	if quality == Quality.ESSENTIAL and is_instance_valid(_mist):
+		_mist.suspend()
+		_release_inactive(_mist.effect)
+
+# A rapid switch can re-enable the effect before the render thread drains the queue.
+func _release_inactive(effect: CompositorEffect) -> void:
+	RenderingServer.call_on_render_thread(func() -> void:
+		if not effect.enabled:
+			effect.release_on_render_thread()
+	)
+
 func set_weather(overcast: float, seconds: float = 2.5) -> void:
 	if _profile.overcast == null or not is_finite(overcast) or not is_finite(seconds):
 		return
@@ -85,8 +107,8 @@ func _process(delta: float) -> void:
 func refresh() -> void:
 	var hour: float = _world.showcase.hour
 	if _label != null:
-		_label.text = "%s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · F7 hậu kỳ · B đối chiếu" % [
-			_profile.display_name, int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
+		_label.text = "%s · %s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · F7 hậu kỳ · Shift+F7 chất lượng · B đối chiếu" % [
+			_profile.display_name, QUALITY_LABELS[quality], int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
 	if _world.look.stage != 2:
 		_update_finish()
 		return
@@ -135,7 +157,7 @@ func _update_finish() -> void:
 	var weight := 1.
 	if _profile.adaptive_bloom_by_hour != null:
 		weight = clampf(_profile.adaptive_bloom_by_hour.sample(_world.showcase.hour / 24.), 0., 1.)
-	var wanted: bool = combined and _allow_adaptive_bloom and _profile.adaptive_bloom and weight > 0. \
+	var wanted: bool = combined and quality == Quality.FULL and _allow_adaptive_bloom and _profile.adaptive_bloom and weight > 0. \
 		and _world.view_mode == "gameplay" and camera.is_current() \
 		and (_profile.local_exposure > 0. or _profile.adaptive_bloom_gain > 0.) \
 		and RenderingServer.get_current_rendering_method() == "mobile" \
@@ -169,7 +191,10 @@ func _update_finish() -> void:
 			_finish_effect.set_air_bloom_spread(_profile.adaptive_bloom_spread)
 	if combined:
 		# Keep native glow until the custom pass has completed one successful frame.
-		var custom_bloom: bool = wanted and _profile.adaptive_bloom_gain > 0. and _finish_effect.snapshot().frames > 0
+		var custom_bloom := false
+		if wanted and _profile.adaptive_bloom_gain > 0.:
+			var state := _finish_effect.snapshot()
+			custom_bloom = state.frames > 0 and state.bytes > 0
 		var native_weight := 1. - weight if custom_bloom else 1.
 		env.glow_enabled = _profile.glow_intensity > 0. and native_weight > 0.
 		env.glow_intensity = _profile.glow_intensity * native_weight
@@ -185,7 +210,7 @@ func _exit_tree() -> void:
 	RenderingServer.call_on_render_thread(effect.release_on_render_thread)
 
 func _prepare_spatial_mist(env: Environment) -> void:
-	var active := _profile.spatial_mist and RenderingServer.get_current_rendering_method() == "mobile" \
+	var active := quality != Quality.ESSENTIAL and _profile.spatial_mist and RenderingServer.get_current_rendering_method() == "mobile" \
 		and RenderingServer.get_rendering_device() != null
 	if not active:
 		_mist_sample.clear()
@@ -198,6 +223,7 @@ func _prepare_spatial_mist(env: Environment) -> void:
 		_mist.material_provider = _world.showcase._mist_materials
 		_mist.compositor_owned = _owns_finish_compositor
 		_mist.noise_strength = .28
+	_mist.screen_tile_pixels = 32 if quality == Quality.BALANCED else 16
 	var tint := Vector3(env.fog_light_color.r, env.fog_light_color.g, env.fog_light_color.b)
 	var phase_density := env.fog_density / maxf(_profile.noon_fog_density, .05)
 	var density := _profile.mist_extinction * phase_density
@@ -273,8 +299,12 @@ func handle_key(event: InputEventKey) -> bool:
 			_fog_enabled = not _fog_enabled
 			refresh()
 		KEY_F7:
-			_allow_adaptive_bloom = not _allow_adaptive_bloom
-			_update_finish()
+			if event.shift_pressed:
+				set_quality(Quality.BALANCED if quality == Quality.FULL else
+					Quality.ESSENTIAL if quality == Quality.BALANCED else Quality.FULL)
+			else:
+				_allow_adaptive_bloom = not _allow_adaptive_bloom
+				_update_finish()
 		KEY_J:
 			_allow_spatial_mist = not _allow_spatial_mist
 			_update_spatial_mist()
