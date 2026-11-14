@@ -2666,7 +2666,7 @@ func apply_time()->void:
 			return
 	_refresh_lantern_glow()
 	if _time_applied:_restore_day()
-	if is_day_anchor():
+	if is_day_anchor() and (use_forest or _weather.weight <= 0.):
 		if use_forest:_apply_forest(env,sun);_time_applied=true
 		else:_sync_canopy_direct()
 		return
@@ -2681,6 +2681,8 @@ func apply_time()->void:
 	if use_forest:
 		_apply_forest(env,sun)
 	else:
+		_weather.apply_lighting(_weather_profile, sun, env)
+		_weather.apply_air(_weather_profile, env, _lighting_scale(&"fog"))
 		_sync_canopy_direct()
 	_time_applied=true
 
