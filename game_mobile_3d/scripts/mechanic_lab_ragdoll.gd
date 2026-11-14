@@ -18,6 +18,7 @@ const WALL_SHOULDER_SLIDE_WINDOW := 5.0 / 60.0
 const WALL_SHOULDER_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
 const FIRST_WALL_SHOULDER_SLIDE_MIN_GAP := 0.17
 const WALL_SHOULDER_SLIDE_MAX := 0.08
+const REBOUND_SHOULDER_SLIDE_MAX_NORMAL_FRACTION := 0.65
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
@@ -635,8 +636,15 @@ func _slide_wall_shoulder_anchors() -> void:
 		for i in state.get_contact_count():
 			var wall := state.get_contact_collider_object(i) as StaticBody3D
 			var normal := state.get_contact_local_normal(i)
-			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y \
-					or absf(gap.dot(normal)) > distance * max_normal_fraction:
+			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y:
+				continue
+			var normal_gap := gap.dot(normal)
+			# An arm rebounding from the wall can also close a tangential
+			# gap while the torso is free. Leave wall-normal motion to physics.
+			var rebounding := normal_gap < 0.0 and core.get_contact_count() == 0 \
+				and state.linear_velocity.dot(normal) > 0.0
+			var normal_fraction := REBOUND_SHOULDER_SLIDE_MAX_NORMAL_FRACTION if rebounding else max_normal_fraction
+			if absf(normal_gap) > distance * normal_fraction:
 				continue
 			var wall_rid := wall.get_rid()
 			if PhysicsServer3D.body_get_shape_count(wall_rid) != 1 \
