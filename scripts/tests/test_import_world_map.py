@@ -3,8 +3,11 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 
 REPO = Path(__file__).resolve().parents[2]
@@ -150,6 +153,55 @@ class ImportWorldMapTests(unittest.TestCase):
         root["Metadata"] = {"TotalBlocks": 2}
         with self.assertRaisesRegex(ValueError, "TotalBlocks"):
             importer.decode_regions(root)
+
+    def test_portable_map_scene_selects_biome_and_preserves_package(self):
+        source = REPO / "game_mobile_3d/assets/maps/meadow_biome_review/World Map.litematic"
+        with tempfile.TemporaryDirectory() as temporary:
+            project = Path(temporary) / "game_mobile_3d"
+            output = project / "assets/maps/new_meadow"
+            scene = project / "scenes/maps/NewMeadow.tscn"
+            args = ["import_world_map.py", str(source), "--border", "bounds",
+                    "--output", str(output), "--scene", str(scene), "--biome", "humid_woodland"]
+            with patch.object(importer, "GODOT_PROJECT", project, create=True):
+                with patch.object(sys, "argv", args):
+                    importer.main()
+                original = scene.read_bytes()
+                self.assertIn(b'res://scenes/GameplayMap.tscn', original)
+                self.assertIn(b'res://scripts/world_map.gd', original)
+                self.assertIn(b'res://assets/graphics/biomes/humid_woodland.tres', original)
+                self.assertIn(b'map_layout_path = "res://assets/maps/new_meadow/runtime.json"', original)
+                self.assertIn(b'biome_graphics = ExtResource("biome")', original)
+                self.assertIn(b'[node name="NewMeadow" instance=ExtResource("base")]', original)
+                existing_runtime = output.joinpath("runtime.json").read_bytes()
+                with patch.object(sys, "argv", args):
+                    with self.assertRaises(SystemExit):
+                        importer.main()
+                self.assertEqual(scene.read_bytes(), original)
+                self.assertEqual(output.joinpath("runtime.json").read_bytes(), existing_runtime)
+                new_scene = scene.with_name("AnotherMeadow.tscn")
+                args[args.index(str(scene))] = str(new_scene)
+                with patch.object(sys, "argv", args):
+                    with self.assertRaises(SystemExit):
+                        importer.main()
+                self.assertFalse(new_scene.exists())
+
+    def test_scene_rejects_nonportable_biome_and_paths_before_import(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            project = Path(temporary) / "game_mobile_3d"
+            scene = project / "scenes/maps/TestMap.tscn"
+            output = project / "assets/maps/test"
+            with patch.object(importer, "GODOT_PROJECT", project, create=True):
+                for overrides in (["--scene", str(scene), "--biome", "forest_reference"],
+                                  ["--scene", str(project / "WrongFolder.tscn")],
+                                  ["--scene", str(scene.with_name("Invalid Scene.tscn"))],
+                                  ["--biome", "meadow"]):
+                    with self.subTest(overrides=overrides):
+                        with patch.object(sys, "argv", ["import_world_map.py", "unused.litematic",
+                                                        "--output", str(output), *overrides]):
+                            with self.assertRaises(SystemExit):
+                                importer.main()
+                self.assertFalse(output.exists())
+                self.assertFalse(scene.exists())
 
     def test_real_source_package_preserves_cells_states_hashes_and_scenery(self):
         source = REPO / "game_mobile_3d/assets/maps/world_map/World Map.litematic"
