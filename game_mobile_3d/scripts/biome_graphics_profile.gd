@@ -47,6 +47,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var local_mist_by_hour: Curve
 ## Independent multiplier for the second map region. Match the midnight endpoints.
 @export var additional_mist_by_hour: Curve
+## Optional tree-receiver weight by normalized hour. A missing track keeps the existing tree envelope.
+@export var grove_mist_by_hour: Curve
 ## Optional light scattered into low areas behind the player.
 @export var ground_haze: GroundHazeProfile
 @export_range(0., 1., .01) var ground_haze_strength := 0.

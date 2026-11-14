@@ -63,6 +63,8 @@ Forest lưu thông số hai lớp sương thấp trong preset tham chiếu. **S�
 
 Map import nạp khí quyển từ preset portable. Dữ liệu khí quyển Forest theo hash chỉ được đọc trên đường chạy tham chiếu. Quy trình dựng map mới dùng cùng controller và shader. Vùng sương cục bộ, vị trí đèn và các trường ánh sáng theo hình học vẫn thuộc từng scene.
 
+**Grove Mist By Hour** đặt độ nhận sương của thân và tán cho những map dùng hệ thống cây Grove. Forest chuyển mượt về cách đã duyệt quanh 12:00 và dùng độ nhận sương đầy đủ như terrain ở 09:30 và 14:15. Curve trống giữ cách cũ. Trong WorldMap, **Sương & hiệu ứng → Sương cục bộ → Sương đồng nhất trên cây** điều chỉnh mức pha trộn với curve. Map Meadow hiện dùng hệ cây khác.
+
 ## Mức chất lượng theo map và thiết bị
 
 Chọn **Biome Quality** trong Inspector của map. **Đầy đủ** là mặc định. **Cân bằng** giữ spatial mist với lưới thưa hơn và dùng glow tích hợp. **Nhẹ** dùng depth fog và glow tích hợp. Tất cả dùng chung giờ, mây, màu, ánh sáng và tonemapping của biome. Với preset bật spatial mist, **Essential Fog Scale** chỉnh lượng depth fog dự phòng ở mức Nhẹ. So ba mức ngay trong map bằng **Shift+F7**. Phím này chỉ đổi mức của phiên đang chơi. Biome Quality áp dụng cho map portable. Forest vẫn đi qua cấu hình tham chiếu riêng.

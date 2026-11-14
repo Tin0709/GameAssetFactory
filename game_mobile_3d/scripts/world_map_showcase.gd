@@ -176,6 +176,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_far_air": ["Chiều sâu sương đêm", 1.],
 	&"twilight_depth_scatter": ["Ánh tán xạ xa chạng vạng", 1.],
 	&"morning_depth_scatter": ["Tán xạ trung cảnh buổi sáng", 1.],
+	&"grove_mist_coherence": ["Sương đồng nhất trên cây", 1.],
 	&"scatter_chroma": ["Màu tán xạ sương", 1.],
 	&"bloom_local_response": ["Bloom theo sáng tối từng vùng", 1.],
 	&"night_bloom_prefilter": ["Lọc nền bloom ban đêm", 1.],
@@ -242,7 +243,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 153
+const LIGHTING_MIX_VERSION := 154
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1361,7 +1362,11 @@ func _mist_materials()->Array:
 	if distant_terrain.visible():
 		result.append(distant_terrain.material)
 	if grove_mist_enabled and level.grove != null:
-		result.append_array(level.grove.mist_receivers(PHASE_FINISH.phase_weight(hour)))
+		var tree_weight := PHASE_FINISH.phase_weight(hour)
+		if _biome_profile != null:
+			var authored := DayNight.sample_curve(_biome_profile.grove_mist_by_hour, hour / 24., tree_weight)
+			tree_weight = lerpf(tree_weight, clampf(authored, tree_weight, 1.), _lighting_scale(&"grove_mist_coherence"))
+		result.append_array(level.grove.mist_receivers(tree_weight))
 	return result
 
 func set_grove_mist(enabled: bool) -> void:
@@ -2085,6 +2090,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 153 and effect == &"forest_path_lamppost":
 			missing_value = 0.
+		if version < 154 and effect == &"grove_mist_coherence":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2234,6 +2241,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"ground_haze":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
+		if effect == &"grove_mist_coherence":
+			slider.editable = slider.editable and _biome_profile != null and _biome_profile.grove_mist_by_hour != null \
+				and is_instance_valid(level.grove)
 		if effect == &"twilight_ground_haze":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.twilight_ground_haze != null
 		if effect == &"distant_terrain":
@@ -2380,7 +2390,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_sync_forest_night_lights()
 		set_coupled_bloom(coupled_bloom)
 		return
-	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze"]:
+	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
 		_update_mist()
 		return
 	if changed_effect in [&"night_path_chroma", &"source_path_chroma"]:
