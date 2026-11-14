@@ -200,15 +200,15 @@ vec3 recover_twilight_shadow_color(vec3 graded, vec3 original) {
  weight += day_mix;""")
   diffusion_condition += " || base[3].y > 0."
  fragment=fragment.replace("void main() {",helpers+"void main() {")
- fragment=fragment.replace("if (air.x > 0.0) {", "if (air.x > 0.0 || air.y > 0.0) {")
- fragment=fragment.replace("adjusted += spread * air.x;","if (" + diffusion_condition + ") adjusted = diffuse_humid_light(adjusted, spread, uv_air);" + """
+ fragment=fragment.replace("if (air.x > 0.0) {", "if (air.x > 0.0 || air.y >= 2.0) {")
+ fragment=fragment.replace("adjusted += spread * (air.x * bloom_gain);","if (" + diffusion_condition + ") adjusted = diffuse_humid_light(adjusted, spread, uv_air);" + """
   // Use the existing bloom samples to soften bright-to-dark transitions before tonemapping.
   if (base[3].w > 0.0 && air.x > 0.0) {
    adjusted += (spread - adjusted) * min(air.x * base[3].w, 0.48);
   }
-  adjusted += spread * air.x;
+  adjusted += spread * (air.x * bloom_gain);
  """)
- fragment=fragment.replace("if (settings.x <= 0.0)","if (settings.x < 0.0)")
+ fragment=fragment.replace("if (settings.x <= 0.0 && air.x <= 0.0)","if (settings.x < 0.0)")
  fragment=fragment.replace("result=vec4(inverse_display(clamp(display,0.,1.)),color.a);","vec3 original_finish = gaf_finish(adjusted);\n\t\tvec3 mixed_finish = mix(original_finish,inverse_display(clamp(display,0.,1.)),base[1].z);\n\t\tresult=vec4(recover_twilight_shadow_color(mixed_finish,original_finish),color.a);")
  if _render_edge:
   fragment=fragment.replace("color.a);", "color.a);result.rgb=clamp(gaf_display(result.rgb),0.,1.);")

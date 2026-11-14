@@ -46,7 +46,7 @@ layout(location=0) out vec4 result;
 const vec3 luma = vec3(0.2126, 0.7152, 0.0722);
 void main() {
 	vec4 color = texelFetch(source_color, ivec2(gl_FragCoord.xy), 0);
-	if (settings.x <= 0.0) {
+	if (settings.x <= 0.0 && air.x <= 0.0) {
 		result = color;
 		return;
 	}
@@ -73,11 +73,19 @@ void main() {
 	float gain = exp2(gain_stops);
 	if(air.z<.5) gain=min(gain,1.0/max(peak,0.002));
 	vec3 adjusted = color.rgb * gain;
+	// Reuse the local meter. Bound bloom's neighborhood gain independently of scene gain.
+	float bloom_gain = 1.0;
+	float response = mod(air.y, 2.0);
+	if (air.x > 0.0 && response > 0.0) {
+		float local_stops = clamp(log2(settings.y) - log_base, -2.0, 2.0);
+		float bloom_stops = 0.45 * max(local_stops, 0.0) * toe + 0.24 * min(local_stops, 0.0);
+		bloom_gain = exp2(response * bloom_stops);
+	}
 	if (air.x > 0.0) {
 		vec2 uv_air = gl_FragCoord.xy / vec2(textureSize(source_color, 0));
 		vec3 spread = textureLod(soft_light, uv_air, 0.0).rgb;
 		// Original bounded Mobile light spread, not the native UE bloom kernel.
-		adjusted += spread * air.x;
+		adjusted += spread * (air.x * bloom_gain);
 	}
 	result = vec4(adjusted, color.a);
 }
@@ -147,6 +155,7 @@ func _coherent_air_source(block:int=4)->String:
 
 var _air_bloom:=false
 var _air_response:=1.
+var _bloom_local_response := 0.
 var _air_spread:=1.
 func set_air_bloom_spread(value: float) -> void:
 	var spread := clampf(value, 0., 2.) if is_finite(value) else 1.
@@ -158,6 +167,13 @@ func set_air_bloom_response(value:float)->void:
 	var response:=clampf(value,0.,4.)if is_finite(value)else 1.
 	if response==_air_response:return
 	_air_response=response;set_neutral(false)
+
+func set_bloom_local_response(value: float) -> void:
+	var response := clampf(value, 0., 1.) if is_finite(value) else 0.
+	if response == _bloom_local_response:
+		return
+	_bloom_local_response = response
+	set_neutral(false)
 
 func set_air_bloom(value:bool)->void:
 	if _air_bloom==value:return
@@ -179,12 +195,13 @@ func _init() -> void:
 	access_resolved_color = true
 
 func set_neutral(neutral: bool) -> void:
-	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16*_air_response if _air_bloom and not neutral else 0.,0.,0.,_air_spread])
+	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16*_air_response if _air_bloom and not neutral else 0.,_bloom_local_response if not neutral else 0.,0.,_air_spread])
 	parameters[0] = 0.0 if neutral else _review_strength
 	_guard.lock()
 	_parameters = parameters.to_byte_array()
 	_state["air_bloom_response"]=_air_response;_state["air_bloom_weight"]=parameters[4]
 	_state["air_bloom_spread"]=_air_spread
+	_state["bloom_local_response"] = parameters[5]
 	_guard.unlock()
 
 func set_review_strength(value: float) -> void:
@@ -343,7 +360,7 @@ func _render_callback(kind: int, data: RenderData) -> void:
 	var finish_needs_soft_light := _finish_needs_soft_light()
 	# The finish and bloom share the same filtered light, with separate weights.
 	if finish_needs_soft_light:
-		parameters.encode_float(20, 1.0)
+		parameters.encode_float(20, parameters.decode_float(20) + 2.0)
 	if _source_format==HDR_FORMAT:
 		# RGB10 scene color stores half radiance; RGBA16F stores full radiance.
 		# Preserve the existing physical middle gray and toe, not a new art gain.
