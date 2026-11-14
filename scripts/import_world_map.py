@@ -358,12 +358,14 @@ def require_portable_biome(biome):
         rf'^\[ext_resource\b[^\n]*\bpath="{re.escape(BIOME_PROFILE_SCRIPT)}"'
         r'[^\n]*\bid="([^"]+)"[^\n]*\]$', re.MULTILINE)
     try:
+        if not any(entry.name == path.name for entry in directory.iterdir()):
+            raise FileNotFoundError(path)
         source = path.read_text(encoding="utf-8-sig")
     except (OSError, UnicodeError) as error:
         raise ValueError(f"Cannot read biome preset {path}") from error
     declarations, section, properties = source.partition("\n[resource]")
     match = loader.search(declarations)
-    if not section or not match or not re.search(
+    if not declarations.startswith("[gd_resource ") or not section or not match or not re.search(
             rf'^script\s*=\s*ExtResource\("{re.escape(match[1])}"\)\s*$',
             properties, re.MULTILINE):
         raise ValueError(f"{path.name} must use BiomeGraphicsProfile")
@@ -371,6 +373,11 @@ def require_portable_biome(biome):
             r'^(?:atmosphere|finish)_reference_(?:path|sha256)\s*=\s*"[^"\n]+',
             properties, re.MULTILINE):
         raise ValueError(f"{path.name} requires private reference data and cannot be used on an imported map")
+    project = GODOT_PROJECT.resolve()
+    for dependency in re.findall(r'^\[ext_resource\b[^\n]*\bpath="res://([^"]+)"', declarations, re.MULTILINE):
+        resource = (project / dependency).resolve()
+        if not resource.is_relative_to(project) or not resource.is_file():
+            raise ValueError(f"{path.name} has an unavailable dependency: res://{dependency}")
 
 
 def map_scene_source(scene_name, runtime_path, biome):
@@ -402,7 +409,7 @@ def main():
     output = args.output.resolve()
     if args.border == "bounds" and output == DEFAULT_OUTPUT.resolve():
         parser.error("--border bounds requires a separate map --output")
-    if args.biome and not args.scene:
+    if args.biome is not None and not args.scene:
         parser.error("--biome requires --scene")
     scene_info = {}
     if args.scene:
@@ -416,7 +423,7 @@ def main():
             parser.error("--scene requires a new --output directory under game_mobile_3d/assets/maps")
         if scene.exists() or output.exists():
             parser.error("--scene and --output must both be new to preserve any existing map work")
-        biome = args.biome or DEFAULT_BIOME
+        biome = DEFAULT_BIOME if args.biome is None else args.biome
         try:
             require_portable_biome(biome)
         except ValueError as error:

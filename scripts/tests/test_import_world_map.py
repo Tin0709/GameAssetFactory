@@ -161,7 +161,10 @@ class ImportWorldMapTests(unittest.TestCase):
             presets = project / "assets/graphics/biomes"
             presets.mkdir(parents=True)
             source_presets = REPO / "game_mobile_3d/assets/graphics/biomes"
-            (presets / "humid_woodland.tres").write_bytes((source_presets / "humid_woodland.tres").read_bytes())
+            for name in ("humid_woodland", "humid_woodland_day_night", "woodland_overcast"):
+                (presets / f"{name}.tres").write_bytes((source_presets / f"{name}.tres").read_bytes())
+            (project / "scripts").mkdir()
+            (project / "scripts/biome_graphics_profile.gd").touch()
             output = project / "assets/maps/new_meadow"
             scene = project / "scenes/maps/NewMeadow.tscn"
             args = ["import_world_map.py", str(source), "--border", "bounds",
@@ -207,8 +210,15 @@ class ImportWorldMapTests(unittest.TestCase):
                 template.replace("biome_graphics_profile", "biome_weather_profile"), encoding="utf-8")
             (presets / "private_lookup.tres").write_text(
                 template + 'finish_reference_path = "old/private.json"\n', encoding="utf-8")
+            (project / "scripts").mkdir()
+            (project / "scripts/biome_graphics_profile.gd").touch()
+            (presets / "broken_valley.tres").write_text(template.replace(
+                "[resource]", '[ext_resource type="Resource" path="res://missing.tres" id="extra"]\n\n[resource]'),
+                encoding="utf-8")
             cases = {
                 "custom_valley": None,
+                "CUSTOM_VALLEY": "Cannot read biome preset",
+                "broken_valley": "has an unavailable dependency",
                 "private_valley": "requires private reference data",
                 "private_lookup": "requires private reference data",
                 "fake_profile": "must use BiomeGraphicsProfile",
