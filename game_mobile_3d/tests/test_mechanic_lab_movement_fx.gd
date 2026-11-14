@@ -366,6 +366,8 @@ func check_wall_slide_steps(lab, dust, wind) -> void:
 	var player = lab.player
 	var movement = lab.get_node("MovementAudio")
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var camera: Camera3D = lab.camera
+	var original_camera_basis := camera.global_basis
 	var wall := StaticBody3D.new()
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -376,7 +378,7 @@ func check_wall_slide_steps(lab, dust, wind) -> void:
 	toggle.button_pressed = true
 	for case: Dictionary in [
 		{"yaw": 0.31, "camera_yaw": 0.0, "live": false, "progress": false},
-		{"yaw": 0.27, "camera_yaw": 0.7, "live": true, "progress": false},
+		{"yaw": 0.31, "camera_yaw": 0.7, "live": true, "progress": false},
 		{"yaw": 1.20, "camera_yaw": 0.7, "live": true, "progress": true},
 	]:
 		var camera_basis := Basis(Vector3.UP, case.camera_yaw)
@@ -385,7 +387,7 @@ func check_wall_slide_steps(lab, dust, wind) -> void:
 		wall.rotation.y = case.yaw + case.camera_yaw
 		lab.reset_player()
 		player.scripted_input = not case.live
-		player.set_movement_camera_basis(camera_basis)
+		camera.global_basis = camera_basis
 		for i in 10:
 			await physics_frame
 		if case.live:
@@ -426,7 +428,7 @@ func check_wall_slide_steps(lab, dust, wind) -> void:
 			" forward=", forward_speed, " lateral=", lateral_speed, " grass_steps=", steps,
 			" dust=", dust_emitted, " wind=", wind_emitted)
 	player.scripted_input = false
-	player.set_movement_camera_basis(Basis.IDENTITY)
+	camera.global_basis = original_camera_basis
 	toggle.button_pressed = false
 	wall.free()
 	lab.reset_player()
