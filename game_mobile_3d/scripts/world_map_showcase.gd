@@ -862,12 +862,14 @@ func _update_mist()->void:
 		var noon := 0.
 		if not _flat_lab and not _balanced_preview and atmosphere_review == "combined":
 			noon = _lighting_scale(&"noon_depth_haze") * _noon_lighting_weight()
-		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * (phase + .46 * noon)
-		strength *= near_scale * _lighting_scale(&"fog")
+		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * (phase + .46 * noon) * near_scale
+		strength *= _lighting_scale(&"fog")
 		sample.near_layer = Vector3(NEAR_HAZE_ENTRY_M, strength, level.spawn_position.y + NEAR_HAZE_REFERENCE_HEIGHT_M)
 		if noon > 0.:
-			# Calibrated from the Foreground/Midground split seen in the Forest captures.
+			# Calibrated from the foreground and midground split in the Forest captures.
 			sample.depth_scatter = 1.65 * noon
+			sample.depth_scatter_offset = mist.effect.DEPTH_SCATTER_START_M
+			sample.depth_scatter_ramp = mist.effect.DEPTH_SCATTER_RAMP_M
 			var cooler := linear * Vector3(.76, .85, 1.44)
 			sample.depth_scatter_color = (cooler * (linear.dot(luma) / maxf(cooler.dot(luma), .000001)) - linear) * noon
 		var depth_mix := _lighting_scale(&"near_haze_depth")
