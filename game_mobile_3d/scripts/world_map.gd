@@ -405,6 +405,7 @@ func set_review_view(mode: String) -> void:
 		geometry.update_cutaway(Vector3.ZERO,Vector3.ZERO)
 	_update_camera_near(camera)
 	if look != null:look.refresh_atmosphere()
+	if biome_controller != null:biome_controller.refresh()
 	if grove != null and (grove.visible or grove.spruce_visible()):grove.update_focus(camera,player.global_position,mode=="gameplay")
 	if showcase!=null:showcase.end_environment_edit()
 

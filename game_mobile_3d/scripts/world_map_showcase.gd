@@ -1,7 +1,9 @@
 extends Node
 ## Owns the unified review, not the private assets or the original controller.
 const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
-const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
+const RenderSettings = preload("res://scripts/biome_render_settings.gd")
+const DayNight = preload("res://scripts/biome_day_night.gd")
+const Weather = preload("res://scripts/biome_weather.gd")
 const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
@@ -32,6 +34,10 @@ var panel:PanelContainer
 var status:Label
 var hour:=12.
 var cycle_enabled:=false
+var _weather := Weather.new()
+var _weather_profile: Resource
+var _weather_button: CheckButton
+var _applied_weather_weight := 0.
 var audio_enabled:=false
 var plants:Node3D
 var palette:=PALETTE.new()
@@ -364,6 +370,11 @@ func setup(world:Node3D)->void:
 	var profile = world.get("biome_graphics")
 	if private_primary and profile != null and profile.use_forest_reference:
 		forest = FOREST.new(profile.atmosphere_reference_path, profile.atmosphere_reference_sha256)
+		_weather_profile = profile.overcast
+		if _weather_profile != null:
+			_weather.set_target(profile.start_overcast, 0.)
+		hour = fposmod(profile.start_hour, 24.)
+		cycle_enabled = profile.auto_cycle
 	if not private_primary:
 		_build_basic_settings()
 		return
@@ -822,6 +833,17 @@ func _exit_tree()->void:
 	if grade_review!=null:grade_review.release()
 	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
 
+func set_weather(overcast: float, seconds: float = 2.5) -> void:
+	if _weather_profile == null:
+		return
+	var old_weight := _weather.weight
+	_weather.set_target(overcast, seconds)
+	if _weather_button != null:
+		_weather_button.set_pressed_no_signal(_weather.target > 0.)
+	if _weather.weight != old_weight:
+		apply_time()
+		_update_mist()
+
 func _update_mist()->void:
 	mist_source_active=false
 	_update_player_falloff()
@@ -949,6 +971,7 @@ func _update_mist()->void:
 		if sample.has("depth_scatter_color"):
 			var depth_delta: Vector3 = sample.depth_scatter_color
 			sample.depth_scatter_color = (Vector3.ONE * depth_delta.dot(luma)).lerp(depth_delta, scatter_chroma)
+	_weather.apply_medium(_weather_profile, sample)
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
 
 func _pre_twilight_air_weight() -> float:
@@ -2474,18 +2497,27 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		p.fog_opacity *= _lighting_scale(&"fog")
 		p.volume_density *= _lighting_scale(&"fog")
 		var fog:Vector3=p.fog_color
-		BiomeGraphics.apply_depth_fog(env, Color(fog.x, fog.y, fog.z), p.fog_opacity, p.fog_begin, p.fog_end)
+		RenderSettings.apply_depth_fog(env, Color(fog.x, fog.y, fog.z), p.fog_opacity, p.fog_begin, p.fog_end)
 		env.fog_light_energy *= _lighting_scale(&"scatter")
 		env.fog_depth_curve=.8
-		if spatial_mist and mist!=null and mist.failure().is_empty() and mist.effect.snapshot().ready:env.fog_density=0.
-		BiomeGraphics.apply_finish(env, float(_day.adjustment_contrast) * p.contrast_scale,
-			env.adjustment_saturation * p.saturation_scale, true,
-			float(_day.glow_intensity) * p.glow_scale * _lighting_scale(&"bloom"),
+		RenderSettings.apply_grade(env, float(_day.adjustment_contrast) * p.contrast_scale,
+			env.adjustment_saturation * p.saturation_scale)
+		RenderSettings.apply_bloom(env, true, float(_day.glow_intensity) * p.glow_scale * _lighting_scale(&"bloom"),
 			float(_day.glow_bloom) * p.bloom_scale, .86)
 	if _vignette!=null:
 		_vignette.visible=atmosphere_review in ["haze","combined"]
 		_vignette.material.set_shader_parameter("strength",p.vignette)
 	_apply_forest_dusk_backdrop(env)
+	if atmosphere_review in ["lighting", "combined"]:
+		_weather.apply_lighting(_weather_profile, sun, env)
+	if atmosphere_review in ["haze", "combined"]:
+		_weather.apply_air(_weather_profile, env, _lighting_scale(&"fog"))
+		p.fog_opacity = env.fog_density
+		var weather_tint := env.fog_light_color
+		p.fog_color = Vector3(weather_tint.r, weather_tint.g, weather_tint.b)
+		if spatial_mist and mist != null and mist.failure().is_empty() and mist.effect.snapshot().ready:
+			env.fog_density = 0.
+	_applied_weather_weight = _weather.weight
 	_forest_expected.clear()
 	for field:String in ENV_FIELDS:_forest_expected[field]=env.get(field)
 	_forest_sun=sun.light_color;_forest_energy=sun.light_energy;_forest_hour=hour
@@ -2519,10 +2551,7 @@ func set_hour(value:float)->void:
 		level.look._refresh_ground_bounce()
 
 func next_shortcut_hour() -> float:
-	for phase: float in TIME_SHORTCUT_HOURS:
-		if phase > hour + 0.01:
-			return phase
-	return TIME_SHORTCUT_HOURS[0]
+	return DayNight.next_hour(hour, TIME_SHORTCUT_HOURS)
 
 func _choose_hour(value: float) -> void:
 	if not is_equal_approx(hour, value):
@@ -2628,7 +2657,7 @@ func apply_time()->void:
 	var sun:DirectionalLight3D=level.get_node("Sun")
 	level.look.refresh_directional_shadow_blur(sun)
 	level.look.refresh_daylight_cloud_shape()
-	if use_forest and _forest_hour==hour and not _forest_expected.is_empty() and sun.light_color==_forest_sun and sun.light_energy==_forest_energy and sun.shadow_opacity==_forest_shadow_opacity:
+	if use_forest and _forest_hour==hour and _applied_weather_weight == _weather.weight and not _forest_expected.is_empty() and sun.light_color==_forest_sun and sun.light_energy==_forest_energy and sun.shadow_opacity==_forest_shadow_opacity:
 		var unchanged:=true
 		for field:String in _forest_expected:
 			if env.get(field)!=_forest_expected[field]:unchanged=false;break
@@ -2642,7 +2671,7 @@ func apply_time()->void:
 		else:_sync_canopy_direct()
 		return
 	var p:Dictionary=palette.sample(hour);var noon:Dictionary=palette.sample(12.)
-	BiomeGraphics.apply_lighting(sun, env, p, noon, _day.sun_rotation, _day.sun_color,
+	RenderSettings.apply_lighting(sun, env, p, noon, _day.sun_rotation, _day.sun_color,
 		_day.sun_energy, _day.ambient_light_color, _day.ambient_light_energy)
 	env.background_color=p.sky
 	env.tonemap_exposure=float(_day.tonemap_exposure)*float(p.exposure)/float(noon.exposure)
@@ -2766,7 +2795,12 @@ func _process(delta:float)->void:
 		_fps_label.text="FPS: %d"%Engine.get_frames_per_second()
 	_elapsed+=delta
 	if cycle_enabled and level.look.stage == 2:
-		hour = PALETTE.advance(hour, delta, _day_cycle_seconds(_lighting_scale(&"day_cycle_pacing")))
+		var profile = level.biome_graphics
+		var cycle_seconds := _day_cycle_seconds(_lighting_scale(&"day_cycle_pacing"))
+		if profile != null and profile.use_forest_reference:
+			cycle_seconds *= profile.cycle_minutes * 60. / FOREST_DAY_SECONDS
+		hour = DayNight.advance(hour, delta, cycle_seconds)
+	_weather.advance(delta)
 	apply_time()
 	_update_mist()
 	_sync_oak_leaf_tint()
@@ -3238,6 +3272,13 @@ func _build_ui()->void:
 	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Sunset",18.5],["Lantern onset",19.25],["Twilight",19.5],["Night",22.],["Dawn",2.5]]:
 		var button:=Button.new();button.text=entry[0];button.focus_mode=Control.FOCUS_NONE;times.add_child(button)
 		button.pressed.connect(_choose_hour.bind(float(entry[1])))
+	if _weather_profile != null:
+		_weather_button = CheckButton.new()
+		_weather_button.name = "ForestWeather"
+		_weather_button.focus_mode = Control.FOCUS_NONE
+		_weather_button.button_pressed = _weather.target > 0.
+		_weather_button.toggled.connect(func(value: bool): set_weather(1. if value else 0.))
+		box.add_child(_weather_button)
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)
@@ -3347,6 +3388,11 @@ func handle_key(event:InputEventKey)->bool:
 		if not plants.visible:plants.reset()
 		return true
 	if event.physical_keycode==KEY_B:_compare_from_settings();return true
+	if event.physical_keycode == KEY_F6 and _weather_profile != null:
+		var previous := _weather.target
+		_settings.remember_edit(set_weather.bind(previous))
+		set_weather(0. if previous > 0. else 1.)
+		return true
 	if event.physical_keycode==KEY_T:
 		if event.shift_pressed:
 			var previous := cycle_enabled
