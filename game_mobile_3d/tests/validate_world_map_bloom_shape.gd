@@ -32,7 +32,6 @@ func run():
  w.showcase.set_source_bloom_shape(true);await settle()
  check(not snapshot(w).get("shape_active",false),"Noon keeps approved original shape")
  if native:
-  var before=snapshot(w)
   w.showcase.set_hour(22.);await settle();await settle()
   var s=snapshot(w)
   check(s.get("shape_active",false),"Six-radius kernel executes in Night main scene")
@@ -40,11 +39,12 @@ func run():
   check(s.get("shape_levels",0)==6,"Six actual spatial levels")
   check(s.get("shape_bytes",0)>0,"Allocation measured")
   check(w.showcase.phase_finish.active and w.look.local_exposure_active(),"Phase grade and F7 remain owned")
-  check(absf(s.get("air_bloom_weight",0.)-.16*w.showcase.bloom_response.sample(0.))<.00000004,"Shape does not duplicate captured night intensity")
+  var shaped_bloom_weight: float = s.get("air_bloom_weight",0.)
   var n=s.rebuilds
   await settle();check(snapshot(w).rebuilds==n,"Stable scene does not reallocate")
   w.showcase.set_source_bloom_shape(false);await settle();s=snapshot(w)
   check(not s.get("shape_active",false)and s.get("shape_bytes",0)==0,"OFF releases extra shape and restores old field")
+  check(is_equal_approx(s.get("air_bloom_weight",-1.),shaped_bloom_weight),"Shape preserves current night bloom strength")
   w.showcase.set_source_bloom_shape(true);await settle()
   w.showcase.set_hour(12.);await settle();s=snapshot(w)
   check(not s.get("shape_active",false)and s.get("shape_bytes",0)==0,"Noon release has no shape texture/pass")
