@@ -149,6 +149,8 @@ func refresh() -> void:
 		exposure = day_night.sample_curve(day_night.exposure, time, exposure)
 	if _profile.key_energy_by_hour != null:
 		sun.light_energy *= maxf(0., _profile.key_energy_by_hour.sample(time))
+	var ambient_scale := DayNight.sample_curve(_profile.ambient_energy_by_hour, time, 1.)
+	env.ambient_light_energy *= maxf(0., ambient_scale)
 	var fog_density := _profile.noon_fog_density * float(p.fog_amount) / float(_noon.fog_amount)
 	if _profile.fog_density_by_hour != null:
 		fog_density *= maxf(0., _profile.fog_density_by_hour.sample(time))

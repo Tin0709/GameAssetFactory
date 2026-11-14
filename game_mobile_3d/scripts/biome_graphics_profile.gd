@@ -72,6 +72,8 @@ const DayNight = preload("res://scripts/biome_day_night.gd")
 @export var day_night: DayNight
 ## Maps normalized time (0 to 1) to a multiplier. Match the midnight endpoints.
 @export var key_energy_by_hour: Curve
+## Ambient multiplier before weather. Omit to retain the shared palette energy.
+@export var ambient_energy_by_hour: Curve
 @export var fog_density_by_hour: Curve
 
 @export_group("Local path fixture")
