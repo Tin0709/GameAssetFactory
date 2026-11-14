@@ -463,6 +463,7 @@ func run() -> void:
 	await check_wall_pinned_joint()
 	await check_wall_pinned_joint(true)
 	await check_edge_landing_gravity()
+	await check_corner_ragdoll(16, 2.0, true, -1.0, 0.18)
 	await check_corner_ragdoll(170, 2.0, true, -1.0, 0.23)
 	await check_corner_ragdoll(287, 2.0, true, -1.0, 0.17)
 	await check_corner_ragdoll(396, 2.0, true, -1.0, 0.19)
