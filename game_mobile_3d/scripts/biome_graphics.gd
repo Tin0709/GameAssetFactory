@@ -2,6 +2,8 @@ extends Node
 ## Applies biome resources to the map's own environment and light.
 
 const Profile = preload("res://scripts/biome_graphics_profile.gd")
+const RenderSettings = preload("res://scripts/biome_render_settings.gd")
+const Weather = preload("res://scripts/biome_weather.gd")
 const DayNight = preload("res://scripts/biome_day_night.gd")
 const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const Palette = preload("res://scripts/world_map_showcase_palette.gd")
@@ -13,11 +15,9 @@ enum Quality { ESSENTIAL, BALANCED, FULL }
 const QUALITY_LABELS := ["Nhẹ", "Cân bằng", "Đầy đủ"]
 
 var quality := Quality.FULL
-var weather_weight := 0.
-var _weather_target := 0.
-var _weather_from := 0.
-var _weather_progress := 1.
-var _weather_duration := 0.
+var _weather := Weather.new()
+var weather_weight: float:
+	get: return _weather.weight
 var _world: Node3D
 var _profile: Profile
 var _palette := Palette.new()
@@ -32,6 +32,7 @@ var _allow_spatial_mist := true
 var _path_fixture := PathFixture.new()
 var _allow_fixture_scatter := true
 var _mist_sample: Dictionary
+var _depth_fog_density := 0.
 var _allow_adaptive_bloom := true
 var _finish_effect: LocalExposure
 var _finish_camera: Camera3D
@@ -70,9 +71,7 @@ func set_profile(profile: Profile) -> void:
 	if slot >= 0:
 		_profile_index = slot
 	if _profile.overcast == null:
-		_weather_target = 0.
-		weather_weight = 0.
-		_weather_progress = 1.
+		_weather.set_target(0., 0.)
 	refresh()
 
 func set_quality(value: Quality) -> void:
@@ -94,15 +93,11 @@ func _release_inactive(effect: CompositorEffect) -> void:
 	)
 
 func set_weather(overcast: float, seconds: float = 2.5) -> void:
-	if _profile.overcast == null or not is_finite(overcast) or not is_finite(seconds):
+	if _profile.overcast == null:
 		return
-	_weather_from = weather_weight
-	_weather_target = clampf(overcast, 0., 1.)
-	_weather_progress = 0.
-	_weather_duration = maxf(seconds, 0.)
-	if _weather_duration == 0.:
-		weather_weight = _weather_target
-		_weather_progress = 1.
+	var previous := _weather.weight
+	_weather.set_target(overcast, seconds)
+	if _weather.weight != previous:
 		refresh()
 
 func _process(delta: float) -> void:
@@ -110,10 +105,8 @@ func _process(delta: float) -> void:
 	_update_finish()
 	_update_spatial_mist()
 	if _cycle and _world.look.stage == 2:
-		_world.showcase.set_hour(Palette.advance(_world.showcase.hour, delta, _profile.cycle_minutes * 60.))
-	if _weather_progress < 1.:
-		_weather_progress = minf(1., _weather_progress + delta / _weather_duration)
-		weather_weight = lerpf(_weather_from, _weather_target, smoothstep(0., 1., _weather_progress))
+		_world.showcase.set_hour(DayNight.advance(_world.showcase.hour, delta, _profile.cycle_minutes * 60.))
+	if _weather.advance(delta):
 		refresh()
 
 func refresh() -> void:
@@ -124,12 +117,13 @@ func refresh() -> void:
 	if _world.look.stage != 2:
 		_update_local_diffuse()
 		_update_fixture(0.)
+		_update_spatial_mist()
 		_update_finish()
 		return
 	var env: Environment = _world.get_node("WorldEnvironment").environment
 	var sun: DirectionalLight3D = _world.get_node("Sun")
 	var p := _palette.sample(hour)
-	apply_lighting(sun, env, p, _noon, _profile.noon_sun_rotation, _profile.noon_sun_color,
+	RenderSettings.apply_lighting(sun, env, p, _noon, _profile.noon_sun_rotation, _profile.noon_sun_color,
 		_profile.noon_sun_energy, _profile.noon_ambient_color, _profile.noon_ambient_energy)
 	sun.shadow_blur = _profile.shadow_blur
 	sun.shadow_opacity = _profile.shadow_opacity
@@ -157,31 +151,26 @@ func refresh() -> void:
 	if _profile.fog_density_by_hour != null:
 		fog_density *= maxf(0., _profile.fog_density_by_hour.sample(time))
 	var saturation := _profile.saturation * float(p.saturation) / float(_noon.saturation)
-	var weather := _profile.overcast
-	if weather != null and weather_weight > 0.:
-		sun.light_color = sun.light_color.lerp(weather.key_color, weather_weight)
-		sun.light_energy *= lerpf(1., weather.key_energy_scale, weather_weight)
-		env.ambient_light_energy *= lerpf(1., weather.ambient_energy_scale, weather_weight)
-		sky = sky.lerp(weather.fog_color, .45 * weather_weight)
-		fog_color = fog_color.lerp(weather.fog_color, weather_weight)
-		fog_density += weather.additional_fog * weather_weight
-		saturation *= lerpf(1., weather.saturation_scale, weather_weight)
-	# Depth fog covers more of the view than the height-limited spatial medium.
-	if quality == Quality.ESSENTIAL and _profile.spatial_mist:
-		fog_density *= _profile.essential_fog_scale
 	env.background_color = sky
 	env.fog_enabled = _fog_enabled
 	env.fog_mode = Environment.FOG_MODE_DEPTH
 	env.fog_depth_curve = _profile.fog_depth_curve
 	env.fog_light_energy = _profile.fog_light_energy
-	apply_depth_fog(env, fog_color, clampf(fog_density, 0., 1.), _profile.fog_depth_m.x,
+	RenderSettings.apply_depth_fog(env, fog_color, fog_density, _profile.fog_depth_m.x,
 		maxf(_profile.fog_depth_m.y, _profile.fog_depth_m.x + .1))
 	env.tonemap_mode = _profile.tonemap
 	env.tonemap_exposure = clampf(exposure, .1, 4.)
 	env.adjustment_enabled = true
 	env.adjustment_color_correction = _profile.color_correction
-	apply_finish(env, _profile.contrast, saturation, _profile.glow_intensity > 0.,
+	RenderSettings.apply_grade(env, _profile.contrast, saturation)
+	RenderSettings.apply_bloom(env, _profile.glow_intensity > 0.,
 		_profile.glow_intensity, _profile.glow_bloom, _profile.glow_hdr_threshold)
+	_weather.apply_lighting(_profile.overcast, sun, env)
+	# Scale the authored depth fog only after applying the weather response.
+	var fog_gain := _profile.essential_fog_scale if quality == Quality.ESSENTIAL and _profile.spatial_mist else 1.
+	env.fog_density *= fog_gain
+	_weather.apply_air(_profile.overcast, env, fog_gain)
+	_depth_fog_density = clampf(env.fog_density, 0., 1.)
 	_update_fixture(time)
 	_prepare_spatial_mist(env, time)
 	_update_local_diffuse()
@@ -230,20 +219,11 @@ func _update_finish() -> void:
 		and RenderingServer.get_current_rendering_method() == "mobile" \
 		and RenderingServer.get_rendering_device() != null
 	if wanted and _finish_effect == null:
-		_finish_camera = camera
-		_previous_compositor = camera.compositor
-		_finish_compositor = Compositor.new()
-		var source := _previous_compositor
-		if source == null:
-			var world_environment: WorldEnvironment = _world.get_node("WorldEnvironment")
-			source = world_environment.compositor
-		var chain: Array[CompositorEffect] = []
-		if source != null:
-			chain.assign(source.compositor_effects)
+		_ensure_compositor(camera)
 		_finish_effect = LocalExposure.new()
+		var chain := _finish_compositor.compositor_effects.duplicate()
 		chain.append(_finish_effect)
 		_finish_compositor.compositor_effects = chain
-		camera.compositor = _finish_compositor
 	if _finish_effect != null:
 		wanted = wanted and camera.compositor == _finish_compositor and _finish_effect.failure().is_empty()
 		_finish_effect.enabled = wanted
@@ -267,15 +247,30 @@ func _update_finish() -> void:
 		env.glow_intensity = _profile.glow_intensity * native_weight
 		env.glow_bloom = _profile.glow_bloom * native_weight
 
+func _ensure_compositor(camera: Camera3D) -> void:
+	if _finish_compositor != null:
+		return
+	_finish_camera = camera
+	_previous_compositor = camera.compositor
+	var source := _previous_compositor
+	if source == null:
+		var world_environment: WorldEnvironment = _world.get_node("WorldEnvironment")
+		source = world_environment.compositor
+	_finish_compositor = Compositor.new()
+	if source != null:
+		_finish_compositor.compositor_effects = source.compositor_effects.duplicate()
+	camera.compositor = _finish_compositor
+
 func _exit_tree() -> void:
 	DiffuseRegion.release(self)
-	if _finish_effect == null:
-		return
-	var effect := _finish_effect
-	effect.enabled = false
+	if is_instance_valid(_mist):
+		_mist.suspend()
+		_mist.queue_free()
 	if is_instance_valid(_finish_camera) and _finish_camera.compositor == _finish_compositor:
 		_finish_camera.compositor = _previous_compositor
-	RenderingServer.call_on_render_thread(effect.release_on_render_thread)
+	if _finish_effect != null:
+		_finish_effect.enabled = false
+		RenderingServer.call_on_render_thread(_finish_effect.release_on_render_thread)
 
 func _update_fixture(time: float) -> void:
 	var anchor: Vector2 = _world.biome_path_fixture_xz
@@ -298,11 +293,14 @@ func _prepare_spatial_mist(env: Environment, time: float) -> void:
 		_update_spatial_mist()
 		return
 	if _mist == null:
+		var camera := _world.get_node("Camera3D") as Camera3D
+		_ensure_compositor(camera)
 		_mist = MistVolume.new()
-		_world.get_node("Camera3D").add_child(_mist)
+		camera.add_child(_mist)
 		_mist.setup()
 		_mist.material_provider = _mist_materials
 		_mist.compositor_owned = _owns_finish_compositor
+		_mist.medium_state = _set_mist_state
 		_mist.path_light_provider = _fixture_air
 		_mist.noise_strength = .28
 	_mist.screen_tile_pixels = 32 if quality == Quality.BALANCED else 16
@@ -320,6 +318,7 @@ func _prepare_spatial_mist(env: Environment, time: float) -> void:
 		"player_light_color": Vector3.ZERO,
 		"player_light_weight": 0.,
 	}
+	_weather.apply_medium(_profile.overcast, _mist_sample)
 	var local_strength := _profile.local_mist_strength * lerpf(.55, 1., weather_weight)
 	var local_weight := clampf(DayNight.sample_curve(_profile.local_mist_by_hour, time, 1.), 0., 1.)
 	var additional_weight := clampf(DayNight.sample_curve(_profile.additional_mist_by_hour, time, 1.), 0., 1.)
@@ -336,15 +335,25 @@ func _mist_materials() -> Array:
 func _owns_finish_compositor(compositor: Compositor) -> bool:
 	return compositor == _finish_compositor
 
+func _set_mist_state(ready: bool, error: String) -> void:
+	if _world.look.stage == 2:
+		var env: Environment = _world.get_node("WorldEnvironment").environment
+		var density := 0. if ready and error.is_empty() else _depth_fog_density
+		if env.fog_density != density:
+			env.fog_density = density
+
 func _update_spatial_mist() -> void:
 	if not is_instance_valid(_mist):
+		_set_mist_state(false, "")
 		return
 	var camera: Camera3D = _mist.get_parent()
 	_mist.visible = _allow_spatial_mist and _fog_enabled and not _mist_sample.is_empty() \
 		and _world.look.stage == 2 and _world.view_mode == "gameplay" \
 		and camera.projection == Camera3D.PROJECTION_ORTHOGONAL and camera.is_current() \
 		and _mist.failure().is_empty()
-	if _mist.visible:
+	if not _mist.visible:
+		_set_mist_state(false, "")
+	else:
 		var position: Vector3 = _world.presentation.player_position()
 		if _profile.ground_haze != null and _profile.ground_haze_strength > 0.:
 			var subject_depth := -camera.global_basis.z.dot(position - camera.global_position)
@@ -354,43 +363,15 @@ func _update_spatial_mist() -> void:
 			_mist_sample.erase("ground_haze")
 		_mist.publish(_mist_sample, position, _world.spawn_position.y, _world.look.elapsed, true, 0.)
 
-static func apply_lighting(sun: DirectionalLight3D, env: Environment, phase: Dictionary, noon: Dictionary,
-		sun_rotation: Vector3, key_color: Color, key_energy: float, ambient_color: Color, ambient_energy: float) -> void:
-	sun.rotation_degrees = sun_rotation + Vector3(phase.pitch - noon.pitch, phase.yaw - noon.yaw, 0.)
-	sun.light_color = key_color * Color(phase.key) / Color(noon.key)
-	sun.light_energy = key_energy * float(phase.energy) / float(noon.energy)
-	env.ambient_light_color = ambient_color * Color(phase.ambient) / Color(noon.ambient)
-	env.ambient_light_energy = ambient_energy * float(phase.ambient_energy) / float(noon.ambient_energy)
-
-static func apply_depth_fog(env: Environment, tint: Color, density: float, begin: float, end: float) -> void:
-	env.fog_light_color = tint
-	env.fog_depth_begin = begin
-	env.fog_depth_end = end
-	env.fog_density = density
-
-static func apply_finish(env: Environment, contrast: float, saturation: float,
-		glow: bool, intensity: float, bloom: float, threshold: float) -> void:
-	env.adjustment_contrast = contrast
-	env.adjustment_saturation = saturation
-	env.glow_enabled = glow
-	env.glow_intensity = intensity
-	env.glow_bloom = bloom
-	env.glow_hdr_threshold = threshold
-
 func handle_key(event: InputEventKey) -> bool:
 	match event.physical_keycode:
 		KEY_T:
 			if event.shift_pressed:
 				_cycle = not _cycle
 			else:
-				var next: float = HOURS[0]
-				for time: float in HOURS:
-					if time > _world.showcase.hour + .01:
-						next = time
-						break
-				_world.showcase.set_hour(next)
+				_world.showcase.set_hour(DayNight.next_hour(_world.showcase.hour, HOURS))
 		KEY_F6:
-			set_weather(0. if _weather_target > 0. else 1.)
+			set_weather(0. if _weather.target > 0. else 1.)
 		KEY_H:
 			_fog_enabled = not _fog_enabled
 			refresh()

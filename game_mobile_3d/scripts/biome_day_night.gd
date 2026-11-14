@@ -11,6 +11,15 @@ extends Resource
 @export var sun_yaw_degrees: Curve
 @export var exposure: Curve
 
+static func advance(hour: float, delta: float, cycle_seconds: float) -> float:
+	return fposmod(hour + delta * 24. / maxf(cycle_seconds, 1.), 24.)
+
+static func next_hour(hour: float, phases: Array) -> float:
+	for phase: float in phases:
+		if phase > hour + .01:
+			return phase
+	return phases[0]
+
 static func sample_color(track: Gradient, time: float, fallback: Color) -> Color:
 	return track.sample(time) if track != null and track.get_point_count() > 0 else fallback
 
