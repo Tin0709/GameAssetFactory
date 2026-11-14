@@ -91,6 +91,7 @@ func run() -> void:
 	await check_floor_edge_landing(lab, dust)
 	await check_non_grass_landing(lab, dust)
 	await check_non_grass_steps(lab, dust, wind)
+	await check_wall_slide_steps(lab, dust, wind)
 	await check_dust_contact_clock(lab, dust)
 	await check_zombie_steps_on_slab(lab)
 	await check_zombie_dust_contact_clock(lab)
@@ -358,6 +359,76 @@ func check_non_grass_steps(lab, dust, wind) -> void:
 	lab.player.scripted_input = false
 	toggle.button_pressed = false
 	slab.free()
+	lab.reset_player()
+	await create_timer(0.10, true, false, true).timeout
+
+func check_wall_slide_steps(lab, dust, wind) -> void:
+	var player = lab.player
+	var movement = lab.get_node("MovementAudio")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var wall := StaticBody3D.new()
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(38.0, 3.0, 0.45)
+	shape.shape = box
+	wall.add_child(shape)
+	lab.add_child(wall)
+	toggle.button_pressed = true
+	for case: Dictionary in [
+		{"yaw": 0.31, "camera_yaw": 0.0, "live": false, "progress": false},
+		{"yaw": 0.31, "camera_yaw": 0.7, "live": true, "progress": false},
+		{"yaw": 1.20, "camera_yaw": 0.7, "live": true, "progress": true},
+	]:
+		var camera_basis := Basis(Vector3.UP, case.camera_yaw)
+		var forward := camera_basis.z
+		wall.position = forward * 2.0 + Vector3.UP * 1.5
+		wall.rotation.y = case.yaw + case.camera_yaw
+		lab.reset_player()
+		player.scripted_input = not case.live
+		player.set_movement_camera_basis(camera_basis)
+		for i in 10:
+			await physics_frame
+		if case.live:
+			Input.action_press("move_backward")
+		else:
+			player.requested_direction = Vector2.DOWN
+			player.requested_run = true
+		for i in 43:
+			await physics_frame
+		var before_audio: int = movement.event_count.grass
+		var before_dust: int = dust._next
+		var before_wind: int = wind._next
+		var dust_emitted := false
+		var wind_emitted := false
+		var wall_frames := 0
+		var forward_speed := 0.0
+		var lateral_speed := 0.0
+		for i in 82:
+			await physics_frame
+			dust_emitted = dust_emitted or dust._next != before_dust
+			wind_emitted = wind_emitted or wind._next != before_wind
+			if player.is_on_wall() and player.is_on_floor():
+				wall_frames += 1
+				var motion: Vector3 = player.get_real_velocity()
+				forward_speed = maxf(forward_speed, motion.dot(forward))
+				lateral_speed = maxf(lateral_speed, absf(motion.dot(camera_basis.x)))
+		Input.action_release("move_backward")
+		var steps: int = movement.event_count.grass - before_audio
+		check(wall_frames >= 75 and lateral_speed > 0.8,
+			"The player stays grounded and slides sideways along the angled wall")
+		if case.progress:
+			check(forward_speed > 5.0 and steps > 0 and dust_emitted and wind_emitted,
+				"Running along the wall still produces grass footsteps, dust and wind")
+		else:
+			check(forward_speed < 0.7 and steps == 0 and not dust_emitted and not wind_emitted,
+				"Sliding mainly sideways into a wall does not produce running cues (live=%s)" % case.live)
+		print("MECHANIC_LAB_WALL_STEPS live=", case.live, " progress=", case.progress, " wall_ticks=", wall_frames,
+			" forward=", forward_speed, " lateral=", lateral_speed, " grass_steps=", steps,
+			" dust=", dust_emitted, " wind=", wind_emitted)
+	player.scripted_input = false
+	player.set_movement_camera_basis(Basis.IDENTITY)
+	toggle.button_pressed = false
+	wall.free()
 	lab.reset_player()
 	await create_timer(0.10, true, false, true).timeout
 
