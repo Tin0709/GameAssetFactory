@@ -643,9 +643,9 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1) ->
 			ATTACK_POOL:
 				slot = _replace_priority_slot(first, start, &"zombie_hit", group, frame)
 			0:
-				if group == &"crossbow_hit" or group == &"crossbow_fire":
-					# An impact burst shares the weapon pool. Leave room for the
-					# local firing cue and let only the admitted impacts rotate.
+				if group == &"crossbow_hit" or group == &"crossbow_fire" or group == &"bow_fire":
+					# Bolts can still land after the player switches to Bow.
+					# Give both firing cues priority in the shared weapon pool.
 					slot = _replace_priority_slot(first, start, &"crossbow_fire", group, frame)
 				else:
 					slot = start
@@ -670,7 +670,9 @@ func _replace_priority_slot(first: int, start: int, priority_group: StringName, 
 	# Same-tick cues already arrive nearest first. Preserve nearby death onsets
 	# across short gaps between ticks, too, while the mixer starts the samples.
 	var priority_streams: Array = _groups.get(priority_group, [])
-	var priority := group == priority_group
+	var ranged_fire := priority_group == &"crossbow_fire"
+	var bow_streams: Array = _groups.get(&"bow_fire", []) if ranged_fire else []
+	var priority := group == priority_group or (ranged_fire and group == &"bow_fire")
 	var compare_onsets := priority and group == &"death" and is_instance_valid(zombie_listener)
 	var listener := zombie_listener.global_position if compare_onsets else Vector3.ZERO
 	var onset_ticks := ceili(DEATH_ONSET_SECONDS * Engine.physics_ticks_per_second)
@@ -680,7 +682,8 @@ func _replace_priority_slot(first: int, start: int, priority_group: StringName, 
 	for offset in VOICES_PER_POOL:
 		var slot := (start + offset) % VOICES_PER_POOL
 		var voice_index := first + slot
-		var playing_priority := _voices[voice_index].stream in priority_streams
+		var stream := _voices[voice_index].stream
+		var playing_priority := stream in priority_streams or (ranged_fire and stream in bow_streams)
 		if priority and not playing_priority:
 			return slot
 		var age := frame - _started_frames[voice_index]
