@@ -179,10 +179,10 @@ var _roam_wait := LAB_ROAM_DELAY
 var _roam_blocked_seconds := 0.0
 var _roam_rng := RandomNumberGenerator.new()
 var _crowd_slot := 0
-var _blocked_chase := false
+var _blocked_walk := false
 var _blocking_zombie_id := 0
 var _blocking_position := Vector3.ZERO
-var _blocked_target_position := Vector3.ZERO
+var _blocked_walk_destination := Vector3.ZERO
 var _skipped_blocked_step := false
 var _flash_left := 0.0
 var _flash_pending := false
@@ -365,35 +365,36 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0.0
 	else:
 		velocity += get_gravity() * _gravity_scale(ZOMBIE_GRAVITY) * delta
-	var chasing := crowd and _target_aggressive and not pushed and controlled_time == delta and not travel.is_zero_approx() \
+	var crowd_walking := crowd and not pushed and controlled_time == delta and not travel.is_zero_approx() \
 		and animation.current_animation in WALK_CLIPS
+	var destination := _last_seen_position if _target_aggressive else _roam_destination
 	_skipped_blocked_step = false
-	if chasing and _blocked_chase and is_on_floor():
+	if crowd_walking and _blocked_walk and is_on_floor() and (_target_aggressive or _blocking_zombie_id != 0):
 		# Spread collision retries across zombies. Keep animation and pose history
 		# on the full physics clock, including frames without a movement query.
-		_skipped_blocked_step = _wait_for_chase_retry()
+		_skipped_blocked_step = _wait_for_walk_retry(destination)
 	if not _skipped_blocked_step:
 		move_and_slide()
-		_blocked_chase = chasing and is_on_floor() and is_on_wall() \
+		_blocked_walk = crowd_walking and is_on_floor() and is_on_wall() \
 			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
-		_update_chase_blocker()
+		_update_walk_blocker(destination)
 	_advance_animation(delta)
 	ragdoll.sample(delta)
 
-func _wait_for_chase_retry() -> bool:
+func _wait_for_walk_retry(destination: Vector3) -> bool:
 	var retry_hz := BLOCKED_CHASE_RETRY_HZ
 	if _blocking_zombie_id != 0:
 		var blocker := instance_from_id(_blocking_zombie_id) as CharacterBody3D
 		if (blocker == null or blocker.is_queued_for_deletion() or blocker.collision_layer == 0
 				or blocker.global_position.distance_squared_to(_blocking_position) > BLOCKER_MOVE_DISTANCE_SQUARED
-				or _last_seen_position.distance_squared_to(_blocked_target_position) > CHASE_TARGET_MOVE_DISTANCE_SQUARED):
+				or destination.distance_squared_to(_blocked_walk_destination) > CHASE_TARGET_MOVE_DISTANCE_SQUARED):
 			return false
 		retry_hz = PACKED_CHASE_RETRY_HZ
 	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / retry_hz))
 	return Engine.get_physics_frames() % stride != _crowd_slot % stride
 
-func _update_chase_blocker() -> void:
-	if not _blocked_chase or get_slide_collision_count() == 0:
+func _update_walk_blocker(destination: Vector3) -> void:
+	if not _blocked_walk or get_slide_collision_count() == 0:
 		_blocking_zombie_id = 0
 		return
 	var blocker := get_last_slide_collision().get_collider() as CharacterBody3D
@@ -405,8 +406,8 @@ func _update_chase_blocker() -> void:
 	var collider_transform: Transform3D = PhysicsServer3D.body_get_state(
 		blocker.get_rid(), PhysicsServer3D.BODY_STATE_TRANSFORM)
 	_blocking_position = collider_transform.origin
-	# Retry when the pursuit destination moves, including on a new sighting.
-	_blocked_target_position = _last_seen_position
+	# Retry when the destination changes, including on a new sighting.
+	_blocked_walk_destination = destination
 
 func _integrate_knockback(delta: float) -> Vector3:
 	var speed := _knockback.length()
@@ -636,7 +637,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		push_duration := 0.0) -> void:
 	if health <= 0 or amount <= 0:
 		return
-	_blocked_chase = false
+	_blocked_walk = false
 	health = maxi(0, health - amount)
 	direction.y = 0.0
 	direction = direction.normalized()
