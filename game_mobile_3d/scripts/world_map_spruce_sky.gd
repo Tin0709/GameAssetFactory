@@ -11,6 +11,7 @@ var applied_strength := 0.
 var applied_tree_strength := 0.
 var applied_edge_fill := 0.
 var applied_sky_color := 0.
+var applied_edge_return := 0.
 var applied_pre_twilight := 0.
 var _level: Node3D
 var _camera: Camera3D
@@ -78,6 +79,7 @@ func setup(level: Node3D) -> void:
 	RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", 0.)
+	RenderingServer.global_shader_parameter_set("gaf_canopy_edge_return", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_extent", Vector3(_dimensions))
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", _texture)
@@ -152,6 +154,7 @@ func refresh() -> void:
 		applied_tree_strength = 0.
 		applied_edge_fill = 0.
 		applied_sky_color = 0.
+		applied_edge_return = 0.
 		applied_pre_twilight = 0.
 		return
 	var strength := 0.
@@ -181,6 +184,15 @@ func refresh() -> void:
 	if sky_color != applied_sky_color:
 		applied_sky_color = sky_color
 		RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", sky_color)
+	var edge_return := 0.
+	if sky_color > 0.:
+		var hour: float = review.hour
+		var early := 1. - smoothstep(7., 11.5, hour)
+		var late := smoothstep(12.5, 16.5, hour) * (1. - smoothstep(16.5, 18.5, hour))
+		edge_return = review._lighting_scale(&"canopy_edge_return") * maxf(early, late)
+	if edge_return != applied_edge_return:
+		applied_edge_return = edge_return
+		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_return", edge_return)
 	var receiver: float = review.pre_twilight_receiver_weight()
 	if receiver != applied_pre_twilight:
 		applied_pre_twilight = receiver
@@ -195,6 +207,7 @@ func _exit_tree() -> void:
 		RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", 0.)
+		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_return", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", null)
 		_owner = null

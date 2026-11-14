@@ -4,6 +4,7 @@ global uniform vec3 gaf_spruce_sky_camera;
 global uniform sampler3D gaf_spruce_sky_volume : filter_linear, repeat_disable;
 global uniform float gaf_canopy_edge_fill;
 global uniform float gaf_canopy_sky_color;
+global uniform float gaf_canopy_edge_return;
 global uniform float gaf_pre_twilight_receiver;
 
 float gaf_spruce_sky(vec3 point, vec3 camera_position) {
@@ -43,5 +44,11 @@ vec3 gaf_canopy_diffuse_color(vec3 rgb, float visibility, float gain) {
 	const vec3 luma = vec3(.2126, .7152, .0722);
 	vec3 cool = rgb * vec3(.72, 1.0, 1.48);
 	cool *= dot(rgb, luma) / max(dot(cool, luma), .000001);
-	return mix(rgb, cool, weight);
+	vec3 shaded_sky = mix(rgb, cool, weight);
+	if (gaf_canopy_edge_return > 0.0) {
+		// Add a diffuse return at partially open receivers without lifting the core shadow.
+		float edge = smoothstep(.40, .69, visibility) * (1.0 - smoothstep(.78, .97, visibility));
+		shaded_sky *= 1.0 + gaf_canopy_edge_return * gain * edge;
+	}
+	return shaded_sky;
 }

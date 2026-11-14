@@ -125,6 +125,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"spruce_sky": ["Forest canopy sky", 1.],
 	&"canopy_edge_fill": ["Ánh trời rìa tán", 1.],
 	&"canopy_sky_color": ["Sắc ánh trời dưới tán", 1.],
+	&"canopy_edge_return": ["Ánh hắt vùng râm thưa", .40],
 	&"pre_twilight_receiver": ["Sắc ánh hắt trước chạng vạng", 1.],
 	&"tree_shade": ["Tree shade depth", 1.],
 	&"twilight_ground_ambient": ["Ánh hắt mặt đất lúc chạng vạng", 1.],
@@ -210,7 +211,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 136
+const LIGHTING_MIX_VERSION := 137
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1356,6 +1357,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .2
 	if effect == &"canopy_sky_color":
 		return .85
+	if effect == &"canopy_edge_return":
+		return .16
 	if effect == &"stone_day_sky":
 		return .3
 	if effect == &"stone_day_face_fill":
@@ -1961,6 +1964,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 99 and effect == &"player_sun_shoulder":
 			missing_value = 0.
+		if version < 137 and effect == &"canopy_edge_return":
+			missing_value = 0.
 		if version < 100 and effect == &"canopy_sky_color":
 			missing_value = 0.
 		if version < 107 and effect == &"stone_day_face_fill":
@@ -2204,7 +2209,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"pre_twilight_receiver":
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"tree_shade"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"canopy_edge_return", &"tree_shade"]:
 		return
 	if changed_effect in [&"player_sky", &"player_bounce", &"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma"]:
 		if level.player_light != null:

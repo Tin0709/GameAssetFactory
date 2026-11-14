@@ -147,6 +147,10 @@ gaf_canopy_sky_color={
 "type": "float",
 "value": 0.0
 }
+gaf_canopy_edge_return={
+"type": "float",
+"value": 0.0
+}
 gaf_pre_twilight_receiver={
 "type": "float",
 "value": 0.0
