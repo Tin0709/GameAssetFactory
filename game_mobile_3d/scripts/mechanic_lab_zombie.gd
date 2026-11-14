@@ -89,7 +89,7 @@ const LAB_ROAM_DELAY := 1.0
 const LAB_ROAM_SPEED := 3.0
 const LAB_ROAM_ARRIVAL := 0.10
 const LAB_ROAM_BLOCKED_TIME := 0.25
-const LAB_ROAM_MIN_PROGRESS_SPEED := LAB_ROAM_SPEED * 0.10
+const MIN_WALL_PROGRESS_SPEED := LAB_ROAM_SPEED * 0.10
 const LAB_ROAM_ATTEMPTS := 4
 const CROWD_RETRY_MIN_ZOMBIES := 32
 const BLOCKED_CHASE_RETRY_HZ := 30.0
@@ -378,7 +378,7 @@ func _physics_process(delta: float) -> void:
 		_blocked_walk = crowd_walking and is_on_floor() and is_on_wall() \
 			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_WALK_MAX_SPEED_SQUARED
 		_update_walk_blocker(destination)
-	_advance_animation(delta)
+	_advance_animation(delta, travel)
 	ragdoll.sample(delta)
 
 func _wait_for_walk_retry(destination: Vector3) -> bool:
@@ -421,11 +421,16 @@ func _integrate_knockback(delta: float) -> Vector3:
 	# the moving part of the step so the push distance is independent of tick rate.
 	return direction * ((speed + end_speed) * 0.5 * moving_time / delta)
 
-func _advance_animation(delta: float) -> void:
+func _advance_animation(delta: float, travel: Vector3) -> void:
 	var clip := animation.current_animation
 	if clip != ATTACK:
 		var play_steps := (step_audio.has_connections() and clip in WALK_STEP_NOTIFIES and is_on_floor()
-			and not _skipped_blocked_step and get_real_velocity().slide(Vector3.UP).length_squared() >= STEP_MIN_SPEED_SQUARED)
+			and not _skipped_blocked_step)
+		if play_steps:
+			var motion := get_real_velocity().slide(Vector3.UP)
+			play_steps = motion.length_squared() >= STEP_MIN_SPEED_SQUARED \
+				and (not is_on_wall() or motion.dot(travel) >= MIN_WALL_PROGRESS_SPEED * travel.length()) \
+				and not travel.is_zero_approx()
 		var previous_phase := animation.current_animation_position if play_steps else 0.0
 		animation.advance(delta)
 		if play_steps:
@@ -524,7 +529,7 @@ func _roam_velocity(delta: float, sample_ai: bool) -> Vector3:
 	var offset := (_roam_destination - global_position).slide(Vector3.UP)
 	var distance := offset.length()
 	# A wall slide can have speed without making meaningful progress to the goal.
-	var stalled := is_on_wall() and get_real_velocity().dot(offset) < LAB_ROAM_MIN_PROGRESS_SPEED * distance
+	var stalled := is_on_wall() and get_real_velocity().dot(offset) < MIN_WALL_PROGRESS_SPEED * distance
 	_roam_blocked_seconds = _roam_blocked_seconds + delta if stalled else 0.0
 	if distance <= LAB_ROAM_ARRIVAL or _roam_blocked_seconds >= LAB_ROAM_BLOCKED_TIME:
 		_reset_roam()
