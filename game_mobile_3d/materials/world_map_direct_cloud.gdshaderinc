@@ -8,6 +8,9 @@ varying float canopy_direct_coverage;
 #endif
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 global uniform float gaf_stone_shade_reach;
+global uniform vec4 gaf_stone_sunset_region;
+global uniform vec4 gaf_stone_sunset_beam;
+varying vec2 stone_sunset_position;
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
 #define GAF_WORLD_FOLIAGE_LOBE_ONLY
@@ -43,6 +46,14 @@ void light() {
 #endif
 	float nl = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
+	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sunset_beam.w > 0.0
+			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sunset_beam.xyz) > 0.9999
+			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
+		vec2 offset = (stone_sunset_position - gaf_stone_sunset_region.xy) / gaf_stone_sunset_region.zw;
+		float region = 1.0 - smoothstep(0.08, 1.0, dot(offset, offset));
+		float direct = smoothstep(0.16, 0.80, ATTENUATION) * smoothstep(0.09, 0.45, nl);
+		key_color *= 1.0 - gaf_stone_sunset_beam.w * region * direct;
+	}
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_shade_fill.w > 0.0 &&
 		max(LIGHT_COLOR.r, max(LIGHT_COLOR.g, LIGHT_COLOR.b)) > 0.0 &&
 		dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_shade_fill.xyz) > 0.9999 &&
