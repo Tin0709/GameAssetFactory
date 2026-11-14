@@ -382,7 +382,8 @@ func _process(delta: float) -> void:
 
 func sync_canopy_player_cue() -> void:
 	if canopy_player_cue != null:
-		canopy_player_cue.sync(self, showcase._lighting_scale(&"canopy_player_cue"), showcase.canopy_cue_day_tone_weight())
+		canopy_player_cue.sync(self, showcase._lighting_scale(&"canopy_player_cue"),
+			showcase.canopy_cue_day_tone_weight(), showcase.canopy_cue_clarity_weight())
 
 func set_review_view(mode: String) -> void:
 	if showcase!=null:showcase.begin_environment_edit()

@@ -6,6 +6,7 @@ const CuePass := preload("res://materials/world_map_canopy_player_cue.gdshader")
 var meshes: Array[MeshInstance3D] = []
 var weight := 0.0
 var day_tone_weight := 0.0
+var clarity_weight := 0.0
 var _cue_materials: Array[ShaderMaterial] = []
 var _attempted := false
 
@@ -15,7 +16,7 @@ func available(level: Node) -> bool:
 		and is_instance_valid(level.grove) and level.grove.source_oaks \
 		and level.player.get("using_original_source") == true and level.player.get("primary_ready") == true
 
-func sync(level: Node, strength: float, day_tone: float) -> void:
+func sync(level: Node, strength: float, day_tone: float, clarity: float) -> void:
 	var target := 0.0
 	if available(level) and level.showcase.forest_active() and not level.player.is_dead \
 			and level.player.is_visible_in_tree() and (level.grove.visible or level.grove.spruce_visible()):
@@ -26,7 +27,8 @@ func sync(level: Node, strength: float, day_tone: float) -> void:
 	if meshes.is_empty():
 		target = 0.0
 	var tone := day_tone if target > 0.0 else 0.0
-	if target == weight and tone == day_tone_weight:
+	var clarity_target := clarity if target > 0.0 else 0.0
+	if target == weight and tone == day_tone_weight and clarity_target == clarity_weight:
 		return
 	if target != weight:
 		var stencil_changed := (target > 0.0) != (weight > 0.0)
@@ -39,8 +41,10 @@ func sync(level: Node, strength: float, day_tone: float) -> void:
 		for material in _cue_materials:
 			material.set_shader_parameter("cue_weight", target)
 	day_tone_weight = tone
+	clarity_weight = clarity_target
 	for material in _cue_materials:
 		material.set_shader_parameter("day_tone_weight", tone)
+		material.set_shader_parameter("clarity_weight", clarity_target)
 
 func _build(surfaces: Array[Array], presenter: Node) -> void:
 	_attempted = true
