@@ -447,7 +447,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		check(pose_matches, "The corner ragdoll %d retains its final simulated pose" % seed)
 	if max_anchor_gap < INF:
 		check(peak_gap > 0.0 and peak_gap < max_anchor_gap,
-			"The shoulder stays near its anchor during the corner collision (%d, strike %d, %.3f m)" % [seed, strike, peak_gap])
+			"Limb joints stay connected during the corner collision (%d, strike %d, %.3f m)" % [seed, strike, peak_gap])
 	if landing_gravity >= 0.0 and not zombie._corpse_parked:
 		var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
 		check(is_equal_approx(head.gravity_scale, landing_gravity), "The corner ragdoll %d uses the expected gravity" % seed)
@@ -471,6 +471,8 @@ func run() -> void:
 	await check_corner_ragdoll(16, 2.0, true, -1.0, 0.22, Zombie.DeathStrike.GROUND,
 		MeleeTools.strikes(MeleeTools.Tool.SHOVEL).back().strength)
 	await check_corner_ragdoll(16, 2.0, true, -1.0, 0.24, Zombie.DeathStrike.AIR,
+		MeleeTools.air_strike(MeleeTools.Tool.PICKAXE).strength)
+	await check_corner_ragdoll(77, 2.0, true, -1.0, 0.25, Zombie.DeathStrike.AIR,
 		MeleeTools.air_strike(MeleeTools.Tool.PICKAXE).strength)
 	await check_corner_ragdoll(170, 2.0, true, -1.0, 0.23)
 	await check_corner_ragdoll(287, 2.0, true, -1.0, 0.17)
