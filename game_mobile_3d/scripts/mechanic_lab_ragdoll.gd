@@ -15,10 +15,10 @@ const WALL_ARM_HANDOFF_MIN_GAP := 3.5 * SOURCE_ANCHOR_TOLERANCE
 const WALL_NECK_BRACE_MIN_GAP := 2.5 * SOURCE_ANCHOR_TOLERANCE
 const WALL_NECK_LANDING_BLEND_END := 0.5
 const WALL_SHOULDER_SLIDE_WINDOW := 5.0 / 60.0
-const WALL_SHOULDER_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
+const WALL_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
 const FIRST_WALL_SHOULDER_SLIDE_MIN_GAP := 0.17
-const WALL_SHOULDER_SLIDE_MAX := 0.08
-const REBOUND_SHOULDER_SLIDE_MAX_NORMAL_FRACTION := 0.65
+const WALL_SLIDE_MAX := 0.08
+const REBOUND_SLIDE_MAX_NORMAL_FRACTION := 0.65
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
@@ -623,7 +623,7 @@ func _slide_wall_shoulder_anchors() -> void:
 	# A clean launch can still hit the corner on the first few physics ticks.
 	# Correct only large gaps and keep the translation parallel to the wall.
 	var initial_collision := _wall_handoff_frame < 0
-	var min_gap := FIRST_WALL_SHOULDER_SLIDE_MIN_GAP if initial_collision else WALL_SHOULDER_SLIDE_MIN_GAP
+	var min_gap := FIRST_WALL_SHOULDER_SLIDE_MIN_GAP if initial_collision else WALL_SLIDE_MIN_GAP
 	var max_normal_fraction := 0.5 if initial_collision else 0.2
 	for name in ["Arm.L", "Arm.R"]:
 		var limb: PhysicalBone3D = bodies[name]
@@ -644,7 +644,7 @@ func _slide_wall_shoulder_anchors() -> void:
 		# The shoulder can lose its solver contact while the wall still
 		# blocks the motion to its anchor. Use the swept contact in that tick.
 		var swept := contacts == 0
-		if swept and (not initial_collision or not free_torso or distance <= WALL_SHOULDER_SLIDE_MIN_GAP
+		if swept and (not initial_collision or not free_torso or distance <= WALL_SLIDE_MIN_GAP
 				or not _test_projection_motion(limb, state.transform, gap)
 				or _projection_hit.get_collision_count() == 0):
 			continue
@@ -658,7 +658,7 @@ func _slide_wall_shoulder_anchors() -> void:
 			# gap while the torso is free. Leave wall-normal motion to physics.
 			var rebounding := normal_gap < 0.0 and free_torso \
 				and state.linear_velocity.dot(normal) > 0.0
-			var normal_fraction := REBOUND_SHOULDER_SLIDE_MAX_NORMAL_FRACTION if rebounding or swept else max_normal_fraction
+			var normal_fraction := REBOUND_SLIDE_MAX_NORMAL_FRACTION if rebounding or swept else max_normal_fraction
 			if absf(normal_gap) > distance * normal_fraction:
 				continue
 			var wall_rid := wall.get_rid()
@@ -684,7 +684,7 @@ func _slide_rebounding_legs() -> void:
 		var spec: Dictionary = source_joints[name]
 		var gap: Vector3 = (core.transform * spec.parent_frame).origin - (state.transform * spec.child_frame).origin
 		var distance := gap.length()
-		if distance <= WALL_SHOULDER_SLIDE_MIN_GAP:
+		if distance <= WALL_SLIDE_MIN_GAP:
 			continue
 		for i in state.get_contact_count():
 			var wall := state.get_contact_collider_object(i) as StaticBody3D
@@ -692,7 +692,7 @@ func _slide_rebounding_legs() -> void:
 			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y or state.linear_velocity.dot(normal) <= 0.0:
 				continue
 			var normal_gap := gap.dot(normal)
-			if normal_gap >= 0.0 or -normal_gap > distance * REBOUND_SHOULDER_SLIDE_MAX_NORMAL_FRACTION:
+			if normal_gap >= 0.0 or -normal_gap > distance * REBOUND_SLIDE_MAX_NORMAL_FRACTION:
 				continue
 			var wall_rid := wall.get_rid()
 			if _is_single_box(wall_rid) and _slide_along_wall(limb, state, gap, normal, wall_rid):
@@ -700,7 +700,7 @@ func _slide_rebounding_legs() -> void:
 
 func _slide_along_wall(limb: PhysicalBone3D, state: PhysicsDirectBodyState3D,
 		gap: Vector3, normal: Vector3, wall: RID) -> bool:
-	var motion := gap.slide(normal).limit_length(WALL_SHOULDER_SLIDE_MAX)
+	var motion := gap.slide(normal).limit_length(WALL_SLIDE_MAX)
 	if _test_projection_motion(limb, state.transform, motion, wall):
 		return false
 	var start := _deepest_contact(_terrain_contact_points(limb, state, Vector3.ZERO))
@@ -735,7 +735,7 @@ func _slide_at_wall_intersection(limb: PhysicalBone3D, state: PhysicsDirectBodyS
 		return false
 	# The vertical direction is tangent to both faces. Sweep it against
 	# other geometry, then check overlap with the contacted walls as well.
-	var motion := Vector3.UP * clampf(vertical_gap, -WALL_SHOULDER_SLIDE_MAX, WALL_SHOULDER_SLIDE_MAX)
+	var motion := Vector3.UP * clampf(vertical_gap, -WALL_SLIDE_MAX, WALL_SLIDE_MAX)
 	var sweep := PhysicsTestMotionParameters3D.new()
 	sweep.from = state.transform
 	sweep.motion = motion
