@@ -418,7 +418,7 @@ func check_zombie_roam_stalled_slide(lab) -> void:
 	var first_remaining := (slide_position - destination).slide(Vector3.UP).length()
 	check(slide_ticks > 0 and slide_speed > 0.15 and first_remaining - remaining < 0.18,
 		"The inserted wall causes a sideways slide with almost no progress toward the destination")
-	check(not zombie._roam_destination.is_finite() and zombie.animation.current_animation == ZOMBIE.IDLE,
+	check(slide_ticks <= 18 and not zombie._roam_destination.is_finite() and zombie.animation.current_animation == ZOMBIE.IDLE,
 		"A sideways scrape does not keep the obstructed patrol leg active")
 	print("MECHANIC_LAB_ROAM_STALLED_SLIDE speed=", slide_speed, " wall_ticks=", slide_ticks,
 		" active=", zombie._roam_destination.is_finite())
