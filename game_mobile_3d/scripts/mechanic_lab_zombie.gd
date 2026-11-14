@@ -579,19 +579,31 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	# Complete the approach turn before locking the swing's heading.
 	var facing_target := _is_in_melee_cone(offset)
 	if target_visible and height_delta <= MELEE_HEIGHT_LIMIT and facing_target and _attack_cooldown <= 0.0:
-		# Crowd sight is staggered. Confirm the path on the commitment tick
-		# when this zombie hasn't sampled sight yet.
-		if in_lab and not sample_ai and not _clear_sight_to(target.global_position):
-			_target_visible = false
+		var target_position := target.global_position
+		if in_lab and not sample_ai and not _confirm_windup_target(target_position):
 			_play_loop(IDLE)
 			return Vector3.ZERO
-		_windup_target_start = target.global_position
+		_windup_target_start = target_position
 		animation.play(ATTACK, 0.1)
 		_attack_cooldown = MELEE_COOLDOWN
 		melee_audio.emit(global_position + Vector3.UP * (HEIGHT * 0.5), false)
 	else:
 		_play_loop(IDLE)
 	return Vector3.ZERO
+
+func _confirm_windup_target(point: Vector3) -> bool:
+	# Crowd sight runs on a staggered clock. The current target must still
+	# be in reach and in front before this tick can commit the windup.
+	var offset := point - global_position
+	if absf(offset.y) > MELEE_HEIGHT_LIMIT:
+		return false
+	offset.y = 0.0
+	if offset.length_squared() > (MELEE_RANGE + MELEE_RANGE_TOLERANCE) ** 2 or not _is_in_melee_cone(offset):
+		return false
+	_target_visible = _clear_sight_to(point)
+	if _target_visible:
+		_last_seen_position = point
+	return _target_visible
 
 func _play_loop(clip: StringName) -> void:
 	if animation.current_animation != clip:
