@@ -4,6 +4,7 @@ extends Node
 const Profile = preload("res://scripts/biome_graphics_profile.gd")
 const Palette = preload("res://scripts/world_map_showcase_palette.gd")
 const MistVolume = preload("res://scripts/world_map_atmosphere_volume.gd")
+const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
 const HOURS := [7., 12., 16.5, 18.5, 22.]
 
 var weather_weight := 0.
@@ -23,6 +24,11 @@ var _label: Label
 var _mist: MistVolume
 var _allow_spatial_mist := true
 var _mist_sample: Dictionary
+var _allow_adaptive_bloom := true
+var _finish_effect: LocalExposure
+var _finish_camera: Camera3D
+var _finish_compositor: Compositor
+var _previous_compositor: Compositor
 
 func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> void:
 	_world = world
@@ -67,6 +73,7 @@ func set_weather(overcast: float, seconds: float = 2.5) -> void:
 		refresh()
 
 func _process(delta: float) -> void:
+	_update_finish()
 	_update_spatial_mist()
 	if _cycle and _world.look.stage == 2:
 		_world.showcase.set_hour(Palette.advance(_world.showcase.hour, delta, _profile.cycle_minutes * 60.))
@@ -78,7 +85,7 @@ func _process(delta: float) -> void:
 func refresh() -> void:
 	var hour: float = _world.showcase.hour
 	if _label != null:
-		_label.text = "%s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · B đối chiếu" % [
+		_label.text = "%s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · F7 hậu kỳ · B đối chiếu" % [
 			_profile.display_name, int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
 	if _world.look.stage != 2:
 		return
@@ -117,7 +124,56 @@ func refresh() -> void:
 	apply_finish(env, _profile.contrast, saturation, _profile.glow_intensity > 0.,
 		_profile.glow_intensity, _profile.glow_bloom, _profile.glow_hdr_threshold)
 	_prepare_spatial_mist(env)
+	_update_finish()
 
+
+func _update_finish() -> void:
+	var camera := _world.get_node("Camera3D") as Camera3D
+	var env: Environment = _world.get_node("WorldEnvironment").environment
+	var combined: bool = _world.look.stage == 2
+	var wanted := combined and _allow_adaptive_bloom and _profile.adaptive_bloom \
+		and _world.view_mode == "gameplay" and camera.is_current() \
+		and (_profile.local_exposure > 0. or _profile.adaptive_bloom_gain > 0.) \
+		and RenderingServer.get_current_rendering_method() == "mobile" \
+		and RenderingServer.get_rendering_device() != null
+	if wanted and _finish_effect == null:
+		_finish_camera = camera
+		_previous_compositor = camera.compositor
+		_finish_compositor = Compositor.new()
+		var source := _previous_compositor
+		if source == null:
+			var world_environment: WorldEnvironment = _world.get_node("WorldEnvironment")
+			source = world_environment.compositor
+		var chain: Array[CompositorEffect] = []
+		if source != null:
+			chain.assign(source.compositor_effects)
+		_finish_effect = LocalExposure.new()
+		chain.append(_finish_effect)
+		_finish_compositor.compositor_effects = chain
+		camera.compositor = _finish_compositor
+	if _finish_effect != null:
+		wanted = wanted and camera.compositor == _finish_compositor and _finish_effect.failure().is_empty()
+		_finish_effect.enabled = wanted
+		if wanted:
+			_finish_effect.set_review_strength(_profile.local_exposure)
+			_finish_effect.set_air_bloom(_profile.adaptive_bloom_gain > 0.)
+			_finish_effect.set_air_bloom_response(_profile.adaptive_bloom_gain)
+			_finish_effect.set_bloom_local_response(_profile.adaptive_bloom_response)
+			_finish_effect.set_bloom_prefilter(_profile.adaptive_bloom_prefilter)
+			_finish_effect.set_air_bloom_spread(_profile.adaptive_bloom_spread)
+	if combined:
+		# Keep native glow until the custom pass has completed one successful frame.
+		var custom_bloom := wanted and _profile.adaptive_bloom_gain > 0. and _finish_effect.snapshot().frames > 0
+		env.glow_enabled = _profile.glow_intensity > 0. and not custom_bloom
+
+func _exit_tree() -> void:
+	if _finish_effect == null:
+		return
+	var effect := _finish_effect
+	effect.enabled = false
+	if is_instance_valid(_finish_camera) and _finish_camera.compositor == _finish_compositor:
+		_finish_camera.compositor = _previous_compositor
+	RenderingServer.call_on_render_thread(effect.release_on_render_thread)
 
 func _prepare_spatial_mist(env: Environment) -> void:
 	var active := _profile.spatial_mist and RenderingServer.get_current_rendering_method() == "mobile" \
@@ -131,6 +187,7 @@ func _prepare_spatial_mist(env: Environment) -> void:
 		_world.get_node("Camera3D").add_child(_mist)
 		_mist.setup()
 		_mist.material_provider = _world.showcase._mist_materials
+		_mist.compositor_owned = _owns_finish_compositor
 		_mist.noise_strength = .28
 	var tint := Vector3(env.fog_light_color.r, env.fog_light_color.g, env.fog_light_color.b)
 	var phase_density := env.fog_density / maxf(_profile.noon_fog_density, .05)
@@ -150,6 +207,9 @@ func _prepare_spatial_mist(env: Environment) -> void:
 	_mist.set_local_region(_world.local_mist_region, local_strength)
 	_mist.set_additional_local_region(_world.additional_mist_region, local_strength)
 	_update_spatial_mist()
+
+func _owns_finish_compositor(compositor: Compositor) -> bool:
+	return compositor == _finish_compositor
 
 func _update_spatial_mist() -> void:
 	if not is_instance_valid(_mist):
@@ -203,6 +263,9 @@ func handle_key(event: InputEventKey) -> bool:
 		KEY_H:
 			_fog_enabled = not _fog_enabled
 			refresh()
+		KEY_F7:
+			_allow_adaptive_bloom = not _allow_adaptive_bloom
+			_update_finish()
 		KEY_J:
 			_allow_spatial_mist = not _allow_spatial_mist
 			_update_spatial_mist()

@@ -44,6 +44,14 @@ const Weather = preload("res://scripts/biome_weather_profile.gd")
 @export_range(0., 1.) var glow_bloom := .035
 @export_range(0., 4.) var glow_hdr_threshold := .9
 
+@export_subgroup("Adaptive bloom")
+@export var adaptive_bloom := false
+@export_range(0., .23, .01) var local_exposure := .08
+@export_range(0., 4., .01) var adaptive_bloom_gain := .5
+@export_range(0., 1., .01) var adaptive_bloom_response := .65
+@export_range(0., 1., .01) var adaptive_bloom_prefilter := .72
+@export_range(0., 2., .01) var adaptive_bloom_spread := .82
+
 @export_group("Day and night")
 @export_range(0., 24.) var start_hour := 12.
 @export_range(1., 60.) var cycle_minutes := 20.
