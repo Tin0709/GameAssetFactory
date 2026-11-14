@@ -66,6 +66,7 @@ func run() -> void:
 	await check_crowd_melee(group)
 	await check_blocked_chase(group)
 	await check_crowd_windup_occlusion(group)
+	await check_crowd_windup_range(group)
 	var packed := OS.get_cmdline_user_args().has("--packed-ragdolls")
 	await launch_ragdolls(group, packed)
 	var bars := group.get_node_or_null("../ZombieHealthBars") as MultiMeshInstance3D
@@ -429,6 +430,55 @@ func check_crowd_windup_occlusion(group: Node) -> void:
 	if windups.size() - hidden_windups != 1 or zombie.animation.current_animation != ZOMBIE.ATTACK:
 		failures.append("The zombie starts one windup when the player's path is clear again")
 	print("CROWD_OCCLUDED_WINDUP hidden=", hidden_windups, " visible=", windups.size() - hidden_windups)
+	zombie.melee_audio.disconnect(listen)
+	player.set_physics_process(true)
+	for member in group.get_children():
+		member.set_physics_process(true)
+
+func check_crowd_windup_range(group: Node) -> void:
+	var player: CharacterBody3D = lab.player
+	var player_origin := player.global_position
+	player.set_physics_process(false)
+	for member in group.get_children():
+		member.set_physics_process(false)
+	var zombie := group.get_child(0) as ZOMBIE
+	var windups: Array[Vector3] = []
+	var listen := func(point: Vector3, contact: bool):
+		if not contact:
+			windups.append(point)
+	zombie.melee_audio.connect(listen)
+	var stride := roundi(Engine.physics_ticks_per_second / ZOMBIE.LAB_CROWD_SIGHT_HZ)
+	for escape in [Vector3.BACK * 1.0, Vector3.UP * 2.05, Vector3.RIGHT * 0.75]:
+		player.global_position = player_origin
+		zombie.global_position = player_origin + Vector3.FORWARD * 1.34
+		zombie.velocity = Vector3.ZERO
+		zombie.rotation.y = 0.0
+		zombie.animation.play(ZOMBIE.IDLE, 0.0)
+		zombie.animation.advance(0.0)
+		zombie._attack_cooldown = 1.0
+		zombie.set_physics_process(true)
+		for i in 5:
+			await physics_frame
+		var remembered := zombie._last_seen_position
+		if not zombie._target_aggressive or not zombie._target_visible or not remembered.is_equal_approx(player_origin):
+			failures.append("The zombie sees the player in reach before the crowd range fixture moves them")
+		windups.clear()
+		player.global_position += escape
+		zombie._crowd_slot = (Engine.get_physics_frames() + 2) % stride
+		zombie._attack_cooldown = 0.0
+		await physics_frame
+		var escaped_windups := windups.size()
+		if escaped_windups != 0 or zombie._attack_cooldown > 0.0:
+			failures.append("A target escaping reach or facing between sight samples prevents a windup: %s" % escape)
+		player.global_position = player_origin
+		for i in 8:
+			await physics_frame
+			if windups.size() > escaped_windups:
+				break
+		if windups.size() - escaped_windups != 1 or zombie.animation.current_animation != ZOMBIE.ATTACK:
+			failures.append("The zombie starts one windup when the target is back in reach: %s" % escape)
+		print("CROWD_WINDUP_RANGE escape=", escape, " invalid=", escaped_windups,
+			" valid=", windups.size() - escaped_windups)
 	zombie.melee_audio.disconnect(listen)
 	player.set_physics_process(true)
 	for member in group.get_children():
