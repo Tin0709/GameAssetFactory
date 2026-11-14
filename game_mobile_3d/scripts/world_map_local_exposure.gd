@@ -21,7 +21,7 @@ void main() {
 """
 const METER := """#version 450
 layout(set=0,binding=0) uniform sampler2D source_color;
-layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; };
+layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; vec4 finish; };
 layout(location=0) out float result;
 const vec3 luma = vec3(0.2126, 0.7152, 0.0722);
 void main() {
@@ -41,7 +41,7 @@ const APPLY := """#version 450
 layout(set=0,binding=0) uniform sampler2D source_color;
 layout(set=0,binding=1) uniform sampler2D log_meter;
 layout(set=0,binding=2) uniform sampler2D soft_light;
-layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; };
+layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; vec4 finish; };
 layout(location=0) out vec4 result;
 const vec3 luma = vec3(0.2126, 0.7152, 0.0722);
 void main() {
@@ -98,11 +98,22 @@ void main() {
 }
 """
 
+const AIR_PREFILTER := """
+vec3 prefilter_air(vec3 scene_color) {
+ if (finish.x <= 0.0) return scene_color;
+ // Keep an unfiltered base for the existing humid-light treatment.
+ // Threshold in physical luminance, independently of packed target encoding.
+ float value = dot(scene_color, vec3(0.2126, 0.7152, 0.0722)) * (air.z > .5 ? 1. : 2.);
+ float highlights = smoothstep(0.025, 0.15, value);
+ return scene_color * mix(1.0, highlights, finish.x);
+}
+"""
 const AIR_SOURCE := """#version 450
 layout(set=0,binding=0) uniform sampler2D source_color;
 layout(set=0,binding=1) uniform sampler2D log_meter;
-layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; };
+layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; vec4 finish; };
 layout(location=0) out vec4 result;
+""" + AIR_PREFILTER + """
 void main(){
  vec2 uv=gl_FragCoord.xy/ceil(vec2(textureSize(source_color,0))/4.0);
  vec2 px=1.0/vec2(textureSize(source_color,0));vec3 sum=vec3(0);
@@ -112,12 +123,12 @@ void main(){
   float stops=clamp((log2(settings.y)-local)*settings.x,-settings.z,settings.w);
   sum+=c*exp2(stops);
  }
- result=vec4(sum/16.,1.);
+ result=vec4(prefilter_air(sum/16.),1.);
 }
 """
 const AIR_BLUR := """#version 450
 layout(set=0,binding=0) uniform sampler2D source_color;
-layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; };
+layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; vec4 finish; };
 layout(location=0) out vec4 result;
 void main(){
  vec2 uv=gl_FragCoord.xy/vec2(textureSize(source_color,0));
@@ -154,7 +165,7 @@ func _coherent_air_source(block:int=4)->String:
   vec3 c=texelFetch(source_color,pixel,0).rgb;
   sum+=c*scene_gain(c,vec2(pixel)+.5);
  }
- result=vec4(sum/16.,1.);
+ result=vec4(prefilter_air(sum/16.),1.);
 }
 """
 	return source.replace("*4;","*"+str(block)+";").replace("y<4;","y<"+str(block)+";").replace("x<4;","x<"+str(block)+";").replace("sum/16.","sum/"+str(block*block)+".")
@@ -163,6 +174,7 @@ func _coherent_air_source(block:int=4)->String:
 var _air_bloom:=false
 var _air_response:=1.
 var _bloom_local_response := 0.
+var _bloom_prefilter := 0.
 var _air_spread:=1.
 func set_air_bloom_spread(value: float) -> void:
 	var spread := clampf(value, 0., 2.) if is_finite(value) else 1.
@@ -174,6 +186,13 @@ func set_air_bloom_response(value:float)->void:
 	var response:=clampf(value,0.,4.)if is_finite(value)else 1.
 	if response==_air_response:return
 	_air_response=response;set_neutral(false)
+
+func set_bloom_prefilter(value: float) -> void:
+	var amount := clampf(value, 0., 1.) if is_finite(value) else 0.
+	if amount == _bloom_prefilter:
+		return
+	_bloom_prefilter = amount
+	set_neutral(false)
 
 func set_bloom_local_response(value: float) -> void:
 	var response := clampf(value, 0., 1.) if is_finite(value) else 0.
@@ -188,7 +207,7 @@ func set_air_bloom(value:bool)->void:
 
 var _guard := Mutex.new()
 const REVIEW_PARAMETERS := [0.23, 0.10, 0.24, 0.38]
-var _parameters := PackedFloat32Array(REVIEW_PARAMETERS + [0.,0.,0.,1.]).to_byte_array()
+var _parameters := PackedFloat32Array(REVIEW_PARAMETERS + [0.,0.,0.,1.,0.,0.,0.,0.]).to_byte_array()
 var _review_strength := float(REVIEW_PARAMETERS[0])
 var _state := {"frames": 0, "rebuilds": 0, "error": "", "bytes": 0, "first_build_us": 0, "air_bloom_spread": 1.}
 var _color := RID()
@@ -202,13 +221,14 @@ func _init() -> void:
 	access_resolved_color = true
 
 func set_neutral(neutral: bool) -> void:
-	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16*_air_response if _air_bloom and not neutral else 0.,_bloom_local_response if not neutral else 0.,0.,_air_spread])
+	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16*_air_response if _air_bloom and not neutral else 0.,_bloom_local_response if not neutral else 0.,0.,_air_spread,_bloom_prefilter if not neutral else 0.,0.,0.,0.])
 	parameters[0] = 0.0 if neutral else _review_strength
 	_guard.lock()
 	_parameters = parameters.to_byte_array()
 	_state["air_bloom_response"]=_air_response;_state["air_bloom_weight"]=parameters[4]
 	_state["air_bloom_spread"]=_air_spread
 	_state["bloom_local_response"] = parameters[5]
+	_state["bloom_prefilter"] = parameters[8]
 	_guard.unlock()
 
 func set_review_strength(value: float) -> void:
@@ -380,7 +400,7 @@ func _render_callback(kind: int, data: RenderData) -> void:
 		var list := rd.draw_list_begin(pass_data[0])
 		rd.draw_list_bind_render_pipeline(list, pass_data[1])
 		rd.draw_list_bind_uniform_set(list, pass_data[2], 0)
-		if index >= 1: rd.draw_list_set_push_constant(list, parameters, 32)
+		if index >= 1: rd.draw_list_set_push_constant(list, parameters, parameters.size())
 		rd.draw_list_draw(list, false, 1, 3)
 		rd.draw_list_end()
 	_guard.lock()

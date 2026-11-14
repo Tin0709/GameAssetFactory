@@ -89,7 +89,7 @@ func _build_air(rd:RenderingDevice,copy:RID,meter:RID,format:RDTextureFormat,lin
 func _coherent_air_source(block:int=4)->String:
 	var source:=super(block)
 	if not _source_render:return source
-	var ending:="result=vec4(sum/"+str(block*block)+".,1.);"
+	var ending:="result=vec4(prefilter_air(sum/"+str(block*block)+".),1.);"
 	if not source.contains(ending):_report("error","Optional source-order contract changed");return ""
 	var helpers:="""// GAF_RECON_SOURCE_ORDER
 layout(set=0,binding=2)uniform sampler2D raw_scene;
@@ -118,7 +118,7 @@ float source_gain(vec3 rgb,vec2 uv){
  vec2 stat_uv=(center-vec2(1.))/vec2(dimensions);
  vec3 candidate=mean_raw*source_gain(mean_raw,stat_uv);
  candidate*=scene_gain(candidate,center);
- result=vec4(mix(sum/AREA,candidate,s[4].y),1.);"""
+ result=vec4(prefilter_air(mix(sum/AREA,candidate,s[4].y)),1.);"""
 	body=body.replace("HALF_BLOCK",str(float(block)*.5)).replace("BLOCK",str(block)).replace("AREA",str(float(block*block)))
 	return source.replace(ending,body)
 

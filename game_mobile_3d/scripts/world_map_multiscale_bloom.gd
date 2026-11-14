@@ -3,7 +3,7 @@ extends "res://scripts/world_map_phase_finish_effect.gd"
 const Shape=preload("res://scripts/world_map_bloom_shapes.gd")
 const DOWN="""#version 450
 layout(set=0,binding=0)uniform sampler2D source_color;
-layout(push_constant,std430)uniform Settings{vec4 settings;vec4 air;};
+layout(push_constant,std430)uniform Settings{vec4 settings;vec4 air;vec4 finish;};
 layout(location=0)out vec4 result;
 void main(){ivec2 size=textureSize(source_color,0);ivec2 first=ivec2(gl_FragCoord.xy)*2;vec3 sum=vec3(0.);
 for(int y=0;y<2;y++)for(int x=0;x<2;x++)sum+=texelFetch(source_color,min(first+ivec2(x,y),size-1),0).rgb;
@@ -13,7 +13,7 @@ const FILTER="""#version 450
 layout(set=0,binding=0)uniform sampler2D source_color;
 layout(set=0,binding=1)uniform sampler2D coarse_color;
 layout(set=0,binding=2,std430)readonly buffer Kernel{vec4 k[];};
-layout(push_constant,std430)uniform Settings{vec4 settings;vec4 air;};
+layout(push_constant,std430)uniform Settings{vec4 settings;vec4 air;vec4 finish;};
 layout(location=0)out vec4 result;
 vec3 border_sample(sampler2D image,vec2 at){
  vec2 size=vec2(textureSize(image,0));

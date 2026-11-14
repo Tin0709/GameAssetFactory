@@ -153,6 +153,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"morning_depth_scatter": ["Tán xạ trung cảnh buổi sáng", 1.],
 	&"scatter_chroma": ["Màu tán xạ sương", 1.],
 	&"bloom_local_response": ["Bloom theo sáng tối từng vùng", 1.],
+	&"night_bloom_prefilter": ["Lọc nền bloom ban đêm", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
@@ -204,7 +205,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 127
+const LIGHTING_MIX_VERSION := 128
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -217,6 +218,7 @@ var night_reference_atmosphere := true
 var _night_reference_toggle: CheckButton
 const BALANCED_ATMOSPHERE := {
 	&"bloom_local_response": 0.,
+	&"night_bloom_prefilter": 0.,
 	&"projected_sun": 0.,
 	&"noon_projected_sun": 0.,
 	&"noon_depth_haze": 0.,
@@ -729,6 +731,9 @@ func set_coupled_bloom(value:bool)->void:
 		level.look._exposure_effect.set_air_bloom(enabled)
 		var local_response := _lighting_scale(&"bloom_local_response") * local_exposure_mix_scale()
 		level.look._exposure_effect.set_bloom_local_response(local_response if enabled else 0.)
+		var dark_phase := maxf(moonlight_weight(hour), .45 * _twilight_window())
+		var prefilter := _lighting_scale(&"night_bloom_prefilter") * dark_phase
+		level.look._exposure_effect.set_bloom_prefilter(prefilter if enabled and atmosphere_review == "combined" else 0.)
 		var response:float=bloom_response.sample(reference_hour())if enabled and measured_bloom_response else 1.
 		# Keep the original main Bloom control and allow it to turn the contribution off.
 		var strength := lerpf(1.0, 1.7, night_soft_bloom_weight())
@@ -1272,6 +1277,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"night_bloom_prefilter":
+		return 0.
 	if effect == &"bloom_local_response":
 		return .65
 	if effect == &"world_outline_width":
@@ -1849,6 +1856,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 125 and effect == &"noon_depth_haze":
 			missing_value = 0.
+		if version < 128 and effect == &"night_bloom_prefilter":
+			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
 			missing_value = 0.
 		if version < 127 and effect == &"scatter_chroma":
@@ -2164,7 +2173,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if level.player_light != null:
 			level.player_light.refresh()
 		return
-	if changed_effect == &"bloom_local_response":
+	if changed_effect in [&"bloom_local_response", &"night_bloom_prefilter"]:
 		set_coupled_bloom(coupled_bloom)
 		return
 	if changed_effect in [&"exposure", &"daylight_shadow_lift", &"twilight_shadow_lift", &"grade"]:
