@@ -24,6 +24,14 @@ const Weather = preload("res://scripts/biome_weather_profile.gd")
 @export var fog_depth_m := Vector2(23., 47.)
 @export_range(0., 1.) var noon_fog_density := .16
 
+@export_subgroup("Spatial mist")
+@export var spatial_mist := false
+## Extinction in inverse metres. The shared volume uses the map's spawn elevation as reference.
+@export_range(0., .06, .001) var mist_extinction := .011
+@export_range(0., 1., .01) var mist_height_falloff := .25
+@export_range(0., 1., .01) var mist_scatter := .40
+@export_range(0., 1., .01) var local_mist_strength := .65
+
 @export_group("Color grading")
 @export var tonemap := Environment.TONE_MAPPER_FILMIC
 @export_range(.1, 4.) var exposure := .96

@@ -3,6 +3,7 @@ extends Node
 
 const Profile = preload("res://scripts/biome_graphics_profile.gd")
 const Palette = preload("res://scripts/world_map_showcase_palette.gd")
+const MistVolume = preload("res://scripts/world_map_atmosphere_volume.gd")
 const HOURS := [7., 12., 16.5, 18.5, 22.]
 
 var weather_weight := 0.
@@ -19,6 +20,9 @@ var _fog_enabled := true
 var _profile_index := 0
 var _choices: Array[Profile] = []
 var _label: Label
+var _mist: MistVolume
+var _allow_spatial_mist := true
+var _mist_sample: Dictionary
 
 func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> void:
 	_world = world
@@ -60,6 +64,7 @@ func set_weather(overcast: float, seconds: float = 2.5) -> void:
 		refresh()
 
 func _process(delta: float) -> void:
+	_update_spatial_mist()
 	if _cycle and _world.look.stage == 2:
 		_world.showcase.set_hour(Palette.advance(_world.showcase.hour, delta, _profile.cycle_minutes * 60.))
 	if _weather_progress < 1.:
@@ -70,7 +75,7 @@ func _process(delta: float) -> void:
 func refresh() -> void:
 	var hour: float = _world.showcase.hour
 	if _label != null:
-		_label.text = "%s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · B đối chiếu" % [
+		_label.text = "%s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · B đối chiếu" % [
 			_profile.display_name, int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
 	if _world.look.stage != 2:
 		return
@@ -108,7 +113,52 @@ func refresh() -> void:
 	env.adjustment_color_correction = _profile.color_correction
 	apply_finish(env, _profile.contrast, saturation, _profile.glow_intensity > 0.,
 		_profile.glow_intensity, _profile.glow_bloom, _profile.glow_hdr_threshold)
+	_prepare_spatial_mist(env)
 
+
+func _prepare_spatial_mist(env: Environment) -> void:
+	var active := _profile.spatial_mist and RenderingServer.get_current_rendering_method() == "mobile" \
+		and RenderingServer.get_rendering_device() != null
+	if not active:
+		_mist_sample.clear()
+		_update_spatial_mist()
+		return
+	if _mist == null:
+		_mist = MistVolume.new()
+		_world.get_node("Camera3D").add_child(_mist)
+		_mist.setup()
+		_mist.material_provider = _world.showcase._mist_materials
+		_mist.noise_strength = .28
+	var tint := Vector3(env.fog_light_color.r, env.fog_light_color.g, env.fog_light_color.b)
+	var phase_density := env.fog_density / maxf(_profile.noon_fog_density, .05)
+	var density := _profile.mist_extinction * phase_density
+	_mist_sample = {
+		"fog_begin": env.fog_depth_end,
+		"fog_color": tint,
+		"volume_density": density,
+		"height_falloff": _profile.mist_height_falloff,
+		"near_layer": Vector3(env.fog_depth_begin, density, _world.spawn_position.y),
+		"near_fade_start": .8,
+		"scatter_energy": _profile.mist_scatter,
+		"player_light_color": Vector3.ZERO,
+		"player_light_weight": 0.,
+	}
+	var local_strength := _profile.local_mist_strength * lerpf(.55, 1., weather_weight)
+	_mist.set_local_region(_world.local_mist_region, local_strength)
+	_mist.set_additional_local_region(_world.additional_mist_region, local_strength)
+	_update_spatial_mist()
+
+func _update_spatial_mist() -> void:
+	if not is_instance_valid(_mist):
+		return
+	var camera: Camera3D = _mist.get_parent()
+	_mist.visible = _allow_spatial_mist and _fog_enabled and not _mist_sample.is_empty() \
+		and _world.look.stage == 2 and _world.view_mode == "gameplay" \
+		and camera.projection == Camera3D.PROJECTION_ORTHOGONAL and camera.is_current() \
+		and _mist.failure().is_empty()
+	if _mist.visible:
+		var position: Vector3 = _world.presentation.player_position()
+		_mist.publish(_mist_sample, position, _world.spawn_position.y, _world.look.elapsed, true, 0.)
 
 static func apply_lighting(sun: DirectionalLight3D, env: Environment, phase: Dictionary, noon: Dictionary,
 		sun_rotation: Vector3, key_color: Color, key_energy: float, ambient_color: Color, ambient_energy: float) -> void:
@@ -150,6 +200,9 @@ func handle_key(event: InputEventKey) -> bool:
 		KEY_H:
 			_fog_enabled = not _fog_enabled
 			refresh()
+		KEY_J:
+			_allow_spatial_mist = not _allow_spatial_mist
+			_update_spatial_mist()
 		KEY_F8:
 			_profile_index = (_profile_index + 1) % _choices.size()
 			set_profile(_choices[_profile_index])

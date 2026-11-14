@@ -1,4 +1,7 @@
 shader_type spatial;
+#ifdef GAF_SHARED_MIST
+#include "res://materials/world_map_mist.gdshaderinc"
+#endif
 render_mode cull_disabled, diffuse_lambert, specular_disabled;
 #include "res://materials/world_map_wind.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
@@ -105,4 +108,8 @@ void fragment() {
 	NORMAL=normalize(mix(face,up,soft));
 	ROUGHNESS=1.0;
 	SPECULAR=0.0;
+#ifdef GAF_SHARED_MIST
+	FOG = gaf_surface_mist(SCREEN_UV, -VERTEX.z, INV_VIEW_MATRIX[3].xyz, -INV_VIEW_MATRIX[2].xyz,
+		vec2(PROJECTION_MATRIX[0][0], PROJECTION_MATRIX[1][1]));
+#endif
 }

@@ -1,4 +1,7 @@
 shader_type spatial;
+#ifdef GAF_SHARED_MIST
+#include "res://materials/world_map_mist.gdshaderinc"
+#endif
 #ifdef GAF_WORLD_LEAF_SAMPLING
 render_mode cull_disabled, diffuse_lambert, specular_disabled, alpha_to_coverage;
 #else
@@ -54,4 +57,8 @@ void fragment() {
 	NORMAL=normalize(mix(face,up,0.16));
 	ROUGHNESS=1.0;
 	SPECULAR=0.0;
+#ifdef GAF_SHARED_MIST
+	FOG = gaf_surface_mist(SCREEN_UV, -VERTEX.z, INV_VIEW_MATRIX[3].xyz, -INV_VIEW_MATRIX[2].xyz,
+		vec2(PROJECTION_MATRIX[0][0], PROJECTION_MATRIX[1][1]));
+#endif
 }
