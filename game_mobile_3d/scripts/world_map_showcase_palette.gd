@@ -33,3 +33,6 @@ func sample(hour:float,into:Dictionary={})->Dictionary:
 	for field:String in COLOR_FIELDS:into[field]=Color(a[field]).lerp(b[field],weight)
 	for field:String in FLOAT_FIELDS:into[field]=lerpf(a[field],b[field],weight)
 	return into
+
+static func advance(hour: float, delta: float, cycle_seconds: float) -> float:
+	return fposmod(hour + delta * 24. / maxf(cycle_seconds, 1.), 24.)

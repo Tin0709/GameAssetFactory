@@ -447,6 +447,10 @@ func set_reference_look(enabled: bool) -> void:
 
 func _input(event: InputEvent) -> void:
 	if map_ready and event is InputEventKey and event.pressed and not event.echo:
+		if biome_controller != null and event.physical_keycode == KEY_L:
+			biome_controller.handle_key(event)
+			get_viewport().set_input_as_handled()
+			return
 		if showcase.handle_hud_key(event):
 			get_viewport().set_input_as_handled()
 

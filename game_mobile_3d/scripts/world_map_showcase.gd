@@ -1,6 +1,7 @@
 extends Node
 ## Owns the unified review, not the private assets or the original controller.
 const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
+const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
 const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
@@ -333,8 +334,8 @@ var _fps_label:Label
 var _fps_elapsed:=0.
 const ENV_FIELDS:=["ambient_light_color","ambient_light_energy","background_color","tonemap_exposure","adjustment_saturation","adjustment_contrast","fog_light_color","fog_density","fog_depth_begin","fog_depth_end","fog_depth_curve","fog_light_energy","glow_enabled","glow_intensity","glow_bloom","glow_hdr_threshold"]
 
-func make_player()->Node3D:
-	private_primary = PlayerFactory.uses_private_player()
+func make_player(use_private: bool = true)->Node3D:
+	private_primary = use_private and PlayerFactory.uses_private_player()
 	var selected := PlayerFactory.create(private_primary)
 	if selected.process_mode == Node.PROCESS_MODE_DISABLED:
 		unavailable_reason = "Primary A&S/MD2 + Sabre requires the private editor workspace. No reference assets are included in builds."
@@ -2318,7 +2319,13 @@ func end_environment_edit()->void:
 		_capture_day();apply_time()
 
 func set_hour(value:float)->void:
-	hour=fposmod(value,24.);apply_time()
+	if not is_finite(value):
+		return
+	hour=fposmod(value,24.)
+	if not _flat_lab and level != null and level.get("biome_controller") != null:
+		level.biome_controller.refresh()
+		return
+	apply_time()
 	if _flat_lab:
 		_publish_dawn_turf_color()
 		_update_mist()
@@ -2438,11 +2445,8 @@ func apply_time()->void:
 		if use_forest:_apply_forest(env,sun);_time_applied=true
 		return
 	var p:Dictionary=palette.sample(hour);var noon:Dictionary=palette.sample(12.)
-	sun.rotation_degrees=Vector3(_day.sun_rotation)+Vector3(p.pitch-noon.pitch,p.yaw-noon.yaw,0)
-	sun.light_color=Color(_day.sun_color)*Color(p.key)/Color(noon.key)
-	sun.light_energy=float(_day.sun_energy)*float(p.energy)/float(noon.energy)
-	env.ambient_light_color=Color(_day.ambient_light_color)*Color(p.ambient)/Color(noon.ambient)
-	env.ambient_light_energy=float(_day.ambient_light_energy)*float(p.ambient_energy)/float(noon.ambient_energy)
+	BiomeGraphics.apply_lighting(sun, env, p, noon, _day.sun_rotation, _day.sun_color,
+		_day.sun_energy, _day.ambient_light_color, _day.ambient_light_energy)
 	env.background_color=p.sky
 	env.tonemap_exposure=float(_day.tonemap_exposure)*float(p.exposure)/float(noon.exposure)
 	env.adjustment_saturation=float(_day.adjustment_saturation)*float(p.saturation)/float(noon.saturation)
@@ -2562,7 +2566,7 @@ func _process(delta:float)->void:
 		_fps_label.text="FPS: %d"%Engine.get_frames_per_second()
 	_elapsed+=delta
 	if cycle_enabled and level.look.stage == 2:
-		hour = fposmod(hour + delta * 24. / _day_cycle_seconds(_lighting_scale(&"day_cycle_pacing")), 24.)
+		hour = PALETTE.advance(hour, delta, _day_cycle_seconds(_lighting_scale(&"day_cycle_pacing")))
 	apply_time()
 	_update_mist()
 	_sync_oak_leaf_tint()
