@@ -30,7 +30,8 @@ func run()->void:
 		w.showcase.set_lighting_scale(&"grass_step_coverage", 1.)
 		w.set_reference_look(false)
 		await process_frame
-		check(material.get_shader_parameter(STEP_COVERAGE) in [null, 0.], "Original graphics comparison bypasses the coverage correction")
+		check(not p.grass_light.active and material.shader == original[material],
+			"Original graphics comparison uses the shader without coverage correction")
 		w.set_reference_look(true)
 		await process_frame
 		check(material.get_shader_parameter(STEP_COVERAGE) == 1., "Returning to Combined restores stepped-terrain coverage")
