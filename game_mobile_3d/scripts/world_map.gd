@@ -181,7 +181,10 @@ func _ready() -> void:
 		biome_controller = BiomeGraphics.new()
 		biome_controller.name = "BiomeGraphics"
 		add_child(biome_controller)
-		biome_controller.setup(self, biome_graphics, comparison_biomes)
+		var profile := biome_graphics
+		if profile == null or profile.use_forest_reference:
+			profile = preload("res://assets/graphics/biomes/meadow.tres")
+		biome_controller.setup(self, profile, comparison_biomes)
 	_setup_movement_effects()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
 	terrain_light.name="TerrainColoredTransport";add_child(terrain_light);terrain_light.setup(self)
@@ -198,7 +201,7 @@ func _ready() -> void:
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func _uses_portable_biome() -> bool:
-	return biome_graphics != null and not biome_graphics.use_forest_reference
+	return map_layout_path != DATA or (biome_graphics != null and not biome_graphics.use_forest_reference)
 
 func abort_map(message: String) -> void:
 	push_error(message)
@@ -451,8 +454,7 @@ func set_reference_look(enabled: bool) -> void:
 
 func _input(event: InputEvent) -> void:
 	if map_ready and event is InputEventKey and event.pressed and not event.echo:
-		if biome_controller != null and event.physical_keycode == KEY_L:
-			biome_controller.handle_key(event)
+		if biome_controller != null and biome_controller.handle_key(event):
 			get_viewport().set_input_as_handled()
 			return
 		if showcase.handle_hud_key(event):
@@ -471,9 +473,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and event.pressed and not event.echo:
-		if biome_controller != null and biome_controller.handle_key(event):
-			get_viewport().set_input_as_handled()
-			return
 		if showcase.handle_key(event):
 			get_viewport().set_input_as_handled();return
 		showcase.begin_environment_edit()

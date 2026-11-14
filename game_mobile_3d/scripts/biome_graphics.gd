@@ -41,6 +41,10 @@ func set_profile(profile: Profile) -> void:
 	if profile == null or profile.use_forest_reference:
 		return
 	_profile = profile
+	if _profile.overcast == null:
+		_weather_target = 0.
+		weather_weight = 0.
+		_weather_progress = 1.
 	refresh()
 
 func set_weather(overcast: float, seconds: float = 2.5) -> void:
@@ -91,10 +95,8 @@ func refresh() -> void:
 	env.background_color = sky
 	env.fog_enabled = _fog_enabled
 	env.fog_mode = Environment.FOG_MODE_DEPTH
-	env.fog_light_color = fog_color
-	env.fog_density = clampf(fog_density, 0., 1.)
-	env.fog_depth_begin = _profile.fog_depth_m.x
-	env.fog_depth_end = maxf(_profile.fog_depth_m.y, _profile.fog_depth_m.x + .1)
+	apply_depth_fog(env, fog_color, clampf(fog_density, 0., 1.), _profile.fog_depth_m.x,
+		maxf(_profile.fog_depth_m.y, _profile.fog_depth_m.x + .1))
 	env.tonemap_mode = _profile.tonemap
 	env.tonemap_exposure = _profile.exposure * float(p.exposure) / float(_noon.exposure)
 	env.adjustment_enabled = true
@@ -110,6 +112,12 @@ static func apply_lighting(sun: DirectionalLight3D, env: Environment, phase: Dic
 	sun.light_energy = key_energy * float(phase.energy) / float(noon.energy)
 	env.ambient_light_color = ambient_color * Color(phase.ambient) / Color(noon.ambient)
 	env.ambient_light_energy = ambient_energy * float(phase.ambient_energy) / float(noon.ambient_energy)
+
+static func apply_depth_fog(env: Environment, tint: Color, density: float, begin: float, end: float) -> void:
+	env.fog_light_color = tint
+	env.fog_depth_begin = begin
+	env.fog_depth_end = end
+	env.fog_density = density
 
 static func apply_finish(env: Environment, contrast: float, saturation: float,
 		glow: bool, intensity: float, bloom: float, threshold: float) -> void:

@@ -2290,9 +2290,9 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		p.fog_opacity *= _lighting_scale(&"fog")
 		p.volume_density *= _lighting_scale(&"fog")
 		var fog:Vector3=p.fog_color
-		env.fog_light_color=Color(fog.x,fog.y,fog.z);env.fog_depth_begin=p.fog_begin;env.fog_depth_end=p.fog_end
+		BiomeGraphics.apply_depth_fog(env, Color(fog.x, fog.y, fog.z), p.fog_opacity, p.fog_begin, p.fog_end)
 		env.fog_light_energy *= _lighting_scale(&"scatter")
-		env.fog_depth_curve=.8;env.fog_density=p.fog_opacity
+		env.fog_depth_curve=.8
 		if spatial_mist and mist!=null and mist.failure().is_empty() and mist.effect.snapshot().ready:env.fog_density=0.
 		BiomeGraphics.apply_finish(env, float(_day.adjustment_contrast) * p.contrast_scale,
 			env.adjustment_saturation * p.saturation_scale, true,
