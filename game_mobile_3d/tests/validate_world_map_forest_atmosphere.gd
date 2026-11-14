@@ -56,5 +56,16 @@ func run():
 	check(not s.forest_active(),"Baseline suspends atmosphere")
 	s.compare_baseline();await process_frame;await process_frame
 	check(s.forest_active()==native,"Combined restores atmosphere")
+	if native and is_instance_valid(w.grove) and w.grove.source_oaks:
+		for hour: float in [16.5, 18.5, 17.75, 19.0]:
+			s.set_hour(hour)
+			var canopy: Vector4 = w.grove.canopy_direct
+			var direction := Vector3(canopy.x, canopy.y, canopy.z)
+			check(canopy.w > 0.0 and direction.is_equal_approx(sun.global_basis.z.normalized()),
+				"Canopy uses the current sun in the same update at %.2f" % hour)
+		s.compare_baseline()
+		check(w.grove.canopy_direct == Vector4.ZERO, "Baseline immediately clears the canopy override")
+		s.compare_baseline()
+		check(w.grove.canopy_direct.w > 0.0, "Combined immediately restores the canopy override")
 	check(not s.audio_enabled and w.player.run_speed==7.,"Mute and approved movement retained")
 	print("FOREST_ATMOSPHERE failures=",JSON.stringify(failures));w.free();await process_frame;quit(0 if failures.is_empty() else 1)
