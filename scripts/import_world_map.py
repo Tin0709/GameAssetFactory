@@ -286,7 +286,7 @@ def centre_ground_candidates(cells, palette, offset):
     return sorted(candidates, key=lambda row: (row["centre_distance_squared"], -row["ground_y"], row["source_cell_xz"]))[:16]
 
 
-def import_source(source, output, *, border_mode="markers"):
+def import_source(source, output, *, border_mode="markers", new_output=False):
     source, output = Path(source).resolve(), Path(output).resolve()
     root, source_hash = read_source(source)
     decoded = decode_regions(root)
@@ -334,7 +334,7 @@ def import_source(source, output, *, border_mode="markers"):
             "vertical_clearance_above_source_m": 8, "extends_below_source_m": 2,
         }
     # Complete validation before making a package, and preserve the original bytes.
-    output.mkdir(parents=True, exist_ok=True)
+    output.mkdir(parents=True, exist_ok=not new_output)
     destination = output / "World Map.litematic"
     if source != destination:
         shutil.copyfile(source, destination)
@@ -387,7 +387,7 @@ def main():
         biome = args.biome or PORTABLE_BIOMES[0]
         scene_source = map_scene_source(scene.stem, output / "runtime.json", biome)
         scene_info = {"scene": str(scene), "biome": biome}
-    runtime, manifest = import_source(args.source, output, border_mode=args.border)
+    runtime, manifest = import_source(args.source, output, border_mode=args.border, new_output=bool(args.scene))
     if args.scene:
         scene.parent.mkdir(parents=True, exist_ok=True)
         with scene.open("x", encoding="utf-8", newline="\n") as handle:
