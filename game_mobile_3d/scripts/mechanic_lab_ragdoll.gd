@@ -626,29 +626,41 @@ func _slide_wall_shoulder_anchors() -> void:
 	for name in ["Arm.L", "Arm.R"]:
 		var limb: PhysicalBone3D = bodies[name]
 		var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
-		if state == null or state.get_contact_count() == 0:
+		if state == null:
 			continue
 		var spec: Dictionary = source_joints[name]
 		var gap: Vector3 = (core.transform * spec.parent_frame).origin - (state.transform * spec.child_frame).origin
 		var distance := gap.length()
 		if distance <= min_gap:
 			continue
-		for i in state.get_contact_count():
-			var wall := state.get_contact_collider_object(i) as StaticBody3D
-			var normal := state.get_contact_local_normal(i)
+		var contacts := state.get_contact_count()
+		var free_torso := core.get_contact_count() == 0
+		if (initial_collision and free_torso and contacts >= 2
+				and absf(gap.y) >= FIRST_WALL_SHOULDER_SLIDE_MIN_GAP
+				and _slide_at_wall_intersection(limb, state, gap.y)):
+			continue
+		# The shoulder can lose its solver contact while the wall still
+		# blocks the motion to its anchor. Use the swept contact in that tick.
+		var swept := contacts == 0
+		if swept and (not initial_collision or not free_torso or distance <= WALL_SHOULDER_SLIDE_MIN_GAP
+				or not _test_projection_motion(limb, state.transform, gap)
+				or _projection_hit.get_collision_count() == 0):
+			continue
+		for i in maxi(contacts, 1):
+			var wall := (_projection_hit.get_collider() if swept else state.get_contact_collider_object(i)) as StaticBody3D
+			var normal := _projection_hit.get_collision_normal() if swept else state.get_contact_local_normal(i)
 			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y:
 				continue
 			var normal_gap := gap.dot(normal)
 			# An arm rebounding from the wall can also close a tangential
 			# gap while the torso is free. Leave wall-normal motion to physics.
-			var rebounding := normal_gap < 0.0 and core.get_contact_count() == 0 \
+			var rebounding := normal_gap < 0.0 and free_torso \
 				and state.linear_velocity.dot(normal) > 0.0
-			var normal_fraction := REBOUND_SHOULDER_SLIDE_MAX_NORMAL_FRACTION if rebounding else max_normal_fraction
+			var normal_fraction := REBOUND_SHOULDER_SLIDE_MAX_NORMAL_FRACTION if rebounding or swept else max_normal_fraction
 			if absf(normal_gap) > distance * normal_fraction:
 				continue
 			var wall_rid := wall.get_rid()
-			if PhysicsServer3D.body_get_shape_count(wall_rid) != 1 \
-					or PhysicsServer3D.shape_get_type(PhysicsServer3D.body_get_shape(wall_rid, 0)) != PhysicsServer3D.SHAPE_BOX:
+			if not _is_single_box(wall_rid):
 				continue
 			# Sweep against the other geometry, then verify that sliding along
 			# the contact face does not deepen the starting overlap.
@@ -660,6 +672,51 @@ func _slide_wall_shoulder_anchors() -> void:
 				if maxf(mid, end) <= maxf(start, PROJECTION_COLLISION_MARGIN) + PROJECTION_COLLISION_MARGIN:
 					state.transform = state.transform.translated(motion)
 			break
+
+func _slide_at_wall_intersection(limb: PhysicalBone3D, state: PhysicsDirectBodyState3D, vertical_gap: float) -> bool:
+	var walls: Array[RID] = []
+	var first_normal := Vector3.ZERO
+	for i in state.get_contact_count():
+		var wall := state.get_contact_collider_object(i) as StaticBody3D
+		var normal := state.get_contact_local_normal(i)
+		if wall == null or absf(normal.y) > 0.001:
+			return false
+		var rid := wall.get_rid()
+		if rid in walls:
+			if walls.size() == 1 and normal.dot(first_normal) < 0.99:
+				return false
+			continue
+		if walls.size() == 2 or not _is_single_box(rid):
+			return false
+		if walls.is_empty():
+			first_normal = normal
+		elif absf(normal.dot(first_normal)) > 0.1:
+			return false
+		walls.append(rid)
+	if walls.size() != 2:
+		return false
+	# The vertical direction is tangent to both faces. Sweep it against
+	# other geometry, then check overlap with the contacted walls as well.
+	var motion := Vector3.UP * clampf(vertical_gap, -WALL_SHOULDER_SLIDE_MAX, WALL_SHOULDER_SLIDE_MAX)
+	var sweep := PhysicsTestMotionParameters3D.new()
+	sweep.from = state.transform
+	sweep.motion = motion
+	sweep.margin = PROJECTION_COLLISION_MARGIN
+	sweep.recovery_as_collision = true
+	sweep.exclude_bodies = walls
+	if PhysicsServer3D.body_test_motion(limb.get_rid(), sweep):
+		return false
+	var start := _deepest_contact(_terrain_contact_points(limb, state, Vector3.ZERO))
+	var mid := _deepest_contact(_terrain_contact_points(limb, state, motion * 0.5))
+	var end := _deepest_contact(_terrain_contact_points(limb, state, motion))
+	if maxf(mid, end) > maxf(start, PROJECTION_COLLISION_MARGIN) + PROJECTION_COLLISION_MARGIN:
+		return false
+	state.transform = state.transform.translated(motion)
+	return true
+
+func _is_single_box(body: RID) -> bool:
+	return PhysicsServer3D.body_get_shape_count(body) == 1 \
+		and PhysicsServer3D.shape_get_type(PhysicsServer3D.body_get_shape(body, 0)) == PhysicsServer3D.SHAPE_BOX
 
 func _wall_chest_shift_preserves_joints(gaps: Array[Vector3], largest_gap: float, motion: Vector3) -> bool:
 	for gap: Vector3 in gaps:
