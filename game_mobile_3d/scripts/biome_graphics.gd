@@ -2,6 +2,7 @@ extends Node
 ## Applies biome resources to the map's own environment and light.
 
 const Profile = preload("res://scripts/biome_graphics_profile.gd")
+const DayNight = preload("res://scripts/biome_day_night.gd")
 const Palette = preload("res://scripts/world_map_showcase_palette.gd")
 const MistVolume = preload("res://scripts/world_map_atmosphere_volume.gd")
 const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
@@ -168,7 +169,7 @@ func refresh() -> void:
 	apply_finish(env, _profile.contrast, saturation, _profile.glow_intensity > 0.,
 		_profile.glow_intensity, _profile.glow_bloom, _profile.glow_hdr_threshold)
 	_update_fixture(time)
-	_prepare_spatial_mist(env)
+	_prepare_spatial_mist(env, time)
 	_update_finish()
 
 
@@ -244,7 +245,7 @@ func _fixture_air() -> PackedFloat32Array:
 		return PackedFloat32Array()
 	return _path_fixture.air_parameters(_profile.path_fixture_scatter)
 
-func _prepare_spatial_mist(env: Environment) -> void:
+func _prepare_spatial_mist(env: Environment, time: float) -> void:
 	var active := quality != Quality.ESSENTIAL and _profile.spatial_mist and RenderingServer.get_current_rendering_method() == "mobile" \
 		and RenderingServer.get_rendering_device() != null
 	if not active:
@@ -275,8 +276,10 @@ func _prepare_spatial_mist(env: Environment) -> void:
 		"player_light_weight": 0.,
 	}
 	var local_strength := _profile.local_mist_strength * lerpf(.55, 1., weather_weight)
-	_mist.set_local_region(_world.local_mist_region, local_strength)
-	_mist.set_additional_local_region(_world.additional_mist_region, local_strength)
+	var local_weight := clampf(DayNight.sample_curve(_profile.local_mist_by_hour, time, 1.), 0., 1.)
+	var additional_weight := clampf(DayNight.sample_curve(_profile.additional_mist_by_hour, time, 1.), 0., 1.)
+	_mist.set_local_region(_world.local_mist_region, local_strength * local_weight)
+	_mist.set_additional_local_region(_world.additional_mist_region, local_strength * additional_weight)
 	_update_spatial_mist()
 
 func _mist_materials() -> Array:

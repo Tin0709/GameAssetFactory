@@ -34,6 +34,10 @@ const DayNight = preload("res://scripts/biome_day_night.gd")
 @export_range(0., 1., .01) var mist_height_falloff := .25
 @export_range(0., 1., .01) var mist_scatter := .40
 @export_range(0., 1., .01) var local_mist_strength := .65
+## Multiplies the first map region by normalized hour. A missing or empty curve uses 1.
+@export var local_mist_by_hour: Curve
+## Independent multiplier for the second map region. Match the midnight endpoints.
+@export var additional_mist_by_hour: Curve
 
 @export_group("Color grading")
 @export var tonemap := Environment.TONE_MAPPER_FILMIC
