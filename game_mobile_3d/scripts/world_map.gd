@@ -19,6 +19,7 @@ const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 const BiomeGraphicsProfile = preload("res://scripts/biome_graphics_profile.gd")
 const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
 const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
+const LocalDiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export_file("*.json") var map_layout_path := DATA
 ## Assign a graphics resource independently of the imported layout.
@@ -35,7 +36,7 @@ var biome_controller: BiomeGraphics
 @export var night_mist_region: LocalMistRegion
 @export var regional_sky_region: RegionalSkyRegion
 @export var ground_haze_profile: GroundHazeProfile
-@export var local_diffuse_region: preload("res://scripts/local_diffuse_region.gd")
+@export var local_diffuse_region: LocalDiffuseRegion
 @export var scene_lighting_mix: SceneLightingMix
 @export var additional_lighting_mixes: Array[SceneLightingMix] = []
 ## Optional origins for the 2 m private Sculk vein meshes, on flat terrain.
