@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
 [ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
@@ -16,10 +16,18 @@ radii_m = Vector3(10, 1.9, 7)
 extinction_per_meter = 0.021
 scatter_multiplier = Vector3(0.9, 1.04, 1.23)
 
+[sub_resource type="Resource" id="StoneGardenMist"]
+script = ExtResource("local_mist")
+center_m = Vector3(4.5, 2.7, -11.5)
+radii_m = Vector3(7, 1.65, 4)
+extinction_per_meter = 0.032
+scatter_multiplier = Vector3(0.9, 1.06, 1.24)
+
 [node name="MeadowBiomeReview" instance=ExtResource("base")]
 script = ExtResource("map")
 map_layout_path = "res://assets/maps/meadow_biome_review/runtime.json"
 local_mist_region = SubResource("LowWesternMist")
+additional_mist_region = SubResource("StoneGardenMist")
 biome_graphics = ExtResource("woodland")
 biome_path_fixture_xz = Vector2(4.5, -4.5)
 comparison_biomes = Array[ExtResource("profile")]([ExtResource("look")])
