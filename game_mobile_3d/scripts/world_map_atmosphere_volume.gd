@@ -164,8 +164,8 @@ func _process(_delta:float)->void:
   _publish_region(&"gaf_additional_mist_center",&"gaf_additional_mist_radii",additional)
  _set_gate(ready);_sync_materials(ready)
 func suspend() -> void:
-	hide()
-	_process(0.)
+ hide()
+ _process(0.)
 
 func _publish_region(center: StringName, radii: StringName, parameters: PackedFloat32Array) -> void:
  if parameters.size()!=12:
