@@ -16,6 +16,7 @@ const WALL_NECK_BRACE_MIN_GAP := 2.5 * SOURCE_ANCHOR_TOLERANCE
 const WALL_NECK_LANDING_BLEND_END := 0.5
 const WALL_SHOULDER_SLIDE_WINDOW := 5.0 / 60.0
 const WALL_SHOULDER_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
+const FIRST_WALL_SHOULDER_SLIDE_MIN_GAP := 0.17
 const WALL_SHOULDER_SLIDE_MAX := 0.08
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
@@ -440,7 +441,7 @@ func _project_source_anchors() -> void:
 	if sabre_flight:
 		_recover_leading_head_wall_overlap()
 	super._project_source_anchors()
-	if sabre_flight and _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _launch_frame \
+	if sabre_flight and Engine.get_physics_frames() - _launch_frame \
 			<= roundi(WALL_SHOULDER_SLIDE_WINDOW * Engine.physics_ticks_per_second):
 		_slide_wall_shoulder_anchors()
 	_recover_early_floor_arm_gap()
@@ -608,6 +609,11 @@ func _slide_wall_shoulder_anchors() -> void:
 	var core := PhysicsServer3D.body_get_direct_state(chest.get_rid())
 	if core == null:
 		return
+	# A clean launch can still hit the corner on the first few physics ticks.
+	# Correct only large gaps and keep the translation parallel to the wall.
+	var initial_collision := _wall_handoff_frame < 0
+	var min_gap := FIRST_WALL_SHOULDER_SLIDE_MIN_GAP if initial_collision else WALL_SHOULDER_SLIDE_MIN_GAP
+	var max_normal_fraction := 0.5 if initial_collision else 0.2
 	for name in ["Arm.L", "Arm.R"]:
 		var limb: PhysicalBone3D = bodies[name]
 		var state := PhysicsServer3D.body_get_direct_state(limb.get_rid())
@@ -616,12 +622,13 @@ func _slide_wall_shoulder_anchors() -> void:
 		var spec: Dictionary = source_joints[name]
 		var gap: Vector3 = (core.transform * spec.parent_frame).origin - (state.transform * spec.child_frame).origin
 		var distance := gap.length()
-		if distance <= WALL_SHOULDER_SLIDE_MIN_GAP:
+		if distance <= min_gap:
 			continue
 		for i in state.get_contact_count():
 			var wall := state.get_contact_collider_object(i) as StaticBody3D
 			var normal := state.get_contact_local_normal(i)
-			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y or absf(gap.dot(normal)) > distance * 0.2:
+			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y \
+					or absf(gap.dot(normal)) > distance * max_normal_fraction:
 				continue
 			var wall_rid := wall.get_rid()
 			if PhysicsServer3D.body_get_shape_count(wall_rid) != 1 \
