@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
 [ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
@@ -16,12 +16,18 @@
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_forest_dawn_mix.tres" id="forest_dawn_mix"]
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_forest_dawn_reference_mix.tres" id="forest_dawn_reference_mix"]
 
+[ext_resource type="Script" path="res://scripts/ground_haze_profile.gd" id="ground_haze_type"]
+
+[sub_resource type="Resource" id="ForestGroundHaze"]
+script = ExtResource("ground_haze_type")
+
 [node name="WorldMap" instance=ExtResource("base")]
 script = ExtResource("map")
 local_mist_region = ExtResource("mist")
 additional_mist_region = ExtResource("cliff_mist")
 night_mist_region = ExtResource("night_mist")
 regional_sky_region = ExtResource("regional_sky")
+ground_haze_profile = SubResource("ForestGroundHaze")
 scene_lighting_mix = ExtResource("forest_mix")
 additional_lighting_mixes = Array[ExtResource("mix_type")]([ExtResource("night_mix"), ExtResource("soft_cliff_mix"), ExtResource("forest_air_mix"), ExtResource("humid_forest_mix"), ExtResource("forest_sun_shadow_mix"), ExtResource("forest_dawn_mix"), ExtResource("forest_dawn_reference_mix")])
 projected_sun_shift = Vector2(0, 6)

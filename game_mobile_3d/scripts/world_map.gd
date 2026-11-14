@@ -16,11 +16,13 @@ const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV
 const LocalMistRegion = preload("res://scripts/local_mist_region.gd")
 const RegionalSkyRegion = preload("res://scripts/regional_sky_region.gd")
 const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
+const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var local_mist_region: LocalMistRegion
 @export var additional_mist_region: LocalMistRegion
 @export var night_mist_region: LocalMistRegion
 @export var regional_sky_region: RegionalSkyRegion
+@export var ground_haze_profile: GroundHazeProfile
 @export var scene_lighting_mix: SceneLightingMix
 @export var additional_lighting_mixes: Array[SceneLightingMix] = []
 ## Optional origins for the 2 m private Sculk vein meshes, on flat terrain.
