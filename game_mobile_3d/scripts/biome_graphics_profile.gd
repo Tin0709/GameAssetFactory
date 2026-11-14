@@ -2,6 +2,7 @@ extends Resource
 
 const Weather = preload("res://scripts/biome_weather_profile.gd")
 const DayNight = preload("res://scripts/biome_day_night.gd")
+const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Map-independent art settings. Geometry-derived lighting fields live on each map.
 
 @export var display_name := "Temperate meadow"
@@ -46,6 +47,9 @@ const DayNight = preload("res://scripts/biome_day_night.gd")
 @export var local_mist_by_hour: Curve
 ## Independent multiplier for the second map region. Match the midnight endpoints.
 @export var additional_mist_by_hour: Curve
+## Optional light scattered into low areas behind the player.
+@export var ground_haze: GroundHazeProfile
+@export_range(0., 1., .01) var ground_haze_strength := 0.
 
 @export_group("Color grading")
 @export var tonemap := Environment.TONE_MAPPER_FILMIC

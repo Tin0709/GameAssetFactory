@@ -346,6 +346,12 @@ func _update_spatial_mist() -> void:
 		and _mist.failure().is_empty()
 	if _mist.visible:
 		var position: Vector3 = _world.presentation.player_position()
+		if _profile.ground_haze != null and _profile.ground_haze_strength > 0.:
+			var subject_depth := -camera.global_basis.z.dot(position - camera.global_position)
+			_mist_sample.ground_haze = _profile.ground_haze.sample(_world.showcase.hour, subject_depth,
+				_world.spawn_position.y, _profile.ground_haze_strength)
+		else:
+			_mist_sample.erase("ground_haze")
 		_mist.publish(_mist_sample, position, _world.spawn_position.y, _world.look.elapsed, true, 0.)
 
 static func apply_lighting(sun: DirectionalLight3D, env: Environment, phase: Dictionary, noon: Dictionary,

@@ -36,6 +36,7 @@ var biome_controller: BiomeGraphics
 @export var night_mist_region: LocalMistRegion
 @export var regional_sky_region: RegionalSkyRegion
 @export var ground_haze_profile: GroundHazeProfile
+@export var twilight_ground_haze_profile: GroundHazeProfile
 @export var local_diffuse_region: LocalDiffuseRegion
 ## Centre X/Z and radius X/Z of the late-day stone highlight adjustment.
 @export var stone_sunset_region := Vector4.ZERO

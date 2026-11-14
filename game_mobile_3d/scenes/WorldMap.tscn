@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
 [ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
@@ -33,6 +33,14 @@ depth_behind_subject_m = Vector2(1.5, 6.5)
 height_above_map_base_m = Vector2(1.5, 7)
 max_gain = 2.0
 
+[sub_resource type="Resource" id="ForestTwilightGroundHaze"]
+script = ExtResource("ground_haze_type")
+depth_behind_subject_m = Vector2(1.5, 6.5)
+height_above_map_base_m = Vector2(1.5, 14)
+max_gain = 7.0
+morning_hours = Vector4(0, 0, 0, 0)
+evening_hours = Vector4(19, 19.5, 20, 21)
+
 [node name="WorldMap" instance=ExtResource("base")]
 script = ExtResource("map")
 biome_graphics = ExtResource("forest_reference")
@@ -41,6 +49,7 @@ additional_mist_region = ExtResource("cliff_mist")
 night_mist_region = ExtResource("night_mist")
 regional_sky_region = ExtResource("regional_sky")
 ground_haze_profile = SubResource("ForestGroundHaze")
+twilight_ground_haze_profile = SubResource("ForestTwilightGroundHaze")
 local_diffuse_region = SubResource("CliffDiffuse")
 stone_sunset_region = Vector4(-22, -40, 13.5, 10.5)
 scene_lighting_mix = ExtResource("forest_mix")

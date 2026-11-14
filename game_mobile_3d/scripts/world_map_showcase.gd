@@ -167,6 +167,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom_local_response": ["Bloom theo sáng tối từng vùng", 1.],
 	&"night_bloom_prefilter": ["Lọc nền bloom ban đêm", 1.],
 	&"ground_haze": ["Ánh sương thấp sau tán", 1.],
+	&"twilight_ground_haze": ["Ánh sương thấp lúc chạng vạng", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
@@ -223,7 +224,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 146
+const LIGHTING_MIX_VERSION := 147
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -923,11 +924,16 @@ func _update_mist()->void:
 			if gain > 0.0:
 				sample.near_scatter = Vector3(FOREST_NEAR_SCATTER_CENTER.x, FOREST_NEAR_SCATTER_CENTER.y, gain)
 	var emitter:Vector3=level.presentation.player_position()
-	if not _flat_lab and level.ground_haze_profile != null and not _balanced_preview and atmosphere_review == "combined" \
+	if not _flat_lab and not _balanced_preview and atmosphere_review == "combined" \
 			and level.view_mode == "gameplay" and sample.has("near_layer"):
 		var subject_depth: float = -camera.global_basis.z.dot(emitter - camera.global_position)
-		sample.ground_haze = level.ground_haze_profile.sample(hour, subject_depth, level.spawn_position.y,
-			_lighting_scale(&"ground_haze"))
+		var map_height: float = level.spawn_position.y
+		var haze: PackedFloat32Array
+		if level.ground_haze_profile != null:
+			haze = level.ground_haze_profile.sample(hour, subject_depth, map_height, _lighting_scale(&"ground_haze"))
+		if haze.is_empty() and level.twilight_ground_haze_profile != null:
+			haze = level.twilight_ground_haze_profile.sample(hour, subject_depth, map_height, _lighting_scale(&"twilight_ground_haze"))
+		sample.ground_haze = haze
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
 		var origin := _lantern_light_origin(lantern.emitter_position())
@@ -2103,6 +2109,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 146 and effect == &"forest_path_dusk":
 			missing_value = 0.
+		if version < 147 and effect == &"twilight_ground_haze":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -2142,6 +2150,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"ground_haze":
 			slider.editable = slider.editable and not _flat_lab and level.ground_haze_profile != null
+		if effect == &"twilight_ground_haze":
+			slider.editable = slider.editable and not _flat_lab and level.twilight_ground_haze_profile != null
 		if effect == &"local_diffuse_return":
 			slider.editable = slider.editable and not _flat_lab and level.local_diffuse_region != null
 		if effect == &"basin_sunlit_mist":
@@ -2280,7 +2290,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_sync_forest_night_lights()
 		set_coupled_bloom(coupled_bloom)
 		return
-	if changed_effect in [&"ground_haze", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze"]:
+	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze"]:
 		_update_mist()
 		return
 	if changed_effect == &"night_path_chroma":
