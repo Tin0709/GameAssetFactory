@@ -56,6 +56,9 @@ func verify() -> void:
 	check(env.fog_light_color.is_equal_approx(morning_fog.lerp(profile.overcast.fog_color, .5)), "Weather blends over biome fog")
 	graphics.set_weather(0., 0.)
 	check(morning.is_equal_approx(light.light_color) and morning_fog.is_equal_approx(env.fog_light_color), "Clear restores authored phase")
+	world.showcase.set_hour(9.5)
+	check(light.light_color.is_equal_approx(morning.lerp(profile.noon_sun_color, .5)),
+		"Morning and Noon colors blend continuously between authored keys")
 	world.showcase.set_hour(23.999)
 	var before_midnight := env.fog_light_color
 	world.showcase.set_hour(0.)
