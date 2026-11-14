@@ -70,6 +70,7 @@ func run() -> void:
 	await check_melee_height(lab)
 	await check_zombie_perception(lab)
 	await check_zombie_roam(lab)
+	await check_zombie_roam_clearance(lab)
 	await check_simultaneous_damage(lab, numbers)
 	lab._on_player_hit(6)
 	lab._process(0.12)
@@ -321,6 +322,56 @@ func check_zombie_roam(lab) -> void:
 	print("MECHANIC_LAB_ZOMBIE_ROAM peak_range=", peak_distance, " peak_speed=", peak_speed, " second_walk=", saw_second_walk)
 	zombie.free()
 	player.set_physics_process(true)
+	lab.reset_player()
+	await ticks(2)
+
+func check_zombie_roam_clearance(lab) -> void:
+	var group: Node = lab.get_node("Zombies")
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie := group.get_child(0) as ZOMBIE
+	zombie.set_physics_process(false)
+	var start := zombie.global_position
+	var seed: int = zombie._roam_rng.seed
+	await ticks(2)
+	var open_destination := zombie._pick_roam_destination()
+	check(open_destination.is_finite(), "The open patrol fixture has a valid destination")
+	if not open_destination.is_finite():
+		zombie.free()
+		return
+	var obstacle := StaticBody3D.new()
+	var collision := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(0.5, 0.6, 0.5)
+	collision.shape = box
+	obstacle.add_child(collision)
+	lab.add_child(obstacle)
+	var midpoint := start.lerp(open_destination, 0.5)
+	obstacle.global_position = Vector3(midpoint.x, 0.3, midpoint.z)
+	await ticks(2)
+	check(zombie._clear_sight_to(open_destination), "The obstacle is below the zombie's sight ray")
+	zombie._roam_rng.seed = seed
+	var destination := zombie._pick_roam_destination()
+	check(destination.is_finite() and not destination.is_equal_approx(open_destination),
+		"Idle patrol chooses another route when its full capsule would hit a low obstacle")
+	if destination.is_finite():
+		zombie._roam_destination = destination
+		zombie.animation.play(ZOMBIE.IDLE, 0.0)
+		zombie.animation.advance(0.0)
+		var player: CharacterBody3D = lab.player
+		player.set_physics_process(false)
+		player.global_position = Vector3(-30.0, 0.02, -30.0)
+		zombie.set_physics_process(true)
+		for tick in 235:
+			await physics_frame
+			if not zombie._roam_destination.is_finite():
+				break
+		check(zombie.global_position.distance_to(destination) < 0.15 and zombie.is_on_floor(),
+			"The zombie walks the replacement route to its patrol destination")
+		player.set_physics_process(true)
+	print("MECHANIC_LAB_ROAM_CLEARANCE open=", open_destination, " selected=", destination,
+		" reached=", zombie.global_position)
+	obstacle.free()
+	zombie.free()
 	lab.reset_player()
 	await ticks(2)
 
