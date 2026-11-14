@@ -37,7 +37,7 @@ Map portable dùng chung các pass sương và bloom với WorldMap. Preset Fore
 
 ## Chỉnh chu kỳ theo biome
 
-Tại **Biome Graphics → Day and night**, mở **Day Night**. Preset Rìa rừng ẩm đã có resource riêng. Duplicate resource này trước khi chỉnh màu nắng, ánh trời, bầu trời hoặc sương cho biome khác. Có thể để trống từng track để dùng đường màu chung. Các màu là giá trị tuyệt đối. Track góc pitch/yaw tính bằng độ và track Exposure dùng giá trị exposure của môi trường. Curve cường độ nắng và mật độ sương ở profile vẫn là hệ số nhân.
+Tại **Biome Graphics → Day and night**, mở **Day Night**. Preset Rìa rừng ẩm đã có resource riêng. Duplicate resource này trước khi chỉnh màu nắng, ánh trời, bầu trời hoặc sương cho biome khác. Có thể để trống từng track để dùng đường màu chung. Các màu là giá trị tuyệt đối. Track góc pitch/yaw tính bằng độ và track Exposure dùng giá trị exposure của môi trường. Các curve cường độ nắng, ánh môi trường và mật độ sương ở profile là hệ số nhân. **Ambient Energy By Hour** được áp dụng trước mức mây, với hệ số 1 nếu để trống. Preset Rìa rừng ẩm giảm ánh môi trường khi trời vừa tối và về mức cũ sau 21:15. Map có đèn cục bộ vẫn dùng đường đèn riêng.
 
 Điểm 0,5 là 12:00. Giữ điểm 0/1 bằng nhau cho các track vòng lặp và chọn nội suy tuyến tính hoặc cubic để màu chuyển dần giữa các mốc. Với yaw qua ±180°, nhập các giá trị liên tục như 170° → 190° để hướng nắng đi qua góc ngắn. **Weather → Start Overcast** đặt mức mây lúc mở map. F8 giữ giờ và mức mây hiện tại khi hai preset đều có cấu hình Overcast. Không cần đổi shader để đổi những thông số này.
 
