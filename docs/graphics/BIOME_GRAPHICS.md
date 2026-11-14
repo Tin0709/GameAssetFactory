@@ -2,6 +2,19 @@
 
 **Mở để chơi thử.** Mở `scenes/maps/m2_v1/MeadowBiomeReview.tscn` trong Godot và bấm **F6**. **F5** vẫn mở WorldMap với preset Forest tham chiếu. Map thử mặc định dùng Rìa rừng ẩm. **J** so sánh volume với fog chuẩn trong cùng preset. **F7** so hậu kỳ khi rời buổi trưa, **Shift+F7** đổi mức chất lượng. **F8** đổi giữa Đồng cỏ ven rừng và Rìa rừng ẩm, **T** chọn giờ, **Shift+T** bật đồng hồ, **F6** trong cửa sổ game chuyển trời quang/nhiều mây, **H** tắt/bật sương, **B** so đồ họa gốc và **L** hiện phím điều khiển. WASD, chuột cuộn và Space dùng chung với WorldMap.
 
+## Phần dùng chung và phần riêng của bản đồ
+
+| Hệ thống | Chỉnh theo biome | Chỉnh theo map |
+| --- | --- | --- |
+| Lighting | Hướng, màu, cường độ nắng và ánh môi trường | Vị trí đèn cục bộ và dữ liệu ánh sáng tính từ hình học |
+| Atmosphere / Fog | Màu trời, màu sương, dải độ sâu, độ suy giảm theo cao độ và cường độ theo giờ | Tâm, kích thước, extinction và màu tán xạ của từng vùng sương |
+| Bloom | Ngưỡng, cường độ, độ lan và mức thích ứng theo giờ | Chọn mức chất lượng phù hợp với cảnh và thiết bị |
+| Color Grading | Tonemapper, exposure, độ tương phản, bão hòa và texture sửa màu tùy chọn | Gán hoặc duplicate preset để tinh chỉnh cục bộ |
+| Day/Night | Giờ bắt đầu, độ dài chu kỳ, các track màu, góc và cường độ | Chọn preset của scene |
+| Weather | Resource chuyển giữa trời quang và nhiều mây, ảnh hưởng lên nắng, sương và màu | Chọn preset hoặc đặt thời tiết lúc bắt đầu phiên chơi |
+
+Map portable dùng chung các pass sương và bloom với WorldMap. Preset Forest tham chiếu còn nạp LUT riêng và các trường ánh sáng gắn với hình học, được xác minh theo map trước khi dùng.
+
 ## Import map tiếp theo
 
 1. Từ thư mục `GameAssetFactory`, chạy `python scripts/import_world_map.py "D:/Maps/MapMoi.litematic" --border bounds --output game_mobile_3d/assets/maps/map_moi`. Với bounds, cạnh ngoài lấy từ vùng chọn của schematic. Vùng đệm rỗng vẫn được giữ theo kích thước vùng chọn. Chế độ `markers` giữ hợp đồng vòng Red Wool 100 × 100 cho WorldMap. Cả hai dùng cùng mapping block và kiểm tra slab, tall grass, vùng chồng lấn và block chưa hỗ trợ.
@@ -20,6 +33,8 @@
 Tại **Biome Graphics → Day and night**, mở **Day Night**. Preset Rìa rừng ẩm đã có resource riêng. Duplicate resource này trước khi chỉnh màu nắng, ánh trời, bầu trời hoặc sương cho biome khác. Có thể để trống từng track để dùng đường màu chung. Các màu là giá trị tuyệt đối. Track góc pitch/yaw tính bằng độ và track Exposure dùng giá trị exposure của môi trường. Curve cường độ nắng và mật độ sương ở profile vẫn là hệ số nhân.
 
 Điểm 0,5 là 12:00. Giữ điểm 0/1 bằng nhau cho các track vòng lặp và chọn nội suy tuyến tính hoặc cubic để màu chuyển dần giữa các mốc. Với yaw qua ±180°, nhập các giá trị liên tục như 170° → 190° để hướng nắng đi qua góc ngắn. **Weather → Start Overcast** đặt mức mây lúc mở map. F8 giữ giờ và mức mây hiện tại khi hai preset đều có cấu hình Overcast. Không cần đổi shader để đổi những thông số này.
+
+Trong **Atmosphere and fog → Spatial mist**, **Local Mist By Hour** và **Additional Mist By Hour** điều khiển hai vùng sương độc lập. Curve dùng cùng trục 0–1 theo giờ và nhân với cường độ đã chọn trong preset và mức mây. Curve để trống giữ hệ số 1. Đặt **Local Mist Region** và **Additional Mist Region** ở node map theo địa hình thực tế. Trong scene Đồng cỏ, đi tới cụm đá gần X = 4,5, Z = −11,5, bấm **T** đến 07:00 hoặc 16:30 và **J** để đối chiếu. Túi sương ở cụm đá bật theo preset Rìa rừng ẩm, về 0 trong khung quanh 12:00.
 
 Các vị trí vùng sương và đèn, cùng dữ liệu ánh sáng đã bake theo hình học, thuộc về map. Cần đặt hoặc dựng lại khi đổi layout. Các tính năng cần texture/LUT PIX và cache chiếu sáng riêng của Forest vẫn chạy qua preset tham chiếu trên WorldMap. Map Litematica mới dùng cấu hình portable.
 
