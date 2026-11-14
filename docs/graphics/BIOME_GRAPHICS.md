@@ -51,6 +51,8 @@ Trong **Atmosphere and fog → Spatial mist**, **Local Mist By Hour** và **Addi
 
 Các vị trí vùng sương và đèn, cùng dữ liệu ánh sáng đã bake theo hình học, thuộc về map. Cần đặt hoặc dựng lại khi đổi layout. Các tính năng cần texture/LUT PIX và cache chiếu sáng riêng của Forest vẫn chạy qua preset tham chiếu trên WorldMap. Map Litematica mới dùng cấu hình portable.
 
+**Ground Haze** và **Ground Haze Strength** trong **Spatial Mist** là cấu hình tự chọn. Mẫu này chỉnh phần ánh sáng tán xạ ở các vùng thấp phía sau nhân vật, theo khoảng cách, cao độ tương đối với map và khung giờ. Bật **Spatial Mist**, đặt độ mạnh lớn hơn 0 và điền resource Ground Haze với hai cửa sổ giờ theo thứ tự bắt đầu, đạt mức cao nhất, bắt đầu giảm, rồi hết. Cửa sổ có bốn số 0 được bỏ qua. Đo ở camera gameplay. Preset Forest có đối chứng **Ánh sương thấp lúc chạng vạng** trong menu **Sương & hiệu ứng → Sương theo khoảng cách**. Các preset portable hiện có để độ mạnh 0.
+
 ## Mức chất lượng theo map và thiết bị
 
 Chọn **Biome Quality** trong Inspector của map. **Đầy đủ** là mặc định. **Cân bằng** giữ spatial mist với lưới thưa hơn và dùng glow tích hợp. **Nhẹ** dùng depth fog và glow tích hợp. Tất cả dùng chung giờ, mây, màu, ánh sáng và tonemapping của biome. Với preset bật spatial mist, **Essential Fog Scale** chỉnh lượng depth fog dự phòng ở mức Nhẹ. So ba mức ngay trong map bằng **Shift+F7**. Phím này chỉ đổi mức của phiên đang chơi. Biome Quality áp dụng cho map portable. Forest vẫn đi qua cấu hình tham chiếu riêng.
