@@ -856,7 +856,10 @@ func _sync_distant_terrain() -> void:
 	var env: Environment = level.get_node("WorldEnvironment").environment
 	var camera: Camera3D = level.get_node("Camera3D")
 	var gain := 0.
-	if forest_active() and atmosphere_review == "combined" and not _balanced_preview and spatial_mist 			and env.fog_enabled and env.background_mode == Environment.BG_COLOR 			and camera.is_current() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL 			and _source_terrain_toggle.button_pressed and mist.failure().is_empty():
+	if (forest_active() and atmosphere_review == "combined" and not _balanced_preview and spatial_mist
+			and env.fog_enabled and env.background_mode == Environment.BG_COLOR
+			and camera.is_current() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL
+			and _source_terrain_toggle.button_pressed and mist.failure().is_empty()):
 		gain = DistantTerrain.phase_weight(hour) * _lighting_scale(&"distant_terrain")
 	distant_terrain.update(gain, env.fog_light_color)
 
@@ -1389,6 +1392,7 @@ func set_source_terrain(enabled: bool) -> bool:
 	var stone_sky: HSlider = _lighting_sliders.get(&"stone_day_sky")
 	if stone_sky != null:
 		stone_sky.editable = _stone_day_sky_editable()
+	_sync_distant_terrain()
 	return enabled
 
 func forest_active()->bool:
