@@ -400,7 +400,7 @@ func check_dust_contact_clock(lab, dust) -> void:
 	lab.reset_player()
 
 func check_zombie_steps_on_slab(lab) -> void:
-	var group := lab.get_node("Zombies")
+	var group: Node = lab.get_node("Zombies")
 	var dust = lab.get_node("ZombieStepDust")
 	var audio = lab.get_node("CombatAudio")
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
