@@ -114,6 +114,7 @@ const LEVEL_COLLISION_MASK := 1
 const CORPSE_COLLISION_LAYER := 8
 const CORPSE_LIFETIME := 5.0
 const CORPSE_DESATURATION_START := 2.3
+const LAB_CORPSE_DESATURATION_START := 0.1 # DefaultHostile GA_Dissolve DesaturateDelay.
 const CORPSE_DESATURATION_END := 3.6
 const CORPSE_SETTLE_TIME := 0.10
 const CORPSE_SETTLE_SPEED := 0.34
@@ -644,8 +645,10 @@ func _update_death(delta: float) -> void:
 	if _corpse_age >= CORPSE_LIFETIME - 0.00001:
 		queue_free()
 		return
-	if not _corpse_color_finished and _corpse_age >= CORPSE_DESATURATION_START:
-		_update_corpse_material()
+	if not _corpse_color_finished:
+		var fade_start := LAB_CORPSE_DESATURATION_START if is_instance_valid(_corpse_floor) else CORPSE_DESATURATION_START
+		if _corpse_age >= fade_start - 0.00001:
+			_update_corpse_material(fade_start)
 	if _corpse_parked:
 		return
 	var sabre_finisher := _death_strike == DeathStrike.SABRE_FINISHER
@@ -972,7 +975,7 @@ func _apply_death_tumble(spin: Vector3, mass: float) -> void:
 		body.apply_central_impulse(spin.cross(body.global_position - centre) * body.mass)
 		body.angular_velocity += spin
 
-func _update_corpse_material() -> void:
+func _update_corpse_material(fade_start: float) -> void:
 	if _mesh.material_override == null:
 		if _corpse_base_material == null:
 			var skin := _mesh.get_active_material(0) as StandardMaterial3D
@@ -982,7 +985,7 @@ func _update_corpse_material() -> void:
 			_corpse_base_material.shader = CORPSE_SHADER
 			_corpse_base_material.set_shader_parameter("skin", skin.albedo_texture)
 		_mesh.material_override = _corpse_base_material
-	var gray := smoothstep(CORPSE_DESATURATION_START, CORPSE_DESATURATION_END, _corpse_age) * 0.80
+	var gray := smoothstep(fade_start, CORPSE_DESATURATION_END, _corpse_age) * 0.80
 	_mesh.set_instance_shader_parameter("desaturation", gray)
 	_corpse_color_finished = is_instance_valid(_corpse_floor) and _corpse_age >= CORPSE_DESATURATION_END
 
