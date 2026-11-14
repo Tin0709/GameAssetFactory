@@ -131,7 +131,7 @@ func _update_finish() -> void:
 	var camera := _world.get_node("Camera3D") as Camera3D
 	var env: Environment = _world.get_node("WorldEnvironment").environment
 	var combined: bool = _world.look.stage == 2
-	var wanted := combined and _allow_adaptive_bloom and _profile.adaptive_bloom \
+	var wanted: bool = combined and _allow_adaptive_bloom and _profile.adaptive_bloom \
 		and _world.view_mode == "gameplay" and camera.is_current() \
 		and (_profile.local_exposure > 0. or _profile.adaptive_bloom_gain > 0.) \
 		and RenderingServer.get_current_rendering_method() == "mobile" \
@@ -163,7 +163,7 @@ func _update_finish() -> void:
 			_finish_effect.set_air_bloom_spread(_profile.adaptive_bloom_spread)
 	if combined:
 		# Keep native glow until the custom pass has completed one successful frame.
-		var custom_bloom := wanted and _profile.adaptive_bloom_gain > 0. and _finish_effect.snapshot().frames > 0
+		var custom_bloom: bool = wanted and _profile.adaptive_bloom_gain > 0. and _finish_effect.snapshot().frames > 0
 		env.glow_enabled = _profile.glow_intensity > 0. and not custom_bloom
 
 func _exit_tree() -> void:
