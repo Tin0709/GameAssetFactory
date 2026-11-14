@@ -20,6 +20,9 @@
 
 [sub_resource type="Resource" id="ForestGroundHaze"]
 script = ExtResource("ground_haze_type")
+depth_behind_subject_m = Vector2(1.5, 6.5)
+height_above_map_base_m = Vector2(1.5, 7)
+max_gain = 2.0
 
 [node name="WorldMap" instance=ExtResource("base")]
 script = ExtResource("map")
