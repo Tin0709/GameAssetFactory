@@ -31,6 +31,10 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var biome_path_fixture_xz := Vector2.INF
 var biome_controller: BiomeGraphics
 
+## Scene placement only. The renderer skips this layer when the map layout changes.
+@export var distant_terrain_origin := Vector3.INF
+@export var distant_terrain_layout_sha := ""
+
 @export var local_mist_region: LocalMistRegion
 @export var additional_mist_region: LocalMistRegion
 @export var night_mist_region: LocalMistRegion

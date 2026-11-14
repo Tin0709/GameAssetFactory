@@ -4,6 +4,7 @@ const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
 const RenderSettings = preload("res://scripts/biome_render_settings.gd")
 const DayNight = preload("res://scripts/biome_day_night.gd")
 const Weather = preload("res://scripts/biome_weather.gd")
+const DistantTerrain = preload("res://scripts/world_map_distant_terrain.gd")
 const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
 const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
@@ -63,6 +64,7 @@ var _spruce_toggle: CheckButton
 var _source_terrain_tiles: Texture2DArray
 var _source_terrain_toggle: CheckButton
 var forest:=FOREST.new()
+var distant_terrain := DistantTerrain.new()
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_replay := preload("res://scripts/world_map_forest_replay.gd").new()
@@ -176,6 +178,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"ground_haze": ["Ánh sương thấp sau tán", 1.],
 	&"twilight_ground_haze": ["Ánh sương thấp lúc chạng vạng", 1.],
 	&"forest_dusk_backdrop": ["Dịu màu nền xa lúc chạng vạng", 1.],
+	&"distant_terrain": ["Địa hình xa lúc chạng vạng", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
@@ -233,7 +236,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 149
+const LIGHTING_MIX_VERSION := 150
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -416,6 +419,8 @@ func setup(world:Node3D)->void:
 	player_contact.setup(level)
 	_build_ui()
 	set_source_terrain(true)
+	if level.distant_terrain_origin.is_finite():
+		distant_terrain.prepare(level, level.distant_terrain_origin, level.distant_terrain_layout_sha)
 	_refresh_lantern_glow()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
 	DisplayServer.window_set_title("GameAssetFactory · Overworld Showcase · A&S / MD2 Sabre · L HUD")
@@ -845,7 +850,18 @@ func set_weather(overcast: float, seconds: float = 2.5) -> void:
 		apply_time()
 		_update_mist()
 
+func _sync_distant_terrain() -> void:
+	if not is_instance_valid(distant_terrain.visual):
+		return
+	var env: Environment = level.get_node("WorldEnvironment").environment
+	var camera: Camera3D = level.get_node("Camera3D")
+	var gain := 0.
+	if forest_active() and atmosphere_review == "combined" and not _balanced_preview and spatial_mist 			and env.fog_enabled and env.background_mode == Environment.BG_COLOR 			and camera.is_current() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL 			and _source_terrain_toggle.button_pressed and mist.failure().is_empty():
+		gain = DistantTerrain.phase_weight(hour) * _lighting_scale(&"distant_terrain")
+	distant_terrain.update(gain, env.fog_light_color)
+
 func _update_mist()->void:
+	_sync_distant_terrain()
 	mist_source_active=false
 	_update_player_falloff()
 	_update_hdr_air()
@@ -1322,6 +1338,8 @@ func _mist_materials()->Array:
 	for chunk:Dictionary in level.geometry._cutaway_chunks:result.append_array(chunk.materials)
 	if forest_path_light.material != null:
 		result.append(forest_path_light.material)
+	if distant_terrain.visible():
+		result.append(distant_terrain.material)
 	if grove_mist_enabled and level.grove != null:
 		result.append_array(level.grove.mist_receivers(PHASE_FINISH.phase_weight(hour)))
 	return result
@@ -2141,7 +2159,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 148 and effect == &"source_path_chroma":
 			missing_value = 0.
-		if version < 149 and effect == &"forest_dusk_backdrop":
+		if (version < 149 and effect == &"forest_dusk_backdrop") or (version < 150 and effect == &"distant_terrain"):
 			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
@@ -2184,6 +2202,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and not _flat_lab and level.ground_haze_profile != null
 		if effect == &"twilight_ground_haze":
 			slider.editable = slider.editable and not _flat_lab and level.twilight_ground_haze_profile != null
+		if effect == &"distant_terrain":
+			slider.editable = slider.editable and is_instance_valid(distant_terrain.visual)
 		if effect == &"local_diffuse_return":
 			slider.editable = slider.editable and not _flat_lab and level.local_diffuse_region != null
 		if effect == &"basin_sunlit_mist":
@@ -2328,7 +2348,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"night_path_chroma", &"source_path_chroma"]:
 		_publish_night_path_chroma()
 		return
-	if changed_effect == &"forest_dusk_backdrop":
+	if changed_effect in [&"forest_dusk_backdrop", &"distant_terrain"]:
 		_forest_hour = INF
 		apply_time()
 		_update_mist()
@@ -2523,6 +2543,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	_forest_sun=sun.light_color;_forest_energy=sun.light_energy;_forest_hour=hour
 	_forest_shadow_opacity=sun.shadow_opacity
 	_mist_sample=p
+	_sync_distant_terrain()
 	_sync_canopy_direct()
 
 func begin_environment_edit()->void:
@@ -2635,6 +2656,7 @@ func apply_time()->void:
 		sky_response_active=false;key_direction_active=false;return
 	refresh_daylight_shading()
 	if not _flat_lab:
+		_sync_distant_terrain()
 		_publish_night_path_chroma()
 		_publish_stone_twilight_color()
 		_sync_twilight_crown()

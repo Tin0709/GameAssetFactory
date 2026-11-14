@@ -44,6 +44,8 @@ evening_hours = Vector4(19, 19.5, 20, 21)
 [node name="WorldMap" instance=ExtResource("base")]
 script = ExtResource("map")
 biome_graphics = ExtResource("forest_reference")
+distant_terrain_origin = Vector3(45, -11.5, -46.5)
+distant_terrain_layout_sha = "53e243bb23f95f17990d02d8871393fa1a26c5aa67ae79314361b5cdc1c6f805"
 local_mist_region = ExtResource("mist")
 additional_mist_region = ExtResource("cliff_mist")
 night_mist_region = ExtResource("night_mist")
