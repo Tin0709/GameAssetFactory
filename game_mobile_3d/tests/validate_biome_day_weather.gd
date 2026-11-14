@@ -56,6 +56,19 @@ func verify() -> void:
 	check(env.fog_light_color.is_equal_approx(morning_fog.lerp(profile.overcast.fog_color, .5)), "Weather blends over biome fog")
 	graphics.set_weather(0., 0.)
 	check(morning.is_equal_approx(light.light_color) and morning_fog.is_equal_approx(env.fog_light_color), "Clear restores authored phase")
+	profile.day_night = profile.day_night.duplicate()
+	var angle_track := Curve.new()
+	angle_track.min_value = -90.
+	angle_track.max_value = 90.
+	angle_track.add_point(Vector2(7. / 24., -24.))
+	var exposure_track := Curve.new()
+	exposure_track.max_value = 2.
+	exposure_track.add_point(Vector2(7. / 24., .88))
+	profile.day_night.set("sun_pitch_degrees", angle_track)
+	profile.day_night.set("exposure", exposure_track)
+	graphics.refresh()
+	check(is_equal_approx(light.rotation_degrees.x, -24.), "Biome can override the phase sun elevation")
+	check(is_equal_approx(env.tonemap_exposure, .88), "Biome can override the phase exposure")
 	world.showcase.set_hour(9.5)
 	check(light.light_color.is_equal_approx(morning.lerp(profile.noon_sun_color, .5)),
 		"Morning and Noon colors blend continuously between authored keys")
