@@ -30,7 +30,9 @@ func run()->void:
 		w.showcase.set_lighting_scale(&"grass_step_coverage", 1.)
 		w.set_reference_look(false)
 		await process_frame
-		check(not p.grass_light.active and material.shader == original[material],
+		await process_frame
+		var mist_shader = preload("res://scripts/world_map_atmosphere_volume.gd")
+		check(not p.grass_light.active and mist_shader.base_shader(material.shader) == mist_shader.base_shader(original[material]),
 			"Original graphics comparison uses the shader without coverage correction")
 		w.set_reference_look(true)
 		await process_frame
