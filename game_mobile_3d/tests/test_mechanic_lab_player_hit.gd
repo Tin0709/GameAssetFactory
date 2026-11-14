@@ -400,7 +400,7 @@ func check_zombie_roam_stalled_slide(lab) -> void:
 	collision.shape = box
 	wall.add_child(collision)
 	wall.position = Vector3(0.0, 1.5, 1.7)
-	wall.rotation.y = 0.13
+	wall.rotation.y = 0.31
 	lab.add_child(wall)
 	var slide_speed := 0.0
 	var slide_position := Vector3.ZERO
@@ -413,8 +413,10 @@ func check_zombie_roam_stalled_slide(lab) -> void:
 			if slide_ticks == 0:
 				slide_position = zombie.global_position
 			slide_ticks += 1
-			slide_speed = zombie.get_real_velocity().slide(Vector3.UP).length()
-	check(slide_ticks > 0 and slide_speed > 0.15 and zombie.global_position.z - slide_position.z < 0.10,
+			slide_speed = maxf(slide_speed, zombie.get_real_velocity().slide(Vector3.UP).length())
+	var remaining := (zombie.global_position - destination).slide(Vector3.UP).length()
+	var first_remaining := (slide_position - destination).slide(Vector3.UP).length()
+	check(slide_ticks > 0 and slide_speed > 0.15 and first_remaining - remaining < 0.18,
 		"The inserted wall causes a sideways slide with almost no progress toward the destination")
 	check(not zombie._roam_destination.is_finite() and zombie.animation.current_animation == ZOMBIE.IDLE,
 		"A sideways scrape does not keep the obstructed patrol leg active")
