@@ -55,7 +55,11 @@ Trong **Atmosphere and fog → Spatial mist**, **Local Mist By Hour** và **Addi
 
 Các vị trí vùng sương và đèn, cùng dữ liệu ánh sáng đã bake theo hình học, thuộc về map. Cần đặt hoặc dựng lại khi đổi layout. Các tính năng cần texture/LUT PIX và cache chiếu sáng riêng của Forest vẫn chạy qua preset tham chiếu trên WorldMap. Map Litematica mới dùng cấu hình portable.
 
-**Ground Haze** và **Ground Haze Strength** trong **Spatial Mist** là cấu hình tự chọn. Mẫu này chỉnh phần ánh sáng tán xạ ở các vùng thấp phía sau nhân vật, theo khoảng cách, cao độ tương đối với map và khung giờ. Bật **Spatial Mist**, đặt độ mạnh lớn hơn 0 và điền resource Ground Haze với hai cửa sổ giờ theo thứ tự bắt đầu, đạt mức cao nhất, bắt đầu giảm, rồi hết. Cửa sổ có bốn số 0 được bỏ qua. Đo ở camera gameplay. Preset Forest có đối chứng **Ánh sương thấp lúc chạng vạng** trong menu **Sương & hiệu ứng → Sương theo khoảng cách**. Các preset portable hiện có để độ mạnh 0.
+**Ground Haze** và **Twilight Ground Haze** nằm trong **Biome Graphics → Atmosphere and fog → Spatial mist**. Cả hai dùng cùng tài nguyên để đặt dải khoảng cách tính sau nhân vật, cao độ tính từ điểm spawn của map và cửa sổ giờ. Bốn mốc giờ là bắt đầu, đạt mức cao nhất, bắt đầu giảm và hết. Cửa sổ có bốn số 0 được bỏ qua. Khi Ground Haze đang hoạt động, nó được ưu tiên. Khi lớp này hết giờ hoặc có cường độ 0, hệ thống lấy Twilight Ground Haze. Hai lớp điều chỉnh ánh sáng tán xạ trong sương và giữ nguyên extinction.
+
+Forest lưu thông số hai lớp sương thấp trong preset tham chiếu. **Sương & hiệu ứng → Sương theo khoảng cách** vẫn có các slider riêng của Forest. Rìa rừng ẩm mặc định có lớp tán xạ thấp từ 18:45 đến 21:09, mạnh nhất từ 19:30 đến 20:00. Đồng cỏ dùng cấu hình sương nhẹ hơn. Mở **MeadowBiomeReview**, đi tới cụm đá rồi bấm **T** để tới 18:30 hoặc dùng **Shift+T** cho thời gian chạy qua 19:30. **J** bật/tắt spatial mist và **F8** đổi biome. Mức Đầy đủ và Cân bằng chạy lớp tán xạ này. Mức Nhẹ và Compatibility dùng depth fog tích hợp. [Hỗ trợ renderer trong Godot](https://docs.godotengine.org/en/stable/tutorials/rendering/renderers.html)
+
+Map import nạp khí quyển từ preset portable. Dữ liệu khí quyển Forest theo hash chỉ được đọc trên đường chạy tham chiếu. Quy trình dựng map mới dùng cùng controller và shader. Vùng sương cục bộ, vị trí đèn và các trường ánh sáng theo hình học vẫn thuộc từng scene.
 
 ## Mức chất lượng theo map và thiết bị
 

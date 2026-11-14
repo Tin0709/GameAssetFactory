@@ -382,6 +382,8 @@ func setup(world:Node3D)->void:
 			_weather.set_target(_biome_profile.start_overcast, 0.)
 		hour = fposmod(_biome_profile.start_hour, 24.)
 		cycle_enabled = _biome_profile.auto_cycle
+	elif private_primary and _biome_profile == null:
+		forest = FOREST.new()
 	if not private_primary:
 		_build_basic_settings()
 		return
@@ -433,8 +435,7 @@ func setup_flat_lab(world: Node3D) -> void:
 	level = world
 	_flat_lab = true
 	process_priority = -10
-	if private_primary:
-		forest = FOREST.new()
+	forest = FOREST.new()
 	if forest_active():
 		_setup_point_lighting()
 		projected_sun.setup()
