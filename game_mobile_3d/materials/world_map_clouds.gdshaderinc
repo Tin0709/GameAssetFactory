@@ -7,6 +7,7 @@ uniform sampler2D cloud_field : filter_linear, repeat_enable;
 global uniform float gaf_projected_sun_strength;
 global uniform vec2 gaf_projected_sun_shift;
 global uniform float gaf_projected_sun_softness;
+global uniform float gaf_projected_sun_openings;
 global uniform sampler2D gaf_projected_sun_mask : filter_linear_mipmap, repeat_enable;
 float cloud_noise(vec2 p) {
 	return texture(cloud_field,(p+0.5)/64.0).r;
@@ -23,5 +24,13 @@ float world_cloud_shade(vec3 world) {
 	float warp = texture(gaf_projected_sun_mask, plane * 0.2 + cloud_time * vec2(0.6, -0.6)).g;
 	vec3 projected = texture(gaf_projected_sun_mask, plane / 30.0 + warp * 0.003).rgb;
 	float mask = mix(projected.r, projected.b, gaf_projected_sun_softness);
-	return mix(current_shade, 0.1 + 0.9 * mask, gaf_projected_sun_strength);
+	float transmission = mix(current_shade, 0.1 + 0.9 * mask, gaf_projected_sun_strength);
+	if (gaf_projected_sun_openings > 0.0) {
+		// In clear gaps of the projected pattern, ease the procedural cloud term toward white.
+		// Receiver shaders still apply geometric shadows independently.
+		float opening = smoothstep(0.46, 0.90, mask);
+		float cloud_loss = (1.0 - current_shade) * (1.0 - gaf_projected_sun_strength);
+		transmission += cloud_loss * opening * gaf_projected_sun_openings;
+	}
+	return transmission;
 }

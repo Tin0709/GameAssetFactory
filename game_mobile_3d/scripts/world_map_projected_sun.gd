@@ -9,6 +9,7 @@ const STRENGTH := &"gaf_projected_sun_strength"
 const SHIFT := &"gaf_projected_sun_shift"
 const SOFTNESS := &"gaf_projected_sun_softness"
 const MASK := &"gaf_projected_sun_mask"
+const OPENINGS := &"gaf_projected_sun_openings"
 
 var _path := ""
 var _texture: ImageTexture
@@ -17,6 +18,7 @@ var _shift := Vector2.ZERO
 var _soft_path := ""
 var _softness := 0.0
 var _softness_loaded := false
+var _opening_recovery := 0.
 
 func setup() -> void:
 	release()
@@ -78,6 +80,14 @@ func set_weight(weight: float) -> void:
 	_weight = weight
 	RenderingServer.global_shader_parameter_set(STRENGTH, weight)
 
+func set_opening_recovery(amount: float) -> void:
+	var applied := clampf(amount, 0., 1.) * clampf(_weight / .40, 0., 1.) if is_finite(amount) else 0.
+	if applied == _opening_recovery:
+		return
+	_opening_recovery = applied
+	RenderingServer.global_shader_parameter_set(OPENINGS, applied)
+
+
 func set_shift(shift: Vector2) -> void:
 	var applied := shift if _weight > 0.0 and shift.is_finite() else Vector2.ZERO
 	if applied == _shift:
@@ -89,8 +99,10 @@ func release() -> void:
 	RenderingServer.global_shader_parameter_set(STRENGTH, 0.)
 	RenderingServer.global_shader_parameter_set(SHIFT, Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set(SOFTNESS, 0.)
+	RenderingServer.global_shader_parameter_set(OPENINGS, 0.)
 	RenderingServer.global_shader_parameter_set(MASK, null)
 	_weight = 0.
+	_opening_recovery = 0.
 	_shift = Vector2.ZERO
 	_softness = 0.
 	_softness_loaded = false

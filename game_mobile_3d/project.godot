@@ -119,6 +119,10 @@ gaf_projected_sun_softness={
 "type": "float",
 "value": 0.0
 }
+gaf_projected_sun_openings={
+"type": "float",
+"value": 0.0
+}
 gaf_projected_sun_mask={
 "type": "sampler2D",
 "value": ""
