@@ -2,6 +2,9 @@
 #include "res://materials/world_map_sun_opening.gdshaderinc"
 // Original WorldMap direct-light response. Godot still resolves ambient, fog and shadows.
 varying float cloud_transmission;
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+global uniform float gaf_stone_shade_reach;
+#endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
 #define GAF_WORLD_FOLIAGE_LOBE_ONLY
 #include "res://materials/world_map_foliage_light.gdshaderinc"
@@ -37,6 +40,11 @@ void light() {
 		// Use the receiver's existing sky and contact terms on sun-facing rock in shadow.
 		float shade = 1.0 - smoothstep(.04, .68, ATTENUATION);
 		float facing = smoothstep(.03, .38, nl);
+		if (gaf_stone_shade_reach > 0.0) {
+			// Indirect fill can reach a face even when it points away from the sun.
+			float open_sky = smoothstep(.45, .97, terrain_canopy_sky);
+			facing = mix(facing, max(facing, .48 + .22 * open_sky), gaf_stone_shade_reach);
+		}
 		vec3 sky = terrain_opening_incident;
 		vec3 fill = mix(sky, vec3(dot(sky, vec3(.2126, .7152, .0722))), .40);
 		DIFFUSE_LIGHT += fill * (facing * shade * gaf_stone_shade_fill.w);
