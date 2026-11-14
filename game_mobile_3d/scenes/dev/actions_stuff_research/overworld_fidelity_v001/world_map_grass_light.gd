@@ -18,6 +18,7 @@ var _grass_root_tone := -1.
 var _night_albedo := -1.
 var _twilight_ambient := -1.
 var _shadow_height_scale := -1.
+var _step_coverage := -1.
 
 func setup(level:Node3D,reader:RefCounted)->void:
 	world=level
@@ -54,6 +55,7 @@ func restore()->void:
 	_night_albedo = -1.
 	_twilight_ambient = -1.
 	_shadow_height_scale = -1.
+	_step_coverage = -1.
 
 func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->void:
 	restore()
@@ -96,6 +98,11 @@ func sync()->void:
 		m.set_shader_parameter("cloud_shape",ground.get_shader_parameter("cloud_shape"))
 		m.set_shader_parameter("cloud_time",look.cloud_clock)
 	_sync_ground_sky()
+	var step_coverage: float = world.showcase._lighting_scale(&"grass_step_coverage")
+	if step_coverage != _step_coverage:
+		_step_coverage = step_coverage
+		for row: Dictionary in _records:
+			row.material.set_shader_parameter("grass_step_coverage", step_coverage)
 	var twilight_ambient: float = world.showcase.twilight_ground_ambient_scale()
 	if twilight_ambient != _twilight_ambient:
 		_twilight_ambient = twilight_ambient

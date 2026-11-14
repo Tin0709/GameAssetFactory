@@ -132,6 +132,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_stone_fill_balance": ["Cân bằng sắc đá ban đêm", 1.],
 	&"night_stone_top_cool": ["Sắc xanh trên mặt đá", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
+	&"grass_step_coverage": ["Cỏ sát bậc địa hình", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
 	&"twilight_grass_albedo": ["Độ dịu lá cỏ chạng vạng", 1.],
 	&"lantern_grass_tone": ["Sắc đèn hông trên cỏ", 1.],
@@ -239,7 +240,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 151
+const LIGHTING_MIX_VERSION := 152
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2072,6 +2073,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 151 and effect == &"actor_twilight_view_fill":
 			missing_value = 0.
+		if version < 152 and effect == &"grass_step_coverage":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2255,6 +2258,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and level.look.player_material.available()
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
 			slider.editable = slider.editable and sky_response.available() and plants != null and plants.grass_light.active
+		if effect == &"grass_step_coverage":
+			slider.editable = slider.editable and plants != null and plants.grass_light.active and plants.dense_grass_review
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
 		if effect == &"twilight_shadow_lift":
@@ -2429,6 +2434,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_update_mist()
 		return
 	if changed_effect == &"pre_twilight_receiver":
+		return
+	if changed_effect == &"grass_step_coverage":
+		if plants != null:
+			plants.grass_light.sync()
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"canopy_edge_return", &"tree_shade"]:
 		return

@@ -91,6 +91,10 @@ uniform bool ground_mask_enabled=false;
 uniform sampler2D ground_coverage_map : filter_nearest, repeat_disable;
 uniform vec2 ground_coverage_origin=vec2(0.0);
 uniform vec2 ground_coverage_extent=vec2(1.0);
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+uniform float grass_step_coverage = 0.0;
+varying flat vec3 grass_support_cell;
+#endif
 varying vec3 foliage_world;
 varying float height_fraction;
 varying vec3 root_color;
@@ -98,6 +102,7 @@ varying vec3 wrapped_normal_world;
 void vertex(){
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 	// The patch origin stays in its own cell while the blades bend.
+	grass_support_cell = vec3(floor(MODEL_MATRIX[3].xz), MODEL_MATRIX[3].y);
 	study_ground_sky_at_root = study_ground_sky_mix > 0.0 ? grass_ground_sky(MODEL_MATRIX[3].xz) : vec4(0.0);
 	study_raw_canopy_sky = gaf_spruce_sky(MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz);
 	study_canopy_sky_at_root = gaf_ground_canopy_sky(study_raw_canopy_sky);
@@ -203,7 +208,17 @@ void fragment(){
 	if(ground_mask_enabled){
 		vec2 mask_uv=(floor(foliage_world.xz)-ground_coverage_origin+vec2(0.5))/ground_coverage_extent;
 		float inside=step(0.0,mask_uv.x)*step(mask_uv.x,1.0)*step(0.0,mask_uv.y)*step(mask_uv.y,1.0);
-		float kind=texture(ground_coverage_map,mask_uv).b;
+		vec4 ground_sample = texture(ground_coverage_map, mask_uv);
+		float kind = ground_sample.b;
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+		// The existing map stores top elevation in G and terrain kind in B.
+		if (grass_step_coverage > 0.0 && kind == 1.0 && grass_support_cell.z - ground_sample.g >= 0.25) {
+			vec2 beyond = abs(foliage_world.xz - grass_support_cell.xy - vec2(0.5)) - vec2(0.5);
+			// Keep a narrow overhang where the taller turf meets the drop.
+			float fade = smoothstep(0.04, 0.25, max(beyond.x, beyond.y));
+			ALPHA *= 1.0 - grass_step_coverage * fade;
+		}
+#endif
 		ALPHA*=inside*(1.0-step(0.25,abs(kind-1.0)));
 	}
 	ROUGHNESS=1.0;SPECULAR=0.0;
