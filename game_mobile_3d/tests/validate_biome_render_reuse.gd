@@ -34,10 +34,9 @@ func run() -> void:
 		var clear := sun.light_energy
 		var clear_tint := env.fog_light_color
 		showcase.set_weather(.5, 0.)
-		check(not showcase.forest_active() or is_equal_approx(sun.light_energy, clear * lerpf(1., forest_settings.overcast.key_energy_scale, .5)),
+		check(is_equal_approx(sun.light_energy, clear * lerpf(1., forest_settings.overcast.key_energy_scale, .5)),
 			"Forest applies shared sunlight response once")
-		if showcase.forest_active():
-			check(env.fog_light_color.is_equal_approx(clear_tint.lerp(forest_settings.overcast.fog_color, .5)),
+		check(env.fog_light_color.is_equal_approx(clear_tint.lerp(forest_settings.overcast.fog_color, .5)),
 			"Forest applies shared fog color response")
 		for index in 3:
 			await process_frame
@@ -47,6 +46,13 @@ func run() -> void:
 		showcase.set_weather(0., 0.)
 		check(is_equal_approx(sun.light_energy, clear) and env.fog_light_color.is_equal_approx(clear_tint),
 			"Clear restores the untouched lighting and fog")
+		showcase.set_hour(12.)
+		var noon := sun.light_energy
+		showcase.set_weather(1., 0.)
+		check(is_equal_approx(sun.light_energy, noon * forest_settings.overcast.key_energy_scale),
+			"Noon can use overcast on both rendering paths")
+		showcase.set_weather(0., 0.)
+		check(is_equal_approx(sun.light_energy, noon), "Clearing weather restores the Noon anchor")
 	forest.free()
 	await process_frame
 	var map = PORTABLE_SCENE.instantiate()
@@ -104,6 +110,9 @@ func run() -> void:
 			await RenderingServer.frame_post_draw
 			check(not graphics._mist.visible and env.fog_density > 0.,
 				"Changing camera restores native depth fog in overview")
+		else:
+			check(graphics._mist == null and graphics._finish_effect == null and env.fog_density > 0.,
+				"Compatibility renderer uses depth fog without compositor allocations")
 	map.free()
 	await process_frame
 	print("BIOME_SHARED_CHECKS ", checks, " failures=", failures)
