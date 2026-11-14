@@ -1,8 +1,17 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
 [ext_resource type="Resource" path="res://assets/graphics/biomes/woodland_overcast.tres" id="weather"]
+
+[sub_resource type="Curve" id="WoodlandKey"]
+_data = [Vector2(0, 0.78), 0.0, 0.0, 0, 0, Vector2(0.29166666, 0.92), 0.0, 0.0, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.95), 0.0, 0.0, 0, 0, Vector2(1, 0.78), 0.0, 0.0, 0, 0]
+point_count = 5
+
+[sub_resource type="Curve" id="WoodlandFog"]
+max_value = 1.5
+_data = [Vector2(0, 1.16), 0.0, 0.0, 0, 0, Vector2(0.29166666, 1.13), 0.0, 0.0, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(0.6875, 1.07), 0.0, 0.0, 0, 0, Vector2(1, 1.16), 0.0, 0.0, 0, 0]
+point_count = 5
 
 [resource]
 script = ExtResource("profile")
@@ -19,4 +28,6 @@ exposure = 0.96
 saturation = 0.95
 contrast = 1.06
 glow_bloom = 0.028
+key_energy_by_hour = SubResource("WoodlandKey")
+fog_density_by_hour = SubResource("WoodlandFog")
 overcast = ExtResource("weather")
