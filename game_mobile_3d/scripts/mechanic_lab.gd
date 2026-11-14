@@ -832,12 +832,16 @@ func _player_foot_contact_at(sole: Vector3) -> Dictionary:
 	if tick != _foot_contact_tick or sole != _foot_contact_sole:
 		_foot_contact_tick = tick
 		_foot_contact_sole = sole
-		_foot_contact = _grass_contact_at(sole)
-		if not _foot_contact.is_empty():
-			var support := _player_floor_support(sole)
-			if not support.is_empty() and support.body != $Ground:
-				_foot_contact = {}
+		_foot_contact = _grass_step_contact_at(sole, player)
 	return _foot_contact
+
+func _grass_step_contact_at(sole: Vector3, actor: CharacterBody3D) -> Dictionary:
+	var grass := _grass_contact_at(sole)
+	if not grass.is_empty() and actor != null:
+		var support := _actor_floor_support(actor, sole)
+		if not support.is_empty() and support.body != $Ground:
+			return {}
+	return grass
 
 func _grass_contact_at(sole: Vector3) -> Dictionary:
 	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * 0.08, sole - Vector3.UP * 0.30, 1)
@@ -851,22 +855,22 @@ func _grass_landing_contact_at(point: Vector3) -> Dictionary:
 	if tick != _landing_contact_tick or point != _landing_contact_point:
 		_landing_contact_tick = tick
 		_landing_contact_point = point
-		var support := _player_floor_support(point)
+		var support := _actor_floor_support(player, point)
 		if support.is_empty():
 			_landing_contact = _grass_contact_at(point)
 		else:
 			_landing_contact = {"position": support.position, "surface": "grass"} if support.body == $Ground else {}
 	return _landing_contact
 
-func _player_floor_support(point: Vector3) -> Dictionary:
+func _actor_floor_support(actor: CharacterBody3D, point: Vector3) -> Dictionary:
 	# A sole outside a ledge can raycast to the grass below. Prefer the
 	# actual floor contact from this move_and_slide, including non-grass.
-	var min_normal_y := cos(player.floor_max_angle)
+	var min_normal_y := cos(actor.floor_max_angle)
 	var closest := INF
 	var nearest := Vector3.ZERO
 	var floor_body: CollisionObject3D
-	for i in player.get_slide_collision_count():
-		var collision := player.get_slide_collision(i)
+	for i in actor.get_slide_collision_count():
+		var collision := actor.get_slide_collision(i)
 		for index in collision.get_collision_count():
 			if collision.get_normal(index).y < min_normal_y:
 				continue
@@ -881,13 +885,13 @@ func _player_floor_support(point: Vector3) -> Dictionary:
 				floor_body = collider
 	return {"position": nearest, "body": floor_body} if floor_body != null else {}
 
-func _on_zombie_step(sole: Vector3) -> void:
+func _on_zombie_step(sole: Vector3, actor: CharacterBody3D = null) -> void:
 	var support: Variant = null
 	if _zombie_step_dust != null:
-		support = _grass_contact_at(sole)
+		support = _grass_step_contact_at(sole, actor)
 		if not support.is_empty():
 			_zombie_step_dust.burst(support.position)
-	_combat_audio.queue_zombie_step(sole, player.global_position, _grass_contact_at, support)
+	_combat_audio.queue_zombie_step(sole, player.global_position, _grass_step_contact_at.bind(actor), support)
 
 func _heavy_debris_delay() -> float:
 	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
