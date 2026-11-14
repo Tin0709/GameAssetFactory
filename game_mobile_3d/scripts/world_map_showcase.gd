@@ -861,7 +861,10 @@ func _sync_distant_terrain() -> void:
 			and env.fog_enabled and env.background_mode == Environment.BG_COLOR
 			and camera.is_current() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL
 			and _source_terrain_toggle.button_pressed and mist.failure().is_empty()):
-		gain = DistantTerrain.phase_weight(hour) * _lighting_scale(&"distant_terrain")
+		# The close camera uses translucent cliff cutaways around the player.
+		# Reserve the distant layer for the wider view and blend it in on zoom-out.
+		var wide_view := smoothstep(14.5, 21., camera.size)
+		gain = DistantTerrain.phase_weight(hour) * wide_view * _lighting_scale(&"distant_terrain")
 		if gain > 0.:
 			var subject: Vector3 = level.presentation.player_position() + Vector3.UP
 			subject_uv = camera.unproject_position(subject) / camera.get_viewport().get_visible_rect().size
