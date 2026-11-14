@@ -120,10 +120,13 @@ func run() -> void:
 	var follow_through_speed := -INF
 	var lowest_corner := 0.0
 	var last_anchor_error := INF
+	var first_desaturation := INF
 	for i in 60:
 		await physics_frame
 		if not zombie.ragdoll.running:
 			break
+		if is_inf(first_desaturation) and zombie._mesh.material_override is ShaderMaterial:
+			first_desaturation = zombie._corpse_age
 		lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
 		last_anchor_error = zombie.ragdoll.max_anchor_error()
 		var momentum := Vector3.ZERO
@@ -141,6 +144,8 @@ func run() -> void:
 			continue
 		fastest_descent = maxf(fastest_descent, -velocity.y)
 	check(fastest_descent > 5.0, "The corpse falls faster than 5 m/s before head or chest contact")
+	check(absf(first_desaturation - 0.1) < 0.00001,
+		"MechanicLab starts corpse desaturation at the source 100 ms delay")
 	# A tilted pose can find support before it rolls into the visible low pose.
 	check(landing_time >= 0.33 and landing_time <= low_pose_time and low_pose_time < 0.55,
 		"A grounded Sabre strike reaches support and then a low pose within 550 ms")
@@ -160,7 +165,7 @@ func run() -> void:
 	for bone in skeleton.get_bone_count():
 		held_still = held_still and skeleton.get_bone_global_pose(bone).is_equal_approx(resting_pose[bone])
 	check(held_still, "The parked corpse holds every bone still across later physics frames")
-	while zombie._corpse_age < 2.95:
+	while zombie._corpse_age < 1.85:
 		await physics_frame
 	var mid_fade: float = zombie._mesh.get_instance_shader_parameter("desaturation")
 	check(absf(mid_fade - 0.4) < 0.02, "The corpse progresses through the existing color fade")
