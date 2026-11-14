@@ -1327,7 +1327,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"daylight_haze":
 		return .65
 	if effect == &"daylight_bloom_diffusion":
-		return .40
+		return .66
 	if effect == &"sun_opening":
 		return .75
 	if effect == &"twilight_shadow_color":
