@@ -166,6 +166,12 @@ float local_optical(vec4 chord,float start,float end,float ray_length,float exti
  float density=chord.z-chord.y*(middle*middle+width*width/12.);
  return extinction*ray_length*width*max(density,0.);
 }
+void include_local_medium(float extra_tau,vec3 extra_light,inout float tau,inout vec3 light){
+ if(extra_tau>0.){
+  light=(light*tau+extra_light*extra_tau)/(tau+extra_tau);
+  tau+=extra_tau;
+ }
+}
 void main(){
  ivec3 size=imageSize(volume);ivec2 pixel=ivec2(gl_GlobalInvocationID.xy);
  if(any(greaterThanEqual(pixel,size.xy)))return;
@@ -176,6 +182,8 @@ void main(){
  float entry=p.origin.w/ray_length;
  vec4 local_chord=local_intersection(origin,ray,p.local_center_strength,p.local_radii.xyz);
  vec4 additional_chord=local_intersection(origin,ray,p.additional_center_strength,p.additional_radii.xyz);
+ bool local_in_far=local_chord.z>0. && local_chord.x+local_chord.w>near_z;
+ bool additional_in_far=additional_chord.z>0. && additional_chord.x+additional_chord.w>near_z;
  vec3 local_light=p.scatter.rgb*p.scatter.w*p.local_scatter_multiplier.xyz;
  vec3 additional_light=p.scatter.rgb*p.scatter.w*p.additional_scatter_multiplier.xyz;
  vec3 scattered=vec3(0.0);float optical=0.0;float previous=0.0;
@@ -211,15 +219,9 @@ void main(){
    light+=directional_air(point);
 #endif
    float local_depth=local_optical(local_chord,max(previous,entry),min(d,near_z),ray_length,p.local_center_strength.w);
-   if(local_depth>0.){
-    light=(light*nearby+local_light*local_depth)/(nearby+local_depth);
-    nearby+=local_depth;
-   }
+   include_local_medium(local_depth,local_light,nearby,light);
    float additional_depth=local_optical(additional_chord,max(previous,entry),min(d,near_z),ray_length,p.additional_center_strength.w);
-   if(additional_depth>0.){
-    light=(light*nearby+additional_light*additional_depth)/(nearby+additional_depth);
-    nearby+=additional_depth;
-   }
+   include_local_medium(additional_depth,additional_light,nearby,light);
    scattered+=exp(-optical)*(1.0-exp(-nearby))*light;optical+=nearby;
   }
   float start=max(previous,near_z);
@@ -237,6 +239,13 @@ void main(){
 #ifdef GAF_DIRECTIONAL_AIR
    light+=directional_air(point);
 #endif
+   // A world-space pocket may cross the camera-relative start of the far bank.
+   if(local_in_far){
+    include_local_medium(local_optical(local_chord,start,d,ray_length,p.local_center_strength.w),local_light,tau,light);
+   }
+   if(additional_in_far){
+    include_local_medium(local_optical(additional_chord,start,d,ray_length,p.additional_center_strength.w),additional_light,tau,light);
+   }
    scattered+=exp(-optical)*(1.0-exp(-tau))*light;optical+=tau;
   }
   imageStore(volume,ivec3(pixel,i),vec4(scattered,exp(-optical)));previous=d;
