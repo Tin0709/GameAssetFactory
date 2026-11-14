@@ -75,10 +75,17 @@ void main() {
 	vec3 adjusted = color.rgb * gain;
 	// Reuse the local meter. Bound bloom's neighborhood gain independently of scene gain.
 	float bloom_gain = 1.0;
-	float response = mod(air.y, 2.0);
+	float response = air.y >= 2.0 ? air.y - 2.0 : air.y;
 	if (air.x > 0.0 && response > 0.0) {
-		float local_stops = clamp(log2(settings.y) - log_base, -2.0, 2.0);
-		float bloom_stops = 0.45 * max(local_stops, 0.0) * toe + 0.24 * min(local_stops, 0.0);
+		float target_log = log2(settings.y);
+		float local_stops = clamp(target_log - log_base, -2.0, 2.0);
+		// Lift the halo where its surroundings are brighter. A uniformly dark
+		// region gets no lift, and hot cores retain a gentler shoulder.
+		float halo = smoothstep(0.10, 0.85, log_area - log_pixel);
+		float highlight = smoothstep(0.5, 2.0, log_pixel - target_log);
+		float bloom_stops = 0.32 * max(local_stops, 0.0) * toe * halo
+			- 0.30 * max(-local_stops, 0.0) - 0.20 * highlight;
+		bloom_stops = clamp(bloom_stops, -0.65, 0.24);
 		bloom_gain = exp2(response * bloom_stops);
 	}
 	if (air.x > 0.0) {
@@ -358,7 +365,7 @@ func _render_callback(kind: int, data: RenderData) -> void:
 	var parameters := _parameters.duplicate()
 	_guard.unlock()
 	var finish_needs_soft_light := _finish_needs_soft_light()
-	# The finish and bloom share the same filtered light, with separate weights.
+	# air.y stores the response in [0, 1]. Add 2 when diffusion needs the same filtered light even without bloom.
 	if finish_needs_soft_light:
 		parameters.encode_float(20, parameters.decode_float(20) + 2.0)
 	if _source_format==HDR_FORMAT:

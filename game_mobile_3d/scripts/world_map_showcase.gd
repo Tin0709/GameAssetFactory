@@ -1273,7 +1273,7 @@ func set_full_direct_shadows(value:bool)->void:
 
 func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"bloom_local_response":
-		return 0.
+		return .65
 	if effect == &"world_outline_width":
 		return 1.
 	if effect == &"stone_dusk_sky_chroma":
@@ -1720,7 +1720,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			or (version < 3 and effect == &"sky_chroma") or (version < 4 and effect == &"player_sky") \
 			or (version < 5 and effect in [&"near_haze", &"bloom_spread"]) \
 			or (version < 7 and effect == &"moon") \
-			or (version < 127 and effect == &"scatter_chroma") or (version < 8 and effect in [&"lantern_lift", &"lantern_air"]) \
+			or (version < 8 and effect in [&"lantern_lift", &"lantern_air"]) \
 			or (version < 9 and effect == &"lantern_glow") \
 			or (version < 10 and effect == &"shadow_softness") \
 			or (version < 11 and effect == &"sun_pockets")
@@ -1851,6 +1851,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
 			missing_value = 0.
+		if version < 127 and effect == &"scatter_chroma":
+			missing_value = 1.
 		if version < 126 and effect == &"day_cycle_pacing":
 			missing_value = 0.
 		if version < 121 and effect == &"stone_dusk_sky_chroma":
