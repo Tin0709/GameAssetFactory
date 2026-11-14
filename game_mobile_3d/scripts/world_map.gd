@@ -21,8 +21,9 @@ const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
 const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export_file("*.json") var map_layout_path := DATA
-## Leave empty to use the existing Forest showcase. Choose a resource for a portable biome.
+## Assign a graphics resource independently of the imported layout.
 @export var biome_graphics: BiomeGraphicsProfile
+@export var comparison_biomes: Array[BiomeGraphicsProfile] = []
 var biome_controller: BiomeGraphics
 
 @export var local_mist_region: LocalMistRegion
@@ -94,7 +95,7 @@ func _enter_tree() -> void:
 	var index:=previous.get_index()
 	showcase=load("res://scripts/world_map_showcase.gd").new()
 	showcase.name="UnifiedShowcase";add_child(showcase)
-	var replacement: Node3D=showcase.make_player(biome_graphics == null)
+	var replacement: Node3D=showcase.make_player(not _uses_portable_biome())
 	if showcase.private_primary:
 		for service:String in ["Combat","SpawnDirector"]:
 			var old:=get_node_or_null(service)
@@ -137,14 +138,14 @@ func _ready() -> void:
 	presentation.setup()
 	reset_player()
 	set_review_view("gameplay")
-	if biome_graphics == null and build_grove():
+	if not _uses_portable_biome() and build_grove():
 		if not grove.source_oaks:
 			grove.build_understory(self)
 		set_grove_visible(true, player.global_position)
 	look=load("res://scripts/world_map_look.gd").new()
 	look.name="ReferenceLook"
 	add_child(look);look.setup(self)
-	if biome_graphics == null:
+	if not _uses_portable_biome():
 		if look.atmosphere_review_available(): look.toggle_day_composition()
 		if look.day_palette_available(): look.toggle_day_finish()
 	ambient=load("res://scripts/world_map_ambient.gd").new()
@@ -176,11 +177,11 @@ func _ready() -> void:
 	canopy_player_cue.name = "CanopyPlayerCue"
 	add_child(canopy_player_cue)
 	showcase.setup(self)
-	if biome_graphics != null:
+	if _uses_portable_biome():
 		biome_controller = BiomeGraphics.new()
 		biome_controller.name = "BiomeGraphics"
 		add_child(biome_controller)
-		biome_controller.setup(self, biome_graphics)
+		biome_controller.setup(self, biome_graphics, comparison_biomes)
 	_setup_movement_effects()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
 	terrain_light.name="TerrainColoredTransport";add_child(terrain_light);terrain_light.setup(self)
@@ -195,6 +196,9 @@ func _ready() -> void:
 	if spruce_sky.proof_ready:
 		spruce_sky.apply_layout(forest_basin_layout_profile, forest_basin_layout_sha256)
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
+
+func _uses_portable_biome() -> bool:
+	return biome_graphics != null and not biome_graphics.use_forest_reference
 
 func abort_map(message: String) -> void:
 	push_error(message)

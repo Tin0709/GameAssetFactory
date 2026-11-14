@@ -1,7 +1,10 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
+
+[ext_resource type="Resource" path="res://assets/graphics/biomes/meadow_overcast.tres" id="weather"]
 
 [resource]
 script = ExtResource("profile")
 display_name = "Đồng cỏ ven rừng"
+overcast = ExtResource("weather")

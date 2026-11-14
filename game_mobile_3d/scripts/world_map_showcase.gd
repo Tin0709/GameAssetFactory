@@ -2294,10 +2294,10 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		env.fog_light_energy *= _lighting_scale(&"scatter")
 		env.fog_depth_curve=.8;env.fog_density=p.fog_opacity
 		if spatial_mist and mist!=null and mist.failure().is_empty() and mist.effect.snapshot().ready:env.fog_density=0.
-		env.glow_enabled=true;env.glow_intensity=float(_day.glow_intensity)*p.glow_scale * _lighting_scale(&"bloom")
-		env.glow_bloom=float(_day.glow_bloom)*p.bloom_scale;env.glow_hdr_threshold=.86
-		env.adjustment_contrast=float(_day.adjustment_contrast)*p.contrast_scale
-		env.adjustment_saturation*=p.saturation_scale
+		BiomeGraphics.apply_finish(env, float(_day.adjustment_contrast) * p.contrast_scale,
+			env.adjustment_saturation * p.saturation_scale, true,
+			float(_day.glow_intensity) * p.glow_scale * _lighting_scale(&"bloom"),
+			float(_day.glow_bloom) * p.bloom_scale, .86)
 	if _vignette!=null:
 		_vignette.visible=atmosphere_review in ["haze","combined"]
 		_vignette.material.set_shader_parameter("strength",p.vignette)

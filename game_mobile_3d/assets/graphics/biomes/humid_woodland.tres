@@ -1,6 +1,8 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
+
+[ext_resource type="Resource" path="res://assets/graphics/biomes/woodland_overcast.tres" id="weather"]
 
 [resource]
 script = ExtResource("profile")
@@ -17,4 +19,4 @@ exposure = 0.96
 saturation = 0.95
 contrast = 1.06
 glow_bloom = 0.028
-overcast_density = 0.16
+overcast = ExtResource("weather")

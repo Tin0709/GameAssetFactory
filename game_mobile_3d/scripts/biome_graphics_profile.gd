@@ -1,7 +1,11 @@
 extends Resource
+
+const Weather = preload("res://scripts/biome_weather_profile.gd")
 ## Map-independent art settings. Geometry-derived lighting fields live on each map.
 
 @export var display_name := "Temperate meadow"
+## The existing reference route requires matching private Forest data.
+@export var use_forest_reference := false
 @export_group("Lighting")
 @export var noon_sun_rotation := Vector3(-50., -38., 0.)
 @export var noon_sun_color := Color(1., .975, .925)
@@ -32,10 +36,5 @@ extends Resource
 @export_range(1., 60.) var cycle_minutes := 20.
 @export var auto_cycle := false
 
-@export_group("Overcast")
-@export_range(0., 1.) var overcast_key := .42
-@export_range(0., 2.) var overcast_ambient := 1.12
-@export var overcast_light_color := Color(.78, .87, .94)
-@export var overcast_fog_color := Color(.57, .66, .73)
-@export_range(0., 1.) var overcast_density := .13
-@export_range(0., 1.) var overcast_saturation := .90
+@export_group("Weather")
+@export var overcast: Weather
