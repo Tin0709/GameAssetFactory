@@ -877,6 +877,8 @@ func _update_mist()->void:
 			sample.near_fade_start = lerpf(.4, NEAR_HAZE_FADE_START, depth_mix)
 		if phase > 0.0 and strength > 0.0 and not _flat_lab and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
 			var gain := _lighting_scale(&"forest_near_scatter") * FOREST_NEAR_SCATTER_MAX_GAIN
+			if noon > 0.:
+				gain *= phase / (phase + .46 * noon)
 			if gain > 0.0:
 				sample.near_scatter = Vector3(FOREST_NEAR_SCATTER_CENTER.x, FOREST_NEAR_SCATTER_CENTER.y, gain)
 	var emitter:Vector3=level.presentation.player_position()
