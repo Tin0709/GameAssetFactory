@@ -4,6 +4,7 @@ const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
 const RenderSettings = preload("res://scripts/biome_render_settings.gd")
 const DayNight = preload("res://scripts/biome_day_night.gd")
 const Weather = preload("res://scripts/biome_weather.gd")
+const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
 const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
@@ -35,7 +36,7 @@ var status:Label
 var hour:=12.
 var cycle_enabled:=false
 var _weather := Weather.new()
-var _weather_profile: Resource
+var _weather_profile: WeatherProfile
 var _weather_button: CheckButton
 var _applied_weather_weight := 0.
 var audio_enabled:=false
@@ -2511,10 +2512,11 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	if atmosphere_review in ["lighting", "combined"]:
 		_weather.apply_lighting(_weather_profile, sun, env)
 	if atmosphere_review in ["haze", "combined"]:
-		_weather.apply_air(_weather_profile, env, _lighting_scale(&"fog"))
-		p.fog_opacity = env.fog_density
-		var weather_tint := env.fog_light_color
-		p.fog_color = Vector3(weather_tint.r, weather_tint.g, weather_tint.b)
+		if _weather.weight > 0.:
+			_weather.apply_air(_weather_profile, env, _lighting_scale(&"fog"))
+			p.fog_opacity = env.fog_density
+			var weather_tint := env.fog_light_color
+			p.fog_color = Vector3(weather_tint.r, weather_tint.g, weather_tint.b)
 		if spatial_mist and mist != null and mist.failure().is_empty() and mist.effect.snapshot().ready:
 			env.fog_density = 0.
 	_applied_weather_weight = _weather.weight

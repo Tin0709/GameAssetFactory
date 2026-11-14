@@ -32,7 +32,6 @@ var _allow_spatial_mist := true
 var _path_fixture := PathFixture.new()
 var _allow_fixture_scatter := true
 var _mist_sample: Dictionary
-var _depth_fog_density := 0.
 var _allow_adaptive_bloom := true
 var _finish_effect: LocalExposure
 var _finish_camera: Camera3D
@@ -170,7 +169,7 @@ func refresh() -> void:
 	var fog_gain := _profile.essential_fog_scale if quality == Quality.ESSENTIAL and _profile.spatial_mist else 1.
 	env.fog_density *= fog_gain
 	_weather.apply_air(_profile.overcast, env, fog_gain)
-	_depth_fog_density = clampf(env.fog_density, 0., 1.)
+	env.fog_density = clampf(env.fog_density, 0., 1.)
 	_update_fixture(time)
 	_prepare_spatial_mist(env, time)
 	_update_local_diffuse()
@@ -300,7 +299,6 @@ func _prepare_spatial_mist(env: Environment, time: float) -> void:
 		_mist.setup()
 		_mist.material_provider = _mist_materials
 		_mist.compositor_owned = _owns_finish_compositor
-		_mist.medium_state = _set_mist_state
 		_mist.path_light_provider = _fixture_air
 		_mist.noise_strength = .28
 	_mist.screen_tile_pixels = 32 if quality == Quality.BALANCED else 16
@@ -335,25 +333,15 @@ func _mist_materials() -> Array:
 func _owns_finish_compositor(compositor: Compositor) -> bool:
 	return compositor == _finish_compositor
 
-func _set_mist_state(ready: bool, error: String) -> void:
-	if _world.look.stage == 2:
-		var env: Environment = _world.get_node("WorldEnvironment").environment
-		var density := 0. if ready and error.is_empty() else _depth_fog_density
-		if env.fog_density != density:
-			env.fog_density = density
-
 func _update_spatial_mist() -> void:
 	if not is_instance_valid(_mist):
-		_set_mist_state(false, "")
 		return
 	var camera: Camera3D = _mist.get_parent()
 	_mist.visible = _allow_spatial_mist and _fog_enabled and not _mist_sample.is_empty() \
 		and _world.look.stage == 2 and _world.view_mode == "gameplay" \
 		and camera.projection == Camera3D.PROJECTION_ORTHOGONAL and camera.is_current() \
 		and _mist.failure().is_empty()
-	if not _mist.visible:
-		_set_mist_state(false, "")
-	else:
+	if _mist.visible:
 		var position: Vector3 = _world.presentation.player_position()
 		if _profile.ground_haze != null and _profile.ground_haze_strength > 0.:
 			var subject_depth := -camera.global_basis.z.dot(position - camera.global_position)
