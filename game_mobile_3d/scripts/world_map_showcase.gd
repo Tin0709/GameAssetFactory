@@ -2534,6 +2534,7 @@ func apply_time()->void:
 	if _time_applied:_restore_day()
 	if is_day_anchor():
 		if use_forest:_apply_forest(env,sun);_time_applied=true
+		else:_sync_canopy_direct()
 		return
 	var p:Dictionary=palette.sample(hour);var noon:Dictionary=palette.sample(12.)
 	BiomeGraphics.apply_lighting(sun, env, p, noon, _day.sun_rotation, _day.sun_color,
