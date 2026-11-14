@@ -93,10 +93,10 @@ const LAB_ROAM_MIN_PROGRESS_SPEED := LAB_ROAM_SPEED * 0.10
 const LAB_ROAM_ATTEMPTS := 4
 const CROWD_RETRY_MIN_ZOMBIES := 32
 const BLOCKED_CHASE_RETRY_HZ := 30.0
-const PACKED_CHASE_RETRY_HZ := 15.0
-const BLOCKED_CHASE_MAX_SPEED_SQUARED := 0.01
+const PACKED_WALK_RETRY_HZ := 15.0
+const BLOCKED_WALK_MAX_SPEED_SQUARED := 0.01
 const BLOCKER_MOVE_DISTANCE_SQUARED := 0.025 * 0.025
-const CHASE_TARGET_MOVE_DISTANCE_SQUARED := 0.10 * 0.10
+const WALK_DESTINATION_MOVE_DISTANCE_SQUARED := 0.10 * 0.10
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
 # Zombie overrides damage and attack speed. MeleeAttackMob supplies the range,
@@ -376,7 +376,7 @@ func _physics_process(delta: float) -> void:
 	if not _skipped_blocked_step:
 		move_and_slide()
 		_blocked_walk = crowd_walking and is_on_floor() and is_on_wall() \
-			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_CHASE_MAX_SPEED_SQUARED
+			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_WALK_MAX_SPEED_SQUARED
 		_update_walk_blocker(destination)
 	_advance_animation(delta)
 	ragdoll.sample(delta)
@@ -387,9 +387,9 @@ func _wait_for_walk_retry(destination: Vector3) -> bool:
 		var blocker := instance_from_id(_blocking_zombie_id) as CharacterBody3D
 		if (blocker == null or blocker.is_queued_for_deletion() or blocker.collision_layer == 0
 				or blocker.global_position.distance_squared_to(_blocking_position) > BLOCKER_MOVE_DISTANCE_SQUARED
-				or destination.distance_squared_to(_blocked_walk_destination) > CHASE_TARGET_MOVE_DISTANCE_SQUARED):
+				or destination.distance_squared_to(_blocked_walk_destination) > WALK_DESTINATION_MOVE_DISTANCE_SQUARED):
 			return false
-		retry_hz = PACKED_CHASE_RETRY_HZ
+		retry_hz = PACKED_WALK_RETRY_HZ
 	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / retry_hz))
 	return Engine.get_physics_frames() % stride != _crowd_slot % stride
 
