@@ -15,6 +15,7 @@ var visual: MeshInstance3D
 var material: ShaderMaterial
 var _attempted := false
 var _submitted := Vector4.INF
+var _subject_uv := Vector2.INF
 
 static func phase_weight(hour: float) -> float:
 	return smoothstep(17., 18.5, hour) * (1. - smoothstep(20., 21.35, hour))
@@ -22,12 +23,15 @@ static func phase_weight(hour: float) -> float:
 func visible() -> bool:
 	return is_instance_valid(visual) and visual.is_visible_in_tree()
 
-func update(weight: float, tint: Color) -> void:
+func update(weight: float, tint: Color, subject_uv: Vector2) -> void:
 	if not is_instance_valid(visual):
 		return
 	visual.visible = weight > 0.
 	if weight <= 0.:
 		return
+	if subject_uv != _subject_uv:
+		_subject_uv = subject_uv
+		material.set_shader_parameter("subject_screen_uv", subject_uv)
 	var color := tint.srgb_to_linear()
 	var state := Vector4(color.r * .13, color.g * .13, color.b * .13, weight * .84)
 	if state == _submitted:

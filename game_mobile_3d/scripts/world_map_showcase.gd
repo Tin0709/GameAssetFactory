@@ -856,12 +856,16 @@ func _sync_distant_terrain() -> void:
 	var env: Environment = level.get_node("WorldEnvironment").environment
 	var camera: Camera3D = level.get_node("Camera3D")
 	var gain := 0.
+	var subject_uv := Vector2(.5, .5)
 	if (forest_active() and atmosphere_review == "combined" and not _balanced_preview and spatial_mist
 			and env.fog_enabled and env.background_mode == Environment.BG_COLOR
 			and camera.is_current() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL
 			and _source_terrain_toggle.button_pressed and mist.failure().is_empty()):
 		gain = DistantTerrain.phase_weight(hour) * _lighting_scale(&"distant_terrain")
-	distant_terrain.update(gain, env.fog_light_color)
+		if gain > 0.:
+			var subject: Vector3 = level.presentation.player_position() + Vector3.UP
+			subject_uv = camera.unproject_position(subject) / camera.get_viewport().get_visible_rect().size
+	distant_terrain.update(gain, env.fog_light_color, subject_uv)
 
 func _update_mist()->void:
 	_sync_distant_terrain()
