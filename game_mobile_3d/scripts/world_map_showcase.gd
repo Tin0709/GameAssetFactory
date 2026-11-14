@@ -168,6 +168,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_bloom_prefilter": ["Lọc nền bloom ban đêm", 1.],
 	&"ground_haze": ["Ánh sương thấp sau tán", 1.],
 	&"twilight_ground_haze": ["Ánh sương thấp lúc chạng vạng", 1.],
+	&"forest_dusk_backdrop": ["Dịu màu nền xa lúc chạng vạng", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
@@ -225,7 +226,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 148
+const LIGHTING_MIX_VERSION := 149
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2116,6 +2117,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 148 and effect == &"source_path_chroma":
 			missing_value = 0.
+		if version < 149 and effect == &"forest_dusk_backdrop":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -2301,6 +2304,11 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"night_path_chroma", &"source_path_chroma"]:
 		_publish_night_path_chroma()
 		return
+	if changed_effect == &"forest_dusk_backdrop":
+		_forest_hour = INF
+		apply_time()
+		_update_mist()
+		return
 	if changed_effect == &"stone_twilight_color":
 		_publish_stone_twilight_color()
 		return
@@ -2400,6 +2408,18 @@ func forest_spatial_sky_context()->bool:
 func terrain_ambient_matches(color:Color,source:Color)->bool:
 	return terrain_ambient_reference().is_equal_approx(source) and _forest_expected.get("ambient_light_color")==color
 
+func _apply_forest_dusk_backdrop(env: Environment) -> void:
+	if _flat_lab or _balanced_preview or atmosphere_review != "combined" \
+			or level.view_mode != "gameplay" or env.background_mode != Environment.BG_COLOR:
+		return
+	# This is the solid clear beyond world geometry, with its own luminance.
+	var phase := smoothstep(17., 18.5, hour) * (1. - smoothstep(19.5, 21., hour))
+	var weight := phase * _lighting_scale(&"forest_dusk_backdrop")
+	if weight > 0.:
+		var linear := env.fog_light_color.srgb_to_linear()
+		var backdrop := Color(.34 * linear.r, .34 * linear.g, .34 * linear.b)
+		env.background_color = env.background_color.lerp(backdrop, weight)
+
 func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	key_response_active=false
 	sunrise_elevation_active = false
@@ -2465,6 +2485,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	if _vignette!=null:
 		_vignette.visible=atmosphere_review in ["haze","combined"]
 		_vignette.material.set_shader_parameter("strength",p.vignette)
+	_apply_forest_dusk_backdrop(env)
 	_forest_expected.clear()
 	for field:String in ENV_FIELDS:_forest_expected[field]=env.get(field)
 	_forest_sun=sun.light_color;_forest_energy=sun.light_energy;_forest_hour=hour
