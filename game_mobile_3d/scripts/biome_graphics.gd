@@ -83,10 +83,10 @@ func refresh() -> void:
 	var fog_color := _profile.noon_fog_color * Color(p.fog) / Color(_noon.fog)
 	var time := hour / 24.
 	if _profile.key_energy_by_hour != null:
-		sun.light_energy *= maxf(0., _profile.key_energy_by_hour.sample_baked(time))
+		sun.light_energy *= maxf(0., _profile.key_energy_by_hour.sample(time))
 	var fog_density := _profile.noon_fog_density * float(p.fog_amount) / float(_noon.fog_amount)
 	if _profile.fog_density_by_hour != null:
-		fog_density *= maxf(0., _profile.fog_density_by_hour.sample_baked(time))
+		fog_density *= maxf(0., _profile.fog_density_by_hour.sample(time))
 	var saturation := _profile.saturation * float(p.saturation) / float(_noon.saturation)
 	var weather := _profile.overcast
 	if weather != null and weather_weight > 0.:
