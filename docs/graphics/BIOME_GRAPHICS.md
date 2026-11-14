@@ -6,8 +6,8 @@
 
 | Hệ thống | Chỉnh theo biome | Chỉnh theo map |
 | --- | --- | --- |
-| Lighting | Hướng, màu, cường độ nắng và ánh môi trường | Vị trí đèn cục bộ và dữ liệu ánh sáng tính từ hình học |
-| Atmosphere / Fog | Màu trời, màu sương, dải độ sâu, độ suy giảm theo cao độ và cường độ theo giờ | Tâm, kích thước, extinction và màu tán xạ của từng vùng sương |
+| Lighting | Hướng, màu, cường độ nắng và ánh môi trường, độ mềm và độ đậm bóng nắng | Vị trí đèn cục bộ và dữ liệu ánh sáng tính từ hình học |
+| Atmosphere / Fog | Màu trời, màu sương, dải độ sâu, đường cong sương, cường độ ánh sương, độ suy giảm theo cao độ và cường độ theo giờ | Tâm, kích thước, extinction và màu tán xạ của từng vùng sương |
 | Bloom | Ngưỡng, cường độ, độ lan và mức thích ứng theo giờ | Chọn mức chất lượng phù hợp với cảnh và thiết bị |
 | Color Grading | Tonemapper, exposure, độ tương phản, bão hòa và texture sửa màu tùy chọn | Gán hoặc duplicate preset để tinh chỉnh cục bộ |
 | Day/Night | Giờ bắt đầu, độ dài chu kỳ, các track màu, góc và cường độ | Chọn preset của scene |
@@ -34,6 +34,12 @@ Map portable dùng chung các pass sương và bloom với WorldMap. Preset Fore
 - `biome_graphics_profile.gd` lưu cấu hình ánh sáng, bầu trời, sương, hậu kỳ và chu kỳ thời gian. `biome_weather_profile.gd` lưu phản ứng với trời nhiều mây. `biome_graphics.gd` áp dụng dữ liệu lên Environment của từng scene. Shader nền, cỏ, mesh và controller được dùng lại. Hai profile mẫu là thiết kế của GameAssetFactory.
 - Forest dùng preset riêng với đường dẫn và hash của dữ liệu khí quyển/hậu kỳ riêng tư. Day/Night, các hàm áp nguồn sáng, fog dự phòng và glow/grade dùng chung. Field ánh sáng, ánh hắt từ geometry, volume sương, LUT PIX và các hiệu ứng chuyên biệt của Forest vẫn có điều kiện riêng. Cache theo hình học kiểm hash runtime trước khi kích hoạt. Rìa rừng ẩm dùng volume chung trên Forward Mobile. Đồng cỏ dùng fog tích hợp. Đồng cỏ dùng glow chuẩn Mobile. Rìa rừng ẩm có adaptive bloom và local exposure vào các giờ ngoài giữa trưa. Đặt hiệu ứng này trong nhóm Bloom của profile và dùng Curve để chỉnh tỉ lệ theo giờ. [Hỗ trợ Godot Mobile](https://docs.godotengine.org/en/4.7/tutorials/3d/environment_and_post_processing.html).
 - Spatial Mist nằm trong nhóm Atmosphere and Fog của preset. Local Mist Region và Additional Mist Region trên node map đặt tâm, bán kính, extinction và màu của từng vùng. Tắt Spatial Mist trong preset để dùng fog chuẩn. Vật liệu ngoài hợp đồng shader chung vẫn nhận fog chuẩn. LUT theo dữ liệu PIX vẫn riêng cho Forest. Preset portable giữ tone curve và grade do biome chọn. Trạng thái nhiều mây của map thử là thiết kế GAF. Bằng chứng MD2 hiện chưa đủ để đặt lịch riêng cho mưa Forest.
+
+## Độ mềm của bóng và chiều sâu không khí
+
+Trong **Biome Graphics → Lighting**, **Shadow Blur** và **Shadow Opacity** chỉnh bán kính lọc và độ đậm bóng nắng. Trong **Atmosphere and fog**, **Fog Depth Curve** chỉnh phân bố sương giữa hai mốc khoảng cách, **Fog Light Energy** chỉnh độ sáng của sương tích hợp. Spatial Mist vẫn dùng các tham số truyền sáng và tán xạ của vùng sương. Mức Nhẹ giữ đường cong và độ sáng của sương tích hợp.
+
+Map thử dùng cặp **1,55 / 0,74** cho bóng và **1,45 / 0,78** cho sương. Preset Đồng cỏ lưu hành vi cũ (**1,25 / 0,782** và **1,70 / 0,75**). Các giá trị của Rìa rừng ẩm là hiệu chỉnh GAF cho map thử. B và F8 có thể dùng để kiểm tra chính xác lúc nào preset đang điều khiển hình ảnh. Các phím thử nghiệm U/P của WorldMap thuộc chế độ tham chiếu Forest. [Thuộc tính sương Godot](https://docs.godotengine.org/en/stable/classes/class_environment.html#class-environment-property-fog-depth-curve) · [Thuộc tính bóng Godot](https://docs.godotengine.org/en/stable/classes/class_light3d.html#class-light3d-property-shadow-blur).
 
 ## Chỉnh chu kỳ theo biome
 
