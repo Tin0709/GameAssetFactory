@@ -137,6 +137,31 @@ func verify() -> void:
 	check(is_equal_approx(light.shadow_blur, 2.1) and is_equal_approx(light.shadow_opacity, .66),
 		"Baseline restore reapplies the same biome shadows")
 	check(world.map_ready and world.player.is_physics_processing(), "Gameplay controller remains active")
+	world.free()
+	await process_frame
+
+	world = MAP.instantiate()
+	world.set("biome_start_hour", 19.5)
+	world.set("biome_start_overcast", .65)
+	world.set("biome_atmosphere_base_y", 6.)
+	root.add_child(world)
+	current_scene = world
+	await process_frame
+	graphics = world.biome_controller
+	check(is_equal_approx(world.showcase.hour, 19.5) and is_equal_approx(graphics.weather_weight, .65),
+		"Imported map can choose first hour and weather without editing either biome resource")
+	check(is_equal_approx(world.biome_graphics.start_hour, 12.) and is_zero_approx(world.biome_graphics.start_overcast),
+		"Map overrides never mutate the shared preset")
+	graphics.set_profile(MEADOW)
+	check(is_equal_approx(world.showcase.hour, 19.5) and is_equal_approx(graphics.weather_weight, .65),
+		"Switching biome does not reset map overrides into the running clock or weather")
+	graphics.set_profile(world.biome_graphics)
+	if RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null:
+		var sample: Dictionary = graphics._mist_sample
+		var near_layer: Vector3 = sample.get("near_layer", Vector3.ZERO)
+		var haze: PackedFloat32Array = sample.get("ground_haze", PackedFloat32Array())
+		check(is_equal_approx(near_layer.z, 6.) and haze.size() == 8 and is_equal_approx(haze[2], 6.25),
+			"Near transmission and twilight scattering use the same map-authored height")
 	finish(world)
 
 func finish(world: Node = null) -> void:
