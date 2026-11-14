@@ -1346,8 +1346,10 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .75
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
-	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"cliff_mist", &"night_spatial_sky"]:
+	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"night_spatial_sky"]:
 		return 0.
+	if effect == &"cliff_mist":
+		return .22
 	if effect == &"night_cliff_mist":
 		return .75
 	if effect == &"sunlit_mist":
