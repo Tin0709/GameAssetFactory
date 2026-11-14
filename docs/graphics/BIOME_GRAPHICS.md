@@ -1,6 +1,6 @@
 # Preset đồ họa cho bản đồ Litematica
 
-**Mở để chơi thử.** Mở `scenes/maps/m2_v1/MeadowBiomeReview.tscn` trong Godot và bấm **F6**. **F5** vẫn mở WorldMap với preset Forest tham chiếu. Map thử mặc định dùng Rìa rừng ẩm. **J** so sánh volume với fog chuẩn trong cùng preset. **F7** so hậu kỳ khi rời buổi trưa, **Shift+F7** đổi mức chất lượng. **F8** đổi giữa Đồng cỏ ven rừng và Rìa rừng ẩm, **T** chọn giờ, **Shift+T** bật đồng hồ, **F6** trong cửa sổ game chuyển trời quang/nhiều mây, **H** tắt/bật sương, **B** so đồ họa gốc và **L** hiện phím điều khiển. WASD, chuột cuộn và Space dùng chung với WorldMap.
+**Mở để chơi thử.** Mở `scenes/maps/m2_v1/MeadowBiomeReview.tscn` trong Godot và bấm **F6**. **F5** mở WorldMap với preset Forest tham chiếu. Map thử mặc định dùng Rìa rừng ẩm. **J** so sánh volume với fog chuẩn trong cùng preset. **F7** so hậu kỳ khi rời buổi trưa, **Shift+F7** đổi mức chất lượng. **F8** đổi giữa Đồng cỏ ven rừng và Rìa rừng ẩm. Trên cả hai map, **T** chọn giờ, **Shift+T** bật đồng hồ và **F6** trong cửa sổ game chuyển trời quang/nhiều mây. Forest cũng có nút **Trời nhiều mây** trong Cài đặt. **H** tắt/bật sương, **B** so đồ họa gốc và **L** hiện phím điều khiển. WASD, chuột cuộn và Space dùng chung với WorldMap.
 
 ## Phần dùng chung và phần riêng của bản đồ
 
@@ -15,6 +15,10 @@
 
 Map portable dùng chung các pass sương và bloom với WorldMap. Preset Forest tham chiếu còn nạp LUT riêng và các trường ánh sáng gắn với hình học, được xác minh theo map trước khi dùng.
 
+`biome_render_settings.gd` áp cấu hình ánh sáng, depth fog, bloom và color grading trên cả hai map. `biome_day_night.gd` điều khiển đồng hồ và mốc giờ, `biome_weather.gd` điều khiển chuyển tiếp và phối hiệu ứng thời tiết lên pha ánh sáng hiện tại. `forest_overcast.tres`, `woodland_overcast.tres` và `meadow_overcast.tres` đặt độ dịu nắng, thay đổi ánh hắt, màu sương và mức bão hòa riêng. Forest mặc định trời quang. Ba preset mây là thiết kế của GameAssetFactory.
+
+Map portable dùng một compositor cho camera. Sương chạy trước khi vẽ vật thể và adaptive bloom chạy ở giai đoạn hậu kỳ. Các vật liệu hỗ trợ spatial mist nhận sương từ volume. Vật liệu thông thường tiếp tục nhận depth fog. Mức Nhẹ, chế độ toàn cảnh và chế độ so sánh có đường dự phòng riêng. Các cache ánh sáng kiểm tra hình học, đèn cục bộ và vùng sương đặt theo tọa độ của map.
+
 Đặt **Local Diffuse Region** trong Inspector của map để chọn tâm, hai bán kính và tọa độ khoảng mở. Trong **Biome Graphics → Lighting**, chỉnh **Local Diffuse Strength** và **Local Diffuse By Hour**. Resource thời tiết có **Local Diffuse Scale** để giảm chênh ánh hắt khi nhiều mây. Cả Forest và map portable dùng cùng hàm shader cho đá, địa hình, cỏ và vật liệu nhân vật hỗ trợ. Forest dùng dữ liệu ánh sáng đã dựng theo hình học. Map portable dùng màu và cường độ ambient của biome hiện tại. Cân bằng và Đầy đủ có hiệu ứng, mức Nhẹ tắt. Trên MeadowBiomeReview, đi tới cụm đá lúc 07:00 hoặc 16:30 rồi bấm **Alt+J** để so sánh.
 
 ## Import map tiếp theo
@@ -26,7 +30,7 @@ Map portable dùng chung các pass sương và bloom với WorldMap. Preset Fore
    ```
 
 2. Trong Godot, mở `scenes/maps/MapMoi.tscn` và bấm **F6**. Chọn `--biome meadow` cho Đồng cỏ ven rừng hoặc `--biome humid_woodland` cho Rìa rừng ẩm. Muốn thêm biome, lưu một bản sao của preset portable dưới `assets/graphics/biomes/ten_biome.tres`, rồi truyền `--biome ten_biome`. Importer kiểm tra đây là resource `BiomeGraphicsProfile` và từ chối preset tham chiếu private trước khi ghi map. Nếu bỏ `--biome`, scene dùng Đồng cỏ ven rừng. Cả thư mục đầu ra và file scene phải là đường dẫn mới khi dùng `--scene` để giữ các chỉnh sửa trên map đã có. Để chỉ xuất dữ liệu như trước, bỏ `--scene` và `--biome`.
-3. Bấm **F8** để so hai preset ngay trên scene vừa tạo. Đổi **Biome Graphics** và **Comparison Biomes** trong Inspector để dùng preset khác. Để tinh chỉnh riêng một map, duplicate preset thành file .tres mới rồi gán cho map đó. Nhiều biome có thể dùng chung một Weather resource. Giờ khởi động, vòng ngày/đêm và thời tiết điều khiển độc lập. Curve theo giờ dùng trục X từ 0 đến 1 cho 00:00 đến 24:00. Giữ hai đầu bằng nhau để chuyển mượt qua nửa đêm. Giá trị 1 tại 0,5 giữ mức đã đặt cho buổi trưa.
+3. Bấm **F8** để so hai preset ngay trên scene vừa tạo. Đổi **Biome Graphics** và **Comparison Biomes** trong Inspector để dùng preset khác. Để tinh chỉnh riêng một map, duplicate preset thành file .tres mới rồi gán cho map đó. Duplicate cả resource con Day/Night hoặc Overcast nếu muốn thay đổi chúng riêng cho map. Nhiều biome có thể dùng chung một Weather resource. Giờ khởi động, vòng ngày/đêm và thời tiết điều khiển độc lập. Curve theo giờ dùng trục X từ 0 đến 1 cho 00:00 đến 24:00. Giữ hai đầu bằng nhau để chuyển mượt qua nửa đêm. Giá trị 1 tại 0,5 giữ mức đã đặt cho buổi trưa.
 4. Giữ nguyên asset registry và kiểm tra các block mới, mép map, chỗ spawn và đường đi sau import. Dùng F6 để test scene vừa chọn. Mặc định nếu bản đồ mới không có preset riêng, runtime chọn Đồng cỏ ven rừng.
 
 ## Phạm vi tích hợp hiện tại
