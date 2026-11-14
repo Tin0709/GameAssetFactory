@@ -2529,7 +2529,9 @@ func apply_time()->void:
 		var unchanged:=true
 		for field:String in _forest_expected:
 			if env.get(field)!=_forest_expected[field]:unchanged=false;break
-		if unchanged:return
+		if unchanged:
+			_sync_canopy_direct()
+			return
 	_refresh_lantern_glow()
 	if _time_applied:_restore_day()
 	if is_day_anchor():
