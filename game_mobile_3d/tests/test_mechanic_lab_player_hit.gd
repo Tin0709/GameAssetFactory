@@ -71,6 +71,7 @@ func run() -> void:
 	await check_zombie_perception(lab)
 	await check_zombie_roam(lab)
 	await check_zombie_roam_clearance(lab)
+	await check_zombie_roam_stalled_slide(lab)
 	await check_simultaneous_damage(lab, numbers)
 	lab._on_player_hit(6)
 	lab._process(0.12)
@@ -372,6 +373,62 @@ func check_zombie_roam_clearance(lab) -> void:
 		" reached=", zombie.global_position)
 	obstacle.free()
 	zombie.free()
+	lab.reset_player()
+	await ticks(2)
+
+func check_zombie_roam_stalled_slide(lab) -> void:
+	var player: CharacterBody3D = lab.player
+	var group: Node = lab.get_node("Zombies")
+	player.set_physics_process(false)
+	player.global_position = Vector3(-30.0, 0.02, -30.0)
+	await ticks(2)
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie := group.get_child(0) as ZOMBIE
+	zombie.global_position = Vector3.ZERO
+	zombie._roam_origin = Vector3.ZERO
+	zombie.animation.play(ZOMBIE.IDLE, 0.0)
+	zombie.animation.advance(0.0)
+	await ticks(12)
+	var destination := Vector3.BACK * 6.0
+	zombie._roam_destination = destination
+	await ticks(8)
+	check(zombie.global_position.z > 0.25, "The zombie is walking before the patrol route is obstructed")
+	var wall := StaticBody3D.new()
+	var collision := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(8.0, 3.0, 0.2)
+	collision.shape = box
+	wall.add_child(collision)
+	wall.position = Vector3(0.0, 1.5, 1.7)
+	wall.rotation.y = 0.13
+	lab.add_child(wall)
+	var slide_speed := 0.0
+	var slide_position := Vector3.ZERO
+	var slide_ticks := 0
+	for i in 65:
+		await physics_frame
+		if not zombie._roam_destination.is_finite():
+			break
+		if zombie.is_on_wall():
+			if slide_ticks == 0:
+				slide_position = zombie.global_position
+			slide_ticks += 1
+			slide_speed = zombie.get_real_velocity().slide(Vector3.UP).length()
+	check(slide_ticks > 0 and slide_speed > 0.15 and zombie.global_position.z - slide_position.z < 0.10,
+		"The inserted wall causes a sideways slide with almost no progress toward the destination")
+	check(not zombie._roam_destination.is_finite() and zombie.animation.current_animation == ZOMBIE.IDLE,
+		"A sideways scrape does not keep the obstructed patrol leg active")
+	print("MECHANIC_LAB_ROAM_STALLED_SLIDE speed=", slide_speed, " wall_ticks=", slide_ticks,
+		" active=", zombie._roam_destination.is_finite())
+	wall.free()
+	var retry_origin := zombie.global_position
+	await ticks(50)
+	check(zombie.global_position.distance_to(retry_origin) < 0.02, "A blocked patrol leg still uses the one-second wait")
+	await ticks(30)
+	check(zombie._roam_destination.is_finite() and zombie.global_position.distance_to(retry_origin) > 0.5,
+		"The zombie picks a new patrol leg and walks again after the wait")
+	zombie.free()
+	player.set_physics_process(true)
 	lab.reset_player()
 	await ticks(2)
 
