@@ -1284,6 +1284,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"ground_haze":
+		return .65
 	if effect == &"night_bloom_prefilter":
 		return .25
 	if effect == &"actor_view_fill_chroma":
