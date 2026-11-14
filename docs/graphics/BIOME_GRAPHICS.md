@@ -10,7 +10,7 @@
 | Atmosphere / Fog | Màu trời, màu sương, dải độ sâu, đường cong sương, cường độ ánh sương, độ suy giảm theo cao độ và cường độ theo giờ | Tâm, kích thước, extinction và màu tán xạ của từng vùng sương |
 | Bloom | Ngưỡng, cường độ, độ lan và mức thích ứng theo giờ | Chọn mức chất lượng phù hợp với cảnh và thiết bị |
 | Color Grading | Tonemapper, exposure, độ tương phản, bão hòa và texture sửa màu tùy chọn | Gán hoặc duplicate preset để tinh chỉnh cục bộ |
-| Day/Night | Giờ bắt đầu, độ dài chu kỳ, các track màu, góc và cường độ | Chọn preset của scene |
+| Day/Night | Giờ bắt đầu mặc định, độ dài chu kỳ, các track màu, góc và cường độ | Chọn giờ mở map hoặc kế thừa preset |
 | Weather | Resource chuyển giữa trời quang và nhiều mây, ảnh hưởng lên nắng, sương và màu | Chọn preset hoặc đặt thời tiết lúc bắt đầu phiên chơi |
 
 Map portable dùng chung các pass sương và bloom với WorldMap. Preset Forest tham chiếu còn nạp LUT riêng và các trường ánh sáng gắn với hình học, được xác minh theo map trước khi dùng.
@@ -30,7 +30,7 @@ Map portable dùng một compositor cho camera. Sương chạy trước khi vẽ
    ```
 
 2. Trong Godot, mở `scenes/maps/MapMoi.tscn` và bấm **F6**. Chọn `--biome meadow` cho Đồng cỏ ven rừng hoặc `--biome humid_woodland` cho Rìa rừng ẩm. Muốn thêm biome, lưu một bản sao của preset portable dưới `assets/graphics/biomes/ten_biome.tres`, rồi truyền `--biome ten_biome`. Importer kiểm tra đây là resource `BiomeGraphicsProfile` và từ chối preset tham chiếu private trước khi ghi map. Nếu bỏ `--biome`, scene dùng Đồng cỏ ven rừng. Cả thư mục đầu ra và file scene phải là đường dẫn mới khi dùng `--scene` để giữ các chỉnh sửa trên map đã có. Để chỉ xuất dữ liệu như trước, bỏ `--scene` và `--biome`.
-3. Bấm **F8** để so hai preset ngay trên scene vừa tạo. Đổi **Biome Graphics** và **Comparison Biomes** trong Inspector để dùng preset khác. Để tinh chỉnh riêng một map, duplicate preset thành file .tres mới rồi gán cho map đó. Duplicate cả resource con Day/Night hoặc Overcast nếu muốn thay đổi chúng riêng cho map. Nhiều biome có thể dùng chung một Weather resource. Giờ khởi động, vòng ngày/đêm và thời tiết điều khiển độc lập. Curve theo giờ dùng trục X từ 0 đến 1 cho 00:00 đến 24:00. Giữ hai đầu bằng nhau để chuyển mượt qua nửa đêm. Giá trị 1 tại 0,5 giữ mức đã đặt cho buổi trưa.
+3. Bấm **F8** để so hai preset ngay trên scene vừa tạo. Đổi **Biome Graphics** và **Comparison Biomes** trong Inspector để dùng preset khác. Mục **Biome Map Overrides** ở node gốc cho phép đặt **Start Hour** (giờ thập phân, ví dụ `19.5` là 19:30), **Start Overcast** (`0` quang đến `1` nhiều mây) và **Atmosphere Base Y** (cao độ mốc theo hệ tọa độ Godot, tính bằng mét). `-1` kế thừa giờ hoặc mây từ preset. `inf` lấy cao độ điểm xuất phát. Các giá trị khởi đầu áp dụng khi mở map. F8 giữ giờ và, nếu hai preset đều có Overcast, mức mây đang chạy.
 4. Giữ nguyên asset registry và kiểm tra các block mới, mép map, chỗ spawn và đường đi sau import. Dùng F6 để test scene vừa chọn. Mặc định nếu bản đồ mới không có preset riêng, runtime chọn Đồng cỏ ven rừng.
 
 ## Phạm vi tích hợp hiện tại
@@ -47,6 +47,8 @@ Map thử dùng cặp **1,55 / 0,74** cho bóng và **1,45 / 0,78** cho sương.
 
 ## Chỉnh chu kỳ theo biome
 
+Khi muốn đổi đặc tính ánh sáng, sương, hậu kỳ hoặc vòng ngày đêm cho riêng một map, duplicate preset thành file `.tres` mới rồi gán cho map đó. Duplicate cả resource con Day/Night hoặc Overcast nếu cần sửa các track riêng. Nhiều biome có thể dùng chung một Weather resource.
+
 Tại **Biome Graphics → Day and night**, mở **Day Night**. Preset Rìa rừng ẩm đã có resource riêng. Duplicate resource này trước khi chỉnh màu nắng, ánh trời, bầu trời hoặc sương cho biome khác. Có thể để trống từng track để dùng đường màu chung. Các màu là giá trị tuyệt đối. Track góc pitch/yaw tính bằng độ và track Exposure dùng giá trị exposure của môi trường. Các curve cường độ nắng, ánh môi trường và mật độ sương ở profile là hệ số nhân. **Ambient Energy By Hour** được áp dụng trước mức mây, với hệ số 1 nếu để trống. Preset Rìa rừng ẩm giảm ánh môi trường khi trời vừa tối và về mức cũ sau 21:15. Map có đèn cục bộ vẫn dùng đường đèn riêng.
 
 Điểm 0,5 là 12:00. Giữ điểm 0/1 bằng nhau cho các track vòng lặp và chọn nội suy tuyến tính hoặc cubic để màu chuyển dần giữa các mốc. Với yaw qua ±180°, nhập các giá trị liên tục như 170° → 190° để hướng nắng đi qua góc ngắn. **Weather → Start Overcast** đặt mức mây lúc mở map. F8 giữ giờ và mức mây hiện tại khi hai preset đều có cấu hình Overcast. Không cần đổi shader để đổi những thông số này.
@@ -55,7 +57,7 @@ Trong **Atmosphere and fog → Spatial mist**, **Local Mist By Hour** và **Addi
 
 Các vị trí vùng sương và đèn, cùng dữ liệu ánh sáng đã bake theo hình học, thuộc về map. Cần đặt hoặc dựng lại khi đổi layout. Các tính năng cần texture/LUT PIX và cache chiếu sáng riêng của Forest vẫn chạy qua preset tham chiếu trên WorldMap. Map Litematica mới dùng cấu hình portable.
 
-**Ground Haze** và **Twilight Ground Haze** nằm trong **Biome Graphics → Atmosphere and fog → Spatial mist**. Cả hai dùng cùng tài nguyên để đặt dải khoảng cách tính sau nhân vật, cao độ tính từ điểm spawn của map và cửa sổ giờ. Bốn mốc giờ là bắt đầu, đạt mức cao nhất, bắt đầu giảm và hết. Cửa sổ có bốn số 0 được bỏ qua. Khi Ground Haze đang hoạt động, nó được ưu tiên. Khi lớp này hết giờ hoặc có cường độ 0, hệ thống lấy Twilight Ground Haze. Hai lớp điều chỉnh ánh sáng tán xạ trong sương và giữ nguyên extinction.
+**Ground Haze** và **Twilight Ground Haze** nằm trong **Biome Graphics → Atmosphere and fog → Spatial mist**. Cả hai dùng cùng tài nguyên để đặt dải khoảng cách tính sau nhân vật, cao độ tính từ **Atmosphere Base Y** của map và cửa sổ giờ. Sương thấp dùng cùng mốc cao độ, hữu ích khi spawn trên sườn đồi nhưng sương cần nằm dưới thung lũng. **Local Mist Region** và **Additional Mist Region** vẫn dùng tâm và bán kính theo tọa độ tuyệt đối. Bốn mốc giờ là bắt đầu, đạt mức cao nhất, bắt đầu giảm và hết. Cửa sổ có bốn số 0 được bỏ qua. Khi Ground Haze đang hoạt động, nó được ưu tiên. Khi lớp này hết giờ hoặc có cường độ 0, hệ thống lấy Twilight Ground Haze. Hai lớp điều chỉnh ánh sáng tán xạ trong sương và giữ nguyên extinction.
 
 Forest lưu thông số hai lớp sương thấp trong preset tham chiếu. **Sương & hiệu ứng → Sương theo khoảng cách** vẫn có các slider riêng của Forest. Rìa rừng ẩm mặc định có lớp tán xạ thấp từ 18:45 đến 21:09, mạnh nhất từ 19:30 đến 20:00. Đồng cỏ dùng cấu hình sương nhẹ hơn. Mở **MeadowBiomeReview**, đi tới cụm đá rồi bấm **T** để tới 18:30 hoặc dùng **Shift+T** cho thời gian chạy qua 19:30. **J** bật/tắt spatial mist và **F8** đổi biome. Mức Đầy đủ và Cân bằng chạy lớp tán xạ này. Mức Nhẹ và Compatibility dùng depth fog tích hợp. [Hỗ trợ renderer trong Godot](https://docs.godotengine.org/en/stable/tutorials/rendering/renderers.html)
 
