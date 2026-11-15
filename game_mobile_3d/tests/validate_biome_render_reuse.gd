@@ -204,10 +204,29 @@ func run() -> void:
 				"Returning to Noon clears twilight parameters")
 			map.showcase.set_hour(19.5)
 			var woodland = map.biome_graphics
+			for index in 8:
+				await process_frame
+				await RenderingServer.frame_post_draw
+			check(graphics._mist.effect.snapshot().bytes > 0 and graphics._finish_effect.snapshot().bytes > 0,
+				"Woodland allocates both effects before comparing biomes")
 			graphics.set_profile(MEADOW)
 			check(not graphics._mist.visible and graphics._mist_sample.is_empty(),
 				"Switching preset cannot leave the previous medium active")
+			for index in 8:
+				await process_frame
+				await RenderingServer.frame_post_draw
+			check(graphics._mist.effect.snapshot().bytes == 0,
+				"Meadow releases the unused spatial mist grid even at Full quality")
+			check(graphics._finish_effect.snapshot().bytes == 0,
+				"Meadow releases the unused adaptive bloom textures even at Full quality")
+			check(env.fog_density > 0. and env.glow_enabled and is_equal_approx(map.showcase.hour, 19.5),
+				"Meadow keeps built-in fog and glow and the current time")
 			graphics.set_profile(woodland)
+			for index in 8:
+				await process_frame
+				await RenderingServer.frame_post_draw
+			check(graphics._mist.effect.snapshot().ready and graphics._finish_effect.snapshot().bytes > 0,
+				"Returning to Woodland rebuilds both effects on the existing camera")
 			graphics.set_quality(0)
 			await process_frame
 			await RenderingServer.frame_post_draw
