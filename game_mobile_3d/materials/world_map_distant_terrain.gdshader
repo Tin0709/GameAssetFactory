@@ -10,7 +10,16 @@ render_mode unshaded, depth_draw_never;
 
 uniform sampler2D terrain_atlas : source_color, filter_linear_mipmap, repeat_disable;
 uniform vec3 distant_light = vec3(0.0);
-#ifndef GAF_OPAQUE_VISTA
+#ifdef GAF_OPAQUE_VISTA
+uniform vec4 vista_clear_blend = vec4(0.0);
+uniform vec4 vista_edges = vec4(0.0);
+uniform vec2 vista_depth_fade = vec2(52.0, 71.0);
+varying vec2 vista_local_xz;
+
+void vertex() {
+	vista_local_xz = VERTEX.xz;
+}
+#else
 uniform float visibility_scale = 0.0;
 uniform vec2 subject_screen_uv = vec2(0.5);
 #endif
@@ -30,6 +39,17 @@ void fragment() {
 #ifdef GAF_SHARED_MIST
 	vec4 air = gaf_surface_mist(SCREEN_UV, -VERTEX.z, INV_VIEW_MATRIX[3].xyz,
 		-INV_VIEW_MATRIX[2].xyz, vec2(PROJECTION_MATRIX[0][0], PROJECTION_MATRIX[1][1]));
+#ifdef GAF_OPAQUE_VISTA
+	if (vista_clear_blend.w > 0.0) {
+		float side = min(vista_local_xz.x - vista_edges.x, vista_edges.y - vista_local_xz.x);
+		float edge = min(side, vista_local_xz.y - vista_edges.z);
+		float border = 1.0 - smoothstep(0.0, vista_edges.w, edge);
+		float distance_fade = smoothstep(vista_depth_fade.x, vista_depth_fade.y, -VERTEX.z);
+		float fade = max(border, distance_fade) * vista_clear_blend.w;
+		ALBEDO = mix(ALBEDO, vista_clear_blend.rgb, fade);
+		air.a *= 1.0 - fade;
+	}
+#endif
 	FOG = vec4(air.rgb * 0.12, air.a);
 #endif
 }

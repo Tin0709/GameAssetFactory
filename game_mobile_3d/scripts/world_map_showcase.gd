@@ -192,6 +192,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_dusk_backdrop": ["Dịu màu nền xa lúc chạng vạng", 1.],
 	&"distant_terrain": ["Địa hình xa lúc chạng vạng", 1.],
 	&"cliff_vista": ["Địa hình xa sau bậc đá", 1.],
+	&"cliff_vista_feather": ["Dịu mép địa hình khi zoom xa", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
@@ -252,7 +253,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 158
+const LIGHTING_MIX_VERSION := 159
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -900,8 +901,9 @@ func sync_cliff_vista(enabled: bool) -> void:
 	if not is_instance_valid(distant_terrain.vista):
 		return
 	var env: Environment = level.get_node("WorldEnvironment").environment
+	var camera: Camera3D = level.get_node("Camera3D")
 	distant_terrain.update_vista(enabled and level.look.stage == 2 and level.view_mode == "gameplay",
-		env.ambient_light_color, hour)
+		env, camera, hour, _lighting_scale(&"cliff_vista_feather") if private_primary else 1.)
 
 func _sync_distant_terrain() -> void:
 	if private_primary:
@@ -2167,6 +2169,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 158 and effect == &"cliff_vista":
 			missing_value = 0.
+		if version < 159 and effect == &"cliff_vista_feather":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2326,7 +2330,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.twilight_ground_haze != null
 		if effect == &"distant_terrain":
 			slider.editable = slider.editable and is_instance_valid(distant_terrain.visual)
-		if effect == &"cliff_vista":
+		if effect in [&"cliff_vista", &"cliff_vista_feather"]:
 			slider.editable = slider.editable and is_instance_valid(distant_terrain.vista)
 		if effect == &"local_diffuse_return":
 			slider.editable = slider.editable and not _flat_lab and level.local_diffuse_region != null
@@ -2486,7 +2490,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		apply_time()
 		_update_mist()
 		return
-	if changed_effect == &"cliff_vista":
+	if changed_effect in [&"cliff_vista", &"cliff_vista_feather"]:
 		_update_mist()
 		return
 	if changed_effect == &"stone_twilight_color":

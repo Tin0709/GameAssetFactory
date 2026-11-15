@@ -20,6 +20,8 @@ var _attempted := false
 var _submitted := Vector4.INF
 var _subject_uv := Vector2.INF
 var _vista_light := Vector3.INF
+var _vista_clear := Vector4.INF
+var _vista_far := INF
 
 static func phase_weight(hour: float) -> float:
 	return smoothstep(17., 18.5, hour) * (1. - smoothstep(20., 21.35, hour))
@@ -30,18 +32,33 @@ func visible() -> bool:
 func vista_visible() -> bool:
 	return is_instance_valid(vista) and vista.is_visible_in_tree()
 
-func update_vista(enabled: bool, ambient: Color, hour: float) -> void:
+func update_vista(enabled: bool, env: Environment, camera: Camera3D, hour: float, edge_strength: float) -> void:
 	if not is_instance_valid(vista):
 		return
 	vista.visible = enabled
 	if not enabled:
 		return
-	var linear := ambient.srgb_to_linear()
+	var linear := env.ambient_light_color.srgb_to_linear()
 	var tint := Vector3(linear.r, linear.g, linear.b).lerp(Vector3(.47, .63, .73), .60)
 	var light := tint * lerpf(.107, .047, smoothstep(17.5, 19.5, hour))
 	if light != _vista_light:
 		_vista_light = light
 		vista_material.set_shader_parameter("distant_light", light)
+	var clear := Vector4.ZERO
+	if edge_strength > 0. and camera.projection == Camera3D.PROJECTION_ORTHOGONAL \
+			and camera.far > 21. and env.background_mode == Environment.BG_COLOR and env.fog_enabled \
+			and is_zero_approx(env.fog_sky_affect) and is_equal_approx(env.background_energy_multiplier, 1.):
+		var weight := edge_strength * smoothstep(27., 34., camera.size)
+		if weight > 0.:
+			# Forward Mobile's solid fog background is converted twice before the HDR finish.
+			var backdrop := env.background_color.srgb_to_linear().srgb_to_linear()
+			clear = Vector4(backdrop.r, backdrop.g, backdrop.b, weight)
+			if camera.far != _vista_far:
+				_vista_far = camera.far
+				vista_material.set_shader_parameter("vista_depth_fade", Vector2(_vista_far - 20., _vista_far - 1.))
+	if clear != _vista_clear:
+		_vista_clear = clear
+		vista_material.set_shader_parameter("vista_clear_blend", clear)
 
 func update(weight: float, tint: Color, subject_uv: Vector2) -> void:
 	if not is_instance_valid(visual):
@@ -116,6 +133,9 @@ func prepare(world: Node3D, origin: Vector3, expected_layout_sha: String, linked
 		vista_material.set_shader_parameter("terrain_atlas", atlas)
 		vista = _add_layer(world, &"PrivateCliffVista", meshes.vista, vista_material, vista_origin)
 		vista.scale = vista_scale
+		var bounds := vista.mesh.get_aabb()
+		var width := clampf(minf(bounds.size.x, bounds.size.z) * .2, .1, 6.)
+		vista_material.set_shader_parameter("vista_edges", Vector4(bounds.position.x, bounds.end.x, bounds.position.z, width))
 
 func _add_layer(world: Node3D, node_name: StringName, mesh: Mesh, layer_material: ShaderMaterial, origin: Vector3) -> MeshInstance3D:
 	var layer := MeshInstance3D.new()
