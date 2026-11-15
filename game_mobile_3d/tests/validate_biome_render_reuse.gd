@@ -26,6 +26,24 @@ func run() -> void:
 	var showcase = forest.showcase
 	var forest_settings = forest.biome_graphics
 	check(forest.map_ready and forest_settings.use_forest_reference, "F5 uses Forest preset")
+	var boulder = forest.get_node_or_null("PlayableBoulder")
+	if RenderingServer.get_rendering_device() != null and RenderingServer.get_current_rendering_method() == "mobile":
+		check(boulder != null and boulder.active, "F5 places the approved stone and enables its support")
+		if boulder != null:
+			check(boulder.roots.size() > 0, "The stone has verified grass roots beneath its surface")
+			check(showcase._mist_materials().has(boulder.material), "The stone takes the same spatial mist as terrain")
+			boulder.set_requested(false)
+			check(not boulder.visual.visible and boulder.collider.collision_layer == 0,
+				"Stone comparison restores the walkable meadow")
+			var before := (forest.player as CharacterBody3D).position
+			forest.player.position = Vector3(-19., 3.02, 24.)
+			boulder.set_requested(true)
+			check(not boulder.active, "Stone waits while the player overlaps its placement")
+			forest.player.position = before
+			await process_frame
+			check(boulder.active, "Stone restores visual and collision once the player moves away")
+	else:
+		check(boulder == null, "Compatibility does not load the private stone")
 	forest.set_review_view("overview")
 	var forest_camera := forest.get_node("Camera3D") as Camera3D
 	check(forest_camera.position == Vector3(-8.5, 140., -1.) and forest_camera.size == 150.,
@@ -115,6 +133,7 @@ func run() -> void:
 	var opened_compositor := camera.compositor
 	check(map.map_ready and map.geometry.cells.size() == 5632 and graphics != null,
 		"Second map uses imported geometry and portable controller")
+	check(map.get_node_or_null("PlayableBoulder") == null, "A second map keeps its own placement data")
 	var gameplay_size := camera.size
 	map.set_review_view("overview")
 	var low: Array = map.runtime.border.min
