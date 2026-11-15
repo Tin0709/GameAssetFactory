@@ -46,7 +46,7 @@ func apply(actor, key: String, delta: float) -> void:
 		phase = fposmod(actor.animation_player.current_animation_position / duration, 1.0)
 		phase_hz = actor._playback_speed / duration
 		phase_advanced = delta * phase_hz
-		var pose := shovel_run_pose(phase)
+		var pose := source_run_pose(phase)
 		for bone in pose.size():
 			rig.set_bone_pose(bone, pose[bone])
 		run_weight = 1.0
@@ -92,7 +92,7 @@ func _balanced_right_arm(current: Quaternion, cycle: float, weight: float) -> Qu
 	# The source uses a generic single-hand holding modifier on the right.
 	# A paired gauntlet wants equal swing, so mirror the unrestricted arm
 	# one alternating step later around the shared shoulder frame.
-	var opposite := shovel_run_pose(cycle + 0.5)
+	var opposite := source_run_pose(cycle + 0.5)
 	var left := opposite[_left_arm].basis.orthonormalized()
 	var right := ARM_MIRROR * left * ARM_MIRROR
 	return current.slerp(right.get_rotation_quaternion(), weight)
@@ -101,7 +101,7 @@ func uses_shovel_run(actor, key: String) -> bool:
 	return actor.weapon_source_locomotion and actor.review_clip.is_empty() and key in RUNS \
 		and actor.clips[key].source_name == SHOVEL_RUN
 
-func shovel_run_pose(cycle: float) -> Array[Transform3D]:
+func source_run_pose(cycle: float) -> Array[Transform3D]:
 	return _locals(_sample("Run", cycle * float(streams.Run.duration)))
 
 func _apply_bow_stride(actor, delta: float) -> void:
@@ -172,7 +172,7 @@ func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transf
 	return native
 
 func run_pose(cycle: float) -> Array[Transform3D]:
-	return _locals(_sample("Run", (cycle + CROSSBOW_RUN_PHASE_OFFSET) * float(streams.Run.duration)))
+	return source_run_pose(cycle + CROSSBOW_RUN_PHASE_OFFSET)
 
 func keep_shoulders_attached() -> void:
 	# The paired grip already comes from the source shoulders.

@@ -124,6 +124,7 @@ func run() -> void:
 	await check_weapon_movement(lab, menu)
 	await check_weapon_idle(lab, menu)
 	await check_shovel_run(lab, menu)
+	await check_basic_gauntlets_run(lab, menu)
 	await check_bow_movement(lab, menu)
 	await check_crossbow_settle(lab, menu)
 	check_crossbow_equip_audio(lab, menu)
@@ -604,7 +605,7 @@ func check_shovel_run(lab: Node3D, menu: OptionButton) -> void:
 		low = minf(low, y)
 		high = maxf(high, y)
 		var phase: float = player._gait_resume_phase
-		var pose: Array[Transform3D] = player.hybrid_motion.shovel_run_pose(phase)
+		var pose: Array[Transform3D] = player.hybrid_motion.source_run_pose(phase)
 		for name: String in pose_bones:
 			var bone := rig.find_bone(name)
 			var expected := pose[bone].basis.get_rotation_quaternion()
@@ -634,6 +635,45 @@ func check_shovel_run(lab: Node3D, menu: OptionButton) -> void:
 		" contacts=", contacts.size(), " minimum_sole=", minimum_sole,
 		" near_ground_rms_m_s=", movement.near_ground_travel_rms_m_s)
 	player.surface_contact.disconnect(trace)
+	player.scripted_input = false
+	lab.reset_player()
+	equip(menu, 0)
+	await ticks(3)
+
+func check_basic_gauntlets_run(lab: Node3D, menu: OptionButton) -> void:
+	var player = lab.player
+	var rig: Skeleton3D = player.skeleton
+	var left := rig.find_bone("J_L_Arm")
+	var right := rig.find_bone("J_R_Arm")
+	var reflection := Basis(Vector3.LEFT, Vector3.UP, Vector3.BACK)
+	for weapon in [7, 4]:
+		equip(menu, weapon)
+		lab.reset_player()
+		await ticks(10)
+		var basic := weapon == 7
+		check(player.basic_gauntlets_equipped == basic, "The balanced run is scoped to regular Gauntlets")
+		if basic:
+			for side in 2:
+				var mount: MeshInstance3D = lab._basic_gauntlet_mounts[side]
+				var arm_bounds_center := 0.06634 if side == 0 else -0.06634
+				var fitted := mount.transform * mount.mesh.get_aabb()
+				check(absf(fitted.get_center().x - arm_bounds_center) < 0.004
+					and fitted.end.z > 0.69 and fitted.end.z < 0.83,
+					"The regular cuff sits over the outboard fist and covers its tip")
+		player.scripted_input = true
+		player.requested_direction = Vector2.DOWN
+		player.requested_run = true
+		await ticks(42)
+		var maximum_error := 0.0
+		for i in 60:
+			await physics_frame
+			var phase: float = player._gait_resume_phase
+			var reference: Array[Transform3D] = player.hybrid_motion.source_run_pose(phase + (0.5 if basic else 0.0))
+			var target := reflection * reference[left].basis.orthonormalized() * reflection if basic else reference[right].basis
+			maximum_error = maxf(maximum_error,
+				rig.get_bone_pose_rotation(right).angle_to(target.get_rotation_quaternion()))
+		check(maximum_error < 0.02, "Regular Gauntlets mirror the left arm and Prime retains its source run")
+		print("MECHANIC_LAB_GAUNTLETS_RUN basic=", basic, " right_angle_error_rad=", maximum_error)
 	player.scripted_input = false
 	lab.reset_player()
 	equip(menu, 0)

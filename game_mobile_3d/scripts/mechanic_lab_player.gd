@@ -256,7 +256,7 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 		var gait_state: Dictionary = source_gait.state(speed)
 		cursor.phase = fposmod(float(cursor.phase) + delta / _composed_gait_period(key, speed, gait_state), 1.0)
 		if shovel_run:
-			return hybrid_motion.shovel_run_pose(float(cursor.phase))
+			return hybrid_motion.source_run_pose(float(cursor.phase))
 		var pose: Array[Transform3D] = source_gait.compose(float(cursor.phase), speed)
 		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
 
