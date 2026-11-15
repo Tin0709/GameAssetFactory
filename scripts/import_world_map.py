@@ -13,6 +13,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import math
 from pathlib import Path
 import re
 import shutil
@@ -23,6 +24,7 @@ GODOT_PROJECT = REPO / "game_mobile_3d"
 DEFAULT_SOURCE = REPO / "game_mobile_3d/assets/maps/world_map/World Map.litematic"
 DEFAULT_OUTPUT = REPO / "game_mobile_3d/assets/maps/world_map"
 DEFAULT_BIOME = "meadow"
+BIOME_QUALITY = {"essential": 0, "balanced": 1, "full": 2}
 BIOME_DIRECTORY = "assets/graphics/biomes"
 BIOME_PROFILE_SCRIPT = "res://scripts/biome_graphics_profile.gd"
 AIR = {"minecraft:air", "minecraft:cave_air", "minecraft:void_air"}
@@ -402,7 +404,7 @@ def validate_biome_dependencies(preset, declarations, project):
                 raise ValueError(f"Cannot read {preset.name} dependency {dependency} (from {owner.name})") from error
 
 
-def map_scene_source(scene_name, runtime_path, biome, comparison):
+def map_scene_source(scene_name, runtime_path, biome, comparison, overrides):
     runtime_resource = "res://" + runtime_path.relative_to(GODOT_PROJECT).as_posix()
     return (
         '[gd_scene load_steps=6 format=3]\n\n'
@@ -416,6 +418,7 @@ def map_scene_source(scene_name, runtime_path, biome, comparison):
         f'map_layout_path = {json.dumps(runtime_resource, ensure_ascii=False)}\n'
         'biome_graphics = ExtResource("biome")\n'
         'comparison_biomes = Array[ExtResource("profile")]([ExtResource("comparison")])\n'
+        + "".join(f"{name} = {value}\n" for name, value in overrides.items())
     )
 
 
@@ -426,7 +429,28 @@ def main():
     parser.add_argument("--border", choices=("markers", "bounds"), default="markers")
     parser.add_argument("--scene", type=Path, help="Create a new playable Godot scene under game_mobile_3d/scenes/maps")
     parser.add_argument("--biome", metavar="PRESET", help=f"Portable .tres file name in {BIOME_DIRECTORY} (default: meadow)")
+    parser.add_argument("--quality", choices=BIOME_QUALITY, help="Override Biome Quality on the new scene")
+    parser.add_argument("--start-hour", type=float, help="Override the starting hour from 0 to 24")
+    parser.add_argument("--start-overcast", type=float, help="Override the starting cloud coverage from 0 to 1")
+    parser.add_argument("--atmosphere-base-y", type=float, help="Override the height reference for fog in Godot metres")
     args = parser.parse_args()
+    overrides = {}
+    if args.quality is not None:
+        overrides["biome_quality"] = BIOME_QUALITY[args.quality]
+    if args.start_hour is not None:
+        if not 0 <= args.start_hour <= 24:
+            parser.error("--start-hour must be between 0 and 24")
+        overrides["biome_start_hour"] = args.start_hour
+    if args.start_overcast is not None:
+        if not 0 <= args.start_overcast <= 1:
+            parser.error("--start-overcast must be between 0 and 1")
+        overrides["biome_start_overcast"] = args.start_overcast
+    if args.atmosphere_base_y is not None:
+        if not math.isfinite(args.atmosphere_base_y):
+            parser.error("--atmosphere-base-y must be finite")
+        overrides["biome_atmosphere_base_y"] = args.atmosphere_base_y
+    if overrides and args.scene is None:
+        parser.error("Map graphics overrides require --scene")
     output = args.output.resolve()
     if args.border == "bounds" and output == DEFAULT_OUTPUT.resolve():
         parser.error("--border bounds requires a separate map --output")
@@ -451,8 +475,10 @@ def main():
             require_portable_biome(comparison)
         except ValueError as error:
             parser.error(str(error))
-        scene_source = map_scene_source(scene.stem, output / "runtime.json", biome, comparison)
+        scene_source = map_scene_source(scene.stem, output / "runtime.json", biome, comparison, overrides)
         scene_info = {"scene": str(scene), "biome": biome}
+        if overrides:
+            scene_info["graphics_overrides"] = overrides
     runtime, manifest = import_source(args.source, output, border_mode=args.border, new_output=bool(args.scene))
     if args.scene:
         scene.parent.mkdir(parents=True, exist_ok=True)
