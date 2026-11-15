@@ -86,6 +86,8 @@ Trong Forest, **Ánh sáng → Bóng và tương phản → Dịu sắc xanh tro
 
 **Ánh trời trong bóng sâu của đá** mặc định 50% trong cùng nhóm. So 0% và 50% tại bậc đá X = −22,5, Z = −40,5 lúc 07:00 hoặc 16:30. Hiệu ứng dùng sắc trời tại mặt đứng để nâng phần bóng sâu khi ánh hắt đã tính theo pha còn thấp. Khi bật trời nhiều mây, nhiều mặt đá đủ điều kiện hơn. Buổi trưa và ban đêm dùng đường chiếu sáng của các pha đó. **Sheltered Stone Return Scale** điều khiển biên độ trong preset. Shader dùng chung lấy dữ liệu từ trường ánh sáng khớp hình học và hướng nắng của scene. Hiện WorldMap Forest có đường cấp dữ liệu này. Các preset của map Litematica dùng depth fog, spatial mist và lighting chung như trước. Preset lưu trước v165 thiếu thanh này sẽ mở ở 0%.
 
+**Ánh sáng → Bóng và tương phản → Dịu màu cỏ và lá trong bóng** mặc định 65% trong Forest. So 0% và 65% ở lối rừng X = −23,5, Z = 17,5 lúc 07:00 hoặc 16:30. Lượt chỉnh màu tham chiếu phục hồi nhẹ sắc đỏ và độ sáng ở vùng xanh tối. Hiệu ứng phân loại theo màu và độ sáng của từng pixel, nên áp dụng được trên cỏ và lá cùng màu mà không cần mask riêng cho map. **Daylight Green Grade Scale** đặt biên độ trong preset, còn **Shadow Grade Recovery By Hour** đặt cửa sổ giờ dùng chung. Hiệu ứng cần Reference finish. Preset Litematica tiếp tục dùng grade của biome. Preset lưu trước v166 thiếu thanh mới sẽ mở ở 0%.
+
 ## Chỉnh chu kỳ theo biome
 
 Khi muốn đổi đặc tính ánh sáng, sương, hậu kỳ hoặc vòng ngày đêm cho riêng một map, duplicate preset thành file `.tres` mới rồi gán cho map đó. Duplicate cả resource con Day/Night hoặc Overcast nếu cần sửa các track riêng. Nhiều biome có thể dùng chung một Weather resource.
