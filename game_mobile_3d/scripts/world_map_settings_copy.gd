@@ -26,6 +26,8 @@ const ITEMS := {
 		"Giảm ảnh hưởng của vùng nền xa lên độ bù sáng quanh nhân vật ở góc rộng.",
 		"Thử ở bậc đá lúc 19:30 với zoom xa. 0% dùng trọng số lấy mẫu gốc."],
 	"biome-weather": ["Trời nhiều mây", "Overcast", "Làm dịu nắng và đổi màu không khí bằng preset thời tiết của biome.", "Bấm F6 trong cửa sổ game hoặc bật tùy chọn này. Giờ trong ngày giữ nguyên."],
+	"biome-preset": ["Biome", "Biome", "Đổi ánh sáng, sương, màu và bloom theo preset của bản đồ. Giờ hiện tại được giữ lại.", "Bấm F8 để chuyển nhanh. Để chọn mặc định cho lần mở sau, chỉnh Biome Graphics trong Inspector."],
+	"biome-quality": ["Chất lượng", "Quality", "Đầy đủ dùng toàn bộ hiệu ứng được bật trong biome. Cân bằng giảm chi phí sương và dùng glow tích hợp. Nhẹ dùng sương và glow tích hợp.", "Bấm Shift+F7 để chuyển nhanh. Để chọn mặc định cho lần mở sau, chỉnh Biome Quality trong Inspector."],
 	"actor_view_fill_chroma": ["Hòa màu ánh bù trên Valorie", "Valorie view fill chroma", "Ánh bù trên mặt, mũ và áo nhận một phần sắc trời tại vị trí đang đứng. Sabre và ánh đèn chiếu trực tiếp dùng cách cũ.", "So 0% với mặc định 60% lúc 05:30 hoặc 18:30. Buổi trưa giữ nguyên."],
 	"player_canopy_color": ["Sắc ánh trời trên nhân vật", "Player canopy sky color", "Cho da và giáp Valorie nhận sắc ánh trời mát hơn dưới tán rừng. Chỉ điều chỉnh ánh trời khuếch tán trên nhân vật.", "So 0% và 50% khi đi qua rìa bóng lúc 07:00 hoặc 16:30. Có thể chỉnh độc lập với màu nền."],
 	"player_sun_specular": ["Dịu phản sáng nắng trên Valorie", "Player sunlight reflection softness", "Giảm phần phản sáng trực tiếp hay lóe khi chân Valorie bước qua rìa bóng. Ánh hắt, sương và đèn hông giữ cường độ cũ.", "So 0% và 100% ở 07:00 hoặc 16:30. Trưa và đêm giữ mức đã duyệt."],

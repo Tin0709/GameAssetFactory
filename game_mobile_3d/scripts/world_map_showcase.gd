@@ -401,9 +401,11 @@ func setup(world:Node3D)->void:
 	elif private_primary and _biome_profile == null:
 		forest = FOREST.new()
 	if not private_primary:
-		if level._uses_portable_biome() and OS.get_environment("GAF_SHOWCASE_PLAYER") != "original":
-			distant_terrain.prepare(level, Vector3.INF, level.distant_terrain_layout_sha)
-		_build_basic_settings()
+		if level._uses_portable_biome():
+			if OS.get_environment("GAF_SHOWCASE_PLAYER") != "original":
+				distant_terrain.prepare(level, Vector3.INF, level.distant_terrain_layout_sha)
+		else:
+			build_basic_settings()
 		return
 	_setup_point_lighting()
 	projected_sun.setup()
@@ -3268,18 +3270,27 @@ func _make_scene_mix_button(mix: SceneLightingMix, message: Label) -> Button:
 		message.show())
 	return button
 
-func _build_basic_settings() -> void:
+func build_basic_settings(biome: Node = null) -> void:
 	var hud: CanvasLayer = level.get_node("HUD")
 	panel = PanelContainer.new()
 	panel.name = "ShowcaseOptions"
 	hud.add_child(panel)
 	var box := VBoxContainer.new()
 	panel.add_child(box)
+	var status: Label
+	if biome != null:
+		status = biome.add_settings_controls(box)
 	var help := Label.new()
 	help.name = "SettingsKeysHelp"
-	help.text = level.get_node("HUD/Help").text + "\nL ẩn / hiện HUD"
+	if biome != null:
+		help.text = "WASD di chuyển · Shift chạy · Space nhảy · Cuộn chuột zoom · R về điểm bắt đầu · V toàn map\n"
+		help.text += "T đổi giờ · Shift+T chạy đồng hồ · F6 trời quang / nhiều mây · F8 đổi biome\n"
+		help.text += "H bật / tắt sương · J so spatial mist · Shift+J tán xạ đèn · Alt+J ánh hắt\n"
+		help.text += "F7 so hậu kỳ · Shift+F7 đổi chất lượng · B so đồ họa gốc · L ẩn / hiện HUD"
+	else:
+		help.text = level.get_node("HUD/Help").text + "\nL ẩn / hiện HUD"
 	box.add_child(help)
-	_settings.setup(hud, panel, box, {}, null, false)
+	_settings.setup(hud, panel, box, {}, status, false)
 	level.get_node("HUD/Help").hide()
 
 func _add_terrain_toggle(parent: Control, prop: Node3D, title: String) -> void:

@@ -219,6 +219,7 @@ func _ready() -> void:
 		if profile == null or profile.use_forest_reference:
 			profile = preload("res://assets/graphics/biomes/meadow.tres")
 		biome_controller.setup(self, profile, comparison_biomes)
+		showcase.build_basic_settings(biome_controller)
 		get_viewport().size_changed.connect(_fit_imported_overview)
 	_setup_movement_effects()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()

@@ -16,6 +16,8 @@ const NAMED := {
 	"SettingsTerrainNote": "terrain-note",
 	"GrassEdgeSampling": "grass-edge-sampling",
 	"ForestWeather": "biome-weather",
+	"BiomePreset": "biome-preset",
+	"BiomeQuality": "biome-quality",
 	"SettingsPresetMessage": "preset-message",
 }
 const PHASES := ["morning", "day", "golden", "night"]
@@ -108,7 +110,7 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	heading.tooltip_text = "Giữ chuột trái trên tiêu đề và kéo để di chuyển menu."
 	heading.gui_input.connect(_drag_header)
 	header.add_child(heading)
-	if full:
+	if full or _widgets.has("biome-preset"):
 		_undo_button = _button("Hoàn tác")
 		_undo_button.name = "UndoSettings"
 		_undo_button.tooltip_text = "Khôi phục lần chỉnh gần nhất."
@@ -386,6 +388,10 @@ func _rebuild(_text: String = "") -> void:
 	if not query.is_empty():
 		_build_results(query)
 	elif not _full:
+		if _widgets.has("biome-preset"):
+			var biome := _section("Đồ họa bản đồ")
+			_add_row(biome, "biome-preset")
+			_add_row(biome, "biome-quality")
 		_add_row(_section("Điều khiển trong game"), "keys-help")
 	elif _active == 0:
 		_build_quick()

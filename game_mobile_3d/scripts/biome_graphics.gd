@@ -27,7 +27,9 @@ var _cycle := false
 var _fog_enabled := true
 var _profile_index := 0
 var _choices: Array[Profile] = []
-var _label: Label
+var _settings_status: Label
+var _settings_preset: OptionButton
+var _settings_quality: OptionButton
 var _mist: MistVolume
 var _allow_spatial_mist := true
 var _path_fixture := PathFixture.new()
@@ -53,13 +55,6 @@ func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> voi
 	for choice in alternatives:
 		if choice != null and not choice.use_forest_reference and not _choices.has(choice):
 			_choices.append(choice)
-	_label = Label.new()
-	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_label.position = Vector2(18., 14.)
-	_label.add_theme_color_override("font_outline_color", Color(0., 0., 0., .9))
-	_label.add_theme_constant_override("outline_size", 4)
-	world.get_node("HUD").add_child(_label)
-	_label.hide()
 	set_profile(profile)
 	var start_overcast: float = world.biome_start_overcast
 	var start_hour: float = world.biome_start_hour
@@ -67,6 +62,39 @@ func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> voi
 	set_weather(start_overcast if 0. <= start_overcast and start_overcast <= 1. else profile.start_overcast, 0.)
 	_world.showcase.set_hour(initial_hour)
 	_cycle = profile.auto_cycle
+
+func add_settings_controls(parent: VBoxContainer) -> Label:
+	_settings_preset = OptionButton.new()
+	_settings_preset.name = "BiomePreset"
+	for profile: Profile in _choices:
+		_settings_preset.add_item(profile.display_name)
+	_settings_preset.disabled = _choices.size() < 2
+	_settings_preset.item_selected.connect(func(index: int) -> void: set_profile(_choices[index]))
+	parent.add_child(_settings_preset)
+
+	_settings_quality = OptionButton.new()
+	_settings_quality.name = "BiomeQuality"
+	for label: String in QUALITY_LABELS:
+		_settings_quality.add_item(label)
+	_settings_quality.item_selected.connect(func(index: int) -> void: set_quality(index as Quality))
+	parent.add_child(_settings_quality)
+
+	_settings_status = Label.new()
+	parent.add_child(_settings_status)
+	_refresh_settings()
+	return _settings_status
+
+func _refresh_settings() -> void:
+	if _settings_status == null:
+		return
+	var hour: float = _world.showcase.hour
+	_settings_status.text = "%02d:%02d · Mây %d%%" % [
+		int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
+	var index := _choices.find(_profile)
+	if _settings_preset.selected != index:
+		_settings_preset.select(index)
+	if _settings_quality.selected != quality:
+		_settings_quality.select(quality)
 
 func set_profile(profile: Profile) -> void:
 	if profile == null or profile.use_forest_reference:
@@ -124,9 +152,7 @@ func _process(delta: float) -> void:
 
 func refresh() -> void:
 	var hour: float = _world.showcase.hour
-	if _label != null:
-		_label.text = "%s · %s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · Shift+J tán xạ đèn · Alt+J ánh hắt · F7 hậu kỳ · Shift+F7 chất lượng · B đối chiếu" % [
-			_profile.display_name, QUALITY_LABELS[quality], int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
+	_refresh_settings()
 	if _world.look.stage != 2:
 		_world.showcase.sync_cliff_vista(false)
 		_update_local_diffuse()
@@ -409,8 +435,6 @@ func handle_key(event: InputEventKey) -> bool:
 		KEY_F8:
 			_profile_index = (_profile_index + 1) % _choices.size()
 			set_profile(_choices[_profile_index])
-		KEY_L:
-			_label.visible = not _label.visible
 		_:
 			return false
 	return true
