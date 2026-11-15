@@ -89,6 +89,9 @@ var biome_controller: BiomeGraphics
 ## Optional placement and matched lighting fields for the private Forest.
 @export var forest_basin_layout_profile := ""
 @export var forest_basin_layout_sha256 := ""
+## Previous verified placement for research workspaces missing the current bake.
+@export var forest_basin_fallback_profile := ""
+@export var forest_basin_fallback_sha256 := ""
 
 var runtime: Dictionary
 var geometry
@@ -232,8 +235,8 @@ func _ready() -> void:
 	spruce_sky.name = "SpruceSkyVisibility"
 	add_child(spruce_sky)
 	spruce_sky.setup(self)
-	if spruce_sky.proof_ready:
-		spruce_sky.apply_layout(forest_basin_layout_profile, forest_basin_layout_sha256)
+	if spruce_sky.proof_ready and not spruce_sky.apply_layout(forest_basin_layout_profile, forest_basin_layout_sha256):
+		spruce_sky.apply_layout(forest_basin_fallback_profile, forest_basin_fallback_sha256)
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func _uses_portable_biome() -> bool:

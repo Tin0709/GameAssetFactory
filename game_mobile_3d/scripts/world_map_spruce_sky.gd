@@ -86,28 +86,28 @@ func setup(level: Node3D) -> void:
 	proof_ready = true
 	set_process(true)
 
-func apply_layout(relative: String, digest: String) -> void:
+func apply_layout(relative: String, digest: String) -> bool:
 	# Called synchronously during level setup, before either texture is sampled.
 	if relative.is_empty() or relative.is_absolute_path() or OS.get_environment("GAF_FOREST_BASIN_BASELINE") == "1":
-		return
+		return false
 	var air = _level.showcase.directional_air
 	if not air.region_available():
-		return
+		return false
 	var root: String = air.research_root
 	var path := root.path_join(relative).simplify_path()
 	if not path.begins_with(root + "/") or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != digest:
-		return
+		return false
 	var profile: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not profile is Dictionary or profile.schema != "private_spruce_layout/1" \
 			or profile.map_sha256 != FileAccess.get_sha256(_level.map_layout_path) or profile.base_sky_profile_sha256 != PROOF_SHA \
 			or profile.base_air_profile_sha256 != _level.directional_air_region_sha256:
-		return
+		return false
 	var position_world := _vector(profile.root)
 	var grove = _level.grove
 	var source: Node3D = grove._spruce_root.get_node_or_null(profile.source_tree)
 	if source == null or source.get_meta("source_glb", "") != profile.source_glb \
 			or not is_equal_approx(_level.surface_height(position_world.x, position_world.z), position_world.y):
-		return
+		return false
 	var dimensions := Vector3i(_vector(profile.sky_dimensions))
 	var origin := _vector(profile.sky_origin)
 	var air_shape := Vector3i(air.texture.get_width(), air.texture.get_height(), air.texture.get_depth())
@@ -115,7 +115,7 @@ func apply_layout(relative: String, digest: String) -> void:
 	var directional: ImageTexture3D = _layout_texture(directory.path_join("directional_compact.private.r8"), profile.air_sha256, air_shape)
 	var sky := _layout_texture(directory.path_join("sky.private.r8"), profile.sky_sha256, dimensions)
 	if directional == null or sky == null:
-		return
+		return false
 	for caster: MeshInstance3D in grove.place_additional_spruce(source, position_world):
 		_casters.append({"node": caster, "transform": caster.global_transform, "mesh": caster.mesh})
 		air._casters.append({"node": caster, "pose": caster.global_transform, "mesh": caster.mesh})
@@ -126,6 +126,7 @@ func apply_layout(relative: String, digest: String) -> void:
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", sky)
 	air.texture = directional
 	_level.showcase.mist.effect.directional_grid = directional
+	return true
 
 func _layout_texture(path: String, digest: String, dimensions: Vector3i) -> ImageTexture3D:
 	if not FileAccess.file_exists(path):
