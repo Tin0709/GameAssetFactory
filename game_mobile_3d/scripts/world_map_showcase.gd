@@ -2715,6 +2715,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and level.look.player_material.available()
 		if effect in [&"actor_shade_sky", &"kai_shade_sky"]:
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_shade_sky_by_hour != null
+			if effect == &"kai_shade_sky":
+				slider.editable = slider.editable and RenderingServer.get_current_rendering_method() == "mobile" \
+					and RenderingServer.get_rendering_device() != null
 		if effect == &"actor_side_sky":
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_side_sky_by_hour != null
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
