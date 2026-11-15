@@ -71,7 +71,7 @@ func apply_air(profile: Profile, env: Environment, fog_gain: float = 1.) -> void
 	env.fog_density = clampf(env.fog_density + profile.additional_fog * weight * fog_gain, 0., 1.)
 	env.adjustment_saturation *= lerpf(1., profile.saturation_scale, weight)
 
-func apply_medium(profile: Profile, sample: Dictionary) -> void:
+func apply_medium(profile: Profile, sample: Dictionary, time: float = 0., phase_color_scale: float = 1.) -> void:
 	if profile == null or weight <= 0.:
 		return
 	var scale := lerpf(1., profile.spatial_extinction_scale, weight)
@@ -86,6 +86,8 @@ func apply_medium(profile: Profile, sample: Dictionary) -> void:
 		var source: Vector3 = sample.linear_scatter_rgb
 		var tint := profile.fog_color.srgb_to_linear()
 		var rgb := Vector3(tint.r, tint.g, tint.b)
-		var luma := Vector3(.2126, .7152, .0722)
-		if rgb.dot(luma) > .00001:
-			sample.linear_scatter_rgb = source.lerp(rgb * (source.dot(luma) / rgb.dot(luma)), weight)
+		var cloud_luma := rgb.dot(LUMA)
+		if cloud_luma > .00001:
+			var retain := clampf(DayNight.sample_curve(profile.mist_phase_color_by_hour, time, 0.), 0., 1.) \
+				* clampf(phase_color_scale, 0., 1.)
+			sample.linear_scatter_rgb = source.lerp(rgb * (source.dot(LUMA) / cloud_luma), weight * (1. - retain))

@@ -1,10 +1,14 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_weather_profile.gd" id="weather"]
 
 [sub_resource type="Curve" id="PhaseColor"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.208333333, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 1), 0.0, 0.0, 0, 0, Vector2(0.479166667, 0), 0.0, 0.0, 0, 0, Vector2(0.520833333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 1), 0.0, 0.0, 0, 0, Vector2(0.770833333, 1), 0.0, 0.0, 0, 0, Vector2(0.8125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 9
+
+[sub_resource type="Curve" id="MistPhaseColor"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.35), 0.0, 0.0, 0, 0, Vector2(0.375, 0.25), 0.0, 0.0, 0, 0, Vector2(0.479166667, 0), 0.0, 0.0, 0, 0, Vector2(0.5625, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.42), 0.0, 0.0, 0, 0, Vector2(0.75, 0.4), 0.0, 0.0, 0, 0, Vector2(0.8125, 0.45), 0.0, 0.0, 0, 0, Vector2(0.854166667, 0.3), 0.0, 0.0, 0, 0, Vector2(0.916666667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 12
 
 [resource]
 script = ExtResource("weather")
@@ -18,3 +22,4 @@ spatial_extinction_scale = 1.14
 phase_key_color_retention = 0.5
 ambient_chroma_reduction = 0.35
 phase_color_by_hour = SubResource("PhaseColor")
+mist_phase_color_by_hour = SubResource("MistPhaseColor")

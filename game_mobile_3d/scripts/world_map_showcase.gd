@@ -107,6 +107,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
 	&"sun": ["Direct sunlight", 2.],
 	&"overcast_phase_color": ["Giữ sắc nắng theo giờ khi nhiều mây", 1.],
+	&"overcast_mist_phase_color": ["Giữ sắc sương theo giờ khi nhiều mây", 1.],
 	&"sun_pockets": ["Sunlight pockets", 1.5],
 	&"sun_opening": ["Sunlit openings", 1.],
 	&"projected_sun": ["Projected sunlight", 1.],
@@ -290,7 +291,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 187
+const LIGHTING_MIX_VERSION := 188
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1124,8 +1125,14 @@ func _update_mist()->void:
 		if sample.has("depth_scatter_color"):
 			var depth_delta: Vector3 = sample.depth_scatter_color
 			sample.depth_scatter_color = (Vector3.ONE * depth_delta.dot(luma)).lerp(depth_delta, scatter_chroma)
-	_weather.apply_medium(_weather_profile, sample)
+	var phase_retention := 0. if _balanced_preview else _lighting_scale(&"overcast_mist_phase_color")
+	_weather.apply_medium(_weather_profile, sample, hour / 24., phase_retention)
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
+
+func _overcast_mist_phase_color_editable() -> bool:
+	return RenderingServer.get_current_rendering_method() == "mobile" \
+		and RenderingServer.get_rendering_device() != null and _weather_profile != null \
+		and _weather_profile.mist_phase_color_by_hour != null
 
 func _pre_twilight_air_weight() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not captured_mist_source \
@@ -2514,6 +2521,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 188 and effect == &"overcast_mist_phase_color":
+			missing_value = 0.
 		if version < 187 and effect == &"kai_twilight_ground_bounce":
 			missing_value = 0.
 		if version < 186 and effect == &"kai_shade_sky":
@@ -2690,6 +2699,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and _has_mist_sky_scatter()
 		if effect == &"mist_dusk_sky_scatter":
 			slider.editable = slider.editable and _has_mist_sky_scatter(true)
+		if effect == &"overcast_mist_phase_color":
+			slider.editable = slider.editable and _overcast_mist_phase_color_editable()
 		if effect == &"mist_entry_scatter":
 			slider.editable = slider.editable and mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"grove_mist_coherence":
@@ -2946,6 +2957,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
+		return
+	if changed_effect == &"overcast_mist_phase_color":
+		_update_mist()
 		return
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"alternate_local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"night_far_air", &"twilight_depth_scatter", &"twilight_far_air", &"twilight_far_air_color", &"twilight_far_optical", &"dawn_mist_source", &"evening_mist_profile", &"pre_twilight_air", &"pre_twilight_midair"]:
 		_update_mist()
@@ -3584,6 +3598,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		var slider := HSlider.new()
 		slider.accessibility_name = label.text
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
+		if effect == &"overcast_mist_phase_color":
+			slider.editable = not _balanced_preview and _overcast_mist_phase_color_editable()
 		if effect == &"kai_shade_sky":
 			slider.editable = not _balanced_preview and _kai_shade_sky_editable()
 		if effect == &"kai_twilight_ground_bounce":

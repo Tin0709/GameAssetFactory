@@ -16,3 +16,6 @@ extends Resource
 @export_range(0., 1., .01) var ambient_chroma_reduction := 0.
 ## Uses normalized hours. An empty curve applies the authored amounts at all hours.
 @export var phase_color_by_hour: Curve
+## Fraction of the clear spatial mist's chroma retained at full cloud cover.
+## Curve X is normalized hour. An empty curve preserves the default weather tint.
+@export var mist_phase_color_by_hour: Curve

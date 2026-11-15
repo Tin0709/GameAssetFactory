@@ -377,7 +377,7 @@ func _prepare_spatial_mist(env: Environment, clear_fog_color: Color, time: float
 			var clear := clear_fog_color.srgb_to_linear()
 			var clear_luma := Vector3(clear.r, clear.g, clear.b).dot(LINEAR_LUMA)
 			_mist_sample.linear_scatter_rgb = source * (clear_luma / source_luma)
-	_weather.apply_medium(_profile.overcast, _mist_sample)
+	_weather.apply_medium(_profile.overcast, _mist_sample, time)
 	var local_strength := _profile.local_mist_strength * lerpf(.55, 1., weather_weight)
 	var local_weight := clampf(DayNight.sample_curve(_profile.local_mist_by_hour, time, 1.), 0., 1.)
 	var alternate_weight := clampf(DayNight.sample_curve(_profile.alternate_mist_by_hour, time, 0.), 0., 1.)
