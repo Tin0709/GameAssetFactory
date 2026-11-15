@@ -84,6 +84,28 @@ func run() -> void:
 		await RenderingServer.frame_post_draw
 		entry_payload = showcase.mist.effect._ground_haze_parameters
 		check(is_zero_approx(entry_payload.decode_float(28)), "Approved Noon has no entry gain")
+		var wall_sky_control: HSlider = showcase._lighting_sliders.get(&"stone_wall_sky")
+		check(wall_sky_control != null and is_equal_approx(wall_sky_control.value, 1.),
+			"Main settings expose the default stone-side sky comparison")
+		var stone: ShaderMaterial
+		for row: Array in forest.look.terrain_materials:
+			var material := row[3] as ShaderMaterial
+			if material != null and material.get_shader_parameter("ground_grade") == 3:
+				stone = material
+				break
+		check(stone != null, "The main map has a stone transport receiver")
+		if stone != null:
+			showcase.set_hour(16.5)
+			check(is_equal_approx(float(stone.get_shader_parameter("stone_wall_sky")), .75),
+				"The afternoon profile reaches the stone diffuse receiver")
+			showcase.set_lighting_scale(&"stone_wall_sky", 0.)
+			check(is_zero_approx(float(stone.get_shader_parameter("stone_wall_sky"))),
+				"The live comparison restores the old stone sky")
+			showcase.set_lighting_scale(&"stone_wall_sky", 1.)
+			for hour: float in [12., 22.]:
+				showcase.set_hour(hour)
+				check(is_zero_approx(float(stone.get_shader_parameter("stone_wall_sky"))),
+					"The sky addition bypasses protected Noon and night")
 		showcase.set_hour(20.25)
 		showcase._update_mist()
 		var late_region = forest.get("alternate_mist_region")
