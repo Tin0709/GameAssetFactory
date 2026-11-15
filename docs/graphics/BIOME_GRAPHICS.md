@@ -50,6 +50,14 @@ Khi chuyển sang preset không dùng spatial mist hoặc bloom thích ứng, re
 
 Đã chạy lại luồng import sạch từ `Testing.litematic` vào thư mục thử riêng. Scene sinh tự động nạp đủ 5.632 cell và chạy chung shader với map review, kể cả khi chưa đặt vùng sương hay đèn. Trên Windows, 65 kiểm tra Forward Mobile/D3D12, 28 kiểm tra Compatibility và 15 kiểm tra importer đều qua. Bộ 12 ảnh của `MeadowBiomeReview` dùng cùng camera để so hai preset ở năm mốc giờ và một lượt trời nhiều mây.
 
+### Thêm và kiểm tra một preset mới
+
+- Duplicate `humid_woodland.tres` nếu biome cần spatial mist, local exposure và adaptive bloom. Duplicate `meadow.tres` nếu biome dùng depth fog và glow tích hợp. Đặt tên file riêng và đổi **Display Name** để dễ chọn. Duplicate cả resource Day/Night hoặc Weather nếu chỉ muốn thay đổi cho biome mới.
+- Giữ LUT, track thời gian và cấu hình thời tiết có thể đi cùng project. `--biome` kiểm tra các file tham chiếu trực tiếp và các file tham chiếu lồng trong `.tres` hoặc `.tscn` trước khi ghi map. Đường dẫn riêng của một máy hoặc dependency bị thiếu sẽ báo tên preset và đường dẫn lỗi.
+- Thêm tính năng mới vào controller hoặc shader dùng chung, với thông số trong preset. Đặt vị trí đèn, vùng sương và dữ liệu bake theo hình học trong scene tương ứng. Kiểm tra preset mới mở cùng map import ở ít nhất hai giờ, chuyển quang/nhiều mây, rồi đổi mức **Nhẹ**. Khi thay shader hoặc hệ thống dùng chung, chạy cả bài `validate_biome_render_reuse.gd` và `validate_biome_day_weather.gd`.
+
+Một preset thử tạo từ Rìa rừng ẩm đã mở scene mới mặc định lúc 19:30 và dùng giá trị nắng/contrast riêng. Scene do importer tạo qua 50 kiểm tra Forward Mobile và 36 kiểm tra Compatibility. Đổi sang Đồng cỏ giữ giờ, mức mây, vị trí nhân vật và địa hình. Ảnh đối chiếu lấy trực tiếp từ scene vừa import.
+
 ## Địa hình trang trí ở rìa map
 
 Trong WorldMap, vào **L → Cài đặt → Sương & hiệu ứng → Sương theo khoảng cách → Địa hình xa sau bậc đá** để so bật/tắt. Lớp địa hình này nhận sắc ánh môi trường của biome và sương tại độ sâu của chính nó. Nó bật mặc định trong Kết hợp. Preset lưu trước phiên bản 158 tắt lớp này khi thiếu tùy chọn để tái hiện hình đã lưu.
