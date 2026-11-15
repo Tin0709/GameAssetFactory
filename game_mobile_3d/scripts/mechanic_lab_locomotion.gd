@@ -118,7 +118,8 @@ func apply_shovel_run(native: Array[Transform3D], cycle: float, weight: float, s
 		reference_step = remap(step, SHOVEL_PUSH_OFF, 1.0, 0.50, 0.90)
 	elif step >= SHOVEL_COMPRESSION_END:
 		reference_step = remap(step, SHOVEL_COMPRESSION_END, SHOVEL_PUSH_OFF, 0.0, 0.50)
-	var reference_phase := (floorf(stride) + reference_step) * 0.5
+	# The first A&S half-cycle receives on the right; Shovel receives on the left.
+	var reference_phase := (1.0 + floorf(stride) + reference_step) * 0.5
 	var reference := _sample("Run", reference_phase * float(streams.Run.duration))
 	var rise := (reference[_run_hips_group].origin.y + 0.07) * 0.29 * weight
 	var root_basis := native[parents[_hip_bone]].basis
@@ -126,10 +127,9 @@ func apply_shovel_run(native: Array[Transform3D], cycle: float, weight: float, s
 	var hip_basis := native[_hip_bone].basis
 	native[_hip_bone].origin += lift
 
-	# Keep the low, load-bearing sole on the native path. The returning leg
-	# follows most of the hip rise without scaling or bending either block.
-	# Advance the rigid MD2 leg sweep through support, then give the free
-	# leg more of the remaining cycle. The receiving poses stay on phase.
+	# Advance the rigid MD2 leg sweep through support, then give the free leg
+	# more of the cycle. Keep the hip lift off the planted sole so it stays
+	# on the retimed path. The returning leg can follow the lift and recover.
 	var sweep := smoothstep(0.0, 0.49, step) * (1.0 - smoothstep(0.53, 0.99, step))
 	var legs: Array[Transform3D] = source_gait.sample("Run", cycle + 0.075 * sweep)
 	for side in 2:
