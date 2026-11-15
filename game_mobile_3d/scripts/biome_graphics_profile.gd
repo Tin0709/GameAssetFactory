@@ -44,6 +44,9 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Blend of the owned sky irradiance on bark, keyed by normalized hour.
 @export var bark_irradiance_by_hour: Curve
 @export var bark_irradiance_tint := Vector3.ONE
+## Fraction of ambient irradiance returned to diffuse bark above ground contact.
+@export var bark_diffuse_return_by_hour: Curve
+@export var bark_diffuse_return_tint := Vector3.ONE
 ## Additional diffuse sky on supported player materials under canopy.
 ## Curve X is normalized hour and Y is a gain from 0 to 1.
 @export var actor_shade_sky_by_hour: Curve

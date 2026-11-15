@@ -127,6 +127,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"dawn_turf_color": ["Sắc cỏ trong bóng rạng sáng", 1.],
 	&"grass_shade_color": ["Grass shade color", 1.],
 	&"bark_irradiance": ["Sắc ánh trời trên vỏ cây", 1.],
+	&"bark_diffuse_return": ["Ánh hắt dịu trên vỏ cây", 1.],
 	&"diffuse_openings": ["Sunlit diffuse fill", 1.],
 	&"regional_sky": ["Local cliff skylight (preview)", 1.],
 	&"daylight_bounce": ["Ánh sáng hắt ban ngày", 1.],
@@ -274,7 +275,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 176
+const LIGHTING_MIX_VERSION := 177
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2049,17 +2050,18 @@ func _sync_bark_irradiance() -> void:
 		return
 	var state := Vector4.ZERO
 	var tint := Vector3.ONE
+	var diffuse_return := Vector3.ZERO
 	if _biome_profile != null and not _balanced_preview and forest_active() and atmosphere_review == "combined" \
-		and level.ambient != null and level.ambient.is_active() and level.view_mode == "gameplay":
-		var strength := clampf(DayNight.sample_curve(_biome_profile.bark_irradiance_by_hour, hour / 24., 0.), 0., 1.)
+			and level.ambient != null and level.ambient.is_active() and level.view_mode == "gameplay":
+		var time := hour / 24.
+		var strength := clampf(DayNight.sample_curve(_biome_profile.bark_irradiance_by_hour, time, 0.), 0., 1.)
 		strength *= _lighting_scale(&"bark_irradiance")
-		if strength > 0.:
-			var environment: Environment = level.get_node("WorldEnvironment").environment
-			if environment != level.ambient._environment or environment.sky != level.ambient._sky \
-				or environment.ambient_light_source != Environment.AMBIENT_SOURCE_SKY \
-				or not is_equal_approx(environment.ambient_light_sky_contribution, 1.):
-				level.grove.set_bark_irradiance(state, tint)
-				return
+		var fill := clampf(DayNight.sample_curve(_biome_profile.bark_diffuse_return_by_hour, time, 0.), 0., .45)
+		fill *= _lighting_scale(&"bark_diffuse_return")
+		var environment: Environment = level.get_node("WorldEnvironment").environment
+		if (strength > 0. or fill > 0.) and environment == level.ambient._environment and environment.sky == level.ambient._sky \
+				and environment.ambient_light_source == Environment.AMBIENT_SOURCE_SKY \
+				and is_equal_approx(environment.ambient_light_sky_contribution, 1.):
 			var linear := environment.ambient_light_color.srgb_to_linear()
 			var incident := Vector3(linear.r, linear.g, linear.b) * environment.ambient_light_energy
 			if incident.is_finite() and not incident.is_zero_approx():
@@ -2068,7 +2070,11 @@ func _sync_bark_irradiance() -> void:
 					state = Vector4(incident.x, incident.y, incident.z, strength)
 				else:
 					tint = Vector3.ONE
-	level.grove.set_bark_irradiance(state, tint)
+				if fill > 0. and _biome_profile.bark_diffuse_return_tint.is_finite():
+					var returned := incident * _biome_profile.bark_diffuse_return_tint.clamp(Vector3.ZERO, Vector3(3., 3., 3.))
+					const LUMA := Vector3(.2126, .7152, .0722)
+					diffuse_return = returned * (fill * incident.dot(LUMA) / maxf(returned.dot(LUMA), .000001))
+	level.grove.set_bark_irradiance(state, tint, diffuse_return)
 
 func _sync_oak_leaf_tint() -> void:
 	if level == null or level.grove == null:
@@ -2351,6 +2357,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 173 and effect == &"shadow_diffuse_return":
 			missing_value = 0.
 		if version < 174 and effect == &"zoom_exposure_blur":
+			missing_value = 0.
+		if version < 177 and effect == &"bark_diffuse_return":
 			missing_value = 0.
 		if version < 176 and effect == &"mist_sky_scatter":
 			missing_value = 0.
@@ -2695,7 +2703,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
-	if changed_effect == &"bark_irradiance":
+	if changed_effect in [&"bark_irradiance", &"bark_diffuse_return"]:
 		_sync_bark_irradiance()
 		return
 	if changed_effect == &"stone_twilight_color":
@@ -2790,6 +2798,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	apply_time()
 	level.look._refresh_ground_bounce()
 	_update_mist()
+	_sync_bark_irradiance()
 	if changed_effect == &"daylight_balance" and phase_finish != null:
 		phase_finish.refresh()
 

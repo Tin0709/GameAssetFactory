@@ -97,6 +97,25 @@ func run() -> void:
 			check(bark is Vector4 and is_equal_approx(bark.w, .60 if time == 16.5 else 0.),
 				"Bark skylight follows the biome phase at %.1f" % time)
 		showcase.set_hour(12.)
+	check(forest_settings.get("bark_diffuse_return_by_hour") is Curve, "Bark diffuse return uses the biome schedule")
+	if showcase.mist != null:
+		var bark_return := showcase._lighting_sliders.get(&"bark_diffuse_return") as HSlider
+		check(bark_return != null and is_equal_approx(bark_return.value, 1.), "F5 exposes the default bark diffuse return")
+		for time: float in [7., 12., 16.5, 22.]:
+			showcase.set_hour(time)
+			await process_frame
+			await RenderingServer.frame_post_draw
+			var value: Variant = forest.grove._spruce_appearance.get_shader_parameter("bark_diffuse_return")
+			check(value is Vector3 and ((value.length() > .001) == (time in [7., 16.5])),
+				"Bark diffuse return reaches the active tree material at %.1f" % time)
+		showcase.set_hour(16.5)
+		showcase.set_lighting_scale(&"bark_diffuse_return", 0.)
+		await process_frame
+		await RenderingServer.frame_post_draw
+		check(forest.grove._spruce_appearance.get_shader_parameter("bark_diffuse_return") == Vector3.ZERO,
+			"Live comparison clears bark light")
+		showcase.set_lighting_scale(&"bark_diffuse_return", 1.)
+		showcase.set_hour(12.)
 	check(forest_settings.get("projected_opening_recovery_by_hour") is Curve,
 		"Forest sunlight opening response comes from the biome preset")
 	check(forest_settings.get("alternate_mist_by_hour") is Curve,

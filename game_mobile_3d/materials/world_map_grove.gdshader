@@ -18,6 +18,7 @@ uniform float crown_ambient_depth = 0.0;
 #ifdef GAF_WORLD_TREE_IRRADIANCE
 uniform vec4 bark_irradiance = vec4(0.0);
 uniform vec3 bark_irradiance_tint = vec3(1.0);
+uniform vec3 bark_diffuse_return = vec3(0.0);
 #endif
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/leaf_material_v001/leaf_material.gdshaderinc"
 #ifdef GAF_SHARED_MIST
@@ -207,6 +208,12 @@ void fragment() {
 		vec3 target = base * bark_irradiance_tint;
 		target *= dot(albedo * base, luma) / max(dot(albedo * target, luma), .00001);
 		IRRADIANCE = vec4(target, bark_irradiance.w);
+	}
+	if (use_source_atlas && atlas_uv.x >= .5 && bark_diffuse_return != vec3(0.0)) {
+		float height = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).y - MODEL_MATRIX[3].y;
+		float above_contact = smoothstep(.12, .92, height);
+		float visibility = mix(.40, 1.0, tree_sky);
+		EMISSION += albedo * bark_diffuse_return * (above_contact * visibility);
 	}
 #endif
 	ALBEDO = albedo;
