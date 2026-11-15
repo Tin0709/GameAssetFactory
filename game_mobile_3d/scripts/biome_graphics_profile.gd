@@ -28,6 +28,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var local_diffuse_by_hour: Curve
 ## Optional normalized-hour blend towards stronger sunlight in openings of a map's projection.
 @export var projected_opening_recovery_by_hour: Curve
+## Scales the baked directional diffuse return on shadowed stone walls.
+@export_range(0., 1.5, .01) var shadowed_wall_return_scale := 0.
 
 @export_group("Atmosphere and fog")
 @export var noon_sky_color := Color(.57, .68, .69)
