@@ -111,6 +111,10 @@ gaf_stone_wall_return={
 "type": "float",
 "value": 0.0
 }
+gaf_sheltered_stone_return={
+"type": "float",
+"value": 0.0
+}
 gaf_stone_sunset_region={
 "type": "vec4",
 "value": Vector4(0, 0, 1, 1)

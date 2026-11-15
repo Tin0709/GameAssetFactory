@@ -55,7 +55,8 @@ void light() {
 		float direct = smoothstep(0.16, 0.80, ATTENUATION) * smoothstep(0.09, 0.45, nl);
 		key_color *= 1.0 - gaf_stone_sunset_beam.w * region * direct;
 	}
-	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && max(gaf_stone_shade_fill.w, gaf_stone_wall_return) > 0.0 &&
+	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL &&
+		max(gaf_stone_shade_fill.w, max(gaf_stone_wall_return, gaf_sheltered_stone_return)) > 0.0 &&
 		max(LIGHT_COLOR.r, max(LIGHT_COLOR.g, LIGHT_COLOR.b)) > 0.0 &&
 		dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_shade_fill.xyz) > 0.9999 &&
 		distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
@@ -73,12 +74,28 @@ void light() {
 			DIFFUSE_LIGHT += fill * (facing * shade * gaf_stone_shade_fill.w);
 		}
 #ifdef GAF_TERRAIN_NIGHT_SKY
-		if (gaf_stone_wall_return > 0.0 && shade > 0.0) {
+		if (max(gaf_stone_wall_return, gaf_sheltered_stone_return) > 0.0 && shade > 0.0) {
 			// Use the map's directional diffuse cache while protecting flat tops and direct light.
+			const vec3 luma = vec3(.2126, .7152, .0722);
 			float wall = 1.0 - smoothstep(.06, .25, abs((mat3(INV_VIEW_MATRIX) * NORMAL).y));
 			vec3 source = terrain_day_bounce * cloud_transmission;
-			vec3 returned = mix(source, vec3(dot(source, vec3(.2126, .7152, .0722))), .30);
-			DIFFUSE_LIGHT += returned * terrain_direct_contact * (wall * shade * gaf_stone_wall_return);
+			float source_y = dot(source, luma);
+			if (gaf_stone_wall_return > 0.0) {
+				vec3 returned = mix(source, vec3(source_y), .30);
+				DIFFUSE_LIGHT += returned * terrain_direct_contact * (wall * shade * gaf_stone_wall_return);
+			}
+			if (gaf_sheltered_stone_return > 0.0) {
+				// Fill the part of the shaded receiver's sky contribution that lacks a
+				// directional return. Preserve contrast where the baked return is already strong.
+				vec3 sky = terrain_opening_incident;
+				float sky_y = dot(sky, luma);
+				float existing_return = source_y * (1.0 + gaf_stone_wall_return * shade);
+				float gap = max(.72 * sky_y - existing_return, 0.0);
+				vec3 tint = mix(vec3(1.0), sky / max(sky_y, .00001), .45);
+				float inner_shade = 1.0 - smoothstep(.035, .36, ATTENUATION);
+				float recovery = min(gap * gaf_sheltered_stone_return, .085);
+				DIFFUSE_LIGHT += tint * (recovery * wall * inner_shade * terrain_direct_contact);
+			}
 		}
 #endif
 	}

@@ -53,6 +53,7 @@ projected_opening_recovery_by_hour = SubResource("ProjectedOpeningRecovery")
 afternoon_key_by_hour = SubResource("AfternoonKey")
 shadow_grade_recovery_by_hour = SubResource("ShadowGradeRecovery")
 shadowed_wall_return_scale = 1.5
+sheltered_stone_return_scale = 1.6
 alternate_mist_by_hour = SubResource("LowForestMistPhase")
 ground_haze = SubResource("ForestGroundHaze")
 ground_haze_strength = 1.0

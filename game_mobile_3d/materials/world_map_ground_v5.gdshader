@@ -117,7 +117,7 @@ void fragment() {
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	stone_sunset_position = surface_world.xz;
 #endif
-	if (gaf_diffuse_opening.w > 0.0 || (ground_grade == 3 && gaf_stone_shade_fill.w > 0.0)) {
+	if (gaf_diffuse_opening.w > 0.0 || (ground_grade == 3 && max(gaf_stone_shade_fill.w, gaf_sheltered_stone_return) > 0.0)) {
 		terrain_opening_incident = terrain_opening_fill(ALBEDO, receiver_contact, sole);
 	}
 	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top,CAMERA_POSITION_WORLD)*sole;
