@@ -31,8 +31,7 @@ void fragment() {
 	ALBEDO = mix(ALBEDO, softened_side, terrace_side_weight * terrace_wall_finish);
 	ROUGHNESS = 1.0;
 #ifdef GAF_SHARED_MIST
-	FOG = gaf_surface_mist(SCREEN_UV,-VERTEX.z,INV_VIEW_MATRIX[3].xyz,-INV_VIEW_MATRIX[2].xyz,
-			vec2(PROJECTION_MATRIX[0][0],PROJECTION_MATRIX[1][1]));
+	FOG = gaf_surface_mist(SCREEN_UV, -VERTEX.z, INV_VIEW_MATRIX[3].xyz, -INV_VIEW_MATRIX[2].xyz,
+		vec2(PROJECTION_MATRIX[0][0], PROJECTION_MATRIX[1][1]));
 #endif
 }
-

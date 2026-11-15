@@ -3413,7 +3413,12 @@ func _build_ui()->void:
 		terrace_toggle.focus_mode = Control.FOCUS_NONE
 		terrace_toggle.tooltip_text = "So địa hình, cỏ và va chạm ở bậc thấp. Nếu đang đứng trong chỗ bậc sẽ xuất hiện, hãy bước ra để áp dụng."
 		box.add_child(terrace_toggle)
-		terrace_toggle.toggled.connect(playable_terrace.set_requested)
+		terrace_toggle.toggled.connect(func(value: bool):
+			var previous := playable_terrace.requested
+			_settings.remember_edit(func():
+				terrace_toggle.set_pressed_no_signal(previous)
+				playable_terrace.set_requested(previous))
+			playable_terrace.set_requested(value))
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)
