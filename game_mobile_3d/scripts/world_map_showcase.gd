@@ -76,6 +76,7 @@ var distant_terrain := DistantTerrain.new()
 var _cliff_vista_enabled := false
 var playable_terrace: PlayableTerrace
 var playable_boulder: PlayableBoulder
+var basin_boulders: Array[PlayableBoulder] = []
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_replay := preload("res://scripts/world_map_forest_replay.gd").new()
@@ -502,6 +503,7 @@ func setup(world:Node3D)->void:
 			level.add_child(boulder)
 		else:
 			boulder.free()
+	_setup_basin_boulders()
 	_build_ui()
 	set_source_terrain(true)
 	_refresh_lantern_glow()
@@ -1567,6 +1569,40 @@ func _mist_state(ready:bool,error:String)->void:
 	env.fog_density=0. if ready and error.is_empty() else float(_mist_sample.fog_opacity)
 	_forest_expected.fog_density=env.fog_density
 
+func _setup_basin_boulders() -> void:
+	if level.basin_boulder_placements.is_empty():
+		return
+	var shared_atlas: Texture2D
+	var occupied: Array[AABB] = []
+	if is_instance_valid(playable_boulder):
+		shared_atlas = playable_boulder.material.get_shader_parameter("source_atlas")
+		occupied.append(playable_boulder.placement_bounds().grow(.35))
+	var prepared: Array[PlayableBoulder] = []
+	for placement: Vector4 in level.basin_boulder_placements:
+		var rock := PlayableBoulder.new()
+		prepared.append(rock)
+		if not placement.is_finite() or placement.w != floorf(placement.w) \
+				or not rock.configure(level, plants, Vector2(placement.x, placement.y), placement.z,
+					level.playable_boulder_layout_sha, int(placement.w), shared_atlas) \
+				or not rock.seats_on_level_ground():
+			break
+		var bounds := rock.placement_bounds().grow(.35)
+		if occupied.any(func(other: AABB) -> bool: return bounds.intersects(other)):
+			break
+		if shared_atlas == null:
+			shared_atlas = rock.material.get_shader_parameter("source_atlas")
+		occupied.append(bounds)
+		basin_boulders.append(rock)
+	if basin_boulders.size() != level.basin_boulder_placements.size():
+		basin_boulders.clear()
+		for rock in prepared:
+			rock.free()
+		return
+	for i in basin_boulders.size():
+		var rock := basin_boulders[i]
+		rock.name = "BasinBoulders" if i == 0 else "BasinBoulder%d" % (i + 1)
+		level.add_child(rock)
+
 func _mist_materials()->Array:
 	var result:Array=level.look.materials.values()
 	result.append_array(level.look._direct_actor_materials)
@@ -1586,6 +1622,9 @@ func _mist_materials()->Array:
 		result.append(playable_terrace.material)
 	if is_instance_valid(playable_boulder) and playable_boulder.active:
 		result.append(playable_boulder.material)
+	for rock in basin_boulders:
+		if is_instance_valid(rock) and rock.active:
+			result.append(rock.material)
 	if grove_mist_enabled and level.grove != null:
 		var tree_weight := PHASE_FINISH.phase_weight(hour)
 		if _biome_profile != null:
@@ -3701,7 +3740,7 @@ func build_basic_settings(biome: Node = null) -> void:
 	_settings.setup(hud, panel, box, {}, status, false)
 	level.get_node("HUD/Help").hide()
 
-func _add_terrain_toggle(parent: Control, prop: Node3D, title: String) -> void:
+func _add_terrain_toggle(parent: Control, prop: Node3D, title: String, companions: Array = []) -> void:
 	var toggle := CheckButton.new()
 	toggle.name = prop.name
 	toggle.text = title
@@ -3713,8 +3752,12 @@ func _add_terrain_toggle(parent: Control, prop: Node3D, title: String) -> void:
 		var previous: bool = prop.requested
 		_settings.remember_edit(func():
 			toggle.set_pressed_no_signal(previous)
-			prop.set_requested(previous))
-		prop.set_requested(value))
+			prop.set_requested(previous)
+			for companion: Node3D in companions:
+				companion.set_requested(previous))
+		prop.set_requested(value)
+		for companion: Node3D in companions:
+			companion.set_requested(value))
 
 func _add_player_skin_picker(box: VBoxContainer) -> void:
 	_skin_picker = OptionButton.new()
@@ -3961,6 +4004,8 @@ func _build_ui()->void:
 		_add_terrain_toggle(box, playable_terrace, "Bậc thấp cạnh đường rừng")
 	if is_instance_valid(playable_boulder):
 		_add_terrain_toggle(box, playable_boulder, "Cụm đá ven đường rừng")
+	if not basin_boulders.is_empty():
+		_add_terrain_toggle(box, basin_boulders[0], "Hai cụm đá ở chân bậc", basin_boulders.slice(1))
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)

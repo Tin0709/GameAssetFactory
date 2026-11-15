@@ -7,6 +7,10 @@ const FOLDER := "extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Environment/Fo
 const MESH := "SM_SF_Boulder_03.glb"
 const ATLAS := "T_TreesBoulders.png"
 const MESH_SHA := "a40fb5003107558f437e7c262bc923641447ce63dc00c3edf1708dba7d715739"
+const MESHES := {
+	1: ["SM_SF_Boulder_01.glb", "0c99b664e949af968bd11ba57633548c410d3c32a7d19446adbc8aa5da8e3917"],
+	3: [MESH, MESH_SHA],
+}
 const ATLAS_SHA := "9b596a2149fcaf999178d6a5557cda9677c204f21848c84c9a30425ad1d850f6"
 
 var collider: StaticBody3D
@@ -21,7 +25,8 @@ var _rebinding := false
 var _bounds: AABB
 var _triangles: PackedVector3Array
 
-func configure(world: Node3D, plants: Node3D, anchor: Vector2, yaw_degrees: float, layout_sha: String) -> bool:
+func configure(world: Node3D, plants: Node3D, anchor: Vector2, yaw_degrees: float, layout_sha: String,
+		variant: int = 3, source_atlas: Texture2D = null) -> bool:
 	if plants == null or not anchor.is_finite() or not is_finite(yaw_degrees) or layout_sha.length() != 64:
 		return false
 	if RenderingServer.get_rendering_device() == null or FileAccess.get_sha256(world.map_layout_path) != layout_sha:
@@ -31,13 +36,23 @@ func configure(world: Node3D, plants: Node3D, anchor: Vector2, yaw_degrees: floa
 	if root.is_empty() or not is_finite(ground):
 		return false
 	var directory := root.path_join(FOLDER)
-	var mesh_path := directory.path_join(MESH)
-	var atlas_path := directory.path_join(ATLAS)
-	if FileAccess.get_sha256(mesh_path) != MESH_SHA or FileAccess.get_sha256(atlas_path) != ATLAS_SHA:
+	var source: Array = MESHES.get(variant, [])
+	if source.is_empty():
 		return false
-	var atlas := Image.load_from_file(atlas_path)
+	var mesh_path := directory.path_join(source[0])
+	if FileAccess.get_sha256(mesh_path) != source[1]:
+		return false
+	if source_atlas == null:
+		var atlas_path := directory.path_join(ATLAS)
+		if FileAccess.get_sha256(atlas_path) != ATLAS_SHA:
+			return false
+		var atlas := Image.load_from_file(atlas_path)
+		if atlas == null or atlas.get_size() != Vector2i(128, 128):
+			return false
+		atlas.generate_mipmaps()
+		source_atlas = ImageTexture.create_from_image(atlas)
 	var mesh := _load_mesh(mesh_path)
-	if mesh == null or atlas == null or atlas.get_size() != Vector2i(128, 128):
+	if mesh == null:
 		return false
 	_triangles = mesh.get_faces()
 	if _triangles.is_empty():
@@ -48,10 +63,9 @@ func configure(world: Node3D, plants: Node3D, anchor: Vector2, yaw_degrees: floa
 	var rotation := Basis(Vector3.UP, deg_to_rad(yaw_degrees))
 	transform = Transform3D(rotation, Vector3(anchor.x, ground - .04, anchor.y) - rotation * seat)
 
-	atlas.generate_mipmaps()
 	material = ShaderMaterial.new()
 	material.shader = StoneMaterial
-	material.set_shader_parameter("source_atlas", ImageTexture.create_from_image(atlas))
+	material.set_shader_parameter("source_atlas", source_atlas)
 	visual = MeshInstance3D.new()
 	visual.name = "Stone"
 	visual.mesh = mesh
@@ -64,12 +78,27 @@ func configure(world: Node3D, plants: Node3D, anchor: Vector2, yaw_degrees: floa
 	collision.shape = shape
 	collider = StaticBody3D.new()
 	collider.name = "StoneSupport"
+	collider.set_meta(&"gaf_boulder_support", true)
 	collider.collision_layer = 0
 	collider.collision_mask = 0
 	collider.add_child(collision)
 	add_child(collider)
 	_world = world
 	_plants = plants
+	return true
+
+func placement_bounds() -> AABB:
+	return transform * _bounds
+
+func seats_on_level_ground() -> bool:
+	var bounds := placement_bounds()
+	var base := bounds.position.y + .04
+	for x in 9:
+		for z in 9:
+			var sample := bounds.position + bounds.size * Vector3(float(x) / 8., 0., float(z) / 8.)
+			var floor: float = _world.surface_height(sample.x, sample.z)
+			if not is_finite(floor) or absf(floor - base) > .01:
+				return false
 	return true
 
 func _load_mesh(path: String) -> Mesh:

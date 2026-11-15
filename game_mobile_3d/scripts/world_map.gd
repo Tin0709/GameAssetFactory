@@ -58,6 +58,8 @@ var biome_controller: BiomeGraphics
 @export var playable_boulder_xz := Vector2.INF
 @export var playable_boulder_yaw_degrees := 0.
 @export var playable_boulder_layout_sha := ""
+## X, Z, yaw in degrees, source mesh variant. Each rock must sit on an intact level patch.
+@export var basin_boulder_placements: PackedVector4Array
 
 @export var local_mist_region: LocalMistRegion
 @export var alternate_mist_region: LocalMistRegion
@@ -318,7 +320,7 @@ func terrain_contact_at(sole: Vector3) -> Dictionary:
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	if hit.is_empty() or hit.normal.y < 0.7:
 		return {}
-	if showcase != null and is_instance_valid(showcase.playable_boulder) and hit.collider == showcase.playable_boulder.collider:
+	if hit.collider.get_meta(&"gaf_boulder_support", false):
 		return {"position": hit.position, "surface": "stone"}
 	if not geometry.is_ancestor_of(hit.collider):
 		return {}
