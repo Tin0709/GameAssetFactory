@@ -2213,7 +2213,7 @@ func _spruce_leaf_filter_editable() -> bool:
 		and is_instance_valid(level.grove) and level.grove.spruce_leaf_filter_available()
 
 func sync_spruce_leaf_filter() -> void:
-	if level == null or not is_instance_valid(level.grove):
+	if _flat_lab or level == null or not is_instance_valid(level.grove):
 		return
 	var strength := 0.0
 	if not _balanced_preview and level.look.stage == 2 and _spruce_leaf_filter_editable():
