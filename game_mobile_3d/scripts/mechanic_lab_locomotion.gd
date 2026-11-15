@@ -6,6 +6,7 @@ const RUNS := ["Run", "CombatRun"]
 # Right-foot contact on the A&S cycle occurs just after the MD2 Walk seam.
 const CROSSBOW_RUN_PHASE_OFFSET := 0.05
 const CROSSBOW_ARM_SWAY_WEIGHT := 0.40
+const CROSSBOW_RUN_CARRY_DIP := PI / 45.0
 const SHOVEL_RUN := "PLayer_Shovel_Run"
 const ARM_MIRROR := Basis(Vector3.LEFT, Vector3.UP, Vector3.BACK)
 const Bow := preload("res://scripts/mechanic_lab_bow.gd")
@@ -154,7 +155,7 @@ func crossbow_run_pose(cycle: float) -> Array[Transform3D]:
 	for bone in _arm_bones:
 		pose[bone] = _crossbow_carry[bone]
 	var shoulder_axis := (pose[_left_arm].origin - pose[_right_arm].origin).normalized()
-	var sway := Basis(shoulder_axis, swing * CROSSBOW_ARM_SWAY_WEIGHT)
+	var sway := Basis(shoulder_axis, CROSSBOW_RUN_CARRY_DIP + swing * CROSSBOW_ARM_SWAY_WEIGHT)
 	for bone in [_left_arm, _right_arm]:
 		pose[bone].basis = sway * pose[bone].basis
 	return pose
