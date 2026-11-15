@@ -77,15 +77,21 @@ func set_profile(profile: Profile) -> void:
 	if _profile.overcast == null:
 		_weather.set_target(0., 0.)
 	refresh()
+	_release_effects_outside_budget()
 
 func set_quality(value: Quality) -> void:
 	if value == quality or value < Quality.ESSENTIAL or value > Quality.FULL:
 		return
 	quality = value
 	refresh()
-	if quality < Quality.FULL and _finish_effect != null:
+	_release_effects_outside_budget()
+
+func _release_effects_outside_budget() -> void:
+	var finish_allowed := quality == Quality.FULL and _profile.adaptive_bloom \
+		and (_profile.local_exposure > 0. or _profile.adaptive_bloom_gain > 0.)
+	if not finish_allowed and _finish_effect != null:
 		_release_inactive(_finish_effect)
-	if quality == Quality.ESSENTIAL and is_instance_valid(_mist):
+	if (quality == Quality.ESSENTIAL or not _profile.spatial_mist) and is_instance_valid(_mist):
 		_mist.suspend()
 		_release_inactive(_mist.effect)
 
