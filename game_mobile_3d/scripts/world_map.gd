@@ -14,6 +14,7 @@ const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 const LocalMistRegion = preload("res://scripts/local_mist_region.gd")
+const MistSkyField = preload("res://scripts/mist_sky_field.gd")
 const RegionalSkyRegion = preload("res://scripts/regional_sky_region.gd")
 const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 const BiomeGraphicsProfile = preload("res://scripts/biome_graphics_profile.gd")
@@ -23,6 +24,8 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export_file("*.json") var map_layout_path := DATA
 ## Assign a graphics resource independently of the imported layout.
 @export var biome_graphics: BiomeGraphicsProfile
+## Optional sky-occlusion lattice baked for this layout.
+@export var mist_sky_field: MistSkyField
 @export var comparison_biomes: Array[BiomeGraphicsProfile] = []
 ## Graphics budget for portable biomes. The Forest reference keeps its existing settings.
 @export var biome_quality: BiomeGraphics.Quality = BiomeGraphics.Quality.FULL
@@ -240,6 +243,12 @@ func _ready() -> void:
 	spruce_sky.setup(self)
 	if spruce_sky.proof_ready and not spruce_sky.apply_layout(forest_basin_layout_profile, forest_basin_layout_sha256):
 		spruce_sky.apply_layout(forest_basin_fallback_profile, forest_basin_fallback_sha256)
+	if showcase.mist != null:
+		if mist_sky_field != null:
+			showcase.mist.set_sky_field(mist_sky_field)
+		elif spruce_sky.proof_ready:
+			showcase.mist.set_sky_field(spruce_sky.mist_sky_field(), spruce_sky.mist_sky_current)
+		showcase._refresh_lighting_mix(&"mist_sky_scatter")
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func _uses_portable_biome() -> bool:

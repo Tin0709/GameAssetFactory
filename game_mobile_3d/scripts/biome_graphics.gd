@@ -346,6 +346,7 @@ func _prepare_spatial_mist(env: Environment, clear_fog_color: Color, time: float
 		_mist = MistVolume.new()
 		camera.add_child(_mist)
 		_mist.setup()
+		_mist.set_sky_field(_world.mist_sky_field)
 		_mist.material_provider = _mist_materials
 		_mist.compositor_owned = _owns_finish_compositor
 		_mist.path_light_provider = _fixture_air
@@ -367,6 +368,7 @@ func _prepare_spatial_mist(env: Environment, clear_fog_color: Color, time: float
 		"near_fade_start": .8,
 		"scatter_energy": clampf(_profile.mist_scatter * scatter_scale, 0., 1.),
 		"entry_scatter_gain": _profile.sample_mist_entry_scatter(time),
+		"sky_scatter_source": _profile.sample_mist_sky_scatter(time, env) if _mist.has_sky_field() else Vector4.ZERO,
 		"player_light_color": Vector3.ZERO,
 		"player_light_weight": 0.,
 	}

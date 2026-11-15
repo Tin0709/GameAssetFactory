@@ -204,6 +204,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_bloom_prefilter": ["Lọc nền bloom ban đêm", 1.],
 	&"ground_haze": ["Ánh sương thấp sau tán", 1.],
 	&"mist_entry_scatter": ["Ánh tán xạ đầu lớp sương", 1.],
+	&"mist_sky_scatter": ["Ánh trời trong sương rìa tán", 1.],
 	&"twilight_ground_haze": ["Ánh sương thấp lúc chạng vạng", 1.],
 	&"forest_dusk_backdrop": ["Dịu màu nền xa lúc chạng vạng", 1.],
 	&"distant_terrain": ["Địa hình xa lúc chạng vạng", 1.],
@@ -273,7 +274,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 175
+const LIGHTING_MIX_VERSION := 176
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -962,6 +963,9 @@ func _sync_distant_terrain() -> void:
 			subject_uv = camera.unproject_position(subject) / camera.get_viewport().get_visible_rect().size
 	distant_terrain.update(gain, env.fog_light_color, subject_uv)
 
+func _has_mist_sky_scatter() -> bool:
+	return mist != null and mist.has_sky_field() and _biome_profile != null and _biome_profile.mist_sky_scatter_by_hour != null
+
 func _update_mist()->void:
 	_sync_distant_terrain()
 	mist_source_active=false
@@ -1076,6 +1080,9 @@ func _update_mist()->void:
 		var subject_depth: float = -camera.global_basis.z.dot(emitter - camera.global_position)
 		sample.ground_haze = _biome_profile.sample_ground_haze(hour, subject_depth, level.spawn_position.y,
 			_lighting_scale(&"ground_haze"), _lighting_scale(&"twilight_ground_haze"))
+		if mist.has_sky_field():
+			sample.sky_scatter_source = _biome_profile.sample_mist_sky_scatter(
+				hour / 24., env, _lighting_scale(&"mist_sky_scatter") * _lighting_scale(&"scatter"))
 		sample.entry_scatter_gain = (_biome_profile.sample_mist_entry_scatter(hour / 24.)
 			* _lighting_scale(&"mist_entry_scatter"))
 	var lantern=level.player.get("lantern")
@@ -2345,6 +2352,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 174 and effect == &"zoom_exposure_blur":
 			missing_value = 0.
+		if version < 176 and effect == &"mist_sky_scatter":
+			missing_value = 0.
 		if version < 175 and effect == &"bark_irradiance":
 			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
@@ -2499,6 +2508,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 				and level.alternate_mist_region != null
 		if effect == &"ground_haze":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
+		if effect == &"mist_sky_scatter":
+			slider.editable = slider.editable and _has_mist_sky_scatter()
 		if effect == &"mist_entry_scatter":
 			slider.editable = slider.editable and mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"grove_mist_coherence":
@@ -2666,7 +2677,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_sync_forest_night_lights()
 		set_coupled_bloom(coupled_bloom)
 		return
-	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"mist_entry_scatter", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
+	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"mist_entry_scatter", &"mist_sky_scatter", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
 		_update_mist()
 		return
 	if changed_effect in [&"night_path_chroma", &"source_path_chroma"]:
@@ -3404,6 +3415,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
 		if effect == &"ground_haze":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
+		if effect == &"mist_sky_scatter":
+			slider.editable = _has_mist_sky_scatter()
 		if effect == &"mist_entry_scatter":
 			slider.editable = mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"basin_sunlit_mist":

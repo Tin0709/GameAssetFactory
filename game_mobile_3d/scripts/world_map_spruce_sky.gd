@@ -4,6 +4,7 @@ extends Node
 const PROOF := "godot_lab/world_map_unified_showcase_v001/forest_spruce_layout_v002/field.private.json"
 const PROOF_SHA := "155d6221f111ab2479aba2dae86841cf33055f5adf351789b61781eab2959d14"
 const PHASE := preload("res://scripts/world_map_phase_finish.gd")
+const MistSkyField = preload("res://scripts/mist_sky_field.gd")
 static var _owner: WeakRef
 
 var proof_ready := false
@@ -150,6 +151,15 @@ func _geometry_current() -> bool:
 		if not is_instance_valid(caster) or caster.mesh != row.mesh or not caster.global_transform.is_equal_approx(row.transform):
 			return false
 	return true
+
+func mist_sky_field() -> MistSkyField:
+	var field := MistSkyField.new()
+	field.texture = _texture
+	field.origin = _origin
+	return field
+
+func mist_sky_current() -> bool:
+	return proof_ready and _level.grove.visible and _level.grove.spruce_visible() and _geometry_current()
 
 func _process(_delta: float) -> void:
 	refresh()
