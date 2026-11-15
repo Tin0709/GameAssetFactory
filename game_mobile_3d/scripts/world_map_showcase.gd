@@ -1987,6 +1987,11 @@ func actor_shade_sky_weight(control: StringName = &"actor_shade_sky") -> float:
 	var gain := DayNight.sample_curve(_biome_profile.actor_shade_sky_by_hour, hour / 24., 0.)
 	return clampf(gain, 0., 1.) * _lighting_scale(control)
 
+func _kai_shade_sky_editable() -> bool:
+	return RenderingServer.get_current_rendering_method() == "mobile" \
+		and RenderingServer.get_rendering_device() != null and level.look.player_material.available() \
+		and _biome_profile != null and _biome_profile.actor_shade_sky_by_hour != null
+
 func actor_side_sky_weight() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() or _biome_profile == null:
 		return 0.
@@ -2713,11 +2718,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks
 		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 			slider.editable = slider.editable and level.look.player_material.available()
-		if effect in [&"actor_shade_sky", &"kai_shade_sky"]:
+		if effect == &"actor_shade_sky":
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_shade_sky_by_hour != null
-			if effect == &"kai_shade_sky":
-				slider.editable = slider.editable and RenderingServer.get_current_rendering_method() == "mobile" \
-					and RenderingServer.get_rendering_device() != null
+		if effect == &"kai_shade_sky":
+			slider.editable = slider.editable and _kai_shade_sky_editable()
 		if effect == &"actor_side_sky":
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_side_sky_by_hour != null
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
@@ -3559,6 +3563,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		var slider := HSlider.new()
 		slider.accessibility_name = label.text
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
+		if effect == &"kai_shade_sky":
+			slider.editable = not _balanced_preview and _kai_shade_sky_editable()
 		if effect in [&"canopy_player_cue", &"canopy_cue_day_tone", &"canopy_cue_clarity", &"canopy_cue_softness"]:
 			slider.editable = level.canopy_player_cue.available(level)
 		if effect == &"crown_ambient_depth":
