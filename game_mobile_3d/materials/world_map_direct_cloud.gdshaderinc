@@ -84,7 +84,7 @@ void light() {
 				vec3 returned = mix(source, vec3(source_y), .30);
 				DIFFUSE_LIGHT += returned * terrain_direct_contact * (wall * shade * gaf_stone_wall_return);
 			}
-			if (gaf_sheltered_stone_return > 0.0) {
+			if (gaf_sheltered_stone_return > 0.0 && wall > 0.0 && ATTENUATION < .36) {
 				// Fill the part of the shaded receiver's sky contribution that lacks a
 				// directional return. Preserve contrast where the baked return is already strong.
 				vec3 sky = terrain_opening_incident;
