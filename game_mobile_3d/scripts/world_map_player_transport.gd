@@ -136,7 +136,10 @@ func refresh(force:bool=false)->void:
 func _kai_ground_bounce(position: Vector3) -> Vector4:
  var review = level.showcase
  var light: OmniLight3D = review._player_light
- if not is_instance_valid(review._kai_skin) or not review._kai_skin.is_visible_in_tree()   or level.look.stage != 2 or not level.look.player_adapter_enabled or not level.look.player_local_light_enabled   or level.view_mode != "gameplay" or not review.source_terrain_active or not is_instance_valid(light)   or not light.is_visible_in_tree() or light.light_energy <= 0. or light.omni_range <= 0.:
+ if (not is_instance_valid(review._kai_skin) or not review._kai_skin.is_visible_in_tree()
+  or level.look.stage != 2 or not level.look.player_adapter_enabled or not level.look.player_local_light_enabled
+  or level.view_mode != "gameplay" or not review.source_terrain_active or not is_instance_valid(light)
+  or not light.is_visible_in_tree() or light.light_energy <= 0. or light.omni_range <= 0.):
   return Vector4.ZERO
  var gain: float = review._night_grass_weight() * review._lighting_scale(&"kai_ground_bounce")
  if gain <= 0.:
@@ -147,7 +150,7 @@ func _kai_ground_bounce(position: Vector3) -> Vector4:
  if reflectance.size() != 5 or field == null:
   return Vector4.ZERO
  # Interpolate the terrain's existing top cells across their centers.
- var pixel := Vector2(position.x, position.z) - look.path_map_origin - Vector2(.5, .5)
+ var pixel: Vector2 = Vector2(position.x, position.z) - look.path_map_origin - Vector2(.5, .5)
  var corner := Vector2i(pixel.floor())
  var fraction := pixel - Vector2(corner)
  var incident := Vector3.ZERO
