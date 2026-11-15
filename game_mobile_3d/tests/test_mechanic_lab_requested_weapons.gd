@@ -542,11 +542,15 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 			check(support_drift < 0.015,
 				"The support hand stays seated on the crossbow throughout the running sway")
 			var motion = player.hybrid_motion
-			var run_pose: Array[Transform3D] = player.source_gait.sample("Run", 0.66)
 			var walk_pose: Array[Transform3D] = player.source_gait.sample("Walk", 0.0)
 			var left_shoulder: Vector3 = walk_pose[motion._left_arm].origin
 			var right_shoulder: Vector3 = walk_pose[motion._right_arm].origin
-			var carry_pose: Array[Transform3D] = motion.crossbow_run_pose(run_pose, 0.66)
+			var carry_pose: Array[Transform3D] = motion.crossbow_run_pose(0.66)
+			var source_run: Array[Transform3D] = motion.run_pose(0.66)
+			for name: String in ["J_Hip", "J_Spine", "J_Shoulders", "J_Head", "J_L_Leg", "J_R_Leg"]:
+				var run_bone: int = player.skeleton.find_bone(name)
+				check(carry_pose[run_bone].is_equal_approx(source_run[run_bone]),
+					"Crossbow run uses the full Actions & Stuff %s motion" % name)
 			check(carry_pose[motion._left_arm].origin.is_equal_approx(left_shoulder)
 				and carry_pose[motion._right_arm].origin.is_equal_approx(right_shoulder),
 				"The paired crossbow sway rotates at the two source shoulder anchors")

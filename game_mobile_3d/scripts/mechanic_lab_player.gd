@@ -257,8 +257,9 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 		cursor.phase = fposmod(float(cursor.phase) + delta / _composed_gait_period(key, speed, gait_state), 1.0)
 		if shovel_run:
 			return hybrid_motion.source_run_pose(float(cursor.phase))
-		var pose: Array[Transform3D] = source_gait.compose(float(cursor.phase), speed)
-		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
+		if crossbow_run:
+			return hybrid_motion.crossbow_run_pose(float(cursor.phase))
+		return source_gait.compose(float(cursor.phase), speed)
 
 func _begin_pose_transition(key: String, seconds: float) -> void:
 	if bow_equipped and active_clip == Bow.ACTION:

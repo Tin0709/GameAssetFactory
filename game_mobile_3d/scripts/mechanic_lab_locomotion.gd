@@ -6,7 +6,6 @@ const RUNS := ["Run", "CombatRun"]
 # Right-foot contact on the A&S cycle occurs just after the MD2 Walk seam.
 const CROSSBOW_RUN_PHASE_OFFSET := 0.05
 const CROSSBOW_ARM_SWAY_WEIGHT := 0.40
-const CROSSBOW_TORSO_SWAY_WEIGHT := 0.60
 const SHOVEL_RUN := "PLayer_Shovel_Run"
 const ARM_MIRROR := Basis(Vector3.LEFT, Vector3.UP, Vector3.BACK)
 const Bow := preload("res://scripts/mechanic_lab_bow.gd")
@@ -59,10 +58,7 @@ func apply(actor, key: String, delta: float) -> void:
 		phase = fposmod(actor.animation_player.current_animation_position / duration, 1.0)
 		phase_hz = actor._playback_speed / duration
 		phase_advanced = delta * phase_hz
-		var native: Array[Transform3D] = []
-		for bone in rig.get_bone_count():
-			native.append(rig.get_bone_pose(bone))
-		var composed := crossbow_run_pose(native, phase)
+		var composed := crossbow_run_pose(phase)
 		for bone in composed.size():
 			rig.set_bone_pose(bone, composed[bone])
 		last_kind = "CrossbowRun"
@@ -145,31 +141,23 @@ func _apply_bow_stride(actor, delta: float) -> void:
 		var duration: float = actor.clips.Walk.duration
 		actor._dispatch_locomotion_events("Walk", before * duration, phase_advanced * duration, delta)
 
-func crossbow_run_pose(native: Array[Transform3D], cycle: float) -> Array[Transform3D]:
-	var actions_and_stuff := run_pose(cycle)
-	for bone in _leg_bones:
-		native[bone] = actions_and_stuff[bone]
-	for bone in range(_hip_bone + 1):
-		native[bone] = actions_and_stuff[bone]
-	var spine := parents[_body_bone]
-	native[spine] = native[spine].interpolate_with(actions_and_stuff[spine], CROSSBOW_TORSO_SWAY_WEIGHT)
-	native[_body_bone] = native[_body_bone].interpolate_with(actions_and_stuff[_body_bone], CROSSBOW_TORSO_SWAY_WEIGHT)
-	# Start from the MD2 walk's authored two-handed hold. Sampling two
-	# independently animated run arms on top of this swing made the support
-	# hand travel across the stock.
-	native[_left_arm] = _crossbow_carry[_left_arm]
-	native[_right_arm] = _crossbow_carry[_right_arm]
+func crossbow_run_pose(cycle: float) -> Array[Transform3D]:
+	var pose := run_pose(cycle)
 	# Transfer the alternating A&S arm swing to the paired MD2 grip.
 	# Rotate around the line through both shoulders. Each shoulder stays
 	# seated and the two hands share one rigid rotation with the weapon.
-	var left_axis := actions_and_stuff[_left_arm].basis.z
-	var right_axis := actions_and_stuff[_right_arm].basis.z
+	var left_axis := pose[_left_arm].basis.z
+	var right_axis := pose[_right_arm].basis.z
 	var swing := (atan2(right_axis.y, right_axis.z) - atan2(left_axis.y, left_axis.z)) * 0.5
-	var shoulder_axis := (native[_left_arm].origin - native[_right_arm].origin).normalized()
+	# Keep both entire arm branches from the same MD2 carry frame. This
+	# keeps the hand and weapon helpers fixed relative to their paired grip.
+	for bone in _arm_bones:
+		pose[bone] = _crossbow_carry[bone]
+	var shoulder_axis := (pose[_left_arm].origin - pose[_right_arm].origin).normalized()
 	var sway := Basis(shoulder_axis, swing * CROSSBOW_ARM_SWAY_WEIGHT)
 	for bone in [_left_arm, _right_arm]:
-		native[bone].basis = sway * native[bone].basis
-	return native
+		pose[bone].basis = sway * pose[bone].basis
+	return pose
 
 func run_pose(cycle: float) -> Array[Transform3D]:
 	return source_run_pose(cycle + CROSSBOW_RUN_PHASE_OFFSET)
