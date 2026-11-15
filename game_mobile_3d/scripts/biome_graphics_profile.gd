@@ -41,6 +41,9 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var stone_wall_sky_by_hour: Curve
 ## Diffuse return on receivers in weak directional light. X is normalized hour.
 @export var shadow_diffuse_by_hour: Curve
+## Blend of the owned sky irradiance on bark, keyed by normalized hour.
+@export var bark_irradiance_by_hour: Curve
+@export var bark_irradiance_tint := Vector3.ONE
 ## Additional diffuse sky on supported player materials under canopy.
 ## Curve X is normalized hour and Y is a gain from 0 to 1.
 @export var actor_shade_sky_by_hour: Curve

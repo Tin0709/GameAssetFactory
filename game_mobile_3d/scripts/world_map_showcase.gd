@@ -126,6 +126,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"dawn_turf_ambient": ["Ánh hắt trên cỏ rạng sáng", 1.],
 	&"dawn_turf_color": ["Sắc cỏ trong bóng rạng sáng", 1.],
 	&"grass_shade_color": ["Grass shade color", 1.],
+	&"bark_irradiance": ["Sắc ánh trời trên vỏ cây", 1.],
 	&"diffuse_openings": ["Sunlit diffuse fill", 1.],
 	&"regional_sky": ["Local cliff skylight (preview)", 1.],
 	&"daylight_bounce": ["Ánh sáng hắt ban ngày", 1.],
@@ -272,7 +273,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 174
+const LIGHTING_MIX_VERSION := 175
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2317,6 +2318,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 173 and effect == &"shadow_diffuse_return":
 			missing_value = 0.
 		if version < 174 and effect == &"zoom_exposure_blur":
+			missing_value = 0.
+		if version < 175 and effect == &"bark_irradiance":
 			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.

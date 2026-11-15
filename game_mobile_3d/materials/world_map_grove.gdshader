@@ -15,6 +15,10 @@ varying float tree_sky;
 uniform float crown_dusk_occlusion = 0.0;
 uniform float crown_ambient_depth = 0.0;
 #endif
+#ifdef GAF_WORLD_TREE_IRRADIANCE
+uniform vec4 bark_irradiance = vec4(0.0);
+uniform vec3 bark_irradiance_tint = vec3(1.0);
+#endif
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/leaf_material_v001/leaf_material.gdshaderinc"
 #ifdef GAF_SHARED_MIST
 #include "res://materials/world_map_mist.gdshaderinc"
@@ -190,6 +194,20 @@ void fragment() {
 	}
 	AO = ambient_visibility;
 	AO_LIGHT_AFFECT = 0.0;
+#endif
+#ifdef GAF_WORLD_TREE_IRRADIANCE
+	IRRADIANCE = vec4(0.0);
+	if (use_source_atlas && atlas_uv.x >= .5 && bark_irradiance.w > 0.0) {
+		const vec3 luma = vec3(.2126, .7152, .0722);
+		vec3 world_normal = mat3(INV_VIEW_MATRIX) * NORMAL;
+		vec3 base = bark_irradiance.rgb;
+		// Cosine convolution of the first-order sky owned by WorldMapAmbient.
+		float horizon = dot(world_normal.xz, vec2(.616, -.788));
+		base += (2.0 / 3.0) * base * (vec3(.15, .25, .45) * world_normal.y + .18 * horizon);
+		vec3 target = base * bark_irradiance_tint;
+		target *= dot(albedo * base, luma) / max(dot(albedo * target, luma), .00001);
+		IRRADIANCE = vec4(target, bark_irradiance.w);
+	}
 #endif
 	ALBEDO = albedo;
 #ifdef GAF_WORLD_CANOPY_DIRECT_SOFTNESS

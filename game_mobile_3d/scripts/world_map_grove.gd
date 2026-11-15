@@ -115,6 +115,8 @@ var _published_source_wind := Vector2.INF
 var _spruce_root: Node3D
 var _spruce_atlas: ImageTexture
 var _spruce_appearance := ShaderMaterial.new()
+var _bark_irradiance := Vector4.ZERO
+var _bark_irradiance_tint := Vector3.ONE
 var _spruce_shadow := ShaderMaterial.new()
 var _spruce_trunks: Array[StaticBody3D] = []
 var _spruce_casters: Array[MeshInstance3D] = []
@@ -548,6 +550,16 @@ func set_canopy_direct(value: Vector4, height: Vector2) -> void:
 func set_crown_detail(enabled: bool) -> void:
 	_canopy_appearance.set_shader_parameter("crown_detail", enabled)
 
+func set_bark_irradiance(value: Vector4, tint: Vector3) -> void:
+	if value == _bark_irradiance and tint == _bark_irradiance_tint:
+		return
+	_bark_irradiance = value
+	_bark_irradiance_tint = tint
+	for material: ShaderMaterial in [_canopy_appearance, _spruce_appearance]:
+		if material.shader != null:
+			material.set_shader_parameter("bark_irradiance", value)
+			material.set_shader_parameter("bark_irradiance_tint", tint)
+
 func publish_crown_wind(enabled: bool, wind_phase: float, breeze_phase: float, travelling: bool, time: float = 0., strength: float = 1.) -> void:
 	if source_oaks:
 		if not source_crown_wind_available():
@@ -576,6 +588,9 @@ func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D,
 			if values[i] != null: material.set_shader_parameter(parameters[i], values[i])
 		if source_oaks and material == _canopy_appearance:
 			_bind_source_atlas(material)
+		if material in [_canopy_appearance, _spruce_appearance]:
+			material.set_shader_parameter("bark_irradiance", _bark_irradiance)
+			material.set_shader_parameter("bark_irradiance_tint", _bark_irradiance_tint)
 	if player_cue_weight > 0.0:
 		material.set_shader_parameter("player_cue_weight", player_cue_weight)
 	if field != null:

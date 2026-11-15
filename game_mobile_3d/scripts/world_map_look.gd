@@ -621,6 +621,8 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 			defines += "\n#define GAF_GROVE_PLAYER_CUE"
 		if tree_sky:
 			defines += "\n#define GAF_WORLD_TREE_SKY"
+			if RenderingServer.get_current_rendering_method() == &"mobile":
+				defines += "\n#define GAF_WORLD_TREE_IRRADIANCE"
 		if bounce:
 			defines += "\n#define GAF_WORLD_GROUND_BOUNCE"
 		if terrain_sky:
