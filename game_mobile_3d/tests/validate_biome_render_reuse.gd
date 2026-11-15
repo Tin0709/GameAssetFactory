@@ -45,6 +45,13 @@ func run() -> void:
 			forest.player.position = before
 			await process_frame
 			check(boulder.active, "Stone restores visual and collision once the player moves away")
+			showcase.compare_baseline()
+			await process_frame
+			check(not boulder.active and boulder.requested, "Baseline hides the stone while retaining its setting")
+			showcase.compare_baseline()
+			await process_frame
+			check(boulder.active and showcase._mist_materials().has(boulder.material),
+				"Returning from baseline restores the terrain and fog receiver")
 	else:
 		check(boulder == null, "Compatibility does not load the private stone")
 	forest.set_review_view("overview")
