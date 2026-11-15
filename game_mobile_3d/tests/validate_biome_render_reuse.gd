@@ -32,7 +32,7 @@ func run() -> void:
 		if boulder != null:
 			check(boulder.roots.size() > 0, "The stone has verified grass roots beneath its surface")
 			check(showcase._mist_materials().has(boulder.material), "The stone takes the same spatial mist as terrain")
-			var toggle := showcase._ui.find_child("PlayableBoulder", true, false) as CheckButton
+			var toggle := showcase.panel.find_child("PlayableBoulder", true, false) as CheckButton
 			check(toggle != null and toggle.button_pressed, "The settings menu exposes the active stone comparison")
 			if toggle != null:
 				toggle.button_pressed = false
