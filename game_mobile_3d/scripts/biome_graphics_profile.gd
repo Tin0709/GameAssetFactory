@@ -68,6 +68,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., 2.) var saturation := .98
 @export_range(0., 2.) var contrast := 1.05
 @export var color_correction: Texture
+## Normalized hours for restoring neutral shadow color in the reference finish.
+@export var shadow_grade_recovery_by_hour: Curve
 
 @export_group("Bloom")
 @export_range(0., 2.) var glow_intensity := .42

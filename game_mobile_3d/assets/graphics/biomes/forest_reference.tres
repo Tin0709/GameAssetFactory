@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=11 format=3]
+[gd_resource type="Resource" load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -40,6 +40,10 @@ point_count = 6
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.65), 0.0, 0.0, 0, 0, Vector2(0.772916667, 0.65), 0.0, 0.0, 0, 0, Vector2(0.8125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 6
 
+[sub_resource type="Curve" id="ShadowGradeRecovery"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 1), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.5625, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 1), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 8
+
 [resource]
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
@@ -47,6 +51,7 @@ use_forest_reference = true
 day_grass_shadow_compactness = 2.0
 projected_opening_recovery_by_hour = SubResource("ProjectedOpeningRecovery")
 afternoon_key_by_hour = SubResource("AfternoonKey")
+shadow_grade_recovery_by_hour = SubResource("ShadowGradeRecovery")
 alternate_mist_by_hour = SubResource("LowForestMistPhase")
 ground_haze = SubResource("ForestGroundHaze")
 ground_haze_strength = 1.0
