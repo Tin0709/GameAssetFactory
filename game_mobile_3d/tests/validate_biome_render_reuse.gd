@@ -184,7 +184,15 @@ func run() -> void:
 			check(graphics._mist.visible and graphics._mist.effect.snapshot().ready and graphics._mist.failure().is_empty(),
 				"Spatial fog runs on the second map")
 			var selected_profile = map.biome_graphics
-			var chromatic_profile = selected_profile.duplicate()
+			check(is_equal_approx(graphics._mist_sample.scatter_energy, .483),
+				"Woodland uses its authored 07:00 scattering on opening the imported scene")
+			var inherited_profile = selected_profile.duplicate()
+			inherited_profile.set("mist_scatter_color_by_hour", null)
+			inherited_profile.set("mist_scatter_energy_by_hour", null)
+			graphics.set_profile(inherited_profile)
+			await process_frame
+			await RenderingServer.frame_post_draw
+			var chromatic_profile = inherited_profile.duplicate()
 			var scatter_color := Gradient.new()
 			scatter_color.set_color(0, Color(.45, .7, 1.))
 			scatter_color.set_color(1, Color(.45, .7, 1.))
@@ -224,7 +232,7 @@ func run() -> void:
 			await RenderingServer.frame_post_draw
 			payload = graphics._mist.effect._parameters
 			check(is_equal_approx(payload.decode_float(124), .42), "Noon uses the authored neutral energy multiplier")
-			graphics.set_profile(selected_profile)
+			graphics.set_profile(inherited_profile)
 			map.showcase.set_hour(7.)
 			check(not graphics._mist_sample.has("linear_scatter_rgb"), "Changing profile clears the optional tint")
 			var alternate_profile = selected_profile.duplicate()
