@@ -3224,6 +3224,21 @@ func _build_basic_settings() -> void:
 	_settings.setup(hud, panel, box, {}, null, false)
 	level.get_node("HUD/Help").hide()
 
+func _add_terrain_toggle(parent: Control, prop: Node3D, title: String) -> void:
+	var toggle := CheckButton.new()
+	toggle.name = prop.name
+	toggle.text = title
+	toggle.button_pressed = prop.requested
+	toggle.focus_mode = Control.FOCUS_NONE
+	toggle.tooltip_text = "So hình khối, cỏ và va chạm. Nếu đang đứng ở chỗ sẽ xuất hiện, hãy bước ra để áp dụng."
+	parent.add_child(toggle)
+	toggle.toggled.connect(func(value: bool):
+		var previous: bool = prop.requested
+		_settings.remember_edit(func():
+			toggle.set_pressed_no_signal(previous)
+			prop.set_requested(previous))
+		prop.set_requested(value))
+
 func _build_ui()->void:
 	var hud:=level.get_node("HUD")
 	_fps_label=Label.new();_fps_label.name="ShowcaseFPS";_fps_label.position=Vector2(18,6)
