@@ -260,7 +260,8 @@ func _place_source_spruce(level: Node3D, assets: Array[Node3D], rows: Array, ima
 		if not is_finite(level.surface_height(spot.x, spot.y)):
 			return
 	_spruce_atlas = ImageTexture.create_from_image(image)
-	if RenderingServer.get_current_rendering_method() == &"mobile" and image.get_width() % 2 == 0:
+	if RenderingServer.get_current_rendering_method() == &"mobile" \
+			and RenderingServer.get_rendering_device() != null and image.get_width() % 2 == 0:
 		# Isolate the leaf half so its mips cannot pick up bark color or opacity.
 		var leaves := image.get_region(Rect2i(0, 0, image.get_width() / 2, image.get_height()))
 		leaves.fix_alpha_edges()

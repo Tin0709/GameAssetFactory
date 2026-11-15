@@ -12,6 +12,7 @@ const PlayableTerrace = preload("res://scripts/world_map_playable_terrace.gd")
 const PlayableBoulder = preload("res://scripts/world_map_boulder.gd")
 const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
 const BiomeProfile = preload("res://scripts/biome_graphics_profile.gd")
+const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
 const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
@@ -281,6 +282,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"humid_light": ["Humid light diffusion", 1.],
 	&"humid_depth": ["Diffusion by depth (preview)", 1.],
 	&"tree_wind": ["Tree canopy wind", CrownWind.MAX_STRENGTH],
+	&"spruce_leaf_filter": ["Dịu chi tiết tán vân sam khi zoom xa", 1.],
 	&"night_path_chroma": ["Night path color", 1.],
 	&"source_path_chroma": ["Dịu sắc đất lối rừng", 1.],
 	&"exposure": ["Local exposure", 1.],
@@ -291,7 +293,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 188
+const LIGHTING_MIX_VERSION := 189
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2204,6 +2206,19 @@ func _sync_canopy_direct() -> void:
 			state = Vector4(direction.x, direction.y, direction.z, gain)
 	level.grove.set_canopy_direct(state, Vector2(2.5, 6.0) + Vector2.ONE * level.spawn_position.y)
 
+func _spruce_leaf_filter_editable() -> bool:
+	return level != null and _biome_profile != null and _biome_profile.spruce_leaf_filter > 0. \
+		and level.biome_quality != BiomeGraphics.Quality.ESSENTIAL \
+		and is_instance_valid(level.grove) and level.grove.spruce_leaf_filter_available()
+
+func sync_spruce_leaf_filter() -> void:
+	if level == null or not is_instance_valid(level.grove):
+		return
+	var strength := 0.0
+	if not _balanced_preview and level.look.stage == 2 and _spruce_leaf_filter_editable():
+		strength = _biome_profile.spruce_leaf_filter * _lighting_scale(&"spruce_leaf_filter")
+	level.grove.set_spruce_leaf_filter(strength)
+
 func _sync_bark_irradiance() -> void:
 	if level == null or level.grove == null:
 		return
@@ -2521,6 +2536,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 189 and effect == &"spruce_leaf_filter":
+			missing_value = 0.
 		if version < 188 and effect == &"overcast_mist_phase_color":
 			missing_value = 0.
 		if version < 187 and effect == &"kai_twilight_ground_bounce":
@@ -2753,6 +2770,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and _kai_shade_sky_editable()
 		if effect == &"kai_twilight_ground_bounce":
 			slider.editable = slider.editable and _kai_twilight_ground_bounce_editable()
+		if effect == &"spruce_leaf_filter":
+			slider.editable = slider.editable and _spruce_leaf_filter_editable()
 		if effect == &"actor_side_sky":
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_side_sky_by_hour != null
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
@@ -2864,6 +2883,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
+	if changed_effect in [&"", &"spruce_leaf_filter"]:
+		sync_spruce_leaf_filter()
+		if changed_effect == &"spruce_leaf_filter":
+			return
 	if changed_effect in [&"", &"tree_wind"] and level != null and level.look != null:
 		level.look._publish_crown_wind()
 		if changed_effect == &"tree_wind":
@@ -3730,6 +3753,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "At 100%, move Humid light diffusion from near surfaces to the distant mist. Try Humid light diffusion at 65% and time 16:30. Requires sampleable 2× or 4× MSAA depth on Mobile Vulkan or D3D12."
 		if effect == &"tree_wind":
 			slider.tooltip_text = "Adjust sway for the source oaks and spruces. 100% is the previous response, 125% is the new default. Alt+N toggles sway."
+		if effect == &"spruce_leaf_filter":
+			slider.editable = not _balanced_preview and _spruce_leaf_filter_editable()
 		if effect == &"night_path_chroma":
 			slider.tooltip_text = "Soften warm dirt color at night using the Forest reference. 0% restores the original path color. Daylight and the source atlas preview keep their own color."
 		slider.focus_mode = Control.FOCUS_NONE
