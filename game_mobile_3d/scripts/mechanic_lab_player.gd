@@ -219,6 +219,8 @@ func _use_composed_gait(key: String) -> bool:
 func _composed_gait_period(key: String, speed: float, state: Dictionary) -> float:
 	if crossbow_equipped and key in LabLocomotion.RUNS and hybrid_motion != null:
 		return hybrid_motion.period(speed, 1.0)
+	if hybrid_motion != null and hybrid_motion.uses_shovel_run(self, key):
+		return hybrid_motion.shovel_run_period(speed, float(state.period), hybrid_motion.shovel_run_weight(self, speed))
 	return super._composed_gait_period(key, speed, state)
 
 func _select_clip() -> String:
@@ -242,6 +244,7 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 	if key not in GAITS or not weapon_source_locomotion:
 		return super._outgoing_locomotion_sampler(key, phase)
 	var crossbow_run := crossbow_equipped and key in LabLocomotion.RUNS
+	var shovel_run: bool = hybrid_motion != null and hybrid_motion.uses_shovel_run(self, key)
 	var cursor := {"clip": key, "phase": phase}
 	_outgoing_locomotion_state = cursor
 	return func(delta: float) -> Array[Transform3D]:
@@ -249,6 +252,8 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 		var gait_state: Dictionary = source_gait.state(speed)
 		cursor.phase = fposmod(float(cursor.phase) + delta / _composed_gait_period(key, speed, gait_state), 1.0)
 		var pose: Array[Transform3D] = source_gait.compose(float(cursor.phase), speed)
+		if shovel_run:
+			hybrid_motion.apply_shovel_run(pose, float(cursor.phase), hybrid_motion.shovel_run_weight(self, speed))
 		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
 
 func _begin_pose_transition(key: String, seconds: float) -> void:
@@ -257,6 +262,9 @@ func _begin_pose_transition(key: String, seconds: float) -> void:
 		return
 	if key == "InspectWeapon" or (active_clip == "InspectWeapon" and key == "Idle"):
 		source_transition.begin_evaluated(IDLE_GESTURE_BLEND_SECONDS, Callable(), &"smoothstep")
+		return
+	if hybrid_motion != null and (hybrid_motion.uses_shovel_run(self, key) or hybrid_motion.uses_shovel_run(self, active_clip)):
+		source_transition.begin_evaluated(maxf(seconds, 0.11), Callable(), &"smoothstep")
 		return
 	if crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY]:
 		if key in GAITS or key in ["Idle", "CombatReady", "InspectWeapon"]:
