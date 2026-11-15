@@ -27,12 +27,6 @@ Nếu map có hai khoảng mở, đặt thêm **Additional Local Diffuse Region*
 
 ## Import map tiếp theo
 
-### Địa hình trang trí ở rìa map
-
-Trong WorldMap, vào **L → Cài đặt → Sương & hiệu ứng → Sương theo khoảng cách → Địa hình xa sau bậc đá** để so bật/tắt. Lớp địa hình này nhận sắc ánh môi trường của biome và sương tại độ sâu của chính nó. Nó bật mặc định trong Kết hợp. Preset lưu trước phiên bản 158 tắt lớp này khi thiếu tùy chọn để tái hiện hình đã lưu.
-
-Để dùng cùng pipeline trên một map import, đặt **Cliff Vista Origin**, **Cliff Vista Scale**, **Cliff Vista Mesh Anchor** và **Cliff Vista Sections** trong Inspector, rồi gán **Distant Terrain Layout Sha** bằng SHA-256 của JSON layout hiện tại. Các section phải nằm trong gói mesh MD2 cục bộ đã được loader kiểm chứng. Đặt chúng ngoài phần chơi và kiểm từ các góc zoom mà map cho phép. Cấu hình map chọn hình học và vị trí. Preset biome tiếp tục quyết định ánh sáng, sương và thời tiết. Chế độ Nhẹ của map portable, Compatibility và bản xuất dùng nền thông thường.
-
 1. Từ thư mục `GameAssetFactory`, chạy lệnh dưới đây để tạo dữ liệu map và scene chơi thử. Với `bounds`, cạnh ngoài lấy từ vùng chọn của schematic và giữ cả vùng đệm rỗng. Chế độ `markers` dùng vòng Red Wool 100 × 100 của WorldMap. Cả hai kiểm tra slab, tall grass, vùng chồng lấn và block chưa hỗ trợ.
 
    ```powershell
@@ -46,6 +40,12 @@ Trong WorldMap, vào **L → Cài đặt → Sương & hiệu ứng → Sương 
 Quy trình trên đã chạy với `Testing.litematic` (50 × 50 m, 5.632 cell) trên Godot Forward Mobile/D3D12. Cùng scene chạy Rìa rừng ẩm và Đồng cỏ với cùng shader. Đã kiểm tra năm mốc giờ, trời quang/nhiều mây, đi lại, mức Nhẹ và góc toàn cảnh. OpenGL Compatibility đã qua bài kiểm tra depth fog dự phòng. Kiểm thử điện thoại và các kiểu thời tiết ngoài quang/nhiều mây còn mở.
 
 Khi chuyển sang preset không dùng spatial mist hoặc bloom thích ứng, renderer giải phóng bộ đệm riêng của hiệu ứng đó và dùng fog/glow tích hợp theo preset mới. Chuyển lại dựng lại hiệu ứng trên cùng camera. Với `Testing.litematic` ở 19:30 trên Forward Mobile/D3D12 (640 × 360), đổi sang Đồng cỏ giải phóng 2.017.840 byte bộ đệm do hai hiệu ứng quản lý. Quay lại Rìa rừng ẩm giữ giờ và khôi phục ảnh trùng từng pixel trong bài đo camera cố định.
+
+## Địa hình trang trí ở rìa map
+
+Trong WorldMap, vào **L → Cài đặt → Sương & hiệu ứng → Sương theo khoảng cách → Địa hình xa sau bậc đá** để so bật/tắt. Lớp địa hình này nhận sắc ánh môi trường của biome và sương tại độ sâu của chính nó. Nó bật mặc định trong Kết hợp. Preset lưu trước phiên bản 158 tắt lớp này khi thiếu tùy chọn để tái hiện hình đã lưu.
+
+Để dùng cùng pipeline trên một map import, đặt **Cliff Vista Origin**, **Cliff Vista Scale**, **Cliff Vista Mesh Anchor** và **Cliff Vista Sections** trong Inspector, rồi gán **Distant Terrain Layout Sha** bằng SHA-256 của JSON layout hiện tại. Các section phải nằm trong gói mesh MD2 cục bộ đã được loader kiểm chứng. Đặt chúng ngoài phần chơi và kiểm từ các góc zoom mà map cho phép. Cấu hình map chọn hình học và vị trí. Preset biome tiếp tục quyết định ánh sáng, sương và thời tiết. Chế độ Nhẹ của map portable, Compatibility và bản xuất dùng nền thông thường.
 
 ## Phạm vi tích hợp hiện tại
 
