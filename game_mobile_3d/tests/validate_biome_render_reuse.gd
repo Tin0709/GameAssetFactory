@@ -101,6 +101,27 @@ func run() -> void:
 		"Forest sunlight opening response comes from the biome preset")
 	check(forest_settings.get("alternate_mist_by_hour") is Curve,
 		"Forest's low mist has a biome-authored schedule")
+	check(forest_settings.get("mist_sky_scatter_by_hour") is Curve,
+		"Forest sky in mist is scheduled by the biome")
+	if showcase.mist != null:
+		var sky_control: HSlider = showcase._lighting_sliders.get(&"mist_sky_scatter")
+		check(sky_control != null and sky_control.editable and is_equal_approx(sky_control.value, 1.),
+			"F5 exposes and enables sky scattering by default")
+		for time: float in [7., 12., 16.5, 22.]:
+			showcase.set_hour(time)
+			await process_frame
+			await RenderingServer.frame_post_draw
+			var gain: float = showcase.mist.effect.snapshot().get("sky_air_gain", -1.)
+			check(is_equal_approx(gain, 1.25 if time in [7., 16.5] else 0.),
+				"Shared volume receives the biome sky gain at %.1f" % time)
+		showcase.set_hour(16.5)
+		showcase.set_lighting_scale(&"mist_sky_scatter", 0.)
+		await process_frame
+		await RenderingServer.frame_post_draw
+		check(is_zero_approx(showcase.mist.effect.snapshot().get("sky_air_gain", -1.)),
+			"Live comparison clears the sky source")
+		showcase.set_lighting_scale(&"mist_sky_scatter", 1.)
+		showcase.set_hour(12.)
 	if showcase.mist != null:
 		var entry_control: HSlider = showcase._lighting_sliders.get(&"mist_entry_scatter")
 		check(entry_control != null and is_equal_approx(entry_control.value, 1.),
