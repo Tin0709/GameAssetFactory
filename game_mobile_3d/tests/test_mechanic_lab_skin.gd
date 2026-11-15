@@ -76,6 +76,32 @@ func run() -> void:
 	picker.select(1)
 	picker.item_selected.emit(1)
 	check(actor.get_node_or_null("KaiAppearance") == kai and kai.is_visible_in_tree(), "Repeated swaps reuse one Kai rig")
+	actor.requested_direction = Vector2.ZERO
+	actor.requested_run = false
+	for i in 18:
+		await physics_frame
+	var weapons := lab.get_node("HUD/Weapon") as OptionButton
+	weapons.select(lab.Weapon.CROSS_POLLINATOR)
+	weapons.item_selected.emit(lab.Weapon.CROSS_POLLINATOR)
+	check(actor.crossbow_equipped, "Kai retains the live Lab weapon selector")
+	actor.attack(true)
+	for i in 3:
+		await physics_frame
+	check(actor.combo.active(), "An equipped crossbow can fire on Kai")
+	var shot_serial: int = actor.combo.serial
+	picker.select(0)
+	picker.item_selected.emit(0)
+	check(actor.combo.active() and actor.combo.serial == shot_serial and actor.crossbow_equipped,
+		"Changing skin mid-attack leaves the same shot active")
+	picker.select(1)
+	picker.item_selected.emit(1)
+	actor.attack(false)
+	for i in 15:
+		await physics_frame
+	lab._on_player_hit(999)
+	check(picker.disabled and kai.visible, "Defeat retains the chosen appearance")
+	lab.reset_player()
+	check(not picker.disabled and picker.selected == 1 and kai.visible, "Respawn keeps Kai and enables the skin selector")
 	lab.free()
 	print("MECHANIC_LAB_SKIN failures=", failures)
 	quit(int(not failures.is_empty()))
