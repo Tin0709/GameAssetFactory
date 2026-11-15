@@ -103,6 +103,7 @@ ambient_energy_by_hour = SubResource("ForestAmbientHours")
 shadow_grade_recovery_by_hour = SubResource("ShadowGradeRecovery")
 daylight_shadow_luminance_scale = 0.3
 daylight_shade_retention = 0.55
+green_shadow_exposure_trim = 0.16
 daylight_green_grade_scale = 1.0
 zoom_exposure_blur_strength = 1.0
 shadowed_wall_return_scale = 1.5

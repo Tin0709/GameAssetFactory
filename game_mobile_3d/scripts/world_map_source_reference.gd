@@ -3,6 +3,7 @@ extends "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphic
 var _source_frame:=-1
 var _source_strength:=0.
 var _source_shadow_lift:=1.
+var _source_green_shadow_trim := 0.
 var _guide_scale := 1.
 var _blur_scale := 1.
 var _submitted_guide_scale := 1.
@@ -27,7 +28,7 @@ func _statistics_blur_scale() -> float:
 
 func rendered_source()->Dictionary:
  return {"frame":_source_frame,"strength":_source_strength,"shadow_lift":_source_shadow_lift,
-  "guide_scale":_submitted_guide_scale,"blur_scale":_graph.blur_scale}
+  "green_shadow_trim":_source_green_shadow_trim,"guide_scale":_submitted_guide_scale,"blur_scale":_graph.blur_scale}
 
 func _storage_uniform(rd: RenderingDevice, binding: int, bytes: PackedByteArray) -> RDUniform:
  var uniform := super(rd, binding, bytes)
@@ -48,10 +49,12 @@ func _render_pass(rd:RenderingDevice,framebuffer:RID,pipeline:RID,uniform_set:RI
     _submitted_guide_scale = scale
   _source_strength=control.decode_float(4)if control.decode_float(0)>0. else 0.
   _source_shadow_lift=control.decode_float(8)
+  _source_green_shadow_trim = control.decode_float(12)
   _source_frame=_frames+1
  super(rd,framebuffer,pipeline,uniform_set,control)
 func _release_resources()->void:
  _source_frame=-1;_source_strength=0.;_source_shadow_lift=1.
+ _source_green_shadow_trim = 0.
  _guide_buffer = RID()
  _submitted_guide_scale = 1.
  super()

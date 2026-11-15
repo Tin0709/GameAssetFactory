@@ -1,5 +1,6 @@
 extends "res://scripts/world_map_multiscale_bloom.gd"
 ## Original source-order experiment. Native clock/radiometry are not established.
+const EXPOSURE_REFERENCE = preload("res://scripts/world_map_source_reference.gd")
 var _source_reference:WeakRef
 var _source_requested:=false
 var _source_weight:=0.
@@ -43,7 +44,10 @@ func _candidate(data:RenderData)->Dictionary:
 	var guide_scale := float(state.get("guide_scale", 1.))
 	if guide_scale != 1.:
 		bytes.encode_float(16, bytes.decode_float(16) * guide_scale)
-	bytes.append_array(PackedFloat32Array([strength,strength,shadow_lift,0.]).to_byte_array())
+	var green_shadow_trim := float(state.get("green_shadow_trim", 0.))
+	if not is_finite(green_shadow_trim) or green_shadow_trim < 0. or green_shadow_trim > .40001:
+		return {}
+	bytes.append_array(PackedFloat32Array([strength,strength,shadow_lift,green_shadow_trim]).to_byte_array())
 	return {"raw":raw,"grid":grid,"blur":blur,"parameters":bytes}
 
 func _render_callback(kind:int,data:RenderData)->void:
@@ -99,6 +103,7 @@ layout(set=0,binding=2)uniform sampler2D raw_scene;
 layout(set=0,binding=3)uniform sampler3D source_statistics;
 layout(set=0,binding=4)uniform sampler2D source_broad_log;
 layout(set=0,binding=5,std430)readonly buffer SourceSettings{vec4 s[];};
+""" + EXPOSURE_REFERENCE.GREEN_SHADOW_TRIM_SHADER + """
 float source_gain(vec3 rgb,vec2 uv){
  float value=log2(max(dot(rgb*s[2].w,s[3].xyz),s[2].z));
  float depth=(value*s[1].z+s[1].w)*s[2].x+s[2].y;
@@ -107,6 +112,7 @@ float source_gain(vec3 rgb,vec2 uv){
  float local=pair.y<s[1].y?broad:pair.x/pair.y;
  float delta=local+(broad-local)*s[1].x+log2(s[0].x/s[0].y);
  float strength=delta>0.?s[4].x:s[4].x*s[4].z;
+ if (delta < 0.0) strength *= gaf_green_shadow_lift(rgb,s[3].xyz,s[4].w);
  float contrast=mix(1.,delta>0.?s[0].z:s[0].w,strength);
  return exp2((contrast-1.)*delta);
 }

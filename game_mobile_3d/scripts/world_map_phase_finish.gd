@@ -132,7 +132,8 @@ func refresh()->void:
   for key in ["tonemap_mode","tonemap_exposure","adjustment_enabled"]:_saved[key]=env.get(key)
  var gain_scale:float=showcase.local_exposure_mix_scale()
  var finish_scale:float=showcase.reference_finish_mix_scale()
- _native.set_strength(weight*gain_scale,showcase.local_exposure_shadow_lift())
+ _native.set_strength(weight * gain_scale, showcase.local_exposure_shadow_lift(),
+  showcase.green_shadow_exposure_trim())
  var camera: Camera3D = showcase.level.get_viewport().get_camera_3d()
  var zoom_weight := 0.
  if not showcase._balanced_preview and camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:

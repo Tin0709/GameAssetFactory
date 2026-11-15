@@ -115,6 +115,7 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., .52, .01) var daylight_shadow_luminance_scale := 0.
 ## Fraction of the daylight shadow lift retained as contrast behind the fog entry.
 @export_range(0., 1., .01) var daylight_shade_retention := 0.
+@export_range(0., .4, .01) var green_shadow_exposure_trim := 0.
 ## Shadow recovery for dark greens in the optional reference finish.
 @export_range(0., 1., .01) var daylight_green_grade_scale := 0.
 ## Keep the reference local-exposure blur footprint steadier when zooming out.

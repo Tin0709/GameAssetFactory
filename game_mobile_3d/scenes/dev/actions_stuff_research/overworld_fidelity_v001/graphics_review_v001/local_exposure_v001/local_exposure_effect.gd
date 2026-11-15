@@ -2,6 +2,15 @@ extends "hdr_raster_gain.gd"
 ## Original opt-in live effect, same conformed graph as frozen-input validation.
 const Pipeline=preload("exposure_pipeline.gd")
 const KERNEL_FOLDER="res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/local_exposure_v001/shaders"
+const GREEN_SHADOW_TRIM_SHADER := """
+float gaf_green_shadow_lift(vec3 color, vec3 luma, float amount) {
+ if (amount <= 0.0) return 1.0;
+ float y = max(dot(color, luma), 0.00001);
+ float hue = smoothstep(.09,.29,(color.g-color.r)/y)*smoothstep(.12,.34,(color.g-color.b)/y);
+ float shade = smoothstep(.002,.007,y)*(1.0-smoothstep(.014,.049,y));
+ return 1.0 - amount*hue*shade;
+}
+"""
 var _graph=Pipeline.new()
 var _parameters:Dictionary={}
 var _kernel_folder:=""
@@ -10,6 +19,7 @@ var _ready_live:=false
 var _neutral:=false
 var _strength:=1.
 var _shadow_lift:=1.
+var _green_shadow_trim := 0.
 var _half:=RID()
 var _half_fb:=RID()
 var _first_pipeline:=RID()
@@ -48,10 +58,11 @@ func _load_external(path:String)->bool:
  return true
 func set_neutral(value:bool)->void:
  _mutex.lock();_neutral=value;_mutex.unlock()
-func set_strength(value:float,shadow_lift:float=1.)->void:
+func set_strength(value:float,shadow_lift:float=1.,green_shadow_trim:float=0.)->void:
  _mutex.lock()
  _strength=clampf(value,0.,1.)if is_finite(value)else 0.
  _shadow_lift=clampf(shadow_lift,0.,1.)if is_finite(shadow_lift)else 1.
+ _green_shadow_trim = clampf(green_shadow_trim, 0., .4) if is_finite(green_shadow_trim) else 0.
  _mutex.unlock()
 func snapshot()->Dictionary:
  _mutex.lock();var result:Dictionary=_published.duplicate(true);_mutex.unlock();return result
@@ -98,6 +109,7 @@ layout(set=0,binding=2)uniform sampler2D blurred_log;
 layout(std430,set=0,binding=3)readonly buffer Parameters{vec4 p[];};
 layout(push_constant,std430)uniform Control{vec4 value;}control;
 layout(location=0)out vec4 output_color;
+""" + GREEN_SHADOW_TRIM_SHADER + """
 void main(){
  ivec2 pixel=ivec2(gl_FragCoord.xy);vec2 uv=gl_FragCoord.xy/vec2(textureSize(source_color,0));
  vec4 color=texelFetch(source_color,pixel,0);
@@ -108,6 +120,7 @@ void main(){
  float local=grid.y<p[1].y?blur:grid.x/grid.y;
  float base=local+(blur-local)*p[1].x+log2(p[0].x);float delta=base-log2(p[0].y);
  float strength=delta>0.?control.value.y:control.value.y*control.value.z;
+ if (delta < 0.0) strength *= gaf_green_shadow_lift(color.rgb,p[3].xyz,control.value.w);
  float contrast=delta>0.?p[0].z:p[0].w;if(strength<1.)contrast=mix(1.,contrast,strength);if(control.value.x==0.)contrast=1.;
  float gain=exp2((contrast-1.)*delta);output_color=vec4(color.rgb*gain,color.a);
 }
@@ -141,8 +154,13 @@ func _render_frame(kind:int,data:RenderData)->void:
   _ready_live=true
  _draw(rd,_copy_fb,_source_set,1.);_render_pass(rd,_half_fb,_first_pipeline,_first_set)
  if not _graph.execute(_statistics_blur_scale()):_error=_graph.error;return
- _mutex.lock();var neutral:=_neutral;var strength:=_strength;var shadow_lift:=_shadow_lift;_mutex.unlock()
- _render_pass(rd,_scene_fb,_final_pipeline,_final_set,PackedFloat32Array([0. if neutral else 1.,strength,shadow_lift,0.]).to_byte_array())
+ _mutex.lock()
+ var neutral := _neutral
+ var strength := _strength
+ var shadow_lift := _shadow_lift
+ var green_shadow_trim := _green_shadow_trim
+ _mutex.unlock()
+ _render_pass(rd,_scene_fb,_final_pipeline,_final_set,PackedFloat32Array([0. if neutral else 1.,strength,shadow_lift,green_shadow_trim]).to_byte_array())
  _mutex.lock();_frames+=1;_mutex.unlock()
 func release_on_render_thread()->void:
  _release_resources();_publish_snapshot()

@@ -280,11 +280,12 @@ const LIGHTING_MIX_CONTROLS := {
 	&"exposure": ["Local exposure", 1.],
 	&"daylight_shadow_lift": ["Daylight shadow lift", 1.],
 	&"daylight_shade_retention": ["Chiều sâu bóng râm qua sương", 1.],
+	&"green_shadow_exposure_trim": ["Giữ sắc độ cỏ trong râm", 1.],
 	&"twilight_shadow_lift": ["Giữ chiều sâu vùng râm", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 183
+const LIGHTING_MIX_VERSION := 184
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2424,6 +2425,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 184 and effect == &"green_shadow_exposure_trim":
+			fallback = 0.
 		if version < 183 and effect == &"kai_ground_bounce":
 			missing_value = 0.
 		if version < 182 and effect == &"daylight_shade_retention":
@@ -2648,6 +2651,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and plants != null and plants.grass_light.active and plants.dense_grass_review
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
+		if effect == &"green_shadow_exposure_trim":
+			slider.editable = slider.editable and _green_shadow_exposure_editable()
 		if effect == &"daylight_shade_retention":
 			slider.editable = slider.editable and _daylight_shade_retention_editable()
 		if effect == &"daylight_shadow_luminance":
@@ -2779,7 +2784,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"cliff_vista", &"cliff_vista_feather"]:
 		_update_mist()
 		return
-	if changed_effect in [&"zoom_exposure_guide", &"zoom_exposure_blur"]:
+	if changed_effect in [&"zoom_exposure_guide", &"zoom_exposure_blur", &"green_shadow_exposure_trim"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -3069,6 +3074,16 @@ func _daylight_grade_phase() -> float:
 func daylight_shadow_grade_weight() -> float:
 	return _daylight_grade_phase() * _lighting_scale(&"daylight_shadow_grade")
 
+func green_shadow_exposure_trim() -> float:
+	if _biome_profile == null or _balanced_preview or level.look.stage != 2 or atmosphere_review != "combined":
+		return 0.
+	var phase := DayNight.sample_curve(_biome_profile.shadow_grade_recovery_by_hour, hour / 24., 0.)
+	return clampf(phase, 0., 1.) * _biome_profile.green_shadow_exposure_trim * _lighting_scale(&"green_shadow_exposure_trim")
+
+func _green_shadow_exposure_editable() -> bool:
+	return _biome_profile != null and _biome_profile.green_shadow_exposure_trim > 0. \
+		and phase_finish != null and phase_finish.available()
+
 func daylight_shade_retention() -> float:
 	if _balanced_preview or _biome_profile == null:
 		return 0.
@@ -3224,6 +3239,9 @@ func _restore_comparison_stage(previous: int) -> void:
 		level.look.set_stage(previous)
 
 func _update_shape_control()->void:
+	var green_shadow: HSlider = _lighting_sliders.get(&"green_shadow_exposure_trim")
+	if green_shadow != null:
+		green_shadow.editable = not _balanced_preview and _green_shadow_exposure_editable()
 	var shade_retention: HSlider = _lighting_sliders.get(&"daylight_shade_retention")
 	if shade_retention != null:
 		shade_retention.editable = not _balanced_preview and _daylight_shade_retention_editable()
