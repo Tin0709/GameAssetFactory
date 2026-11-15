@@ -52,6 +52,7 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var bark_diffuse_return_tint := Vector3.ONE
 ## Bright-leaf response to the supported player lamp at twilight.
 @export_range(0., 1., .01) var twilight_leaf_lamp_shoulder_strength := 0.
+@export_range(0., 1., .01) var night_leaf_lamp_shoulder_strength := 0.
 ## Additional diffuse sky on supported player materials under canopy.
 ## Curve X is normalized hour and Y is a gain from 0 to 1.
 @export var actor_shade_sky_by_hour: Curve

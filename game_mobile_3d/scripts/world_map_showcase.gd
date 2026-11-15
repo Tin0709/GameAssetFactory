@@ -259,7 +259,8 @@ const LIGHTING_MIX_CONTROLS := {
 	&"actor_view_fill_chroma": ["Hòa màu ánh bù trên Valorie", 1.],
 	&"actor_twilight_view_fill": ["Dịu ánh bù trên Valorie lúc chạng vạng", 1.],
 	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
-	&"twilight_leaf_lamp_shoulder": ["Dịu ánh đèn hông trên lá", 1.],
+	&"twilight_leaf_lamp_shoulder": ["Dịu ánh đèn hông trên lá lúc chạng vạng", 1.],
+	&"night_leaf_lamp_shoulder": ["Dịu ánh đèn hông trên lá ban đêm", 1.],
 	&"canopy_direct_softness": ["Dịu nắng trên tán cao", 1.],
 	&"late_canopy_sun": ["Dịu nắng còn lại khi lên đèn", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
@@ -294,7 +295,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 190
+const LIGHTING_MIX_VERSION := 191
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2186,14 +2187,22 @@ func _sync_twilight_crown() -> void:
 	level.grove.set_crown_dusk_occlusion(amount)
 	level.grove.set_crown_ambient_depth(depth)
 	var lamp_shoulder := 0.
-	if _twilight_leaf_lamp_editable() and forest_active() and level.look.stage == 2:
-		lamp_shoulder = _biome_profile.twilight_leaf_lamp_shoulder_strength * twilight_finish_weight() \
-			* _lighting_scale(&"twilight_leaf_lamp_shoulder")
+	if level.look.stage == 2 and atmosphere_review == "combined" and not _balanced_preview:
+		if forest_active() and _leaf_lamp_editable(&"twilight_leaf_lamp_shoulder"):
+			lamp_shoulder = _biome_profile.twilight_leaf_lamp_shoulder_strength * twilight_finish_weight() \
+				* _lighting_scale(&"twilight_leaf_lamp_shoulder")
+		if _leaf_lamp_editable(&"night_leaf_lamp_shoulder"):
+			var night_mix := moonlight_weight(hour) * _lighting_scale(&"night_leaf_lamp_shoulder")
+			lamp_shoulder = lerpf(lamp_shoulder, _biome_profile.night_leaf_lamp_shoulder_strength, night_mix)
 	level.grove.set_twilight_leaf_lamp_shoulder(lamp_shoulder)
 
-func _twilight_leaf_lamp_editable() -> bool:
-	return RenderingServer.get_current_rendering_method() == &"mobile" and is_instance_valid(level.grove) \
-		and level.grove.source_oaks and _biome_profile != null and _biome_profile.twilight_leaf_lamp_shoulder_strength > 0.
+func _leaf_lamp_editable(effect: StringName) -> bool:
+	if RenderingServer.get_current_rendering_method() != &"mobile" or not is_instance_valid(level.grove) \
+			or not level.grove.source_oaks or _biome_profile == null:
+		return false
+	if effect == &"night_leaf_lamp_shoulder":
+		return _biome_profile.night_leaf_lamp_shoulder_strength > 0.
+	return _biome_profile.twilight_leaf_lamp_shoulder_strength > 0.
 
 func _sync_canopy_direct() -> void:
 	if level == null or not is_instance_valid(level.grove):
@@ -2542,6 +2551,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 191 and effect == &"night_leaf_lamp_shoulder":
+			missing_value = 0.
 		if version < 190 and effect == &"day_path_chroma":
 			missing_value = 0.
 		if version < 189 and effect == &"spruce_leaf_filter":
@@ -2766,8 +2777,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"crown_ambient_depth":
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
-		if effect == &"twilight_leaf_lamp_shoulder":
-			slider.editable = slider.editable and _twilight_leaf_lamp_editable()
+		if effect in [&"twilight_leaf_lamp_shoulder", &"night_leaf_lamp_shoulder"]:
+			slider.editable = slider.editable and _leaf_lamp_editable(effect)
 		if effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks
 		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
@@ -2960,7 +2971,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if plants != null:
 			plants.grass_light.sync()
 		return
-	if changed_effect in [&"twilight_crown", &"crown_ambient_depth", &"twilight_leaf_lamp_shoulder"]:
+	if changed_effect in [&"twilight_crown", &"crown_ambient_depth", &"twilight_leaf_lamp_shoulder", &"night_leaf_lamp_shoulder"]:
 		_sync_twilight_crown()
 		return
 	if changed_effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
@@ -3712,8 +3723,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = _has_mist_sky_scatter()
 		if effect == &"mist_dusk_sky_scatter":
 			slider.editable = _has_mist_sky_scatter(true)
-		if effect == &"twilight_leaf_lamp_shoulder":
-			slider.editable = _twilight_leaf_lamp_editable()
+		if effect in [&"twilight_leaf_lamp_shoulder", &"night_leaf_lamp_shoulder"]:
+			slider.editable = _leaf_lamp_editable(effect)
 		if effect == &"mist_entry_scatter":
 			slider.editable = mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"basin_sunlit_mist":

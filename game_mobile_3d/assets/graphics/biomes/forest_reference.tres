@@ -126,6 +126,7 @@ bark_irradiance_tint = Vector3(0.50, 1.16, 1.79)
 bark_diffuse_return_by_hour = SubResource("ForestBarkDiffuseReturn")
 bark_diffuse_return_tint = Vector3(0.57, 1, 1.39)
 twilight_leaf_lamp_shoulder_strength = 0.4
+night_leaf_lamp_shoulder_strength = 0.3
 actor_shade_sky_by_hour = SubResource("ForestActorShadeSky")
 lantern_ground_return_by_hour = SubResource("ForestLanternGroundReturn")
 actor_side_sky_by_hour = SubResource("ForestActorSideSky")
