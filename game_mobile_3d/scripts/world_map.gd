@@ -405,6 +405,7 @@ func _process(delta: float) -> void:
 			if absf(camera.size - _camera_size_target) < 0.002:
 				camera.size = _camera_size_target
 				_camera_zooming = false
+			showcase.refresh_cliff_vista()
 		var focus: Vector3 = presentation.player_position()
 		_update_camera_near(camera)
 		camera.position=Vector3(focus.x,_camera_ground_y,focus.z)+CAMERA_OFFSET

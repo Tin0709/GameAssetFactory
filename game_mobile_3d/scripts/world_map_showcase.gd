@@ -69,6 +69,7 @@ var _source_terrain_toggle: CheckButton
 var forest := FOREST.new("", "")
 var _biome_profile: BiomeProfile
 var distant_terrain := DistantTerrain.new()
+var _cliff_vista_enabled := false
 var playable_terrace: PlayableTerrace
 var playable_boulder: PlayableBoulder
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
@@ -898,11 +899,15 @@ func set_weather(overcast: float, seconds: float = 2.5) -> void:
 		_update_mist()
 
 func sync_cliff_vista(enabled: bool) -> void:
+	_cliff_vista_enabled = enabled
+	refresh_cliff_vista()
+
+func refresh_cliff_vista() -> void:
 	if not is_instance_valid(distant_terrain.vista):
 		return
 	var env: Environment = level.get_node("WorldEnvironment").environment
 	var camera: Camera3D = level.get_node("Camera3D")
-	distant_terrain.update_vista(enabled and level.look.stage == 2 and level.view_mode == "gameplay",
+	distant_terrain.update_vista(_cliff_vista_enabled and level.look.stage == 2 and level.view_mode == "gameplay",
 		env, camera, hour, _lighting_scale(&"cliff_vista_feather") if private_primary else 1.)
 
 func _sync_distant_terrain() -> void:
