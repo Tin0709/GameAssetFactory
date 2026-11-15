@@ -170,7 +170,9 @@ class ImportWorldMapTests(unittest.TestCase):
             output = project / "assets/maps/new_meadow"
             scene = project / "scenes/maps/NewMeadow.tscn"
             args = ["import_world_map.py", str(source), "--border", "bounds",
-                    "--output", str(output), "--scene", str(scene), "--biome", "humid_woodland"]
+                    "--output", str(output), "--scene", str(scene), "--biome", "humid_woodland",
+                    "--quality", "balanced", "--start-hour", "19.5", "--start-overcast", "0",
+                    "--atmosphere-base-y", "-2.25"]
             with patch.object(importer, "GODOT_PROJECT", project), patch("sys.stdout", new_callable=io.StringIO), patch("sys.stderr", new_callable=io.StringIO):
                 with patch.object(sys, "argv", args):
                     importer.main()
@@ -181,6 +183,10 @@ class ImportWorldMapTests(unittest.TestCase):
                 self.assertIn(b'res://assets/graphics/biomes/meadow.tres', original)
                 self.assertIn(b'map_layout_path = "res://assets/maps/new_meadow/runtime.json"', original)
                 self.assertIn(b'biome_graphics = ExtResource("biome")', original)
+                self.assertIn(b"biome_quality = 1", original)
+                self.assertIn(b"biome_start_hour = 19.5", original)
+                self.assertIn(b"biome_start_overcast = 0.0", original)
+                self.assertIn(b"biome_atmosphere_base_y = -2.25", original)
                 self.assertIn(b'comparison_biomes = Array[ExtResource("profile")]([ExtResource("comparison")])', original)
                 self.assertIn(b'[node name="NewMeadow" instance=ExtResource("base")]', original)
                 existing_runtime = output.joinpath("runtime.json").read_bytes()
@@ -255,6 +261,9 @@ class ImportWorldMapTests(unittest.TestCase):
                             importer.main()
                             self.assertIn('res://assets/graphics/biomes/custom_valley.tres', scene.read_text())
                             self.assertIn('res://assets/graphics/biomes/meadow.tres', scene.read_text())
+                            for property_name in ("biome_quality", "biome_start_hour",
+                                                  "biome_start_overcast", "biome_atmosphere_base_y"):
+                                self.assertNotIn(f"{property_name} =", scene.read_text())
                             self.assertTrue(output.joinpath("runtime.json").exists())
                         else:
                             with self.assertRaises(SystemExit):
@@ -272,7 +281,16 @@ class ImportWorldMapTests(unittest.TestCase):
                 for overrides in (["--scene", str(scene), "--biome", "forest_reference"],
                                   ["--scene", str(project / "WrongFolder.tscn")],
                                   ["--scene", str(scene.with_name("Invalid Scene.tscn"))],
-                                  ["--biome", "meadow"]):
+                                  ["--biome", "meadow"],
+                                  ["--quality", "balanced"],
+                                  ["--start-hour", "7"],
+                                  ["--start-overcast", "0"],
+                                  ["--atmosphere-base-y", "0"],
+                                  ["--scene", str(scene), "--quality", "ultra"],
+                                  ["--scene", str(scene), "--start-hour", "25"],
+                                  ["--scene", str(scene), "--start-overcast", "-0.01"],
+                                  ["--scene", str(scene), "--atmosphere-base-y", "inf"],
+                                  ["--scene", str(scene), "--start-hour", "nan"]):
                     with self.subTest(overrides=overrides):
                         with patch.object(sys, "argv", ["import_world_map.py", "unused.litematic",
                                                         "--output", str(output), *overrides]):
