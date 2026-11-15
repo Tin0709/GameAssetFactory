@@ -2043,12 +2043,18 @@ func _sync_bark_irradiance() -> void:
 	var state := Vector4.ZERO
 	var tint := Vector3.ONE
 	if _biome_profile != null and not _balanced_preview and forest_active() and atmosphere_review == "combined" \
-		and level.ambient != null and level.view_mode == "gameplay":
+		and level.ambient != null and level.ambient.is_active() and level.view_mode == "gameplay":
 		var strength := clampf(DayNight.sample_curve(_biome_profile.bark_irradiance_by_hour, hour / 24., 0.), 0., 1.)
 		strength *= _lighting_scale(&"bark_irradiance")
 		if strength > 0.:
 			var environment: Environment = level.get_node("WorldEnvironment").environment
-			var incident: Vector3 = level.ambient.sky_irradiance_mean(environment)
+			if environment != level.ambient._environment or environment.sky != level.ambient._sky \
+				or environment.ambient_light_source != Environment.AMBIENT_SOURCE_SKY \
+				or not is_equal_approx(environment.ambient_light_sky_contribution, 1.):
+				level.grove.set_bark_irradiance(state, tint)
+				return
+			var linear := environment.ambient_light_color.srgb_to_linear()
+			var incident := Vector3(linear.r, linear.g, linear.b) * environment.ambient_light_energy
 			if incident.is_finite() and not incident.is_zero_approx():
 				tint = _biome_profile.bark_irradiance_tint.clamp(Vector3(.05, .05, .05), Vector3(3., 3., 3.))
 				if tint.is_finite():
