@@ -56,17 +56,19 @@ func run():
   check(is_equal_approx(w.get_node("Sun").light_energy,sun),"Gentler Noon sunlight unchanged")
   check(is_equal_approx(w.look._exposure_effect._review_strength,.12),"Noon bounded exposure restored")
   var control := w.showcase._lighting_sliders.get(&"daylight_shadow_luminance") as HSlider
-  check(control != null and is_equal_approx(control.value, 1.), "Default daylight shade adjustment has a live slider")
+  check(control != null and is_equal_approx(control.value, .70), "Default daylight shade adjustment has a live slider at 70%")
   var effect: CompositorEffect = w.look._exposure_effect
   for hour in [7., 16.5]:
    w.showcase.set_hour(hour)
    await settle()
-   check(is_equal_approx(effect.snapshot().get("daylight_shadow_luminance", -1.), .30),
+   check(is_equal_approx(effect.snapshot().get("daylight_shadow_luminance", -1.), .21),
     "Daylight shade reaches the existing finish pass at %.1f" % hour)
   w.showcase.set_lighting_scale(&"daylight_shadow_luminance", 0.)
   await settle()
   check(is_zero_approx(effect.snapshot().get("daylight_shadow_luminance", -1.)), "Slider zero restores unlifted shadows")
   w.showcase.set_lighting_scale(&"daylight_shadow_luminance", 1.)
+  await settle()
+  check(is_equal_approx(effect.snapshot().get("daylight_shadow_luminance", -1.), .30), "100% restores the previous daylight shade lift")
   w.showcase.set_lighting_scale(&"grade", 0.)
   await settle()
   check(is_zero_approx(effect.snapshot().get("daylight_shadow_luminance", -1.)), "Turning off reference color excludes shade correction")
