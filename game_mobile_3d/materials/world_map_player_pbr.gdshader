@@ -33,6 +33,7 @@ uniform float self_light_scale = 0.0;
 uniform float actor_view_fill_chroma = 0.0;
 uniform float actor_twilight_view_fill = 0.0;
 uniform float actor_shade_sky = 0.0;
+uniform float actor_side_sky = 0.0;
 varying vec3 actor_world;
 varying float actor_canopy_sky;
 #ifdef GAF_PLAYER_DIRECT
@@ -105,7 +106,13 @@ void fragment(){
 				float side = 1.0 - .82 * smoothstep(.13, .87, wn.y);
 				shade_weight = actor_shade_sky * covered * side;
 			}
-			if (color_sky || shade_weight > 0.0) {
+			float side_weight = 0.0;
+			if (actor_side_sky > 0.0 && recovered_roughness && actor_canopy_sky < .97) {
+				float sides = 1.0 - smoothstep(.05, .60, abs(wn.y));
+				float covered = smoothstep(.03, .24, 1.0 - actor_canopy_sky);
+				side_weight = actor_side_sky * sides * covered;
+			}
+			if (color_sky || shade_weight > 0.0 || side_weight > 0.0) {
 				vec3 uncovered_sky = player_cube_sky(wn, height, 1.0);
 				// Retint only the diffuse sky contribution. The probe's sun bounce and reflection are separate.
 				if (color_sky) {
@@ -117,6 +124,14 @@ void fragment(){
 					// Return soft sky to covered sides using the local directional probes.
 					float sky_y = dot(uncovered_sky, vec3(.2126, .7152, .0722));
 					incident += mix(vec3(sky_y), uncovered_sky, .59) * shade_weight;
+				}
+				if (side_weight > 0.0) {
+					const vec3 luma = vec3(.2126, .7152, .0722);
+					vec3 upper = player_cube_sky(vec3(0.0, 1.0, 0.0), height, actor_canopy_sky);
+					float ceiling = dot(upper, luma);
+					float gap = clamp(.72 * ceiling - dot(uncovered_sky * actor_canopy_sky, luma), 0.0, .035);
+					vec3 hue = mix(vec3(1.0), upper / max(ceiling, .000001), .40);
+					incident += hue * (side_weight * gap);
 				}
 			}
 			if (recovered_roughness) incident = gaf_local_diffuse(incident, actor_world, wn);

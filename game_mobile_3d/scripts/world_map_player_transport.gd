@@ -20,7 +20,7 @@ var phase_bounce_active:=false
 var source_field_enabled:=false
 var source_field_active:=false
 var _source_key:Array=[]
-var _last_shade_sky := -1.
+var _last_shade_sky := Vector2(-1., -1.)
 func set_source_field(value:bool)->void:
  source_field_enabled=value;refresh(true)
 func set_phase_sky(value:bool)->void:
@@ -129,12 +129,15 @@ func refresh(force:bool=false)->void:
  update_usec=Time.get_ticks_usec()-started
 
 func refresh_shade_sky(force: bool = false) -> void:
- var strength: float = level.showcase.actor_shade_sky_weight() if _active and level.look.player_local_light_enabled else 0.
+ var strength := Vector2.ZERO
+ if _active and level.look.player_local_light_enabled:
+  strength = Vector2(level.showcase.actor_shade_sky_weight(), level.showcase.actor_side_sky_weight())
  if not force and _last_shade_sky == strength:
   return
  _last_shade_sky = strength
  for material: ShaderMaterial in level.look._direct_actor_materials:
   if material != null and material.get_meta("verified_valorie", false):
-   material.set_shader_parameter("actor_shade_sky", strength)
+   material.set_shader_parameter("actor_shade_sky", strength.x)
+   material.set_shader_parameter("actor_side_sky", strength.y)
 
 func _process(_delta:float)->void:refresh()

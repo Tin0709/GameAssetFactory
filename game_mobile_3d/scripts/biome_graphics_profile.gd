@@ -50,6 +50,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Additional diffuse sky on supported player materials under canopy.
 ## Curve X is normalized hour and Y is a gain from 0 to 1.
 @export var actor_shade_sky_by_hour: Curve
+## Fraction of the local upper-sky deficit returned to shaded lateral faces.
+@export var actor_side_sky_by_hour: Curve
 
 @export_group("Atmosphere and fog")
 @export var noon_sky_color := Color(.57, .68, .69)

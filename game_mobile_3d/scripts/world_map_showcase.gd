@@ -242,6 +242,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"player_sun_specular": ["Dịu phản sáng nắng trên Valorie", 1.],
 	&"player_canopy_color": ["Sắc ánh trời trên nhân vật", 1.],
 	&"actor_shade_sky": ["Ánh trời dịu trên Valorie dưới tán", 1.],
+	&"actor_side_sky": ["Ánh trời dịu trên mặt bên của Valorie", 1.],
 	&"actor_view_fill_chroma": ["Hòa màu ánh bù trên Valorie", 1.],
 	&"actor_twilight_view_fill": ["Dịu ánh bù trên Valorie lúc chạng vạng", 1.],
 	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
@@ -275,7 +276,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 177
+const LIGHTING_MIX_VERSION := 178
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1871,6 +1872,12 @@ func actor_shade_sky_weight() -> float:
 	var gain := DayNight.sample_curve(_biome_profile.actor_shade_sky_by_hour, hour / 24., 0.)
 	return clampf(gain, 0., 1.) * _lighting_scale(&"actor_shade_sky")
 
+func actor_side_sky_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() or _biome_profile == null:
+		return 0.
+	var gain := DayNight.sample_curve(_biome_profile.actor_side_sky_by_hour, hour / 24., 0.)
+	return clampf(gain, 0., 1.) * _lighting_scale(&"actor_side_sky")
+
 func actor_twilight_view_fill_weight() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() \
 			or not level.look.player_effects_available():
@@ -2358,6 +2365,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 174 and effect == &"zoom_exposure_blur":
 			missing_value = 0.
+		if version < 178 and effect == &"actor_side_sky":
+			missing_value = 0.
 		if version < 177 and effect == &"bark_diffuse_return":
 			missing_value = 0.
 		if version < 176 and effect == &"mist_sky_scatter":
@@ -2564,6 +2573,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and level.look.player_material.available()
 		if effect == &"actor_shade_sky":
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_shade_sky_by_hour != null
+		if effect == &"actor_side_sky":
+			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_side_sky_by_hour != null
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
 			slider.editable = slider.editable and sky_response.available() and plants != null and plants.grass_light.active
 		if effect == &"grass_step_coverage":
@@ -2769,7 +2780,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"canopy_edge_return", &"tree_shade"]:
 		return
-	if changed_effect == &"actor_shade_sky":
+	if changed_effect in [&"actor_shade_sky", &"actor_side_sky"]:
 		if level.player_light != null:
 			level.player_light.refresh_shade_sky()
 		return
@@ -2799,6 +2810,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	level.look._refresh_ground_bounce()
 	_update_mist()
 	_sync_bark_irradiance()
+	if level.player_light != null:
+		level.player_light.refresh_shade_sky()
 	if changed_effect == &"daylight_balance" and phase_finish != null:
 		phase_finish.refresh()
 

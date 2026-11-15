@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=20 format=3]
+[gd_resource type="Resource" load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -81,6 +81,10 @@ max_value = 0.22
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.22), 0.0, 0.0, 0, 0, Vector2(0.333333333, 0.22), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.22), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 9
 
+[sub_resource type="Curve" id="ForestActorSideSky"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 1), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 1), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 8
+
 [resource]
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
@@ -103,6 +107,7 @@ bark_irradiance_tint = Vector3(0.50, 1.16, 1.79)
 bark_diffuse_return_by_hour = SubResource("ForestBarkDiffuseReturn")
 bark_diffuse_return_tint = Vector3(0.57, 1, 1.39)
 actor_shade_sky_by_hour = SubResource("ForestActorShadeSky")
+actor_side_sky_by_hour = SubResource("ForestActorSideSky")
 alternate_mist_by_hour = SubResource("LowForestMistPhase")
 mist_entry_scatter_by_hour = SubResource("ForestEntryScatter")
 mist_sky_scatter_by_hour = SubResource("ForestMistSky")

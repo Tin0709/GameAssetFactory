@@ -116,6 +116,32 @@ func run() -> void:
 			"Live comparison clears bark light")
 		showcase.set_lighting_scale(&"bark_diffuse_return", 1.)
 		showcase.set_hour(12.)
+	check(forest_settings.get("actor_side_sky_by_hour") is Curve,
+		"Valorie side sky gain comes from the biome schedule")
+	if showcase.mist != null:
+		var side_slider := showcase._lighting_sliders.get(&"actor_side_sky") as HSlider
+		check(side_slider != null and is_equal_approx(side_slider.value, 1.), "F5 enables lateral sky on Valorie")
+		var side_material: ShaderMaterial
+		for m: ShaderMaterial in forest.look._direct_actor_materials:
+			if m != null and m.get_meta("verified_valorie", false):
+				side_material = m
+				break
+		check(side_material != null, "Verified Valorie material")
+		if side_material != null:
+			for time: float in [7., 12., 16.5, 22.]:
+				showcase.set_hour(time)
+				await process_frame
+				await RenderingServer.frame_post_draw
+				var side: Variant = side_material.get_shader_parameter("actor_side_sky")
+				check(side is float and is_equal_approx(side, 1. if time in [7., 16.5] else 0.),
+					"Valorie side sky respects the default phase at %.1f" % time)
+			showcase.set_hour(16.5)
+			await process_frame
+			showcase.set_lighting_scale(&"actor_side_sky", .37)
+			check(is_equal_approx(side_material.get_shader_parameter("actor_side_sky"), .37),
+				"The live side-light slider reaches Valorie")
+			showcase.set_lighting_scale(&"actor_side_sky", 1.)
+			showcase.set_hour(12.)
 	check(forest_settings.get("projected_opening_recovery_by_hour") is Curve,
 		"Forest sunlight opening response comes from the biome preset")
 	check(forest_settings.get("alternate_mist_by_hour") is Curve,
