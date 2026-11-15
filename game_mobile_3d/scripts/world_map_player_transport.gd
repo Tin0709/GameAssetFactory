@@ -20,7 +20,7 @@ var phase_bounce_active:=false
 var source_field_enabled:=false
 var source_field_active:=false
 var _source_key:Array=[]
-var _last_shade_sky := Vector2(-1., -1.)
+var _last_shade_sky := Vector3(-1., -1., -1.)
 func set_source_field(value:bool)->void:
  source_field_enabled=value;refresh(true)
 func set_phase_sky(value:bool)->void:
@@ -231,9 +231,10 @@ static func _ground_return_weights(fraction: float) -> Vector4:
  return Vector4(opposite * opposite * opposite, 4. - 6. * squared + 3. * cubed,
   1. + 3. * fraction + 3. * squared - 3. * cubed, cubed) / 6.
 func refresh_shade_sky(force: bool = false) -> void:
- var strength := Vector2.ZERO
+ var strength := Vector3.ZERO
  if _active and level.look.player_local_light_enabled:
-  strength = Vector2(level.showcase.actor_shade_sky_weight(), level.showcase.actor_side_sky_weight())
+  strength = Vector3(level.showcase.actor_shade_sky_weight(), level.showcase.actor_side_sky_weight(),
+   level.showcase.actor_shade_sky_weight(&"kai_shade_sky"))
  if not force and _last_shade_sky == strength:
   return
  _last_shade_sky = strength
@@ -241,5 +242,7 @@ func refresh_shade_sky(force: bool = false) -> void:
   if material != null and material.get_meta("verified_valorie", false):
    material.set_shader_parameter("actor_shade_sky", strength.x)
    material.set_shader_parameter("actor_side_sky", strength.y)
+  elif material != null and material.get_meta("kai_matte_lighting", false):
+   material.set_shader_parameter("actor_shade_sky", strength.z)
 
 func _process(_delta:float)->void:refresh()

@@ -112,7 +112,7 @@ void fragment(){
 			vec3 incident = player_cube_light(wn,height,cloud,actor_canopy_sky);
 			bool color_sky = (actor_canopy_color_mix > 0.0 && actor_canopy_sky < 0.96) || gaf_pre_twilight_receiver > 0.0;
 			float shade_weight = 0.0;
-			if (actor_shade_sky > 0.0 && recovered_roughness && actor_canopy_sky < .955) {
+			if (actor_shade_sky > 0.0 && (recovered_roughness || gaf_matte_opening) && actor_canopy_sky < .955) {
 				float covered = smoothstep(.045, .36, 1.0 - actor_canopy_sky);
 				float side = 1.0 - .82 * smoothstep(.13, .87, wn.y);
 				shade_weight = actor_shade_sky * covered * side;
