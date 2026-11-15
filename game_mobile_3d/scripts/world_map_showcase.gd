@@ -1342,6 +1342,8 @@ func _shadow_diffuse_available() -> bool:
 		and RenderingServer.get_rendering_device() != null)
 
 func _sync_shadow_diffuse() -> void:
+	if _point_kernel_owner == null or _point_kernel_owner.get_ref() != self:
+		return
 	var state := Vector4.ZERO
 	if (not _balanced_preview and _shadow_diffuse_available() and atmosphere_review == "combined"
 			and forest_active() and level.terrain_light.is_active()):
