@@ -424,6 +424,7 @@ func _select_weapon(index: int) -> void:
 	player.crossbow_equipped = crossbow_equipped
 	player.bow_equipped = bow_equipped
 	player.gauntlets_equipped = gauntlets_equipped
+	player.basic_gauntlets_equipped = basic_gauntlets
 	player.clips.AirAttack = player.clips[Gauntlets.AIR] if gauntlets_equipped else _sabre_air_clip
 	player.tool_air_hold = -1.0
 	player.tool_air_loop = -1.0

@@ -8,6 +8,7 @@ const CROSSBOW_RUN_PHASE_OFFSET := 0.05
 const CROSSBOW_ARM_SWAY_WEIGHT := 0.40
 const CROSSBOW_TORSO_SWAY_WEIGHT := 0.60
 const SHOVEL_RUN := "PLayer_Shovel_Run"
+const ARM_MIRROR := Basis(Vector3.LEFT, Vector3.UP, Vector3.BACK)
 const Bow := preload("res://scripts/mechanic_lab_bow.gd")
 var _left_arm := -1
 var _right_arm := -1
@@ -73,6 +74,28 @@ func apply(actor, key: String, delta: float) -> void:
 		phase = fposmod(actor.animation_player.current_animation_position / float(actor.clips[key].duration), 1.0)
 		run_weight = 1.0
 	super.apply(actor, key, delta)
+	if actor.basic_gauntlets_equipped and key in RUNS and owns_pose:
+		var current := rig.get_bone_pose_rotation(_right_arm)
+		rig.set_bone_pose_rotation(_right_arm, _balanced_right_arm(current, phase, run_weight))
+
+func outgoing_pose(delta: float, cursor: Dictionary, speed: float) -> Array[Transform3D]:
+	var pose := super.outgoing_pose(delta, cursor, speed)
+	if cursor.get("balance_gauntlet_arms", false):
+		var basis := pose[_right_arm].basis
+		var rotation := _balanced_right_arm(basis.get_rotation_quaternion(), float(cursor.phase), float(cursor.weight))
+		pose[_right_arm].basis = Basis(rotation) * Basis.from_scale(basis.get_scale())
+	return pose
+
+func _balanced_right_arm(current: Quaternion, cycle: float, weight: float) -> Quaternion:
+	if weight <= 0.0:
+		return current
+	# The source uses a generic single-hand holding modifier on the right.
+	# A paired gauntlet wants equal swing, so mirror the unrestricted arm
+	# one alternating step later around the shared shoulder frame.
+	var opposite := shovel_run_pose(cycle + 0.5)
+	var left := opposite[_left_arm].basis.orthonormalized()
+	var right := ARM_MIRROR * left * ARM_MIRROR
+	return current.slerp(right.get_rotation_quaternion(), weight)
 
 func uses_shovel_run(actor, key: String) -> bool:
 	return actor.weapon_source_locomotion and actor.review_clip.is_empty() and key in RUNS \

@@ -16,6 +16,7 @@ const MIN_WALL_STEP_PROGRESS := 0.10
 
 var crossbow_equipped := false
 var gauntlets_equipped := false
+var basic_gauntlets_equipped := false
 var _crossbow_pose_serial := -1
 var _crossbow_mount: MeshInstance3D
 var _crossbow_carry_mesh: Mesh
@@ -242,7 +243,10 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 		_outgoing_locomotion_state.clear()
 		return Callable()
 	if key not in GAITS or not weapon_source_locomotion:
-		return super._outgoing_locomotion_sampler(key, phase)
+		var outgoing := super._outgoing_locomotion_sampler(key, phase)
+		if basic_gauntlets_equipped and key in LabLocomotion.RUNS and hybrid_motion != null:
+			_outgoing_locomotion_state.balance_gauntlet_arms = true
+		return outgoing
 	var crossbow_run := crossbow_equipped and key in LabLocomotion.RUNS
 	var shovel_run: bool = hybrid_motion != null and hybrid_motion.uses_shovel_run(self, key)
 	var cursor := {"clip": key, "phase": phase}

@@ -57,8 +57,9 @@ static func mount_transform(left: bool, basic := false) -> Transform3D:
 	# bone. J_*_Hand and J_*_Weapon are independently animated prop helpers.
 	var outside := 1.0 if left else -1.0
 	if basic:
-		# The ordinary mesh is symmetric across the grip and shorter than the unique pair.
-		return Transform3D(Basis.IDENTITY, Vector3(0, 0, 0.65))
+		# The fist mesh is 66 mm outboard of the arm pivot. Seat the cuff
+		# back along the arm so the front still covers the end of the fist.
+		return Transform3D(Basis.IDENTITY, Vector3(outside * 0.06634, -0.001, 0.61))
 	var basis := Basis.IDENTITY if left else Basis(Vector3.BACK, PI)
 	return Transform3D(basis, Vector3(outside * 0.065, 0.0, 0.68))
 
