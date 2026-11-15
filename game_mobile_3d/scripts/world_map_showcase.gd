@@ -1064,7 +1064,8 @@ func _update_mist()->void:
 		var subject_depth: float = -camera.global_basis.z.dot(emitter - camera.global_position)
 		sample.ground_haze = _biome_profile.sample_ground_haze(hour, subject_depth, level.spawn_position.y,
 			_lighting_scale(&"ground_haze"), _lighting_scale(&"twilight_ground_haze"))
-		sample.entry_scatter_gain = _biome_profile.sample_mist_entry_scatter(hour / 24.) +			* _lighting_scale(&"mist_entry_scatter")
+		sample.entry_scatter_gain = (_biome_profile.sample_mist_entry_scatter(hour / 24.)
+			* _lighting_scale(&"mist_entry_scatter"))
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
 		var origin := _lantern_light_origin(lantern.emitter_position())
