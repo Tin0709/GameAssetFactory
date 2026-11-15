@@ -14,6 +14,7 @@ var requested := true
 var _world: Node3D
 var _plants: Node3D
 var _refresh_pending := false
+var _original_surface: Callable
 
 static func read_profile(world: Node3D, relative_path: String, expected_sha: String) -> Dictionary:
 	if relative_path.is_empty() or relative_path.is_absolute_path() or expected_sha.length() != 64:
@@ -101,6 +102,7 @@ static func _vector(values: Array) -> Vector3:
 	return Vector3(values[0], values[1], values[2]) if values.size() == 3 else Vector3.INF
 
 func _ready() -> void:
+	_original_surface = _plants.interaction.surface_height_provider
 	_plants.interaction.surface_height_provider = surface_height
 	_plants.child_order_changed.connect(_queue_root_refresh)
 	_refresh_roots()
@@ -120,8 +122,7 @@ func _sync() -> void:
 	active = wanted
 	visual.visible = active
 	collider.collision_layer = 1 if active else 0
-	for root: Dictionary in roots:
-		root.mesh.set_instance_transform(root.index, root.raised if active else root.original)
+	_place_roots(active)
 	if _world.showcase.mist != null:
 		_world.showcase.mist._process(0.)
 
@@ -136,7 +137,7 @@ func _would_intersect_player() -> bool:
 	return false
 
 func surface_height(x: float, z: float) -> float:
-	var floor: float = _world.surface_height(x, z)
+	var floor: float = _original_surface.call(x, z)
 	return support.get(Vector2i(floori(x * 2.), floori(z * 2.)), floor) if active else floor
 
 func _queue_root_refresh() -> void:
@@ -147,6 +148,7 @@ func _queue_root_refresh() -> void:
 
 func _refresh_roots() -> void:
 	_refresh_pending = false
+	_place_roots(false)
 	roots.clear()
 	var footprint := visual.global_transform * visual.get_aabb()
 	for batch in _plants.get_children():
@@ -167,6 +169,16 @@ func _refresh_roots() -> void:
 				continue
 			var raised := original
 			raised.origin += batch.global_basis.inverse() * Vector3(0., top - at.y, 0.)
-			roots.append({"mesh": population, "index": index, "original": original, "raised": raised})
+			roots.append({"batch": batch, "mesh": population, "index": index, "original": original, "raised": raised})
 			if active:
 				population.set_instance_transform(index, raised)
+
+func _place_roots(raised: bool) -> void:
+	for root: Dictionary in roots:
+		if is_instance_valid(root.batch) and root.batch.get_parent() == _plants:
+			root.mesh.set_instance_transform(root.index, root.raised if raised else root.original)
+
+func _exit_tree() -> void:
+	if is_instance_valid(_plants) and _plants.interaction.surface_height_provider == surface_height:
+		_plants.interaction.surface_height_provider = _original_surface
+		_place_roots(false)
