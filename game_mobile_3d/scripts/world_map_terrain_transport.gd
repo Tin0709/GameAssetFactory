@@ -395,7 +395,7 @@ func bind(force:bool=false)->void:
 	var stone_wall_sky: float = level.showcase.stone_wall_sky_weight()
 	var response:bool=level.look.terrain_visibility_response
 	var dielectric:bool=level.look.terrain_dielectric_response and level.look.terrain_review=="combined"
-	var transport_unchanged := (key == _last_key and scale == _last_scale and tint == _last_tint
+	var transport_unchanged: bool = (key == _last_key and scale == _last_scale and tint == _last_tint
 			and turf_color == _last_turf_color and stone_softness == _last_stone_softness
 			and dawn_stone_color == _last_dawn_stone_color and stone_day_sky == _last_stone_day_sky
 			and response == _last_response and dielectric == _last_dielectric)
@@ -414,6 +414,7 @@ func bind(force:bool=false)->void:
 	for chunk in level.geometry._cutaway_chunks:
 		for m in chunk.materials:materials[m]=true
 	for m:ShaderMaterial in materials:
+		# Changing only the wall slider should leave the other receiver bindings alone.
 		if wall_sky_changed and m.get_shader_parameter("ground_grade") == 3:
 			m.set_shader_parameter("stone_wall_sky", stone_wall_sky)
 		if not force and transport_unchanged:
