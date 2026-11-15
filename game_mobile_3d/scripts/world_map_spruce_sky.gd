@@ -5,6 +5,7 @@ const PROOF := "godot_lab/world_map_unified_showcase_v001/forest_spruce_layout_v
 const PROOF_SHA := "155d6221f111ab2479aba2dae86841cf33055f5adf351789b61781eab2959d14"
 const PHASE := preload("res://scripts/world_map_phase_finish.gd")
 const MistSkyField = preload("res://scripts/mist_sky_field.gd")
+const ActorBounce = preload("res://scripts/world_map_actor_bounce.gd")
 static var _owner: WeakRef
 
 var proof_ready := false
@@ -96,7 +97,8 @@ func apply_layout(relative: String, digest: String) -> bool:
 		return false
 	var root: String = air.research_root
 	var profile := _layout_profile(root, relative, digest)
-	if profile.get("schema") not in ["private_spruce_layout/1", "private_spruce_layout/2"] \
+	var schema: String = profile.get("schema", "")
+	if schema not in ["private_spruce_layout/1", "private_spruce_layout/2", "private_spruce_layout/3"] \
 			or profile.map_sha256 != FileAccess.get_sha256(_level.map_layout_path) or profile.base_sky_profile_sha256 != PROOF_SHA \
 			or profile.base_air_profile_sha256 != _level.directional_air_region_sha256:
 		return false
@@ -110,9 +112,11 @@ func apply_layout(relative: String, digest: String) -> bool:
 	var move_to := Vector3.ZERO
 	var bounce_layout_sha := digest
 	var bounce_air_sha: String = profile.air_sha256
-	if profile.schema == "private_spruce_layout/2":
-		bounce_layout_sha = _level.forest_basin_layout_sha256
-		var previous := _layout_profile(root, _level.forest_basin_layout_profile, bounce_layout_sha)
+	var matched_bounce := schema == "private_spruce_layout/3"
+	if schema != "private_spruce_layout/1":
+		var basin_profile: String = profile.get("basin_profile", "") if matched_bounce else _level.forest_basin_layout_profile
+		bounce_layout_sha = profile.get("previous_layout_sha256", "") if matched_bounce else _level.forest_basin_layout_sha256
+		var previous := _layout_profile(root, basin_profile, bounce_layout_sha)
 		if previous.get("schema") != "private_spruce_layout/1" or profile.get("previous_layout_sha256") != bounce_layout_sha:
 			return false
 		# This layout changes the main grove. The pinned parent identifies the unchanged
@@ -141,6 +145,17 @@ func apply_layout(relative: String, digest: String) -> bool:
 	var sky := _layout_texture(directory.path_join("sky.private.r8"), profile.sky_sha256, dimensions)
 	if directional == null or sky == null:
 		return false
+	var player_light = _level.player_light
+	var candidate_bounce: ActorBounce
+	if matched_bounce:
+		if player_light == null or not player_light.cache_ready:
+			return false
+		# Keep the previous placement and fields available if a matched asset is missing.
+		candidate_bounce = ActorBounce.new()
+		candidate_bounce.setup_region(_level, profile.get("actor_bounce_profile", ""),
+			profile.get("actor_bounce_sha256", ""), bounce_layout_sha, bounce_air_sha, false)
+		if not candidate_bounce.available() or not candidate_bounce._load():
+			return false
 	if mover != null:
 		mover.global_position = move_to
 		for row: Dictionary in _casters:
@@ -159,8 +174,9 @@ func apply_layout(relative: String, digest: String) -> bool:
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", sky)
 	air.texture = directional
 	_level.showcase.mist.effect.directional_grid = directional
-	var player_light = _level.player_light
-	if player_light != null and player_light.cache_ready:
+	if candidate_bounce != null:
+		player_light.local_phase_bounce = candidate_bounce
+	elif player_light != null and player_light.cache_ready:
 		player_light.local_phase_bounce.setup_region(_level, _level.local_actor_bounce_profile,
 			_level.local_actor_bounce_sha256, bounce_layout_sha, bounce_air_sha,
 			_level.showcase._lighting_scale(&"player_bounce") > 0.)
