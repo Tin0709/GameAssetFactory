@@ -1718,6 +1718,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .65
 	if effect == &"daylight_shadow_luminance":
 		return .70
+	if effect == &"kai_ground_bounce":
+		return 1.35
 	if effect == &"night_bloom_prefilter":
 		return .25
 	if effect in [&"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
