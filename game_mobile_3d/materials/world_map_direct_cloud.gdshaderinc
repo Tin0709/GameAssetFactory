@@ -11,6 +11,7 @@ global uniform float gaf_stone_shade_reach;
 global uniform float gaf_stone_wall_return;
 global uniform vec4 gaf_stone_sunset_region;
 global uniform vec4 gaf_stone_sunset_beam;
+global uniform vec4 gaf_stone_sun_warmth;
 varying vec2 stone_sunset_position;
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
@@ -49,6 +50,14 @@ void light() {
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	DIFFUSE_LIGHT += gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
 		ATTENUATION, cloud_transmission, nl, terrain_direct_contact);
+	// The same directional light and shadow term shape both the original key and the warmth.
+	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sun_warmth.w > 0.0
+			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sun_warmth.xyz) > 0.9999
+			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
+		float open_sun = smoothstep(.38, .91, ATTENUATION * cloud_transmission);
+		float facing = smoothstep(.08, .43, nl);
+		key_color *= 1.0 + gaf_stone_sun_warmth.w * open_sun * facing * vec3(1.15, .72, .08);
+	}
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sunset_beam.w > 0.0
 			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sunset_beam.xyz) > 0.9999
 			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
