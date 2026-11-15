@@ -8,14 +8,19 @@ const MESH := "SM_SF_Boulder_03.glb"
 const ATLAS := "T_TreesBoulders.png"
 const MESH_SHA := "a40fb5003107558f437e7c262bc923641447ce63dc00c3edf1708dba7d715739"
 const MESHES := {
-	1: ["SM_SF_Boulder_01.glb", "0c99b664e949af968bd11ba57633548c410d3c32a7d19446adbc8aa5da8e3917"],
-	3: [MESH, MESH_SHA],
+	# Area-weighted linear colors from the verified atlas on upward mesh faces.
+	1: ["SM_SF_Boulder_01.glb", "0c99b664e949af968bd11ba57633548c410d3c32a7d19446adbc8aa5da8e3917",
+		Vector3(.0458684, .0616295, .0546141)],
+	3: [MESH, MESH_SHA, Vector3(.0538839, .0797327, .0426882)],
 }
 const ATLAS_SHA := "9b596a2149fcaf999178d6a5557cda9677c204f21848c84c9a30425ad1d850f6"
 
 var collider: StaticBody3D
 var visual: MeshInstance3D
 var material: ShaderMaterial
+var ground_bounce_reflectance := Vector3.ZERO
+var ground_bounce_cells: Dictionary[Vector2i, Vector2] = {}
+var ground_bounce_bounds := Rect2()
 var requested := true
 var active := false
 var roots: Array[Dictionary] = []
@@ -85,6 +90,8 @@ func configure(world: Node3D, plants: Node3D, anchor: Vector2, yaw_degrees: floa
 	add_child(collider)
 	_world = world
 	_plants = plants
+	ground_bounce_reflectance = source[2]
+	_bake_ground_bounce_cells()
 	return true
 
 func placement_bounds() -> AABB:
@@ -100,6 +107,40 @@ func seats_on_level_ground() -> bool:
 			if not is_finite(floor) or absf(floor - base) > .01:
 				return false
 	return true
+
+func _bake_ground_bounce_cells() -> void:
+	# Match the terrain sampler's metre cells. Subsamples preserve the areas
+	# that remain grass beside each raised face when the light blends cells.
+	var bounds := placement_bounds()
+	var start := Vector2i(floori(bounds.position.x), floori(bounds.position.z))
+	var end := Vector2i(ceili(bounds.end.x), ceili(bounds.end.z))
+	ground_bounce_bounds = Rect2(Vector2(start), Vector2(end - start)).grow(2.5)
+	var to_local_pose := transform.affine_inverse()
+	for z in range(start.y, end.y):
+		for x in range(start.x, end.x):
+			var floor_height: float = _world.surface_height(x + .5, z + .5)
+			if not is_finite(floor_height):
+				continue
+			var hits := 0
+			var height_sum := 0.
+			for dz in 4:
+				for dx in 4:
+					var origin := Vector3(x + (dx + .5) / 4., bounds.end.y + 1., z + (dz + .5) / 4.)
+					var height := _bounce_surface_height(to_local_pose * origin)
+					if height > floor_height + .03:
+						hits += 1
+						height_sum += height
+			if hits > 0:
+				ground_bounce_cells[Vector2i(x, z)] = Vector2(float(hits) / 16., height_sum / hits)
+
+func _bounce_surface_height(origin: Vector3) -> float:
+	var highest := -INF
+	for i in range(0, _triangles.size(), 3):
+		var hit: Variant = Geometry3D.ray_intersects_triangle(origin, Vector3.DOWN,
+			_triangles[i], _triangles[i + 1], _triangles[i + 2])
+		if hit != null:
+			highest = maxf(highest, hit.y + transform.origin.y)
+	return highest
 
 func _load_mesh(path: String) -> Mesh:
 	var document := GLTFDocument.new()

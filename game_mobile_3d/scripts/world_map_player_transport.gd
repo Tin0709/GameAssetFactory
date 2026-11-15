@@ -156,6 +156,16 @@ func _kai_ground_bounce(position: Vector3) -> Vector4:
  var fraction := pixel - Vector2(corner)
  var x_weights := _ground_return_weights(fraction.x)
  var z_weights := _ground_return_weights(fraction.y)
+ var nearby_boulders: Array = []
+ for rock in review.basin_boulders:
+  if rock.active and rock.ground_bounce_bounds.has_point(Vector2(position.x, position.z)):
+   nearby_boulders.append(rock)
+ var roadside_rock = review.playable_boulder
+ if is_instance_valid(roadside_rock) and roadside_rock.active \
+  and roadside_rock.ground_bounce_bounds.has_point(Vector2(position.x, position.z)):
+  nearby_boulders.append(roadside_rock)
+ var lamp_position := light.global_position
+ var range_squared := light.omni_range * light.omni_range
  var incident := Vector3.ZERO
  var surface_height := 0.
  var surface_weight := 0.
@@ -166,21 +176,28 @@ func _kai_ground_bounce(position: Vector3) -> Vector4:
    if not bounds.has_point(cell):
     continue
    var info := field.get_pixelv(cell)
-   if info.a <= 0.:
-    continue
-   var distance_from_floor := position.y - info.g
-   var support := smoothstep(-.65, -.18, distance_from_floor) * (1. - smoothstep(.28, 1.8, distance_from_floor))
-   var weight := x_weights[x] * z_weights[z] * support
+   var cell_weight := x_weights[x] * z_weights[z]
    var world_cell: Vector2 = look.path_map_origin + Vector2(cell) + Vector2(.5, .5)
-   var to_light := light.global_position - Vector3(world_cell.x, info.g, world_cell.y)
-   var distance_squared := to_light.length_squared()
-   var radius_ratio := distance_squared / (light.omni_range * light.omni_range)
-   var falloff := pow(maxf(0., 1. - radius_ratio * radius_ratio) / (1. + radius_ratio), 2.)
-   var cosine := clampf(to_light.y / maxf(sqrt(distance_squared), .001), 0., 1.)
+   var remaining := 1.
+   for rock in nearby_boulders:
+    var surface: Vector2 = rock.ground_bounce_cells.get(Vector2i(world_cell.floor()), Vector2.ZERO)
+    if surface.x <= 0.:
+     continue
+    var coverage := minf(surface.x, remaining)
+    var sample := _ground_return_sample(rock.ground_bounce_reflectance, Vector3(world_cell.x, surface.y, world_cell.y),
+     position.y, lamp_position, range_squared, cell_weight * coverage)
+    incident += Vector3(sample.x, sample.y, sample.z)
+    surface_height += surface.y * sample.w
+    surface_weight += sample.w
+    remaining -= coverage
+   if info.a <= 0. or remaining <= 0.:
+    continue
    var layer := 4 if info.b < .5 else (0 if info.b < 1.5 else 3)
-   incident += reflectance[layer] * (weight * falloff * cosine)
-   surface_height += info.g * weight
-   surface_weight += weight
+   var sample := _ground_return_sample(reflectance[layer], Vector3(world_cell.x, info.g, world_cell.y),
+    position.y, lamp_position, range_squared, cell_weight * remaining)
+   incident += Vector3(sample.x, sample.y, sample.z)
+   surface_height += info.g * sample.w
+   surface_weight += sample.w
  if surface_weight <= .0001:
   return Vector4.ZERO
  var warm := light.light_color.srgb_to_linear()
@@ -191,6 +208,19 @@ func _kai_ground_bounce(position: Vector3) -> Vector4:
  diffuse = (Vector3.ONE * luminance).lerp(diffuse, .58)
  return Vector4(diffuse.x, diffuse.y, diffuse.z, surface_height / surface_weight)
 
+
+static func _ground_return_sample(reflectance: Vector3, surface: Vector3, foot_height: float,
+ lamp_position: Vector3, range_squared: float, coverage: float) -> Vector4:
+ var distance_from_floor := foot_height - surface.y
+ var support := smoothstep(-.65, -.18, distance_from_floor) * (1. - smoothstep(.28, 1.8, distance_from_floor))
+ var weight := coverage * support
+ var to_light := lamp_position - surface
+ var distance_squared := to_light.length_squared()
+ var radius_ratio := distance_squared / range_squared
+ var falloff := pow(maxf(0., 1. - radius_ratio * radius_ratio) / (1. + radius_ratio), 2.)
+ var cosine := clampf(to_light.y / maxf(sqrt(distance_squared), .001), 0., 1.)
+ var source := reflectance * (weight * falloff * cosine)
+ return Vector4(source.x, source.y, source.z, weight)
 
 static func _ground_return_weights(fraction: float) -> Vector4:
  # Cubic B-spline over four cell centers. The weights sum to one and
