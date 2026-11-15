@@ -60,6 +60,8 @@ Khi chuyển sang preset không dùng spatial mist hoặc bloom thích ứng, re
 
 Lượt kiểm tra bổ sung sau khi tách track tán xạ có 71 kiểm tra Forward Mobile/D3D12 và 28 kiểm tra Compatibility qua trên Windows. So cùng camera tại năm giờ và thêm một lượt nhiều mây trên `MeadowBiomeReview`, số draw call và dung lượng đệm mist/bloom giữ nguyên giữa hai cấu hình. Ảnh trời quang tại 12:00 và 22:00 trùng từng pixel. Kết quả này kiểm chứng đường render trên PC.
 
+Kiểm tra lại sau bản Forest v222 bằng một scene sinh mới từ `Testing.litematic` và bản sao preset Rìa rừng ẩm có giờ mở, cường độ nắng và độ tương phản riêng. Scene nạp đủ 5.632 cell, dùng cùng shader và chuyển được sang preset Đồng cỏ giữa lúc chơi mà giữ nguyên địa hình, nhân vật, giờ và thời tiết. Kiểm tra scene sinh mới đạt 50/50 trên Forward Mobile/D3D12 và 36/36 trên Compatibility. Bộ hồi quy WorldMap và MeadowBiomeReview đạt lần lượt 97/97 và 28/28. Các kết quả này đo trên Windows. Thời tiết hiện hỗ trợ trời quang và nhiều mây.
+
 ### Thêm và kiểm tra một preset mới
 
 - Duplicate `humid_woodland.tres` nếu biome cần spatial mist, local exposure và adaptive bloom. Duplicate `meadow.tres` nếu biome dùng depth fog và glow tích hợp. Đặt tên file riêng và đổi **Display Name** để dễ chọn. Duplicate cả resource Day/Night hoặc Weather nếu chỉ muốn thay đổi cho biome mới.
