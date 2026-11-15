@@ -122,7 +122,8 @@ func _sync() -> void:
 	collider.collision_layer = 1 if active else 0
 	for root: Dictionary in roots:
 		root.mesh.set_instance_transform(root.index, root.raised if active else root.original)
-	_world.showcase.mist._process(0.)
+	if _world.showcase.mist != null:
+		_world.showcase.mist._process(0.)
 
 func _would_intersect_player() -> bool:
 	var at: Vector3 = _world.player.global_position

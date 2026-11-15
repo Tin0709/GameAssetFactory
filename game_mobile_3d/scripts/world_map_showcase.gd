@@ -5,6 +5,7 @@ const RenderSettings = preload("res://scripts/biome_render_settings.gd")
 const DayNight = preload("res://scripts/biome_day_night.gd")
 const Weather = preload("res://scripts/biome_weather.gd")
 const DistantTerrain = preload("res://scripts/world_map_distant_terrain.gd")
+const PlayableTerrace = preload("res://scripts/world_map_playable_terrace.gd")
 const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
 const BiomeProfile = preload("res://scripts/biome_graphics_profile.gd")
 const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
@@ -67,6 +68,7 @@ var _source_terrain_toggle: CheckButton
 var forest := FOREST.new("", "")
 var _biome_profile: BiomeProfile
 var distant_terrain := DistantTerrain.new()
+var playable_terrace: PlayableTerrace
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_replay := preload("res://scripts/world_map_forest_replay.gd").new()
@@ -427,10 +429,21 @@ func setup(world:Node3D)->void:
 	player_contact = PlayerContact.new()
 	add_child(player_contact)
 	player_contact.setup(level)
+	var terrace_profile := PlayableTerrace.read_profile(level, level.playable_terrace_profile, level.playable_terrace_sha256)
+	if level.distant_terrain_origin.is_finite():
+		distant_terrain.prepare(level, level.distant_terrain_origin, level.distant_terrain_layout_sha,
+			StringName(terrace_profile.get("section", "")))
+	if not terrace_profile.is_empty() and distant_terrain.linked_section != null and distant_terrain.material != null:
+		var insert := PlayableTerrace.new()
+		var atlas: Texture2D = distant_terrain.material.get_shader_parameter("terrain_atlas")
+		if insert.configure(level, plants, distant_terrain.linked_section, atlas, terrace_profile):
+			playable_terrace = insert
+			insert.name = "PlayableTerrace"
+			level.add_child(insert)
+		else:
+			insert.free()
 	_build_ui()
 	set_source_terrain(true)
-	if level.distant_terrain_origin.is_finite():
-		distant_terrain.prepare(level, level.distant_terrain_origin, level.distant_terrain_layout_sha)
 	_refresh_lantern_glow()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
 	DisplayServer.window_set_title("GameAssetFactory · Overworld Showcase · A&S / MD2 Sabre · L HUD")
@@ -1369,6 +1382,8 @@ func _mist_materials()->Array:
 		result.append(path_lamppost.material)
 	if distant_terrain.visible():
 		result.append(distant_terrain.material)
+	if is_instance_valid(playable_terrace) and playable_terrace.active:
+		result.append(playable_terrace.material)
 	if grove_mist_enabled and level.grove != null:
 		var tree_weight := PHASE_FINISH.phase_weight(hour)
 		if _biome_profile != null:
@@ -3390,6 +3405,15 @@ func _build_ui()->void:
 		_weather_button.button_pressed = _weather.target > 0.
 		_weather_button.toggled.connect(func(value: bool): set_weather(1. if value else 0.))
 		box.add_child(_weather_button)
+	if is_instance_valid(playable_terrace):
+		var terrace_toggle := CheckButton.new()
+		terrace_toggle.name = "PlayableTerrace"
+		terrace_toggle.text = "Bậc thấp cạnh đường rừng"
+		terrace_toggle.button_pressed = playable_terrace.requested
+		terrace_toggle.focus_mode = Control.FOCUS_NONE
+		terrace_toggle.tooltip_text = "So địa hình, cỏ và va chạm ở bậc thấp. Nếu đang đứng trong chỗ bậc sẽ xuất hiện, hãy bước ra để áp dụng."
+		box.add_child(terrace_toggle)
+		terrace_toggle.toggled.connect(playable_terrace.set_requested)
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)
