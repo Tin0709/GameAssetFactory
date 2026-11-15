@@ -91,13 +91,14 @@ void fragment(){
 	AO_LIGHT_AFFECT=0.0;
 #endif
 	if (max(kai_ground_bounce.r, max(kai_ground_bounce.g, kai_ground_bounce.b)) > 0.0) {
-		// The lower hemisphere fills the sides of the face and torso, with a small
-		// contribution on upper faces. This uses the same fog as the base material.
+		// Give the vertical faces a broader view of the lit ground so the return
+		// reaches the torso and face. Upward faces still receive very little.
 		vec3 ground_normal = normalize(mat3(INV_VIEW_MATRIX) * NORMAL);
 		float hemisphere = .06 + .74 * (1.0 - smoothstep(-.76, .78, ground_normal.y));
+		float side = 1.0 - smoothstep(.08, .72, abs(ground_normal.y));
 		float height = max(actor_world.y - kai_ground_bounce.w, 0.0);
-		float falloff = 1.0 / (1.0 + .32 * height * height);
-		EMISSION += ALBEDO * (1.0 - METALLIC) * kai_ground_bounce.rgb * (hemisphere * falloff);
+		float falloff = 1.0 / (1.0 + mix(.32, .13, side) * height * height);
+		EMISSION += ALBEDO * (1.0 - METALLIC) * kai_ground_bounce.rgb * ((hemisphere + .42 * side) * falloff);
 	}
 	if(player_local_light || player_rough_reflection){
 		vec3 wn=normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.)).xyz);
