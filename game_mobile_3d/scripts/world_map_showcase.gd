@@ -3274,6 +3274,9 @@ func _restore_comparison_stage(previous: int) -> void:
 		level.look.set_stage(previous)
 
 func _update_shape_control()->void:
+	var stone_warmth: HSlider = _lighting_sliders.get(&"stone_sun_warmth")
+	if stone_warmth != null:
+		stone_warmth.editable = not _balanced_preview and _stone_sun_warmth_available()
 	var green_shadow: HSlider = _lighting_sliders.get(&"green_shadow_exposure_trim")
 	if green_shadow != null:
 		green_shadow.editable = not _balanced_preview and _green_shadow_exposure_editable()
