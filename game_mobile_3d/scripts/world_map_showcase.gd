@@ -2618,6 +2618,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"noon_sky_chroma" and (hour <= 10. or hour >= 15.):
 		return
+	if changed_effect == &"overcast_phase_color":
+		if _weather_profile == null or _weather.weight <= 0. or DayNight.sample_curve(
+				_weather_profile.phase_color_by_hour, hour / 24., 1.) <= 0.:
+			return
 	# Re-evaluate the authored preset before applying scales to prevent compounding.
 	_forest_hour = INF
 	apply_time()
