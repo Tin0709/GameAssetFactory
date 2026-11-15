@@ -509,6 +509,7 @@ func setup(world:Node3D)->void:
 		else:
 			boulder.free()
 	_setup_basin_boulders()
+	sync_spruce_leaf_filter()
 	_build_ui()
 	set_source_terrain(true)
 	_refresh_lantern_glow()
