@@ -37,6 +37,8 @@ Map portable dùng một compositor cho camera. Sương chạy trước khi vẽ
 
 Quy trình trên đã chạy với `Testing.litematic` (50 × 50 m, 5.632 cell) trên Godot Forward Mobile/D3D12. Cùng scene chạy Rìa rừng ẩm và Đồng cỏ với cùng shader. Đã kiểm tra năm mốc giờ, trời quang/nhiều mây, đi lại, mức Nhẹ và góc toàn cảnh. OpenGL Compatibility đã qua bài kiểm tra depth fog dự phòng. Kiểm thử điện thoại và các kiểu thời tiết ngoài quang/nhiều mây còn mở.
 
+Khi chuyển sang preset không dùng spatial mist hoặc bloom thích ứng, renderer giải phóng bộ đệm riêng của hiệu ứng đó và dùng fog/glow tích hợp theo preset mới. Chuyển lại dựng lại hiệu ứng trên cùng camera. Với `Testing.litematic` ở 19:30 trên Forward Mobile/D3D12 (640 × 360), đổi sang Đồng cỏ giải phóng 2.017.840 byte bộ đệm do hai hiệu ứng quản lý. Quay lại Rìa rừng ẩm giữ giờ và khôi phục ảnh trùng từng pixel trong bài đo camera cố định.
+
 ## Phạm vi tích hợp hiện tại
 
 - `biome_graphics_profile.gd` lưu cấu hình ánh sáng, bầu trời, sương, hậu kỳ và chu kỳ thời gian. `biome_weather_profile.gd` lưu phản ứng với trời nhiều mây. `biome_graphics.gd` áp dụng dữ liệu lên Environment của từng scene. Shader nền, cỏ, mesh và controller được dùng lại. Hai profile mẫu là thiết kế của GameAssetFactory.
