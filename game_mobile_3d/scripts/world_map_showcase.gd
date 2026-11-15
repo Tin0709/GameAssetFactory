@@ -2426,7 +2426,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
 		if version < 184 and effect == &"green_shadow_exposure_trim":
-			fallback = 0.
+			missing_value = 0.
 		if version < 183 and effect == &"kai_ground_bounce":
 			missing_value = 0.
 		if version < 182 and effect == &"daylight_shade_retention":
