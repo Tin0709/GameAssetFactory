@@ -95,6 +95,8 @@ var _stone_sunset_beam := Vector4.ZERO
 var _stone_sunset_region := Vector4.ZERO
 var _local_diffuse_source := Vector4.ZERO
 var _additional_diffuse_source := Vector4.ZERO
+var _shadow_diffuse_state := Vector4.ZERO
+var _shadow_diffuse_tint := Vector3.ONE
 const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
 	&"sun": ["Direct sunlight", 2.],
@@ -129,6 +131,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"daylight_bounce": ["Ánh sáng hắt ban ngày", 1.],
 	&"stone_diffuse_contrast": ["Stone face lighting transition (preview)", 1.],
 	&"stone_day_face_fill": ["Ánh hắt mặt đá ban ngày", 1.],
+	&"shadow_diffuse_return": ["Ánh dịu trong bóng trên đất và cỏ", 1.],
 	&"stone_shade_fill": ["Ánh hắt trong bóng đá", .55],
 	&"stone_shade_reach": ["Ánh hắt tới mặt đá khuất nắng", 1.],
 	&"stone_wall_return": ["Ánh phản xạ trên vách đá trong bóng", 1.],
@@ -268,7 +271,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 172
+const LIGHTING_MIX_VERSION := 173
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -425,6 +428,8 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_fill", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -887,6 +892,8 @@ func _exit_tree()->void:
 		if not _flat_lab:
 			RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_fill", Vector4.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", Vector4.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1279,6 +1286,7 @@ func _sync_point_camera() -> void:
 		_sync_stone_shade_fill()
 		_sync_stone_sunset_beam()
 		_sync_local_diffuse_return()
+		_sync_shadow_diffuse()
 
 func _stone_sunset_available() -> bool:
 	if _flat_lab or level == null:
@@ -1326,6 +1334,33 @@ func _sync_local_diffuse_return() -> void:
 	if source.w > 0.:
 		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_region", level.local_diffuse_region.bounds())
 	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", source)
+
+func _shadow_diffuse_available() -> bool:
+	return (not _flat_lab and _biome_profile != null and _biome_profile.shadow_diffuse_by_hour != null
+		and level.terrain_light != null and level.terrain_light.installed
+		and RenderingServer.get_current_rendering_method() == &"mobile"
+		and RenderingServer.get_rendering_device() != null)
+
+func _sync_shadow_diffuse() -> void:
+	var state := Vector4.ZERO
+	if (not _balanced_preview and _shadow_diffuse_available() and atmosphere_review == "combined"
+			and forest_active() and level.terrain_light.is_active()):
+		var sun: DirectionalLight3D = level.get_node("Sun")
+		var gain := clampf(DayNight.sample_curve(_biome_profile.shadow_diffuse_by_hour, hour / 24., 0.), 0., .10)
+		gain *= _lighting_scale(&"shadow_diffuse_return") * smoothstep(0., .2, sun.shadow_opacity)
+		if gain > 0. and sun.shadow_enabled and sun.light_energy > 0. and sun.is_visible_in_tree():
+			var direction := sun.global_basis.z.normalized()
+			state = Vector4(direction.x, direction.y, direction.z, gain)
+			var env: Environment = level.get_node("WorldEnvironment").environment
+			var c := env.ambient_light_color.srgb_to_linear()
+			var rgb := Vector3(c.r, c.g, c.b)
+			var tint := Vector3.ONE.lerp(rgb / maxf(rgb.dot(KEY_LUMA), .0001), .44)
+			if tint != _shadow_diffuse_tint:
+				_shadow_diffuse_tint = tint
+				RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", tint)
+	if state != _shadow_diffuse_state:
+		_shadow_diffuse_state = state
+		RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", state)
 
 func _sync_stone_shade_fill() -> void:
 	var state := Vector4.ZERO
@@ -2276,6 +2311,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 172 and effect == &"daylight_shadow_luminance":
 			missing_value = 0.
+		if version < 173 and effect == &"shadow_diffuse_return":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2556,6 +2593,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		refresh_daylight_shading()
 		return
 	if changed_effect == &"day_cycle_pacing":
+		return
+	if changed_effect == &"shadow_diffuse_return":
+		_sync_shadow_diffuse()
 		return
 	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach", &"stone_wall_return", &"sheltered_stone_return", &"local_diffuse_return", &"basin_diffuse_return"]:
 		return # Published with the final camera and sun before drawing.
@@ -3112,6 +3152,9 @@ func _process(delta:float)->void:
 	var wall_sky: HSlider = _lighting_sliders.get(&"stone_wall_sky")
 	if wall_sky != null:
 		wall_sky.editable = _stone_day_sky_editable() and _biome_profile != null and _biome_profile.stone_wall_sky_by_hour != null
+	var shade_diffuse: HSlider = _lighting_sliders.get(&"shadow_diffuse_return")
+	if shade_diffuse != null:
+		shade_diffuse.editable = _shadow_diffuse_available()
 	var night_editable := _night_sky_editable()
 	for effect in [&"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
 		var slider: HSlider = _lighting_sliders.get(effect)
