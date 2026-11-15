@@ -91,7 +91,7 @@ Map import nạp khí quyển từ preset portable. Dữ liệu khí quyển For
 
 **Projected Opening Recovery By Hour** đặt mức phục hồi vệt nắng qua khe trong preset Forest tham chiếu. Forest dùng mạnh nhất lúc 09:30 và 14:15 trời quang, rồi giảm qua các mốc lân cận. **Ánh sáng → Mặt trời và bầu trời → Nắng qua khe tán** điều chỉnh cường độ trong game. Mẫu chiếu Forest thuộc WorldMap. Các scene import dùng ánh nắng, bóng hình học và phản ứng thời tiết của preset portable.
 
-**Day Grass Shadow Compactness** đặt mặc định cho map dùng adapter vật liệu cỏ. Trên Forest, **Địa hình & cây cỏ → Cỏ và tương tác → Bóng cỏ sáng / chiều** mặc định 200%, so với mức trước là 100%. Lúc 07:00 và 16:30, đỉnh bụi cỏ trong lượt vẽ bóng nắng dùng 70% chiều cao hiển thị. Hiệu ứng giảm mượt về 0 quanh 12:00 và lúc vào tối. Các preset cũ giữ giá trị đã lưu. Phần cỏ hiển thị, bóng cây và cấu hình Meadow giữ nguyên.
+**Day Grass Shadow Compactness** đặt mặc định cho map dùng adapter vật liệu cỏ. Trên Forest, **Địa hình & cây cỏ → Cỏ và tương tác → Bóng cỏ sáng / chiều** mặc định 200%, so với mức trước là 100%. Lúc 07:00 và 16:30, đỉnh bụi cỏ trong lượt vẽ bóng nắng dùng 70% chiều cao hiển thị. Mức rút giảm mượt về 0 tại 12:00 và 19:00. Các preset cũ giữ giá trị đã lưu. Phần cỏ hiển thị, bóng cây và cấu hình Meadow giữ nguyên.
 
 ## Mức chất lượng theo map và thiết bị
 
