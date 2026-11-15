@@ -136,7 +136,7 @@ func refresh(force:bool=false)->void:
 func _kai_ground_bounce(position: Vector3) -> Vector4:
  var review = level.showcase
  var light: OmniLight3D = review._player_light
- if (not is_instance_valid(review._kai_skin) or not review._kai_skin.is_visible_in_tree()
+ if (not position.is_finite() or not is_instance_valid(review._kai_skin) or not review._kai_skin.is_visible_in_tree()
   or level.look.stage != 2 or not level.look.player_adapter_enabled or not level.look.player_local_light_enabled
   or level.view_mode != "gameplay" or not review.source_terrain_active or not is_instance_valid(light)
   or not light.is_visible_in_tree() or light.light_energy <= 0. or light.omni_range <= 0.):
@@ -183,6 +183,9 @@ func _kai_ground_bounce(position: Vector3) -> Vector4:
  var warm := light.light_color.srgb_to_linear()
  # Broad diffuse return. Scale with the existing lantern rather than adding a light.
  var diffuse := incident * Vector3(warm.r, warm.g, warm.b) * minf(light.light_energy * gain * 1.35, 2.)
+ var luminance := diffuse.dot(Vector3(.2126, .7152, .0722))
+ # The broad return mixes with neighboring surfaces and the cool night fill.
+ diffuse = (Vector3.ONE * luminance).lerp(diffuse, .58)
  return Vector4(diffuse.x, diffuse.y, diffuse.z, surface_height / surface_weight)
 
 func refresh_shade_sky(force: bool = false) -> void:
