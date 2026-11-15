@@ -65,6 +65,25 @@ func run() -> void:
 	check(forest_settings.get("alternate_mist_by_hour") is Curve,
 		"Forest's low mist has a biome-authored schedule")
 	if showcase.mist != null:
+		var entry_control: HSlider = showcase._lighting_sliders.get(&"mist_entry_scatter")
+		check(entry_control != null and is_equal_approx(entry_control.value, 1.),
+			"The main Forest settings expose the default near-entry scatter comparison")
+		showcase.set_hour(7.)
+		await process_frame
+		await RenderingServer.frame_post_draw
+		var entry_payload: PackedByteArray = showcase.mist.effect._ground_haze_parameters
+		check(is_equal_approx(entry_payload.decode_float(28), 3.8), "Forest sends the dawn scatter gain to the volume")
+		showcase.set_lighting_scale(&"mist_entry_scatter", 0.)
+		await process_frame
+		await RenderingServer.frame_post_draw
+		entry_payload = showcase.mist.effect._ground_haze_parameters
+		check(is_zero_approx(entry_payload.decode_float(28)), "Live comparison clears just the entry gain")
+		showcase.set_lighting_scale(&"mist_entry_scatter", 1.)
+		showcase.set_hour(12.)
+		await process_frame
+		await RenderingServer.frame_post_draw
+		entry_payload = showcase.mist.effect._ground_haze_parameters
+		check(is_zero_approx(entry_payload.decode_float(28)), "Approved Noon has no entry gain")
 		showcase.set_hour(20.25)
 		showcase._update_mist()
 		var late_region = forest.get("alternate_mist_region")
@@ -202,6 +221,11 @@ func run() -> void:
 			scatter_energy.add_point(Vector2(.5, 1.))
 			chromatic_profile.set("mist_scatter_color_by_hour", scatter_color)
 			chromatic_profile.set("mist_scatter_energy_by_hour", scatter_energy)
+			var entry_gain := Curve.new()
+			entry_gain.max_value = 4.
+			entry_gain.add_point(Vector2(7. / 24., 2.))
+			entry_gain.add_point(Vector2(.5, 0.))
+			chromatic_profile.set("mist_entry_scatter_by_hour", entry_gain)
 			var old_near: Vector3 = graphics._mist_sample.near_layer
 			var old_density: float = graphics._mist_sample.volume_density
 			var old_payload: PackedByteArray = graphics._mist.effect._parameters
@@ -220,6 +244,9 @@ func run() -> void:
 				and is_equal_approx(old_density, graphics._mist_sample.volume_density)
 				and env.fog_light_color.is_equal_approx(clear_tint),
 				"The 07:00 scattering curve reaches the shader without altering extinction or depth fog")
+			var entry_payload: PackedByteArray = graphics._mist.effect._ground_haze_parameters
+			check(is_equal_approx(entry_payload.decode_float(28), 2.),
+				"An imported biome authors the same entry response without Forest or local haze assets")
 			graphics.set_weather(1., 0.)
 			var cloud_source: Vector3 = graphics._mist_sample.get("linear_scatter_rgb", Vector3.ZERO)
 			var cloud_tint: Color = selected_profile.overcast.fog_color.srgb_to_linear()
@@ -234,7 +261,11 @@ func run() -> void:
 			check(is_equal_approx(payload.decode_float(124), .42), "Noon uses the authored neutral energy multiplier")
 			graphics.set_profile(inherited_profile)
 			map.showcase.set_hour(7.)
+			await process_frame
+			await RenderingServer.frame_post_draw
 			check(not graphics._mist_sample.has("linear_scatter_rgb"), "Changing profile clears the optional tint")
+			entry_payload = graphics._mist.effect._ground_haze_parameters
+			check(is_zero_approx(entry_payload.decode_float(28)), "Switching biome clears the prior entry response")
 			var alternate_profile = selected_profile.duplicate()
 			var alternate_track := Curve.new()
 			alternate_track.add_point(Vector2(0., .8))
