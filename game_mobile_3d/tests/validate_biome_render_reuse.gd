@@ -60,6 +60,33 @@ func run() -> void:
 		"The reference overview keeps its approved framing")
 	forest.set_review_view("gameplay")
 	check(forest_settings.overcast != null, "Forest needs its own overcast resource")
+	if RenderingServer.get_rendering_device() != null and RenderingServer.get_current_rendering_method() == "mobile":
+		var diffuse_slider := showcase._lighting_sliders.get(&"shadow_diffuse_return") as HSlider
+		check(diffuse_slider != null and is_equal_approx(diffuse_slider.value, 1.),
+			"The default diffuse shadow return is adjustable")
+		var sun_for_shade := forest.get_node("Sun") as DirectionalLight3D
+		for time: float in [7., 16.5, 12., 19.5, 22.]:
+			showcase.set_hour(time)
+			await process_frame
+			await RenderingServer.frame_post_draw
+			var state: Variant = showcase.get("_shadow_diffuse_state")
+			var expected := .06 if time in [7., 16.5] else 0.
+			check(state is Vector4 and is_equal_approx(state.w, expected),
+				"Diffuse return follows the biome curve at %.1f" % time)
+		showcase.set_hour(7.)
+		showcase.set_lighting_scale(&"shadow_diffuse_return", 0.)
+		await process_frame
+		await RenderingServer.frame_post_draw
+		var disabled: Variant = showcase.get("_shadow_diffuse_state")
+		check(disabled is Vector4 and disabled.is_zero_approx(), "Zero slider removes the added diffuse return")
+		showcase.set_lighting_scale(&"shadow_diffuse_return", 1.)
+		sun_for_shade.shadow_enabled = false
+		await process_frame
+		await RenderingServer.frame_post_draw
+		disabled = showcase.get("_shadow_diffuse_state")
+		check(disabled is Vector4 and disabled.is_zero_approx(), "Disabling sun shadows clears the diffuse return")
+		sun_for_shade.shadow_enabled = true
+		showcase.set_hour(12.)
 	check(forest_settings.get("projected_opening_recovery_by_hour") is Curve,
 		"Forest sunlight opening response comes from the biome preset")
 	check(forest_settings.get("alternate_mist_by_hour") is Curve,
