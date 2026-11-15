@@ -80,6 +80,7 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	_collect(legacy, sliders)
 	panel.remove_child(legacy)
 	legacy.queue_free()
+	var map_settings := _widgets.has("biome-preset")
 
 	_shield = Control.new()
 	_shield.name = "WorldMapSettingsPointerShield"
@@ -100,7 +101,7 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 
 	var header := HBoxContainer.new()
 	layout.add_child(header)
-	var heading := _label("Cài đặt Overworld", 23)
+	var heading := _label("Cài đặt bản đồ" if map_settings else "Cài đặt Overworld", 23)
 	heading.name = "SettingsDragHandle"
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -110,7 +111,7 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	heading.tooltip_text = "Giữ chuột trái trên tiêu đề và kéo để di chuyển menu."
 	heading.gui_input.connect(_drag_header)
 	header.add_child(heading)
-	if full or _widgets.has("biome-preset"):
+	if full or map_settings:
 		_undo_button = _button("Hoàn tác")
 		_undo_button.name = "UndoSettings"
 		_undo_button.tooltip_text = "Khôi phục lần chỉnh gần nhất."
@@ -134,6 +135,7 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 
 	var navigation := HBoxContainer.new()
 	layout.add_child(navigation)
+	navigation.visible = not map_settings
 	_views = OptionButton.new()
 	_views.name = "SettingsSection"
 	_views.focus_mode = Control.FOCUS_NONE
@@ -180,7 +182,7 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	gear = _button("⚙  Cài đặt")
 	gear.name = "WorldMapSettingsButton"
 	gear.theme = panel.theme
-	gear.tooltip_text = "Mở cài đặt Overworld. Phím L ẩn / hiện HUD."
+	gear.tooltip_text = "Mở cài đặt bản đồ. Phím L ẩn / hiện HUD."
 	hud.add_child(gear)
 	gear.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	gear.offset_left = -142
