@@ -105,6 +105,10 @@ func run() -> void:
 			check(Vector3(bounce.x, bounce.y, bounce.z).length() > .01
 				and face_material.get_shader_parameter("kai_ground_bounce") == bounce,
 				"The shared overhead light returns through the terrain to Kai's face and cloth at night")
+			world.showcase.set_lighting_scale(&"kai_ground_bounce", 1.)
+			var previous: Vector4 = material.get_shader_parameter("kai_ground_bounce")
+			check(bounce.y > previous.y and is_equal_approx(bounce.w, previous.w),
+				"Fresh Night uses stronger Kai ground return with the same sampled floor as the previous look")
 			world.showcase.set_lighting_scale(&"kai_ground_bounce", 0.)
 			await draw(4)
 			check(material.get_shader_parameter("kai_ground_bounce") == Vector4.ZERO
