@@ -233,6 +233,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"player_sun_shoulder": ["Dịu nắng trên nhân vật", .4],
 	&"player_sun_specular": ["Dịu phản sáng nắng trên Valorie", 1.],
 	&"player_canopy_color": ["Sắc ánh trời trên nhân vật", 1.],
+	&"actor_shade_sky": ["Ánh trời dịu trên Valorie dưới tán", 1.],
 	&"actor_view_fill_chroma": ["Hòa màu ánh bù trên Valorie", 1.],
 	&"actor_twilight_view_fill": ["Dịu ánh bù trên Valorie lúc chạng vạng", 1.],
 	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
@@ -266,7 +267,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 170
+const LIGHTING_MIX_VERSION := 171
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1816,6 +1817,12 @@ func player_canopy_color_weight() -> float:
 		return 0.
 	return _lighting_scale(&"player_canopy_color") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 
+func actor_shade_sky_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() or _biome_profile == null:
+		return 0.
+	var gain := DayNight.sample_curve(_biome_profile.actor_shade_sky_by_hour, hour / 24., 0.)
+	return clampf(gain, 0., 1.) * _lighting_scale(&"actor_shade_sky")
+
 func actor_twilight_view_fill_weight() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_spatial_sky_context() \
 			or not level.look.player_effects_available():
@@ -2263,6 +2270,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 169 and effect == &"mist_entry_scatter":
 			missing_value = 0.
 		if version < 170 and effect == &"stone_wall_sky":
+			missing_value = 0.
+		if version < 171 and effect == &"actor_shade_sky":
 			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
