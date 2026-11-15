@@ -123,6 +123,7 @@ func run() -> void:
 			"%s has its own selector entry and MD2 icon" % NEW_WEAPON_NAMES[i])
 	await check_weapon_movement(lab, menu)
 	await check_weapon_idle(lab, menu)
+	await check_shovel_run(lab, menu)
 	await check_bow_movement(lab, menu)
 	await check_crossbow_settle(lab, menu)
 	check_crossbow_equip_audio(lab, menu)
@@ -569,6 +570,77 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 	player.scripted_input = false
 	lab.reset_player()
 	await ticks(12)
+
+func check_shovel_run(lab: Node3D, menu: OptionButton) -> void:
+	equip(menu, 9)
+	lab.reset_player()
+	await ticks(10)
+	var player = lab.player
+	var rig: Skeleton3D = player.skeleton
+	var hip := rig.find_bone("J_Hip")
+	var shoulders := rig.find_bone("J_Shoulders")
+	var grip_bones := ["J_L_Arm", "J_L_Hand", "J_R_Arm", "J_R_Hand", "J_R_Weapon"]
+	var low := INF
+	var high := -INF
+	var minimum_sole := INF
+	var reference_grip_sample: Transform3D = lab._weapon_mesh.transform
+	var grip_preserved := true
+	var sway := 0.0
+	var contacts: Array[Vector3] = []
+	var trace := func(point: Vector3, landed: bool):
+		if not landed and player.active_clip == "Run":
+			contacts.append(point)
+	player.surface_contact.connect(trace)
+	player.scripted_input = true
+	player.requested_direction = Vector2.DOWN
+	await ticks(24)
+	check(player.active_clip == "Walk" and player.clips.Walk.source_name == "Player_Shovel_Walk"
+		and player.hybrid_motion.last_kind == "MD2Walk", "Shovel's walk remains its MD2 source")
+	player.requested_run = true
+	await ticks(32)
+	var start: Vector3 = player.global_position
+	player.foot_placement.reset_metrics()
+	for i in 82:
+		await physics_frame
+		var y := rig.get_bone_global_pose(hip).origin.y
+		low = minf(low, y)
+		high = maxf(high, y)
+		var phase: float = player._gait_resume_phase
+		var pose: Array[Transform3D] = player.source_gait.compose(phase, player.current_speed)
+		for name: String in grip_bones:
+			var bone := rig.find_bone(name)
+			grip_preserved = grip_preserved and rig.get_bone_pose(bone).is_equal_approx(pose[bone])
+		var rotation := rig.get_bone_pose_rotation(shoulders)
+		sway = maxf(sway, rotation.angle_to(pose[shoulders].basis.get_rotation_quaternion()))
+		for sole: Dictionary in player.direction_adapter.observe_soles(player.global_position.y, true):
+			minimum_sole = minf(minimum_sole, sole.height)
+	var movement: Dictionary = player.foot_placement.snapshot()
+	check(player.active_clip == "Run" and player.hybrid_motion.last_kind == "ShovelRun"
+		and is_equal_approx(player.current_speed, player.run_speed) and player.global_position.distance_to(start) > 9.0,
+		"Shovel uses its hybrid run at the original controller speed")
+	check(low < 0.725 and high > 0.775 and sway > 0.025 and sway < 0.15,
+		"Shovel receives, pushes off and carries a restrained shoulder sway")
+	check(grip_preserved and lab._weapon_mesh.transform.is_equal_approx(reference_grip_sample),
+		"Shovel preserves the MD2 arm, hand and weapon socket transforms")
+	check(contacts.size() >= 5 and minimum_sole > -0.015
+		and movement.near_ground_samples >= 20 and movement.near_ground_travel_rms_m_s < 2.5,
+		"Shovel alternates grounded steps with bounded near-ground slip")
+	player.requested_run = false
+	await ticks(23)
+	check(player.active_clip == "Walk" and player.source_transition.incoming_weight >= 0.99,
+		"Shovel blends from the run into its original walk")
+	player.requested_direction = Vector2.ZERO
+	await ticks(45)
+	check(player.active_clip == "Idle" and player.source_transition.incoming_weight >= 0.99,
+		"Shovel returns to its original idle after stopping")
+	print("MECHANIC_LAB_SHOVEL_RUN hip=[", low, ",", high, "] sway_rad=", sway,
+		" contacts=", contacts.size(), " minimum_sole=", minimum_sole,
+		" near_ground_rms_m_s=", movement.near_ground_travel_rms_m_s)
+	player.surface_contact.disconnect(trace)
+	player.scripted_input = false
+	lab.reset_player()
+	equip(menu, 0)
+	await ticks(3)
 
 func check_bow_movement(lab: Node3D, menu: OptionButton) -> void:
 	equip(menu, 6)
