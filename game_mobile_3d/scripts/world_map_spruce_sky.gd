@@ -126,6 +126,11 @@ func apply_layout(relative: String, digest: String) -> bool:
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", sky)
 	air.texture = directional
 	_level.showcase.mist.effect.directional_grid = directional
+	var player_light = _level.player_light
+	if player_light != null and player_light.cache_ready:
+		player_light.local_phase_bounce.setup_region(_level, _level.local_actor_bounce_profile,
+			_level.local_actor_bounce_sha256, digest, profile.air_sha256,
+			_level.showcase._lighting_scale(&"player_bounce") > 0.)
 	return true
 
 func _layout_texture(path: String, digest: String, dimensions: Vector3i) -> ImageTexture3D:

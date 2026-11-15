@@ -15,6 +15,7 @@ var _last_bind_key:Array=[]
 var phase_sky:=true
 var source_field=preload("res://scripts/world_map_actor_source_field.gd").new()
 var phase_bounce=preload("res://scripts/world_map_actor_bounce.gd").new()
+var local_phase_bounce=preload("res://scripts/world_map_actor_bounce.gd").new()
 var phase_bounce_active:=false
 var source_field_enabled:=false
 var source_field_active:=false
@@ -86,14 +87,17 @@ func refresh(force:bool=false)->void:
   var sun:DirectionalLight3D=level.get_node("Sun");var c:=sun.light_color.srgb_to_linear();var d:Array=cache.get_meta("sun_direction")
   if level.look._ground_bounce_requested and sun.global_basis.z.normalized().dot(Vector3(d[0],d[1],d[2]))>cos(deg_to_rad(.1)):key=Vector3(c.r,c.g,c.b)*sun.light_energy
   var bounce_mix:float=level.showcase._lighting_scale(&"player_bounce")
-  if bounce_mix>0. and key==Vector3.ZERO and level.look._ground_bounce_requested and phase_bounce.available() \
+  if bounce_mix>0. and key==Vector3.ZERO and level.look._ground_bounce_requested \
    and (level.look.player_local_light_enabled or level.look.player_reflection_enabled):
-   var slots:Vector4=level.showcase.directional_air.sun_slots()
-   var values:PackedVector3Array=phase_bounce.sample(p,slots)
-   if values.size()==18:
-    bounce_sun=values
-    key=Vector3(c.r,c.g,c.b)*(sun.light_energy*bounce_mix*slots.w*phase_bounce.fade(p))
-    phase_bounce_active=true
+   var local:bool=local_phase_bounce.available() and local_phase_bounce.fade(p)>0.
+   var bounce=local_phase_bounce if local else phase_bounce
+   if bounce.available():
+    var slots:Vector4=level.showcase.directional_air.sun_slots()
+    var values:PackedVector3Array=bounce.sample(p,slots)
+    if values.size()==18:
+     bounce_sun=values
+     key=Vector3(c.r,c.g,c.b)*(sun.light_energy*bounce_mix*slots.w*bounce.fade(p))
+     phase_bounce_active=true
  var skin_verified:bool=level.look.player_effects_available()
  var sun_shoulder:float=level.showcase.player_sun_shoulder_weight()
  var sun_specular:float=level.showcase.player_sun_specular_weight()

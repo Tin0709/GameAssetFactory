@@ -27,6 +27,24 @@ func setup(level: Node3D, base_path: String, warm_cache: bool = false) -> void:
 	var proof: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if proof.map_sha256 != FileAccess.get_sha256(level.map_layout_path) or proof.input_atlas_sha256 != air.payload_sha256:
 		return
+	_configure(proof, folder, warm_cache)
+
+func setup_region(level: Node3D, relative: String, digest: String, layout_digest: String,
+		atlas_digest: String, warm_cache: bool) -> void:
+	if relative.is_empty() or relative.is_absolute_path():
+		return
+	var root: String = level.showcase.directional_air.research_root
+	var path := root.path_join(relative).simplify_path()
+	if not path.begins_with(root + "/") or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != digest:
+		return
+	var proof: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not proof is Dictionary or proof.get("schema") != "private_actor_key_bounce/1" \
+			or proof.get("layout_sha256") != layout_digest or proof.get("input_atlas_sha256") != atlas_digest \
+			or proof.get("map_sha256") != FileAccess.get_sha256(level.map_layout_path):
+		return
+	_configure(proof, path.get_base_dir(), warm_cache)
+
+func _configure(proof: Dictionary, folder: String, warm_cache: bool) -> void:
 	_origin = _vector(proof.origin)
 	_step = _vector(proof.step)
 	_size = Vector3i(_vector(proof.size))

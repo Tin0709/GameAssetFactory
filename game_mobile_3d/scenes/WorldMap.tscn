@@ -69,6 +69,8 @@ forest_basin_layout_profile = "graphics_vfx/acquisition_20261114/analysis/forest
 forest_basin_layout_sha256 = "93734f3aa165447dcd8d2964bfb8703d1a3c5287c8c5a35b7f9bd77b64e70c7f"
 forest_basin_fallback_profile = "graphics_vfx/forest_pix_capture_20261112/forest_morning_depth/basin_day_layout/composed/layout.private.json"
 forest_basin_fallback_sha256 = "ffd6ceabe4beb5fcbbfcbdbde38bae99f5c2b70ffc05fc057c574d17d6171c54"
+local_actor_bounce_profile = "graphics_vfx/acquisition_20261114/analysis/forest_basin_air_v201/bounce/profile.private.json"
+local_actor_bounce_sha256 = "7cd7c98595fa399e98b3278ddd5ed5da1e22b4d974d7d6d8156736820f9af4b5"
 
 sculk_surface_sites = PackedVector2Array(-22, 15, -23, 19, -24, 23, -24, 26)
 forest_path_light_offset = Vector2(-9.6, 2.3)

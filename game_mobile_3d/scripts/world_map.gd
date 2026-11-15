@@ -92,6 +92,9 @@ var biome_controller: BiomeGraphics
 ## Previous verified placement for research workspaces missing the current bake.
 @export var forest_basin_fallback_profile := ""
 @export var forest_basin_fallback_sha256 := ""
+## Optional actor bounce field baked against the selected layout's directional atlas.
+@export var local_actor_bounce_profile := ""
+@export var local_actor_bounce_sha256 := ""
 
 var runtime: Dictionary
 var geometry
