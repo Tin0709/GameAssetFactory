@@ -44,6 +44,9 @@ var biome_controller: BiomeGraphics
 ## Scene placement only. The renderer skips this layer when the map layout changes.
 @export var distant_terrain_origin := Vector3.INF
 @export var distant_terrain_layout_sha := ""
+## A verified support and sky bake relative to the private research folder.
+@export var playable_terrace_profile := ""
+@export var playable_terrace_sha256 := ""
 
 @export var local_mist_region: LocalMistRegion
 @export var alternate_mist_region: LocalMistRegion

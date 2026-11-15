@@ -13,6 +13,7 @@ const MESH_ANCHOR := Vector3(16., 38., 16.)
 
 var visual: MeshInstance3D
 var material: ShaderMaterial
+var linked_section: Mesh
 var _attempted := false
 var _submitted := Vector4.INF
 var _subject_uv := Vector2.INF
@@ -40,14 +41,7 @@ func update(weight: float, tint: Color, subject_uv: Vector2) -> void:
 	material.set_shader_parameter("distant_light", Vector3(state.x, state.y, state.z))
 	material.set_shader_parameter("visibility_scale", state.w)
 
-func prepare(world: Node3D, origin: Vector3, expected_layout_sha: String) -> void:
-	if _attempted or not is_instance_valid(world) or not origin.is_finite() \
-			or not OS.has_feature("editor") or RenderingServer.get_current_rendering_method() != "mobile" \
-			or RenderingServer.get_rendering_device() == null:
-		return
-	_attempted = true
-	if expected_layout_sha.is_empty() or FileAccess.get_sha256(world.map_layout_path) != expected_layout_sha:
-		return
+static func research_root() -> String:
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	if root.is_empty():
 		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
@@ -55,12 +49,25 @@ func prepare(world: Node3D, origin: Vector3, expected_layout_sha: String) -> voi
 	var project := ProjectSettings.globalize_path("res://../").simplify_path().replace("\\", "/").trim_suffix("/").to_lower()
 	if not root.is_absolute_path() or root.begins_with("res://") or root.begins_with("user://") \
 			or root.to_lower() == project or root.to_lower().begins_with(project + "/"):
+		return ""
+	return root
+
+func prepare(world: Node3D, origin: Vector3, expected_layout_sha: String, linked_name: StringName = &"") -> void:
+	if _attempted or not is_instance_valid(world) or not origin.is_finite() \
+			or not OS.has_feature("editor") or RenderingServer.get_current_rendering_method() != "mobile" \
+			or RenderingServer.get_rendering_device() == null:
+		return
+	_attempted = true
+	if expected_layout_sha.is_empty() or FileAccess.get_sha256(world.map_layout_path) != expected_layout_sha:
+		return
+	var root := research_root()
+	if root.is_empty():
 		return
 	var mesh_path := root.path_join(ROOT).path_join(MESH_PATH)
 	var atlas_path := root.path_join(ROOT).path_join(ATLAS_PATH)
 	if FileAccess.get_sha256(mesh_path) != MESH_SHA or FileAccess.get_sha256(atlas_path) != ATLAS_SHA:
 		return
-	var mesh := _read_terrain(mesh_path)
+	var mesh := _read_terrain(mesh_path, linked_name)
 	if mesh == null:
 		return
 	var image := Image.load_from_file(atlas_path)
@@ -80,7 +87,7 @@ func prepare(world: Node3D, origin: Vector3, expected_layout_sha: String) -> voi
 	visual.hide()
 	world.add_child(visual)
 
-func _read_terrain(path: String) -> ArrayMesh:
+func _read_terrain(path: String, linked_name: StringName) -> ArrayMesh:
 	var document := GLTFDocument.new()
 	var state := GLTFState.new()
 	if document.append_from_file(path, state) != OK:
@@ -92,7 +99,11 @@ func _read_terrain(path: String) -> ArrayMesh:
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var found := {}
 	for part: MeshInstance3D in source.find_children("*", "MeshInstance3D", true, false):
-		if part.name in SECTIONS and part.mesh != null and part.mesh.get_surface_count() == 1 and part.transform == Transform3D.IDENTITY:
+		if part.mesh == null or part.mesh.get_surface_count() != 1 or part.transform != Transform3D.IDENTITY:
+			continue
+		if part.name == linked_name:
+			linked_section = part.mesh
+		if part.name in SECTIONS:
 			surface.append_from(part.mesh, 0, Transform3D(Basis.IDENTITY, -MESH_ANCHOR))
 			found[part.name] = true
 	source.free()
