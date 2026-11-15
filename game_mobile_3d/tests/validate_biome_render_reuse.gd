@@ -96,15 +96,22 @@ func run() -> void:
 		check(stone != null, "The main map has a stone transport receiver")
 		if stone != null:
 			showcase.set_hour(16.5)
-			check(is_equal_approx(float(stone.get_shader_parameter("stone_wall_sky")), .75),
+			await process_frame
+			await RenderingServer.frame_post_draw
+			var wall_sky: Variant = stone.get_shader_parameter("stone_wall_sky")
+			check(wall_sky is float and is_equal_approx(wall_sky, .75),
 				"The afternoon profile reaches the stone diffuse receiver")
 			showcase.set_lighting_scale(&"stone_wall_sky", 0.)
-			check(is_zero_approx(float(stone.get_shader_parameter("stone_wall_sky"))),
+			wall_sky = stone.get_shader_parameter("stone_wall_sky")
+			check(wall_sky is float and is_zero_approx(wall_sky),
 				"The live comparison restores the old stone sky")
 			showcase.set_lighting_scale(&"stone_wall_sky", 1.)
 			for hour: float in [12., 22.]:
 				showcase.set_hour(hour)
-				check(is_zero_approx(float(stone.get_shader_parameter("stone_wall_sky"))),
+				await process_frame
+				await RenderingServer.frame_post_draw
+				wall_sky = stone.get_shader_parameter("stone_wall_sky")
+				check(wall_sky is float and is_zero_approx(wall_sky),
 					"The sky addition bypasses protected Noon and night")
 		showcase.set_hour(20.25)
 		showcase._update_mist()
