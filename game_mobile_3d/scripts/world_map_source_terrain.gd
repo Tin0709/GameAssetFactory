@@ -33,6 +33,7 @@ static func load_tiles() -> Texture2DArray:
 	if atlas == null or atlas.is_empty():
 		return null
 	var images: Array[Image] = []
+	var surface_reflectance := PackedVector3Array()
 	for key in TILE_KEYS:
 		var offset: Variant = manifest.tiles.get(key)
 		if not offset is Array or offset.size() != 2 or not (offset[0] is float or offset[0] is int) \
@@ -42,7 +43,17 @@ static func load_tiles() -> Texture2DArray:
 		if not Rect2i(Vector2i.ZERO, atlas.get_size()).encloses(tile):
 			return null
 		var image := atlas.get_region(tile)
+		var sum := Vector3.ZERO
+		for y in TILE_SIZE:
+			for x in TILE_SIZE:
+				var color := image.get_pixel(x, y).srgb_to_linear()
+				sum += Vector3(color.r, color.g, color.b)
+		surface_reflectance.append(sum / float(TILE_SIZE * TILE_SIZE))
 		image.generate_mipmaps()
 		images.append(image)
 	var texture := Texture2DArray.new()
-	return texture if texture.create_from_images(images) == OK else null
+	if texture.create_from_images(images) != OK:
+		return null
+	# Low-frequency reflectance used by the local receiver, with no texture readback.
+	texture.set_meta("surface_reflectance", surface_reflectance)
+	return texture

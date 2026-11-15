@@ -28,6 +28,7 @@ uniform float glow_energy = 1.0;
 uniform bool recovered_roughness = false;
 uniform bool recovered_self_light = false;
 uniform bool gaf_matte_opening = false;
+uniform vec4 kai_ground_bounce = vec4(0.0);
 // Values supplied only by the validated external reference profile.
 uniform vec3 roughness_transform = vec3(1.0,0.0,1.0);
 uniform float self_light_scale = 0.0;
@@ -89,6 +90,15 @@ void fragment(){
 	AO=actor_sky_visibility(actor_world,normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.0)).xyz));
 	AO_LIGHT_AFFECT=0.0;
 #endif
+	if (max(kai_ground_bounce.r, max(kai_ground_bounce.g, kai_ground_bounce.b)) > 0.0) {
+		// The lower hemisphere fills the sides of the face and torso, with a small
+		// contribution on upper faces. This uses the same fog as the base material.
+		vec3 ground_normal = normalize(mat3(INV_VIEW_MATRIX) * NORMAL);
+		float hemisphere = .06 + .74 * (1.0 - smoothstep(-.76, .78, ground_normal.y));
+		float height = max(actor_world.y - kai_ground_bounce.w, 0.0);
+		float falloff = 1.0 / (1.0 + .32 * height * height);
+		EMISSION += ALBEDO * (1.0 - METALLIC) * kai_ground_bounce.rgb * (hemisphere * falloff);
+	}
 	if(player_local_light || player_rough_reflection){
 		vec3 wn=normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.)).xyz);
 		vec3 wv=normalize((INV_VIEW_MATRIX*vec4(VIEW,0.)).xyz);

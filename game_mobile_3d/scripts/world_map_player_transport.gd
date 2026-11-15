@@ -105,8 +105,9 @@ func refresh(force:bool=false)->void:
  var canopy_color:float=level.showcase.player_canopy_color_weight() if active and level.look.player_local_light_enabled else 0.
  var view_fill_chroma: float = level.showcase.actor_view_fill_chroma_weight() if active and level.look.player_local_light_enabled else 0.
  var twilight_view_fill: float = level.showcase.actor_twilight_view_fill_weight() if active and level.look.player_local_light_enabled else 0.
+ var ground_bounce := _kai_ground_bounce(p)
  refresh_shade_sky(force)
- var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if phase_bounce_active else null,sun_shoulder,sun_specular,canopy_color,view_fill_chroma,twilight_view_fill]
+ var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if phase_bounce_active else null,sun_shoulder,sun_specular,canopy_color,view_fill_chroma,twilight_view_fill,ground_bounce]
  if not force and bind_key==_last_bind_key:
   update_usec=Time.get_ticks_usec()-started;return
  _last_bind_key=bind_key
@@ -116,7 +117,10 @@ func refresh(force:bool=false)->void:
   m.set_shader_parameter("player_local_light",diffuse)
   m.set_shader_parameter("player_rough_reflection",active and level.look.player_reflection_enabled)
   var verified_valorie:bool=m.get_meta("verified_valorie",false)
-  var daylight_receiver:bool=verified_valorie or m.get_meta("kai_matte_lighting",false)
+  var kai_matte: bool = m.get_meta("kai_matte_lighting", false)
+  var daylight_receiver: bool = verified_valorie or kai_matte
+  if kai_matte:
+   m.set_shader_parameter("kai_ground_bounce", ground_bounce)
   m.set_shader_parameter("player_sun_shoulder",sun_shoulder if daylight_receiver else 0.)
   m.set_shader_parameter("player_sun_specular_normalization",sun_specular if verified_valorie else 0.)
   m.set_shader_parameter("actor_canopy_color_mix",canopy_color if verified_valorie else 0.)
@@ -128,6 +132,55 @@ func refresh(force:bool=false)->void:
    m.set_shader_parameter("player_probe_base",p.y);m.set_shader_parameter("player_probe_tint",tint)
    m.set_shader_parameter("player_probe_scale",scale);m.set_shader_parameter("player_probe_key",key)
  update_usec=Time.get_ticks_usec()-started
+
+func _kai_ground_bounce(position: Vector3) -> Vector4:
+ var review = level.showcase
+ var light: OmniLight3D = review._player_light
+ if not is_instance_valid(review._kai_skin) or not review._kai_skin.is_visible_in_tree()   or level.look.stage != 2 or not level.look.player_adapter_enabled or not level.look.player_local_light_enabled   or level.view_mode != "gameplay" or not review.source_terrain_active or not is_instance_valid(light)   or not light.is_visible_in_tree() or light.light_energy <= 0. or light.omni_range <= 0.:
+  return Vector4.ZERO
+ var gain: float = review._night_grass_weight() * review._lighting_scale(&"kai_ground_bounce")
+ if gain <= 0.:
+  return Vector4.ZERO
+ var look = level.look
+ var reflectance: PackedVector3Array = review._source_terrain_tiles.get_meta("surface_reflectance", PackedVector3Array())
+ var field: Image = look.path_map_image
+ if reflectance.size() != 5 or field == null:
+  return Vector4.ZERO
+ # Interpolate the terrain's existing top cells across their centers.
+ var pixel := Vector2(position.x, position.z) - look.path_map_origin - Vector2(.5, .5)
+ var corner := Vector2i(pixel.floor())
+ var fraction := pixel - Vector2(corner)
+ var incident := Vector3.ZERO
+ var surface_height := 0.
+ var surface_weight := 0.
+ var bounds := Rect2i(Vector2i.ZERO, field.get_size())
+ for y in 2:
+  for x in 2:
+   var cell := corner + Vector2i(x, y)
+   if not bounds.has_point(cell):
+    continue
+   var info := field.get_pixelv(cell)
+   if info.a <= 0.:
+    continue
+   var distance_from_floor := position.y - info.g
+   var support := smoothstep(-.65, -.18, distance_from_floor) * (1. - smoothstep(.28, 1.8, distance_from_floor))
+   var weight := (fraction.x if x == 1 else 1. - fraction.x) * (fraction.y if y == 1 else 1. - fraction.y) * support
+   var world_cell: Vector2 = look.path_map_origin + Vector2(cell) + Vector2(.5, .5)
+   var to_light := light.global_position - Vector3(world_cell.x, info.g, world_cell.y)
+   var distance_squared := to_light.length_squared()
+   var radius_ratio := distance_squared / (light.omni_range * light.omni_range)
+   var falloff := pow(maxf(0., 1. - radius_ratio * radius_ratio) / (1. + radius_ratio), 2.)
+   var cosine := clampf(to_light.y / maxf(sqrt(distance_squared), .001), 0., 1.)
+   var layer := 4 if info.b < .5 else (0 if info.b < 1.5 else 3)
+   incident += reflectance[layer] * (weight * falloff * cosine)
+   surface_height += info.g * weight
+   surface_weight += weight
+ if surface_weight <= .0001:
+  return Vector4.ZERO
+ var warm := light.light_color.srgb_to_linear()
+ # Broad diffuse return. Scale with the existing lantern rather than adding a light.
+ var diffuse := incident * Vector3(warm.r, warm.g, warm.b) * minf(light.light_energy * gain * 1.35, 2.)
+ return Vector4(diffuse.x, diffuse.y, diffuse.z, surface_height / surface_weight)
 
 func refresh_shade_sky(force: bool = false) -> void:
  var strength := Vector2.ZERO

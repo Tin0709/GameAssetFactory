@@ -68,6 +68,7 @@ var grove_mist_enabled := true
 var _grove_mist_toggle: CheckButton
 var _spruce_toggle: CheckButton
 var _source_terrain_tiles: Texture2DArray
+var source_terrain_active := false
 var _source_terrain_toggle: CheckButton
 var forest := FOREST.new("", "")
 var _biome_profile: BiomeProfile
@@ -123,6 +124,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"daylight_balance": ["Daylight color balance", 1.],
 	&"player_sky": ["Player sky fill", 2.],
 	&"player_bounce": ["Ánh nắng hắt lên nhân vật", 1.],
+	&"kai_ground_bounce": ["Ánh hắt từ nền lên Kai ban đêm", 1.5],
 	&"foot_contact": ["Bóng tiếp xúc dưới chân", 1.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"turf_ambient_color": ["Sắc ánh hắt trên cỏ lúc tối", 1.],
@@ -282,7 +284,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 182
+const LIGHTING_MIX_VERSION := 183
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1590,6 +1592,7 @@ func set_source_terrain(enabled: bool) -> bool:
 	if enabled and _source_terrain_tiles == null:
 		_source_terrain_tiles = preload("res://scripts/world_map_source_terrain.gd").load_tiles()
 	enabled = enabled and _source_terrain_tiles != null
+	source_terrain_active = enabled
 	var bound: Dictionary[ShaderMaterial, bool] = {}
 	for item: Array in level.look.terrain_materials:
 		var material: ShaderMaterial = item[3]
@@ -2421,6 +2424,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 183 and effect == &"kai_ground_bounce":
+			missing_value = 0.
 		if version < 182 and effect == &"daylight_shade_retention":
 			missing_value = 0.
 		if version < 181 and effect == &"twilight_leaf_lamp_shoulder":
@@ -2848,7 +2853,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if level.player_light != null:
 			level.player_light.refresh_shade_sky()
 		return
-	if changed_effect in [&"player_sky", &"player_bounce", &"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
+	if changed_effect in [&"player_sky", &"player_bounce", &"kai_ground_bounce", &"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 		if level.player_light != null:
 			level.player_light.refresh()
 		return
