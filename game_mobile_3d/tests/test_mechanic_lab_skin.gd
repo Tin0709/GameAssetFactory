@@ -46,27 +46,40 @@ func run() -> void:
 	var kai_mesh := kai.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D
 	check(kai_mesh.material_overlay != null, "A skin loaded during a hit inherits the flash")
 	var head := kai_rig.find_bone("J_Head")
-	var rope := kai_rig.find_bone("J_Kai_Rope_Sway")
+	var lantern := kai_rig.find_bone("J_Kai_Lantern_Sway")
 	var tail := kai_rig.find_bone("J_Headband_Tail_A")
 	var tail_b := kai_rig.find_bone("J_Headband_Tail_B")
-	check(head >= 0 and rope >= 0 and tail >= 0 and tail_b >= 0, "Kai keeps the rig and all three sway bones")
-	if rope < 0 or tail < 0 or tail_b < 0:
+	check(head >= 0 and lantern >= 0 and tail >= 0 and tail_b >= 0, "Kai keeps the rig and all three sway bones")
+	check(kai_rig.find_bone("J_Kai_Rope_Sway") < 0, "The old rope is removed from the Lab skin")
+	var lamp := kai.find_child("Kai Run | MD2 metal lantern", true, false) as MeshInstance3D
+	var clasp := kai.find_child("Kai Run | MD2 lantern clasp", true, false) as MeshInstance3D
+	var pouch := kai.find_child("Kai Right Hip Pouch", true, false) as MeshInstance3D
+	check(lamp != null and clasp != null and pouch != null, "The new lantern, clasp and fixed right-hip pouch are loaded")
+	if lamp != null:
+		var material := lamp.get_active_material(0) as BaseMaterial3D
+		check(material != null and material.emission_enabled and material.emission_texture != null
+			and material.albedo_texture != null, "The lantern uses textured yellow emission and its dark frame")
+	if pouch != null:
+		check(pouch.get_aabb().end.x < -0.23 and uses_bone(pouch, kai_rig, &"J_Shoulders")
+			and not uses_bone(pouch, kai_rig, &"J_Kai_Lantern_Sway"), "The large pouch sits on Kai's right and is fixed to the belt")
+	if lantern < 0 or tail < 0 or tail_b < 0:
 		quit(1)
 		return
 	actor.scripted_input = true
 	actor.requested_run = true
 	actor.requested_direction = Vector2(1, 0)
-	var rope_samples: Array[Quaternion] = []
+	var lantern_samples: Array[Quaternion] = []
 	var tail_samples: Array[Quaternion] = []
 	var tail_b_samples: Array[Quaternion] = []
 	for i in 55:
 		await physics_frame
 		await process_frame
 		if i > 20:
-			rope_samples.append(kai_rig.get_bone_pose_rotation(rope))
+			lantern_samples.append(kai_rig.get_bone_pose_rotation(lantern))
 			tail_samples.append(kai_rig.get_bone_pose_rotation(tail))
 			tail_b_samples.append(kai_rig.get_bone_pose_rotation(tail_b))
-	check(actor.current_speed > 2.0 and deltas(rope_samples) > 0.10
+	check(lamp != null and uses_bone(lamp, kai_rig, &"J_Kai_Lantern_Sway"), "The lantern is skinned to the handle pivot")
+	check(actor.current_speed > 2.0 and deltas(lantern_samples) > 0.10
 		and deltas(tail_samples) > 0.10 and deltas(tail_b_samples) > 0.10, "Running drives all three accessories through a real gait")
 	check(kai_mesh.material_overlay == null, "The flash expires on Kai")
 	picker.select(0)
@@ -111,3 +124,16 @@ func deltas(values: Array[Quaternion]) -> float:
 	for value: Quaternion in values:
 		largest = maxf(largest, values[0].angle_to(value))
 	return largest
+
+
+func uses_bone(mesh: MeshInstance3D, rig: Skeleton3D, bone: StringName) -> bool:
+	var bone_index := rig.find_bone(bone)
+	for surface in mesh.mesh.get_surface_count():
+		var arrays := mesh.mesh.surface_get_arrays(surface)
+		var ids: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
+		var weights: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
+		for i in ids.size():
+			if weights[i] > 0.001 and (mesh.skin.get_bind_name(ids[i]) == bone
+					or (bone_index >= 0 and mesh.skin.get_bind_bone(ids[i]) == bone_index)):
+				return true
+	return false
