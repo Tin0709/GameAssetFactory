@@ -70,6 +70,8 @@ Trong **Biome Graphics → Lighting**, **Shadow Blur** và **Shadow Opacity** ch
 
 Map thử dùng cặp **1,55 / 0,74** cho bóng và **1,45 / 0,78** cho sương. Preset Đồng cỏ lưu hành vi cũ (**1,25 / 0,782** và **1,70 / 0,75**). Các giá trị của Rìa rừng ẩm là hiệu chỉnh GAF cho map thử. B và F8 có thể dùng để kiểm tra chính xác lúc nào preset đang điều khiển hình ảnh. Các phím thử nghiệm U/P của WorldMap thuộc chế độ tham chiếu Forest. [Thuộc tính sương Godot](https://docs.godotengine.org/en/stable/classes/class_environment.html#class-environment-property-fog-depth-curve) · [Thuộc tính bóng Godot](https://docs.godotengine.org/en/stable/classes/class_light3d.html#class-light3d-property-shadow-blur).
 
+Trong Forest, **Sương & hiệu ứng → Exposure và màu cuối → Dịu sắc xanh trong bóng ban ngày** mặc định 50%. Lớp này phục hồi một phần màu trung tính trong bóng khi phần chỉnh màu tham chiếu làm nó quá xanh. Độ sáng tuyến tính của bóng được giữ. So 0% và 50% ở bậc đá gần X = −22,5, Z = −40,5 lúc 07:00 hoặc 16:30. **Shadow Grade Recovery By Hour** trong nhóm Color Grading của preset đặt cửa sổ hiệu lực, với hai đỉnh lúc 07:00 và 16:30. Preset biomes dùng hậu kỳ portable tiếp tục áp chỉnh màu trong Environment. Preset lưu trước v162 thiếu thanh mới sẽ mở ở 0%.
+
 ## Chỉnh chu kỳ theo biome
 
 Khi muốn đổi đặc tính ánh sáng, sương, hậu kỳ hoặc vòng ngày đêm cho riêng một map, duplicate preset thành file `.tres` mới rồi gán cho map đó. Duplicate cả resource con Day/Night hoặc Overcast nếu cần sửa các track riêng. Nhiều biome có thể dùng chung một Weather resource.
