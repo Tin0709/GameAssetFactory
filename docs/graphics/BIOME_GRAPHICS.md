@@ -33,6 +33,14 @@ Preset **Rìa rừng ẩm** dùng hai track này mặc định trên map thử v
 
 Nếu map có hai khoảng mở, đặt thêm **Additional Local Diffuse Region** trong Inspector với tâm, bán kính và vị trí nguồn riêng. Hai vùng dùng chung shader. Tại chỗ chồng lấn, shader hòa trộn theo độ ảnh hưởng của từng vùng. Với map import, cả hai cùng dùng **Local Diffuse Strength**, đường cong giờ và thời tiết của preset. Trong WorldMap, **Địa hình & cây cỏ → Đá và mặt đất → Ánh hắt ở bậc đá** cho phép so sánh riêng vùng thứ hai. Điểm dễ quan sát nằm gần X = −22,5, Z = −40,5 lúc 07:00 hoặc 16:30.
 
+### Ánh trời trong sương rìa tán
+
+Forest bật mặc định mức 100% trong **L → Cài đặt → Sương & hiệu ứng → Sương theo khoảng cách → Ánh trời trong sương rìa tán**. Đứng ở lối rừng lúc 07:00 hoặc 16:30 và so 0% với 100%. Nguồn này lấy ánh môi trường đang chạy nên hoạt động khi trời nhiều mây. Độ truyền sáng giữ nguyên, giữa trưa và ban đêm giữ cấu hình đã duyệt. Preset lưu trước v176 dùng 0% khi thiếu mục này.
+
+Với map import có spatial mist, đặt **Mist Sky Scatter By Hour** và **Mist Sky Scatter Tint** trong preset. Trục Curve dùng giờ chia cho 24, nên đặt cùng giá trị tại 0 và 1. Gán **Mist Sky Field** trên node map. Resource dùng một Texture3D có kênh đỏ biểu thị độ che bán cầu của từng điểm, Origin là tâm texel đầu tiên bằng tọa độ thế giới và Spacing là bước theo mét giữa hai tâm. Bản đồ dùng lại cùng pass sương. Nếu map thiếu field, preset thiếu curve hoặc dùng mức Nhẹ hay Compatibility, đường render tương ứng tiếp tục theo cấu hình sương hiện có.
+
+Forest lấy field che trời đã kiểm theo hình học spruce. Texture đó nằm ngoài Git. Map Meadow kiểm chứng đường gán field với dữ liệu kiểm thử. Scene Meadow chơi thông thường vẫn dùng preset đã có.
+
 ## Import map tiếp theo
 
 1. Từ thư mục `GameAssetFactory`, chạy lệnh dưới đây để tạo dữ liệu map và scene chơi thử. Với `bounds`, cạnh ngoài lấy từ vùng chọn của schematic và giữ cả vùng đệm rỗng. Chế độ `markers` dùng vòng Red Wool 100 × 100 của WorldMap. Cả hai kiểm tra slab, tall grass, vùng chồng lấn và block chưa hỗ trợ.
