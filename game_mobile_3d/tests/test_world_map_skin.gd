@@ -99,6 +99,18 @@ func run() -> void:
 				"Kai skips the calibration specific to Valorie's textures")
 			world.showcase.set_hour(22.)
 			await draw(18)
+			var face_mesh := kai.find_child("Kai Run | Face and expressions", true, false) as MeshInstance3D
+			var face_material := face_mesh.get_active_material(0) as ShaderMaterial
+			var bounce: Vector4 = material.get_shader_parameter("kai_ground_bounce")
+			check(Vector3(bounce.x, bounce.y, bounce.z).length() > .01
+				and face_material.get_shader_parameter("kai_ground_bounce") == bounce,
+				"The shared overhead light returns through the terrain to Kai's face and cloth at night")
+			world.showcase.set_lighting_scale(&"kai_ground_bounce", 0.)
+			await draw(4)
+			check(material.get_shader_parameter("kai_ground_bounce") == Vector4.ZERO
+				and point.light_energy == point_energy and point.light_color == point_color,
+				"The bounce comparison leaves the shared direct lamp alone")
+			world.showcase.set_lighting_scale(&"kai_ground_bounce", 1.)
 		var glass := lamp.get_active_material(0) as ShaderMaterial
 		var native_glass := lamp.mesh.surface_get_material(0) as BaseMaterial3D
 		check(glass != null and native_glass != null
@@ -118,6 +130,8 @@ func run() -> void:
 		var until_hidden := Time.get_ticks_msec() + 1500
 		while source_lamp_visual.visible and Time.get_ticks_msec() < until_hidden:
 			await draw(1)
+		check(material == null or material.get_shader_parameter("kai_ground_bounce") == Vector4.ZERO,
+			"The night ground return is absent at Noon")
 		check(not point.visible and not source_lamp_visual.visible and lamp.is_visible_in_tree()
 			and is_zero_approx(float(glass.get_shader_parameter("glow_energy"))),
 			"The shared daytime curve dims Kai glass while retaining the authored fixture")
