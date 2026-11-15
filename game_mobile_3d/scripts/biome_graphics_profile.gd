@@ -45,6 +45,7 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var shadow_diffuse_by_hour: Curve
 ## Blend of the owned sky irradiance on bark, keyed by normalized hour.
 @export var bark_irradiance_by_hour: Curve
+@export_range(0.0, 1.0) var spruce_leaf_filter := 0.0
 @export var bark_irradiance_tint := Vector3.ONE
 ## Fraction of ambient irradiance returned to diffuse bark above ground contact.
 @export var bark_diffuse_return_by_hour: Curve

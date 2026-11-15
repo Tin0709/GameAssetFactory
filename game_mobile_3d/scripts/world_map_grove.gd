@@ -114,6 +114,8 @@ var _source_crown_time := 0.
 var _published_source_wind := Vector2.INF
 var _spruce_root: Node3D
 var _spruce_atlas: ImageTexture
+var _spruce_leaf_mips: ImageTexture
+var _spruce_leaf_filter := 0.0
 var _spruce_appearance := ShaderMaterial.new()
 var _bark_irradiance := Vector4.ZERO
 var _twilight_leaf_lamp_shoulder := 0.
@@ -258,6 +260,12 @@ func _place_source_spruce(level: Node3D, assets: Array[Node3D], rows: Array, ima
 		if not is_finite(level.surface_height(spot.x, spot.y)):
 			return
 	_spruce_atlas = ImageTexture.create_from_image(image)
+	if RenderingServer.get_current_rendering_method() == &"mobile" and image.get_width() % 2 == 0:
+		# Isolate the leaf half so its mips cannot pick up bark color or opacity.
+		var leaves := image.get_region(Rect2i(0, 0, image.get_width() / 2, image.get_height()))
+		leaves.fix_alpha_edges()
+		if leaves.generate_mipmaps() == OK:
+			_spruce_leaf_mips = ImageTexture.create_from_image(leaves)
 	for material: ShaderMaterial in [_spruce_appearance, _spruce_shadow]:
 		material.shader = REVEAL_SHADER
 		_bind_spruce_atlas(material)
@@ -292,10 +300,22 @@ func _place_source_spruce(level: Node3D, assets: Array[Node3D], rows: Array, ima
 func _bind_spruce_atlas(material: ShaderMaterial) -> void:
 	material.set_shader_parameter("use_source_atlas", true)
 	material.set_shader_parameter("source_atlas", _spruce_atlas)
+	if material == _spruce_appearance and _spruce_leaf_mips != null:
+		material.set_shader_parameter("spruce_leaf_mips", _spruce_leaf_mips)
+		material.set_shader_parameter("spruce_leaf_filter", _spruce_leaf_filter)
 	if _source_crown_pattern != null:
 		material.set_shader_parameter("source_crown_pattern", _source_crown_pattern)
 	if _source_crown_weights != null:
 		material.set_shader_parameter("source_crown_weights", _source_crown_weights)
+
+func spruce_leaf_filter_available() -> bool:
+	return _spruce_leaf_mips != null and spruce_available()
+
+func set_spruce_leaf_filter(strength: float) -> void:
+	var weight := strength if spruce_leaf_filter_available() else 0.0
+	if weight != _spruce_leaf_filter:
+		_spruce_leaf_filter = weight
+		_spruce_appearance.set_shader_parameter("spruce_leaf_filter", weight)
 
 func spruce_available() -> bool:
 	return is_instance_valid(_spruce_root)

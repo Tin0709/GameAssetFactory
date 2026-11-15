@@ -31,6 +31,8 @@ uniform bool reveal_player = false;
 uniform float grove_mist_strength = 0.0;
 uniform bool use_source_atlas = false;
 uniform sampler2D source_atlas : source_color, filter_nearest, repeat_disable;
+uniform sampler2D spruce_leaf_mips : source_color, filter_linear_mipmap, repeat_disable;
+uniform float spruce_leaf_filter = 0.0;
 uniform sampler2D source_leaf_weights : filter_nearest, repeat_disable;
 uniform float source_leaf_hue = 0.0;
 uniform float source_leaf_tint_mix = 0.0;
@@ -143,6 +145,21 @@ void fragment() {
 			atlas_uv.x = max(atlas_uv.x, 0.5 + inset);
 		}
 		vec4 texel = texture(source_atlas, atlas_uv);
+		if (spruce_leaf_filter > 0.0 && atlas_leaf > 0.5) {
+			vec2 leaf_uv = vec2(atlas_uv.x * 2.0, atlas_uv.y);
+			vec2 dx = dFdx(vec2(UV.x * 2.0, UV.y));
+			vec2 dy = dFdy(vec2(UV.x * 2.0, UV.y));
+			vec2 leaf_size = vec2(textureSize(spruce_leaf_mips, 0));
+			float footprint = max(length(dx * leaf_size), length(dy * leaf_size));
+			float weight = spruce_leaf_filter * smoothstep(0.48, 1.16, footprint);
+			if (weight > 0.0) {
+				vec4 filtered = textureGrad(spruce_leaf_mips, leaf_uv, dx, dy);
+				// Retain more of the original holes as the crown gets smaller.
+				float alpha_weight = weight * mix(0.70, 0.46, smoothstep(1.15, 2.0, footprint));
+				texel.rgb = mix(texel.a < 0.3333 ? filtered.rgb : texel.rgb, filtered.rgb, 0.65 * weight);
+				texel.a = mix(texel.a, filtered.a, alpha_weight);
+			}
+		}
 		if (texel.a < 0.3333) discard;
 		albedo = texel.rgb;
 		if (source_leaf_red > 0.0) {

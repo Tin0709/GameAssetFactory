@@ -912,6 +912,7 @@ func refresh_grove_lighting() -> void:
 	var bark := _review_variant(native, direct, false, false, _grove_coverage_applied, cue)
 	var leaves := _review_variant(native, direct, false, foliage_light_active(), _grove_coverage_applied, cue)
 	level.grove.set_lighting(bark, leaves, _pockets_texture if direct else null, _cloud_shape, cloud_clock)
+	level.showcase.sync_spruce_leaf_filter()
 	level.grove.set_crown_detail(stage == 2 and _crown_detail_requested)
 	_publish_crown_wind()
 
