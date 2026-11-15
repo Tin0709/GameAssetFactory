@@ -108,6 +108,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"projected_sun_openings": ["Projected sunlight openings", 1.],
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
+	&"ambient_by_hour": ["Ánh trời sáng và chiều", 1.],
 	&"sky_chroma": ["Sky color", 1.],
 	&"noon_sky_chroma": ["Sắc ánh trời buổi trưa", 1.],
 	&"twilight_sky_chroma": ["Sắc ánh sáng hắt chạng vạng", 1.],
@@ -262,7 +263,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 166
+const LIGHTING_MIX_VERSION := 167
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2232,6 +2233,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 166 and effect == &"daylight_green_grade":
 			missing_value = 0.
+		if version < 167 and effect == &"ambient_by_hour":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2715,6 +2718,8 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		_apply_captured_key(sun)
 		_apply_captured_direction(sun)
 		env.ambient_light_energy *= _lighting_scale(&"sky") * _night_sky_fill_multiplier()
+		if _biome_profile != null and not _balanced_preview:
+			env.ambient_light_energy *= _biome_profile.ambient_hour_scale(hour, _lighting_scale(&"ambient_by_hour"))
 		if sky_response_active:
 			env.ambient_light_energy *= lerpf(1.0, .75, _lighting_scale(&"twilight_ambient") * twilight_finish_weight())
 		_apply_key_mix(sun)

@@ -102,7 +102,7 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var key_energy_by_hour: Curve
 ## Optional weight of the verified Forest direct-key sequence, in normalized hours.
 @export var afternoon_key_by_hour: Curve
-## Ambient multiplier before weather. Omit to retain the shared palette energy.
+## Ambient multiplier before weather, in normalized hours. An empty track uses 1.
 @export var ambient_energy_by_hour: Curve
 @export var fog_density_by_hour: Curve
 
@@ -115,6 +115,11 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_group("Weather")
 @export var overcast: Weather
 @export_range(0., 1., .01) var start_overcast := 0.
+
+func ambient_hour_scale(hour: float, strength: float = 1.) -> float:
+	var time := fposmod(hour, 24.) / 24.
+	var authored := maxf(0., DayNight.sample_curve(ambient_energy_by_hour, time, 1.))
+	return lerpf(1., authored, clampf(strength, 0., 1.))
 
 func sample_ground_haze(hour: float, subject_depth_m: float, map_base_y: float,
 		day_mix: float = 1., twilight_mix: float = 1.) -> PackedFloat32Array:
