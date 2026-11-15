@@ -71,6 +71,7 @@ func release()->void:
   _effect.set_humid_light(0.)
   _effect.set_twilight_shadow_color(0.)
   _effect.set_daylight_shadow_grade(0.)
+  _effect.set_daylight_green_grade(0.)
   _effect.set_bloom_diffusion(0.)
   if _effect.has_method("set_bloom_source_reference"):_effect.set_bloom_source_reference(null,false,0.)
   _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_display_edges(false)
@@ -141,6 +142,7 @@ func refresh()->void:
  var shadow_color: float = showcase.shadow_color_detail_weight() if finish_scale > 0. else 0.
  effect.set_twilight_shadow_color(shadow_color)
  effect.set_daylight_shadow_grade(showcase.daylight_shadow_grade_weight() if finish_scale > 0. else 0.)
+ effect.set_daylight_green_grade(showcase.daylight_green_grade_weight() if finish_scale > 0. else 0.)
  var soft_light := maxf(showcase.night_soft_bloom_weight(), showcase.twilight_soft_bloom_weight())
  var manual: float = showcase._lighting_scale(&"bloom_diffusion")
  var daylight: float = showcase.daylight_bloom_diffusion_weight()

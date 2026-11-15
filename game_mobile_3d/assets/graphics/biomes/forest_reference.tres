@@ -52,6 +52,7 @@ day_grass_shadow_compactness = 2.0
 projected_opening_recovery_by_hour = SubResource("ProjectedOpeningRecovery")
 afternoon_key_by_hour = SubResource("AfternoonKey")
 shadow_grade_recovery_by_hour = SubResource("ShadowGradeRecovery")
+daylight_green_grade_scale = 1.0
 shadowed_wall_return_scale = 1.5
 sheltered_stone_return_scale = 1.6
 alternate_mist_by_hour = SubResource("LowForestMistPhase")
