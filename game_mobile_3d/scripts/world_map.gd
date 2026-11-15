@@ -90,6 +90,8 @@ var biome_controller: BiomeGraphics
 @export var directional_air_region_profile := ""
 @export var directional_air_region_sha256 := ""
 ## Optional placement and matched lighting fields for the private Forest.
+@export var forest_road_layout_profile := ""
+@export var forest_road_layout_sha256 := ""
 @export var forest_basin_layout_profile := ""
 @export var forest_basin_layout_sha256 := ""
 ## Previous verified placement for research workspaces missing the current bake.
@@ -241,7 +243,9 @@ func _ready() -> void:
 	spruce_sky.name = "SpruceSkyVisibility"
 	add_child(spruce_sky)
 	spruce_sky.setup(self)
-	if spruce_sky.proof_ready and not spruce_sky.apply_layout(forest_basin_layout_profile, forest_basin_layout_sha256):
+	if spruce_sky.proof_ready \
+			and not spruce_sky.apply_layout(forest_road_layout_profile, forest_road_layout_sha256) \
+			and not spruce_sky.apply_layout(forest_basin_layout_profile, forest_basin_layout_sha256):
 		spruce_sky.apply_layout(forest_basin_fallback_profile, forest_basin_fallback_sha256)
 	if showcase.mist != null:
 		if mist_sky_field != null:

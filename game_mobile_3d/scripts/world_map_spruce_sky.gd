@@ -89,17 +89,14 @@ func setup(level: Node3D) -> void:
 
 func apply_layout(relative: String, digest: String) -> bool:
 	# Called synchronously during level setup, before either texture is sampled.
-	if relative.is_empty() or relative.is_absolute_path() or OS.get_environment("GAF_FOREST_BASIN_BASELINE") == "1":
+	if OS.get_environment("GAF_FOREST_BASIN_BASELINE") == "1":
 		return false
 	var air = _level.showcase.directional_air
 	if not air.region_available():
 		return false
 	var root: String = air.research_root
-	var path := root.path_join(relative).simplify_path()
-	if not path.begins_with(root + "/") or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != digest:
-		return false
-	var profile: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not profile is Dictionary or profile.schema != "private_spruce_layout/1" \
+	var profile := _layout_profile(root, relative, digest)
+	if profile.get("schema") not in ["private_spruce_layout/1", "private_spruce_layout/2"] \
 			or profile.map_sha256 != FileAccess.get_sha256(_level.map_layout_path) or profile.base_sky_profile_sha256 != PROOF_SHA \
 			or profile.base_air_profile_sha256 != _level.directional_air_region_sha256:
 		return false
@@ -109,14 +106,49 @@ func apply_layout(relative: String, digest: String) -> bool:
 	if source == null or source.get_meta("source_glb", "") != profile.source_glb \
 			or not is_equal_approx(_level.surface_height(position_world.x, position_world.z), position_world.y):
 		return false
+	var mover: Node3D
+	var move_to := Vector3.ZERO
+	var bounce_layout_sha := digest
+	var bounce_air_sha: String = profile.air_sha256
+	if profile.schema == "private_spruce_layout/2":
+		bounce_layout_sha = _level.forest_basin_layout_sha256
+		var previous := _layout_profile(root, _level.forest_basin_layout_profile, bounce_layout_sha)
+		if previous.get("schema") != "private_spruce_layout/1" or profile.get("previous_layout_sha256") != bounce_layout_sha:
+			return false
+		# This layout changes the main grove. The pinned parent identifies the unchanged
+		# northwest basin and its local actor-bounce bake.
+		for key: String in ["map_sha256", "base_sky_profile_sha256", "base_air_profile_sha256",
+				"root", "source_tree", "source_glb", "sky_origin", "sky_dimensions"]:
+			if profile.get(key) != previous.get(key):
+				return false
+		bounce_air_sha = previous.air_sha256
+		mover = grove._spruce_root.get_node_or_null(profile.get("move_tree", "")) as Node3D
+		if mover == null or mover.get_meta("source_glb", "") != profile.get("move_source"):
+			return false
+		var before: Array = profile.get("move_from", [])
+		var after: Array = profile.get("move_to", [])
+		if before.size() != 3 or after.size() != 3 or not mover.global_position.is_equal_approx(_vector(before)):
+			return false
+		move_to = _vector(after)
+		if not move_to.is_finite() or not is_equal_approx(_level.surface_height(move_to.x, move_to.z), move_to.y) \
+				or not _geometry_current() or not air._geometry_current():
+			return false
 	var dimensions := Vector3i(_vector(profile.sky_dimensions))
 	var origin := _vector(profile.sky_origin)
 	var air_shape := Vector3i(air.texture.get_width(), air.texture.get_height(), air.texture.get_depth())
-	var directory := path.get_base_dir()
+	var directory := root.path_join(relative).get_base_dir()
 	var directional: ImageTexture3D = _layout_texture(directory.path_join("directional_compact.private.r8"), profile.air_sha256, air_shape)
 	var sky := _layout_texture(directory.path_join("sky.private.r8"), profile.sky_sha256, dimensions)
 	if directional == null or sky == null:
 		return false
+	if mover != null:
+		mover.global_position = move_to
+		for row: Dictionary in _casters:
+			if mover.is_ancestor_of(row.node):
+				row.transform = row.node.global_transform
+		for row: Dictionary in air._casters:
+			if mover.is_ancestor_of(row.node):
+				row.pose = row.node.global_transform
 	for caster: MeshInstance3D in grove.place_additional_spruce(source, position_world):
 		_casters.append({"node": caster, "transform": caster.global_transform, "mesh": caster.mesh})
 		air._casters.append({"node": caster, "pose": caster.global_transform, "mesh": caster.mesh})
@@ -130,9 +162,18 @@ func apply_layout(relative: String, digest: String) -> bool:
 	var player_light = _level.player_light
 	if player_light != null and player_light.cache_ready:
 		player_light.local_phase_bounce.setup_region(_level, _level.local_actor_bounce_profile,
-			_level.local_actor_bounce_sha256, digest, profile.air_sha256,
+			_level.local_actor_bounce_sha256, bounce_layout_sha, bounce_air_sha,
 			_level.showcase._lighting_scale(&"player_bounce") > 0.)
 	return true
+
+func _layout_profile(root: String, relative: String, digest: String) -> Dictionary:
+	if relative.is_empty() or relative.is_absolute_path():
+		return {}
+	var path := root.path_join(relative).simplify_path()
+	if not path.begins_with(root + "/") or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != digest:
+		return {}
+	var profile: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	return profile if profile is Dictionary else {}
 
 func _layout_texture(path: String, digest: String, dimensions: Vector3i) -> ImageTexture3D:
 	if not FileAccess.file_exists(path):
