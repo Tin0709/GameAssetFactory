@@ -28,6 +28,8 @@ func run() -> void:
 	var rig: Skeleton3D = actor.skeleton
 	var md2 := actor.model.find_child("SabrePrototypeBody", true, false) as MeshInstance3D
 	var weapon := actor.model.find_child("SabrePrototypeSabre", true, false) as MeshInstance3D
+	var md2_lantern := actor.get("lantern") as Node3D
+	check(md2_lantern != null and md2_lantern.visible, "The MD2 skin retains its original lantern presentation")
 	lab._on_player_hit(6)
 	var position_before := actor.global_position
 	var health_before: int = lab.player_health
@@ -36,6 +38,7 @@ func run() -> void:
 	picker.item_selected.emit(1)
 	var kai := actor.get_node_or_null("KaiAppearance") as Node3D
 	check(kai != null and kai.is_visible_in_tree() and not md2.visible, "Selecting Kai swaps the live player meshes")
+	check(md2_lantern == null or not md2_lantern.is_visible_in_tree(), "Kai shows only his attached lantern")
 	if kai == null:
 		quit(1)
 		return
@@ -86,6 +89,7 @@ func run() -> void:
 	picker.item_selected.emit(0)
 	check(not kai.visible and md2.is_visible_in_tree() and weapon.is_visible_in_tree(),
 		"Switching back while moving restores MD2 and preserves the weapon")
+	check(md2_lantern != null and md2_lantern.visible, "Returning to MD2 restores its original lantern presentation")
 	picker.select(1)
 	picker.item_selected.emit(1)
 	check(actor.get_node_or_null("KaiAppearance") == kai and kai.is_visible_in_tree(), "Repeated swaps reuse one Kai rig")
