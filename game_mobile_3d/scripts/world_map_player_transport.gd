@@ -149,17 +149,20 @@ func _kai_ground_bounce(position: Vector3) -> Vector4:
  var field: Image = look.path_map_image
  if reflectance.size() != 5 or field == null:
   return Vector4.ZERO
- # Interpolate the terrain's existing top cells across their centers.
+ # Blend a patch of terrain around the feet so thin paths return some
+ # light from their grassy edges as well as from the cell under Kai.
  var pixel: Vector2 = Vector2(position.x, position.z) - look.path_map_origin - Vector2(.5, .5)
  var corner := Vector2i(pixel.floor())
  var fraction := pixel - Vector2(corner)
+ var x_weights := _ground_return_weights(fraction.x)
+ var z_weights := _ground_return_weights(fraction.y)
  var incident := Vector3.ZERO
  var surface_height := 0.
  var surface_weight := 0.
  var bounds := Rect2i(Vector2i.ZERO, field.get_size())
- for y in 2:
-  for x in 2:
-   var cell := corner + Vector2i(x, y)
+ for z in 4:
+  for x in 4:
+   var cell := corner + Vector2i(x - 1, z - 1)
    if not bounds.has_point(cell):
     continue
    var info := field.get_pixelv(cell)
@@ -167,7 +170,7 @@ func _kai_ground_bounce(position: Vector3) -> Vector4:
     continue
    var distance_from_floor := position.y - info.g
    var support := smoothstep(-.65, -.18, distance_from_floor) * (1. - smoothstep(.28, 1.8, distance_from_floor))
-   var weight := (fraction.x if x == 1 else 1. - fraction.x) * (fraction.y if y == 1 else 1. - fraction.y) * support
+   var weight := x_weights[x] * z_weights[z] * support
    var world_cell: Vector2 = look.path_map_origin + Vector2(cell) + Vector2(.5, .5)
    var to_light := light.global_position - Vector3(world_cell.x, info.g, world_cell.y)
    var distance_squared := to_light.length_squared()
@@ -188,6 +191,15 @@ func _kai_ground_bounce(position: Vector3) -> Vector4:
  diffuse = (Vector3.ONE * luminance).lerp(diffuse, .58)
  return Vector4(diffuse.x, diffuse.y, diffuse.z, surface_height / surface_weight)
 
+
+static func _ground_return_weights(fraction: float) -> Vector4:
+ # Cubic B-spline over four cell centers. The weights sum to one and
+ # meet smoothly at cell boundaries, without temporal lag when turning.
+ var squared := fraction * fraction
+ var cubed := squared * fraction
+ var opposite := 1. - fraction
+ return Vector4(opposite * opposite * opposite, 4. - 6. * squared + 3. * cubed,
+  1. + 3. * fraction + 3. * squared - 3. * cubed, cubed) / 6.
 func refresh_shade_sky(force: bool = false) -> void:
  var strength := Vector2.ZERO
  if _active and level.look.player_local_light_enabled:
