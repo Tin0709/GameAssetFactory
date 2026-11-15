@@ -191,6 +191,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"twilight_ground_haze": ["Ánh sương thấp lúc chạng vạng", 1.],
 	&"forest_dusk_backdrop": ["Dịu màu nền xa lúc chạng vạng", 1.],
 	&"distant_terrain": ["Địa hình xa lúc chạng vạng", 1.],
+	&"cliff_vista": ["Địa hình xa sau bậc đá", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
@@ -251,7 +252,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 157
+const LIGHTING_MIX_VERSION := 158
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -397,6 +398,8 @@ func setup(world:Node3D)->void:
 	elif private_primary and _biome_profile == null:
 		forest = FOREST.new()
 	if not private_primary:
+		if level._uses_portable_biome() and OS.get_environment("GAF_SHOWCASE_PLAYER") != "original":
+			distant_terrain.prepare(level, Vector3.INF, level.distant_terrain_layout_sha)
 		_build_basic_settings()
 		return
 	_setup_point_lighting()
@@ -435,9 +438,8 @@ func setup(world:Node3D)->void:
 	add_child(player_contact)
 	player_contact.setup(level)
 	var terrace_profile := PlayableTerrace.read_profile(level, level.playable_terrace_profile, level.playable_terrace_sha256)
-	if level.distant_terrain_origin.is_finite():
-		distant_terrain.prepare(level, level.distant_terrain_origin, level.distant_terrain_layout_sha,
-			StringName(terrace_profile.get("section", "")))
+	distant_terrain.prepare(level, level.distant_terrain_origin, level.distant_terrain_layout_sha,
+		StringName(terrace_profile.get("section", "")))
 	if not terrace_profile.is_empty() and distant_terrain.linked_section != null and distant_terrain.material != null:
 		var insert := PlayableTerrace.new()
 		var atlas: Texture2D = distant_terrain.material.get_shader_parameter("terrain_atlas")
@@ -894,7 +896,17 @@ func set_weather(overcast: float, seconds: float = 2.5) -> void:
 		apply_time()
 		_update_mist()
 
+func sync_cliff_vista(enabled: bool) -> void:
+	if not is_instance_valid(distant_terrain.vista):
+		return
+	var env: Environment = level.get_node("WorldEnvironment").environment
+	distant_terrain.update_vista(enabled and level.look.stage == 2 and level.view_mode == "gameplay",
+		env.ambient_light_color, hour)
+
 func _sync_distant_terrain() -> void:
+	if private_primary:
+		sync_cliff_vista(forest_active() and atmosphere_review == "combined" and not _balanced_preview
+			and _source_terrain_toggle != null and _source_terrain_toggle.button_pressed and _lighting_scale(&"cliff_vista") > 0.)
 	if not is_instance_valid(distant_terrain.visual):
 		return
 	var env: Environment = level.get_node("WorldEnvironment").environment
@@ -1402,6 +1414,8 @@ func _mist_materials()->Array:
 		result.append(path_lamppost.material)
 	if distant_terrain.visible():
 		result.append(distant_terrain.material)
+	if distant_terrain.vista_visible():
+		result.append(distant_terrain.vista_material)
 	if is_instance_valid(playable_terrace) and playable_terrace.active:
 		result.append(playable_terrace.material)
 	if is_instance_valid(playable_boulder) and playable_boulder.active:
@@ -1923,7 +1937,7 @@ func set_lighting_scale(effect: StringName, value: float) -> void:
 	var scale := clampf(value, 0., LIGHTING_MIX_CONTROLS[effect][1])
 	if effect == &"world_outline_width":
 		scale = clampf(roundf(scale), 1., 4.)
-	if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost"]:
+	if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost", &"cliff_vista"]:
 		scale = roundf(scale)
 	if scale == float(_lighting_mix.get(effect, _lighting_scale_default(effect))):
 		return
@@ -2151,6 +2165,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 157 and effect == &"basin_diffuse_return":
 			missing_value = 0.
+		if version < 158 and effect == &"cliff_vista":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2275,7 +2291,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			return ERR_INVALID_DATA
 		if effect == &"world_outline_width" and (value < 1. or value != roundf(value)):
 			return ERR_INVALID_DATA
-		if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost"] and value != roundf(value):
+		if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost", &"cliff_vista"] and value != roundf(value):
 			return ERR_INVALID_DATA
 		restored[effect] = float(value)
 	_lighting_mix = restored
@@ -2310,6 +2326,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.twilight_ground_haze != null
 		if effect == &"distant_terrain":
 			slider.editable = slider.editable and is_instance_valid(distant_terrain.visual)
+		if effect == &"cliff_vista":
+			slider.editable = slider.editable and is_instance_valid(distant_terrain.vista)
 		if effect == &"local_diffuse_return":
 			slider.editable = slider.editable and not _flat_lab and level.local_diffuse_region != null
 		if effect == &"basin_diffuse_return":
@@ -2466,6 +2484,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"forest_dusk_backdrop", &"distant_terrain"]:
 		_forest_hour = INF
 		apply_time()
+		_update_mist()
+		return
+	if changed_effect == &"cliff_vista":
 		_update_mist()
 		return
 	if changed_effect == &"stone_twilight_color":
@@ -3201,7 +3222,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"world_outline_width":
 			slider.min_value = 1.
 			slider.step = 1.
-		if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost"]:
+		if effect in [&"forest_path_placement", &"forest_replay_placement", &"forest_path_lamppost", &"cliff_vista"]:
 			slider.step = 1.
 		slider.value = _lighting_scale(effect)
 		slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL

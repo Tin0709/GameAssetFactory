@@ -128,6 +128,7 @@ func refresh() -> void:
 		_label.text = "%s · %s · %02d:%02d · Mây %d%%   T giờ · Shift+T tự chuyển · F6 mây · F8 preset · J so sương · Shift+J tán xạ đèn · Alt+J ánh hắt · F7 hậu kỳ · Shift+F7 chất lượng · B đối chiếu" % [
 			_profile.display_name, QUALITY_LABELS[quality], int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
 	if _world.look.stage != 2:
+		_world.showcase.sync_cliff_vista(false)
 		_update_local_diffuse()
 		_update_fixture(0.)
 		_update_spatial_mist()
@@ -184,6 +185,7 @@ func refresh() -> void:
 	env.fog_density *= fog_gain
 	_weather.apply_air(_profile.overcast, env, fog_gain)
 	env.fog_density = clampf(env.fog_density, 0., 1.)
+	_world.showcase.sync_cliff_vista(quality != Quality.ESSENTIAL)
 	_update_fixture(time)
 	_prepare_spatial_mist(env, time)
 	_update_local_diffuse()
