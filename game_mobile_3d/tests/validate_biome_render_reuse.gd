@@ -84,6 +84,32 @@ func run() -> void:
 		await RenderingServer.frame_post_draw
 		entry_payload = showcase.mist.effect._ground_haze_parameters
 		check(is_zero_approx(entry_payload.decode_float(28)), "Approved Noon has no entry gain")
+		var actor_shade_control: HSlider = showcase._lighting_sliders.get(&"actor_shade_sky")
+		check(actor_shade_control != null and is_equal_approx(actor_shade_control.value, 1.),
+			"The main settings expose the Valorie canopy sky comparison")
+		var actor_receiver: ShaderMaterial
+		for material: ShaderMaterial in forest.look._direct_actor_materials:
+			if material != null and material.get_meta("verified_valorie", false):
+				actor_receiver = material
+				break
+		check(actor_receiver != null, "Valorie has a verified receiver")
+		if actor_receiver != null:
+			showcase.set_hour(7.)
+			await process_frame
+			await RenderingServer.frame_post_draw
+			var actor_gain: Variant = actor_receiver.get_shader_parameter("actor_shade_sky")
+			check(actor_gain is float and is_equal_approx(actor_gain, .68),
+				"Valorie receives dawn canopy sky from the biome")
+			showcase.set_lighting_scale(&"actor_shade_sky", 0.)
+			actor_gain = actor_receiver.get_shader_parameter("actor_shade_sky")
+			check(actor_gain is float and is_zero_approx(actor_gain), "Live comparison clears the extra sky")
+			showcase.set_lighting_scale(&"actor_shade_sky", 1.)
+			for hour: float in [12., 22.]:
+				showcase.set_hour(hour)
+				await process_frame
+				await RenderingServer.frame_post_draw
+				actor_gain = actor_receiver.get_shader_parameter("actor_shade_sky")
+				check(actor_gain is float and is_zero_approx(actor_gain), "Noon and night keep their earlier actor sky")
 		var wall_sky_control: HSlider = showcase._lighting_sliders.get(&"stone_wall_sky")
 		check(wall_sky_control != null and is_equal_approx(wall_sky_control.value, 1.),
 			"Main settings expose the default stone-side sky comparison")
