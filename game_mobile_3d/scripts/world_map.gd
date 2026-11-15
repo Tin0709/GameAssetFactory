@@ -44,6 +44,10 @@ var biome_controller: BiomeGraphics
 ## Scene placement only. The renderer skips this layer when the map layout changes.
 @export var distant_terrain_origin := Vector3.INF
 @export var distant_terrain_layout_sha := ""
+@export var cliff_vista_origin := Vector3.INF
+@export var cliff_vista_scale := Vector3.ONE
+@export var cliff_vista_mesh_anchor := Vector3.ZERO
+@export var cliff_vista_sections: PackedStringArray
 ## A verified support and sky bake relative to the private research folder.
 @export var playable_terrace_profile := ""
 @export var playable_terrace_sha256 := ""

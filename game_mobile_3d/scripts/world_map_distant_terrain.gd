@@ -13,16 +13,35 @@ const MESH_ANCHOR := Vector3(16., 38., 16.)
 
 var visual: MeshInstance3D
 var material: ShaderMaterial
+var vista: MeshInstance3D
+var vista_material: ShaderMaterial
 var linked_section: Mesh
 var _attempted := false
 var _submitted := Vector4.INF
 var _subject_uv := Vector2.INF
+var _vista_light := Vector3.INF
 
 static func phase_weight(hour: float) -> float:
 	return smoothstep(17., 18.5, hour) * (1. - smoothstep(20., 21.35, hour))
 
 func visible() -> bool:
 	return is_instance_valid(visual) and visual.is_visible_in_tree()
+
+func vista_visible() -> bool:
+	return is_instance_valid(vista) and vista.is_visible_in_tree()
+
+func update_vista(enabled: bool, ambient: Color, hour: float) -> void:
+	if not is_instance_valid(vista):
+		return
+	vista.visible = enabled
+	if not enabled:
+		return
+	var linear := ambient.srgb_to_linear()
+	var tint := Vector3(linear.r, linear.g, linear.b).lerp(Vector3(.47, .63, .73), .60)
+	var light := tint * lerpf(.107, .047, smoothstep(17.5, 19.5, hour))
+	if light != _vista_light:
+		_vista_light = light
+		vista_material.set_shader_parameter("distant_light", light)
 
 func update(weight: float, tint: Color, subject_uv: Vector2) -> void:
 	if not is_instance_valid(visual):
@@ -53,9 +72,17 @@ static func research_root() -> String:
 	return root
 
 func prepare(world: Node3D, origin: Vector3, expected_layout_sha: String, linked_name: StringName = &"") -> void:
-	if _attempted or not is_instance_valid(world) or not origin.is_finite() \
+	if _attempted or not is_instance_valid(world) \
 			or not OS.has_feature("editor") or RenderingServer.get_current_rendering_method() != "mobile" \
 			or RenderingServer.get_rendering_device() == null:
+		return
+	var vista_origin: Vector3 = world.cliff_vista_origin
+	var vista_scale: Vector3 = world.cliff_vista_scale
+	var vista_anchor: Vector3 = world.cliff_vista_mesh_anchor
+	var vista_sections: PackedStringArray = world.cliff_vista_sections
+	var want_vista := vista_origin.is_finite() and vista_anchor.is_finite() and vista_scale.is_finite() \
+		and vista_scale.x > 0. and vista_scale.y > 0. and vista_scale.z > 0. and not vista_sections.is_empty()
+	if not origin.is_finite() and not want_vista:
 		return
 	_attempted = true
 	if expected_layout_sha.is_empty() or FileAccess.get_sha256(world.map_layout_path) != expected_layout_sha:
@@ -67,46 +94,69 @@ func prepare(world: Node3D, origin: Vector3, expected_layout_sha: String, linked
 	var atlas_path := root.path_join(ROOT).path_join(ATLAS_PATH)
 	if FileAccess.get_sha256(mesh_path) != MESH_SHA or FileAccess.get_sha256(atlas_path) != ATLAS_SHA:
 		return
-	var mesh := _read_terrain(mesh_path, linked_name)
-	if mesh == null:
+	var meshes := _read_terrain(mesh_path, linked_name, origin.is_finite(), vista_sections if want_vista else PackedStringArray(), vista_anchor)
+	if meshes.is_empty():
 		return
 	var image := Image.load_from_file(atlas_path)
 	if image == null or image.is_empty():
 		return
 	image.generate_mipmaps()
-	material = ShaderMaterial.new()
-	material.shader = SHADER
-	material.render_priority = -10
-	material.set_shader_parameter("terrain_atlas", ImageTexture.create_from_image(image))
-	visual = MeshInstance3D.new()
-	visual.name = "PrivateDistantTerrain"
-	visual.mesh = mesh
-	visual.set_surface_override_material(0, material)
-	visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	visual.position = origin
-	visual.hide()
-	world.add_child(visual)
+	var atlas := ImageTexture.create_from_image(image)
+	if meshes.has("distant"):
+		material = ShaderMaterial.new()
+		material.shader = SHADER
+		material.render_priority = -10
+		material.set_shader_parameter("terrain_atlas", atlas)
+		visual = _add_layer(world, &"PrivateDistantTerrain", meshes.distant, material, origin)
+	if meshes.has("vista"):
+		var opaque := Shader.new()
+		opaque.code = SHADER.code.replace("shader_type spatial;", "shader_type spatial;\n#define GAF_OPAQUE_VISTA")
+		vista_material = ShaderMaterial.new()
+		vista_material.shader = opaque
+		vista_material.set_shader_parameter("terrain_atlas", atlas)
+		vista = _add_layer(world, &"PrivateCliffVista", meshes.vista, vista_material, vista_origin)
+		vista.scale = vista_scale
 
-func _read_terrain(path: String, linked_name: StringName) -> ArrayMesh:
+func _add_layer(world: Node3D, node_name: StringName, mesh: Mesh, layer_material: ShaderMaterial, origin: Vector3) -> MeshInstance3D:
+	var layer := MeshInstance3D.new()
+	layer.name = node_name
+	layer.mesh = mesh
+	layer.set_surface_override_material(0, layer_material)
+	layer.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	layer.position = origin
+	layer.hide()
+	world.add_child(layer)
+	return layer
+
+func _read_terrain(path: String, linked_name: StringName, want_distant: bool, vista_sections: PackedStringArray, vista_anchor: Vector3) -> Dictionary:
 	var document := GLTFDocument.new()
 	var state := GLTFState.new()
 	if document.append_from_file(path, state) != OK:
-		return null
+		return {}
 	var source := document.generate_scene(state)
 	if source == null:
-		return null
+		return {}
 	var surface := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var vista_surface := SurfaceTool.new()
+	vista_surface.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var found := {}
+	var found_vista := {}
 	for part: MeshInstance3D in source.find_children("*", "MeshInstance3D", true, false):
 		if part.mesh == null or part.mesh.get_surface_count() != 1 or part.transform != Transform3D.IDENTITY:
 			continue
 		if part.name == linked_name:
 			linked_section = part.mesh
-		if part.name in SECTIONS:
+		if want_distant and part.name in SECTIONS:
 			surface.append_from(part.mesh, 0, Transform3D(Basis.IDENTITY, -MESH_ANCHOR))
 			found[part.name] = true
+		if vista_sections.has(String(part.name)):
+			vista_surface.append_from(part.mesh, 0, Transform3D(Basis.IDENTITY, -vista_anchor))
+			found_vista[part.name] = true
 	source.free()
-	if found.size() != SECTIONS.size():
-		return null
-	return surface.commit()
+	var meshes := {}
+	if found.size() == SECTIONS.size():
+		meshes.distant = surface.commit()
+	if not vista_sections.is_empty() and found_vista.size() == vista_sections.size():
+		meshes.vista = vista_surface.commit()
+	return meshes
