@@ -3,6 +3,8 @@ extends "res://scripts/world_map_reference_grade.gd"
 ## The Filmic/BCS order follows Godot's public mathematical operations; verified on GPU.
 const EDGES=preload("res://scripts/world_map_display_edges.gd")
 const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
+const BASELINE_BYTES := 80
+const DAYLIGHT_SHADOW_GRADE_OFFSET := 64
 var _edge_requested:=false
 var _render_edge:=false
 var _reported_size:=Vector2i.ZERO
@@ -22,6 +24,7 @@ var _daylight_haze_weight := 0.
 var _daylight_haze_spill := 0.
 var _humid_actor := Vector4.ZERO
 var _twilight_shadow_weight := 0.
+var _daylight_shadow_grade := 0.
 var _bloom_diffusion_mix := 0.
 var _depth_diffusion := DepthDiffusion.new()
 var _humid_depth := PackedByteArray()
@@ -44,6 +47,11 @@ func set_twilight_shadow_color(weight: float) -> void:
  _twilight_shadow_weight = clampf(weight, 0., 1.) if is_finite(weight) else 0.
  _guard.unlock()
 
+func set_daylight_shadow_grade(weight: float) -> void:
+ _guard.lock()
+ _daylight_shadow_grade = clampf(weight, 0., 1.) if is_finite(weight) else 0.
+ _guard.unlock()
+
 func set_bloom_diffusion(weight: float) -> void:
  _guard.lock()
  _bloom_diffusion_mix = clampf(weight, 0., 1.) if is_finite(weight) else 0.
@@ -64,6 +72,7 @@ func configure_finish(value:bool,env:Environment=null,weight:float=0.)->bool:
     image.convert(Image.FORMAT_RGBA8)
    _baseline_texture=texture
   var data:=PackedFloat32Array([env.tonemap_exposure,env.tonemap_white,env.adjustment_brightness,env.adjustment_contrast,env.adjustment_saturation,1. if env.adjustment_enabled else 0.,clampf(weight,0.,1.),0.,0.,0.,0.,0.,0.,0.,0.,0.]).to_byte_array()
+  data.resize(BASELINE_BYTES)
   _guard.lock();_baseline=data;_baseline_slices=slices;_finish_wanted=true
   if changed:_palette_generation+=1
   _guard.unlock()
@@ -98,6 +107,7 @@ func _render_callback(kind:int,data:RenderData)->void:
  var depth_data := _humid_depth
  var depth_mist := _humid_mist if use_diffusion else null
  var twilight_shadow_weight := _twilight_shadow_weight if wanted and _reference_enabled else 0.
+ var daylight_shadow_grade := _daylight_shadow_grade if wanted and _reference_enabled else 0.
  var bloom_diffusion_mix := _bloom_diffusion_mix if diffusion_active else 0.
  _guard.unlock()
  if not baseline.is_empty():
@@ -110,6 +120,7 @@ func _render_callback(kind:int,data:RenderData)->void:
   baseline.encode_float(52, daylight_haze)
   baseline.encode_float(56, daylight_spill)
   baseline.encode_float(60, bloom_diffusion_mix)
+  baseline.encode_float(DAYLIGHT_SHADOW_GRADE_OFFSET, daylight_shadow_grade)
  var depth_changed := _depth_diffusion.refresh_sources(rd, buffers, depth_mist)
  if depth_changed or wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
@@ -126,17 +137,20 @@ func _render_callback(kind:int,data:RenderData)->void:
  _report("daylight_haze_spill", _last_baseline.decode_float(56) if not depth_applied.is_empty() and _baseline_buffer.is_valid() and failure().is_empty() else 0.)
  _report("humid_depth_weight", depth_applied.decode_float(28) if depth_applied.size() == DepthDiffusion.SETTINGS_SIZE and failure().is_empty() else 0.)
  _report("twilight_shadow_weight", _last_baseline.decode_float(48) if _baseline_buffer.is_valid() and failure().is_empty() else 0.)
+ _report("daylight_shadow_grade", _last_baseline.decode_float(DAYLIGHT_SHADOW_GRADE_OFFSET)
+  if _baseline_buffer.is_valid() and failure().is_empty() else 0.)
 func _release(rd:RenderingDevice)->void:
  _depth_diffusion.release(rd, _resources)
  _baseline_buffer=RID();_last_baseline=PackedByteArray();_report("finish_ready",false);_report("finish_bytes",0);_report("edge_active",false);_report("edge_bytes",0);_report("edge_size",[0,0])
  _report("twilight_shadow_weight",0.)
+ _report("daylight_shadow_grade",0.)
  _report("daylight_haze_weight",0.)
  _report("daylight_haze_spill",0.)
  super(rd)
 func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUniform])->String:
  if not _render_finish or not fragment.contains("inverse_display(clamp(display,0.,1.))"):return fragment
  _guard.lock();var slices:=_baseline_slices.duplicate();var baseline:=_baseline.duplicate();_guard.unlock()
- if slices.size()!=32 or baseline.size()!=64:return fragment
+ if slices.size()!=32 or baseline.size()!=BASELINE_BYTES:return fragment
  var format:=RDTextureFormat.new();format.texture_type=RenderingDevice.TEXTURE_TYPE_3D;format.width=32;format.height=32;format.depth=32;format.format=RenderingDevice.DATA_FORMAT_R8G8B8A8_SRGB;format.usage_bits=RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT
  if not rd.texture_is_format_supported_for_usage(format.format,format.usage_bits):
   _report("error","Owned finish requires sampled 3D sRGB texture support");return fragment
@@ -183,6 +197,21 @@ vec3 recover_twilight_shadow_color(vec3 graded, vec3 original) {
  float shift = min(missing, .85 * blue * luma.b / luma.r) * mask * base[3].x;
  return graded + vec3(shift, 0., -shift * luma.r / luma.b);
 }
+vec3 recover_daylight_shadow_color(vec3 graded, vec3 original, vec3 previous) {
+ if (base[4].x <= 0.) return previous;
+ float y = dot(graded, luma);
+ float original_y = dot(original, luma);
+ if (y <= .003 || y >= .21 || original_y <= .001) return previous;
+ float original_chroma = (max(max(original.r, original.g), original.b) - min(min(original.r, original.g), original.b)) / original_y;
+ float neutral_source = 1.0 - smoothstep(.25, .65, original_chroma);
+ if (neutral_source <= 0.) return previous;
+ float introduced_blue = (graded.b - graded.g) / y - (original.b - original.g) / original_y;
+ float lost_red = original.r / original_y - graded.r / y;
+ float cool_mask = smoothstep(.13, .50, introduced_blue) * smoothstep(.07, .25, lost_red);
+ float shade_mask = smoothstep(.003, .010, y) * (1. - smoothstep(.095, .21, y));
+ vec3 target = original * (y / original_y);
+ return mix(previous, target, base[4].x * cool_mask * neutral_source * shade_mask);
+}
 """
  var diffusion_condition := "base[1].w > 0."
  if not depth_shader.is_empty():
@@ -209,7 +238,12 @@ vec3 recover_twilight_shadow_color(vec3 graded, vec3 original) {
   adjusted += spread * (air.x * bloom_gain);
  """)
  fragment=fragment.replace("if (settings.x <= 0.0 && air.x <= 0.0)","if (settings.x < 0.0)")
- fragment=fragment.replace("result=vec4(inverse_display(clamp(display,0.,1.)),color.a);","vec3 original_finish = gaf_finish(adjusted);\n\t\tvec3 mixed_finish = mix(original_finish,inverse_display(clamp(display,0.,1.)),base[1].z);\n\t\tresult=vec4(recover_twilight_shadow_color(mixed_finish,original_finish),color.a);")
+ fragment=fragment.replace("result=vec4(inverse_display(clamp(display,0.,1.)),color.a);", """
+  vec3 original_finish = gaf_finish(adjusted);
+  vec3 mixed_finish = mix(original_finish, inverse_display(clamp(display,0.,1.)), base[1].z);
+  vec3 previous_finish = recover_twilight_shadow_color(mixed_finish, original_finish);
+  result = vec4(recover_daylight_shadow_color(mixed_finish, original_finish, previous_finish), color.a);
+ """)
  if _render_edge:
   fragment=fragment.replace("color.a);", "color.a);result.rgb=clamp(gaf_display(result.rgb),0.,1.);")
  _report("finish_ready",true);_report("finish_bytes",131072+baseline.size())
