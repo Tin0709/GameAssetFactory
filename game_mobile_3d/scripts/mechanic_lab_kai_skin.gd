@@ -2,10 +2,10 @@ extends Node3D
 ## MechanicLab-only appearance. The source actor still owns gameplay and weapon sockets.
 
 const Source := preload("res://scripts/mechanic_lab_weapon_source.gd")
-const MODEL := "blender/khai_skin_v001/Kai_Survival_3D_Lab.glb"
-const SHA256 := "b5909604ad5fcf8e28e27755316db281ced17b4c006f51af036b4f524faa4bd6"
+const MODEL := "blender/khai_skin_v001/Kai_Survival_3D_Lab_v002.glb"
+const SHA256 := "fd7e1f83f536a71ce31ab59139c65e2d841c8685f3dadb8f1422cc66d6035bfc"
 const RUNS := ["Run", "CombatRun"]
-const ACCESSORY_BONES := [&"J_Kai_Rope_Sway", &"J_Headband_Tail_A", &"J_Headband_Tail_B"]
+const ACCESSORY_BONES := [&"J_Kai_Lantern_Sway", &"J_Headband_Tail_A", &"J_Headband_Tail_B"]
 
 var meshes: Array[MeshInstance3D] = []
 var _actor: CharacterBody3D
