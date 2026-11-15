@@ -373,11 +373,33 @@ def require_portable_biome(biome):
             r'^(?:atmosphere|finish)_reference_(?:path|sha256)\s*=\s*"[^"\n]+',
             properties, re.MULTILINE):
         raise ValueError(f"{path.name} requires private reference data and cannot be used on an imported map")
-    project = GODOT_PROJECT.resolve()
-    for dependency in re.findall(r'^\[ext_resource\b[^\n]*\bpath="res://([^"]+)"', declarations, re.MULTILINE):
-        resource = (project / dependency).resolve()
-        if not resource.is_relative_to(project) or not resource.is_file():
-            raise ValueError(f"{path.name} has an unavailable dependency: res://{dependency}")
+    validate_biome_dependencies(path, declarations, GODOT_PROJECT.resolve())
+
+
+def validate_biome_dependencies(preset, declarations, project):
+    external_paths = re.compile(r'^\[ext_resource\b[^\n]*\bpath="([^"\n]+)"', re.MULTILINE)
+    pending = [(preset, declarations)]
+    visited = {preset.resolve()}
+    while pending:
+        owner, text = pending.pop()
+        for dependency in external_paths.findall(text):
+            if dependency.startswith("res://"):
+                resource = (project / dependency.removeprefix("res://")).resolve()
+            elif not Path(dependency).anchor and "://" not in dependency:
+                resource = (owner.parent / dependency).resolve()
+            else:
+                raise ValueError(f"{preset.name} has a dependency outside the Godot project: {dependency}")
+            if not resource.is_relative_to(project):
+                raise ValueError(f"{preset.name} has a dependency outside the Godot project: {dependency}")
+            if not resource.is_file():
+                raise ValueError(f"{preset.name} has an unavailable dependency: {dependency} (from {owner.name})")
+            if resource in visited or resource.suffix.lower() not in {".tres", ".tscn"}:
+                continue
+            visited.add(resource)
+            try:
+                pending.append((resource, resource.read_text(encoding="utf-8-sig")))
+            except (OSError, UnicodeError) as error:
+                raise ValueError(f"Cannot read {preset.name} dependency {dependency} (from {owner.name})") from error
 
 
 def map_scene_source(scene_name, runtime_path, biome, comparison):
