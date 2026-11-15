@@ -646,7 +646,7 @@ func check_basic_gauntlets_run(lab: Node3D, menu: OptionButton) -> void:
 	var left := rig.find_bone("J_L_Arm")
 	var right := rig.find_bone("J_R_Arm")
 	var reflection := Basis(Vector3.LEFT, Vector3.UP, Vector3.BACK)
-	for weapon in [7, 4]:
+	for weapon: int in [7, 4]:
 		equip(menu, weapon)
 		lab.reset_player()
 		await ticks(10)
