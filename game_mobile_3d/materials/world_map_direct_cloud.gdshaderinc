@@ -8,6 +8,7 @@ varying float canopy_direct_coverage;
 #endif
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 global uniform float gaf_stone_shade_reach;
+global uniform float gaf_stone_wall_return;
 global uniform vec4 gaf_stone_sunset_region;
 global uniform vec4 gaf_stone_sunset_beam;
 varying vec2 stone_sunset_position;
@@ -54,7 +55,7 @@ void light() {
 		float direct = smoothstep(0.16, 0.80, ATTENUATION) * smoothstep(0.09, 0.45, nl);
 		key_color *= 1.0 - gaf_stone_sunset_beam.w * region * direct;
 	}
-	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_shade_fill.w > 0.0 &&
+	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && max(gaf_stone_shade_fill.w, gaf_stone_wall_return) > 0.0 &&
 		max(LIGHT_COLOR.r, max(LIGHT_COLOR.g, LIGHT_COLOR.b)) > 0.0 &&
 		dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_shade_fill.xyz) > 0.9999 &&
 		distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
@@ -69,6 +70,15 @@ void light() {
 		vec3 sky = terrain_opening_incident;
 		vec3 fill = mix(sky, vec3(dot(sky, vec3(.2126, .7152, .0722))), .40);
 		DIFFUSE_LIGHT += fill * (facing * shade * gaf_stone_shade_fill.w);
+#ifdef GAF_TERRAIN_NIGHT_SKY
+		if (gaf_stone_wall_return > 0.0 && shade > 0.0) {
+			// Use the map's directional diffuse cache while protecting flat tops and direct light.
+			float wall = 1.0 - smoothstep(.06, .25, abs((mat3(INV_VIEW_MATRIX) * NORMAL).y));
+			vec3 source = terrain_day_bounce * cloud_transmission;
+			vec3 returned = mix(source, vec3(dot(source, vec3(.2126, .7152, .0722))), .30);
+			DIFFUSE_LIGHT += returned * terrain_direct_contact * (wall * shade * gaf_stone_wall_return);
+		}
+#endif
 	}
 	float opening_fill = gaf_diffuse_opening_weight(LIGHT_IS_DIRECTIONAL, LIGHT, LIGHT_COLOR, INV_VIEW_MATRIX, ATTENUATION * cloud_transmission);
 	if (opening_fill > 0.0) {
