@@ -54,6 +54,7 @@ func run() -> void:
 		quit(1)
 		return
 	actor.scripted_input = true
+	actor.requested_run = true
 	actor.requested_direction = Vector2(1, 0)
 	var rope_samples: Array[Quaternion] = []
 	var tail_samples: Array[Quaternion] = []
