@@ -122,7 +122,13 @@ func _process(delta: float) -> void:
 		var source := _source_bones[bone]
 		if source >= 0:
 			_poses[bone] = local_from_world * Transform3D(presenter.display_world[source]) * _rest_corrections[bone]
-			_rig.set_bone_pose(bone, parent_pose.affine_inverse() * _poses[bone])
+			if absf(parent_pose.basis.determinant()) > 0.000001:
+				_rig.set_bone_pose(bone, parent_pose.affine_inverse() * _poses[bone])
+			else:
+				# Ranged clips can collapse an unused weapon branch to zero scale.
+				var previous_pose: Transform3D = presenter.previous.poses[source]
+				var current_pose: Transform3D = presenter.current.poses[source]
+				_rig.set_bone_pose(bone, previous_pose.interpolate_with(current_pose, presenter.render_alpha))
 		else:
 			var rest := _rig.get_bone_rest(bone)
 			_rig.set_bone_pose(bone, rest)

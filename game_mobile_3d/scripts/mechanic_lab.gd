@@ -95,7 +95,7 @@ var _slam_audio_point: Vector3
 var _contact_sparks: ContactSparks
 var _movement_audio: MovementAudio
 var _kai_skin: KaiSkin
-var _md2_skin_meshes: Array[MeshInstance3D] = []
+var _md2_skin_visibility: Dictionary[MeshInstance3D, bool] = {}
 var _weapon_mesh: MeshInstance3D
 var _equipped_weapon := Weapon.SABRE
 var _sabre_mesh: Mesh
@@ -257,8 +257,8 @@ func _ready() -> void:
 		_player_flash_material.shader = PLAYER_HIT_FLASH_SHADER
 		for mesh: MeshInstance3D in player.model.find_children("*", "MeshInstance3D", true, false):
 			if mesh.skin != null:
-				_md2_skin_meshes.append(mesh)
-		_player_flash_meshes = _md2_skin_meshes.duplicate()
+				_player_flash_meshes.append(mesh)
+				_md2_skin_visibility[mesh] = mesh.visible
 		_player_damage_numbers = Node3D.new()
 		_player_damage_numbers.name = "PlayerDamageNumbers"
 		$CombatEffects.add_child(_player_damage_numbers)
@@ -317,16 +317,19 @@ func _select_skin(index: int) -> void:
 			$HUD/SpawnStatus.text = "Thiếu bản xuất Kai hợp lệ trong MD2 Research."
 			return
 		_kai_skin = candidate
+		var flash_weight := 0.0
+		if not _player_overlays.is_empty():
+			var flashing: MeshInstance3D = _player_flash_meshes[0]
+			flash_weight = float(flashing.get_instance_shader_parameter(&"player_hit_flash"))
 		for mesh: MeshInstance3D in _kai_skin.meshes:
 			_player_flash_meshes.append(mesh)
 			if not _player_overlays.is_empty():
 				_player_overlays[mesh] = mesh.material_overlay
 				mesh.material_overlay = _player_flash_material
-				mesh.set_instance_shader_parameter(&"player_hit_flash",
-					_md2_skin_meshes[0].get_instance_shader_parameter(&"player_hit_flash"))
+				mesh.set_instance_shader_parameter(&"player_hit_flash", flash_weight)
 	var use_kai := index == PlayerSkin.KAI
-	for mesh: MeshInstance3D in _md2_skin_meshes:
-		mesh.visible = not use_kai
+	for mesh: MeshInstance3D in _md2_skin_visibility:
+		mesh.visible = not use_kai and _md2_skin_visibility[mesh]
 	if _kai_skin != null:
 		_kai_skin.show_skin(use_kai)
 
@@ -1202,7 +1205,9 @@ func _on_player_hit(amount: int) -> void:
 		player.enter_lab_defeat()
 		# The popup captures keyboard input while it is open, including R.
 		$HUD/Weapon.get_popup().hide()
+		$HUD/PlayerSkin.get_popup().hide()
 		$HUD/Weapon.disabled = true
+		$HUD/PlayerSkin.disabled = true
 		$HUD/Defeat.show()
 
 func _show_player_hit(lost: int) -> void:
@@ -1249,6 +1254,7 @@ func reset_player() -> void:
 		player.set_process_unhandled_input(true)
 		$HUD/Defeat.hide()
 		$HUD/Weapon.disabled = _weapon_mesh == null or not player.combo.native_enabled
+		$HUD/PlayerSkin.disabled = false
 	player_health = MAX_PLAYER_HEALTH
 	_stop_crowd_spawn()
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
