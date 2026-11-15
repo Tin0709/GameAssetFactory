@@ -99,4 +99,4 @@ Cột đèn cạnh bậc dùng **Biome Path Lamp Xz** tại X = −29,5, Z = 17,
 
 WorldMap private Forward Mobile đặt cụm đá ForestA1 ở X = −19, Z = 24. Trong **L → Cài đặt**, **Cụm đá ven đường rừng** so riêng đá, va chạm và những cụm cỏ dưới đá. **B** chuyển toàn bộ đồ họa về bản gốc. Nếu nhân vật đang đứng trong vị trí đặt đá, bật lại sẽ đợi nhân vật bước ra. Shader đá lấy ánh sáng từ cảnh và dùng chung sương terrain. Mesh và atlas được đọc từ MD2 Research theo hash.
 
-Vị trí, hướng và hash của layout nằm ở **Playable Boulder** trên node map. Mặc định để trống vị trí. Khi dùng trên bản đồ private khác, kiểm tra nền dưới cả footprint, tuyến chạy, cỏ và hướng đáp trước khi gán hash layout của map đó. Bản phân phối, Compatibility và các map không gán vị trí bỏ qua cụm đá.
+Vị trí, hướng và hash của layout nằm ở các thuộc tính **Playable Boulder** trên node WorldMap. Khi dời đá, kiểm tra nền dưới cả footprint, tuyến chạy, cỏ và hướng đáp. Bộ nạp hiện nằm trong adapter Forest private. Các map portable dùng chuẩn Lighting và Fog chung. Bản phân phối và Compatibility bỏ qua cụm đá.
