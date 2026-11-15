@@ -2501,6 +2501,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"cliff_vista", &"cliff_vista_feather"]:
 		_update_mist()
 		return
+	if changed_effect == &"zoom_exposure_guide":
+		if phase_finish != null:
+			phase_finish.refresh()
+		return
 	if changed_effect == &"stone_twilight_color":
 		_publish_stone_twilight_color()
 		return
