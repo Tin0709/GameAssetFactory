@@ -23,6 +23,10 @@ Gameplay và công cụ chạy kịch bản dùng chung `world.showcase.set_hour
 
 Map portable dùng một compositor cho camera. Sương chạy trước khi vẽ vật thể và adaptive bloom chạy ở giai đoạn hậu kỳ. Các vật liệu hỗ trợ spatial mist nhận sương từ volume. Vật liệu thông thường tiếp tục nhận depth fog. Mức Nhẹ, chế độ toàn cảnh và chế độ so sánh có đường dự phòng riêng. Các cache ánh sáng kiểm tra hình học, đèn cục bộ và vùng sương đặt theo tọa độ của map.
 
+Trong preset portable, mở **Atmosphere and fog → Spatial mist** để chỉnh **Mist Scatter Color By Hour** và **Mist Scatter Energy By Hour**. Track màu đổi sắc ánh sáng tán xạ ở cùng độ chói tuyến tính. Track cường độ nhân với **Mist Scatter**. Cả hai giữ nguyên độ truyền sáng của volume và màu depth fog. Trời nhiều mây vẫn chuyển sắc bằng resource Weather. Track trống kế thừa giá trị cũ. Dùng giờ chia cho 24 cho trục ngang và khớp giá trị ở 0 và 1 khi đi qua nửa đêm.
+
+Preset **Rìa rừng ẩm** dùng hai track này mặc định trên map thử và khi import với `--biome humid_woodland`. Sắc tán xạ hơi lạnh hơn quanh cụm đá lúc 07:00, 16:30 và 18:30. Để so riêng hai track trong Inspector, duplicate preset rồi bỏ Gradient và Curve mới ở bản sao. Mức **Nhẹ** và renderer Compatibility tiếp tục dùng depth fog. Dữ liệu đối chiếu riêng của Forest vẫn do preset tham chiếu và map Forest quản lý.
+
 Đặt **Local Diffuse Region** trong Inspector của map để chọn tâm, hai bán kính và tọa độ khoảng mở. Trong **Biome Graphics → Lighting**, chỉnh **Local Diffuse Strength** và **Local Diffuse By Hour**. Resource thời tiết có **Local Diffuse Scale** để giảm chênh ánh hắt khi nhiều mây. Cả Forest và map portable dùng cùng hàm shader cho đá, địa hình, cỏ và vật liệu nhân vật hỗ trợ. Forest dùng dữ liệu ánh sáng đã dựng theo hình học. Map portable dùng màu và cường độ ambient của biome hiện tại. Cân bằng và Đầy đủ có hiệu ứng, mức Nhẹ tắt. Trên MeadowBiomeReview, đi tới cụm đá lúc 07:00 hoặc 16:30 rồi bấm **Alt+J** để so sánh.
 
 Nếu map có hai khoảng mở, đặt thêm **Additional Local Diffuse Region** trong Inspector với tâm, bán kính và vị trí nguồn riêng. Hai vùng dùng chung shader. Tại chỗ chồng lấn, shader hòa trộn theo độ ảnh hưởng của từng vùng. Với map import, cả hai cùng dùng **Local Diffuse Strength**, đường cong giờ và thời tiết của preset. Trong WorldMap, **Địa hình & cây cỏ → Đá và mặt đất → Ánh hắt ở bậc đá** cho phép so sánh riêng vùng thứ hai. Điểm dễ quan sát nằm gần X = −22,5, Z = −40,5 lúc 07:00 hoặc 16:30.
@@ -49,6 +53,8 @@ Khi chuyển sang preset không dùng spatial mist hoặc bloom thích ứng, re
 - Đứng yên ở một góc nhìn có cả đất, cỏ, đá và nhân vật. So hai preset bằng **F8** ở sáng, trưa, chiều và tối. Dùng **F6** trong cửa sổ game để thử nhiều mây tại cùng một giờ. **Shift+F7** kiểm tra đường dự phòng cho máy yếu. Khi chốt, lưu **Biome Graphics** và **Biome Quality** trong Inspector của scene.
 
 Đã chạy lại luồng import sạch từ `Testing.litematic` vào thư mục thử riêng. Scene sinh tự động nạp đủ 5.632 cell và chạy chung shader với map review, kể cả khi chưa đặt vùng sương hay đèn. Trên Windows, 65 kiểm tra Forward Mobile/D3D12, 28 kiểm tra Compatibility và 15 kiểm tra importer đều qua. Bộ 12 ảnh của `MeadowBiomeReview` dùng cùng camera để so hai preset ở năm mốc giờ và một lượt trời nhiều mây.
+
+Lượt kiểm tra bổ sung sau khi tách track tán xạ có 71 kiểm tra Forward Mobile/D3D12 và 28 kiểm tra Compatibility qua trên Windows. So cùng camera tại năm giờ và thêm một lượt nhiều mây trên `MeadowBiomeReview`, số draw call và dung lượng đệm mist/bloom giữ nguyên giữa hai cấu hình. Ảnh trời quang tại 12:00 và 22:00 trùng từng pixel. Kết quả này kiểm chứng đường render trên PC.
 
 ### Thêm và kiểm tra một preset mới
 
