@@ -184,6 +184,45 @@ func run() -> void:
 			check(graphics._mist.visible and graphics._mist.effect.snapshot().ready and graphics._mist.failure().is_empty(),
 				"Spatial fog runs on the second map")
 			var selected_profile = map.biome_graphics
+			var chromatic_profile = selected_profile.duplicate()
+			var scatter_color := Gradient.new()
+			scatter_color.set_color(0, Color(.45, .7, 1.))
+			scatter_color.set_color(1, Color(.45, .7, 1.))
+			var scatter_energy := Curve.new()
+			scatter_energy.max_value = 2.
+			scatter_energy.add_point(Vector2(7. / 24., 1.5))
+			scatter_energy.add_point(Vector2(.5, 1.))
+			chromatic_profile.set("mist_scatter_color_by_hour", scatter_color)
+			chromatic_profile.set("mist_scatter_energy_by_hour", scatter_energy)
+			var old_near: Vector3 = graphics._mist_sample.near_layer
+			var old_density: float = graphics._mist_sample.volume_density
+			var old_payload: PackedByteArray = graphics._mist.effect._parameters
+			graphics.set_profile(chromatic_profile)
+			var payload: PackedByteArray = graphics._mist.effect._parameters
+			var rgb := Vector3(payload.decode_float(112), payload.decode_float(116), payload.decode_float(120))
+			var old_rgb := Vector3(old_payload.decode_float(112), old_payload.decode_float(116), old_payload.decode_float(120))
+			var luma := Vector3(.2126, .7152, .0722)
+			check(rgb.z > rgb.y and rgb.y > rgb.x and not rgb.is_equal_approx(old_rgb)
+				and is_equal_approx(rgb.dot(luma), old_rgb.dot(luma)),
+				"A portable preset independently tints spatial scattering at the original source luminance")
+			check(is_equal_approx(payload.decode_float(124), .63)
+				and old_near.is_equal_approx(graphics._mist_sample.near_layer)
+				and is_equal_approx(old_density, graphics._mist_sample.volume_density)
+				and env.fog_light_color.is_equal_approx(clear_tint),
+				"The 07:00 scattering curve reaches the shader without altering extinction or depth fog")
+			graphics.set_weather(1., 0.)
+			var cloud_source: Vector3 = graphics._mist_sample.get("linear_scatter_rgb", Vector3.ZERO)
+			var cloud_tint: Color = selected_profile.overcast.fog_color.srgb_to_linear()
+			check(cloud_source.normalized().is_equal_approx(Vector3(cloud_tint.r, cloud_tint.g, cloud_tint.b).normalized())
+				and is_equal_approx(cloud_source.dot(luma), rgb.dot(luma)),
+				"Overcast retints the authored scattering at constant luminance")
+			graphics.set_weather(0., 0.)
+			map.showcase.set_hour(12.)
+			payload = graphics._mist.effect._parameters
+			check(is_equal_approx(payload.decode_float(124), .42), "Noon uses the authored neutral energy multiplier")
+			graphics.set_profile(selected_profile)
+			map.showcase.set_hour(7.)
+			check(not graphics._mist_sample.has("linear_scatter_rgb"), "Changing profile clears the optional tint")
 			var alternate_profile = selected_profile.duplicate()
 			var alternate_track := Curve.new()
 			alternate_track.add_point(Vector2(0., .8))
