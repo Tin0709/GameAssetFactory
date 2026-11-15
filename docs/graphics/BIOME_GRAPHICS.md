@@ -72,6 +72,8 @@ Map thử dùng cặp **1,55 / 0,74** cho bóng và **1,45 / 0,78** cho sương.
 
 Trong Forest, **Ánh sáng → Bóng và tương phản → Dịu sắc xanh trong bóng ban ngày** mặc định 50%. Lớp này phục hồi một phần màu trung tính trong bóng khi phần chỉnh màu tham chiếu làm nó quá xanh. Độ sáng tuyến tính của bóng được giữ. So 0% và 50% ở bậc đá gần X = −22,5, Z = −40,5 lúc 07:00 hoặc 16:30. **Shadow Grade Recovery By Hour** trong nhóm Color Grading của preset đặt cửa sổ hiệu lực, với hai đỉnh lúc 07:00 và 16:30. Preset biome dùng hậu kỳ portable tiếp tục áp chỉnh màu trong Environment. Preset lưu trước v162 thiếu thanh mới sẽ mở ở 0%.
 
+**Địa hình & cây cỏ → Đá và mặt đất → Ánh phản xạ trên vách đá trong bóng** mặc định 50% trong Forest. Thanh này dùng trường ánh nắng hắt có sẵn của map để tăng độ đọc trên mặt đá đứng bị che. Hiệu ứng lên rõ nhất ở 07:00 và 16:30, yếu đi khi trời nhiều mây. Thông số **Shadowed Wall Return Scale** trong preset điều khiển biên độ. Map cần trường ánh sáng đã tính theo hình học và hướng nắng hợp lệ. Preset lưu trước v163 thiếu thanh này sẽ mở ở 0%.
+
 ## Chỉnh chu kỳ theo biome
 
 Khi muốn đổi đặc tính ánh sáng, sương, hậu kỳ hoặc vòng ngày đêm cho riêng một map, duplicate preset thành file `.tres` mới rồi gán cho map đó. Duplicate cả resource con Day/Night hoặc Overcast nếu cần sửa các track riêng. Nhiều biome có thể dùng chung một Weather resource.
