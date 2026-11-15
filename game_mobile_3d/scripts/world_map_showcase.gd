@@ -2406,7 +2406,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if effect == &"ground_haze":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
 		if effect == &"mist_entry_scatter":
-			slider.editable = slider.editable and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
+			slider.editable = slider.editable and mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"grove_mist_coherence":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.grove_mist_by_hour != null \
 				and is_instance_valid(level.grove)
@@ -3276,6 +3276,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
 		if effect == &"ground_haze":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
+		if effect == &"mist_entry_scatter":
+			slider.editable = mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"basin_sunlit_mist":
 			slider.editable = directional_air.region_available()
 		if effect == &"sunlit_mist":
