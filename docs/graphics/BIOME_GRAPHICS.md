@@ -86,3 +86,9 @@ Chọn **Biome Quality** trong Inspector của map. **Đầy đủ** là mặc �
 Trong MeadowBiomeReview, bấm **T** tới 22:00 rồi đi về X = 4,5, Z = −4,5. **Shift+J** chỉ bật/tắt tán xạ của đèn, **J** so hai đường sương; **Shift+F7** thử mức Nhẹ vẫn có đèn bề mặt. Giờ và vị trí đèn tách khỏi thời tiết và mức chất lượng. Khi muốn đèn lên sớm ở chạng vạng, chỉnh **Path Fixture By Hour** của biome. Forest dùng điều khiển riêng trong **Ánh sáng → Đèn và vật phát sáng → Đèn lối rừng lúc chạng vạng** để so với bản tham chiếu cũ.
 
 Để dùng cột đèn ForestA1 trên một map khác, đặt **Biome Path Lamp Xz** và **Biome Path Lamp Yaw Degrees** trên node map. Chân cột cần một mặt bằng ngang. Mesh và collider thân cột hiện cả ban ngày. Biome dùng **Path Fixture By Hour**, **Energy** và **Scatter** để điều khiển phát sáng, đèn điểm và tán xạ. Khi có cả hai vị trí, cột đèn được ưu tiên và bếp lửa là fallback. Trên WorldMap, mục **Cột đèn lối rừng** ở **Ánh sáng → Đèn và vật phát sáng** chuyển giữa hai bố trí. Cột cũng cần các file riêng tư đã xác minh và chạy trong editor Mobile.
+
+## Bậc thấp cạnh đường rừng
+
+**F5** mở WorldMap với bậc thấp mặc định trong bản chơi thử private dùng Forward Mobile. Bấm **L**, mở **Cài đặt** và dùng **Bậc thấp cạnh đường rừng** để so riêng bậc, vị trí chân cỏ và va chạm. **B** so toàn bộ đồ họa với bản gốc. Nếu nhân vật ở trong phần sẽ xuất hiện, bước ra ngoài mép để bậc được bật lại.
+
+Vị trí, collider, cao độ chân cỏ và mẫu che ánh trời thuộc bản đồ. Node WorldMap gán **Playable Terrace Profile** và SHA-256 của file đặt bậc. Trình nạp kiểm tra hash của cả profile và dữ liệu map, rồi dùng chung mesh package, atlas đã xác minh và shader sương hiện có. Map import dùng preset biome bình thường. Bản dựng phân phối và renderer Compatibility dùng mặt bằng gốc. Muốn đặt bậc ở vị trí mới, dựng và kiểm lại dữ liệu hỗ trợ theo layout mới trước khi gán profile.
