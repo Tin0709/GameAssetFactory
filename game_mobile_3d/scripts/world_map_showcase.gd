@@ -2469,6 +2469,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks
 		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 			slider.editable = slider.editable and level.look.player_material.available()
+		if effect == &"actor_shade_sky":
+			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_shade_sky_by_hour != null
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
 			slider.editable = slider.editable and sky_response.available() and plants != null and plants.grass_light.active
 		if effect == &"grass_step_coverage":
@@ -2664,6 +2666,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			plants.grass_light.sync()
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"canopy_edge_return", &"tree_shade"]:
+		return
+	if changed_effect == &"actor_shade_sky":
+		if level.player_light != null:
+			level.player_light.refresh_shade_sky()
 		return
 	if changed_effect in [&"player_sky", &"player_bounce", &"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 		if level.player_light != null:
