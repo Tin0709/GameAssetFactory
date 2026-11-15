@@ -19,6 +19,7 @@ const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd
 const Gauntlets := preload("res://scripts/mechanic_lab_gauntlets.gd")
 const MeleeTools := preload("res://scripts/mechanic_lab_melee_tools.gd")
 const Bow := preload("res://scripts/mechanic_lab_bow.gd")
+const KaiSkin := preload("res://scripts/mechanic_lab_kai_skin.gd")
 const IDLE_NOVELTIES := {
 	"NativeLabBowLook": ["Player_Idle_Novelty_LookAround",
 		"0961de63ea6a6e30ae524952f937604ad574aac02fa9fd8cd0bf016862556661"],
@@ -60,6 +61,8 @@ const SABRE_LANDING_SHAKE_DELAY := 0.052268848
 # AM_Player_Sabre_JumpAttack: one-shot PlayNiagaraEffect minus LandingStart.
 const SABRE_LANDING_BURST_DELAY := 0.056890413
 
+enum PlayerSkin { MD2, KAI }
+
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD, CROSS_POLLINATOR, GAUNTLETS,
 	CLEAVER, BOW, BASIC_GAUNTLETS, PICKAXE, SHOVEL }
 const TOOL_TYPES := {
@@ -75,6 +78,8 @@ const MELEE_AUDIO_NAMES := {
 var presentation: Node
 var look: WorldLook
 var showcase: WorldShowcase
+# The flat lab has no forest canopy. The shared lighting expects this property.
+var grove: Node3D
 var view_mode := "gameplay"
 var spawn_position := SPAWN
 var player_health := MAX_PLAYER_HEALTH
@@ -89,6 +94,8 @@ var _slam_audio_frame := -1
 var _slam_audio_point: Vector3
 var _contact_sparks: ContactSparks
 var _movement_audio: MovementAudio
+var _kai_skin: KaiSkin
+var _md2_skin_meshes: Array[MeshInstance3D] = []
 var _weapon_mesh: MeshInstance3D
 var _equipped_weapon := Weapon.SABRE
 var _sabre_mesh: Mesh
@@ -250,7 +257,8 @@ func _ready() -> void:
 		_player_flash_material.shader = PLAYER_HIT_FLASH_SHADER
 		for mesh: MeshInstance3D in player.model.find_children("*", "MeshInstance3D", true, false):
 			if mesh.skin != null:
-				_player_flash_meshes.append(mesh)
+				_md2_skin_meshes.append(mesh)
+		_player_flash_meshes = _md2_skin_meshes.duplicate()
 		_player_damage_numbers = Node3D.new()
 		_player_damage_numbers.name = "PlayerDamageNumbers"
 		$CombatEffects.add_child(_player_damage_numbers)
@@ -287,7 +295,40 @@ func _ready() -> void:
 		$Zombies.zombie_attack_audio.connect(_combat_audio.zombie_attack)
 		$Zombies.zombie_step_audio.connect(_on_zombie_step)
 		_setup_weapon_selector()
+	_setup_skin_selector(using_private and player_ready)
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
+
+func _setup_skin_selector(player_ready: bool) -> void:
+	var picker: OptionButton = $HUD/PlayerSkin
+	picker.add_item("Skin · MD2")
+	picker.add_item("Skin · Kai Survival 3D")
+	picker.select(PlayerSkin.MD2)
+	picker.set_item_disabled(PlayerSkin.KAI, not (player_ready and KaiSkin.source_available()))
+	picker.disabled = not player_ready
+	picker.item_selected.connect(_select_skin)
+
+func _select_skin(index: int) -> void:
+	if index == PlayerSkin.KAI and _kai_skin == null:
+		var candidate := KaiSkin.new()
+		if not candidate.setup(player):
+			candidate.free()
+			$HUD/PlayerSkin.select(PlayerSkin.MD2)
+			$HUD/PlayerSkin.set_item_disabled(PlayerSkin.KAI, true)
+			$HUD/SpawnStatus.text = "Thiếu bản xuất Kai hợp lệ trong MD2 Research."
+			return
+		_kai_skin = candidate
+		for mesh: MeshInstance3D in _kai_skin.meshes:
+			_player_flash_meshes.append(mesh)
+			if not _player_overlays.is_empty():
+				_player_overlays[mesh] = mesh.material_overlay
+				mesh.material_overlay = _player_flash_material
+				mesh.set_instance_shader_parameter(&"player_hit_flash",
+					_md2_skin_meshes[0].get_instance_shader_parameter(&"player_hit_flash"))
+	var use_kai := index == PlayerSkin.KAI
+	for mesh: MeshInstance3D in _md2_skin_meshes:
+		mesh.visible = not use_kai
+	if _kai_skin != null:
+		_kai_skin.show_skin(use_kai)
 
 func _setup_weapon_selector() -> void:
 	$HUD/Weapon.add_item("Sabre")

@@ -180,6 +180,16 @@ fit_to_longest_item = false
 text_overrun_behavior = 3
 tooltip_text = "Chọn vũ khí để thử trong MechanicLab."
 
+[node name="PlayerSkin" type="OptionButton" parent="HUD"]
+offset_left = 990.0
+offset_top = 108.0
+offset_right = 1238.0
+offset_bottom = 139.0
+focus_mode = 0
+fit_to_longest_item = false
+text_overrun_behavior = 3
+tooltip_text = "Đổi ngoại hình giữa MD2 và Kai ngay trong MechanicLab."
+
 [node name="CrossbowAmmo" type="Label" parent="HUD"]
 visible = false
 offset_left = 794.0
