@@ -205,7 +205,7 @@ func refresh() -> void:
 	RenderSettings.apply_grade(env, _profile.contrast, saturation)
 	RenderSettings.apply_bloom(env, _profile.glow_intensity > 0.,
 		_profile.glow_intensity, _profile.glow_bloom, _profile.glow_hdr_threshold)
-	_weather.apply_lighting(_profile.overcast, sun, env)
+	_weather.apply_lighting(_profile.overcast, sun, env, hour)
 	# Scale the authored depth fog only after applying the weather response.
 	var fog_gain := _profile.essential_fog_scale if quality == Quality.ESSENTIAL and _profile.spatial_mist else 1.
 	env.fog_density *= fog_gain
