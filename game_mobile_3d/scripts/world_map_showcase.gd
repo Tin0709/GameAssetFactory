@@ -6,6 +6,7 @@ const DayNight = preload("res://scripts/biome_day_night.gd")
 const Weather = preload("res://scripts/biome_weather.gd")
 const DistantTerrain = preload("res://scripts/world_map_distant_terrain.gd")
 const PlayableTerrace = preload("res://scripts/world_map_playable_terrace.gd")
+const PlayableBoulder = preload("res://scripts/world_map_boulder.gd")
 const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
 const BiomeProfile = preload("res://scripts/biome_graphics_profile.gd")
 const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
@@ -69,6 +70,7 @@ var forest := FOREST.new("", "")
 var _biome_profile: BiomeProfile
 var distant_terrain := DistantTerrain.new()
 var playable_terrace: PlayableTerrace
+var playable_boulder: PlayableBoulder
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_replay := preload("res://scripts/world_map_forest_replay.gd").new()
@@ -442,6 +444,14 @@ func setup(world:Node3D)->void:
 			level.add_child(insert)
 		else:
 			insert.free()
+	if level.playable_boulder_xz.is_finite():
+		var boulder := PlayableBoulder.new()
+		if boulder.configure(level, plants, level.playable_boulder_xz, level.playable_boulder_yaw_degrees, level.playable_boulder_layout_sha):
+			playable_boulder = boulder
+			boulder.name = "PlayableBoulder"
+			level.add_child(boulder)
+		else:
+			boulder.free()
 	_build_ui()
 	set_source_terrain(true)
 	_refresh_lantern_glow()
@@ -1384,6 +1394,8 @@ func _mist_materials()->Array:
 		result.append(distant_terrain.material)
 	if is_instance_valid(playable_terrace) and playable_terrace.active:
 		result.append(playable_terrace.material)
+	if is_instance_valid(playable_boulder) and playable_boulder.active:
+		result.append(playable_boulder.material)
 	if grove_mist_enabled and level.grove != null:
 		var tree_weight := PHASE_FINISH.phase_weight(hour)
 		if _biome_profile != null:
@@ -3406,19 +3418,9 @@ func _build_ui()->void:
 		_weather_button.toggled.connect(func(value: bool): set_weather(1. if value else 0.))
 		box.add_child(_weather_button)
 	if is_instance_valid(playable_terrace):
-		var terrace_toggle := CheckButton.new()
-		terrace_toggle.name = "PlayableTerrace"
-		terrace_toggle.text = "Bậc thấp cạnh đường rừng"
-		terrace_toggle.button_pressed = playable_terrace.requested
-		terrace_toggle.focus_mode = Control.FOCUS_NONE
-		terrace_toggle.tooltip_text = "So địa hình, cỏ và va chạm ở bậc thấp. Nếu đang đứng trong chỗ bậc sẽ xuất hiện, hãy bước ra để áp dụng."
-		box.add_child(terrace_toggle)
-		terrace_toggle.toggled.connect(func(value: bool):
-			var previous := playable_terrace.requested
-			_settings.remember_edit(func():
-				terrace_toggle.set_pressed_no_signal(previous)
-				playable_terrace.set_requested(previous))
-			playable_terrace.set_requested(value))
+		_add_terrain_toggle(box, playable_terrace, "Bậc thấp cạnh đường rừng")
+	if is_instance_valid(playable_boulder):
+		_add_terrain_toggle(box, playable_boulder, "Cụm đá ven đường rừng")
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)

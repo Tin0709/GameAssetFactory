@@ -47,6 +47,10 @@ var biome_controller: BiomeGraphics
 ## A verified support and sky bake relative to the private research folder.
 @export var playable_terrace_profile := ""
 @export var playable_terrace_sha256 := ""
+## Private stone placement. Leave the anchor unset on maps without this prop.
+@export var playable_boulder_xz := Vector2.INF
+@export var playable_boulder_yaw_degrees := 0.
+@export var playable_boulder_layout_sha := ""
 
 @export var local_mist_region: LocalMistRegion
 @export var alternate_mist_region: LocalMistRegion
@@ -287,7 +291,11 @@ func terrain_contact_at(sole: Vector3) -> Dictionary:
 	# Follow the support immediately below the foot, including slabs under a ledge.
 	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * 0.08, sole - Vector3.UP * 0.30, 1)
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
-	if hit.is_empty() or hit.normal.y < 0.7 or not geometry.is_ancestor_of(hit.collider):
+	if hit.is_empty() or hit.normal.y < 0.7:
+		return {}
+	if showcase != null and is_instance_valid(showcase.playable_boulder) and hit.collider == showcase.playable_boulder.collider:
+		return {"position": hit.position, "surface": "stone"}
+	if not geometry.is_ancestor_of(hit.collider):
 		return {}
 	var position: Vector3 = hit.position
 	var offset: Array = runtime.offset
