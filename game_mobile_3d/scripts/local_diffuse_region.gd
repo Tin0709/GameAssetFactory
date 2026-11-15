@@ -9,6 +9,7 @@ static var _owner: WeakRef
 static func claim(publisher: Node) -> void:
 	_owner = weakref(publisher)
 	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_additional_source", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_ambient", Vector3.ZERO)
 
 static func owns(publisher: Node) -> bool:
@@ -17,6 +18,7 @@ static func owns(publisher: Node) -> bool:
 static func release(publisher: Node) -> void:
 	if owns(publisher):
 		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_source", Vector4.ZERO)
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_additional_source", Vector4.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_ambient", Vector3.ZERO)
 		_owner = null
 
@@ -29,3 +31,11 @@ func bounds() -> Vector4:
 
 func source(gain: float) -> Vector4:
 	return Vector4(opening_world.x, opening_world.y, opening_world.z, gain)
+
+static func publish_additional(region: Resource, gain: float, previous: Vector4) -> Vector4:
+	var value: Vector4 = region.source(gain) if gain > 0. and region != null and region.is_valid() else Vector4.ZERO
+	if value != previous:
+		if value.w > 0.:
+			RenderingServer.global_shader_parameter_set("gaf_local_diffuse_additional_region", region.bounds())
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_additional_source", value)
+	return value
