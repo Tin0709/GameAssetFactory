@@ -111,4 +111,3 @@ func deltas(values: Array[Quaternion]) -> float:
 	for value: Quaternion in values:
 		largest = maxf(largest, values[0].angle_to(value))
 	return largest
-

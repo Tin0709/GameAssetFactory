@@ -138,4 +138,3 @@ func _process(delta: float) -> void:
 			_poses[bone] = parent_pose * _rig.get_bone_pose(bone)
 	_face.set_blend_shape_value(_focus_shape, _actor.focus_value)
 	_face.set_blend_shape_value(_blink_shape, _actor.blink_value)
-
