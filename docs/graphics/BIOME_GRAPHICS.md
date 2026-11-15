@@ -78,6 +78,8 @@ Trong WorldMap, vào **L → Cài đặt → Sương & hiệu ứng → Sương 
 
 **Sương & hiệu ứng → Exposure và màu cuối → Ổn định sáng tối khi zoom xa** điều chỉnh phần local exposure tham chiếu của Forest. Ở size 29–40 m, nó giảm dần trọng số mẫu rộng về 30% giá trị gốc, giữ lưới sáng cục bộ và cùng chế độ bloom. Buổi trưa và góc chơi gần giữ công thức cũ. Preset trước phiên bản 160 mở ở 0% nếu thiếu trường.
 
+**Giữ ánh sáng ổn định khi cuộn zoom** dùng `Zoom Exposure Blur Strength` của preset Forest. Ở sáng sớm và chiều, trong dải camera 18–26 m, nó giữ bán kính lấy mẫu theo mét cho lớp làm mượt của local exposure. Từ 26 m trở lên, mức hiệu chỉnh dừng ở giá trị đã kiểm chứng. Phần histogram của local exposure vẫn dùng các ô gốc. Vào **Sương & hiệu ứng → Exposure và màu cuối** để so 0% và 100% lúc 07:00 hoặc 16:30. Preset lưu trước v174 mở ở 0% nếu thiếu mục này. Bản mặc định Forest dùng 100%. Các biome dùng đường hậu kỳ portable và renderer Compatibility giữ cấu hình riêng.
+
 Để dùng cùng pipeline trên một map import, đặt **Cliff Vista Origin**, **Cliff Vista Scale**, **Cliff Vista Mesh Anchor** và **Cliff Vista Sections** trong Inspector, rồi gán **Distant Terrain Layout Sha** bằng SHA-256 của JSON layout hiện tại. Các section phải nằm trong gói mesh MD2 cục bộ đã được loader kiểm chứng. Đặt chúng ngoài phần chơi và kiểm từ các góc zoom mà map cho phép. Cấu hình map chọn hình học và vị trí. Preset biome tiếp tục quyết định ánh sáng, sương và thời tiết. Chế độ Nhẹ của map portable, Compatibility và bản xuất dùng nền thông thường.
 
 ## Phạm vi tích hợp hiện tại
