@@ -4,6 +4,9 @@ layout(local_size_x=8,local_size_y=8,local_size_z=1) in;
 layout(rgba16f,set=0,binding=0) uniform writeonly image3D volume;
 layout(set=0,binding=1) uniform sampler2D noise_field;
 layout(set=0,binding=3) uniform sampler3D light_field;
+#ifdef GAF_SKY_AIR
+layout(set=0,binding=5) uniform sampler3D sky_air_field;
+#endif
 #ifdef GAF_DIRECTIONAL_AIR
 layout(set=0,binding=4) uniform sampler3D directional_field;
 #endif
@@ -45,6 +48,11 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 depth_scatter_color; // Linear change to ambient source RGB, enabled in w.
  vec4 ground_haze_band; // view-depth start/end and lower/upper world Y
  vec4 ground_haze; // low ground source gain in x, near-entry source gain in w
+#ifdef GAF_SKY_AIR
+ vec4 sky_air_source;
+ vec4 sky_air_origin;
+ vec4 sky_air_spacing;
+#endif
 } p;
 const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
 const float FOREST_SCATTER_END_RADIUS_M = 15.0;
@@ -57,6 +65,20 @@ float scatter_visibility(vec3 point){
  // original radial screen-space blur. Never modify optical extinction.
  return p.light_step.w+(1.-p.light_step.w)*v*v;
 }
+#ifdef GAF_SKY_AIR
+vec3 sky_air(vec3 point) {
+ if(p.sky_air_source.w<=0.)return vec3(0.);
+ vec3 cell=(point-p.sky_air_origin.xyz)/p.sky_air_spacing.xyz;
+ vec3 dims=vec3(textureSize(sky_air_field,0));
+ if(any(lessThanEqual(cell,vec3(0.)))||any(greaterThanEqual(cell,dims-1.)))return vec3(0.);
+ float cover=textureLod(sky_air_field,(cell+.5)/dims,0.).r;
+ float canopy_edge=smoothstep(.035,.14,cover)*(1.-smoothstep(.48,.75,cover));
+ vec3 rim=min(cell,dims-1.-cell)*p.sky_air_spacing.xyz;
+ float feather=smoothstep(0.,1.,min(rim.x,min(rim.y,rim.z)));
+ float height=1.-smoothstep(p.origin_dy.w+2.,p.origin_dy.w+7.,point.y);
+ return p.sky_air_source.rgb*(p.sky_air_source.w*canopy_edge*feather*height);
+}
+#endif
 // Independently authored radial source. Source proof establishes exponent2;
 // using it in this original participating medium is a reconstruction.
 float local_point_weight(vec3 offset,float radius,bool recovered){
@@ -222,6 +244,9 @@ void main(){
     light+=p.scatter.rgb*p.scatter.w*(p.ray.w*region);
    }
    light=light*scatter_visibility(point)+path_light(point);
+#ifdef GAF_SKY_AIR
+   light+=sky_air(point);
+#endif
 #ifdef GAF_DIRECTIONAL_AIR
    light+=directional_air(point);
 #endif
@@ -243,6 +268,9 @@ void main(){
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
    vec3 light=ambient_depth_source((start+d)*.5*ray_length,(start+d)*.5,point.y)+p.warm.rgb*(warmth*.25);
    light=light*scatter_visibility(point)+path_light(point);
+#ifdef GAF_SKY_AIR
+   light+=sky_air(point);
+#endif
 #ifdef GAF_DIRECTIONAL_AIR
    light+=directional_air(point);
 #endif

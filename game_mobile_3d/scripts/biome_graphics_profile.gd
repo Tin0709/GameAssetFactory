@@ -73,6 +73,9 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Added light near the entry to the spatial mist, sampled by normalized hour.
 ## An empty track leaves the original medium lighting in place.
 @export var mist_entry_scatter_by_hour: Curve
+## Adds ambient sky color to the existing mist in partially occluded air.
+@export var mist_sky_scatter_by_hour: Curve
+@export var mist_sky_scatter_tint := Vector3.ONE
 @export_range(0., 1., .01) var local_mist_strength := .65
 ## Multiplies the first map region by normalized hour. A missing or empty curve uses 1.
 @export var local_mist_by_hour: Curve
@@ -152,6 +155,20 @@ func ambient_hour_scale(hour: float, strength: float = 1.) -> float:
 
 func sample_mist_entry_scatter(time: float) -> float:
 	return clampf(DayNight.sample_curve(mist_entry_scatter_by_hour, time, 0.), 0., 4.)
+
+func sample_mist_sky_scatter(time: float, env: Environment, strength: float = 1.) -> Vector4:
+	var gain := clampf(DayNight.sample_curve(mist_sky_scatter_by_hour, time, 0.) * strength, 0., 4.)
+	if gain <= 0. or not mist_sky_scatter_tint.is_finite():
+		return Vector4.ZERO
+	var ambient_color := env.ambient_light_color.srgb_to_linear()
+	var ambient := Vector3(ambient_color.r, ambient_color.g, ambient_color.b) * env.ambient_light_energy * .75
+	var tint := ambient * mist_sky_scatter_tint.clamp(Vector3.ZERO, Vector3(4., 4., 4.))
+	var luma := Vector3(.2126, .7152, .0722)
+	var tint_luma := tint.dot(luma)
+	if tint_luma <= .000001:
+		return Vector4.ZERO
+	tint *= ambient.dot(luma) / tint_luma
+	return Vector4(tint.x, tint.y, tint.z, gain)
 
 func sample_ground_haze(hour: float, subject_depth_m: float, map_base_y: float,
 		day_mix: float = 1., twilight_mix: float = 1.) -> PackedFloat32Array:

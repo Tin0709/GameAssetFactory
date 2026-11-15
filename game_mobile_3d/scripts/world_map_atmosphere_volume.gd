@@ -1,6 +1,7 @@
 extends Node3D
 ## Shared camera-scoped medium. No scene-color/depth copy or fullscreen overlay.
 const FIELD=preload("res://scripts/world_map_mist_field.gd")
+const MistSkyField = preload("res://scripts/mist_sky_field.gd")
 const LocalMistRegion=preload("res://scripts/local_mist_region.gd")
 static var _owner:WeakRef
 var effect:CompositorEffect
@@ -13,6 +14,8 @@ var _clock:=0.
 var _radius:=8.
 var _bound_generation:=-1
 var _gate:=false
+var _sky_field: MistSkyField
+var _sky_current: Callable
 var noise_strength:=1.
 var screen_tile_pixels := 16
 var recovered_point_kernel:=false
@@ -43,6 +46,25 @@ func setup()->void:
   for x in 64:
    image.set_pixel(x,y,Color(clampf(source.get_noise_2d((x-32)*4.,(y-32)*4.)*.5+.5,0.,1.),0,0))
  noise=ImageTexture.create_from_image(image);hide()
+func set_sky_field(field: MistSkyField, current := Callable()) -> void:
+ # A volume keeps one field for the lifetime of its compositor.
+ if effect == null or effect.enabled or _sky_field != null or field == null or not field.is_valid():
+  return
+ _sky_field = field
+ _sky_current = current
+ effect.sky_grid = field.texture
+
+func has_sky_field() -> bool:
+ return _sky_field != null
+
+func _sky_parameters() -> PackedFloat32Array:
+ if not has_sky_field():
+  return PackedFloat32Array()
+ var source: Vector4 = _profile.get("sky_scatter_source", Vector4.ZERO)
+ if source.w > 0. and _sky_current.is_valid() and not _sky_current.call():
+  source = Vector4.ZERO
+ return _sky_field.parameters(source)
+
 func publish(p:Dictionary,actor:Vector3,base:float,time:float,_ortho:bool,radius:float)->void:
  _profile=p;_actor=actor;_base=base;_clock=time;_radius=radius
 func set_local_region(region:LocalMistRegion,gain:float)->void:
@@ -141,7 +163,8 @@ func _process(_delta:float)->void:
     var depth_ramp := float(_profile.get("depth_scatter_ramp", effect.DEPTH_SCATTER_RAMP_M))
     effect.configure_with_depth_scatter(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional,depth_scatter,depth_color,depth_optical,depth_offset,morning_optical,depth_ramp,
      _profile.get("ground_haze", PackedFloat32Array()) if near_layer.y > 0. else PackedFloat32Array(),
-     _profile.get("entry_scatter_gain", 0.) if near_layer.y > 0. else 0.)
+     _profile.get("entry_scatter_gain", 0.) if near_layer.y > 0. else 0.,
+     _sky_parameters())
    else:
     effect.configure_with_mist_regions(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional)
   else:
