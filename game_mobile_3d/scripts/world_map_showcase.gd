@@ -285,6 +285,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"spruce_leaf_filter": ["Dịu chi tiết tán vân sam khi zoom xa", 1.],
 	&"night_path_chroma": ["Night path color", 1.],
 	&"source_path_chroma": ["Dịu sắc đất lối rừng", 1.],
+	&"day_path_chroma": ["Cân sắc đất lối đi sáng và chiều", 1.],
 	&"exposure": ["Local exposure", 1.],
 	&"daylight_shadow_lift": ["Daylight shadow lift", 1.],
 	&"daylight_shade_retention": ["Chiều sâu bóng râm qua sương", 1.],
@@ -293,7 +294,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 189
+const LIGHTING_MIX_VERSION := 190
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2537,6 +2538,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 190 and effect == &"day_path_chroma":
+			missing_value = 0.
 		if version < 189 and effect == &"spruce_leaf_filter":
 			missing_value = 0.
 		if version < 188 and effect == &"overcast_mist_phase_color":
@@ -2773,6 +2776,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and _kai_twilight_ground_bounce_editable()
 		if effect == &"spruce_leaf_filter":
 			slider.editable = slider.editable and _spruce_leaf_filter_editable()
+		if effect == &"day_path_chroma":
+			slider.editable = slider.editable and _biome_profile != null and _biome_profile.day_path_chroma_by_hour != null
 		if effect == &"actor_side_sky":
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_side_sky_by_hour != null
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
@@ -2909,8 +2914,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"mist_entry_scatter", &"mist_sky_scatter", &"mist_dusk_sky_scatter", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
 		_update_mist()
 		return
-	if changed_effect in [&"night_path_chroma", &"source_path_chroma"]:
-		_publish_night_path_chroma()
+	if changed_effect in [&"night_path_chroma", &"source_path_chroma", &"day_path_chroma"]:
+		_publish_path_chroma()
 		return
 	if changed_effect in [&"forest_dusk_backdrop", &"distant_terrain"]:
 		_forest_hour = INF
@@ -3178,7 +3183,7 @@ func _choose_hour(value: float) -> void:
 		_settings.remember_edit(set_hour.bind(hour))
 	set_hour(value)
 
-func _publish_night_path_chroma() -> void:
+func _publish_path_chroma() -> void:
 	if level == null or level.look == null:
 		return
 	var strength := 0.0
@@ -3188,6 +3193,9 @@ func _publish_night_path_chroma() -> void:
 	var atlas_gain := 0.0
 	if forest_active() and atmosphere_review == "combined" and not _balanced_preview:
 		atlas_gain = maxf(moonlight_weight(hour), _twilight_window()) * _lighting_scale(&"source_path_chroma")
+		if _biome_profile != null:
+			var day_gain := clampf(DayNight.sample_curve(_biome_profile.day_path_chroma_by_hour, hour / 24., 0.), 0., 1.)
+			atlas_gain = lerpf(atlas_gain, 1., day_gain * _lighting_scale(&"day_path_chroma"))
 	level.look.set_source_path_chroma(atlas_gain)
 
 func twilight_color_weight() -> float:
@@ -3309,7 +3317,7 @@ func apply_time()->void:
 	refresh_daylight_shading()
 	if not _flat_lab:
 		_sync_distant_terrain()
-		_publish_night_path_chroma()
+		_publish_path_chroma()
 		_publish_stone_twilight_color()
 		_sync_twilight_crown()
 		_sync_forest_night_lights()

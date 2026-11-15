@@ -153,6 +153,7 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var afternoon_key_by_hour: Curve
 ## Ambient multiplier before weather, in normalized hours. An empty track uses 1.
 @export var ambient_energy_by_hour: Curve
+@export var day_path_chroma_by_hour: Curve
 @export var fog_density_by_hour: Curve
 
 @export_group("Local path fixture")

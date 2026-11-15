@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=23 format=3]
+[gd_resource type="Resource" load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -47,6 +47,10 @@ point_count = 8
 [sub_resource type="Curve" id="ForestAmbientHours"]
 max_value = 1.35
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.229166667, 1), 0.0, 0.0, 0, 0, Vector2(0.291666667, 1.35), 0.0, 0.0, 0, 0, Vector2(0.4375, 1), 0.0, 0.0, 0, 0, Vector2(0.583333333, 1), 0.0, 0.0, 0, 0, Vector2(0.6875, 1.35), 0.0, 0.0, 0, 0, Vector2(0.78125, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 8
+
+[sub_resource type="Curve" id="ForestDayPathChroma"]
+_data = [Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.32), 0.0, 0.0, 0, 0, Vector2(0.395833333, 0.32), 0.0, 0.0, 0, 0, Vector2(0.46875, 0), 0.0, 0.0, 0, 0, Vector2(0.552083333, 0), 0.0, 0.0, 0, 0, Vector2(0.635416667, 0.32), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.32), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0]
 point_count = 8
 
 [sub_resource type="Curve" id="ForestEntryScatter"]
@@ -104,6 +108,7 @@ daylight_canopy_cue_opacity = 0.75
 projected_opening_recovery_by_hour = SubResource("ProjectedOpeningRecovery")
 afternoon_key_by_hour = SubResource("AfternoonKey")
 ambient_energy_by_hour = SubResource("ForestAmbientHours")
+day_path_chroma_by_hour = SubResource("ForestDayPathChroma")
 shadow_grade_recovery_by_hour = SubResource("ShadowGradeRecovery")
 daylight_shadow_luminance_scale = 0.3
 daylight_shade_retention = 0.55
