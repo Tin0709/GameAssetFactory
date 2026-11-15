@@ -94,6 +94,27 @@ func run():
   w.showcase.set_lighting_scale(&"bloom",1.)
   w.showcase.set_lighting_scale(&"humid_light",0.)
   await settle()
+  var zoom_control := w.showcase._lighting_sliders.get(&"zoom_exposure_blur") as HSlider
+  check(zoom_control != null and is_equal_approx(zoom_control.value, 1.), "World exposure blur has a default comparison slider")
+  var saved_size: float = w._camera_size_target
+  w._camera_size_target = 26.
+  w.set_review_view("gameplay")
+  await settle()
+  check(f.active and is_equal_approx(float(f._native.rendered_source().blur_scale), 18. / 26.),
+   "Morning uses the submitted exposure blur scale at the wider zoom")
+  w.showcase.set_lighting_scale(&"zoom_exposure_blur",0.)
+  await settle()
+  check(f.active and is_equal_approx(float(f._native.rendered_source().blur_scale),1.),
+   "Zero restores the authored blur offsets in the same pass")
+  w.showcase.set_lighting_scale(&"zoom_exposure_blur",1.)
+  w.showcase.set_hour(22.)
+  await settle()
+  check(f.active and is_equal_approx(float(f._native.rendered_source().blur_scale),1.),
+   "Night keeps the authored blur at the wider zoom")
+  w._camera_size_target = saved_size
+  w.set_review_view("gameplay")
+  w.showcase.set_hour(7.)
+  await settle()
   w.look.set_local_exposure(false);await settle();check(not f.active,"F7 OFF suspends finishing")
   w.look.set_local_exposure(true);await settle();check(f.active,"F7 ON resumes finishing")
   w.showcase.set_hdr_air(false);await settle();check(not f.active,"Packed fallback suspends finishing")
