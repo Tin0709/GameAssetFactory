@@ -4,6 +4,10 @@ Trong **L → Cài đặt → Nhân vật → Ngoại hình**, Kai Survival 3D g
 
 Hai skin dùng chung một nguồn sáng của WorldMap, với cùng màu, cường độ theo giờ, bán kính, suy giảm, bloom và tán xạ trong sương. Ở chế độ chiếu từ trên cao, vị trí chiếu giữ nguyên khi đổi skin. Khi tắt chế độ này, ánh sáng bám tâm chiếc đèn đang hiển thị và phần sương dùng cùng vị trí. Kính đèn của Kai giữ texture gốc, nhận cùng điều khiển độ phát sáng và nhịp bật/tắt của đèn WorldMap.
 
+### Ánh hắt từ nền lên Kai ban đêm
+
+Trong **L → Cài đặt → Nhân vật → Ánh sáng trên nhân vật**, thanh **Ánh hắt từ nền lên Kai ban đêm** mặc định 100% trên WorldMap Forward Mobile. Vào Night (22:00) rồi đổi giữa 0% và 100% trên cỏ, đường đất hoặc đá. Hiệu ứng lấy màu từ các ô nền cạnh chân và cường độ từ đèn hông dùng chung. Phần hắt ưu tiên các mặt bên của thân và mặt, giảm dần khi nhảy rồi trở lại khi đáp. Mức sáng trực tiếp và vị trí đèn vẫn dùng thiết lập chung của hai skin. Hiệu ứng sử dụng atlas terrain private đang bật. Công thức trước v183 dùng 0% khi chưa có mục mới.
+
 Current full-scene revalidation with the owned HDR foundation: `lantern_idle_v001/final_review_hdr_v003/review.log`, Forward Mobile/D3D12, exit0 and `LANTERN_IDLE failures=[]`. Source load, native toggle keys, emitter/mist alignment, automatic inspection, movement/combat interruption, Day hide and Night grow were exercised together. Display previews apply one linear-to-sRGB transfer to HDR screenshot exports; no exposure/color retune.
 
 ## V002 follow-up — recovered native toggle and material override
