@@ -53,7 +53,8 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		path_light: PackedFloat32Array, local_mist: PackedFloat32Array, additional_mist: PackedFloat32Array,
 		depth_scatter: float, depth_color: Vector3 = Vector3.ZERO, depth_optical: float = 0.0,
 		depth_scatter_offset: float = DEPTH_SCATTER_START_M, morning_optical: float = 0.0,
-		depth_scatter_ramp: float = DEPTH_SCATTER_RAMP_M, ground_haze := PackedFloat32Array()) -> void:
+		depth_scatter_ramp: float = DEPTH_SCATTER_RAMP_M, ground_haze := PackedFloat32Array(),
+		entry_scatter_gain: float = 0.) -> void:
 	var path_bytes := path_light.to_byte_array()
 	if path_bytes.size() == LEGACY_PATH_SOURCE_BYTES:
 		path_bytes.resize(PATH_SOURCE_BYTES)
@@ -90,6 +91,7 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		gain, optical_gain, color.x, color.y, color.z, 1.0 if color != Vector3.ZERO else 0.0]).to_byte_array()
 	var ground_haze_bytes := ground_haze.to_byte_array() if ground_haze.size() == 8 else PackedByteArray()
 	ground_haze_bytes.resize(GROUND_HAZE_BYTES)
+	ground_haze_bytes.encode_float(28, clampf(entry_scatter_gain, 0., 4.) if entry > 0. and is_finite(entry_scatter_gain) else 0.)
 	_mutex.lock()
 	_parameters=parameters.duplicate()
 	_path_parameters = path_bytes

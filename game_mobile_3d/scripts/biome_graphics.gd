@@ -366,6 +366,7 @@ func _prepare_spatial_mist(env: Environment, clear_fog_color: Color, time: float
 		"near_layer": Vector3(env.fog_depth_begin, density, base_y),
 		"near_fade_start": .8,
 		"scatter_energy": clampf(_profile.mist_scatter * scatter_scale, 0., 1.),
+		"entry_scatter_gain": _profile.sample_mist_entry_scatter(time),
 		"player_light_color": Vector3.ZERO,
 		"player_light_weight": 0.,
 	}

@@ -59,6 +59,9 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var mist_scatter_color_by_hour: Gradient
 ## Multiplier for scattered light. Defaults to 1 and does not change transmission.
 @export var mist_scatter_energy_by_hour: Curve
+## Added light near the entry to the spatial mist, sampled by normalized hour.
+## An empty track leaves the original medium lighting in place.
+@export var mist_entry_scatter_by_hour: Curve
 @export_range(0., 1., .01) var local_mist_strength := .65
 ## Multiplies the first map region by normalized hour. A missing or empty curve uses 1.
 @export var local_mist_by_hour: Curve
@@ -131,6 +134,9 @@ func ambient_hour_scale(hour: float, strength: float = 1.) -> float:
 	if is_equal_approx(authored, 1.):
 		return 1.
 	return lerpf(1., authored, clampf(strength, 0., 1.))
+
+func sample_mist_entry_scatter(time: float) -> float:
+	return clampf(DayNight.sample_curve(mist_entry_scatter_by_hour, time, 0.), 0., 4.)
 
 func sample_ground_haze(hour: float, subject_depth_m: float, map_base_y: float,
 		day_mix: float = 1., twilight_mix: float = 1.) -> PackedFloat32Array:
