@@ -6,6 +6,7 @@ const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
 const BASELINE_BYTES := 80
 const DAYLIGHT_SHADOW_GRADE_OFFSET := 64
 const DAYLIGHT_GREEN_GRADE_OFFSET := 68
+const DAYLIGHT_SHADOW_LUMINANCE_OFFSET := 72
 var _edge_requested:=false
 var _render_edge:=false
 var _reported_size:=Vector2i.ZERO
@@ -27,6 +28,7 @@ var _humid_actor := Vector4.ZERO
 var _twilight_shadow_weight := 0.
 var _daylight_shadow_grade := 0.
 var _daylight_green_grade := 0.
+var _daylight_shadow_luminance := 0.
 var _bloom_diffusion_mix := 0.
 var _depth_diffusion := DepthDiffusion.new()
 var _humid_depth := PackedByteArray()
@@ -57,6 +59,11 @@ func set_daylight_shadow_grade(weight: float) -> void:
 func set_daylight_green_grade(weight: float) -> void:
  _guard.lock()
  _daylight_green_grade = clampf(weight, 0., 1.) if is_finite(weight) else 0.
+ _guard.unlock()
+
+func set_daylight_shadow_luminance(gain: float) -> void:
+ _guard.lock()
+ _daylight_shadow_luminance = clampf(gain, 0., .52) if is_finite(gain) else 0.
  _guard.unlock()
 
 func set_bloom_diffusion(weight: float) -> void:
@@ -116,6 +123,7 @@ func _render_callback(kind:int,data:RenderData)->void:
  var twilight_shadow_weight := _twilight_shadow_weight if wanted and _reference_enabled else 0.
  var daylight_shadow_grade := _daylight_shadow_grade if wanted and _reference_enabled else 0.
  var daylight_green_grade := _daylight_green_grade if wanted and _reference_enabled else 0.
+ var daylight_shadow_luminance := _daylight_shadow_luminance if wanted and _reference_enabled else 0.
  var bloom_diffusion_mix := _bloom_diffusion_mix if diffusion_active else 0.
  _guard.unlock()
  if not baseline.is_empty():
@@ -130,6 +138,7 @@ func _render_callback(kind:int,data:RenderData)->void:
   baseline.encode_float(60, bloom_diffusion_mix)
   baseline.encode_float(DAYLIGHT_SHADOW_GRADE_OFFSET, daylight_shadow_grade)
   baseline.encode_float(DAYLIGHT_GREEN_GRADE_OFFSET, daylight_green_grade)
+  baseline.encode_float(DAYLIGHT_SHADOW_LUMINANCE_OFFSET, daylight_shadow_luminance)
  var depth_changed := _depth_diffusion.refresh_sources(rd, buffers, depth_mist)
  if depth_changed or wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
@@ -150,12 +159,15 @@ func _render_callback(kind:int,data:RenderData)->void:
   if _baseline_buffer.is_valid() and failure().is_empty() else 0.)
  _report("daylight_green_grade", _last_baseline.decode_float(DAYLIGHT_GREEN_GRADE_OFFSET)
   if _baseline_buffer.is_valid() and failure().is_empty() else 0.)
+ _report("daylight_shadow_luminance", _last_baseline.decode_float(DAYLIGHT_SHADOW_LUMINANCE_OFFSET)
+  if _baseline_buffer.is_valid() and failure().is_empty() else 0.)
 func _release(rd:RenderingDevice)->void:
  _depth_diffusion.release(rd, _resources)
  _baseline_buffer=RID();_last_baseline=PackedByteArray();_report("finish_ready",false);_report("finish_bytes",0);_report("edge_active",false);_report("edge_bytes",0);_report("edge_size",[0,0])
  _report("twilight_shadow_weight",0.)
  _report("daylight_shadow_grade",0.)
  _report("daylight_green_grade",0.)
+ _report("daylight_shadow_luminance",0.)
  _report("daylight_haze_weight",0.)
  _report("daylight_haze_spill",0.)
  super(rd)
@@ -241,6 +253,14 @@ vec3 recover_green_shade(vec3 graded, vec3 original) {
  float y_restore = clamp((original_y - y) * .50, 0.0, .022);
  return chroma * (1.0 + weight * y_restore / y);
 }
+vec3 lift_shaded_detail(vec3 color) {
+ float gain = base[4].z;
+ if (gain <= 0.0) return color;
+ float luminance = dot(color, luma);
+ // Preserve the darkest contacts and sunlit faces. A shared RGB gain retains the shadow hue.
+ float mask = smoothstep(.004, .026, luminance) * (1.0 - smoothstep(.066, .180, luminance));
+ return color * (1.0 + gain * mask);
+}
 """
  var diffusion_condition := "base[1].w > 0."
  if not depth_shader.is_empty():
@@ -272,7 +292,8 @@ vec3 recover_green_shade(vec3 graded, vec3 original) {
   vec3 mixed_finish = mix(original_finish, inverse_display(clamp(display,0.,1.)), base[1].z);
   vec3 previous_finish = recover_twilight_shadow_color(mixed_finish, original_finish);
   vec3 neutral_finish = recover_daylight_shadow_color(mixed_finish, original_finish, previous_finish);
-  result = vec4(recover_green_shade(neutral_finish, original_finish), color.a);
+  vec3 finish = recover_green_shade(neutral_finish, original_finish);
+  result = vec4(lift_shaded_detail(finish), color.a);
  """)
  if _render_edge:
   fragment=fragment.replace("color.a);", "color.a);result.rgb=clamp(gaf_display(result.rgb),0.,1.);")

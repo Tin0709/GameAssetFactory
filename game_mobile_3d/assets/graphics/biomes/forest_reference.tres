@@ -72,6 +72,7 @@ projected_opening_recovery_by_hour = SubResource("ProjectedOpeningRecovery")
 afternoon_key_by_hour = SubResource("AfternoonKey")
 ambient_energy_by_hour = SubResource("ForestAmbientHours")
 shadow_grade_recovery_by_hour = SubResource("ShadowGradeRecovery")
+daylight_shadow_luminance_scale = 0.3
 daylight_green_grade_scale = 1.0
 shadowed_wall_return_scale = 1.5
 sheltered_stone_return_scale = 1.6

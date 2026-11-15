@@ -157,6 +157,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
 	&"cool_shadow_detail": ["Cool shadow detail", 1.],
 	&"daylight_shadow_grade": ["Dịu sắc xanh trong bóng ban ngày", 1.],
+	&"daylight_shadow_luminance": ["Chi tiết vùng râm sáng và chiều", 1.],
 	&"daylight_green_grade": ["Dịu màu cỏ và lá trong bóng", 1.],
 	&"spruce_sky": ["Forest canopy sky", 1.],
 	&"canopy_edge_fill": ["Ánh trời rìa tán", 1.],
@@ -267,7 +268,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 171
+const LIGHTING_MIX_VERSION := 172
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2273,6 +2274,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 171 and effect == &"actor_shade_sky":
 			missing_value = 0.
+		if version < 172 and effect == &"daylight_shadow_luminance":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2477,6 +2480,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and plants != null and plants.grass_light.active and plants.dense_grass_review
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
+		if effect == &"daylight_shadow_luminance":
+			slider.editable = slider.editable and phase_finish != null and phase_finish.available()
 		if effect == &"twilight_shadow_lift":
 			slider.editable = slider.editable and phase_finish != null and phase_finish.available() and sky_response.twilight_available()
 		if effect == &"twilight_soft_bloom":
@@ -2608,7 +2613,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"stone_twilight_color":
 		_publish_stone_twilight_color()
 		return
-	if changed_effect in [&"twilight_shadow_color", &"cool_shadow_detail", &"daylight_shadow_grade", &"daylight_green_grade"]:
+	if changed_effect in [&"twilight_shadow_color", &"cool_shadow_detail", &"daylight_shadow_grade",
+			&"daylight_green_grade", &"daylight_shadow_luminance"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -2883,6 +2889,11 @@ func _daylight_grade_phase() -> float:
 
 func daylight_shadow_grade_weight() -> float:
 	return _daylight_grade_phase() * _lighting_scale(&"daylight_shadow_grade")
+
+func daylight_shadow_luminance() -> float:
+	if _biome_profile == null:
+		return 0.
+	return _daylight_grade_phase() * _biome_profile.daylight_shadow_luminance_scale * _lighting_scale(&"daylight_shadow_luminance")
 
 func daylight_green_grade_weight() -> float:
 	if _biome_profile == null:

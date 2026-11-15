@@ -92,6 +92,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var color_correction: Texture
 ## Normalized hours for restoring neutral shadow color in the reference finish.
 @export var shadow_grade_recovery_by_hour: Curve
+## Maximum luminance gain for shaded detail under the same hour curve.
+@export_range(0., .52, .01) var daylight_shadow_luminance_scale := 0.
 ## Shadow recovery for dark greens in the optional reference finish.
 @export_range(0., 1., .01) var daylight_green_grade_scale := 0.
 
