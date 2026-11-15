@@ -56,6 +56,9 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var actor_shade_sky_by_hour: Curve
 ## Fraction of the local upper-sky deficit returned to shaded lateral faces.
 @export var actor_side_sky_by_hour: Curve
+## Ground reflection from the player's lantern during the handoff to night.
+## Curve X is normalized hour. Y is the fraction of the daytime gap to fill.
+@export var lantern_ground_return_by_hour: Curve
 
 @export_group("Atmosphere and fog")
 @export var noon_sky_color := Color(.57, .68, .69)

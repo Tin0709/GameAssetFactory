@@ -141,7 +141,7 @@ func _kai_ground_bounce(position: Vector3) -> Vector4:
   or level.view_mode != "gameplay" or not review.source_terrain_active or not is_instance_valid(light)
   or not light.is_visible_in_tree() or light.light_energy <= 0. or light.omni_range <= 0.):
   return Vector4.ZERO
- var gain: float = review._night_grass_weight() * review._lighting_scale(&"kai_ground_bounce")
+ var gain: float = review.kai_lantern_ground_return_weight()
  if gain <= 0.:
   return Vector4.ZERO
  var look = level.look

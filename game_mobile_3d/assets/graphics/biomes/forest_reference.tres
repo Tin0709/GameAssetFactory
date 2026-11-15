@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=22 format=3]
+[gd_resource type="Resource" load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -67,6 +67,10 @@ point_count = 8
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.68), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.68), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 8
 
+[sub_resource type="Curve" id="ForestLanternGroundReturn"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.766666667, 0), 0.0, 0.0, 0, 0, Vector2(0.808333333, 0.75), 0.0, 0.0, 0, 0, Vector2(0.875, 0.75), 0.0, 0.0, 0, 0, Vector2(0.895833333, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 6
+
 [sub_resource type="Curve" id="ForestBarkIrradiance"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.6), 0.0, 0.0, 0, 0, Vector2(0.777777778, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 5
@@ -117,6 +121,7 @@ bark_diffuse_return_by_hour = SubResource("ForestBarkDiffuseReturn")
 bark_diffuse_return_tint = Vector3(0.57, 1, 1.39)
 twilight_leaf_lamp_shoulder_strength = 0.4
 actor_shade_sky_by_hour = SubResource("ForestActorShadeSky")
+lantern_ground_return_by_hour = SubResource("ForestLanternGroundReturn")
 actor_side_sky_by_hour = SubResource("ForestActorSideSky")
 alternate_mist_by_hour = SubResource("LowForestMistPhase")
 mist_entry_scatter_by_hour = SubResource("ForestEntryScatter")

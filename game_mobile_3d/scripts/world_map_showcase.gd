@@ -127,6 +127,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"player_sky": ["Player sky fill", 2.],
 	&"player_bounce": ["Ánh nắng hắt lên nhân vật", 1.],
 	&"kai_ground_bounce": ["Ánh hắt từ nền lên Kai ban đêm", 1.5],
+	&"kai_twilight_ground_bounce": ["Ánh hắt từ nền lên Kai lúc lên đèn", 1.],
 	&"foot_contact": ["Bóng tiếp xúc dưới chân", 1.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"turf_ambient_color": ["Sắc ánh hắt trên cỏ lúc tối", 1.],
@@ -289,7 +290,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 186
+const LIGHTING_MIX_VERSION := 187
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2110,6 +2111,21 @@ func _night_grass_weight() -> float:
 		return 0.0
 	return moonlight_weight(hour)
 
+func kai_lantern_ground_return_weight() -> float:
+	if _balanced_preview or not forest_active() or atmosphere_review != "combined":
+		return 0.
+	var night := moonlight_weight(hour)
+	var night_return := night * _lighting_scale(&"kai_ground_bounce")
+	if night >= 1. or _biome_profile == null:
+		return night_return
+	var twilight := clampf(DayNight.sample_curve(_biome_profile.lantern_ground_return_by_hour, hour / 24., 0.), 0., 1.)
+	return night_return + (1. - night) * twilight * _lighting_scale(&"kai_twilight_ground_bounce")
+
+func _kai_twilight_ground_bounce_editable() -> bool:
+	return RenderingServer.get_current_rendering_method() == "mobile" \
+		and RenderingServer.get_rendering_device() != null and level.look.player_material.available() \
+		and _biome_profile != null and _biome_profile.lantern_ground_return_by_hour != null
+
 func grass_shadow_height_scale() -> float:
 	var height := _twilight_grass_shadow_height_scale()
 	if not forest_active() or atmosphere_review != "combined" or _balanced_preview or not level.look.direct_clouds_active():
@@ -2498,6 +2514,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 187 and effect == &"kai_twilight_ground_bounce":
+			missing_value = 0.
 		if version < 186 and effect == &"kai_shade_sky":
 			missing_value = 0.
 		if version < 185 and effect == &"stone_sun_warmth":
@@ -2722,6 +2740,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_shade_sky_by_hour != null
 		if effect == &"kai_shade_sky":
 			slider.editable = slider.editable and _kai_shade_sky_editable()
+		if effect == &"kai_twilight_ground_bounce":
+			slider.editable = slider.editable and _kai_twilight_ground_bounce_editable()
 		if effect == &"actor_side_sky":
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_side_sky_by_hour != null
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
@@ -2942,7 +2962,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if level.player_light != null:
 			level.player_light.refresh_shade_sky()
 		return
-	if changed_effect in [&"player_sky", &"player_bounce", &"kai_ground_bounce", &"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
+	if changed_effect in [&"player_sky", &"player_bounce", &"kai_ground_bounce", &"kai_twilight_ground_bounce",
+			&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 		if level.player_light != null:
 			level.player_light.refresh()
 		return
@@ -3565,6 +3586,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
 		if effect == &"kai_shade_sky":
 			slider.editable = not _balanced_preview and _kai_shade_sky_editable()
+		if effect == &"kai_twilight_ground_bounce":
+			slider.editable = not _balanced_preview and _kai_twilight_ground_bounce_editable()
 		if effect in [&"canopy_player_cue", &"canopy_cue_day_tone", &"canopy_cue_clarity", &"canopy_cue_softness"]:
 			slider.editable = level.canopy_player_cue.available(level)
 		if effect == &"crown_ambient_depth":
