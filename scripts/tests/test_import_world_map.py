@@ -217,10 +217,24 @@ class ImportWorldMapTests(unittest.TestCase):
             (presets / "broken_valley.tres").write_text(template.replace(
                 "[resource]", '[ext_resource type="Resource" path="res://missing.tres" id="extra"]\n\n[resource]'),
                 encoding="utf-8")
+            nested_template = template.replace(
+                "[resource]", '[ext_resource type="Resource" path="res://assets/graphics/biomes/layers.tres" id="layers"]\n\n[resource]')
+            (presets / "nested_valley.tres").write_text(nested_template, encoding="utf-8")
+            (presets / "layers.tres").write_text(
+                '[gd_resource type="Resource" load_steps=2 format=3]\n'
+                '[ext_resource type="Texture2D" uid="uid://placeholder" path="res://missing_lut.png" id="lut"]\n'
+                '[resource]\n', encoding="utf-8")
+            external_lut = (Path(temporary) / "local_lut.png").as_posix()
+            Path(external_lut).touch()
+            (presets / "external_valley.tres").write_text(template.replace(
+                "[resource]", f'[ext_resource type="Texture2D" path="{external_lut}" id="lut"]\n\n[resource]')
+                + 'color_correction = ExtResource("lut")\n', encoding="utf-8")
             cases = {
                 "custom_valley": None,
                 "CUSTOM_VALLEY": "Cannot read biome preset",
                 "broken_valley": "has an unavailable dependency",
+                "nested_valley": "res://missing_lut.png",
+                "external_valley": "has a dependency outside the Godot project",
                 "private_valley": "requires private reference data",
                 "private_lookup": "requires private reference data",
                 "fake_profile": "must use BiomeGraphicsProfile",
