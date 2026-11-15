@@ -52,6 +52,52 @@ func verify() -> void:
 		check(false, "Both maps need the same low-air sampling function")
 	check(profile.day_night != null and is_equal_approx(graphics.weather_weight, .25),
 		"Woodland profile must load with its own day/night colors and starting weather")
+	var settings = world.showcase._settings
+	var preset := settings._widgets.get("biome-preset") as OptionButton
+	var quality := settings._widgets.get("biome-quality") as OptionButton
+	check(preset != null and quality != null, "Imported maps expose biome and quality in the mouse settings menu")
+	if preset != null and quality != null:
+		var map_hud := world.get_node("HUD") as CanvasLayer
+		var was_visible := map_hud.visible
+		var hud_key := InputEventKey.new()
+		hud_key.physical_keycode = KEY_L
+		hud_key.pressed = true
+		world._input(hud_key)
+		check(map_hud.visible != was_visible, "L still toggles the HUD on an imported map")
+		world._input(hud_key)
+		map_hud.show()
+		settings.gear.pressed.emit()
+		check(settings.panel.visible and preset.is_visible_in_tree() and quality.is_visible_in_tree(),
+			"Settings opens both selections through the gear button")
+		var start_position: Vector3 = world.player.position
+		var start_hour: float = world.showcase.hour
+		preset.get_popup().about_to_popup.emit()
+		preset.select(1)
+		preset.item_selected.emit(1)
+		check(graphics._profile == MEADOW and is_equal_approx(world.showcase.hour, start_hour)
+			and is_equal_approx(graphics.weather_weight, .25) and world.player.position == start_position,
+			"Mouse-selected biome keeps hour, weather and the same player")
+		settings._undo_button.pressed.emit()
+		check(graphics._profile == profile and preset.selected == 0, "Undo restores the previous biome")
+		quality.get_popup().about_to_popup.emit()
+		quality.select(0)
+		quality.item_selected.emit(0)
+		check(graphics.quality == 0, "Mouse-selected quality applies immediately")
+		settings._undo_button.pressed.emit()
+		check(graphics.quality == 2 and quality.selected == 2, "Undo restores the previous quality")
+		settings.set_open(false)
+		var shortcut := InputEventKey.new()
+		shortcut.pressed = true
+		shortcut.physical_keycode = KEY_F8
+		world._input(shortcut)
+		check(preset.selected == 1 and graphics._profile == MEADOW, "F8 also updates the displayed selection")
+		world._input(shortcut)
+		shortcut.physical_keycode = KEY_F7
+		shortcut.shift_pressed = true
+		world._input(shortcut)
+		check(quality.selected == 1 and graphics.quality == 1, "Shift+F7 updates the displayed quality")
+		graphics.set_quality(2)
+		map_hud.visible = was_visible
 	if profile.day_night == null:
 		finish(world)
 		return
