@@ -198,6 +198,8 @@ func run() -> void:
 			var old_density: float = graphics._mist_sample.volume_density
 			var old_payload: PackedByteArray = graphics._mist.effect._parameters
 			graphics.set_profile(chromatic_profile)
+			await process_frame
+			await RenderingServer.frame_post_draw
 			var payload: PackedByteArray = graphics._mist.effect._parameters
 			var rgb := Vector3(payload.decode_float(112), payload.decode_float(116), payload.decode_float(120))
 			var old_rgb := Vector3(old_payload.decode_float(112), old_payload.decode_float(116), old_payload.decode_float(120))
@@ -218,6 +220,8 @@ func run() -> void:
 				"Overcast retints the authored scattering at constant luminance")
 			graphics.set_weather(0., 0.)
 			map.showcase.set_hour(12.)
+			await process_frame
+			await RenderingServer.frame_post_draw
 			payload = graphics._mist.effect._parameters
 			check(is_equal_approx(payload.decode_float(124), .42), "Noon uses the authored neutral energy multiplier")
 			graphics.set_profile(selected_profile)
