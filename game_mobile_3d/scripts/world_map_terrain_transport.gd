@@ -395,10 +395,12 @@ func bind(force:bool=false)->void:
 	var stone_wall_sky: float = level.showcase.stone_wall_sky_weight()
 	var response:bool=level.look.terrain_visibility_response
 	var dielectric:bool=level.look.terrain_dielectric_response and level.look.terrain_review=="combined"
-	if (not force and key == _last_key and scale == _last_scale and tint == _last_tint
+	var transport_unchanged := (key == _last_key and scale == _last_scale and tint == _last_tint
 			and turf_color == _last_turf_color and stone_softness == _last_stone_softness
 			and dawn_stone_color == _last_dawn_stone_color and stone_day_sky == _last_stone_day_sky
-			and stone_wall_sky == _last_stone_wall_sky and response == _last_response and dielectric == _last_dielectric):
+			and response == _last_response and dielectric == _last_dielectric)
+	var wall_sky_changed := force or stone_wall_sky != _last_stone_wall_sky
+	if not force and transport_unchanged and not wall_sky_changed:
 		return
 	_last_key=key;_last_scale=scale;_last_tint=tint;_last_response=response
 	_last_dielectric=dielectric
@@ -412,13 +414,16 @@ func bind(force:bool=false)->void:
 	for chunk in level.geometry._cutaway_chunks:
 		for m in chunk.materials:materials[m]=true
 	for m:ShaderMaterial in materials:
+		if wall_sky_changed and m.get_shader_parameter("ground_grade") == 3:
+			m.set_shader_parameter("stone_wall_sky", stone_wall_sky)
+		if not force and transport_unchanged:
+			continue
 		m.set_shader_parameter("terrain_key_radiance",key);m.set_shader_parameter("terrain_ambient_scale",scale);m.set_shader_parameter("terrain_ambient_tint",tint)
 		m.set_shader_parameter("terrain_colored_visibility",response)
 		m.set_shader_parameter("turf_ambient_color", turf_color)
 		m.set_shader_parameter("night_stone_blue_softness", stone_softness)
 		m.set_shader_parameter("dawn_stone_sky_color", dawn_stone_color)
 		m.set_shader_parameter("stone_day_sky", stone_day_sky)
-		m.set_shader_parameter("stone_wall_sky", stone_wall_sky)
 		var compatible:bool=dielectric and is_zero_approx(float(m.get_shader_parameter("native_metallic")))
 		m.set_shader_parameter("terrain_dielectric_response",compatible);m.set_shader_parameter("terrain_rough_reflection",compatible);m.set_shader_parameter("terrain_env_brdf",BRDF)
 func _process(_delta:float)->void:
