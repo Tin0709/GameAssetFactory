@@ -145,7 +145,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"twilight_grass_albedo": ["Độ dịu lá cỏ chạng vạng", 1.],
 	&"lantern_grass_tone": ["Sắc đèn hông trên cỏ", 1.],
 	&"grass_shadow_reach": ["Grass shadow reach", 1.],
-	&"day_grass_shadow_compactness": ["Day grass shadow compactness", 1.],
+	&"day_grass_shadow_compactness": ["Day grass shadow compactness", 2.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
 	&"cool_shadow_detail": ["Cool shadow detail", 1.],
@@ -255,7 +255,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 160
+const LIGHTING_MIX_VERSION := 161
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1595,6 +1595,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .45
 	if effect == &"grass_root_tone":
 		return .85
+	if effect == &"day_grass_shadow_compactness" and _biome_profile != null:
+		return _biome_profile.day_grass_shadow_compactness
 	if effect == &"forest_path_beam":
 		return .65
 	if effect in [&"night_mist_light", &"forest_path_air"]:
@@ -1875,7 +1877,12 @@ func grass_shadow_height_scale() -> float:
 	# Keep the existing twilight reach correction and the approved Noon and Night.
 	var morning := smoothstep(5.5, 7.0, hour) * (1.0 - smoothstep(7.0, 12.0, hour))
 	var afternoon := smoothstep(12.0, 16.5, hour) * (1.0 - smoothstep(16.5, 19.0, hour))
-	return height * (1.0 - 0.15 * _lighting_scale(&"day_grass_shadow_compactness") * (morning + afternoon))
+	var phase := morning + afternoon
+	var strength := _lighting_scale(&"day_grass_shadow_compactness")
+	var original_range := height * (1.0 - .15 * minf(strength, 1.) * phase)
+	# Keep saved values through 100%. Beyond that, approach the tested height
+	# without multiplying the existing low-sun correction a second time.
+	return lerpf(original_range, minf(original_range, .70), maxf(0., strength - 1.) * phase)
 
 func _twilight_grass_shadow_height_scale() -> float:
 	var strength := _lighting_scale(&"grass_shadow_reach") * twilight_color_weight()

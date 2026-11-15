@@ -21,6 +21,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., 2.) var noon_ambient_energy := .32
 @export_range(0., 4., .05) var shadow_blur := 1.25
 @export_range(0., 1., .01) var shadow_opacity := .782
+## Daylight caster adjustment for maps with the grass lighting adapter.
+@export_range(0., 2., .01) var day_grass_shadow_compactness := 1.
 ## Local diffuse response around a map-authored opening.
 @export_range(0., .65, .01) var local_diffuse_strength := 0.
 @export var local_diffuse_by_hour: Curve

@@ -44,6 +44,7 @@ point_count = 6
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
 use_forest_reference = true
+day_grass_shadow_compactness = 2.0
 projected_opening_recovery_by_hour = SubResource("ProjectedOpeningRecovery")
 afternoon_key_by_hour = SubResource("AfternoonKey")
 alternate_mist_by_hour = SubResource("LowForestMistPhase")
