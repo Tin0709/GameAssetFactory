@@ -41,6 +41,13 @@ Quy trình trên đã chạy với `Testing.litematic` (50 × 50 m, 5.632 cell) 
 
 Khi chuyển sang preset không dùng spatial mist hoặc bloom thích ứng, renderer giải phóng bộ đệm riêng của hiệu ứng đó và dùng fog/glow tích hợp theo preset mới. Chuyển lại dựng lại hiệu ứng trên cùng camera. Với `Testing.litematic` ở 19:30 trên Forward Mobile/D3D12 (640 × 360), đổi sang Đồng cỏ giải phóng 2.017.840 byte bộ đệm do hai hiệu ứng quản lý. Quay lại Rìa rừng ẩm giữ giờ và khôi phục ảnh trùng từng pixel trong bài đo camera cố định.
 
+### Kiểm tra map mới trước khi chỉnh riêng
+
+- Chạy scene vừa sinh và kiểm tra map với preset đã chọn, trước khi thêm đèn hoặc vùng sương. Rìa rừng ẩm có thể chạy spatial mist và adaptive bloom ngay từ scene do importer tạo. Dữ liệu bake của Forest thuộc bố cục Forest. Nếu map mới cần bake, dựng dữ liệu từ hình học của map đó.
+- Đứng yên ở một góc nhìn có cả đất, cỏ, đá và nhân vật. So hai preset bằng **F8** ở sáng, trưa, chiều và tối. Dùng **F6** trong cửa sổ game để thử nhiều mây tại cùng một giờ. **Shift+F7** kiểm tra đường dự phòng cho máy yếu. Khi chốt, lưu **Biome Graphics** và **Biome Quality** trong Inspector của scene.
+
+Đã chạy lại luồng import sạch từ `Testing.litematic` vào thư mục thử riêng. Scene sinh tự động nạp đủ 5.632 cell và chạy chung shader với map review, kể cả khi chưa đặt vùng sương hay đèn. Trên Windows, 65 kiểm tra Forward Mobile/D3D12, 28 kiểm tra Compatibility và 15 kiểm tra importer đều qua. Bộ 12 ảnh của `MeadowBiomeReview` dùng cùng camera để so hai preset ở năm mốc giờ và một lượt trời nhiều mây.
+
 ## Địa hình trang trí ở rìa map
 
 Trong WorldMap, vào **L → Cài đặt → Sương & hiệu ứng → Sương theo khoảng cách → Địa hình xa sau bậc đá** để so bật/tắt. Lớp địa hình này nhận sắc ánh môi trường của biome và sương tại độ sâu của chính nó. Nó bật mặc định trong Kết hợp. Preset lưu trước phiên bản 158 tắt lớp này khi thiếu tùy chọn để tái hiện hình đã lưu.
