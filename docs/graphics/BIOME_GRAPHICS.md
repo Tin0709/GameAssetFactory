@@ -184,6 +184,12 @@ Trong MeadowBiomeReview, bấm **T** tới 22:00 rồi đi về X = 4,5, Z = −
 
 Để dùng cột đèn ForestA1 trên một map khác, đặt **Biome Path Lamp Xz** và **Biome Path Lamp Yaw Degrees** trên node map. Chân cột cần một mặt bằng ngang. Mesh và collider thân cột hiện cả ban ngày. Biome dùng **Path Fixture By Hour**, **Energy** và **Scatter** để điều khiển phát sáng, đèn điểm và tán xạ. Khi có cả hai vị trí, cột đèn được ưu tiên và bếp lửa là fallback. Trên WorldMap, mục **Cột đèn lối rừng** ở **Ánh sáng → Đèn và vật phát sáng** chuyển giữa hai bố trí. Cột cũng cần các file riêng tư đã xác minh và chạy trong editor Mobile.
 
+## Vệt nắng cạnh cột đèn Forest
+
+Bản F5 trên Forward Mobile dùng vị trí mới cho cây vân sam cạnh lối rừng. Đoạn đường tại X = −22,5, Z = 17–20 nhận thêm một vệt nắng lúc sáng và đầu chiều. Hãy bấm **Shift+G** rồi đi về phía cột đèn. Có thể xem dưới ánh chiều bằng nút **Golden**. Ảnh so sánh dùng thêm 09:30 và 14:15 để thấy rõ khe nắng.
+
+WorldMap xác minh hồ sơ bố trí, ánh trời và atlas sương cùng lúc rồi mới dịch cây và collider. Nếu bộ mới thiếu hoặc sai hash, scene dùng bộ bố trí Forest trước đó. Map import dùng preset riêng. Tài nguyên dựng lại nằm trong MD2 Research.
+
 ## Bậc thấp cạnh đường rừng
 
 **F5** mở WorldMap với bậc thấp mặc định trong bản chơi thử private dùng Forward Mobile. Bấm **L**, mở **Cài đặt** và dùng **Bậc thấp cạnh đường rừng** để so riêng bậc, vị trí chân cỏ và va chạm. **B** so toàn bộ đồ họa với bản gốc. Nếu nhân vật ở trong phần sẽ xuất hiện, bước ra ngoài mép để bậc được bật lại.
