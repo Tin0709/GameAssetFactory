@@ -59,17 +59,19 @@ void light() {
 		max(LIGHT_COLOR.r, max(LIGHT_COLOR.g, LIGHT_COLOR.b)) > 0.0 &&
 		dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_shade_fill.xyz) > 0.9999 &&
 		distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
-		// Use the receiver's existing sky and contact terms on sun-facing rock in shadow.
 		float shade = 1.0 - smoothstep(.04, .68, ATTENUATION);
-		float facing = smoothstep(.03, .38, nl);
-		if (gaf_stone_shade_reach > 0.0) {
-			// Indirect fill can reach a face even when it points away from the sun.
-			float open_sky = smoothstep(.45, .97, terrain_canopy_sky);
-			facing = mix(facing, max(facing, .48 + .22 * open_sky), gaf_stone_shade_reach);
+		if (gaf_stone_shade_fill.w > 0.0) {
+			// Use the receiver's existing sky and contact terms on sun-facing rock in shadow.
+			float facing = smoothstep(.03, .38, nl);
+			if (gaf_stone_shade_reach > 0.0) {
+				// Indirect fill can reach a face even when it points away from the sun.
+				float open_sky = smoothstep(.45, .97, terrain_canopy_sky);
+				facing = mix(facing, max(facing, .48 + .22 * open_sky), gaf_stone_shade_reach);
+			}
+			vec3 sky = terrain_opening_incident;
+			vec3 fill = mix(sky, vec3(dot(sky, vec3(.2126, .7152, .0722))), .40);
+			DIFFUSE_LIGHT += fill * (facing * shade * gaf_stone_shade_fill.w);
 		}
-		vec3 sky = terrain_opening_incident;
-		vec3 fill = mix(sky, vec3(dot(sky, vec3(.2126, .7152, .0722))), .40);
-		DIFFUSE_LIGHT += fill * (facing * shade * gaf_stone_shade_fill.w);
 #ifdef GAF_TERRAIN_NIGHT_SKY
 		if (gaf_stone_wall_return > 0.0 && shade > 0.0) {
 			// Use the map's directional diffuse cache while protecting flat tops and direct light.
