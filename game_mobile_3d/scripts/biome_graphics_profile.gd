@@ -98,6 +98,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., .52, .01) var daylight_shadow_luminance_scale := 0.
 ## Shadow recovery for dark greens in the optional reference finish.
 @export_range(0., 1., .01) var daylight_green_grade_scale := 0.
+## Keep the reference local-exposure blur footprint steadier when zooming out.
+@export_range(0., 1., .01) var zoom_exposure_blur_strength := 0.
 
 @export_group("Bloom")
 @export_range(0., 2.) var glow_intensity := .42

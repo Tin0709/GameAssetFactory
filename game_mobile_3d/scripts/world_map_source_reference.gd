@@ -4,6 +4,7 @@ var _source_frame:=-1
 var _source_strength:=0.
 var _source_shadow_lift:=1.
 var _guide_scale := 1.
+var _blur_scale := 1.
 var _submitted_guide_scale := 1.
 var _guide_buffer := RID()
 var _original_guide_weight := 0.
@@ -13,9 +14,20 @@ func set_guide_scale(value: float) -> void:
  _guide_scale = clampf(value, 0., 1.) if is_finite(value) else 1.
  _mutex.unlock()
 
+func set_blur_scale(value: float) -> void:
+ _mutex.lock()
+ _blur_scale = clampf(value, .5, 1.) if is_finite(value) else 1.
+ _mutex.unlock()
+
+func _statistics_blur_scale() -> float:
+ _mutex.lock()
+ var scale := _blur_scale
+ _mutex.unlock()
+ return scale
+
 func rendered_source()->Dictionary:
  return {"frame":_source_frame,"strength":_source_strength,"shadow_lift":_source_shadow_lift,
-  "guide_scale":_submitted_guide_scale}
+  "guide_scale":_submitted_guide_scale,"blur_scale":_graph.blur_scale}
 
 func _storage_uniform(rd: RenderingDevice, binding: int, bytes: PackedByteArray) -> RDUniform:
  var uniform := super(rd, binding, bytes)

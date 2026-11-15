@@ -123,6 +123,8 @@ func _render_pass(rd:RenderingDevice,framebuffer:RID,pipeline:RID,uniform_set:RI
  rd.draw_list_draw(list,false,1,3);rd.draw_list_end()
 func _render_callback(kind:int,data:RenderData)->void:
  _render_frame(kind,data);_publish_snapshot()
+func _statistics_blur_scale() -> float:
+ return 1.
 func _render_frame(kind:int,data:RenderData)->void:
  if kind!=CompositorEffect.EFFECT_CALLBACK_TYPE_POST_TRANSPARENT or not _error.is_empty():return
  var buffers:RenderSceneBuffersRD=data.get_render_scene_buffers();var rd:=RenderingServer.get_rendering_device()
@@ -138,7 +140,7 @@ func _render_frame(kind:int,data:RenderData)->void:
   if not _initialize_pipeline(rd,color,format)or not _initialize_live(rd):return
   _ready_live=true
  _draw(rd,_copy_fb,_source_set,1.);_render_pass(rd,_half_fb,_first_pipeline,_first_set)
- if not _graph.execute():_error=_graph.error;return
+ if not _graph.execute(_statistics_blur_scale()):_error=_graph.error;return
  _mutex.lock();var neutral:=_neutral;var strength:=_strength;var shadow_lift:=_shadow_lift;_mutex.unlock()
  _render_pass(rd,_scene_fb,_final_pipeline,_final_set,PackedFloat32Array([0. if neutral else 1.,strength,shadow_lift,0.]).to_byte_array())
  _mutex.lock();_frames+=1;_mutex.unlock()

@@ -9,6 +9,9 @@ var _grid:Dictionary={}
 var _pyramid:Array[Dictionary]=[]
 var _log:Dictionary={}
 var _blur:Array[Dictionary]=[]
+var _blur_parameter_buffers: Array[RID] = []
+var _blur_base_parameters: Array[PackedByteArray] = []
+var blur_scale := 1.
 func _keep(rid:RID)->RID:
  if rid.is_valid():owned.append(rid)
  else:error="Failed to create a RenderingDevice resource"
@@ -73,14 +76,32 @@ func initialize(rd:RenderingDevice,source_half:RID,parameters:Dictionary,folder:
  for i in 2:
   var target:RID=blur_h if i==0 else blur_v;var framebuffer:=_keep(device.framebuffer_create([target]))
   if not blur_pipeline.is_valid():blur_pipeline=_raster(blur_shader,framebuffer)
-  _blur.append({"pipeline":blur_pipeline,"framebuffer":framebuffer,"set":_uniform_set(blur_shader,[_sample(0,source,mirror),_buffer(1,parameters.blur[i])])});source=target
+  var blur_parameters := _buffer(1, parameters.blur[i])
+  _blur_parameter_buffers.append(blur_parameters.get_ids()[0])
+  _blur_base_parameters.append(parameters.blur[i])
+  _blur.append({"pipeline":blur_pipeline,"framebuffer":framebuffer,"set":_uniform_set(blur_shader,[_sample(0,source,mirror),blur_parameters])});source=target
  return error.is_empty()
 func _dispatch(pass_data:Dictionary)->void:
  var list:=device.compute_list_begin();device.compute_list_bind_compute_pipeline(list,pass_data.pipeline);device.compute_list_bind_uniform_set(list,pass_data.set,0);device.compute_list_dispatch(list,pass_data.groups.x,pass_data.groups.y,pass_data.groups.z);device.compute_list_end()
 func _draw(pass_data:Dictionary)->void:
  var list:=device.draw_list_begin(pass_data.framebuffer);device.draw_list_bind_render_pipeline(list,pass_data.pipeline);device.draw_list_bind_uniform_set(list,pass_data.set,0);device.draw_list_draw(list,false,1,3);device.draw_list_end()
-func execute()->bool:
- if not error.is_empty():return false
+func _apply_blur_scale(scale: float) -> bool:
+ if scale == blur_scale:
+  return true
+ for index in _blur_parameter_buffers.size():
+  var data := _blur_base_parameters[index].duplicate()
+  # Slot zero contains the sampling alignment. Scale only the seventeen tap offsets.
+  for tap in range(1, 18):
+   var offset := tap * 16
+   data.encode_float(offset, data.decode_float(offset) * scale)
+   data.encode_float(offset + 4, data.decode_float(offset + 4) * scale)
+  if device.buffer_update(_blur_parameter_buffers[index], 0, data.size(), data) != OK:
+   error = "Could not update the local exposure blur offsets"
+   return false
+ blur_scale = scale
+ return true
+func execute(blur_width: float = 1.)->bool:
+ if not error.is_empty() or not _apply_blur_scale(blur_width):return false
  _dispatch(_grid)
  for pass_data:Dictionary in _pyramid:_draw(pass_data)
  _dispatch(_log)
@@ -90,3 +111,4 @@ func release()->void:
  owned.reverse()
  for rid:RID in owned:device.free_rid(rid)
  owned.clear();outputs.clear();_grid.clear();_pyramid.clear();_log.clear();_blur.clear()
+ _blur_parameter_buffers.clear();_blur_base_parameters.clear();blur_scale=1.

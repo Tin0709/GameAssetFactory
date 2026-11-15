@@ -138,6 +138,10 @@ func refresh()->void:
  if not showcase._balanced_preview and camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
   zoom_weight = smoothstep(29., 40., camera.size)
  _native.set_guide_scale(lerpf(1., .30, zoom_weight * showcase._lighting_scale(&"zoom_exposure_guide")))
+ var blur_scale := 1.
+ if camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+  blur_scale = lerpf(1., 18. / clampf(camera.size, 18., 26.), showcase.zoom_exposure_blur_weight())
+ _native.set_blur_scale(blur_scale)
  effect.set_review_strength(_saved_strength*(1.-weight)*gain_scale)
  effect.set_finish_weight(weight*finish_scale);effect.set_reference_grade(true)
  var shadow_color: float = showcase.shadow_color_detail_weight() if finish_scale > 0. else 0.

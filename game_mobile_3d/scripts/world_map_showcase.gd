@@ -209,6 +209,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"cliff_vista": ["Địa hình xa sau bậc đá", 1.],
 	&"cliff_vista_feather": ["Dịu mép địa hình khi zoom xa", 1.],
 	&"zoom_exposure_guide": ["Ổn định sáng tối khi zoom xa", 1.],
+	&"zoom_exposure_blur": ["Giữ ánh sáng ổn định khi cuộn zoom", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
@@ -271,7 +272,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 173
+const LIGHTING_MIX_VERSION := 174
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2315,6 +2316,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 173 and effect == &"shadow_diffuse_return":
 			missing_value = 0.
+		if version < 174 and effect == &"zoom_exposure_blur":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2648,7 +2651,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"cliff_vista", &"cliff_vista_feather"]:
 		_update_mist()
 		return
-	if changed_effect == &"zoom_exposure_guide":
+	if changed_effect in [&"zoom_exposure_guide", &"zoom_exposure_blur"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -2941,6 +2944,11 @@ func daylight_green_grade_weight() -> float:
 	if _biome_profile == null:
 		return 0.
 	return _daylight_grade_phase() * _biome_profile.daylight_green_grade_scale * _lighting_scale(&"daylight_green_grade")
+
+func zoom_exposure_blur_weight() -> float:
+	if _biome_profile == null:
+		return 0.
+	return _daylight_grade_phase() * _biome_profile.zoom_exposure_blur_strength * _lighting_scale(&"zoom_exposure_blur")
 
 func _publish_stone_twilight_color() -> void:
 	if level != null and level.look != null:
