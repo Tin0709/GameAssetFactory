@@ -155,6 +155,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
 	&"cool_shadow_detail": ["Cool shadow detail", 1.],
 	&"daylight_shadow_grade": ["Dịu sắc xanh trong bóng ban ngày", 1.],
+	&"daylight_green_grade": ["Dịu màu cỏ và lá trong bóng", 1.],
 	&"spruce_sky": ["Forest canopy sky", 1.],
 	&"canopy_edge_fill": ["Ánh trời rìa tán", 1.],
 	&"canopy_sky_color": ["Sắc ánh trời dưới tán", 1.],
@@ -261,7 +262,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 165
+const LIGHTING_MIX_VERSION := 166
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1604,6 +1605,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .3
 	if effect == &"daylight_shadow_grade":
 		return .5
+	if effect == &"daylight_green_grade":
+		return .65
 	if effect == &"stone_day_face_fill":
 		return .55
 	if effect == &"stone_shade_fill":
@@ -2227,6 +2230,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 165 and effect == &"sheltered_stone_return":
 			missing_value = 0.
+		if version < 166 and effect == &"daylight_green_grade":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2556,7 +2561,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"stone_twilight_color":
 		_publish_stone_twilight_color()
 		return
-	if changed_effect in [&"twilight_shadow_color", &"cool_shadow_detail", &"daylight_shadow_grade"]:
+	if changed_effect in [&"twilight_shadow_color", &"cool_shadow_detail", &"daylight_shadow_grade", &"daylight_green_grade"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -2817,11 +2822,19 @@ func shadow_color_detail_weight() -> float:
 	# Share the existing correction so overlapping time windows cannot stack.
 	return lerpf(twilight, maxf(twilight, phase_target), strength)
 
-func daylight_shadow_grade_weight() -> float:
+func _daylight_grade_phase() -> float:
 	if _biome_profile == null or _balanced_preview or not forest_active() or atmosphere_review != "combined":
 		return 0.
 	var weight := DayNight.sample_curve(_biome_profile.shadow_grade_recovery_by_hour, hour / 24., 0.)
-	return clampf(weight, 0., 1.) * _lighting_scale(&"daylight_shadow_grade")
+	return clampf(weight, 0., 1.)
+
+func daylight_shadow_grade_weight() -> float:
+	return _daylight_grade_phase() * _lighting_scale(&"daylight_shadow_grade")
+
+func daylight_green_grade_weight() -> float:
+	if _biome_profile == null:
+		return 0.
+	return _daylight_grade_phase() * _biome_profile.daylight_green_grade_scale * _lighting_scale(&"daylight_green_grade")
 
 func _publish_stone_twilight_color() -> void:
 	if level != null and level.look != null:
