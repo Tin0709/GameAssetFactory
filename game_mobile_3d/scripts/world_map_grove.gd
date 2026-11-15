@@ -116,6 +116,7 @@ var _spruce_root: Node3D
 var _spruce_atlas: ImageTexture
 var _spruce_appearance := ShaderMaterial.new()
 var _bark_irradiance := Vector4.ZERO
+var _twilight_leaf_lamp_shoulder := 0.
 var _bark_irradiance_tint := Vector3.ONE
 var _bark_diffuse_return := Vector3.ZERO
 var _spruce_shadow := ShaderMaterial.new()
@@ -551,6 +552,14 @@ func set_canopy_direct(value: Vector4, height: Vector2) -> void:
 func set_crown_detail(enabled: bool) -> void:
 	_canopy_appearance.set_shader_parameter("crown_detail", enabled)
 
+func set_twilight_leaf_lamp_shoulder(value: float) -> void:
+	if value == _twilight_leaf_lamp_shoulder:
+		return
+	_twilight_leaf_lamp_shoulder = value
+	for material: ShaderMaterial in [_canopy_appearance, _spruce_appearance]:
+		if material.shader != null:
+			material.set_shader_parameter("twilight_leaf_lamp_shoulder", value)
+
 func set_bark_irradiance(value: Vector4, tint: Vector3, diffuse_return := Vector3.ZERO) -> void:
 	if value == _bark_irradiance and tint == _bark_irradiance_tint and diffuse_return == _bark_diffuse_return:
 		return
@@ -595,6 +604,7 @@ func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D,
 			material.set_shader_parameter("bark_irradiance", _bark_irradiance)
 			material.set_shader_parameter("bark_irradiance_tint", _bark_irradiance_tint)
 			material.set_shader_parameter("bark_diffuse_return", _bark_diffuse_return)
+			material.set_shader_parameter("twilight_leaf_lamp_shoulder", _twilight_leaf_lamp_shoulder)
 	if player_cue_weight > 0.0:
 		material.set_shader_parameter("player_cue_weight", player_cue_weight)
 	if field != null:

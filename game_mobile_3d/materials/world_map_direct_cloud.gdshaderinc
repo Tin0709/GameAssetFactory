@@ -118,6 +118,14 @@ void light() {
 		incident*=terrain_direct_contact;
 #endif
 		if (LIGHT_IS_DIRECTIONAL) incident *= cloud_transmission;
+#ifdef GAF_WORLD_TREE_IRRADIANCE
+		if (twilight_leaf_lamp_shoulder > 0.0 && crown_local_lamp_receiver > 0.5
+				&& point_transfer < 1.0 && gaf_is_player_point(LIGHT_IS_DIRECTIONAL, LIGHT_COLOR.b)) {
+			// This is a response of the leaf to the verified hip light.
+			float reflected = dot(incident * ALBEDO, vec3(.2126, .7152, .0722));
+			incident *= 1.0 - twilight_leaf_lamp_shoulder * smoothstep(.002, .025, reflected);
+		}
+#endif
 		vec3 diffuse_incident = incident;
 #if defined(GAF_WORLD_SPATIAL_TERRAIN) || defined(GAF_WORLD_FLAT_TURF)
 		if (gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && surface_top > 0.998 && ground_grade == 1

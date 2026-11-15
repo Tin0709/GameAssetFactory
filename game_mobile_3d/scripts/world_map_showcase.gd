@@ -2,6 +2,9 @@ extends Node
 ## Owns the unified review, not the private assets or the original controller.
 const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
 const RenderSettings = preload("res://scripts/biome_render_settings.gd")
+const KaiSkin = preload("res://scripts/mechanic_lab_kai_skin.gd")
+const PlayerLantern = preload("res://scripts/world_map_player_lantern.gd")
+enum PlayerSkin { MD2, KAI }
 const DayNight = preload("res://scripts/biome_day_night.gd")
 const Weather = preload("res://scripts/biome_weather.gd")
 const DistantTerrain = preload("res://scripts/world_map_distant_terrain.gd")
@@ -206,6 +209,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"ground_haze": ["Ánh sương thấp sau tán", 1.],
 	&"mist_entry_scatter": ["Ánh tán xạ đầu lớp sương", 1.],
 	&"mist_sky_scatter": ["Ánh trời trong sương rìa tán", 1.],
+	&"mist_dusk_sky_scatter": ["Ánh trời trong sương chạng vạng", 1.],
 	&"twilight_ground_haze": ["Ánh sương thấp lúc chạng vạng", 1.],
 	&"forest_dusk_backdrop": ["Dịu màu nền xa lúc chạng vạng", 1.],
 	&"distant_terrain": ["Địa hình xa lúc chạng vạng", 1.],
@@ -246,6 +250,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"actor_view_fill_chroma": ["Hòa màu ánh bù trên Valorie", 1.],
 	&"actor_twilight_view_fill": ["Dịu ánh bù trên Valorie lúc chạng vạng", 1.],
 	&"crown_ambient_depth": ["Chiều sâu bóng trên tán", 1.],
+	&"twilight_leaf_lamp_shoulder": ["Dịu ánh đèn hông trên lá", 1.],
 	&"canopy_direct_softness": ["Dịu nắng trên tán cao", 1.],
 	&"late_canopy_sun": ["Dịu nắng còn lại khi lên đèn", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
@@ -272,11 +277,12 @@ const LIGHTING_MIX_CONTROLS := {
 	&"source_path_chroma": ["Dịu sắc đất lối rừng", 1.],
 	&"exposure": ["Local exposure", 1.],
 	&"daylight_shadow_lift": ["Daylight shadow lift", 1.],
+	&"daylight_shade_retention": ["Chiều sâu bóng râm qua sương", 1.],
 	&"twilight_shadow_lift": ["Giữ chiều sâu vùng râm", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 178
+const LIGHTING_MIX_VERSION := 182
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -355,6 +361,9 @@ var _warm_kernel_toggle:CheckButton
 var noninverse_player_light:=true
 var _point_response_toggle:CheckButton
 var _player_light:OmniLight3D
+var _kai_skin: KaiSkin
+var _skin_picker: OptionButton
+var _md2_skin_visibility: Dictionary[MeshInstance3D, bool] = {}
 var _evening_lantern_bounds := Vector2.ZERO
 var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
@@ -965,8 +974,10 @@ func _sync_distant_terrain() -> void:
 			subject_uv = camera.unproject_position(subject) / camera.get_viewport().get_visible_rect().size
 	distant_terrain.update(gain, env.fog_light_color, subject_uv)
 
-func _has_mist_sky_scatter() -> bool:
-	return mist != null and mist.has_sky_field() and _biome_profile != null and _biome_profile.mist_sky_scatter_by_hour != null
+func _has_mist_sky_scatter(dusk := false) -> bool:
+	if mist == null or not mist.has_sky_field() or _biome_profile == null:
+		return false
+	return (_biome_profile.mist_dusk_sky_scatter_by_hour if dusk else _biome_profile.mist_sky_scatter_by_hour) != null
 
 func _update_mist()->void:
 	_sync_distant_terrain()
@@ -1083,13 +1094,15 @@ func _update_mist()->void:
 		sample.ground_haze = _biome_profile.sample_ground_haze(hour, subject_depth, level.spawn_position.y,
 			_lighting_scale(&"ground_haze"), _lighting_scale(&"twilight_ground_haze"))
 		if mist.has_sky_field():
+			var scatter_strength := _lighting_scale(&"scatter")
 			sample.sky_scatter_source = _biome_profile.sample_mist_sky_scatter(
-				hour / 24., env, _lighting_scale(&"mist_sky_scatter") * _lighting_scale(&"scatter"))
+				hour / 24., env, _lighting_scale(&"mist_sky_scatter") * scatter_strength,
+				_lighting_scale(&"mist_dusk_sky_scatter") * scatter_strength)
 		sample.entry_scatter_gain = (_biome_profile.sample_mist_entry_scatter(hour / 24.)
 			* _lighting_scale(&"mist_entry_scatter"))
-	var lantern=level.player.get("lantern")
-	if lantern!=null and lantern.ready_private:
-		var origin := _lantern_light_origin(lantern.emitter_position())
+	var lantern_point := _lantern_emitter_point()
+	if lantern_point.is_finite():
+		var origin := _lantern_light_origin(lantern_point)
 		_position_lantern_light(origin)
 		emitter=origin-Vector3.UP*1.4
 	var scatter_chroma := _lighting_scale(&"scatter_chroma")
@@ -1435,18 +1448,39 @@ func set_lantern_overhead(value: bool) -> void:
 	_refresh_lantern_position()
 
 func _refresh_lantern_position() -> void:
+	_apply_lantern_emitter(_lantern_emitter_point())
+
+func _lantern_emitter_point() -> Vector3:
 	if level == null:
-		return
+		return Vector3.INF
+	if is_instance_valid(_kai_skin) and _kai_skin.visible:
+		var point := _kai_skin.lantern_position()
+		if point.is_finite():
+			return point
 	var lantern = level.player.get("lantern")
 	if lantern != null and lantern.ready_private:
-		sync_lantern_emitter(lantern.emitter_position())
+		return lantern.emitter_position()
+	return Vector3.INF
 
 func _refresh_lantern_glow() -> void:
 	if level == null or not forest.available() or RenderingServer.get_current_rendering_method() != "mobile":
 		return
 	var lantern = level.player.get("lantern")
 	if lantern != null and lantern.ready_private:
-		lantern.set_emission_gain(LANTERN_EMISSION_GAIN * _lighting_scale(&"lantern_glow") * lerpf(1.0, .82, _night_glare_weight()))
+		lantern.set_emission_gain(LANTERN_EMISSION_GAIN * _lantern_glass_scale())
+
+func _lantern_glass_scale() -> float:
+	return _lighting_scale(&"lantern_glow") * lerpf(1.0, .82, _night_glare_weight())
+
+func _sync_kai_lantern_glass() -> void:
+	var original = level.player.get("lantern")
+	var lit := is_instance_valid(_player_light) and _player_light.visible
+	# Keep Kai's material gain and texture while following the original lamp's
+	# grow/shrink timing and the same WorldMap glare control.
+	var envelope := float(lit)
+	if original != null and original.ready_private:
+		envelope = clampf(original.visual_scale, 0., 1.)
+	_kai_skin.set_lantern_gain(_lantern_glass_scale() * envelope)
 
 func _night_glare_weight() -> float:
 	if _balanced_preview or not forest_active() or atmosphere_review != "combined":
@@ -1468,6 +1502,13 @@ func _position_lantern_light(origin: Vector3) -> void:
 	_player_light.global_position = origin
 
 func sync_lantern_emitter(point:Vector3)->void:
+	if is_instance_valid(_kai_skin) and _kai_skin.visible:
+		_sync_kai_lantern_glass()
+		_apply_lantern_emitter(_lantern_emitter_point())
+	else:
+		_apply_lantern_emitter(point)
+
+func _apply_lantern_emitter(point: Vector3) -> void:
 	if not point.is_finite():return
 	var origin := _lantern_light_origin(point)
 	_position_lantern_light(origin)
@@ -1585,6 +1626,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"twilight_ground_ambient" and _biome_profile != null:
+		return _biome_profile.twilight_ground_shade_strength
 	if effect == &"alternate_local_mist":
 		return .42
 	if effect == &"ground_haze":
@@ -2034,6 +2077,15 @@ func _sync_twilight_crown() -> void:
 			depth = lerpf(0.32 * twilight_finish_weight(), 0.62, night) * _lighting_scale(&"crown_ambient_depth")
 	level.grove.set_crown_dusk_occlusion(amount)
 	level.grove.set_crown_ambient_depth(depth)
+	var lamp_shoulder := 0.
+	if _twilight_leaf_lamp_editable() and forest_active() and level.look.stage == 2:
+		lamp_shoulder = _biome_profile.twilight_leaf_lamp_shoulder_strength * twilight_finish_weight() \
+			* _lighting_scale(&"twilight_leaf_lamp_shoulder")
+	level.grove.set_twilight_leaf_lamp_shoulder(lamp_shoulder)
+
+func _twilight_leaf_lamp_editable() -> bool:
+	return RenderingServer.get_current_rendering_method() == &"mobile" and is_instance_valid(level.grove) \
+		and level.grove.source_oaks and _biome_profile != null and _biome_profile.twilight_leaf_lamp_shoulder_strength > 0.
 
 func _sync_canopy_direct() -> void:
 	if level == null or not is_instance_valid(level.grove):
@@ -2367,6 +2419,12 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 178 and effect == &"actor_side_sky":
 			missing_value = 0.
+		if version < 180 and effect == &"mist_dusk_sky_scatter":
+			missing_value = 0.
+		if version < 182 and effect == &"daylight_shade_retention":
+			missing_value = 0.
+		if version < 181 and effect == &"twilight_leaf_lamp_shoulder":
+			missing_value = 0.
 		if version < 177 and effect == &"bark_diffuse_return":
 			missing_value = 0.
 		if version < 176 and effect == &"mist_sky_scatter":
@@ -2527,6 +2585,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
 		if effect == &"mist_sky_scatter":
 			slider.editable = slider.editable and _has_mist_sky_scatter()
+		if effect == &"mist_dusk_sky_scatter":
+			slider.editable = slider.editable and _has_mist_sky_scatter(true)
 		if effect == &"mist_entry_scatter":
 			slider.editable = slider.editable and mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"grove_mist_coherence":
@@ -2567,6 +2627,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"crown_ambient_depth":
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
+		if effect == &"twilight_leaf_lamp_shoulder":
+			slider.editable = slider.editable and _twilight_leaf_lamp_editable()
 		if effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks
 		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
@@ -2581,6 +2643,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and plants != null and plants.grass_light.active and plants.dense_grass_review
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
+		if effect == &"daylight_shade_retention":
+			slider.editable = slider.editable and _daylight_shade_retention_editable()
 		if effect == &"daylight_shadow_luminance":
 			slider.editable = slider.editable and phase_finish != null and phase_finish.available()
 		if effect == &"twilight_shadow_lift":
@@ -2674,7 +2738,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return # Terrain transport refreshes both receivers together.
 	if changed_effect in [&"night_soft_bloom", &"twilight_soft_bloom"] and level != null:
 		set_coupled_bloom(coupled_bloom)
-	if changed_effect in [&"night_soft_bloom", &"twilight_soft_bloom", &"bloom_diffusion", &"daylight_bloom_diffusion", &"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
+	if changed_effect in [&"night_soft_bloom", &"twilight_soft_bloom", &"bloom_diffusion", &"daylight_bloom_diffusion", &"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth", &"daylight_shade_retention"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -2696,7 +2760,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_sync_forest_night_lights()
 		set_coupled_bloom(coupled_bloom)
 		return
-	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"mist_entry_scatter", &"mist_sky_scatter", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
+	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"mist_entry_scatter", &"mist_sky_scatter", &"mist_dusk_sky_scatter", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
 		_update_mist()
 		return
 	if changed_effect in [&"night_path_chroma", &"source_path_chroma"]:
@@ -2741,7 +2805,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if plants != null:
 			plants.grass_light.sync()
 		return
-	if changed_effect in [&"twilight_crown", &"crown_ambient_depth"]:
+	if changed_effect in [&"twilight_crown", &"crown_ambient_depth", &"twilight_leaf_lamp_shoulder"]:
 		_sync_twilight_crown()
 		return
 	if changed_effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
@@ -3000,6 +3064,15 @@ func _daylight_grade_phase() -> float:
 func daylight_shadow_grade_weight() -> float:
 	return _daylight_grade_phase() * _lighting_scale(&"daylight_shadow_grade")
 
+func daylight_shade_retention() -> float:
+	if _balanced_preview or _biome_profile == null:
+		return 0.
+	return _biome_profile.daylight_shade_retention * _lighting_scale(&"daylight_shade_retention")
+
+func _daylight_shade_retention_editable() -> bool:
+	return _biome_profile != null and _biome_profile.daylight_shade_retention > 0. \
+		and DepthDiffusion.supported(level.get_viewport()) and phase_finish != null and phase_finish.available()
+
 func daylight_shadow_luminance() -> float:
 	if _biome_profile == null:
 		return 0.
@@ -3146,6 +3219,9 @@ func _restore_comparison_stage(previous: int) -> void:
 		level.look.set_stage(previous)
 
 func _update_shape_control()->void:
+	var shade_retention: HSlider = _lighting_sliders.get(&"daylight_shade_retention")
+	if shade_retention != null:
+		shade_retention.editable = not _balanced_preview and _daylight_shade_retention_editable()
 	for effect: StringName in [&"daylight_haze", &"daylight_haze_spill", &"humid_depth"]:
 		var depth_slider: HSlider = _lighting_sliders.get(effect)
 		if depth_slider != null:
@@ -3248,6 +3324,11 @@ func _process(delta:float)->void:
 		hour = DayNight.advance(hour, delta, cycle_seconds)
 	_weather.advance(delta)
 	apply_time()
+	if is_instance_valid(_kai_skin) and _kai_skin.visible:
+		var lantern = level.player.get("lantern")
+		if lantern == null or not lantern.ready_private:
+			_sync_kai_lantern_glass()
+			_refresh_lantern_position()
 	_update_mist()
 	_sync_bark_irradiance()
 	_sync_oak_leaf_tint()
@@ -3258,7 +3339,10 @@ func _process(delta:float)->void:
 		_legacy_sky_button.set_pressed_no_signal(level.terrain_sky.enabled)
 		_terrain_light_note.text="Local field: %s · original GAF transport\nSky RGB retint; sun transport stays Day-guarded."%("active" if level.terrain_light!=null and level.terrain_light.is_active() else "suspended / off")
 		var profile_scope:="nine captured phases" if level.look.player_phase_material_enabled and level.look.player_material.phase_verified else "Day-only comparison"
-		_player_material_note.text="Same scene light / pose. Material: %s.\nB suspends adapter; F3 also gates direct clouds."%(profile_scope if level.look.player_effects_available() else "suspended outside verified scope")
+		if is_instance_valid(_kai_skin) and _kai_skin.visible:
+			_player_material_note.text = "Kai dùng ánh sáng của cảnh và thông số vật liệu từ bản xuất gốc."
+		else:
+			_player_material_note.text="Same scene light / pose. Material: %s.\nB suspends adapter; F3 also gates direct clouds."%(profile_scope if level.look.player_effects_available() else "suspended outside verified scope")
 		_cycle_button.set_pressed_no_signal(cycle_enabled)
 		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
 		var msaa:String=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
@@ -3439,6 +3523,10 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.ground_haze != null
 		if effect == &"mist_sky_scatter":
 			slider.editable = _has_mist_sky_scatter()
+		if effect == &"mist_dusk_sky_scatter":
+			slider.editable = _has_mist_sky_scatter(true)
+		if effect == &"twilight_leaf_lamp_shoulder":
+			slider.editable = _twilight_leaf_lamp_editable()
 		if effect == &"mist_entry_scatter":
 			slider.editable = mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"basin_sunlit_mist":
@@ -3566,6 +3654,54 @@ func _add_terrain_toggle(parent: Control, prop: Node3D, title: String) -> void:
 			toggle.set_pressed_no_signal(previous)
 			prop.set_requested(previous))
 		prop.set_requested(value))
+
+func _add_player_skin_picker(box: VBoxContainer) -> void:
+	_skin_picker = OptionButton.new()
+	_skin_picker.name = "PlayerSkin"
+	_skin_picker.focus_mode = Control.FOCUS_NONE
+	_skin_picker.add_item("Skin · MD2", PlayerSkin.MD2)
+	_skin_picker.add_item("Skin · Kai Survival 3D", PlayerSkin.KAI)
+	_skin_picker.select(PlayerSkin.MD2)
+	var ready_for_kai: bool = level.player.get("primary_ready") == true and KaiSkin.source_available()
+	_skin_picker.set_item_disabled(PlayerSkin.KAI, not ready_for_kai)
+	if not ready_for_kai:
+		_skin_picker.tooltip_text = "Cần bản xuất Kai đã xác minh trong MD2 Research và nhân vật MD2 đang hoạt động."
+	_skin_picker.item_selected.connect(_select_player_skin)
+	box.add_child(_skin_picker)
+
+func _select_player_skin(index: int) -> void:
+	if _skin_picker.is_item_disabled(index):
+		_skin_picker.select(PlayerSkin.MD2)
+		return
+	var actor: CharacterBody3D = level.player
+	if index == PlayerSkin.KAI and _kai_skin == null:
+		var candidate := KaiSkin.new()
+		if not candidate.setup(actor):
+			candidate.free()
+			_skin_picker.set_item_disabled(PlayerSkin.KAI, true)
+			_skin_picker.select(PlayerSkin.MD2)
+			_skin_picker.tooltip_text = "Không tải được bản xuất Kai đã xác minh trong MD2 Research."
+			return
+		_kai_skin = candidate
+		_kai_skin.set_lantern_receive_layers(PlayerLantern.FIXTURE_LAYER)
+		# Snapshot the rendered source meshes, not the canopy proxies they own.
+		for mesh: MeshInstance3D in actor.render_presenter.meshes:
+			if mesh.skin != null:
+				_md2_skin_visibility[mesh] = mesh.visible
+		level.look.register_kai_materials(_kai_skin.meshes)
+		level.canopy_player_cue.set_alternate(_kai_skin, _kai_skin.canopy_silhouette())
+	var use_kai := index == PlayerSkin.KAI
+	for mesh in _md2_skin_visibility:
+		mesh.visible = not use_kai and _md2_skin_visibility[mesh]
+	var lantern := actor.get("lantern") as Node3D
+	if lantern != null:
+		lantern.visible = not use_kai
+	if _kai_skin != null:
+		_kai_skin.show_skin(use_kai)
+	if use_kai:
+		_sync_kai_lantern_glass()
+	_refresh_lantern_position()
+	level.sync_canopy_player_cue()
 
 func _build_ui()->void:
 	var hud:=level.get_node("HUD")
@@ -3780,6 +3916,7 @@ func _build_ui()->void:
 	var audio:=CheckButton.new();audio.text="Enable test audio (default off)";audio.button_pressed=audio_enabled;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
 	audio.toggled.connect(set_audio_enabled)
 	var material_modes:=["original","neutral","cloud","roughness","self_light","combined"]
+	_add_player_skin_picker(box)
 	var material_picker:=OptionButton.new();material_picker.name="PlayerMaterialComparison";material_picker.focus_mode=Control.FOCUS_NONE
 	for label:String in ["Original materials (previous player)","Neutral adapter · no new effects","Cloud shading only","Recovered Valorie roughness only","Recovered view self-light only","Combined · current default"]:material_picker.add_item(label)
 	material_picker.select(material_modes.find(level.look.player_material_review));box.add_child(material_picker)

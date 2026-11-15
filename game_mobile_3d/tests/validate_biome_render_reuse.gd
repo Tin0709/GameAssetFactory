@@ -152,12 +152,16 @@ func run() -> void:
 		var sky_control: HSlider = showcase._lighting_sliders.get(&"mist_sky_scatter")
 		check(sky_control != null and sky_control.editable and is_equal_approx(sky_control.value, 1.),
 			"F5 exposes and enables sky scattering by default")
-		for time: float in [7., 12., 16.5, 22.]:
+		var dusk_control: HSlider = showcase._lighting_sliders.get(&"mist_dusk_sky_scatter")
+		check(dusk_control != null and dusk_control.editable and is_equal_approx(dusk_control.value, 1.),
+			"F5 exposes an independent twilight sky scattering control")
+		for time: float in [7., 12., 16.5, 19.5, 22.]:
 			showcase.set_hour(time)
 			await process_frame
 			await RenderingServer.frame_post_draw
 			var gain: float = showcase.mist.effect.snapshot().get("sky_air_gain", -1.)
-			check(is_equal_approx(gain, 1.25 if time in [7., 16.5] else 0.),
+			var expected: float = {7.: 1.25, 16.5: 1.25, 19.5: 1.8}.get(time, 0.)
+			check(is_equal_approx(gain, expected),
 				"Shared volume receives the biome sky gain at %.1f" % time)
 		showcase.set_hour(16.5)
 		showcase.set_lighting_scale(&"mist_sky_scatter", 0.)

@@ -7,7 +7,7 @@ layout(set=0,binding=7) uniform sampler2DMS gaf_diffusion_depth;
 layout(set=0,binding=8) uniform sampler3D gaf_diffusion_mist;
 layout(set=0,binding=9,std430) readonly buffer DiffusionDepth { vec4 projection; vec4 layer; vec4 samples; } diffusion_depth;
 
-float gaf_diffusion_depth_scale(vec2 uv) {
+vec2 gaf_diffusion_depth_sample(vec2 uv) {
 	ivec2 extent = textureSize(gaf_diffusion_depth);
 	ivec2 pixel = clamp(ivec2(uv * vec2(extent)), ivec2(0), extent - 1);
 	// Reverse Z: favor the near surface at mixed-coverage edges.
@@ -17,7 +17,7 @@ float gaf_diffusion_depth_scale(vec2 uv) {
 		raw = max(raw, max(texelFetch(gaf_diffusion_depth, pixel, 2).r,
 			texelFetch(gaf_diffusion_depth, pixel, 3).r));
 	}
-	if (raw <= 0.0) return 1.0;
+	if (raw <= 0.0) return vec2(1.0, 0.0);
 	float ndc = 1.0 - 2.0 * raw;
 	vec4 inverse_z = diffusion_depth.projection;
 	float depth_m = -(inverse_z.x * ndc + inverse_z.y) / (inverse_z.z * ndc + inverse_z.w);
@@ -35,7 +35,8 @@ float gaf_diffusion_depth_scale(vec2 uv) {
 	}
 	float distance_weight = smoothstep(0.6, 6.0, depth_m - diffusion_depth.layer.x);
 	float haze_weight = smoothstep(0.004, 0.035, opacity);
-	return 0.14 + 1.28 * distance_weight * haze_weight;
+	float shadow_depth = distance_weight * haze_weight;
+	return vec2(0.14 + 1.28 * distance_weight * haze_weight, shadow_depth);
 }
 """
 

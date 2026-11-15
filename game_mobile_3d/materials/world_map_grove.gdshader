@@ -19,6 +19,8 @@ uniform float crown_ambient_depth = 0.0;
 uniform vec4 bark_irradiance = vec4(0.0);
 uniform vec3 bark_irradiance_tint = vec3(1.0);
 uniform vec3 bark_diffuse_return = vec3(0.0);
+uniform float twilight_leaf_lamp_shoulder = 0.0;
+varying float crown_local_lamp_receiver;
 #endif
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/leaf_material_v001/leaf_material.gdshaderinc"
 #ifdef GAF_SHARED_MIST
@@ -217,6 +219,9 @@ void fragment() {
 	}
 #endif
 	ALBEDO = albedo;
+#ifdef GAF_WORLD_TREE_IRRADIANCE
+	crown_local_lamp_receiver = use_source_atlas && atlas_uv.x < 0.5 ? 1.0 : 0.0;
+#endif
 #ifdef GAF_WORLD_CANOPY_DIRECT_SOFTNESS
 	canopy_direct_coverage = 0.0;
 	if (canopy_direct.w > 0.0 && use_source_atlas && atlas_uv.x < 0.5) {

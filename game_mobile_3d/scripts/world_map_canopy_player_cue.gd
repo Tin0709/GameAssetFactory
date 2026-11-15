@@ -10,6 +10,14 @@ var day_tone_weight := 0.0
 var clarity_weight := 0.0
 var _cue_materials: Array[ShaderMaterial] = []
 var _attempted := false
+var _alternate: Node3D
+var _alternate_sources: Array[MeshInstance3D] = []
+var _alternate_attempted := false
+var _morph_proxies: Dictionary[MeshInstance3D, MeshInstance3D] = {}
+
+func set_alternate(appearance: Node3D, sources: Array[MeshInstance3D]) -> void:
+	_alternate = appearance
+	_alternate_sources = sources
 
 func available(level: Node) -> bool:
 	return RenderingServer.get_current_rendering_method() == "mobile" \
@@ -23,8 +31,21 @@ func sync(level: Node, strength: float, day_tone: float, clarity: float, opacity
 			and level.player.is_visible_in_tree() and (level.grove.visible or level.grove.spruce_visible()):
 		var noon_distance: float = absf(level.showcase.hour - 12.0)
 		target = strength * smoothstep(0.0, 0.5, noon_distance)
-	if target > 0.0 and not _attempted:
-		_build(level.look.actor_materials, level.player.render_presenter)
+	if target > 0.0:
+		if not _attempted:
+			_attempted = true
+			var presenter: Node = level.player.render_presenter
+			_build(level.look.actor_materials, presenter.meshes, presenter)
+		if not _alternate_attempted and is_instance_valid(_alternate) and _alternate.is_visible_in_tree():
+			_alternate_attempted = true
+			_build(level.look.actor_materials, _alternate_sources)
+		for source in _morph_proxies:
+			if source.is_visible_in_tree():
+				var proxy := _morph_proxies[source]
+				for index in source.mesh.get_blend_shape_count():
+					var value := source.get_blend_shape_value(index)
+					if value != proxy.get_blend_shape_value(index):
+						proxy.set_blend_shape_value(index, value)
 	if meshes.is_empty():
 		target = 0.0
 	var tone := day_tone if target > 0.0 else 0.0
@@ -51,16 +72,14 @@ func sync(level: Node, strength: float, day_tone: float, clarity: float, opacity
 			material.set_shader_parameter("day_tone_weight", tone)
 			material.set_shader_parameter("clarity_weight", clarity_target)
 
-func _build(surfaces: Array[Array], presenter: Node) -> void:
-	_attempted = true
+func _build(surfaces: Array[Array], sources: Array[MeshInstance3D], presenter: Node = null) -> void:
 	var copies: Dictionary[MeshInstance3D, MeshInstance3D] = {}
 	var counts: Dictionary[MeshInstance3D, int] = {}
 	for row: Array in surfaces:
 		counts[row[0]] = counts.get(row[0], 0) + 1
 	for row: Array in surfaces:
 		var source: MeshInstance3D = row[0]
-		# Only reproduce meshes covered by the same render-pose snapshots.
-		if counts[source] != source.mesh.get_surface_count() or not presenter.meshes.has(source):
+		if counts[source] != source.mesh.get_surface_count() or not sources.has(source):
 			continue
 		var proxy: MeshInstance3D = copies.get(source)
 		if proxy == null:
@@ -72,17 +91,24 @@ func _build(surfaces: Array[Array], presenter: Node) -> void:
 			proxy.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 			proxy.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			proxy.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
-			proxy.hide()
+			proxy.visible = weight > 0.0
 			source.add_child(proxy)
 			var skeleton := source.get_node_or_null(source.skeleton)
 			if skeleton is Skeleton3D:
 				proxy.skeleton = proxy.get_path_to(skeleton)
-			presenter.add_mesh_follower(source, proxy)
+			if presenter != null:
+				presenter.add_mesh_follower(source, proxy)
+			elif source.mesh.get_blend_shape_count() > 0:
+				# The alternate mesh already follows the live presentation skeleton.
+				_morph_proxies[source] = proxy
 			copies[source] = proxy
 			meshes.append(proxy)
 		var opacity: BaseMaterial3D = row[3]
 		var mask := _make_material(VisiblePass, 20, opacity)
 		var cue := _make_material(CuePass, 21, opacity)
+		cue.set_shader_parameter("cue_weight", opacity_weight)
+		cue.set_shader_parameter("day_tone_weight", day_tone_weight)
+		cue.set_shader_parameter("clarity_weight", clarity_weight)
 		mask.next_pass = cue
 		proxy.set_surface_override_material(row[1], mask)
 		_cue_materials.append(cue)

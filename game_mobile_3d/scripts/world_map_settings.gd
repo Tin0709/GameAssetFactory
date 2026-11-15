@@ -8,6 +8,7 @@ const NAMED := {
 	"LightingMixLoad": "load-mix",
 	"SceneLightingMix": "apply-forest",
 	"PlayerMaterialComparison": "player-material",
+	"PlayerSkin": "player-skin",
 	"TerrainLightComparison": "terrain-material",
 	"BalancedAtmospherePreview": "balanced",
 	"NearHazePreview": "near-haze-toggle",

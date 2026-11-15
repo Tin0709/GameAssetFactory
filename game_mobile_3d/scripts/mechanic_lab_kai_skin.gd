@@ -1,11 +1,15 @@
 extends Node3D
-## MechanicLab-only appearance. The source actor still owns gameplay and weapon sockets.
+## Private appearance shared by MechanicLab and WorldMap. The source actor owns the gameplay pose.
 
 const Source := preload("res://scripts/mechanic_lab_weapon_source.gd")
 const MODEL := "blender/khai_skin_v001/Kai_Survival_3D_Lab_v002.glb"
 const SHA256 := "fd7e1f83f536a71ce31ab59139c65e2d841c8685f3dadb8f1422cc66d6035bfc"
 const RUNS := ["Run", "CombatRun"]
 const ACCESSORY_BONES := [&"J_Kai_Lantern_Sway", &"J_Headband_Tail_A", &"J_Headband_Tail_B"]
+const LANTERN_MESH := &"Kai Run | MD2 metal lantern"
+const CANOPY_SILHOUETTE := [
+	&"Kai Run | Body", &"Kai Run | Face and expressions", &"Kai Run | Brown hair", &"Kai Run | Red headband",
+]
 
 var meshes: Array[MeshInstance3D] = []
 var _actor: CharacterBody3D
@@ -20,6 +24,10 @@ var _rest_corrections: Array[Transform3D] = []
 var _poses: Array[Transform3D] = []
 var _rig_offset: Transform3D
 var _sway_weight := 0.0
+var _lantern: MeshInstance3D
+var _lantern_bone := -1
+var _lantern_rest_point := Vector3.ZERO
+var _lantern_base_gain := 0.
 
 static func source_available() -> bool:
 	return OS.has_feature("editor") and FileAccess.file_exists(Source.research_root().path_join(MODEL))
@@ -72,6 +80,8 @@ func setup(actor: CharacterBody3D) -> bool:
 		if mesh.mesh == null or mesh.skin == null or mesh.get_node_or_null(mesh.skeleton) != _rig:
 			return false
 		meshes.append(mesh)
+		if mesh.name == LANTERN_MESH:
+			_lantern = mesh
 		for surface in mesh.mesh.get_surface_count():
 			var material := mesh.get_active_material(surface) as BaseMaterial3D
 			if material != null:
@@ -85,11 +95,46 @@ func setup(actor: CharacterBody3D) -> bool:
 
 	name = "KaiAppearance"
 	top_level = true
+	process_priority = actor.process_priority + 1
 	hide()
 	actor.add_child(self)
 	_rig_offset = (global_transform.affine_inverse() * _rig.global_transform).affine_inverse()
+	_lantern_bone = _rig.find_bone(ACCESSORY_BONES[0])
+	if _lantern != null and _lantern_bone >= 0:
+		var material := _lantern.get_active_material(0) as BaseMaterial3D
+		if material != null:
+			_lantern_base_gain = material.emission_energy_multiplier
+		_lantern_rest_point = _rig.get_bone_global_rest(_lantern_bone).affine_inverse() \
+			* _rig.to_local(_lantern.to_global(_lantern.get_aabb().get_center()))
 	set_process(false)
 	return true
+
+func lantern_position() -> Vector3:
+	if _lantern == null or _lantern_bone < 0:
+		return Vector3.INF
+	return _rig.to_global(_rig.get_bone_global_pose(_lantern_bone) * _lantern_rest_point)
+
+func canopy_silhouette() -> Array[MeshInstance3D]:
+	var result: Array[MeshInstance3D] = []
+	for mesh in meshes:
+		if mesh.name in CANOPY_SILHOUETTE:
+			result.append(mesh)
+	return result
+
+func set_lantern_receive_layers(mask: int) -> void:
+	if _lantern != null:
+		_lantern.layers = mask
+
+func set_lantern_gain(multiplier: float) -> void:
+	if _lantern == null:
+		return
+	var gain := _lantern_base_gain * multiplier
+	var native := _lantern.mesh.surface_get_material(0) as BaseMaterial3D
+	if native != null and not is_equal_approx(native.emission_energy_multiplier, gain):
+		native.emission_energy_multiplier = gain
+	var adapter := _lantern.get_active_material(0) as ShaderMaterial
+	if adapter != null and not is_equal_approx(float(adapter.get_shader_parameter("glow_energy")), gain):
+		adapter.set_shader_parameter("glow_energy", gain)
 
 func show_skin(active: bool) -> void:
 	if active:

@@ -201,6 +201,21 @@ func _collect_actor_materials() -> void:
 			if native is BaseMaterial3D:
 				actor_materials.append([node,index,node.get_surface_override_material(index),native.duplicate(),native.albedo_color])
 
+func register_kai_materials(meshes: Array[MeshInstance3D]) -> void:
+	# Fill the original rows first so the adapters keep the same surface indices.
+	if _direct_actor_materials.is_empty():
+		_apply_player_materials(false, false)
+	for mesh in meshes:
+		if not mesh.visible:
+			continue
+		for index in mesh.mesh.get_surface_count():
+			var source := mesh.get_active_material(index) as BaseMaterial3D
+			if source == null:
+				continue
+			actor_materials.append([mesh, index, mesh.get_surface_override_material(index), source, source.albedo_color])
+			_direct_actor_materials.append(player_material.create(mesh, source, source.albedo_color, true))
+	_apply_review_shaders()
+
 func _capture_shadow_settings() -> void:
 	saved_shadow_size=int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/size"))
 	saved_shadow_16bit=bool(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/16_bits"))
@@ -722,7 +737,9 @@ func _apply_player_materials(direct:bool,sky:bool)->void:
 		if not enabled:
 			row[0].set_surface_override_material(row[1],row[2]);continue
 		var visible_sky:bool=sky and not _flat_lab and is_instance_valid(level.grove) and level.grove.is_visible_in_tree()
-		m.shader=player_material.variant(row[3].transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,direct and player_cloud_enabled,visible_sky)
+		var source: BaseMaterial3D = row[3]
+		m.shader=player_material.variant(source.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,
+			direct and player_cloud_enabled,visible_sky,source.cull_mode==BaseMaterial3D.CULL_BACK,source.texture_repeat)
 		m.set_shader_parameter("albedo_tint",row[4])
 		var verified:bool=m.get_meta("verified_valorie",false) and player_effects_available()
 		m.set_shader_parameter("recovered_roughness",verified and player_roughness_enabled)

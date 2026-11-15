@@ -18,4 +18,6 @@ At720p, the effect's owned allocation rises from4,384,800 to8,071,200bytes, in a
 
 HDR framebuffer exports are linear RGBH. PNG previews require one linear→sRGB conversion; raw HDR PNGs look artificially dark. Preserve raw binary/format metadata and use the corrected display images for review.
 
+For camera-matched SDR reviews, record `Viewport.use_hdr_2d`, `Image.get_format()`, the viewport size and the camera transform. Read the original float color and apply the sRGB transfer before quantizing to PNG. On an LDR viewport, preserve the existing display encoding. Report SDR metrics separately from HDR light and transmission measurements. [Godot ViewportTexture](https://docs.godotengine.org/en/4.7/classes/class_viewporttexture.html)
+
 Engine evidence: [Godot4.7.2 Mobile pass ordering](https://raw.githubusercontent.com/godotengine/godot/4.7.2-stable/servers/rendering/renderer_rd/forward_mobile/render_forward_mobile.cpp), [buffer format selection](https://raw.githubusercontent.com/godotengine/godot/4.7.2-stable/servers/rendering/renderer_rd/storage_rd/render_scene_buffers_rd.h). Native MD2 research/reference files remain private. Overall visual acceptance and the active graphics goal remain open.

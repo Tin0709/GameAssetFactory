@@ -4,6 +4,7 @@ const FILE="godot_lab/world_map_unified_showcase_v001/lantern_idle_v001/profile_
 const SHA="68b5d9f8d321aa313b5340798a598f325fa5c532aab8e0ba1e6d3f13f79e7499"
 ## Upper center of the handle on the verified SM_SWT_MetalLantern.
 const HANDLE_LOCAL := Vector3(.15625, .5625, -.15625)
+const FIXTURE_LAYER := 2
 var actor:Node3D
 var profile:Dictionary={}
 var spine:=-1
@@ -71,7 +72,7 @@ func setup(body:Node3D)->void:
  var mask:=ImageTexture.create_from_image(emission_image)
  _base_emission_energy = .8 * float(profile.emissive_brightness) / float(profile.generic_emissive_brightness)
  for mesh:MeshInstance3D in mesh_root.find_children("*","MeshInstance3D",true,false):
-  mesh.layers=2 # Receive sun/ambient, exclude the fixture-centered point light.
+  mesh.layers=FIXTURE_LAYER # Receive sun/ambient, exclude the fixture-centered point light.
   for i in mesh.mesh.get_surface_count():
    var source=mesh.get_active_material(i)
    if source is StandardMaterial3D:

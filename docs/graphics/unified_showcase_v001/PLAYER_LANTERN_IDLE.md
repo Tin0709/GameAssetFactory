@@ -1,3 +1,9 @@
+## Đèn hông của hai skin trong WorldMap
+
+Trong **L → Cài đặt → Nhân vật → Ngoại hình**, Kai Survival 3D giữ mesh, texture, khóa và vị trí đèn từ MechanicLab. MD2 dùng bộ đèn đã duyệt của mình. Đổi skin chỉ hiện bộ đèn tương ứng trên cùng nhân vật.
+
+Hai skin dùng chung một nguồn sáng của WorldMap, với cùng màu, cường độ theo giờ, bán kính, suy giảm, bloom và tán xạ trong sương. Ở chế độ chiếu từ trên cao, vị trí chiếu giữ nguyên khi đổi skin. Khi tắt chế độ này, ánh sáng bám tâm chiếc đèn đang hiển thị và phần sương dùng cùng vị trí. Kính đèn của Kai giữ texture gốc, nhận cùng điều khiển độ phát sáng và nhịp bật/tắt của đèn WorldMap.
+
 Current full-scene revalidation with the owned HDR foundation: `lantern_idle_v001/final_review_hdr_v003/review.log`, Forward Mobile/D3D12, exit0 and `LANTERN_IDLE failures=[]`. Source load, native toggle keys, emitter/mist alignment, automatic inspection, movement/combat interruption, Day hide and Night grow were exercised together. Display previews apply one linear-to-sRGB transfer to HDR screenshot exports; no exposure/color retune.
 
 ## V002 follow-up — recovered native toggle and material override

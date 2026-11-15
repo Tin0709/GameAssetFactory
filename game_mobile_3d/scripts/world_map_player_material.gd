@@ -77,11 +77,13 @@ func texture_matches(texture:Texture2D,sha:String)->bool:
 	var digest:=HashingContext.new();digest.start(HashingContext.HASH_SHA256);digest.update(image.get_data())
 	return digest.finish().hex_encode()==sha
 
-func supports(node:MeshInstance3D,source:BaseMaterial3D)->bool:
+func supports(node:MeshInstance3D,source:BaseMaterial3D,kai_surface:=false)->bool:
 	if not source is StandardMaterial3D:return false
-	if node.material_override!=null or source.next_pass!=null or source.albedo_texture==null:return false
-	if (source.cull_mode!=BaseMaterial3D.CULL_DISABLED or source.texture_filter!=BaseMaterial3D.TEXTURE_FILTER_NEAREST
-		or source.texture_repeat or not source.transparency in [BaseMaterial3D.TRANSPARENCY_DISABLED,BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR]
+	if node.material_override!=null or source.next_pass!=null:return false
+	if not kai_surface and (source.albedo_texture==null or source.texture_repeat):return false
+	if source.cull_mode!=BaseMaterial3D.CULL_DISABLED and not (kai_surface and source.cull_mode==BaseMaterial3D.CULL_BACK):return false
+	if (source.texture_filter!=BaseMaterial3D.TEXTURE_FILTER_NEAREST
+		or not source.transparency in [BaseMaterial3D.TRANSPARENCY_DISABLED,BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR]
 		or source.shading_mode!=BaseMaterial3D.SHADING_MODE_PER_PIXEL
 		or source.diffuse_mode!=BaseMaterial3D.DIFFUSE_BURLEY or source.specular_mode!=BaseMaterial3D.SPECULAR_SCHLICK_GGX
 		or source.depth_draw_mode!=BaseMaterial3D.DEPTH_DRAW_OPAQUE_ONLY
@@ -92,19 +94,22 @@ func supports(node:MeshInstance3D,source:BaseMaterial3D)->bool:
 	# These two inert flags are allowed only because vertex color and height mapping
 	# have already been excluded. All other non-feature behavior needs a new adapter.
 	for flag in BaseMaterial3D.FLAG_MAX:
+		if kai_surface and flag==BaseMaterial3D.FLAG_USE_TEXTURE_REPEAT:continue
 		if source.get_flag(flag) and not flag in [BaseMaterial3D.FLAG_SRGB_VERTEX_COLOR,BaseMaterial3D.FLAG_INVERT_HEIGHTMAP]:return false
 	for feature in BaseMaterial3D.FEATURE_MAX:
 		if feature!=BaseMaterial3D.FEATURE_EMISSION and source.get_feature(feature):return false
 	return true
 
-func variant(cutout:bool,direct:bool,sky:bool)->Shader:
-	var key:=str([cutout,direct,sky])
+func variant(cutout:bool,direct:bool,sky:bool,cull_back:=false,repeat_uv:=false)->Shader:
+	var key:=str([cutout,direct,sky,cull_back,repeat_uv])
 	if not variants.has(key):
 		var header:="shader_type spatial;"
 		if cutout:header+="\n#define GAF_PLAYER_CUTOUT"
 		if direct:header+="\n#define GAF_PLAYER_DIRECT"
 		if sky:header+="\n#define GAF_PLAYER_SKY"
 		var code:=SHADER.code.replace("shader_type spatial;",header)
+		if cull_back:code=code.replace("render_mode cull_disabled", "render_mode cull_back")
+		if repeat_uv:code=code.replace("repeat_disable", "repeat_enable")
 		if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
 			code=code.replace("diffuse_burley","diffuse_lambert").replace(header,header+"\n#define GAF_WORLD_FORCE_LAMBERT")
 		var shader:=Shader.new();shader.code=code;variants[key]=shader
@@ -114,9 +119,11 @@ func channel(value:int)->Vector4:
 	if value==BaseMaterial3D.TEXTURE_CHANNEL_GRAYSCALE:return Vector4(1./3.,1./3.,1./3.,0)
 	var result:=Vector4.ZERO;result[value]=1.;return result
 
-func create(node:MeshInstance3D,source:BaseMaterial3D,tint:Color)->ShaderMaterial:
-	if not available() or not supports(node,source):return null
-	var m:=ShaderMaterial.new();m.shader=variant(source.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,false,false)
+func create(node:MeshInstance3D,source:BaseMaterial3D,tint:Color,kai_surface:=false)->ShaderMaterial:
+	if not available() or not supports(node,source,kai_surface):return null
+	var m:=ShaderMaterial.new()
+	m.shader=variant(source.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,false,false,
+		source.cull_mode==BaseMaterial3D.CULL_BACK,source.texture_repeat)
 	m.render_priority=source.render_priority
 	for pair:Array in [["atlas",source.albedo_texture],["albedo_tint",tint],["metal_map",source.metallic_texture],["rough_map",source.roughness_texture],
 		["metal_channel",channel(source.metallic_texture_channel)],["rough_channel",channel(source.roughness_texture_channel)],
@@ -124,7 +131,10 @@ func create(node:MeshInstance3D,source:BaseMaterial3D,tint:Color)->ShaderMateria
 		["cutout",source.alpha_scissor_threshold],["glow_map",source.emission_texture],["glow_tint",source.emission],
 		["glow_energy",source.emission_energy_multiplier],["glow_enabled",source.emission_enabled],["glow_add",source.emission_operator==BaseMaterial3D.EMISSION_OP_ADD]]:
 		m.set_shader_parameter(pair[0],pair[1])
-	var verified:=source_skin(node,source);m.set_meta("verified_valorie",verified)
+	var verified:=not kai_surface and source_skin(node,source);m.set_meta("verified_valorie",verified)
+	if kai_surface and source.metallic == 0. and not source.emission_enabled:
+		m.set_meta("kai_matte_lighting", true)
+		m.set_shader_parameter("gaf_matte_opening", true)
 	if verified:
 		m.set_shader_parameter("roughness_transform",profile.roughness);m.set_shader_parameter("self_light_scale",profile.self_light)
 		if skin_mask!=null:m.set_shader_parameter("skin_profile_mask",skin_mask);m.set_meta("has_profile_mask",true)

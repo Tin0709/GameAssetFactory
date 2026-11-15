@@ -217,6 +217,29 @@ func verify() -> void:
 	check(is_equal_approx(world.showcase.hour, 19.5) and is_equal_approx(graphics.weather_weight, .65),
 		"Switching biome does not reset map overrides into the running clock or weather")
 	graphics.set_profile(world.biome_graphics)
+	var without_weather = world.biome_graphics.duplicate()
+	without_weather.overcast = null
+	light = world.get_node("Sun")
+	env = world.get_node("WorldEnvironment").environment
+	var cloudy_energy := light.light_energy
+	var cloudy_fog := env.fog_light_color
+	graphics.set_profile(without_weather)
+	check(is_zero_approx(graphics.weather_weight) and light.light_energy > cloudy_energy
+		and not env.fog_light_color.is_equal_approx(cloudy_fog),
+		"A biome without overcast uses its clear lighting and atmosphere")
+	graphics.set_profile(world.biome_graphics)
+	check(is_equal_approx(graphics.weather_weight, .65) and is_equal_approx(light.light_energy, cloudy_energy)
+		and env.fog_light_color.is_equal_approx(cloudy_fog),
+		"Comparing with a biome without overcast preserves the map's weather")
+	graphics.set_process(false)
+	world.showcase.set_weather(1., 1.)
+	graphics._process(.25)
+	graphics.set_profile(without_weather)
+	graphics._process(.5)
+	graphics.set_profile(world.biome_graphics)
+	check(is_equal_approx(graphics.weather_weight, lerpf(.65, 1., smoothstep(0., 1., .75))),
+		"The weather transition continues across biome changes")
+	world.showcase.set_weather(.65, 0.)
 	if RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null:
 		var sample: Dictionary = graphics._mist_sample
 		var near_layer: Vector3 = sample.get("near_layer", Vector3.ZERO)

@@ -19,7 +19,7 @@ const QUALITY_LABELS := ["Nhẹ", "Cân bằng", "Đầy đủ"]
 var quality := Quality.FULL
 var _weather := Weather.new()
 var weather_weight: float:
-	get: return _weather.weight
+	get: return _weather.weight if _profile != null and _profile.overcast != null else 0.
 var _world: Node3D
 var _profile: Profile
 var _palette := Palette.new()
@@ -89,8 +89,8 @@ func _refresh_settings() -> void:
 	if _settings_status == null:
 		return
 	var hour: float = _world.showcase.hour
-	_settings_status.text = "%02d:%02d · Mây %d%%" % [
-		int(hour), int(fmod(hour, 1.) * 60.), roundi(weather_weight * 100.)]
+	var weather_status := "Mây %d%%" % roundi(weather_weight * 100.) if _profile.overcast != null else "Preset không có cấu hình mây"
+	_settings_status.text = "%02d:%02d · %s" % [int(hour), int(fmod(hour, 1.) * 60.), weather_status]
 	var index := _choices.find(_profile)
 	if _settings_preset.selected != index:
 		_settings_preset.select(index)
@@ -104,8 +104,6 @@ func set_profile(profile: Profile) -> void:
 	var slot := _choices.find(profile)
 	if slot >= 0:
 		_profile_index = slot
-	if _profile.overcast == null:
-		_weather.set_target(0., 0.)
 	refresh()
 	_release_effects_outside_budget()
 
@@ -133,11 +131,9 @@ func _release_inactive(effect: CompositorEffect) -> void:
 	)
 
 func set_weather(overcast: float, seconds: float = 2.5) -> void:
-	if _profile.overcast == null:
-		return
-	var previous := _weather.weight
+	var previous := weather_weight
 	_weather.set_target(overcast, seconds)
-	if _weather.weight != previous:
+	if weather_weight != previous:
 		refresh()
 
 func _process(delta: float) -> void:
@@ -148,7 +144,7 @@ func _process(delta: float) -> void:
 	_update_spatial_mist()
 	if _cycle and _world.look.stage == 2:
 		_world.showcase.set_hour(DayNight.advance(_world.showcase.hour, delta, _profile.cycle_minutes * 60.))
-	if _weather.advance(delta):
+	if _weather.advance(delta) and _profile.overcast != null:
 		refresh()
 
 func refresh() -> void:
@@ -425,7 +421,8 @@ func handle_key(event: InputEventKey) -> bool:
 			else:
 				_world.showcase.set_hour(DayNight.next_hour(_world.showcase.hour, HOURS))
 		KEY_F6:
-			_world.showcase.set_weather(0. if _weather.target > 0. else 1.)
+			if _profile.overcast != null:
+				_world.showcase.set_weather(0. if _weather.target > 0. else 1.)
 		KEY_H:
 			_fog_enabled = not _fog_enabled
 			refresh()

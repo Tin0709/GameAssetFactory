@@ -21,6 +21,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., 2.) var noon_ambient_energy := .32
 @export_range(0., 4., .05) var shadow_blur := 1.25
 @export_range(0., 1., .01) var shadow_opacity := .782
+## Default strength of twilight diffuse attenuation on terrain and grass receivers that support it.
+@export_range(0., 1., .01) var twilight_ground_shade_strength := 1.
 ## Daylight caster adjustment for maps with the grass lighting adapter.
 @export_range(0., 2., .01) var day_grass_shadow_compactness := 1.
 ## Relative opacity of the daytime canopy silhouette at close camera zoom.
@@ -47,6 +49,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Fraction of ambient irradiance returned to diffuse bark above ground contact.
 @export var bark_diffuse_return_by_hour: Curve
 @export var bark_diffuse_return_tint := Vector3.ONE
+## Bright-leaf response to the supported player lamp at twilight.
+@export_range(0., 1., .01) var twilight_leaf_lamp_shoulder_strength := 0.
 ## Additional diffuse sky on supported player materials under canopy.
 ## Curve X is normalized hour and Y is a gain from 0 to 1.
 @export var actor_shade_sky_by_hour: Curve
@@ -80,6 +84,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var mist_entry_scatter_by_hour: Curve
 ## Adds ambient sky color to the existing mist in partially occluded air.
 @export var mist_sky_scatter_by_hour: Curve
+## Independent twilight gain, sharing the same map provider and tint as daytime.
+@export var mist_dusk_sky_scatter_by_hour: Curve
 @export var mist_sky_scatter_tint := Vector3.ONE
 @export_range(0., 1., .01) var local_mist_strength := .65
 ## Multiplies the first map region by normalized hour. A missing or empty curve uses 1.
@@ -107,6 +113,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export var shadow_grade_recovery_by_hour: Curve
 ## Maximum luminance gain for shaded detail under the same hour curve.
 @export_range(0., .52, .01) var daylight_shadow_luminance_scale := 0.
+## Fraction of the daylight shadow lift retained as contrast behind the fog entry.
+@export_range(0., 1., .01) var daylight_shade_retention := 0.
 ## Shadow recovery for dark greens in the optional reference finish.
 @export_range(0., 1., .01) var daylight_green_grade_scale := 0.
 ## Keep the reference local-exposure blur footprint steadier when zooming out.
@@ -161,8 +169,11 @@ func ambient_hour_scale(hour: float, strength: float = 1.) -> float:
 func sample_mist_entry_scatter(time: float) -> float:
 	return clampf(DayNight.sample_curve(mist_entry_scatter_by_hour, time, 0.), 0., 4.)
 
-func sample_mist_sky_scatter(time: float, env: Environment, strength: float = 1.) -> Vector4:
-	var gain := clampf(DayNight.sample_curve(mist_sky_scatter_by_hour, time, 0.) * strength, 0., 4.)
+func sample_mist_sky_scatter(time: float, env: Environment, strength: float = 1.,
+		dusk_strength: float = 1.) -> Vector4:
+	var day := DayNight.sample_curve(mist_sky_scatter_by_hour, time, 0.) * strength
+	var dusk := DayNight.sample_curve(mist_dusk_sky_scatter_by_hour, time, 0.) * dusk_strength
+	var gain := clampf(maxf(day, dusk), 0., 4.)
 	if gain <= 0. or not mist_sky_scatter_tint.is_finite():
 		return Vector4.ZERO
 	var ambient_color := env.ambient_light_color.srgb_to_linear()

@@ -10,7 +10,7 @@ render_mode cull_disabled, diffuse_burley, specular_schlick_ggx;
 #ifdef GAF_PLAYER_SKY
 #include "res://materials/world_map_actor_sky.gdshaderinc"
 #endif
-uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
+uniform sampler2D atlas : source_color, hint_default_white, filter_nearest, repeat_disable;
 uniform sampler2D metal_map : hint_default_white, filter_nearest, repeat_disable;
 uniform sampler2D rough_map : hint_default_white, filter_nearest, repeat_disable;
 uniform sampler2D glow_map : source_color, hint_default_black, filter_nearest, repeat_disable;
@@ -27,6 +27,7 @@ uniform bool glow_add = false;
 uniform float glow_energy = 1.0;
 uniform bool recovered_roughness = false;
 uniform bool recovered_self_light = false;
+uniform bool gaf_matte_opening = false;
 // Values supplied only by the validated external reference profile.
 uniform vec3 roughness_transform = vec3(1.0,0.0,1.0);
 uniform float self_light_scale = 0.0;
@@ -134,7 +135,7 @@ void fragment(){
 					incident += hue * (side_weight * gap);
 				}
 			}
-			if (recovered_roughness) incident = gaf_local_diffuse(incident, actor_world, wn);
+			if (recovered_roughness || gaf_matte_opening) incident = gaf_local_diffuse(incident, actor_world, wn);
 			EMISSION+=ALBEDO*(1.-METALLIC)*incident*visible_sky;
 			AO=0.; // Replace engine diffuse sky instead of stacking two ambient terms.
 			AO_LIGHT_AFFECT=0.;

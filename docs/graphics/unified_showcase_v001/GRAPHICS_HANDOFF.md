@@ -89,3 +89,10 @@ All proprietary MD2 meshes, textures, clips, sound, compiled metadata, PIX captu
 Local checkpoint pointer: `C:/Users/ADMIN/Desktop/MD2 Research/CURRENT_GRAPHICS_CHECKPOINT.txt`. That directory holds the precommit patch/fileSHA snapshot and final Git verification record. Native/source data are LOCAL, not backed up by the project push; securely copy the research workspace separately when moving computers. NormalF5 needs private data for the selected character; missing source intentionally falls back/unavailable rather than distributing proprietary assets.
 
 If explicitly resumed: read this handoff and checkpoint first; reproduce existing entries before editing. Highest-value unclosed work is LE+sourceLUT/radiometry and mobile-efficient multi-scale bloom, then full lighting/atmosphere visual acceptance on real handsets. Preserve all approved gameplay/assets and reuse existing captures; do not restart extraction or broadreverse-engineering. No automatic continuation while stopped.
+## Dáng nhân vật sau tán trên WorldMap
+
+Trong **L → Cài đặt → Nhân vật → Ánh sáng trên nhân vật → Dáng nhân vật sau tán**, cùng một thanh điều chỉnh dáng MD2 và Kai khi thân hoặc tán cây che camera. Kai dùng mesh thân, mặt, tóc và băng trán đang chuyển động. Kiếm giữ đường hiển thị chung. Thử ở lối rừng quanh X = −26,2, Z = 17,5 lúc 07:00, 16:30 hoặc 22:00. Hiệu ứng tắt ở mốc trưa và dùng đường hiển thị bình thường trên Compatibility.
+
+## Nắng và ánh hắt trên Kai
+
+Da, vải và những bề mặt mờ trong bộ Kai dùng chung **Dịu nắng trên nhân vật**, **Ánh hắt cục bộ theo địa hình** và **Ánh hắt ở bậc đá** với WorldMap Forward Mobile. Các thanh giữ giá trị đang dùng. Thử lúc 16:30 ở X = −24,2, đi dọc Z = −41,35 đến −39,65 trên bậc cao Y = 4 m. Đây là đoạn từ râm sang nắng trên cùng mặt bằng. Trưa và đêm dùng ánh sáng đã duyệt, bao gồm đèn chiếu từ trên xuống. Hệ số phản sáng riêng của Valorie vẫn lấy từ vật liệu Valorie.
