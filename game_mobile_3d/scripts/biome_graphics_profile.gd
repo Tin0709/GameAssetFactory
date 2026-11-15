@@ -36,6 +36,9 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., 1.5, .01) var shadowed_wall_return_scale := 0.
 ## Restores a limited share of the local sky on shaded walls with low baked return.
 @export_range(0., 1.6, .01) var sheltered_stone_return_scale := 0.
+## Additional diffuse sky on dark stone sides using the map's existing transport.
+## Curve X is normalized hour and Y is a gain from 0 to 1.
+@export var stone_wall_sky_by_hour: Curve
 
 @export_group("Atmosphere and fog")
 @export var noon_sky_color := Color(.57, .68, .69)

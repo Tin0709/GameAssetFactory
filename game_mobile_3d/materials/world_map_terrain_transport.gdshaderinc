@@ -24,6 +24,7 @@ uniform float night_stone_top_cool = 0.0;
 uniform float night_stone_blue_softness = 0.0;
 uniform float dawn_stone_sky_color = 0.0;
 uniform float stone_day_sky = 0.0;
+uniform float stone_wall_sky = 0.0;
 
 float gaf_stone_diffuse_sample(int receiver, vec3 world_normal) {
 	if (stone_diffuse_strength <= 0.0 || ground_grade != 3 || abs(world_normal.y) >= 0.1) return 0.0;
@@ -86,6 +87,13 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 		vec3 target = diffuse_sky * ratios;
 		target *= dot(diffuse_sky, luma) / max(dot(target, luma), .000001);
 		diffuse_sky = mix(diffuse_sky, target, stone_dusk_sky_chroma);
+	}
+	if (stone_wall_sky > 0.0 && ground_grade == 3 && abs(face_y) < .85) {
+		// Restore some diffuse light on dark sides from the receiver's own sky.
+		float diffuse_y = dot(diffuse_sky, vec3(.2126, .7152, .0722));
+		float weak_sky = 1.0 - smoothstep(.045, .14, diffuse_y);
+		float side = 1.0 - smoothstep(.2, .85, abs(face_y));
+		diffuse_sky += mix(vec3(diffuse_y), diffuse_sky, .37) * (stone_wall_sky * side * weak_sky);
 	}
 #endif
 	vec3 irradiance = diffuse_sky + terrain_sun_bounce * terrain_key_radiance * cloud;
