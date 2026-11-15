@@ -61,6 +61,22 @@ func run() -> void:
 	forest.set_review_view("gameplay")
 	check(forest_settings.overcast != null, "Forest needs its own overcast resource")
 	if RenderingServer.get_rendering_device() != null and RenderingServer.get_current_rendering_method() == "mobile":
+		var leaf_material: ShaderMaterial = forest.grove._canopy_appearance
+		var leaf_control := showcase._lighting_sliders.get(&"night_leaf_lamp_shoulder") as HSlider
+		showcase.set_hour(22.)
+		check(leaf_control != null and leaf_control.editable
+			and is_equal_approx(float(leaf_material.get_shader_parameter("twilight_leaf_lamp_shoulder")), .30),
+			"Fresh Forest Night uses the adjustable leaf response to the player lamp")
+		showcase.set_lighting_scale(&"night_leaf_lamp_shoulder", 0.)
+		check(is_zero_approx(float(leaf_material.get_shader_parameter("twilight_leaf_lamp_shoulder"))),
+			"Zero restores the earlier night leaf response")
+		showcase.set_lighting_scale(&"night_leaf_lamp_shoulder", 1.)
+		showcase.set_hour(19.5)
+		check(is_equal_approx(float(leaf_material.get_shader_parameter("twilight_leaf_lamp_shoulder")), .40),
+			"The night adjustment preserves the existing twilight leaf shoulder")
+		showcase.set_hour(12.)
+		check(is_zero_approx(float(leaf_material.get_shader_parameter("twilight_leaf_lamp_shoulder"))),
+			"The leaf shoulder is absent at approved Noon")
 		var diffuse_slider := showcase._lighting_sliders.get(&"shadow_diffuse_return") as HSlider
 		check(diffuse_slider != null and is_equal_approx(diffuse_slider.value, 1.),
 			"The default diffuse shadow return is adjustable")
