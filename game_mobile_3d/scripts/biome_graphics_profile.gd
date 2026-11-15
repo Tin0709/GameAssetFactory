@@ -23,6 +23,10 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., 1., .01) var shadow_opacity := .782
 ## Daylight caster adjustment for maps with the grass lighting adapter.
 @export_range(0., 2., .01) var day_grass_shadow_compactness := 1.
+## Relative opacity of the daytime canopy silhouette at close camera zoom.
+@export_range(0., 1., .01) var daylight_canopy_cue_opacity := 1.
+## Orthographic camera sizes that blend the silhouette back to full opacity.
+@export var canopy_cue_zoom_fade := Vector2(22., 36.)
 ## Local diffuse response around a map-authored opening.
 @export_range(0., .65, .01) var local_diffuse_strength := 0.
 @export var local_diffuse_by_hour: Curve

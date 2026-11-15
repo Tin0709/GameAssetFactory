@@ -54,6 +54,7 @@ script = ExtResource("profile")
 display_name = "Forest · Private reference"
 use_forest_reference = true
 day_grass_shadow_compactness = 2.0
+daylight_canopy_cue_opacity = 0.75
 projected_opening_recovery_by_hour = SubResource("ProjectedOpeningRecovery")
 afternoon_key_by_hour = SubResource("AfternoonKey")
 ambient_energy_by_hour = SubResource("ForestAmbientHours")

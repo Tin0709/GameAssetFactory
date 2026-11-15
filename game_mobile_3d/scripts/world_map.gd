@@ -397,7 +397,6 @@ func _physics_process(_delta: float) -> void:
 
 func _process(delta: float) -> void:
 	if not map_ready:return
-	sync_canopy_player_cue()
 	if not is_finite(_camera_ground_y):_camera_ground_y=player.global_position.y
 	# Hold the last supported elevation through the jump. Horizontal tracking
 	# remains exact; a different landing elevation settles without a camera pop.
@@ -418,13 +417,15 @@ func _process(delta: float) -> void:
 		camera.position=Vector3(focus.x,_camera_ground_y,focus.z)+CAMERA_OFFSET
 		geometry.update_cutaway(focus,camera.global_position)
 		if grove != null and (grove.visible or grove.spruce_visible()):grove.update_focus(camera,focus,true)
+	sync_canopy_player_cue()
 	if presentation.enabled and look != null and look.active:
 		look.publish_render_wind(presentation.wind_time(look.motion.clock))
 
 func sync_canopy_player_cue() -> void:
 	if canopy_player_cue != null:
 		canopy_player_cue.sync(self, showcase._lighting_scale(&"canopy_player_cue"),
-			showcase.canopy_cue_day_tone_weight(), showcase.canopy_cue_clarity_weight())
+			showcase.canopy_cue_day_tone_weight(), showcase.canopy_cue_clarity_weight(),
+			showcase.canopy_cue_opacity_scale($Camera3D.size))
 
 func set_review_view(mode: String) -> void:
 	if showcase!=null:showcase.begin_environment_edit()
