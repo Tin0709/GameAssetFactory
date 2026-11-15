@@ -28,11 +28,14 @@ func run() -> void:
 	check(forest.map_ready and forest_settings.use_forest_reference, "F5 uses Forest preset")
 	var boulder = forest.get_node_or_null("PlayableBoulder")
 	if RenderingServer.get_rendering_device() != null and RenderingServer.get_current_rendering_method() == "mobile":
-		check(boulder != null and boulder.active, "F5 places the approved stone and enables its support")
+		check(boulder != null and boulder.active, "F5 places the authored stone and enables its support")
 		if boulder != null:
 			check(boulder.roots.size() > 0, "The stone has verified grass roots beneath its surface")
 			check(showcase._mist_materials().has(boulder.material), "The stone takes the same spatial mist as terrain")
-			boulder.set_requested(false)
+			var toggle := showcase._ui.find_child("PlayableBoulder", true, false) as CheckButton
+			check(toggle != null and toggle.button_pressed, "The settings menu exposes the active stone comparison")
+			if toggle != null:
+				toggle.button_pressed = false
 			check(not boulder.visual.visible and boulder.collider.collision_layer == 0,
 				"Stone comparison restores the walkable meadow")
 			var before := (forest.player as CharacterBody3D).position
