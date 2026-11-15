@@ -62,13 +62,22 @@ func sample_evening(hour: float, strength: float) -> Vector3:
  var weight := strength * smoothstep(19.0, 19.5, hour) * (1.0 - smoothstep(20.5, 21.0, hour))
  if weight <= 0.0:
   return baseline
+ return _blend_evening_anchor(hour, baseline, weight)
+
+func sample_afternoon(hour: float, evening_strength: float, afternoon_weight: float) -> Vector3:
+ var baseline := sample_evening(hour, evening_strength)
+ if not evening_available() or not is_finite(hour) or not is_finite(afternoon_weight) or afternoon_weight <= 0.0:
+  return baseline
+ return _blend_evening_anchor(hour, baseline, minf(afternoon_weight, 1.0))
+
+func _blend_evening_anchor(hour: float, baseline: Vector3, weight: float) -> Vector3:
  for i in range(1, evening_anchors.size()):
   var end: Dictionary = evening_anchors[i]
   if hour <= float(end.hour):
    var start: Dictionary = evening_anchors[i - 1]
    var a: Array = start.rgb_ratio
    var b: Array = end.rgb_ratio
-   var blend := inverse_lerp(float(start.hour), float(end.hour), hour)
+   var blend := clampf(inverse_lerp(float(start.hour), float(end.hour), hour), 0.0, 1.0)
    var measured := Vector3(a[0], a[1], a[2]).lerp(Vector3(b[0], b[1], b[2]), blend)
    return baseline.lerp(measured, weight)
  return baseline

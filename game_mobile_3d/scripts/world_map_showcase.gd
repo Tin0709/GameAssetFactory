@@ -199,6 +199,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"pre_twilight_air": ["Ánh sương xa trước chạng vạng", 1.],
 	&"pre_twilight_midair": ["Sương trung cảnh chiều muộn", 1.],
 	&"evening_key_response": ["Ánh trực tiếp lúc chạng vạng", 1.],
+	&"afternoon_key_response": ["Nắng cuối chiều", 1.],
 	&"sunrise_key_response": ["Nắng chuyển lúc bình minh", 1.],
 	&"sunrise_elevation": ["Góc nắng rạng sáng", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
@@ -248,7 +249,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 155
+const LIGHTING_MIX_VERSION := 156
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -674,7 +675,11 @@ func _captured_key_rgb(time:float)->Vector3:
 	var base:Color=Color(_day.sun_color).srgb_to_linear()
 	var reference:Vector3=Vector3(base.r,base.g,base.b)*noon.key_color_scale*float(_day.sun_energy)*float(noon.key_scale)
 	var evening_strength := 0.0 if _balanced_preview else _lighting_scale(&"evening_key_response")
-	return reference * key_response.sample_evening(time, evening_strength)
+	var afternoon_weight := 0.0
+	if not _balanced_preview and _biome_profile != null:
+		afternoon_weight = DayNight.sample_curve(_biome_profile.afternoon_key_by_hour, time / 24., 0.) \
+			* _lighting_scale(&"afternoon_key_response")
+	return reference * key_response.sample_afternoon(time, evening_strength, afternoon_weight)
 
 func set_moonlight_enabled(value:bool)->void:
 	if moonlight_enabled==value:return
@@ -2135,6 +2140,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 155 and effect == &"alternate_local_mist":
 			missing_value = 0.
+		if version < 156 and effect == &"afternoon_key_response":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2310,6 +2317,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and key_response.sunrise_elevation_available() and direction_response.available()
 		if effect == &"evening_key_response":
 			slider.editable = slider.editable and key_response.evening_available()
+		if effect == &"afternoon_key_response":
+			slider.editable = slider.editable and key_response.evening_available() \
+				and _biome_profile != null and _biome_profile.afternoon_key_by_hour != null
 		if effect in [&"evening_lantern", &"afternoon_lantern"]:
 			slider.editable = slider.editable and point_response.evening_available()
 		if effect == &"pre_twilight_receiver":
