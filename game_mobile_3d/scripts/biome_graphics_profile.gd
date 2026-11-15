@@ -119,6 +119,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 func ambient_hour_scale(hour: float, strength: float = 1.) -> float:
 	var time := fposmod(hour, 24.) / 24.
 	var authored := maxf(0., DayNight.sample_curve(ambient_energy_by_hour, time, 1.))
+	if is_equal_approx(authored, 1.):
+		return 1.
 	return lerpf(1., authored, clampf(strength, 0., 1.))
 
 func sample_ground_haze(hour: float, subject_depth_m: float, map_base_y: float,
