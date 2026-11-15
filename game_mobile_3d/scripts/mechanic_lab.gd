@@ -330,6 +330,9 @@ func _select_skin(index: int) -> void:
 	var use_kai := index == PlayerSkin.KAI
 	for mesh: MeshInstance3D in _md2_skin_visibility:
 		mesh.visible = not use_kai and _md2_skin_visibility[mesh]
+	var source_lantern := player.get("lantern") as Node3D
+	if source_lantern != null:
+		source_lantern.visible = not use_kai
 	if _kai_skin != null:
 		_kai_skin.show_skin(use_kai)
 
