@@ -964,6 +964,7 @@ func _sync_distant_terrain() -> void:
 
 func _update_mist()->void:
 	_sync_distant_terrain()
+	_sync_bark_irradiance()
 	mist_source_active=false
 	_update_player_falloff()
 	_update_hdr_air()
@@ -2037,6 +2038,26 @@ func _sync_canopy_direct() -> void:
 			state = Vector4(direction.x, direction.y, direction.z, gain)
 	level.grove.set_canopy_direct(state, Vector2(2.5, 6.0) + Vector2.ONE * level.spawn_position.y)
 
+func _sync_bark_irradiance() -> void:
+	if level == null or level.grove == null:
+		return
+	var state := Vector4.ZERO
+	var tint := Vector3.ONE
+	if _biome_profile != null and not _balanced_preview and forest_active() and atmosphere_review == "combined" \
+		and level.ambient != null and level.view_mode == "gameplay":
+		var strength := clampf(DayNight.sample_curve(_biome_profile.bark_irradiance_by_hour, hour / 24., 0.), 0., 1.)
+		strength *= _lighting_scale(&"bark_irradiance")
+		if strength > 0.:
+			var environment: Environment = level.get_node("WorldEnvironment").environment
+			var incident: Vector3 = level.ambient.sky_irradiance_mean(environment)
+			if incident.is_finite() and not incident.is_zero_approx():
+				tint = _biome_profile.bark_irradiance_tint.clamp(Vector3(.05, .05, .05), Vector3(3., 3., 3.))
+				if tint.is_finite():
+					state = Vector4(incident.x, incident.y, incident.z, strength)
+				else:
+					tint = Vector3.ONE
+	level.grove.set_bark_irradiance(state, tint)
+
 func _sync_oak_leaf_tint() -> void:
 	if level == null or level.grove == null:
 		return
@@ -2657,6 +2678,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"zoom_exposure_guide", &"zoom_exposure_blur"]:
 		if phase_finish != null:
 			phase_finish.refresh()
+		return
+	if changed_effect == &"bark_irradiance":
+		_sync_bark_irradiance()
 		return
 	if changed_effect == &"stone_twilight_color":
 		_publish_stone_twilight_color()

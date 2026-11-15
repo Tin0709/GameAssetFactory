@@ -41,6 +41,14 @@ func _eligible(environment: Environment) -> bool:
 		and environment.ambient_light_source == Environment.AMBIENT_SOURCE_COLOR \
 		and environment.reflected_light_source in [Environment.REFLECTION_SOURCE_SKY, Environment.REFLECTION_SOURCE_DISABLED]
 
+func sky_irradiance_mean(environment: Environment) -> Vector3:
+	if environment == null or environment != _environment or environment.sky != _sky \
+		or environment.ambient_light_source != Environment.AMBIENT_SOURCE_SKY \
+		or not is_equal_approx(environment.ambient_light_sky_contribution, 1.):
+		return Vector3.ZERO
+	var linear := environment.ambient_light_color.srgb_to_linear()
+	return Vector3(linear.r, linear.g, linear.b) * environment.ambient_light_energy
+
 func _update_field() -> void:
 	var color := _environment.ambient_light_color
 	var energy := _environment.ambient_light_energy
@@ -49,8 +57,7 @@ func _update_field() -> void:
 	_energy = energy
 	# Full sky contribution bypasses Environment ambient energy in Mobile.
 	# Bake that energy into the original linear radiance, not into display RGB.
-	var linear := color.srgb_to_linear()
-	var mean := Vector3(linear.r, linear.g, linear.b) * energy
+	var mean := sky_irradiance_mean(_environment)
 	_material.set_shader_parameter("center", mean)
 	_material.set_shader_parameter("vertical", mean * Vector3(0.15, 0.25, 0.45))
 	_material.set_shader_parameter("horizontal", mean * 0.18)
