@@ -64,7 +64,7 @@ func apply(actor, key: String, delta: float) -> void:
 			var native: Array[Transform3D] = []
 			for bone in rig.get_bone_count():
 				native.append(rig.get_bone_pose(bone))
-			apply_shovel_run(native, cycle, weight)
+			apply_shovel_run(native, cycle, weight, actor.source_gait)
 			for bone in [_hip_bone, _body_bone, _neck, _shovel_legs[0], _shovel_legs[1]]:
 				rig.set_bone_pose(bone, native[bone])
 		# The existing MD2 clock still owns footstep notifies and phase handoff.
@@ -105,7 +105,7 @@ static func shovel_run_weight(actor, speed: float) -> float:
 func shovel_run_period(speed: float, source_period: float, weight: float) -> float:
 	return lerpf(source_period, SHOVEL_RUN_DISTANCE / maxf(speed, 0.001), weight)
 
-func apply_shovel_run(native: Array[Transform3D], cycle: float, weight: float) -> void:
+func apply_shovel_run(native: Array[Transform3D], cycle: float, weight: float, source_gait) -> void:
 	if weight <= 0.0:
 		return
 	var stride := fposmod(cycle - SHOVEL_LEFT_RECEIVE, 1.0) * 2.0
@@ -121,17 +121,25 @@ func apply_shovel_run(native: Array[Transform3D], cycle: float, weight: float) -
 	var reference_phase := (floorf(stride) + reference_step) * 0.5
 	var reference := _sample("Run", reference_phase * float(streams.Run.duration))
 	var rise := (reference[_run_hips_group].origin.y + 0.07) * 0.29 * weight
+	var root_basis := native[parents[_hip_bone]].basis
+	var lift := root_basis.inverse() * Vector3.UP * rise
 	var hip_basis := native[_hip_bone].basis
-	native[_hip_bone].origin.y += rise
+	native[_hip_bone].origin += lift
 
 	# Keep the low, load-bearing sole on the native path. The returning leg
 	# follows most of the hip rise without scaling or bending either block.
+	# Advance the rigid MD2 leg sweep through support, then give the free
+	# leg more of the remaining cycle. The receiving poses stay on phase.
+	var sweep := smoothstep(0.0, 0.49, step) * (1.0 - smoothstep(0.53, 0.99, step))
+	var legs: Array[Transform3D] = source_gait.sample("Run", cycle + 0.075 * sweep)
 	for side in 2:
 		var foot_phase := fposmod(stride + float(side), 2.0)
 		var receiving := smoothstep(0.0, 0.16, foot_phase + 0.16) \
 			* (1.0 - smoothstep(0.46, 0.82, foot_phase))
 		receiving = maxf(receiving, smoothstep(1.82, 2.0, foot_phase))
-		native[_shovel_legs[side]].origin -= hip_basis.inverse() * Vector3.UP * rise * receiving
+		var bone := _shovel_legs[side]
+		native[bone] = native[bone].interpolate_with(legs[bone], 0.80 * weight)
+		native[bone].origin -= hip_basis.inverse() * lift * receiving
 
 	# Arms, hands and the socket keep their authored relative motion. The
 	# shoulder block carries the entire two-handed pose through the sway.
