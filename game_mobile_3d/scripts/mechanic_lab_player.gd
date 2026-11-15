@@ -220,7 +220,7 @@ func _composed_gait_period(key: String, speed: float, state: Dictionary) -> floa
 	if crossbow_equipped and key in LabLocomotion.RUNS and hybrid_motion != null:
 		return hybrid_motion.period(speed, 1.0)
 	if hybrid_motion != null and hybrid_motion.uses_shovel_run(self, key):
-		return hybrid_motion.shovel_run_period(speed, float(state.period), hybrid_motion.shovel_run_weight(self, speed))
+		return hybrid_motion.period(speed, 1.0)
 	return super._composed_gait_period(key, speed, state)
 
 func _select_clip() -> String:
@@ -251,9 +251,9 @@ func _outgoing_locomotion_sampler(key: String, phase: float) -> Callable:
 		var speed := _animation_motion_speed if _combat_plan_active else current_speed
 		var gait_state: Dictionary = source_gait.state(speed)
 		cursor.phase = fposmod(float(cursor.phase) + delta / _composed_gait_period(key, speed, gait_state), 1.0)
-		var pose: Array[Transform3D] = source_gait.compose(float(cursor.phase), speed)
 		if shovel_run:
-			hybrid_motion.apply_shovel_run(pose, float(cursor.phase), hybrid_motion.shovel_run_weight(self, speed), source_gait)
+			return hybrid_motion.shovel_run_pose(float(cursor.phase))
+		var pose: Array[Transform3D] = source_gait.compose(float(cursor.phase), speed)
 		return hybrid_motion.crossbow_run_pose(pose, float(cursor.phase)) if crossbow_run else pose
 
 func _begin_pose_transition(key: String, seconds: float) -> void:
