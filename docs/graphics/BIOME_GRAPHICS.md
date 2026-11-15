@@ -140,6 +140,8 @@ Map import nạp khí quyển từ preset portable. Dữ liệu khí quyển For
 
 **Day Grass Shadow Compactness** đặt mặc định cho map dùng adapter vật liệu cỏ. Trên Forest, **Địa hình & cây cỏ → Cỏ và tương tác → Bóng cỏ sáng / chiều** mặc định 200%, so với mức trước là 100%. Lúc 07:00 và 16:30, đỉnh bụi cỏ trong lượt vẽ bóng nắng dùng 70% chiều cao hiển thị. Mức rút giảm mượt về 0 tại 12:00 và 19:00. Các preset cũ giữ giá trị đã lưu. Phần cỏ hiển thị, bóng cây và cấu hình Meadow giữ nguyên.
 
+**Shadow Diffuse By Hour** đặt lượng ánh bù khuếch tán cho các vật liệu có đường chiếu nắng riêng của WorldMap. Ở Forest, mặc định đạt đỉnh 0,06 lúc 07:00 và 16:30, giảm về 0 quanh trưa và ban đêm. Vào **L → Cài đặt → Địa hình & cây cỏ → Đá và mặt đất → Ánh dịu trong bóng trên đất và cỏ** và so 0% với 100% ở lối vào bậc đá. Hiệu ứng đi theo độ che hiện tại của nguồn nắng và màu ánh môi trường, dùng cùng lượt chiếu sáng. Preset đã lưu trước v173 dùng 0% nếu thiếu mục này. Mục này thuộc đường vật liệu nâng cao của WorldMap; biome import tiếp tục dùng ánh môi trường và fog theo preset của map.
+
 **Daylight Shadow Luminance Scale** đặt mức nâng chi tiết ở vùng râm trong bước Reference finish. WorldMap Forest mặc định dùng 0,30 và đường giờ **Shadow Grade Recovery By Hour**. Vào **L → Cài đặt → Ánh sáng → Bóng và tương phản → Chi tiết vùng râm sáng và chiều** để so 0% và 100% ở lối rừng lúc 07:00 hoặc bậc đá lúc 16:30. Hiệu ứng giữ sắc của bóng, dùng chung pass phối màu hiện có và về 0 quanh trưa và ban đêm. Giá trị khởi tạo của profile mới là 0. Preset người chơi trước v172 dùng 0% khi chưa lưu mục này. Map portable vẫn dùng Color Grading và adaptive bloom của biome; thanh này thuộc Reference finish của Forest.
 
 ## Mức chất lượng theo map và thiết bị
