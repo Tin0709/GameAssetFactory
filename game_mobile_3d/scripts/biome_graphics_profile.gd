@@ -54,6 +54,11 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., .06, .001) var mist_extinction := .011
 @export_range(0., 1., .01) var mist_height_falloff := .25
 @export_range(0., 1., .01) var mist_scatter := .40
+## Optional spatial mist light tint, independent of the depth fog color. Preserves source luminance.
+## Both tracks use normalized hours. Match the endpoints for a continuous midnight.
+@export var mist_scatter_color_by_hour: Gradient
+## Multiplier for scattered light. Defaults to 1 and does not change transmission.
+@export var mist_scatter_energy_by_hour: Curve
 @export_range(0., 1., .01) var local_mist_strength := .65
 ## Multiplies the first map region by normalized hour. A missing or empty curve uses 1.
 @export var local_mist_by_hour: Curve

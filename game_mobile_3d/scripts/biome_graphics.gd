@@ -12,6 +12,7 @@ const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
 const PathFixture = preload("res://scripts/world_map_forest_path_light.gd")
 const PathLamppost = preload("res://scripts/world_map_path_lamppost.gd")
 const HOURS := [7., 12., 16.5, 18.5, 22.]
+const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 enum Quality { ESSENTIAL, BALANCED, FULL }
 const QUALITY_LABELS := ["Nhẹ", "Cân bằng", "Đầy đủ"]
 
@@ -212,7 +213,7 @@ func refresh() -> void:
 	env.fog_density = clampf(env.fog_density, 0., 1.)
 	_world.showcase.sync_cliff_vista(quality != Quality.ESSENTIAL)
 	_update_fixture(time)
-	_prepare_spatial_mist(env, time)
+	_prepare_spatial_mist(env, fog_color, time)
 	_update_local_diffuse()
 	_update_finish()
 
@@ -332,7 +333,7 @@ func _fixture_air() -> PackedFloat32Array:
 		return _path_lamppost.air_parameters(_profile.path_fixture_scatter)
 	return _path_fixture.air_parameters(_profile.path_fixture_scatter)
 
-func _prepare_spatial_mist(env: Environment, time: float) -> void:
+func _prepare_spatial_mist(env: Environment, clear_fog_color: Color, time: float) -> void:
 	var active := quality != Quality.ESSENTIAL and _profile.spatial_mist and RenderingServer.get_current_rendering_method() == "mobile" \
 		and RenderingServer.get_rendering_device() != null
 	if not active:
@@ -353,6 +354,7 @@ func _prepare_spatial_mist(env: Environment, time: float) -> void:
 	var tint := Vector3(env.fog_light_color.r, env.fog_light_color.g, env.fog_light_color.b)
 	var phase_density := env.fog_density / maxf(_profile.noon_fog_density, .05)
 	var density := _profile.mist_extinction * phase_density
+	var scatter_scale := DayNight.sample_curve(_profile.mist_scatter_energy_by_hour, time, 1.)
 	var base_y: float = _world.biome_atmosphere_base_y
 	if not is_finite(base_y):
 		base_y = _world.spawn_position.y
@@ -363,10 +365,19 @@ func _prepare_spatial_mist(env: Environment, time: float) -> void:
 		"height_falloff": _profile.mist_height_falloff,
 		"near_layer": Vector3(env.fog_depth_begin, density, base_y),
 		"near_fade_start": .8,
-		"scatter_energy": _profile.mist_scatter,
+		"scatter_energy": clampf(_profile.mist_scatter * scatter_scale, 0., 1.),
 		"player_light_color": Vector3.ZERO,
 		"player_light_weight": 0.,
 	}
+	var tint_track := _profile.mist_scatter_color_by_hour
+	if tint_track != null and tint_track.get_point_count() > 0:
+		var phase_tint := tint_track.sample(time).srgb_to_linear()
+		var source := Vector3(phase_tint.r, phase_tint.g, phase_tint.b)
+		var source_luma := source.dot(LINEAR_LUMA)
+		if source_luma > .00001:
+			var clear := clear_fog_color.srgb_to_linear()
+			var clear_luma := Vector3(clear.r, clear.g, clear.b).dot(LINEAR_LUMA)
+			_mist_sample.linear_scatter_rgb = source * (clear_luma / source_luma)
 	_weather.apply_medium(_profile.overcast, _mist_sample)
 	var local_strength := _profile.local_mist_strength * lerpf(.55, 1., weather_weight)
 	var local_weight := clampf(DayNight.sample_curve(_profile.local_mist_by_hour, time, 1.), 0., 1.)
