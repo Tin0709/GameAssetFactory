@@ -24,6 +24,8 @@ void light(){
 		response+=world_foliage_lobe(study_face,LIGHT,VIEW,front,study_tip_weight,study_transmission);
 	}
 	float cloud=LIGHT_IS_DIRECTIONAL?study_cloud:1.0;
+	DIFFUSE_LIGHT += gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
+		ATTENUATION, cloud, sqrt(front), .82);
 	float gain = gaf_opening_gain(LIGHT_IS_DIRECTIONAL, ATTENUATION * cloud);
 	float opening_fill = gaf_diffuse_opening_weight(LIGHT_IS_DIRECTIONAL, LIGHT, LIGHT_COLOR, INV_VIEW_MATRIX, ATTENUATION * cloud);
 	if (opening_fill > 0.0) {

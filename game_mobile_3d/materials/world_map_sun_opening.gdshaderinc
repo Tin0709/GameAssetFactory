@@ -2,6 +2,8 @@
 
 global uniform float gaf_sun_opening_gain;
 global uniform vec4 gaf_diffuse_opening;
+global uniform vec4 gaf_shadow_diffuse_sun;
+global uniform vec3 gaf_shadow_diffuse_tint;
 
 // Lift the direct beam in lit openings using the existing geometric and
 // projected visibility. Sky, bounce and local light stay separately owned.
@@ -22,4 +24,16 @@ float gaf_diffuse_opening_weight(bool directional, vec3 light, vec3 light_color,
 	}
 	// Original low-frequency response to the same shadow and projected visibility.
 	return gaf_diffuse_opening.w * smoothstep(0.12, 0.76, visibility);
+}
+
+vec3 gaf_shadow_diffuse(bool directional, vec3 view_light, mat4 inverse_view,
+		float attenuation, float cloud, float facing, float contact) {
+	if (gaf_shadow_diffuse_sun.w <= 0.0 || !directional ||
+		dot(mat3(inverse_view) * view_light, gaf_shadow_diffuse_sun.xyz) < .9999 ||
+		distance(inverse_view[3].xyz, gaf_point_kernel_camera) > .005) {
+		return vec3(0.0);
+	}
+	float direct = attenuation * cloud * facing;
+	float shade = 1.0 - smoothstep(.055, .48, direct);
+	return gaf_shadow_diffuse_tint * (gaf_shadow_diffuse_sun.w * contact * shade);
 }

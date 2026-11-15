@@ -47,6 +47,8 @@ void light() {
 #endif
 	float nl = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
+	DIFFUSE_LIGHT += gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
+		ATTENUATION, cloud_transmission, nl, terrain_direct_contact);
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sunset_beam.w > 0.0
 			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sunset_beam.xyz) > 0.9999
 			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
