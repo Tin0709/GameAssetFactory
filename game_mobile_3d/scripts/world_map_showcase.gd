@@ -964,7 +964,6 @@ func _sync_distant_terrain() -> void:
 
 func _update_mist()->void:
 	_sync_distant_terrain()
-	_sync_bark_irradiance()
 	mist_source_active=false
 	_update_player_falloff()
 	_update_hdr_air()
@@ -3211,6 +3210,7 @@ func _process(delta:float)->void:
 	_weather.advance(delta)
 	apply_time()
 	_update_mist()
+	_sync_bark_irradiance()
 	_sync_oak_leaf_tint()
 	if _hint!=null and unavailable_reason.is_empty():_hint.visible=_elapsed<12. and not panel.visible
 	if status!=null and panel.visible:

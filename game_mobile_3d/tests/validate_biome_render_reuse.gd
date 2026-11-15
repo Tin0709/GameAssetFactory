@@ -87,6 +87,16 @@ func run() -> void:
 		check(disabled is Vector4 and disabled.is_zero_approx(), "Disabling sun shadows clears the diffuse return")
 		sun_for_shade.shadow_enabled = true
 		showcase.set_hour(12.)
+		var bark_slider := showcase._lighting_sliders.get(&"bark_irradiance") as HSlider
+		check(bark_slider != null and is_equal_approx(bark_slider.value, 1.), "Bark skylight has a live comparison slider")
+		for time: float in [12., 16.5, 19.5]:
+			showcase.set_hour(time)
+			await process_frame
+			await RenderingServer.frame_post_draw
+			var bark: Variant = forest.grove._spruce_appearance.get_shader_parameter("bark_irradiance")
+			check(bark is Vector4 and is_equal_approx(bark.w, .60 if time == 16.5 else 0.),
+				"Bark skylight follows the biome phase at %.1f" % time)
+		showcase.set_hour(12.)
 	check(forest_settings.get("projected_opening_recovery_by_hour") is Curve,
 		"Forest sunlight opening response comes from the biome preset")
 	check(forest_settings.get("alternate_mist_by_hour") is Curve,
