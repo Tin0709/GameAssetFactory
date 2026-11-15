@@ -40,6 +40,7 @@ var _finish_camera: Camera3D
 var _finish_compositor: Compositor
 var _previous_compositor: Compositor
 var _local_diffuse_source := Vector4.ZERO
+var _additional_diffuse_source := Vector4.ZERO
 var _local_diffuse_bounds := Vector4.ZERO
 var _local_diffuse_ambient := Vector3.ZERO
 var _allow_local_diffuse := true
@@ -195,19 +196,22 @@ func _update_local_diffuse() -> void:
 	var bounds := Vector4.ZERO
 	var ambient := Vector3.ZERO
 	var region = _world.local_diffuse_region
+	var gain := 0.0
 	if _allow_local_diffuse and quality != Quality.ESSENTIAL and _world.look.stage == 2 \
-			and _world.view_mode == "gameplay" and region != null and region.is_valid() \
+			and _world.view_mode == "gameplay" \
 			and _profile.local_diffuse_strength > 0. and RenderingServer.get_current_rendering_method() == "mobile":
 		var time: float = _world.showcase.hour / 24.
-		var gain := _profile.local_diffuse_strength * clampf(DayNight.sample_curve(_profile.local_diffuse_by_hour, time, 1.), 0., 1.)
+		gain = _profile.local_diffuse_strength * clampf(DayNight.sample_curve(_profile.local_diffuse_by_hour, time, 1.), 0., 1.)
 		if _profile.overcast != null:
 			gain *= lerpf(1., _profile.overcast.local_diffuse_scale, weather_weight)
-		if gain > 0.:
-			source = region.source(gain)
-			bounds = region.bounds()
-			var env: Environment = _world.get_node("WorldEnvironment").environment
-			var linear := env.ambient_light_color.srgb_to_linear()
-			ambient = Vector3(linear.r, linear.g, linear.b) * env.ambient_light_energy
+	if gain > 0. and region != null and region.is_valid():
+		source = region.source(gain)
+		bounds = region.bounds()
+	_additional_diffuse_source = DiffuseRegion.publish_additional(_world.additional_local_diffuse_region, gain, _additional_diffuse_source)
+	if source.w > 0. or _additional_diffuse_source.w > 0.:
+		var env: Environment = _world.get_node("WorldEnvironment").environment
+		var linear := env.ambient_light_color.srgb_to_linear()
+		ambient = Vector3(linear.r, linear.g, linear.b) * env.ambient_light_energy
 	if bounds != _local_diffuse_bounds:
 		_local_diffuse_bounds = bounds
 		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_region", bounds)
