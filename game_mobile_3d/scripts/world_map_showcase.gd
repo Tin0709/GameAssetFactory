@@ -97,6 +97,7 @@ var _additional_diffuse_source := Vector4.ZERO
 const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
 	&"sun": ["Direct sunlight", 2.],
+	&"overcast_phase_color": ["Giữ sắc nắng theo giờ khi nhiều mây", 1.],
 	&"sun_pockets": ["Sunlight pockets", 1.5],
 	&"sun_opening": ["Sunlit openings", 1.],
 	&"projected_sun": ["Projected sunlight", 1.],
@@ -2211,6 +2212,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 163 and effect == &"stone_wall_return":
 			missing_value = 0.
+		if version < 164 and effect == &"overcast_phase_color":
+			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.
 		if version < 127 and effect == &"bloom_local_response":
@@ -2718,7 +2721,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		_vignette.material.set_shader_parameter("strength",p.vignette)
 	_apply_forest_dusk_backdrop(env)
 	if atmosphere_review in ["lighting", "combined"]:
-		_weather.apply_lighting(_weather_profile, sun, env)
+		_weather.apply_lighting(_weather_profile, sun, env, hour, _lighting_scale(&"overcast_phase_color"))
 	if atmosphere_review in ["haze", "combined"]:
 		if _weather.weight > 0.:
 			_weather.apply_air(_weather_profile, env, _lighting_scale(&"fog"))
@@ -2907,7 +2910,7 @@ func apply_time()->void:
 	if use_forest:
 		_apply_forest(env,sun)
 	else:
-		_weather.apply_lighting(_weather_profile, sun, env)
+		_weather.apply_lighting(_weather_profile, sun, env, hour, _lighting_scale(&"overcast_phase_color"))
 		_weather.apply_air(_weather_profile, env, _lighting_scale(&"fog"))
 		_sync_canopy_direct()
 	_time_applied=true
