@@ -20,6 +20,7 @@ var phase_bounce_active:=false
 var source_field_enabled:=false
 var source_field_active:=false
 var _source_key:Array=[]
+var _last_shade_sky := -1.
 func set_source_field(value:bool)->void:
  source_field_enabled=value;refresh(true)
 func set_phase_sky(value:bool)->void:
@@ -104,6 +105,7 @@ func refresh(force:bool=false)->void:
  var canopy_color:float=level.showcase.player_canopy_color_weight() if active and level.look.player_local_light_enabled else 0.
  var view_fill_chroma: float = level.showcase.actor_view_fill_chroma_weight() if active and level.look.player_local_light_enabled else 0.
  var twilight_view_fill: float = level.showcase.actor_twilight_view_fill_weight() if active and level.look.player_local_light_enabled else 0.
+ refresh_shade_sky(force)
  var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if phase_bounce_active else null,sun_shoulder,sun_specular,canopy_color,view_fill_chroma,twilight_view_fill]
  if not force and bind_key==_last_bind_key:
   update_usec=Time.get_ticks_usec()-started;return
@@ -125,4 +127,14 @@ func refresh(force:bool=false)->void:
    m.set_shader_parameter("player_probe_base",p.y);m.set_shader_parameter("player_probe_tint",tint)
    m.set_shader_parameter("player_probe_scale",scale);m.set_shader_parameter("player_probe_key",key)
  update_usec=Time.get_ticks_usec()-started
+
+func refresh_shade_sky(force: bool = false) -> void:
+ var strength: float = level.showcase.actor_shade_sky_weight() if _active and level.look.player_local_light_enabled else 0.
+ if not force and _last_shade_sky == strength:
+  return
+ _last_shade_sky = strength
+ for material: ShaderMaterial in level.look._direct_actor_materials:
+  if material != null and material.get_meta("verified_valorie", false):
+   material.set_shader_parameter("actor_shade_sky", strength)
+
 func _process(_delta:float)->void:refresh()

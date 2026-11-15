@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=15 format=3]
+[gd_resource type="Resource" load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -58,6 +58,10 @@ point_count = 10
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.75), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.75), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 8
 
+[sub_resource type="Curve" id="ForestActorShadeSky"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.68), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.68), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 8
+
 [resource]
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
@@ -72,6 +76,7 @@ daylight_green_grade_scale = 1.0
 shadowed_wall_return_scale = 1.5
 sheltered_stone_return_scale = 1.6
 stone_wall_sky_by_hour = SubResource("ForestWallSky")
+actor_shade_sky_by_hour = SubResource("ForestActorShadeSky")
 alternate_mist_by_hour = SubResource("LowForestMistPhase")
 mist_entry_scatter_by_hour = SubResource("ForestEntryScatter")
 ground_haze = SubResource("ForestGroundHaze")

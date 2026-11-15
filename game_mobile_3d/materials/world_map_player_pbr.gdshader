@@ -32,6 +32,7 @@ uniform vec3 roughness_transform = vec3(1.0,0.0,1.0);
 uniform float self_light_scale = 0.0;
 uniform float actor_view_fill_chroma = 0.0;
 uniform float actor_twilight_view_fill = 0.0;
+uniform float actor_shade_sky = 0.0;
 varying vec3 actor_world;
 varying float actor_canopy_sky;
 #ifdef GAF_PLAYER_DIRECT
@@ -97,11 +98,26 @@ void fragment(){
 #endif
 		if(player_local_light){
 			vec3 incident = player_cube_light(wn,height,cloud,actor_canopy_sky);
-			if ((actor_canopy_color_mix > 0.0 && actor_canopy_sky < 0.96) || gaf_pre_twilight_receiver > 0.0) {
+			bool color_sky = (actor_canopy_color_mix > 0.0 && actor_canopy_sky < 0.96) || gaf_pre_twilight_receiver > 0.0;
+			float shade_weight = 0.0;
+			if (actor_shade_sky > 0.0 && recovered_roughness && actor_canopy_sky < .955) {
+				float covered = smoothstep(.045, .36, 1.0 - actor_canopy_sky);
+				float side = 1.0 - .82 * smoothstep(.13, .87, wn.y);
+				shade_weight = actor_shade_sky * covered * side;
+			}
+			if (color_sky || shade_weight > 0.0) {
+				vec3 uncovered_sky = player_cube_sky(wn, height, 1.0);
 				// Retint only the diffuse sky contribution. The probe's sun bounce and reflection are separate.
-				vec3 sky = player_cube_sky(wn, height, actor_canopy_sky);
-				vec3 diffuse_sky = gaf_canopy_diffuse_color(sky, actor_canopy_sky, actor_canopy_color_mix);
-				incident += gaf_pre_twilight_diffuse(diffuse_sky, CAMERA_POSITION_WORLD) - sky;
+				if (color_sky) {
+					vec3 sky = uncovered_sky * actor_canopy_sky;
+					vec3 diffuse_sky = gaf_canopy_diffuse_color(sky, actor_canopy_sky, actor_canopy_color_mix);
+					incident += gaf_pre_twilight_diffuse(diffuse_sky, CAMERA_POSITION_WORLD) - sky;
+				}
+				if (shade_weight > 0.0) {
+					// Return soft sky to covered sides using the local directional probes.
+					float sky_y = dot(uncovered_sky, vec3(.2126, .7152, .0722));
+					incident += mix(vec3(sky_y), uncovered_sky, .59) * shade_weight;
+				}
 			}
 			if (recovered_roughness) incident = gaf_local_diffuse(incident, actor_world, wn);
 			EMISSION+=ALBEDO*(1.-METALLIC)*incident*visible_sky;

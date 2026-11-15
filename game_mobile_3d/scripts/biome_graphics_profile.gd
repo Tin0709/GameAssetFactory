@@ -39,6 +39,9 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Additional diffuse sky on dark stone sides using the map's existing transport.
 ## Curve X is normalized hour and Y is a gain from 0 to 1.
 @export var stone_wall_sky_by_hour: Curve
+## Additional diffuse sky on supported player materials under canopy.
+## Curve X is normalized hour and Y is a gain from 0 to 1.
+@export var actor_shade_sky_by_hour: Curve
 
 @export_group("Atmosphere and fog")
 @export var noon_sky_color := Color(.57, .68, .69)
