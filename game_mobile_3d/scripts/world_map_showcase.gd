@@ -194,6 +194,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"distant_terrain": ["Địa hình xa lúc chạng vạng", 1.],
 	&"cliff_vista": ["Địa hình xa sau bậc đá", 1.],
 	&"cliff_vista_feather": ["Dịu mép địa hình khi zoom xa", 1.],
+	&"zoom_exposure_guide": ["Ổn định sáng tối khi zoom xa", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
 	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
@@ -254,7 +255,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 159
+const LIGHTING_MIX_VERSION := 160
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2175,6 +2176,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 158 and effect == &"cliff_vista":
 			missing_value = 0.
 		if version < 159 and effect == &"cliff_vista_feather":
+			missing_value = 0.
+		if version < 160 and effect == &"zoom_exposure_guide":
 			missing_value = 0.
 		if version < 128 and effect == &"night_bloom_prefilter":
 			missing_value = 0.

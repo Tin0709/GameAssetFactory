@@ -40,6 +40,9 @@ func _candidate(data:RenderData)->Dictionary:
 	if state.get("frame",-1)!=native._frames or not is_finite(strength)or strength<=0. or strength>1.:return {}
 	var shadow_lift:=float(state.get("shadow_lift",1.))
 	if not is_finite(shadow_lift)or shadow_lift<0. or shadow_lift>1.:return {}
+	var guide_scale := float(state.get("guide_scale", 1.))
+	if guide_scale != 1.:
+		bytes.encode_float(16, bytes.decode_float(16) * guide_scale)
 	bytes.append_array(PackedFloat32Array([strength,strength,shadow_lift,0.]).to_byte_array())
 	return {"raw":raw,"grid":grid,"blur":blur,"parameters":bytes}
 
