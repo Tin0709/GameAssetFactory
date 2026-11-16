@@ -99,6 +99,7 @@ var _stone_wall_return := 0.
 var _sheltered_stone_return := 0.
 var _stone_sunset_beam := Vector4.ZERO
 var _stone_sun_warmth := Vector4.ZERO
+var _stone_warmth_luma_trim := 0.
 var _stone_sunset_region := Vector4.ZERO
 var _local_diffuse_source := Vector4.ZERO
 var _additional_diffuse_source := Vector4.ZERO
@@ -156,6 +157,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_dusk_sky_chroma": ["Sắc đá trong râm chiều muộn", 1.],
 	&"stone_sunset_beam": ["Dịu nắng chiều trên đá", 1.],
 	&"stone_sun_warmth": ["Nắng ấm trên mặt đá", 1.],
+	&"stone_warmth_luma_trim": ["Giảm chói của nắng ấm trên đá", 1.],
 	&"stone_detail_softness": ["Stone texture softness", 1.],
 	&"night_spatial_sky": ["Night terrain bounce (preview)", 1.],
 	&"night_stone_blue_softness": ["Dịu sắc lam trên đá ban đêm", 1.],
@@ -302,7 +304,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 198
+const LIGHTING_MIX_VERSION := 199
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -469,6 +471,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_sunset_beam", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_sun_warmth", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_stone_warmth_luma_trim", 0.)
 	if not _flat_lab:
 		DiffuseRegion.claim(self)
 	RenderingServer.global_shader_parameter_set("gaf_replay_bounce", Vector4.ZERO)
@@ -936,6 +939,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_sunset_beam", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_sun_warmth", Vector4.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_stone_warmth_luma_trim", 0.)
 			forest_replay.publish_bounce(0.0)
 			forest_replay.release_surface()
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
@@ -1365,6 +1369,12 @@ func _sync_stone_sun_warmth() -> void:
 	if state != _stone_sun_warmth:
 		_stone_sun_warmth = state
 		RenderingServer.global_shader_parameter_set("gaf_stone_sun_warmth", state)
+	var trim := 0.
+	if state.w > 0. and is_finite(_biome_profile.stone_warmth_luma_trim):
+		trim = clampf(_biome_profile.stone_warmth_luma_trim * _lighting_scale(&"stone_warmth_luma_trim"), 0., 1.)
+	if trim != _stone_warmth_luma_trim:
+		_stone_warmth_luma_trim = trim
+		RenderingServer.global_shader_parameter_set("gaf_stone_warmth_luma_trim", trim)
 
 func _stone_sunset_available() -> bool:
 	if _flat_lab or level == null:
@@ -2601,6 +2611,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 199 and effect == &"stone_warmth_luma_trim":
+			missing_value = 0.
 		if version < 198 and effect == &"day_grass_ground_tone":
 			missing_value = 0.
 		if version < 197 and effect == &"exposure_neighborhood_limit":
@@ -2925,6 +2937,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = level.terrain_light.stone_twilight_available()
 		if effect == &"stone_dusk_sky_chroma":
 			slider.editable = _stone_day_sky_editable()
+		if effect == &"stone_warmth_luma_trim":
+			slider.editable = slider.editable and _stone_sun_warmth_available() and _biome_profile.stone_warmth_luma_trim > 0.
 		if effect == &"stone_sun_warmth":
 			slider.editable = slider.editable and _stone_sun_warmth_available()
 		if effect == &"stone_sunset_beam":
@@ -3056,7 +3070,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
 		_sync_canopy_direct()
 		return
-	if changed_effect == &"stone_sun_warmth":
+	if changed_effect in [&"stone_sun_warmth", &"stone_warmth_luma_trim"]:
 		_sync_stone_sun_warmth()
 		return
 	if changed_effect == &"stone_sunset_beam":
@@ -3506,6 +3520,9 @@ func _restore_comparison_stage(previous: int) -> void:
 		level.look.set_stage(previous)
 
 func _update_shape_control()->void:
+	var luma_trim: HSlider = _lighting_sliders.get(&"stone_warmth_luma_trim")
+	if luma_trim != null:
+		luma_trim.editable = not _balanced_preview and _stone_sun_warmth_available() and _biome_profile.stone_warmth_luma_trim > 0.
 	var stone_warmth: HSlider = _lighting_sliders.get(&"stone_sun_warmth")
 	if stone_warmth != null:
 		stone_warmth.editable = not _balanced_preview and _stone_sun_warmth_available()

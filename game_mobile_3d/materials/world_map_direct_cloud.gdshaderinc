@@ -12,6 +12,7 @@ global uniform float gaf_stone_wall_return;
 global uniform vec4 gaf_stone_sunset_region;
 global uniform vec4 gaf_stone_sunset_beam;
 global uniform vec4 gaf_stone_sun_warmth;
+global uniform float gaf_stone_warmth_luma_trim;
 varying vec2 stone_sunset_position;
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
@@ -56,7 +57,13 @@ void light() {
 			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
 		float open_sun = smoothstep(.38, .91, ATTENUATION * cloud_transmission);
 		float facing = smoothstep(.08, .43, nl);
-		key_color *= 1.0 + gaf_stone_sun_warmth.w * open_sun * facing * vec3(1.15, .72, .08);
+		vec3 warm_key = key_color * (1.0 + gaf_stone_sun_warmth.w * open_sun * facing * vec3(1.15, .72, .08));
+		if (gaf_stone_warmth_luma_trim > 0.0) {
+			const vec3 luma = vec3(.2126, .7152, .0722);
+			float relative_luma = dot(key_color, luma) / max(dot(warm_key, luma), 0.00001);
+			warm_key *= mix(1.0, relative_luma, gaf_stone_warmth_luma_trim);
+		}
+		key_color = warm_key;
 	}
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sunset_beam.w > 0.0
 			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sunset_beam.xyz) > 0.9999
