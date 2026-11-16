@@ -84,10 +84,7 @@ func add_settings_controls(parent: VBoxContainer) -> Label:
 	_settings_quality.item_selected.connect(func(index: int) -> void: set_quality(index as Quality))
 	parent.add_child(_settings_quality)
 
-	if _actor_ground_light != null and _actor_ground_light.supported:
-		var label := Label.new()
-		label.text = "Ánh hắt từ nền lên nhân vật"
-		parent.add_child(label)
+	if _has_actor_ground_settings():
 		_actor_ground_slider = HSlider.new()
 		_actor_ground_slider.name = "ActorGroundLightScale"
 		_actor_ground_slider.max_value = 1.
@@ -114,7 +111,8 @@ func _refresh_settings() -> void:
 	if _settings_quality.selected != quality:
 		_settings_quality.select(quality)
 	if _actor_ground_slider != null:
-		_actor_ground_slider.editable = quality != Quality.ESSENTIAL and _profile.actor_ground_light_by_hour != null
+		_actor_ground_slider.editable = quality != Quality.ESSENTIAL and _profile.actor_ground_light_by_hour != null \
+			and _actor_ground_light != null and _actor_ground_light.supported
 
 func set_profile(profile: Profile) -> void:
 	if profile == null or profile.use_forest_reference:
@@ -165,6 +163,15 @@ func _process(delta: float) -> void:
 		_world.showcase.set_hour(DayNight.advance(_world.showcase.hour, delta, _profile.cycle_minutes * 60.))
 	if _weather.advance(delta) and _profile.overcast != null:
 		refresh()
+
+func _has_actor_ground_settings() -> bool:
+	if not ActorGroundLight.available() or _world.player.get("using_original_source") == true:
+		return false
+	for profile in _choices:
+		if profile.actor_ground_light_by_hour != null:
+			return true
+	return false
+
 
 func set_actor_ground_scale(value: float) -> void:
 	_actor_ground_scale = clampf(value, 0., 1.)

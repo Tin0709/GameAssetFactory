@@ -19,6 +19,7 @@ const NAMED := {
 	"ForestWeather": "biome-weather",
 	"BiomePreset": "biome-preset",
 	"BiomeQuality": "biome-quality",
+	"ActorGroundLightScale": "actor-ground-light",
 	"SettingsPresetMessage": "preset-message",
 }
 const PHASES := ["morning", "day", "golden", "night"]
@@ -220,6 +221,8 @@ func _collect_widget(node: Node) -> void:
 	if id.is_empty() and node is Button and not node is OptionButton:
 		id = _regex.sub(node.text.to_lower(), "-", true).strip_edges().trim_prefix("-").trim_suffix("-")
 	if not id.is_empty():
+		if node is HSlider:
+			_sliders[id] = node
 		_register(id, node)
 
 func _register(id: String, widget: Control) -> void:
@@ -395,6 +398,7 @@ func _rebuild(_text: String = "") -> void:
 			var biome := _section("Đồ họa bản đồ")
 			_add_row(biome, "biome-preset")
 			_add_row(biome, "biome-quality")
+			_add_row(biome, "actor-ground-light")
 		_add_row(_section("Điều khiển trong game"), "keys-help")
 	elif _active == 0:
 		_build_quick()
@@ -484,7 +488,7 @@ func _add_row(parent: VBoxContainer, id: String) -> void:
 	parent.add_child(stack)
 	var row := HBoxContainer.new()
 	stack.add_child(row)
-	if widget is OptionButton:
+	if widget is OptionButton or widget is HSlider:
 		var caption := _label(_items[id][0])
 		caption.custom_minimum_size.x = 138
 		row.add_child(caption)
