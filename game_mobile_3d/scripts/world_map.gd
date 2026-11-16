@@ -233,8 +233,15 @@ func _ready() -> void:
 		var profile := biome_graphics
 		if profile == null or profile.use_forest_reference:
 			profile = preload("res://assets/graphics/biomes/meadow.tres")
+		if is_device_review() and map_layout_path == DATA:
+			profile = preload("res://assets/graphics/biomes/humid_woodland.tres")
 		biome_controller.setup(self, profile, comparison_biomes)
 		showcase.build_basic_settings(biome_controller)
+		if is_device_review():
+			var controls := preload("res://scripts/world_map_device_controls.gd").new()
+			controls.name = "DeviceReviewControls"
+			$HUD.add_child(controls)
+			controls.setup(self)
 		get_viewport().size_changed.connect(_fit_imported_overview)
 	_setup_movement_effects()
 	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
@@ -261,7 +268,10 @@ func _ready() -> void:
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func _uses_portable_biome() -> bool:
-	return map_layout_path != DATA or (biome_graphics != null and not biome_graphics.use_forest_reference)
+	return is_device_review() or map_layout_path != DATA or (biome_graphics != null and not biome_graphics.use_forest_reference)
+
+func is_device_review() -> bool:
+	return OS.has_feature("gaf_device_review") or (OS.has_feature("editor") and "--gaf-device-review" in OS.get_cmdline_user_args())
 
 func abort_map(message: String) -> void:
 	push_error(message)
@@ -534,6 +544,10 @@ func review_grove(visit: bool) -> void:
 func update_status() -> void:
 	$HUD/Defeated.visible=player.is_dead
 
+func step_gameplay_zoom(steps: float) -> void:
+	_camera_size_target = clampf(_camera_size_target * pow(CAMERA_ZOOM_STEP, steps), CAMERA_SIZE_MIN, CAMERA_SIZE_MAX)
+	_camera_zooming = true
+
 func set_reference_look(enabled: bool) -> void:
 	look.set_stage(2 if enabled else 0)
 	if biome_controller != null:
@@ -555,9 +569,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var wheel_up: bool = event.button_index == MOUSE_BUTTON_WHEEL_UP
 		if wheel_up or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			var steps: float = event.factor if event.factor > 0.0 else 1.0
-			_camera_size_target = clampf(_camera_size_target * pow(CAMERA_ZOOM_STEP, -steps if wheel_up else steps),
-				CAMERA_SIZE_MIN, CAMERA_SIZE_MAX)
-			_camera_zooming = true
+			step_gameplay_zoom(-steps if wheel_up else steps)
 			get_viewport().set_input_as_handled()
 			return
 	if event.is_action_pressed("reset_test"):reset_player()
