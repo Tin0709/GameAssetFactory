@@ -11,6 +11,7 @@ import re
 import shutil
 from statistics import median
 import subprocess
+import sys
 import tempfile
 
 from dev import ROOT, find_tool
@@ -247,6 +248,7 @@ def main() -> None:
             run("xcrun", "xctrace", "record", "--device", args.device, "--template", args.template,
                 "--time-limit", args.duration, "--attach", PRODUCT, "--output", trace)
         elif args.command == "summarize":
+            sys.stdout.reconfigure(encoding="utf-8")
             summarize(args.report)
         else:
             export(args)
