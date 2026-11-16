@@ -15,6 +15,7 @@ var _ground_sky_state:=Vector4.INF
 var _grass_shade_color := Vector3.INF
 var _turf_ambient_color := Vector3.INF
 var _grass_root_tone := -1.
+var _grass_ground_tone := Vector2.INF
 var _sky_height := -1.
 var _night_albedo := -1.
 var _twilight_ambient := -1.
@@ -54,6 +55,7 @@ func restore()->void:
 	_grass_shade_color = Vector3.INF
 	_turf_ambient_color = Vector3.INF
 	_grass_root_tone = -1.
+	_grass_ground_tone = Vector2.INF
 	_sky_height = -1.
 	_night_albedo = -1.
 	_twilight_ambient = -1.
@@ -151,14 +153,18 @@ func _sync_ground_sky()->void:
 	var color_changed := shade_color != _grass_shade_color
 	var root_tone: float = world.showcase.grass_root_tone_mix()
 	var root_changed := root_tone != _grass_root_tone
+	var ground_tone: Vector2 = world.showcase.day_grass_ground_tone()
+	var ground_tone_changed := ground_tone != _grass_ground_tone
 	var sky_height: float = world.showcase.grass_sky_height_mix() if state.w > 0. else 0.
 	var sky_height_changed := sky_height != _sky_height
-	if not sky_changed and not color_changed and not root_changed and not turf_changed and not sky_height_changed:
+	if not sky_changed and not color_changed and not root_changed and not turf_changed \
+			and not sky_height_changed and not ground_tone_changed:
 		return
 	_ground_sky_state=state
 	_grass_shade_color = shade_color
 	_turf_ambient_color = turf_color
 	_grass_root_tone = root_tone
+	_grass_ground_tone = ground_tone
 	_sky_height = sky_height
 	for row:Dictionary in _records:
 		var material:ShaderMaterial=row.material
@@ -174,6 +180,8 @@ func _sync_ground_sky()->void:
 			material.set_shader_parameter("turf_ambient_color", turf_color)
 		if root_changed:
 			material.set_shader_parameter("study_grass_root_tone", root_tone)
+		if ground_tone_changed:
+			material.set_shader_parameter("study_grass_ground_tone", ground_tone)
 		if sky_height_changed:
 			material.set_shader_parameter("study_grass_sky_height", sky_height)
 

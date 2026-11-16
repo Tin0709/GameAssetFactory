@@ -25,6 +25,7 @@ uniform float study_ground_sky_mix = 0.0;
 uniform float study_twilight_ground_ambient = 1.0;
 uniform vec3 study_grass_shade_color = vec3(0.0);
 uniform float study_grass_root_tone = 0.0;
+uniform vec2 study_grass_ground_tone = vec2(0.0);
 uniform float study_grass_sky_height = 0.0;
 uniform float study_grass_night_albedo = 0.0;
 uniform float study_grass_shadow_height = 1.0;
@@ -178,6 +179,18 @@ void fragment(){
 		color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);
 		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
+		if (max(study_grass_ground_tone.x, study_grass_ground_tone.y) > 0.0 &&
+				height_fraction < 0.74 && !IN_SHADOW_PASS) {
+			const vec3 ground_luma = vec3(0.2126, 0.7152, 0.0722);
+			float base = dot(color, ground_luma);
+			float turf_luma = dot(root_color, ground_luma);
+			if (turf_luma > 0.00001) {
+				vec3 turf_tone = root_color * (base / turf_luma);
+				float blend = study_grass_ground_tone.x * (1.0 - smoothstep(0.12, 0.74, height_fraction));
+				color = mix(color, turf_tone, blend);
+				color *= exp2(-study_grass_ground_tone.y * (1.0 - smoothstep(0.03, 0.52, height_fraction)));
+			}
+		}
 		if (study_grass_root_tone > 0.0 && height_fraction < 0.62) {
 			// Calibrated against adjacent terrain and foliage in the Forest
 			// G-buffer. Preserve luminance and taper towards the blade tip.

@@ -166,6 +166,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_stone_top_cool": ["Sắc xanh trên mặt đá", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
 	&"day_grass_sky_height": ["Ánh trời từ gốc đến ngọn cỏ", 1.],
+	&"day_grass_ground_tone": ["Hòa màu gốc cỏ với mặt đất", 1.],
 	&"grass_step_coverage": ["Cỏ sát bậc địa hình", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
 	&"twilight_grass_albedo": ["Độ dịu lá cỏ chạng vạng", 1.],
@@ -301,7 +302,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 197
+const LIGHTING_MIX_VERSION := 198
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2046,6 +2047,18 @@ func grass_sky_fill_mix_scale() -> float:
 		return _lighting_scale(&"grass_sky") * PHASE_FINISH.phase_weight(hour)
 	return 0.
 
+func day_grass_ground_tone() -> Vector2:
+	if not _grass_ground_tone_editable() or atmosphere_review != "combined":
+		return Vector2.ZERO
+	var tone := _biome_profile.grass_ground_tone.clamp(Vector2.ZERO, Vector2(1., .5))
+	return tone * _lighting_scale(&"day_grass_ground_tone") \
+		* PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+
+func _grass_ground_tone_editable() -> bool:
+	return not _balanced_preview and _biome_profile != null and _biome_profile.grass_ground_tone.is_finite() \
+		and _biome_profile.grass_ground_tone != Vector2.ZERO \
+		and plants != null and plants.grass_light != null and plants.grass_light.active
+
 func grass_sky_height_mix() -> float:
 	if not _grass_sky_height_editable() or atmosphere_review != "combined" or not forest_spatial_sky_context():
 		return 0.
@@ -2588,6 +2601,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 198 and effect == &"day_grass_ground_tone":
+			missing_value = 0.
 		if version < 197 and effect == &"exposure_neighborhood_limit":
 			missing_value = 0.
 		if version < 196 and effect == &"day_grass_sky_height":
@@ -2900,6 +2915,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _day_bounce_editable()
 		if effect == &"day_stone_bounce_focus":
 			slider.editable = _stone_bounce_focus_editable()
+		if effect == &"day_grass_ground_tone":
+			slider.editable = _grass_ground_tone_editable()
 		if effect == &"day_grass_sky_height":
 			slider.editable = _grass_sky_height_editable()
 		if effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color"]:
@@ -3076,7 +3093,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if plants != null:
 			plants.grass_light.sync()
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"day_grass_sky_height", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"canopy_edge_return", &"tree_shade"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"day_grass_sky_height", &"day_grass_ground_tone", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"canopy_edge_return", &"tree_shade"]:
 		return
 	if changed_effect in [&"actor_shade_sky", &"actor_side_sky", &"kai_shade_sky"]:
 		if level.player_light != null:
@@ -3573,6 +3590,9 @@ func _process(delta:float)->void:
 	var regional_slider: HSlider = _lighting_sliders.get(&"regional_sky")
 	if regional_slider != null:
 		regional_slider.editable = _regional_sky_editable()
+	var grass_ground_tone: HSlider = _lighting_sliders.get(&"day_grass_ground_tone")
+	if grass_ground_tone != null:
+		grass_ground_tone.editable = _grass_ground_tone_editable()
 	var grass_height: HSlider = _lighting_sliders.get(&"day_grass_sky_height")
 	if grass_height != null:
 		grass_height.editable = _grass_sky_height_editable()

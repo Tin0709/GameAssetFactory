@@ -119,6 +119,7 @@ exposure_neighborhood_limit = 0.2
 stone_sun_warmth = 0.38
 stone_bounce_focus = 1.25
 grass_sky_height = 0.36
+grass_ground_tone = Vector2(0.46, 0.19)
 daylight_green_grade_scale = 1.0
 zoom_exposure_blur_strength = 1.0
 shadowed_wall_return_scale = 1.5

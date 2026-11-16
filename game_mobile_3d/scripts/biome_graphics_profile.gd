@@ -133,6 +133,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., 2., .01) var stone_bounce_focus := 0.
 ## Range in exposure stops for sky fill from blade base to tip during daylight.
 @export_range(0., .6, .01) var grass_sky_height := 0.
+## Blend toward the turf atlas chroma (X) and reduce base luminance in EV (Y).
+@export var grass_ground_tone := Vector2.ZERO
 ## Shadow recovery for dark greens in the optional reference finish.
 @export_range(0., 1., .01) var daylight_green_grade_scale := 0.
 ## Keep the reference local-exposure blur footprint steadier when zooming out.
