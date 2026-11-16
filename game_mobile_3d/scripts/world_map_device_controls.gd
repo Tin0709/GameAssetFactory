@@ -15,6 +15,7 @@ var _refresh_after := 0.
 
 func setup(world: Node) -> void:
 	_world = world
+	AudioServer.set_bus_mute(0, true)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_world.showcase.panel.visibility_changed.connect(_release_controls)
@@ -58,8 +59,9 @@ func _draw() -> void:
 	draw_arc(center, STICK_RADIUS, 0., TAU, 48, Color("#b3cabc"), 2., true)
 	draw_circle(center + _stick_offset, 22., Color("#a4c9af"), true, -1., true)
 	var names := {&"jump": "Nhảy", &"sprint": "Chạy", &"zoom_in": "+", &"zoom_out": "−", &"hour": "Đổi giờ", &"weather": "Mây", &"settings": "Cài đặt"}
-	for key: StringName in _buttons():
-		var rect: Rect2 = _buttons()[key]
+	var buttons := _buttons()
+	for key: StringName in buttons:
+		var rect: Rect2 = buttons[key]
 		draw_rect(rect, Color("#386449") if key in _held.values() else panel_color)
 		var title: String = names[key]
 		var width := font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, 21).x
