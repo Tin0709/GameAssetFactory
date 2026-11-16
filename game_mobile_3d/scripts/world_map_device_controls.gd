@@ -5,8 +5,14 @@ const MOVE := [&"move_left", &"move_right", &"move_forward", &"move_backward"]
 const HOURS := [7., 12., 16.5, 19.5, 22.]
 const STICK_RADIUS := 65.
 const BUTTON_SIZE := Vector2(88., 58.)
+const Benchmark := preload("res://scripts/world_map_device_benchmark.gd")
+const REVIEW_SITES := [
+	{"name": "Lối rừng", "position": Vector2(-22.5, 17.5), "zoom": 18.},
+	{"name": "Bậc đá", "position": Vector2(-22.5, -40.5), "zoom": 26.},
+]
 
 var _world: Node
+var _benchmark: Benchmark
 var _held: Dictionary = {}
 var _stick_id := -1
 var _stick_offset := Vector2.ZERO
@@ -20,6 +26,11 @@ func setup(world: Node) -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_world.showcase.panel.visibility_changed.connect(_release_controls)
 	_world.showcase._settings.gear.hide()
+	if _world.map_layout_path == _world.DATA:
+		_benchmark = Benchmark.new()
+		_benchmark.name = "DeviceBenchmark"
+		add_child(_benchmark)
+		_benchmark.setup(_world, REVIEW_SITES)
 	print("GAF_DEVICE_REVIEW renderer=%s driver=%s scene=WorldMap assets=project" % [
 		RenderingServer.get_current_rendering_method(), RenderingServer.get_current_rendering_driver_name()])
 
@@ -30,7 +41,10 @@ func _stick_center() -> Vector2:
 
 func _buttons() -> Dictionary:
 	var right := size.x - 153.
-	return {
+	var measure_button := Rect2(Vector2(right - 495., 40.), BUTTON_SIZE)
+	if _benchmark != null and _benchmark.active:
+		return {&"measure": measure_button}
+	var buttons := {
 		&"jump": Rect2(Vector2(right, size.y - 145.), BUTTON_SIZE),
 		&"sprint": Rect2(Vector2(right - 99., size.y - 106.), BUTTON_SIZE),
 		&"zoom_in": Rect2(Vector2(right - 99., 40.), BUTTON_SIZE),
@@ -39,6 +53,9 @@ func _buttons() -> Dictionary:
 		&"weather": Rect2(Vector2(right - 297., 40.), BUTTON_SIZE),
 		&"settings": Rect2(Vector2(right - 396., 40.), BUTTON_SIZE),
 	}
+	if _benchmark != null:
+		buttons[&"measure"] = measure_button
+	return buttons
 
 
 func _process(delta: float) -> void:
@@ -54,11 +71,14 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	var ink := Color("#ecf6ef")
 	var panel_color := Color(0.07, 0.12, 0.12, .83)
-	var center := _stick_center()
-	draw_circle(center, STICK_RADIUS, panel_color, true, -1., true)
-	draw_arc(center, STICK_RADIUS, 0., TAU, 48, Color("#b3cabc"), 2., true)
-	draw_circle(center + _stick_offset, 22., Color("#a4c9af"), true, -1., true)
+	var measuring := _benchmark != null and _benchmark.active
+	if not measuring:
+		var center := _stick_center()
+		draw_circle(center, STICK_RADIUS, panel_color, true, -1., true)
+		draw_arc(center, STICK_RADIUS, 0., TAU, 48, Color("#b3cabc"), 2., true)
+		draw_circle(center + _stick_offset, 22., Color("#a4c9af"), true, -1., true)
 	var names := {&"jump": "Nhảy", &"sprint": "Chạy", &"zoom_in": "+", &"zoom_out": "−", &"hour": "Đổi giờ", &"weather": "Mây", &"settings": "Cài đặt"}
+	names[&"measure"] = "Dừng" if measuring else "Đo 10p"
 	var buttons := _buttons()
 	for key: StringName in buttons:
 		var rect: Rect2 = buttons[key]
@@ -71,6 +91,9 @@ func _draw() -> void:
 		Engine.get_frames_per_second(), RenderingServer.get_current_rendering_driver_name()]
 	draw_rect(Rect2(Vector2(65., 40.), Vector2(255., 44.)), panel_color)
 	draw_string(font, Vector2(79., 70.), status, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, ink)
+	if _benchmark != null and not _benchmark.status.is_empty():
+		draw_rect(Rect2(Vector2(65., 95.), Vector2(255., 40.)), panel_color)
+		draw_string(font, Vector2(79., 123.), _benchmark.status, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, ink)
 
 
 func _input(event: InputEvent) -> void:
@@ -89,7 +112,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _press(index: int, point: Vector2) -> bool:
-	if _stick_id < 0 and point.distance_to(_stick_center()) <= STICK_RADIUS * 1.35:
+	var measuring := _benchmark != null and _benchmark.active
+	if not measuring and _stick_id < 0 and point.distance_to(_stick_center()) <= STICK_RADIUS * 1.35:
 		_stick_id = index
 		_move_stick(point)
 		return true
@@ -118,6 +142,12 @@ func _press(index: int, point: Vector2) -> bool:
 				_world.biome_controller.set_weather(0. if weather >= .5 else 1.)
 			&"settings":
 				_world.showcase._settings.gear.pressed.emit()
+			&"measure":
+				_release_controls()
+				if measuring:
+					_benchmark.cancel()
+				else:
+					_benchmark.start()
 		queue_redraw()
 		return true
 	return false
@@ -161,3 +191,5 @@ func _release_controls() -> void:
 func _notification(what: int) -> void:
 	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_EXIT_TREE]:
 		_release_controls()
+		if what != NOTIFICATION_EXIT_TREE and _benchmark != null:
+			_benchmark.cancel()
