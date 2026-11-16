@@ -25,6 +25,7 @@ uniform float study_ground_sky_mix = 0.0;
 uniform float study_twilight_ground_ambient = 1.0;
 uniform vec3 study_grass_shade_color = vec3(0.0);
 uniform float study_grass_root_tone = 0.0;
+uniform float study_grass_sky_height = 0.0;
 uniform float study_grass_night_albedo = 0.0;
 uniform float study_grass_shadow_height = 1.0;
 uniform float study_grass_shadow_footprint = 1.0;
@@ -259,6 +260,13 @@ void fragment(){
 		EMISSION = gaf_dawn_turf_chroma(EMISSION, vec3(1.65, 1.0, .81), .55 * dawn_turf);
 	}
 	EMISSION = gaf_pre_twilight_diffuse(EMISSION, CAMERA_POSITION_WORLD);
+	if (tinted_grass && study_grass_sky_height > 0.0) {
+		// Vary sky fill through a blade while keeping baked bounce and local emitters independent.
+		float height_response = smoothstep(.12, .76, height_fraction);
+		float grass_sky = exp2(study_grass_sky_height * (height_response - .42));
+		EMISSION *= grass_sky;
+		AO = min(AO * grass_sky, 1.0);
+	}
 	EMISSION += color * (1.0 - METALLIC) * study_day_bounce_at_root;
 	EMISSION *= sole;
 	EMISSION += color * (1.0 - METALLIC) * gaf_replay_incident(foliage_world,vec3(0.0,1.0,0.0)) * (0.64 * sole);
