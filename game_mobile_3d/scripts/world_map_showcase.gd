@@ -2589,7 +2589,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
 		if version < 197 and effect == &"exposure_neighborhood_limit":
-			default_value = 0.
+			missing_value = 0.
 		if version < 196 and effect == &"day_grass_sky_height":
 			missing_value = 0.
 		if version < 195 and effect == &"day_stone_bounce_focus":
