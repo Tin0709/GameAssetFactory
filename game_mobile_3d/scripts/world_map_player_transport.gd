@@ -2,6 +2,8 @@ extends Node
 ## Original low-frequency actor illumination; not recovered Lumen or native SSS.
 const SAMPLER=preload("res://scripts/world_map_actor_irradiance.gd")
 const PATH="res://assets/graphics/world_map_actor_light_v001/field.res"
+const NOON_BOUNCE_FULL_ANGLE := .04
+const NOON_BOUNCE_END_ANGLE := .75
 var level:Node3D
 var field=SAMPLER.new()
 var cache:Resource
@@ -86,9 +88,12 @@ func refresh(force:bool=false)->void:
   tint=Vector3(b.r/a.r,b.g/a.g,b.b/a.b);scale=env.ambient_light_energy/float(cache.get_meta("ambient_energy"))
   scale*=level.showcase.player_sky_fill_mix_scale()
   var sun:DirectionalLight3D=level.get_node("Sun");var c:=sun.light_color.srgb_to_linear();var d:Array=cache.get_meta("sun_direction")
-  if level.look._ground_bounce_requested and sun.global_basis.z.normalized().dot(Vector3(d[0],d[1],d[2]))>cos(deg_to_rad(.1)):key=Vector3(c.r,c.g,c.b)*sun.light_energy
+  var noon_weight := 0.
+  if level.look._ground_bounce_requested:
+   noon_weight = _noon_bounce_weight(sun.global_basis.z.normalized(), Vector3(d[0], d[1], d[2]))
+  var key_strength := sun.light_energy * noon_weight
   var bounce_mix:float=level.showcase._lighting_scale(&"player_bounce")
-  if bounce_mix>0. and key==Vector3.ZERO and level.look._ground_bounce_requested \
+  if bounce_mix>0. and noon_weight < 1. and level.look._ground_bounce_requested \
    and (level.look.player_local_light_enabled or level.look.player_reflection_enabled):
    var local:bool=local_phase_bounce.available() and local_phase_bounce.fade(p)>0.
    var bounce=local_phase_bounce if local else phase_bounce
@@ -97,8 +102,17 @@ func refresh(force:bool=false)->void:
     var values:PackedVector3Array=bounce.sample(p,slots)
     if values.size()==18:
      bounce_sun=values
-     key=Vector3(c.r,c.g,c.b)*(sun.light_energy*bounce_mix*slots.w*bounce.fade(p))
+     var phase_strength := sun.light_energy * bounce_mix * slots.w * bounce.fade(p) * (1. - noon_weight)
+     if key_strength > 0. and phase_strength > 0.:
+      # Both fields share the same shader key. Interpolate their probe values
+      # by energy so the combined incident light is continuous through Noon.
+      bounce_sun = values.duplicate()
+      var phase_fraction := phase_strength / (key_strength + phase_strength)
+      for axis in bounce_sun.size():
+       bounce_sun[axis] = _sun[axis].lerp(values[axis], phase_fraction)
+     key_strength += phase_strength
      phase_bounce_active=true
+  key = Vector3(c.r, c.g, c.b) * key_strength
  var skin_verified:bool=level.look.player_effects_available()
  var sun_shoulder:float=level.showcase.player_sun_shoulder_weight()
  var sun_specular:float=level.showcase.player_sun_specular_weight()
@@ -107,7 +121,7 @@ func refresh(force:bool=false)->void:
  var twilight_view_fill: float = level.showcase.actor_twilight_view_fill_weight() if active and level.look.player_local_light_enabled else 0.
  var ground_bounce := _kai_ground_bounce(p)
  refresh_shade_sky(force)
- var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if phase_bounce_active else null,sun_shoulder,sun_specular,canopy_color,view_fill_chroma,twilight_view_fill,ground_bounce]
+ var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if active else null,sun_shoulder,sun_specular,canopy_color,view_fill_chroma,twilight_view_fill,ground_bounce]
  if not force and bind_key==_last_bind_key:
   update_usec=Time.get_ticks_usec()-started;return
  _last_bind_key=bind_key
@@ -132,6 +146,12 @@ func refresh(force:bool=false)->void:
    m.set_shader_parameter("player_probe_base",p.y);m.set_shader_parameter("player_probe_tint",tint)
    m.set_shader_parameter("player_probe_scale",scale);m.set_shader_parameter("player_probe_key",key)
  update_usec=Time.get_ticks_usec()-started
+
+static func _noon_bounce_weight(direction: Vector3, baked_direction: Vector3) -> float:
+ # Chord length is stable at near-identical directions.
+ var chord := direction.distance_to(baked_direction.normalized())
+ return 1. - smoothstep(2. * sin(deg_to_rad(NOON_BOUNCE_FULL_ANGLE) * .5),
+  2. * sin(deg_to_rad(NOON_BOUNCE_END_ANGLE) * .5), chord)
 
 func _kai_ground_bounce(position: Vector3) -> Vector4:
  var review = level.showcase
