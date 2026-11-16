@@ -30,41 +30,43 @@ git switch -c iphone-review FETCH_HEAD
 
 Sau lần đầu, dùng `git switch iphone-review` và `git merge --ff-only FETCH_HEAD` cho bản đồng bộ tiếp theo. Nếu branch không thể fast-forward, xem lại lịch sử hai máy trước khi hợp nhất.
 
+Nếu có bản vá workflow chưa commit đi kèm bundle, chạy `git apply --check` với đường dẫn bản vá trên branch review trước khi chạy `git apply`. Giữ cả bundle và bản vá trong phần lưu trữ nội bộ. Với các lần đồng bộ qua Git sau đó, lấy các thay đổi bằng commit tương ứng.
+
 ## Xuất và cài lên iPhone
 
 Chạy từ thư mục GameAssetFactory trên Mac. Nếu Godot ở một bundle khác, đặt `GODOT_BIN` trỏ tới binary bên trong bundle.
 
 ```sh
 python3 scripts/ios_review.py check
-python3 scripts/ios_review.py devices
 export GAF_IOS_TEAM_ID='TEAM_ID_10_KY_TU'
 export GAF_IOS_BUNDLE_ID='com.tenmiencuaban.gameassetfactory.review'
-python3 scripts/ios_review.py build --team-id "$GAF_IOS_TEAM_ID" --bundle-id "$GAF_IOS_BUNDLE_ID"
+python3 scripts/ios_review.py build
 ```
 
 Mở đường dẫn `.xcodeproj` lệnh in ra. Trong **Signing & Capabilities**, dùng **Automatically manage signing** và chọn team đã đăng nhập. Chọn đúng iPhone ở Run Destination và bấm **Run** để tạo provisioning và kiểm màn hình đầu. ID ký chỉ dùng cục bộ. Mỗi lần chạy tạo thư mục mới dưới `game_mobile_3d/builds/device_review` và để nguyên preset trong checkout chính.
 
-Khi việc ký đã hoạt động, build/cài/mở trực tiếp bằng CLI. Lấy ID thật của iPhone từ Xcode. Cờ `--allow-provisioning-updates` cho phép Xcode cập nhật profile khi cần. Thêm `--release-template` cho phiên đo hiệu năng, dùng cùng loại build cho cả hai vế A/B.
+Khi việc ký đã hoạt động, build, cài và mở trực tiếp bằng CLI. Lấy UDID của iPhone từ phần đầu của lệnh `devices` hoặc trong **Xcode → Window → Devices and Simulators**. Nếu `devicectl` của bản Xcode đang dùng yêu cầu ID khác, đặt `GAF_IPHONE_CORE_DEVICE_ID` theo phần CoreDevice của lệnh `devices`. Dùng `--allow-provisioning-updates` khi Xcode cần tạo hoặc cập nhật profile. Thêm `--release-template` cho phiên đo hiệu năng và dùng cùng loại build cho cả hai vế A/B. Cả hai loại template dùng chữ ký **Apple Development** cho luồng này. Khi lỗi ở bước Xcode, mở `Build.xcresult` nếu Xcode đã ghi kết quả.
 
 ```sh
-python3 scripts/ios_review.py build --team-id "$GAF_IOS_TEAM_ID" --bundle-id "$GAF_IOS_BUNDLE_ID" \
-  --device "$GAF_IPHONE_DEVICE_ID" --allow-provisioning-updates --release-template
+python3 scripts/ios_review.py devices
+export GAF_IPHONE_DEVICE_ID='UDID_CUA_IPHONE'
+python3 scripts/ios_review.py build --device "$GAF_IPHONE_DEVICE_ID" --release-template
 ```
 
-Nếu cần chạy trên Windows trước, dùng `python scripts/ios_review.py pack` để xuất PCK và khởi chạy headless từ PCK. Dùng đối chiếu trực quan bằng Godot Mobile với `-- --gaf-device-review` ở cuối lệnh khi chạy editor binary. Kết quả này xác nhận đường export và hành vi project trên PC. Lần chạy đầu trên iPhone phải thấy `renderer=mobile driver=metal` trong log hoặc HUD. Simulator chỉ phù hợp kiểm bố cục ở đường Compatibility. [Godot iOS export và simulator](https://docs.godotengine.org/en/4.7/tutorials/export/exporting_for_ios.html) · [Driver theo nền tảng](https://docs.godotengine.org/en/stable/classes/class_projectsettings.html#class-projectsettings-property-rendering-rendering-device-driver-ios)
+Trên Windows, `python scripts/ios_review.py pack` xuất PCK và chạy smoke test headless. Khi cần kiểm tra cấu trúc bộ xuất iOS trước khi đồng bộ, `python scripts/ios_review.py project --release-template` tạo dự án Xcode chưa ký nếu sẵn template `ios.zip` cùng phiên bản. Lệnh nhận cùng biến Team ID, Bundle ID và tùy chọn `--ios-template`. Dùng đối chiếu trực quan bằng Godot Mobile với `-- --gaf-device-review` ở cuối lệnh khi chạy editor binary. Lần chạy đầu trên iPhone phải có `renderer=mobile driver=metal` trong log. HUD hiển thị `metal`. Simulator chỉ phù hợp kiểm bố cục ở đường Compatibility. [Godot iOS export và simulator](https://docs.godotengine.org/en/4.7/tutorials/export/exporting_for_ios.html) · [Driver theo nền tảng](https://docs.godotengine.org/en/stable/classes/class_projectsettings.html#class-projectsettings-property-rendering-rendering-device-driver-ios)
 
 ## Đo trên iPhone thật
 
 1. Ghi model iPhone, iOS, commit, template Debug hay Release, renderer, chất lượng, render scale, mức pin và trạng thái nhiệt ban đầu. Dùng cùng góc máy, giờ, thời tiết và tuyến chạy khi so A/B. Kiểm khởi động, di chuyển, chạy, nhảy, zoom, đổi mây, đổi giờ rồi thử các mức đồ họa.
 2. Mở app và bắt đầu ghi Instruments, sau đó bấm **Đo 10p** trong WorldMap. App lặp cùng tuyến ở lối rừng và bậc đá, đủ năm mốc giờ và có lượt 16:30 nhiều mây. Thứ tự là **Đầy đủ → Cân bằng → Cân bằng → Đầy đủ**. Mỗi đoạn có 2 giây ổn định trước khi đo, sau đó nhân vật đi, chạy, nhảy và đổi zoom. App trả lại vị trí và cài đặt khi kết thúc hoặc bấm **Dừng**. Đo GPU duration trong **Game Performance** hoặc **Metal System Trace**, memory footprint và đỉnh RAM bằng công cụ phù hợp trong Instruments. Lưu thermal state cùng các mốc đo. [Game Performance và Metal System Trace](https://developer.apple.com/documentation/xcode/analyzing-the-performance-of-your-metal-app/)
-3. Lưu `.trace` cùng ảnh theo mốc giờ, ghi rõ tên vế A/B. Dùng Xcode Metal Capture cho một frame đại diện khi cần tìm pass, pipeline hoặc texture tốn chi phí. Dùng phiên chơi liên tục khi đo hiệu năng duy trì. [Metal GPU profiling](https://developer.apple.com/documentation/xcode/optimizing-gpu-performance)
+3. Lưu `.trace` cùng ảnh theo mốc giờ, ghi rõ tên vế A/B. Đối chiếu các đoạn đầu và cuối cùng mức **Đầy đủ**, với cùng địa điểm, giờ và góc máy. Mục tiêu 30 FPS cho ngân sách 33,3 ms/khung. Đối chiếu P95, GPU duration, memory footprint và thermal state trước khi kết luận nguyên nhân tụt FPS. Dùng **Game Memory** riêng khi cần truy nguồn cấp phát, và **Metal Capture** riêng cho một frame đại diện để tìm pass, pipeline hoặc texture tốn chi phí. [Game Memory](https://developer.apple.com/documentation/xcode/analyzing-the-memory-usage-of-your-metal-app) · [Metal GPU profiling](https://developer.apple.com/documentation/xcode/optimizing-gpu-performance)
 
 ```sh
 xcrun xctrace list templates
-python3 scripts/ios_review.py record --device "$GAF_IPHONE_DEVICE_ID" --duration 11m
+python3 scripts/ios_review.py record --device "$GAF_IPHONE_DEVICE_ID" --duration 12m
 ```
 
-Khi app hiện **Đã lưu kết quả đo**, tìm file JSON trong thư mục `device_review_runs` của app. Từ **Xcode → Window → Devices and Simulators**, chọn iPhone và app rồi dùng **Download Container**. Log có dòng `GAF_DEVICE_BENCH_RESULT` kèm đường dẫn. Báo cáo ghi FPS và frametime theo đoạn, GPU viewport khi Godot có mẫu, cùng đỉnh draw call và bộ nhớ do renderer báo. Dùng Instruments để đối chiếu thermal state, GPU timeline và memory footprint của quá trình. [Lấy app container qua Xcode](https://developer.apple.com/documentation/metal/creating-binary-archives-from-device-built-pipeline-state-objects)
+Khi app hiện **Đã lưu kết quả đo**, tìm file JSON trong thư mục `device_review_runs` của app. Từ **Xcode → Window → Devices and Simulators**, chọn iPhone và app rồi dùng **Download Container**. Log có dòng `GAF_DEVICE_BENCH_RESULT` kèm đường dẫn. Báo cáo ghi FPS và frametime theo đoạn, GPU viewport khi Godot có mẫu, cùng đỉnh draw call và bộ nhớ do renderer báo. Bộ nhớ renderer và memory footprint của tiến trình là hai phép đo riêng. Lưu cả JSON và Instruments trace để có thể đối chiếu. [Lấy app container qua Xcode](https://developer.apple.com/documentation/metal/creating-binary-archives-from-device-built-pipeline-state-objects)
 
 ```sh
 python3 scripts/ios_review.py summarize "/đường-dẫn/đến/kết-quả.json"
