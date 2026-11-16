@@ -14,6 +14,7 @@ from statistics import median
 import subprocess
 import sys
 import tempfile
+from zipfile import BadZipFile, ZipFile
 
 from dev import ROOT, find_tool
 
@@ -122,7 +123,7 @@ dedicated_server=false
 custom_features="gaf_device_review"
 export_filter="all_resources"
 include_filter="assets/maps/world_map/*.json,assets/environment/litematic_m2_v1/*.json"
-exclude_filter="*.private.*,private_*,tests/*,tools/*,scenes/dev/*,scripts/world_map_source_reference.gd"
+exclude_filter="*.private.*,private_*,tests/*,tools/*,scenes/dev/*,scripts/world_map_source_reference.gd,device-review-icon.png"
 export_path=""
 script_export_mode=2
 
@@ -130,11 +131,19 @@ script_export_mode=2
 '''
     if template:
         template_path = json.dumps(template.as_posix(), ensure_ascii=False)
+        # Use the engine template's placeholder artwork for the iOS launcher only.
+        with ZipFile(template) as archive:
+            splash = next((name for name in archive.namelist()
+                           if name.endswith("/SplashImage.imageset/splash@2x.png")), None)
+            if splash is None:
+                raise ValueError(f"The iOS template has no placeholder launcher artwork: {template}")
+            (target / "device-review-icon.png").write_bytes(archive.read(splash))
         contents += f'''application/app_store_team_id="{team}"
 application/bundle_identifier="{bundle}"
 application/export_project_only=true
 application/export_method_release=1
 application/code_sign_identity_release="Apple Development"
+icons/icon_1024x1024="res://device-review-icon.png"
 custom_template/debug={template_path}
 custom_template/release={template_path}
 architectures/arm64=true
@@ -166,7 +175,7 @@ def export(args: argparse.Namespace) -> None:
         else:
             preset(staged)
         print(f"Staged {count} tracked project files. Output: {output}", flush=True)
-        base = (godot, "--headless", "--path", staged)
+        base = (godot, "--headless", "--quiet", "--path", staged)
         run(*base, "--import", "--log-file", output / "import.log")
         if not ios:
             pack = output / f"{PRODUCT}.pck"
@@ -304,7 +313,7 @@ def main() -> None:
             summarize(args.report)
         else:
             export(args)
-    except (OSError, ValueError, subprocess.CalledProcessError) as error:
+    except (OSError, ValueError, BadZipFile, subprocess.CalledProcessError) as error:
         cli.exit(1, f"{error}\n")
 
 
