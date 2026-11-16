@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime
 import json
+import os
 from pathlib import Path, PurePosixPath
 import platform
 import re
@@ -54,6 +55,30 @@ def verify_xcode() -> None:
     run("xcrun", "--sdk", "iphoneos", "--show-sdk-path")
 
 
+def verify_ios_template(explicit: Path | None = None) -> Path:
+    if platform.system() == "Darwin":
+        data = Path.home() / "Library/Application Support"
+    elif platform.system() == "Windows":
+        data = Path(os.environ["APPDATA"])
+    else:
+        data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share"))
+    template = (explicit or data / "Godot/export_templates/4.7.2.stable/ios.zip").expanduser().resolve()
+    if not template.is_file():
+        raise ValueError(f"Install the matching Godot export templates from Editor → Manage Export Templates. Missing {template}")
+    return template
+
+
+def list_devices() -> None:
+    devices = json.loads(run("xcrun", "xcdevice", "list", "--timeout", "5", capture=True))
+    for device in devices:
+        if device.get("platform") != "com.apple.platform.iphoneos" or device.get("simulator"):
+            continue
+        state = "available" if device.get("available") else device.get("error", {}).get("description", "unavailable")
+        print(f"{device['name']} | {device['identifier']} | {device.get('operatingSystemVersion', '?')} | {state}")
+    print("CoreDevice list (for devicectl, if your Xcode uses a different identifier):", flush=True)
+    run("xcrun", "devicectl", "list", "devices")
+
+
 def stage(target: Path) -> int:
     tracked = run("git", "-C", ROOT, "ls-files", "-z", "--", PROJECT.name, capture=True)
     lfs_pointer = b"version https://git-lfs.github.com/spec/v1"
@@ -86,12 +111,8 @@ def stage(target: Path) -> int:
     return count
 
 
-def preset(target: Path, team: str = "", bundle: str = "") -> None:
-    if team and not re.fullmatch(r"[A-Z0-9]{10}", team):
-        raise ValueError("Use the ten-character Apple Team ID from Xcode.")
-    if bundle and not re.fullmatch(r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+", bundle):
-        raise ValueError("Use a reverse-DNS bundle identifier assigned to your team.")
-    platform_name = "iOS" if team else "Windows Desktop"
+def preset(target: Path, team: str = "", bundle: str = "", template: Path | None = None) -> None:
+    platform_name = "iOS" if template else "Windows Desktop"
     contents = f'''[preset.0]
 name="{PRESET}"
 platform="{platform_name}"
@@ -107,10 +128,15 @@ script_export_mode=2
 
 [preset.0.options]
 '''
-    if team:
+    if template:
+        template_path = json.dumps(template.as_posix(), ensure_ascii=False)
         contents += f'''application/app_store_team_id="{team}"
 application/bundle_identifier="{bundle}"
 application/export_project_only=true
+application/export_method_release=1
+application/code_sign_identity_release="Apple Development"
+custom_template/debug={template_path}
+custom_template/release={template_path}
 architectures/arm64=true
 '''
     else:
@@ -119,19 +145,26 @@ architectures/arm64=true
 
 
 def export(args: argparse.Namespace) -> None:
-    ios = args.command == "build"
+    ios = args.command in {"build", "project"}
+    template = None
     if ios:
-        verify_xcode()
-        template = Path.home() / "Library/Application Support/Godot/export_templates/4.7.2.stable/ios.zip"
-        if not template.is_file():
-            raise ValueError(f"Install the matching Godot export templates from Editor → Manage Export Templates. Missing {template}")
+        if not re.fullmatch(r"[A-Z0-9]{10}", args.team_id):
+            raise ValueError("Use --team-id or GAF_IOS_TEAM_ID with the ten-character Apple Team ID from Xcode.")
+        if not re.fullmatch(r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+", args.bundle_id):
+            raise ValueError("Use --bundle-id or GAF_IOS_BUNDLE_ID with a reverse-DNS identifier assigned to your team.")
+        if args.command == "build":
+            verify_xcode()
+        template = verify_ios_template(args.ios_template)
     godot = verify_godot(args.godot)
     output = BUILD_ROOT / datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     output.mkdir(parents=True)
     with tempfile.TemporaryDirectory(prefix="gaf-device-review-") as temporary:
         staged = Path(temporary)
         count = stage(staged)
-        preset(staged, args.team_id, args.bundle_id) if ios else preset(staged)
+        if ios:
+            preset(staged, args.team_id, args.bundle_id, template)
+        else:
+            preset(staged)
         print(f"Staged {count} tracked project files. Output: {output}", flush=True)
         base = (godot, "--headless", "--path", staged)
         run(*base, "--import", "--log-file", output / "import.log")
@@ -154,37 +187,45 @@ def export(args: argparse.Namespace) -> None:
         flag = "--export-release" if args.release_template else "--export-debug"
         run(*base, flag, PRESET, output / f"{PRODUCT}.ipa", "--log-file", output / "export.log")
     project = output / f"{PRODUCT}.xcodeproj"
-    if not project.is_dir():
+    if not (project / "project.pbxproj").is_file() or not (output / f"{PRODUCT}.pck").is_file():
         raise ValueError(f"Godot did not produce {project}. See {output / 'export.log'}.")
     print(f"Xcode project: {project}")
-    if not args.device:
+    if args.command == "project" or not args.device:
         return
     config_dir = output / "Device"
     changes = ["-allowProvisioningUpdates"] if args.allow_provisioning_updates else []
     run("xcodebuild", "-project", project, "-scheme", PRODUCT, "-configuration", config,
         "-destination", f"platform=iOS,id={args.device}", "-derivedDataPath", output / "DerivedData",
         f"CONFIGURATION_BUILD_DIR={config_dir}", f"DEVELOPMENT_TEAM={args.team_id}",
-        "CODE_SIGN_STYLE=Automatic", *changes, "build")
+        "CODE_SIGN_STYLE=Automatic", "CODE_SIGN_IDENTITY=Apple Development",
+        "-resultBundlePath", output / "Build.xcresult", *changes, "build")
     app = config_dir / f"{PRODUCT}.app"
     if not app.is_dir():
         raise ValueError(f"Missing built app at {app}.")
-    run("xcrun", "devicectl", "device", "install", "app", "--device", args.device, app)
-    run("xcrun", "devicectl", "device", "process", "launch", "--device", args.device, args.bundle_id)
+    core_device = args.core_device or args.device
+    run("xcrun", "devicectl", "device", "install", "app", "--device", core_device, app)
+    run("xcrun", "devicectl", "device", "process", "launch", "--device", core_device,
+        "--terminate-existing", args.bundle_id)
 
 
 def parser() -> argparse.ArgumentParser:
     cli = argparse.ArgumentParser(description=__doc__)
     commands = cli.add_subparsers(dest="command", required=True)
     for name, help_text in (("check", "verify the installed toolchain"), ("pack", "export and smoke-test a review PCK"),
-                            ("build", "export a signed development project on the Mac")):
+                            ("project", "generate the unsigned iOS Xcode project"),
+                            ("build", "export and optionally install the development build on the Mac")):
         cmd = commands.add_parser(name, help=help_text)
         cmd.add_argument("--godot", help="path to the matching Godot executable")
-        if name == "build":
-            cmd.add_argument("--team-id", required=True)
-            cmd.add_argument("--bundle-id", required=True)
-            cmd.add_argument("--device", help="Xcode device ID to build, install and launch on")
-            cmd.add_argument("--allow-provisioning-updates", action="store_true")
+        if name in {"build", "project"}:
+            cmd.add_argument("--team-id", default=os.environ.get("GAF_IOS_TEAM_ID", ""))
+            cmd.add_argument("--bundle-id", default=os.environ.get("GAF_IOS_BUNDLE_ID", ""))
+            cmd.add_argument("--ios-template", type=Path, help="path to the matching ios.zip")
             cmd.add_argument("--release-template", action="store_true", help="use an optimized Godot release template")
+        if name == "build":
+            cmd.add_argument("--device", help="physical iPhone UDID shown by xcdevice")
+            cmd.add_argument("--core-device", default=os.environ.get("GAF_IPHONE_CORE_DEVICE_ID"),
+                             help="devicectl identifier, if different from the iPhone UDID")
+            cmd.add_argument("--allow-provisioning-updates", action="store_true")
     commands.add_parser("devices", help="list paired physical iPhones on the Mac")
     trace = commands.add_parser("record", help="record Instruments against the running app")
     trace.add_argument("--device", required=True)
@@ -232,12 +273,13 @@ def main() -> None:
             print(f"Godot {GODOT_VERSION}: {verify_godot(args.godot)}")
             if platform.system() == "Darwin":
                 verify_xcode()
-                run("xcrun", "devicectl", "list", "devices")
+                print(f"iOS template: {verify_ios_template()}", flush=True)
+                list_devices()
             else:
                 print("iPhone build and Instruments run on the Mac.")
         elif args.command == "devices":
             verify_xcode()
-            run("xcrun", "devicectl", "list", "devices")
+            list_devices()
         elif args.command == "record":
             verify_xcode()
             trace = args.output or BUILD_ROOT / datetime.now().strftime("iphone-%Y%m%d-%H%M%S.trace")
