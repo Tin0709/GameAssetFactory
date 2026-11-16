@@ -2642,7 +2642,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
 		if version < 200 and effect == &"turf_sun_chroma":
-			scale = 0.
+			missing_value = 0.
 		if version < 199 and effect == &"stone_warmth_luma_trim":
 			missing_value = 0.
 		if version < 198 and effect == &"day_grass_ground_tone":
