@@ -2,8 +2,7 @@ extends Node
 ## Original low-frequency actor illumination; not recovered Lumen or native SSS.
 const SAMPLER=preload("res://scripts/world_map_actor_irradiance.gd")
 const PATH="res://assets/graphics/world_map_actor_light_v001/field.res"
-const NOON_BOUNCE_FULL_ANGLE := .04
-const NOON_BOUNCE_END_ANGLE := .75
+const RenderSettings = preload("res://scripts/biome_render_settings.gd")
 var level:Node3D
 var field=SAMPLER.new()
 var cache:Resource
@@ -90,7 +89,7 @@ func refresh(force:bool=false)->void:
   var sun:DirectionalLight3D=level.get_node("Sun");var c:=sun.light_color.srgb_to_linear();var d:Array=cache.get_meta("sun_direction")
   var noon_weight := 0.
   if level.look._ground_bounce_requested:
-   noon_weight = _noon_bounce_weight(sun.global_basis.z.normalized(), Vector3(d[0], d[1], d[2]))
+   noon_weight = RenderSettings.noon_bounce_weight(sun.global_basis.z.normalized(), Vector3(d[0], d[1], d[2]))
   var key_strength := sun.light_energy * noon_weight
   var bounce_mix:float=level.showcase._lighting_scale(&"player_bounce")
   if bounce_mix>0. and noon_weight < 1. and level.look._ground_bounce_requested \
@@ -146,12 +145,6 @@ func refresh(force:bool=false)->void:
    m.set_shader_parameter("player_probe_base",p.y);m.set_shader_parameter("player_probe_tint",tint)
    m.set_shader_parameter("player_probe_scale",scale);m.set_shader_parameter("player_probe_key",key)
  update_usec=Time.get_ticks_usec()-started
-
-static func _noon_bounce_weight(direction: Vector3, baked_direction: Vector3) -> float:
- # Chord length is stable at near-identical directions.
- var chord := direction.distance_to(baked_direction.normalized())
- return 1. - smoothstep(2. * sin(deg_to_rad(NOON_BOUNCE_FULL_ANGLE) * .5),
-  2. * sin(deg_to_rad(NOON_BOUNCE_END_ANGLE) * .5), chord)
 
 func _kai_ground_bounce(position: Vector3) -> Vector4:
  var review = level.showcase

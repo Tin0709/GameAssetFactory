@@ -1,6 +1,15 @@
 extends RefCounted
 ## Shared Environment and directional-light setters. The caller owns the scene and phase inputs.
 
+const NOON_BOUNCE_FULL_ANGLE := .04
+const NOON_BOUNCE_END_ANGLE := .75
+
+static func noon_bounce_weight(direction: Vector3, baked_direction: Vector3) -> float:
+	# Chord length is stable at near-identical directions.
+	var chord := direction.distance_to(baked_direction.normalized())
+	return 1. - smoothstep(2. * sin(deg_to_rad(NOON_BOUNCE_FULL_ANGLE) * .5),
+		2. * sin(deg_to_rad(NOON_BOUNCE_END_ANGLE) * .5), chord)
+
 static func apply_lighting(sun: DirectionalLight3D, env: Environment, phase: Dictionary, noon: Dictionary,
 		sun_rotation: Vector3, key_color: Color, key_energy: float, ambient_color: Color, ambient_energy: float) -> void:
 	sun.rotation_degrees = sun_rotation + Vector3(phase.pitch - noon.pitch, phase.yaw - noon.yaw, 0.)

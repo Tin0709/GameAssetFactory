@@ -4,6 +4,7 @@ const PATH="res://assets/graphics/world_map_terrain_transport_v001/transport.res
 const BRDF=preload("res://assets/graphics/world_map_air_light_v001/brdf.res")
 const SKY_HOURS := preload("res://scripts/world_map_sky_response.gd").HOURS
 const RegionalSkyRegion = preload("res://scripts/regional_sky_region.gd")
+const RenderSettings = preload("res://scripts/biome_render_settings.gd")
 var level:Node3D
 var cache:Resource
 var installed:=false
@@ -387,9 +388,19 @@ func ambient_tint(env:Environment)->Vector3:
 
 func bind(force:bool=false)->void:
 	if not is_active():return
-	var sun:DirectionalLight3D=level.get_node("Sun");var c:=sun.light_color.srgb_to_linear();var key:=Vector3(c.r,c.g,c.b)*sun.light_energy
-	var direction:Array=cache.get_meta("sun_direction")
-	if not level.look._ground_bounce_requested or sun.global_basis.z.normalized().dot(Vector3(direction[0],direction[1],direction[2]))<cos(deg_to_rad(.1)):key=Vector3.ZERO
+	var sun: DirectionalLight3D = level.get_node("Sun")
+	var key := Vector3.ZERO
+	if level.look._ground_bounce_requested:
+		var direction: Array = cache.get_meta("sun_direction")
+		var baked_direction := Vector3(direction[0], direction[1], direction[2])
+		var current_direction := sun.global_basis.z.normalized()
+		var weight := 0.
+		if level.showcase.forest_spatial_sky_context():
+			weight = RenderSettings.noon_bounce_weight(current_direction, baked_direction)
+		elif current_direction.dot(baked_direction) >= cos(deg_to_rad(.1)):
+			weight = 1.
+		var color := sun.light_color.srgb_to_linear()
+		key = Vector3(color.r, color.g, color.b) * (sun.light_energy * weight)
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	var scale := ambient_scale(env) * float(level.showcase.twilight_ground_ambient_scale())
 	var tint:=ambient_tint(env)
