@@ -35,6 +35,7 @@ var _settings_quality: OptionButton
 var _actor_ground_light: ActorGroundLight
 var _actor_ground_scale := 1.
 var _actor_ground_slider: HSlider
+var _actor_ground_drag_before := 1.
 var _mist: MistVolume
 var _allow_spatial_mist := true
 var _path_fixture := PathFixture.new()
@@ -92,6 +93,10 @@ func add_settings_controls(parent: VBoxContainer) -> Label:
 		_actor_ground_slider.value = _actor_ground_scale
 		_actor_ground_slider.tooltip_text = "Kéo về 0 để so sánh với ánh sáng gốc. Áp dụng lúc thiếu sáng."
 		_actor_ground_slider.value_changed.connect(set_actor_ground_scale)
+		_actor_ground_slider.drag_started.connect(func(): _actor_ground_drag_before = _actor_ground_scale)
+		_actor_ground_slider.drag_ended.connect(func(changed: bool):
+			if changed and not is_equal_approx(_actor_ground_drag_before, _actor_ground_scale):
+				_world.showcase._settings.remember_edit(set_actor_ground_scale.bind(_actor_ground_drag_before)))
 		parent.add_child(_actor_ground_slider)
 
 	_settings_status = Label.new()

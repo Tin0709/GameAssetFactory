@@ -6,6 +6,8 @@ iPhone là thiết bị ưu tiên cho kiểm thử mobile. Windows tiếp tục 
 
 Bản device review mở WorldMap với preset dùng chung **Rìa rừng ẩm** và nhân vật gốc có sẵn trong project. Dùng joystick để di chuyển, nút **Chạy** và **Nhảy** để xem animation, **+/−** để đổi zoom, **Đổi giờ** để qua 07:00, 12:00, 16:30, 19:30, 22:00 và **Mây** để chuyển thời tiết. **Cài đặt** mở các mức chất lượng hiện có. HUD lấy FPS và tên driver đang hoạt động trực tiếp từ Godot. Bản kiểm thử tắt âm thanh.
 
+Ở preset **Rìa rừng ẩm**, mức **Cân bằng** và **Đầy đủ** có ánh hắt từ cỏ, đất và đá giúp thấy rõ nhân vật lúc thiếu sáng. Trong **Cài đặt → Đồ họa bản đồ → Ánh hắt từ nền**, kéo về 0% để so với ánh sáng gốc. Thử ở 07:00, 19:30 và 22:00. Nhân vật ở 12:00 dùng ánh sáng gốc.
+
 MD2/A&S, Sabre, Kai và các reference LUT hoặc trường ánh sáng editor-private cần dữ liệu ngoài repository. Chúng tiếp tục dùng trong bản F5 private. Mọi phép đo trên iPhone phải ghi rõ đang chạy nội dung device review. Dữ liệu private và mã adapter chỉ dùng trong editor nằm ngoài bản xuất. Các export khác chỉ chọn chế độ review nếu bật feature `gaf_device_review`.
 
 ## Chuẩn bị một lần trên Mac
