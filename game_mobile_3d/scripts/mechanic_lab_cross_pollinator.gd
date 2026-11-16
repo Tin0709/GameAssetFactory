@@ -8,7 +8,7 @@ signal bolt_launched(bolt: Node3D)
 signal bolt_ended(bolt: Node3D)
 
 const Source := preload("res://scripts/mechanic_lab_weapon_source.gd")
-const SourceGait := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
+const SOURCE_GAIT_PATH := "res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd"
 const DIRECTORY := Source.EQUIPMENT + "RapidCrossbow/RapidCrossbow_Unique/"
 const CLIPS := Source.ANIMATIONS + "Weapons_Ranged/Crossbow/"
 const LIBRARY := &"private_cross_pollinator"
@@ -119,6 +119,9 @@ static func interpolate_shot_poses(actor: CharacterBody3D) -> void:
 			animation.track_set_interpolation_type(track, Animation.INTERPOLATION_LINEAR)
 
 static func load_locomotion(actor: CharacterBody3D, root: String) -> Dictionary:
+	if not OS.has_feature("editor") or not ResourceLoader.exists(SOURCE_GAIT_PATH):
+		return {}
+	var gait_source := load(SOURCE_GAIT_PATH) as Script
 	var entries: Array[Dictionary] = []
 	for slot: String in LOCOMOTION:
 		var source: Array = LOCOMOTION[slot]
@@ -140,7 +143,7 @@ static func load_locomotion(actor: CharacterBody3D, root: String) -> Dictionary:
 		var clip: Dictionary = slots[keys[i]]
 		samples.append({"semantic": keys[i], "source_name": clip.source_name,
 			"input": inputs[i], "duration": clip.duration, "rate": 1.0})
-	var gait := SourceGait.new()
+	var gait: RefCounted = gait_source.new()
 	if not gait.setup(actor.skeleton, actor.animation_player, slots, {
 		"schema": "md2-private-source-gait/1", "base_speed_cm_s": 700.0, "input_floor": 0.2, "samples": samples,
 	}):
