@@ -24,6 +24,43 @@ func check_noon_bounce(world: Node3D) -> void:
 	world.showcase.set_hour(12.)
 	await process_frame
 
+func check_caster_matched_bounce(world: Node3D) -> void:
+	var transport = world.terrain_light
+	if not transport.has_method("set_day_bounce_layout"):
+		check(false, "Terrain can consume a bake tied to the applied caster layout")
+		return
+	world.showcase.set_hour(16.5)
+	await process_frame
+	await process_frame
+	check(transport.matched_day_bounce_active, "F5 selects the caster-matched bake")
+	var corrected: ImageTexture3D = transport.day_bounce_texture
+	var tree := world.find_child("BasinDaySpruce", true, false) as Node3D
+	check(tree != null and corrected != null, "Matched tree and RGB9E5 texture are live")
+	if tree == null or corrected == null:
+		return
+	var pose := tree.global_position
+	tree.global_position += Vector3(.25, 0., 0.)
+	transport._refresh_day_bounce()
+	check(not transport.matched_day_bounce_active and transport.day_bounce_texture != corrected,
+		"Moved caster switches to the original bake")
+	tree.global_position = pose
+	transport._refresh_day_bounce()
+	check(transport.matched_day_bounce_active, "Restoring the verified caster resumes the correction")
+	var region = transport._regional_sky.duplicate()
+	var digest: String = region.sun_bounce_matched_layout_sha256
+	check(region.load_matched_sun_bounce_texture("unknown") == null, "Unrecognized layout is rejected")
+	var path: String = region.sun_bounce_matched_path
+	region.sun_bounce_matched_path = path + ".missing"
+	check(region.load_matched_sun_bounce_texture(digest) == null, "Missing alternate field is rejected")
+	region.sun_bounce_matched_path = path
+	region.sun_bounce_matched_sha256 = "0".repeat(64)
+	check(region.load_matched_sun_bounce_texture(digest) == null, "Incorrect payload hash is rejected")
+	region.sun_bounce_matched_sha256 = transport._regional_sky.sun_bounce_matched_sha256
+	region.sun_bounce_sha256 = "0".repeat(64)
+	check(region.load_matched_sun_bounce_texture(digest) == null, "Changed base field invalidates the correction")
+	world.showcase.set_hour(12.)
+	await process_frame
+
 func run()->void:
 	var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w)
 	await create_timer(.3).timeout
@@ -57,6 +94,7 @@ func run()->void:
 		w.look.set_ground_bounce(true)
 		check(w.terrain_light.error.is_empty(),"Cache validates all source data")
 		await check_noon_bounce(w)
+		await check_caster_matched_bounce(w)
 		for energy in [0.,NAN,INF]:
 			var probe=load("res://scripts/world_map_terrain_transport.gd").new();probe.level=w;probe.cache=w.terrain_light.cache.duplicate(true);probe.cache.set_meta("ambient_energy",energy)
 			check(not probe._install() and "normalization" in probe.error,"Invalid normalization metadata fails closed");probe.free()
