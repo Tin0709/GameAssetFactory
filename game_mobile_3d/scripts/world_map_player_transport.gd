@@ -121,7 +121,7 @@ func refresh(force:bool=false)->void:
  var twilight_view_fill: float = level.showcase.actor_twilight_view_fill_weight() if active and level.look.player_local_light_enabled else 0.
  var ground_bounce := _kai_ground_bounce(p)
  refresh_shade_sky(force)
- var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if active else null,sun_shoulder,sun_specular,canopy_color,view_fill_chroma,twilight_view_fill,ground_bounce]
+ var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if phase_bounce_active else null,sun_shoulder,sun_specular,canopy_color,view_fill_chroma,twilight_view_fill,ground_bounce]
  if not force and bind_key==_last_bind_key:
   update_usec=Time.get_ticks_usec()-started;return
  _last_bind_key=bind_key
