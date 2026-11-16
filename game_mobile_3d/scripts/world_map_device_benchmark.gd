@@ -210,6 +210,9 @@ func _finish() -> void:
 		output.store_string(JSON.stringify({"schema": 1, "renderer": RenderingServer.get_current_rendering_method(),
 			"driver": RenderingServer.get_current_rendering_driver_name(), "platform": OS.get_name(),
 			"device": OS.get_model_name(), "os_version": OS.get_version(), "engine": Engine.get_version_info().string,
+			"rendering_scale": get_viewport().scaling_3d_scale, "debug_template": OS.is_debug_build(),
+			"source_commit": ProjectSettings.get_setting("gaf_device_review/source_commit", "editor"),
+			"source_dirty": ProjectSettings.get_setting("gaf_device_review/source_dirty", null),
 			"viewport": [size.x, size.y], "physics_hz": Engine.physics_ticks_per_second, "order": ORDER,
 			"segment_ticks": _length, "warmup_ticks": _warmup, "elapsed_s": (Time.get_ticks_usec() - _opened_usec) / 1000000.,
 			"rows": _rows}, "\t"))

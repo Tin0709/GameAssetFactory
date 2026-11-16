@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+import json
 from pathlib import Path, PurePosixPath
 import platform
 import re
 import shutil
+from statistics import median
 import subprocess
 import tempfile
 
@@ -76,6 +78,9 @@ def stage(target: Path) -> int:
     text = text.replace('[rendering]\n', '[rendering]\n\nrenderer/rendering_method.mobile="mobile"\n'
                         'rendering_device/driver.ios="metal"\n'
                         'textures/vram_compression/import_etc2_astc=true\n')
+    commit = run("git", "-C", ROOT, "rev-parse", "--short", "HEAD", capture=True).strip()
+    dirty = bool(run("git", "-C", ROOT, "status", "--porcelain", "--", PROJECT.name, capture=True).strip())
+    text += f'\n[gaf_device_review]\n\nsource_commit="{commit}"\nsource_dirty={str(dirty).lower()}\n'
     settings.write_text(text, encoding="utf-8")
     return count
 
@@ -185,7 +190,37 @@ def parser() -> argparse.ArgumentParser:
     trace.add_argument("--duration", default="60s")
     trace.add_argument("--template", default="Game Performance")
     trace.add_argument("--output", type=Path)
+    summary = commands.add_parser("summarize", help="summarize one in-app ABBA report")
+    summary.add_argument("report", type=Path)
     return cli
+
+
+def summarize(path: Path) -> None:
+    report = json.loads(path.read_text(encoding="utf-8"))
+    if report.get("schema") != 1 or report.get("order") != [2, 1, 1, 2] or len(report.get("rows", [])) != 48:
+        raise ValueError("Expected a complete Godot WorldMap ABBA report.")
+    groups = {}
+    for row in report["rows"]:
+        key = row["site"], row["hour"], row["weather"], row["camera_size"]
+        groups.setdefault(key, []).append(row)
+    if len(groups) != 12 or any([row["quality"] for row in rows] != report["order"] for rows in groups.values()):
+        raise ValueError("Report did not repeat the same angles and conditions in ABBA order.")
+    print(f"{report['platform']} · {report['renderer']}/{report['driver']} · {report.get('source_commit', 'unknown')}")
+    print("Site | Hour | Cloud | FPS average (Full / Balanced) | Frame P95 ms | Viewport GPU P50 ms")
+    for (site, hour, cloud, _), rows in groups.items():
+        results = []
+        for quality in (2, 1):
+            pair = [row for row in rows if row["quality"] == quality]
+            if any(not row["frame_ms"] for row in pair):
+                raise ValueError("A segment has no frame samples.")
+            gpu = [row["gpu_ms"]["p50"] for row in pair if row["gpu_sample_count"] > 0]
+            results.append((median(row["mean_fps"] for row in pair),
+                            median(row["frame_ms"]["p95"] for row in pair),
+                            f"{median(gpu):.3f}" if len(gpu) == len(pair) else "n/a"))
+        full, balanced = results
+        minutes = round(hour * 60)
+        print(f"{site} | {minutes // 60:02}:{minutes % 60:02} | {cloud:.0%} | "
+              f"{full[0]:.1f} / {balanced[0]:.1f} | {full[1]:.2f} / {balanced[1]:.2f} | {full[2]} / {balanced[2]}")
 
 
 def main() -> None:
@@ -211,6 +246,8 @@ def main() -> None:
             trace.parent.mkdir(parents=True, exist_ok=True)
             run("xcrun", "xctrace", "record", "--device", args.device, "--template", args.template,
                 "--time-limit", args.duration, "--attach", PRODUCT, "--output", trace)
+        elif args.command == "summarize":
+            summarize(args.report)
         else:
             export(args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
