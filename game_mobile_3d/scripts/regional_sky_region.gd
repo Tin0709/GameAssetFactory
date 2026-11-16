@@ -17,6 +17,10 @@ extends Resource
 @export var night_field_sha256: String
 @export var sun_bounce_path: String
 @export var sun_bounce_sha256: String
+@export var sun_bounce_matched_path: String
+@export var sun_bounce_matched_sha256: String
+@export var sun_bounce_matched_layout_sha256: String
+@export var sun_bounce_matched_base_sha256: String
 @export var sun_bounce_hours: PackedFloat32Array
 @export var sun_bounce_directions: PackedVector3Array
 @export var sun_bounce_slices: PackedInt32Array
@@ -107,6 +111,16 @@ func sun_bounce_sample(hour: float, direction: Vector3) -> Vector2:
 
 func load_sun_bounce_texture() -> ImageTexture3D:
 	return _load_volume(sun_bounce_path, sun_bounce_sha256, sun_bounce_layer_count)
+
+func supports_matched_sun_bounce(layout_sha256: String) -> bool:
+	return layout_sha256.length() == 64 and layout_sha256 == sun_bounce_matched_layout_sha256 \
+		and sun_bounce_sha256 == sun_bounce_matched_base_sha256 \
+		and not sun_bounce_matched_path.is_empty() and sun_bounce_matched_sha256.length() == 64
+
+func load_matched_sun_bounce_texture(layout_sha256: String) -> ImageTexture3D:
+	if not supports_matched_sun_bounce(layout_sha256):
+		return null
+	return _load_volume(sun_bounce_matched_path, sun_bounce_matched_sha256, sun_bounce_layer_count)
 
 func load_night_texture() -> ImageTexture:
 	if extent.x <= 0 or extent.y <= 0 or not _supports_packed_texture():

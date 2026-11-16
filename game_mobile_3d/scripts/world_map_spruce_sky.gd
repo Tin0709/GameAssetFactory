@@ -174,6 +174,8 @@ func apply_layout(relative: String, digest: String) -> bool:
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", sky)
 	air.texture = directional
 	_level.showcase.mist.effect.directional_grid = directional
+	if _level.terrain_light != null:
+		_level.terrain_light.set_day_bounce_layout(digest, air._geometry_current)
 	if candidate_bounce != null:
 		player_light.local_phase_bounce = candidate_bounce
 	elif player_light != null and player_light.cache_ready:

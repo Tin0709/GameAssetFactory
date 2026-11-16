@@ -32,6 +32,10 @@ var night_sky_state := Vector2.ZERO
 var night_stone_top_cool := 0.0
 var day_bounce_texture: ImageTexture3D
 var day_bounce_key := Vector4.ZERO
+var matched_day_bounce_active := false
+var _day_bounce_layout_sha256 := ""
+var _day_bounce_casters_current: Callable
+var _matched_day_bounce_failed := false
 var stone_bounce_focus := 0.
 var stone_diffuse_texture: ImageTexture
 var stone_diffuse_strength := 0.0
@@ -152,8 +156,8 @@ func _install()->bool:
 		_stone_diffuse_ready = _regional_sky.has_stone_diffuse_field()
 		_stone_twilight_ready = _regional_sky.has_stone_twilight_sky()
 		if _day_bounce_ready and level.showcase._lighting_scale(&"daylight_bounce") > 0.0:
-			# Prepare the default field during map loading, before the first daylight transition.
-			_load_day_bounce()
+			# The validated caster layout is installed later in this same map setup.
+			_load_day_bounce.call_deferred()
 	return true
 
 func regional_sky_available() -> bool:
@@ -201,8 +205,28 @@ func night_sky_available() -> bool:
 func day_bounce_available() -> bool:
 	return _day_bounce_ready
 
+func set_day_bounce_layout(layout_sha256: String, casters_current: Callable) -> void:
+	_day_bounce_layout_sha256 = layout_sha256
+	_day_bounce_casters_current = casters_current
+	_matched_day_bounce_failed = false
+
 func _load_day_bounce() -> void:
+	var use_matched := not _matched_day_bounce_failed and _day_bounce_casters_current.is_valid() \
+		and _regional_sky.supports_matched_sun_bounce(_day_bounce_layout_sha256) \
+		and bool(_day_bounce_casters_current.call())
+	if day_bounce_texture != null and matched_day_bounce_active == use_matched:
+		return
+	if use_matched:
+		var corrected := _regional_sky.load_matched_sun_bounce_texture(_day_bounce_layout_sha256)
+		if corrected != null:
+			day_bounce_texture = corrected
+			matched_day_bounce_active = true
+			return
+		_matched_day_bounce_failed = true
+		if day_bounce_texture != null and not matched_day_bounce_active:
+			return
 	day_bounce_texture = _regional_sky.load_sun_bounce_texture()
+	matched_day_bounce_active = false
 	_day_bounce_ready = day_bounce_texture != null
 
 func stone_diffuse_available() -> bool:
@@ -267,6 +291,7 @@ func _bind_stone_diffuse_receivers() -> void:
 
 func _refresh_day_bounce() -> void:
 	var review = level.showcase
+	var previous_texture := day_bounce_texture
 	var key := Vector4.ZERO
 	var hour: float = review.hour
 	var strength: float = review._lighting_scale(&"daylight_bounce")
@@ -279,14 +304,13 @@ func _refresh_day_bounce() -> void:
 		var sun: DirectionalLight3D = level.get_node("Sun")
 		var sample := _regional_sky.sun_bounce_sample(hour, sun.global_basis.z.normalized())
 		if sample.y > 0.0 and sun.is_visible_in_tree() and sun.shadow_enabled and sun.light_energy > 0.0:
-			if day_bounce_texture == null:
-				_load_day_bounce()
+			_load_day_bounce()
 			if day_bounce_texture != null:
 				var c := sun.light_color.srgb_to_linear()
 				var rgb := Vector3(c.r, c.g, c.b) * (sun.light_energy * sample.y * strength)
 				key = Vector4(rgb.x, rgb.y, rgb.z, sample.x)
 	var focus: float = review.stone_bounce_focus_weight() if key != Vector4.ZERO else 0.
-	if key != day_bounce_key or focus != stone_bounce_focus:
+	if key != day_bounce_key or focus != stone_bounce_focus or previous_texture != day_bounce_texture:
 		day_bounce_key = key
 		stone_bounce_focus = focus
 		_bind_sky_receivers()
