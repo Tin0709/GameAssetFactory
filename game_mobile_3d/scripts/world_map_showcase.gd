@@ -225,6 +225,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_bloom_prefilter": ["Lọc nền bloom ban đêm", 1.],
 	&"ground_haze": ["Ánh sương thấp sau tán", 1.],
 	&"mist_entry_scatter": ["Ánh tán xạ đầu lớp sương", 1.],
+	&"mist_rear_chroma": ["Cân sắc lam của sương xa", 1.],
 	&"mist_sky_scatter": ["Ánh trời trong sương rìa tán", 1.],
 	&"mist_dusk_sky_scatter": ["Ánh trời trong sương chạng vạng", 1.],
 	&"twilight_ground_haze": ["Ánh sương thấp lúc chạng vạng", 1.],
@@ -306,7 +307,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 200
+const LIGHTING_MIX_VERSION := 201
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1123,8 +1124,18 @@ func _update_mist()->void:
 	if not _flat_lab and not _balanced_preview and atmosphere_review == "combined" \
 			and _biome_profile != null and level.view_mode == "gameplay" and sample.has("near_layer"):
 		var subject_depth: float = -camera.global_basis.z.dot(emitter - camera.global_position)
-		sample.ground_haze = _biome_profile.sample_ground_haze(hour, subject_depth, level.spawn_position.y,
+		var ground_haze := _biome_profile.sample_ground_haze(hour, subject_depth, level.spawn_position.y,
 			_lighting_scale(&"ground_haze"), _lighting_scale(&"twilight_ground_haze"))
+		if _mist_rear_chroma_available():
+			var daylight_window := smoothstep(5.4, 7., hour) * (1. - smoothstep(16.5, 18.7, hour))
+			var rear_chroma := clampf(_biome_profile.mist_rear_chroma * _lighting_scale(&"mist_rear_chroma"), 0., 1.)
+			rear_chroma *= local_phase * daylight * daylight_window
+			if rear_chroma > 0. and is_finite(subject_depth):
+				# The volume's existing ground-haze buffer has two reserved lanes.
+				ground_haze.resize(8)
+				ground_haze[5] = rear_chroma
+				ground_haze[6] = subject_depth
+		sample.ground_haze = ground_haze
 		if mist.has_sky_field():
 			var scatter_strength := _lighting_scale(&"scatter")
 			sample.sky_scatter_source = _biome_profile.sample_mist_sky_scatter(
@@ -1898,6 +1909,10 @@ func balanced_shadow_weight() -> float:
 	# Keep the approved Noon and night filtering. This is a Godot look blend.
 	return PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 
+func _mist_rear_chroma_available() -> bool:
+	return not _flat_lab and _biome_profile != null and is_finite(_biome_profile.mist_rear_chroma) \
+		and _biome_profile.mist_rear_chroma > 0. and RenderingServer.get_current_rendering_method() == &"mobile"
+
 func _balanced_daylight_weight() -> float:
 	return smoothstep(5.5, 7., hour) * (1. - smoothstep(16.5, 19.5, hour))
 
@@ -2641,6 +2656,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 201 and effect == &"mist_rear_chroma":
+			missing_value = 0.
 		if version < 200 and effect == &"turf_sun_chroma":
 			missing_value = 0.
 		if version < 199 and effect == &"stone_warmth_luma_trim":
@@ -2850,6 +2867,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if effect == &"grove_mist_coherence":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.grove_mist_by_hour != null \
 				and is_instance_valid(level.grove)
+		if effect == &"mist_rear_chroma":
+			slider.editable = slider.editable and _mist_rear_chroma_available()
 		if effect == &"twilight_ground_haze":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.twilight_ground_haze != null
 		if effect == &"distant_terrain":
@@ -3053,7 +3072,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_sync_forest_night_lights()
 		set_coupled_bloom(coupled_bloom)
 		return
-	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"mist_entry_scatter", &"mist_sky_scatter", &"mist_dusk_sky_scatter", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
+	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"mist_rear_chroma", &"mist_entry_scatter", &"mist_sky_scatter", &"mist_dusk_sky_scatter", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
 		_update_mist()
 		return
 	if changed_effect in [&"night_path_chroma", &"source_path_chroma", &"day_path_chroma"]:

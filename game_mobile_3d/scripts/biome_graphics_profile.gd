@@ -91,6 +91,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Added light near the entry to the spatial mist, sampled by normalized hour.
 ## An empty track leaves the original medium lighting in place.
 @export var mist_entry_scatter_by_hour: Curve
+## Mix of the rear ambient scattering tint during daylight.
+@export_range(0., 1., .01) var mist_rear_chroma := 0.
 ## Adds ambient sky color to the existing mist in partially occluded air.
 @export var mist_sky_scatter_by_hour: Curve
 ## Independent twilight gain, sharing the same map provider and tint as daytime.

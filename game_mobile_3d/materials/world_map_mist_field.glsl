@@ -47,7 +47,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 depth_scatter; // World metres along the ray: start, full effect, source gain, extinction gain (negative selects the bounded morning band).
  vec4 depth_scatter_color; // Linear change to ambient source RGB, enabled in w.
  vec4 ground_haze_band; // view-depth start/end and lower/upper world Y
- vec4 ground_haze; // low ground source gain in x, near-entry source gain in w
+ vec4 ground_haze; // low ground source gain, rear chroma mix, focus depth, near-entry source gain
 #ifdef GAF_SKY_AIR
  vec4 sky_air_source;
  vec4 sky_air_origin;
@@ -170,6 +170,13 @@ vec3 ambient_depth_source(float depth_m, float view_depth, float world_y){
  if(p.depth_scatter.z>0.)amount=smoothstep(p.depth_scatter.x,p.depth_scatter.y,depth_m);
  vec3 source=p.scatter.rgb;
  if(p.depth_scatter_color.w>0.)source+=p.depth_scatter_color.rgb*amount;
+ if (p.ground_haze.y > 0.0 && view_depth > p.ground_haze.z + 1.5) {
+  float rear = smoothstep(1.5, 7.5, view_depth - p.ground_haze.z);
+  const vec3 luma = vec3(.2126, .7152, .0722);
+  vec3 tinted = source * vec3(1.24, 1.0, .59);
+  tinted *= dot(source, luma) / max(dot(tinted, luma), .000001);
+  source = mix(source, tinted, rear * p.ground_haze.y);
+ }
  float low_air = 0.0;
  if (p.ground_haze.x > 0.0) {
   float behind = smoothstep(p.ground_haze_band.x, p.ground_haze_band.y, view_depth);
