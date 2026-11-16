@@ -27,6 +27,7 @@ uniform vec3 study_grass_shade_color = vec3(0.0);
 uniform float study_grass_root_tone = 0.0;
 uniform float study_grass_night_albedo = 0.0;
 uniform float study_grass_shadow_height = 1.0;
+uniform float study_grass_shadow_footprint = 1.0;
 varying flat vec4 study_ground_sky_at_root;
 varying flat float study_canopy_sky_at_root;
 varying flat float study_raw_canopy_sky;
@@ -149,6 +150,9 @@ void vertex(){
 	// Only the orthographic shadow draw uses the corrected blade height.
 	if (IN_SHADOW_PASS && PROJECTION_MATRIX[3][3] > .5) {
 		VERTEX.y *= study_grass_shadow_height;
+		if (study_grass_shadow_footprint < 1.0) {
+			VERTEX.xz = mix(UV2.xy, VERTEX.xz, study_grass_shadow_footprint);
+		}
 	}
 #endif
 	foliage_world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;

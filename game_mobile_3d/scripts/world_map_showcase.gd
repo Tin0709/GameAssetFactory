@@ -169,6 +169,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"lantern_grass_tone": ["Sắc đèn hông trên cỏ", 1.],
 	&"grass_shadow_reach": ["Grass shadow reach", 1.],
 	&"day_grass_shadow_compactness": ["Day grass shadow compactness", 2.],
+	&"day_grass_shadow_footprint": ["Bề ngang bóng cỏ sáng và chiều", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
 	&"cool_shadow_detail": ["Cool shadow detail", 1.],
@@ -295,7 +296,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 191
+const LIGHTING_MIX_VERSION := 192
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2146,15 +2147,23 @@ func grass_shadow_height_scale() -> float:
 	var height := _twilight_grass_shadow_height_scale()
 	if not forest_active() or atmosphere_review != "combined" or _balanced_preview or not level.look.direct_clouds_active():
 		return height
-	# Keep the existing twilight reach correction and the approved Noon and Night.
-	var morning := smoothstep(5.5, 7.0, hour) * (1.0 - smoothstep(7.0, 12.0, hour))
-	var afternoon := smoothstep(12.0, 16.5, hour) * (1.0 - smoothstep(16.5, 19.0, hour))
-	var phase := morning + afternoon
+	var phase := _day_grass_shadow_weight()
 	var strength := _lighting_scale(&"day_grass_shadow_compactness")
 	var original_range := height * (1.0 - .15 * minf(strength, 1.) * phase)
 	# Keep saved values through 100%. Beyond that, approach the tested height
 	# without multiplying the existing low-sun correction a second time.
 	return lerpf(original_range, minf(original_range, .70), maxf(0., strength - 1.) * phase)
+
+func grass_shadow_footprint_scale() -> float:
+	if _biome_profile == null or atmosphere_review != "combined" or _balanced_preview or not level.look.direct_clouds_active():
+		return 1.0
+	var reduction := _biome_profile.day_grass_shadow_footprint_reduction
+	return 1.0 - reduction * _day_grass_shadow_weight() * _lighting_scale(&"day_grass_shadow_footprint")
+
+func _day_grass_shadow_weight() -> float:
+	var morning := smoothstep(5.5, 7.0, hour) * (1.0 - smoothstep(7.0, 12.0, hour))
+	var afternoon := smoothstep(12.0, 16.5, hour) * (1.0 - smoothstep(16.5, 19.0, hour))
+	return morning + afternoon
 
 func _twilight_grass_shadow_height_scale() -> float:
 	var strength := _lighting_scale(&"grass_shadow_reach") * twilight_color_weight()
@@ -2551,6 +2560,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 192 and effect == &"day_grass_shadow_footprint":
+			missing_value = 0.
 		if version < 191 and effect == &"night_leaf_lamp_shoulder":
 			missing_value = 0.
 		if version < 190 and effect == &"day_path_chroma":
@@ -2799,6 +2810,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.available() and plants != null and plants.grass_light.active
 		if effect == &"grass_step_coverage":
 			slider.editable = slider.editable and plants != null and plants.grass_light.active and plants.dense_grass_review
+		if effect == &"day_grass_shadow_footprint":
+			slider.editable = slider.editable and plants != null and plants.grass_light.active \
+				and _biome_profile != null and _biome_profile.day_grass_shadow_footprint_reduction > 0.
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
 		if effect == &"green_shadow_exposure_trim":
@@ -3010,7 +3024,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"pre_twilight_receiver":
 		return
-	if changed_effect == &"grass_step_coverage":
+	if changed_effect in [&"grass_step_coverage", &"day_grass_shadow_footprint"]:
 		if plants != null:
 			plants.grass_light.sync()
 		return
