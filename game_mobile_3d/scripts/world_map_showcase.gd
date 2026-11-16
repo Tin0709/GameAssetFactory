@@ -3106,6 +3106,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"turf_sun_chroma":
 		_sync_turf_sun_chroma()
+		return
 	if changed_effect in [&"stone_sun_warmth", &"stone_warmth_luma_trim"]:
 		_sync_stone_sun_warmth()
 		return
