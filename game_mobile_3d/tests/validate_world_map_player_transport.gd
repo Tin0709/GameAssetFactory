@@ -5,6 +5,34 @@ func check(ok:bool,label:String):
  checks+=1
  if not ok:failures.append(label)
 func _initialize():call_deferred("run")
+func check_noon_bounce(world: Node3D) -> void:
+ var receiver: ShaderMaterial
+ for material: ShaderMaterial in world.look._direct_actor_materials:
+  if material != null and material.get_meta("verified_valorie", false):
+   receiver = material
+   break
+ check(receiver != null, "Noon regression has a verified actor receiver")
+ if receiver == null:
+  return
+ var samples := PackedVector3Array()
+ var noon_bake: PackedVector3Array = world.player_light._sun.duplicate()
+ for step in range(-25, 26):
+  world.showcase.set_hour(12. + float(step) * .01)
+  await process_frame
+  world.player_light.refresh(true)
+  var key: Vector3 = receiver.get_shader_parameter("player_probe_key")
+  var probes: PackedVector3Array = receiver.get_shader_parameter("player_probe_sun")
+  samples.append(probes[9] * key)
+  if step == 0:
+   check(probes == noon_bake, "Exact Noon retains the validated bake")
+ var peak := samples[25].length()
+ var max_step := 0.
+ for index in range(1, samples.size()):
+  max_step = maxf(max_step, samples[index].distance_to(samples[index - 1]))
+ check(peak > .001, "Exact Noon still receives baked sun bounce")
+ check(max_step < .2 * peak, "No sudden bounce switch around Noon (%f of peak)" % (max_step / maxf(peak, .0001)))
+ world.showcase.set_hour(12.)
+
 func run():
  if not ResourceLoader.exists("res://scripts/world_map_actor_irradiance.gd"):
   check(false,"Original actor field sampler is implemented");print("PLAYER_TRANSPORT ",failures);quit(1);return
@@ -28,6 +56,7 @@ func run():
  var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w);await create_timer(.7).timeout
  var native=RenderingServer.get_current_rendering_method()=="mobile" and RenderingServer.get_rendering_device()!=null
  if native:
+  await check_noon_bounce(w)
   w.look.set_player_phase_material(false) # Legacy material scope; phase proof has its own native test.
   check(w.get("player_light")!=null,"Main WorldMap owns actor field")
   if w.get("player_light")!=null:
