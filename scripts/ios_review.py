@@ -247,22 +247,32 @@ def summarize(path: Path) -> None:
         groups.setdefault(key, []).append(row)
     if len(groups) != 12 or any([row["quality"] for row in rows] != report["order"] for rows in groups.values()):
         raise ValueError("Report did not repeat the same angles and conditions in ABBA order.")
-    print(f"{report['platform']} · {report['renderer']}/{report['driver']} · {report.get('source_commit', 'unknown')}")
-    print("Site | Hour | Cloud | FPS average (Full / Balanced) | Frame P95 ms | Viewport GPU P50 ms")
+    template = "Debug" if report.get("debug_template") else "Release"
+    print(f"{report['platform']} · {report.get('device', 'unknown')} · OS {report.get('os_version', '?')} · "
+          f"{report['renderer']}/{report['driver']} · {template} · {report.get('source_commit', 'unknown')}")
+    print(f"Elapsed {report['elapsed_s']:.1f}s · viewport {report.get('viewport')} · scale {report.get('rendering_scale')}")
+    print("Site | Hour | Cloud | Average FPS (Full / Balanced) | Frame P95 ms | Viewport GPU P50 ms | Renderer peak MiB")
+    full_p95_change = []
     for (site, hour, cloud, _), rows in groups.items():
+        if any(not row["frame_ms"] for row in rows):
+            raise ValueError("A segment has no frame samples.")
+        full_p95_change.append(rows[-1]["frame_ms"]["p95"] - rows[0]["frame_ms"]["p95"])
         results = []
         for quality in (2, 1):
             pair = [row for row in rows if row["quality"] == quality]
-            if any(not row["frame_ms"] for row in pair):
-                raise ValueError("A segment has no frame samples.")
             gpu = [row["gpu_ms"]["p50"] for row in pair if row["gpu_sample_count"] > 0]
+            video_bytes = [row["peak_render_video_bytes"] for row in pair
+                           if row.get("peak_render_video_bytes") is not None]
             results.append((median(row["mean_fps"] for row in pair),
                             median(row["frame_ms"]["p95"] for row in pair),
-                            f"{median(gpu):.3f}" if len(gpu) == len(pair) else "n/a"))
+                            f"{median(gpu):.3f}" if len(gpu) == len(pair) else "n/a",
+                            f"{max(video_bytes) / (1024 ** 2):.1f}" if video_bytes else "n/a"))
         full, balanced = results
         minutes = round(hour * 60)
         print(f"{site} | {minutes // 60:02}:{minutes % 60:02} | {cloud:.0%} | "
-              f"{full[0]:.1f} / {balanced[0]:.1f} | {full[1]:.2f} / {balanced[1]:.2f} | {full[2]} / {balanced[2]}")
+              f"{full[0]:.1f} / {balanced[0]:.1f} | {full[1]:.2f} / {balanced[1]:.2f} | "
+              f"{full[2]} / {balanced[2]} | {full[3]} / {balanced[3]}")
+    print(f"Full quality, median late − early change in P95: {median(full_p95_change):+.2f} ms across matched sites.")
 
 
 def main() -> None:
