@@ -32,9 +32,13 @@ void light(){
 		DIFFUSE_LIGHT += grass_opening_incident * (0.65 * opening_fill);
 	}
 	vec3 diffuse_color=LIGHT_COLOR * gain;
+	float turf_sun = gaf_turf_sun_weight(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX, ATTENUATION * cloud);
+	if (turf_sun > 0.0) {
+		diffuse_color *= gaf_diffuse_chroma_scale(ALBEDO, diffuse_color, vec3(1.25, 1.0, 1.40), turf_sun);
+	}
 	// The identity transfer is returned for non-lantern lights and other cameras.
 	if (gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && gaf_is_player_point(LIGHT_IS_DIRECTIONAL,LIGHT_COLOR.b)) {
-		diffuse_color *= gaf_lantern_diffuse_tint(ALBEDO,LIGHT_COLOR,vec3(1.247,1.0,1.078),gaf_lantern_grass_tone);
+		diffuse_color *= gaf_diffuse_chroma_scale(ALBEDO,LIGHT_COLOR,vec3(1.247,1.0,1.078),gaf_lantern_grass_tone);
 	}
 	DIFFUSE_LIGHT+=response*diffuse_color*(ATTENUATION*point_transfer*cloud/PI);
 }

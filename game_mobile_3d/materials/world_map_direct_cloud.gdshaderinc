@@ -144,12 +144,18 @@ void light() {
 #endif
 		vec3 diffuse_incident = incident;
 #if defined(GAF_WORLD_SPATIAL_TERRAIN) || defined(GAF_WORLD_FLAT_TURF)
+		if (gaf_turf_sun_chroma.w > 0.0 && use_source_terrain && surface_top > 0.998 &&
+				(ground_grade == 1 || ground_grade == 2) &&
+				ALBEDO.g > ALBEDO.r * 1.22 && ALBEDO.g > ALBEDO.b * 1.35) {
+			float tint = gaf_turf_sun_weight(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX, ATTENUATION * cloud_transmission);
+			if (tint > 0.0) diffuse_incident *= gaf_diffuse_chroma_scale(ALBEDO, incident, vec3(1.67, 1.0, 1.75), tint);
+		}
 		if (gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && surface_top > 0.998 && ground_grade == 1
 			&& gaf_is_player_point(LIGHT_IS_DIRECTIONAL,LIGHT_COLOR.b)) {
 			// Only the green side of the grass/soil blend receives the turf correction.
 			float turf = min(smoothstep(1.04,1.10,ALBEDO.g/max(ALBEDO.r,0.0001)),
 				smoothstep(1.1,1.2,ALBEDO.g/max(ALBEDO.b,0.0001)));
-			if (turf > 0.0) diffuse_incident *= gaf_lantern_diffuse_tint(ALBEDO,LIGHT_COLOR,
+			if (turf > 0.0) diffuse_incident *= gaf_diffuse_chroma_scale(ALBEDO,LIGHT_COLOR,
 				vec3(1.489,1.0,1.479),turf*gaf_lantern_grass_tone);
 		}
 #endif

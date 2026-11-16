@@ -100,6 +100,7 @@ var _sheltered_stone_return := 0.
 var _stone_sunset_beam := Vector4.ZERO
 var _stone_sun_warmth := Vector4.ZERO
 var _stone_warmth_luma_trim := 0.
+var _turf_sun_chroma := Vector4.ZERO
 var _stone_sunset_region := Vector4.ZERO
 var _local_diffuse_source := Vector4.ZERO
 var _additional_diffuse_source := Vector4.ZERO
@@ -169,6 +170,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grass_root_tone": ["Night grass root tone", 1.],
 	&"day_grass_sky_height": ["Ánh trời từ gốc đến ngọn cỏ", 1.],
 	&"day_grass_ground_tone": ["Hòa màu gốc cỏ với mặt đất", 1.],
+	&"turf_sun_chroma": ["Sắc nắng trên cỏ và mặt cỏ", 1.],
 	&"grass_step_coverage": ["Cỏ sát bậc địa hình", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
 	&"twilight_grass_albedo": ["Độ dịu lá cỏ chạng vạng", 1.],
@@ -304,7 +306,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 199
+const LIGHTING_MIX_VERSION := 200
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -472,6 +474,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_stone_sunset_beam", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_sun_warmth", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_warmth_luma_trim", 0.)
+	RenderingServer.global_shader_parameter_set("gaf_turf_sun_chroma", Vector4.ZERO)
 	if not _flat_lab:
 		DiffuseRegion.claim(self)
 	RenderingServer.global_shader_parameter_set("gaf_replay_bounce", Vector4.ZERO)
@@ -940,6 +943,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_stone_sunset_beam", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_sun_warmth", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_warmth_luma_trim", 0.)
+			RenderingServer.global_shader_parameter_set("gaf_turf_sun_chroma", Vector4.ZERO)
 			forest_replay.publish_bounce(0.0)
 			forest_replay.release_surface()
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
@@ -1344,8 +1348,30 @@ func _sync_point_camera() -> void:
 		_sync_stone_shade_fill()
 		_sync_stone_sunset_beam()
 		_sync_stone_sun_warmth()
+		_sync_turf_sun_chroma()
 		_sync_local_diffuse_return()
 		_sync_shadow_diffuse()
+
+func _turf_sun_chroma_available() -> bool:
+	return not _flat_lab and _biome_profile != null and is_finite(_biome_profile.turf_sun_chroma) \
+		and _biome_profile.turf_sun_chroma > 0. and source_terrain_active and level != null \
+		and RenderingServer.get_current_rendering_method() == &"mobile" and level.look.direct_clouds_active()
+
+func _sync_turf_sun_chroma() -> void:
+	if _point_kernel_owner == null or _point_kernel_owner.get_ref() != self:
+		return
+	var state := Vector4.ZERO
+	if _turf_sun_chroma_available() and not _balanced_preview and level.view_mode == "gameplay" \
+			and atmosphere_review == "combined" and level.look.terrain_review == "combined":
+		var phase := PHASE_FINISH.phase_weight(hour) * smoothstep(5.4, 7., hour) * (1. - smoothstep(16.5, 18.7, hour))
+		var gain := phase * clampf(_biome_profile.turf_sun_chroma * _lighting_scale(&"turf_sun_chroma"), 0., 1.)
+		var sun: DirectionalLight3D = level.get_node("Sun")
+		if gain > 0. and sun.is_visible_in_tree() and sun.light_energy > 0.:
+			var direction := sun.global_basis.z.normalized()
+			state = Vector4(direction.x, direction.y, direction.z, gain)
+	if state != _turf_sun_chroma:
+		_turf_sun_chroma = state
+		RenderingServer.global_shader_parameter_set("gaf_turf_sun_chroma", state)
 
 func _stone_sun_warmth_available() -> bool:
 	return not _flat_lab and _biome_profile != null and _biome_profile.stone_sun_warmth > 0. \
@@ -1711,6 +1737,10 @@ func set_source_terrain(enabled: bool) -> bool:
 	if stone_sky != null:
 		stone_sky.editable = _stone_day_sky_editable()
 	_sync_distant_terrain()
+	_sync_turf_sun_chroma()
+	var turf_sun: HSlider = _lighting_sliders.get(&"turf_sun_chroma")
+	if turf_sun != null:
+		turf_sun.editable = not _balanced_preview and _turf_sun_chroma_available()
 	return enabled
 
 func forest_active()->bool:
@@ -2611,6 +2641,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 200 and effect == &"turf_sun_chroma":
+			scale = 0.
 		if version < 199 and effect == &"stone_warmth_luma_trim":
 			missing_value = 0.
 		if version < 198 and effect == &"day_grass_ground_tone":
@@ -2929,6 +2961,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _stone_bounce_focus_editable()
 		if effect == &"day_grass_ground_tone":
 			slider.editable = _grass_ground_tone_editable()
+		if effect == &"turf_sun_chroma":
+			slider.editable = slider.editable and _turf_sun_chroma_available()
 		if effect == &"day_grass_sky_height":
 			slider.editable = _grass_sky_height_editable()
 		if effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color"]:
@@ -3070,6 +3104,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
 		_sync_canopy_direct()
 		return
+	if changed_effect == &"turf_sun_chroma":
+		_sync_turf_sun_chroma()
 	if changed_effect in [&"stone_sun_warmth", &"stone_warmth_luma_trim"]:
 		_sync_stone_sun_warmth()
 		return
@@ -3520,6 +3556,9 @@ func _restore_comparison_stage(previous: int) -> void:
 		level.look.set_stage(previous)
 
 func _update_shape_control()->void:
+	var turf_sun: HSlider = _lighting_sliders.get(&"turf_sun_chroma")
+	if turf_sun != null:
+		turf_sun.editable = not _balanced_preview and _turf_sun_chroma_available()
 	var luma_trim: HSlider = _lighting_sliders.get(&"stone_warmth_luma_trim")
 	if luma_trim != null:
 		luma_trim.editable = not _balanced_preview and _stone_sun_warmth_available() and _biome_profile.stone_warmth_luma_trim > 0.

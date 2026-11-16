@@ -131,6 +131,7 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., .65, .01) var stone_sun_warmth := 0.
 ## Remove a fraction of the luminance added by the stone warmth tint.
 @export_range(0., 1., .01) var stone_warmth_luma_trim := 0.
+@export_range(0., 1., .01) var turf_sun_chroma := 0.
 ## Extra baked directional bounce on stone sides during morning and afternoon.
 @export_range(0., 2., .01) var stone_bounce_focus := 0.
 ## Range in exposure stops for sky fill from blade base to tip during daylight.

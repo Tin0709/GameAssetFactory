@@ -4,6 +4,16 @@ global uniform float gaf_sun_opening_gain;
 global uniform vec4 gaf_diffuse_opening;
 global uniform vec4 gaf_shadow_diffuse_sun;
 global uniform vec3 gaf_shadow_diffuse_tint;
+global uniform vec4 gaf_turf_sun_chroma;
+
+float gaf_turf_sun_weight(bool directional, vec3 view_light, mat4 inverse_view, float visibility) {
+	if (!directional || gaf_turf_sun_chroma.w <= 0.0 ||
+			dot(mat3(inverse_view) * view_light, gaf_turf_sun_chroma.xyz) < 0.9999 ||
+			distance(inverse_view[3].xyz, gaf_point_kernel_camera) > 0.005) {
+		return 0.0;
+	}
+	return smoothstep(0.27, 0.85, visibility) * gaf_turf_sun_chroma.w;
+}
 
 // Lift the direct beam in lit openings using the existing geometric and
 // projected visibility. Sky, bounce and local light stay separately owned.

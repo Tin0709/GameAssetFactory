@@ -118,6 +118,7 @@ green_shadow_exposure_trim = 0.16
 exposure_neighborhood_limit = 0.2
 stone_sun_warmth = 0.38
 stone_warmth_luma_trim = 0.60
+turf_sun_chroma = 0.60
 stone_bounce_focus = 1.25
 grass_sky_height = 0.36
 grass_ground_tone = Vector2(0.46, 0.19)
