@@ -116,6 +116,7 @@ daylight_shade_retention = 0.55
 daylight_air_chroma = 0.36
 green_shadow_exposure_trim = 0.16
 stone_sun_warmth = 0.38
+stone_bounce_focus = 1.25
 daylight_green_grade_scale = 1.0
 zoom_exposure_blur_strength = 1.0
 shadowed_wall_return_scale = 1.5

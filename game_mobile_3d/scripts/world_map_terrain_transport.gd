@@ -31,6 +31,7 @@ var night_sky_state := Vector2.ZERO
 var night_stone_top_cool := 0.0
 var day_bounce_texture: ImageTexture3D
 var day_bounce_key := Vector4.ZERO
+var stone_bounce_focus := 0.
 var stone_diffuse_texture: ImageTexture
 var stone_diffuse_strength := 0.0
 var stone_twilight_texture: ImageTexture
@@ -283,8 +284,10 @@ func _refresh_day_bounce() -> void:
 				var c := sun.light_color.srgb_to_linear()
 				var rgb := Vector3(c.r, c.g, c.b) * (sun.light_energy * sample.y * strength)
 				key = Vector4(rgb.x, rgb.y, rgb.z, sample.x)
-	if key != day_bounce_key:
+	var focus: float = review.stone_bounce_focus_weight() if key != Vector4.ZERO else 0.
+	if key != day_bounce_key or focus != stone_bounce_focus:
 		day_bounce_key = key
+		stone_bounce_focus = focus
 		_bind_sky_receivers()
 
 func _refresh_night_sky() -> void:
@@ -322,6 +325,8 @@ func _bind_sky_receivers() -> void:
 
 func bind_regional_sky(material: ShaderMaterial) -> void:
 	material.set_shader_parameter("day_bounce_key", day_bounce_key)
+	if material.get_shader_parameter("ground_grade") == 3:
+		material.set_shader_parameter("stone_bounce_focus", stone_bounce_focus)
 	if day_bounce_key != Vector4.ZERO and material.get_shader_parameter("day_bounce_field") != day_bounce_texture:
 		material.set_shader_parameter("day_bounce_field", day_bounce_texture)
 		material.set_shader_parameter("day_bounce_roots", Vector4(

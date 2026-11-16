@@ -25,6 +25,7 @@ uniform float night_stone_blue_softness = 0.0;
 uniform float dawn_stone_sky_color = 0.0;
 uniform float stone_day_sky = 0.0;
 uniform float stone_wall_sky = 0.0;
+uniform float stone_bounce_focus = 0.0;
 
 float gaf_stone_diffuse_sample(int receiver, vec3 world_normal) {
 	if (stone_diffuse_strength <= 0.0 || ground_grade != 3 || abs(world_normal.y) >= 0.1) return 0.0;
@@ -118,7 +119,18 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 		target *= dot(irradiance, luma) / max(dot(target, luma), .000001);
 		irradiance = mix(irradiance, target, .70 * dawn_stone_sky_color);
 	}
-	irradiance += terrain_day_bounce;
+	vec3 day_return = terrain_day_bounce;
+	if (stone_bounce_focus > 0.0 && ground_grade == 3 && abs(face_y) < .80) {
+		const vec3 return_luma = vec3(.2126, .7152, .0722);
+		float sky_y = dot(diffuse_sky, return_luma);
+		float bounced_y = dot(day_return, return_luma);
+		// Use the existing directional bake to emphasize side faces with real bounce.
+		float side = 1.0 - smoothstep(.15, .80, abs(face_y));
+		float readable_sky = smoothstep(.023, .057, sky_y) * (1.0 - smoothstep(.16, .27, sky_y));
+		float return_share = smoothstep(.06, .25, bounced_y / max(sky_y, .04));
+		day_return *= 1.0 + stone_bounce_focus * side * readable_sky * return_share;
+	}
+	irradiance += day_return;
 #endif
 	if(terrain_colored_visibility)irradiance*=terrain_contact_response(color,contact);
 	return color*(1.0-metallic)*irradiance;
