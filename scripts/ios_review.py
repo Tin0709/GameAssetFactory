@@ -57,7 +57,7 @@ def stage(target: Path) -> int:
     count = 0
     for name in filter(None, tracked.split("\0")):
         relative = PurePosixPath(name).relative_to(PROJECT.name)
-        if relative.parts[0] in {"builds", ".godot", "tests", "tools"}:
+        if relative.parts[0] in {"builds", ".godot", "tests"}:
             continue
         if any("private" in part.casefold() for part in relative.parts):
             continue
@@ -74,7 +74,8 @@ def stage(target: Path) -> int:
     text = settings.read_text(encoding="utf-8")
     text = text.replace('[display]\n', '[display]\n\nwindow/handheld/orientation=0\n')
     text = text.replace('[rendering]\n', '[rendering]\n\nrenderer/rendering_method.mobile="mobile"\n'
-                        'rendering_device/driver.ios="metal"\n')
+                        'rendering_device/driver.ios="metal"\n'
+                        'textures/vram_compression/import_etc2_astc=true\n')
     settings.write_text(text, encoding="utf-8")
     return count
 

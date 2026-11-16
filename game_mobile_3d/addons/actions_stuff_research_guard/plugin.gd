@@ -7,12 +7,17 @@ class ResearchExportGuard extends EditorExportPlugin:
 	const RESEARCH_SCENE := "res://scenes/dev/ActionsStuffWalkRunTest.tscn"
 	const RESEARCH_ROOT := "res://scenes/dev/actions_stuff_research/"
 	const GUARD_ROOT := "res://addons/actions_stuff_research_guard/"
+	const MIST_KERNEL := "res://materials/world_map_mist_field.glsl"
 
 	func _get_name() -> String:
 		return "ActionsStuffResearchReleaseExclusion"
 
 	func _supports_platform(_platform: EditorExportPlatform) -> bool:
 		return true
+
+	func _export_begin(_features: PackedStringArray, _is_debug: bool, _path: String, _flags: int) -> void:
+		# The runtime specializes this source before compiling on the active GPU backend.
+		add_file(MIST_KERNEL, FileAccess.get_file_as_bytes(MIST_KERNEL), false)
 
 	func _export_file(path: String, _type: String, _features: PackedStringArray) -> void:
 		var normalized := path.replace("\\", "/").simplify_path()

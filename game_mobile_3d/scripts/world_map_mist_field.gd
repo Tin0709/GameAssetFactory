@@ -133,12 +133,17 @@ func _keep(rid:RID)->RID:
 	if rid.is_valid():_resources.append(rid)
 	return rid
 func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
+	var kernel := FileAccess.get_file_as_string("res://materials/world_map_mist_field.glsl")
+	if kernel.is_empty():
+		_report("error", "Missing mist kernel source")
+		return false
 	var shape:=RDTextureFormat.new();shape.texture_type=RenderingDevice.TEXTURE_TYPE_3D
 	shape.width=size.x;shape.height=size.y;shape.depth=32;shape.format=RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT
 	shape.usage_bits=RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT|RenderingDevice.TEXTURE_USAGE_STORAGE_BIT|RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
 	if not rd.texture_is_format_supported_for_usage(shape.format,shape.usage_bits):_report("error","RGBA16F volume storage unavailable");return false
 	var volume:=_keep(rd.texture_create(shape,RDTextureView.new()))
-	var source:=RDShaderSource.new();source.source_compute=FileAccess.get_file_as_string("res://materials/world_map_mist_field.glsl").replace("#[compute]","")
+	var source := RDShaderSource.new()
+	source.source_compute = kernel.replace("#[compute]", "")
 	if directional_grid != null:
 		source.source_compute = source.source_compute.replace("#version 450", "#version 450\n#define GAF_DIRECTIONAL_AIR")
 		if directional_region:
