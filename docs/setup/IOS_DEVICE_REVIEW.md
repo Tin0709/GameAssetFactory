@@ -54,12 +54,18 @@ Nếu cần chạy trên Windows trước, dùng `python scripts/ios_review.py p
 ## Đo trên iPhone thật
 
 1. Ghi model iPhone, iOS, commit, template Debug hay Release, renderer, chất lượng, render scale, mức pin và trạng thái nhiệt ban đầu. Dùng cùng góc máy, giờ, thời tiết và tuyến chạy khi so A/B. Kiểm khởi động, di chuyển, chạy, nhảy, zoom, đổi mây, đổi giờ rồi thử các mức đồ họa.
-2. Chạy tuyến bậc đá và lối rừng trong 10 phút. Ghi FPS và frame pacing sau lúc tải, so đoạn đầu và đoạn cuối. Đo GPU duration trong **Game Performance** hoặc **Metal System Trace**, memory footprint và đỉnh RAM bằng công cụ phù hợp trong Instruments. Lưu thermal state cùng các mốc đo. Đặt app chạy trước khi ghi trace bằng CLI. [Game Performance và Metal System Trace](https://developer.apple.com/documentation/xcode/analyzing-the-performance-of-your-metal-app/)
+2. Mở app và bắt đầu ghi Instruments, sau đó bấm **Đo 10p** trong WorldMap. App lặp cùng tuyến ở lối rừng và bậc đá, đủ năm mốc giờ và có lượt 16:30 nhiều mây. Thứ tự là **Đầy đủ → Cân bằng → Cân bằng → Đầy đủ**. Mỗi đoạn có 2 giây ổn định trước khi đo, sau đó nhân vật đi, chạy, nhảy và đổi zoom. App trả lại vị trí và cài đặt khi kết thúc hoặc bấm **Dừng**. Đo GPU duration trong **Game Performance** hoặc **Metal System Trace**, memory footprint và đỉnh RAM bằng công cụ phù hợp trong Instruments. Lưu thermal state cùng các mốc đo. [Game Performance và Metal System Trace](https://developer.apple.com/documentation/xcode/analyzing-the-performance-of-your-metal-app/)
 3. Lưu `.trace` cùng ảnh theo mốc giờ, ghi rõ tên vế A/B. Dùng Xcode Metal Capture cho một frame đại diện khi cần tìm pass, pipeline hoặc texture tốn chi phí. Dùng phiên chơi liên tục khi đo hiệu năng duy trì. [Metal GPU profiling](https://developer.apple.com/documentation/xcode/optimizing-gpu-performance)
 
 ```sh
 xcrun xctrace list templates
-python3 scripts/ios_review.py record --device "$GAF_IPHONE_DEVICE_ID" --duration 10m
+python3 scripts/ios_review.py record --device "$GAF_IPHONE_DEVICE_ID" --duration 11m
+```
+
+Khi app hiện **Đã lưu kết quả đo**, tìm file JSON trong thư mục `device_review_runs` của app. Từ **Xcode → Window → Devices and Simulators**, chọn iPhone và app rồi dùng **Download Container**. Log có dòng `GAF_DEVICE_BENCH_RESULT` kèm đường dẫn. Báo cáo ghi FPS và frametime theo đoạn, GPU viewport khi Godot có mẫu, cùng đỉnh draw call và bộ nhớ do renderer báo. Dùng Instruments để đối chiếu thermal state, GPU timeline và memory footprint của quá trình. [Lấy app container qua Xcode](https://developer.apple.com/documentation/metal/creating-binary-archives-from-device-built-pipeline-state-objects)
+
+```sh
+python3 scripts/ios_review.py summarize "/đường-dẫn/đến/kết-quả.json"
 ```
 
 Nếu tên template hoặc bộ đếm tùy phiên bản Xcode và model iPhone, dùng **Product → Profile** để chọn tập dữ liệu thực tế thiết bị hỗ trợ. Android vẫn dùng renderer và luồng export riêng. Kết quả iPhone hoặc PC không đại diện cho Android.

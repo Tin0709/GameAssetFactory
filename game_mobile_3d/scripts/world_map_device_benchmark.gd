@@ -21,6 +21,7 @@ var _warmup := 0
 var _viewport_rid := RID()
 var _measure_gpu := false
 var _opened_usec := 0
+var _segment_usec := 0
 var _last_frame_usec := 0
 var _frame_ms := PackedFloat32Array()
 var _gpu_ms := PackedFloat32Array()
@@ -106,6 +107,7 @@ func _begin_segment() -> bool:
 	_peak_texture_bytes = 0
 	_peak_video_bytes = 0
 	_jump_started = false
+	_segment_usec = Time.get_ticks_usec()
 	status = "%d/%d · %s" % [_index + 1, _segment_count(), planned.site.name]
 	print("GAF_DEVICE_BENCH_BEGIN ", JSON.stringify({"segment": _index + 1,
 		"quality": planned.quality, "site": planned.site.name, "hour": planned.hour, "weather": planned.weather}))
@@ -189,6 +191,8 @@ func _save_segment() -> void:
 	var frame_time := _summary(_frame_ms)
 	_rows.append({"segment": _index + 1, "site": planned.site.name, "quality": planned.quality,
 		"hour": planned.hour, "weather": planned.weather, "camera_size": planned.site.zoom,
+		"started_s": (_segment_usec - _opened_usec) / 1000000.,
+		"ended_s": (Time.get_ticks_usec() - _opened_usec) / 1000000.,
 		"start": [_start_position.x, _start_position.y, _start_position.z],
 		"end": [_previous_position.x, _previous_position.y, _previous_position.z],
 		"travel_m": _travel_m, "jump_started": _jump_started, "sample_count": _frame_ms.size(),
