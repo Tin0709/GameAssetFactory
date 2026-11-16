@@ -1,5 +1,7 @@
 # MacBook setup — GameAssetFactory
 
+For the current iPhone workflow, use [iPhone build and profiling](IOS_DEVICE_REVIEW.md).
+
 Migration prepared2026-10-14 on Windows. The five-viewer startup workflow was subsequently tested on this Mac with Blender5.2.2 on2026-10-15; the Godot migration checks still require their own visual smoke test before asset authoring. Cleanup is validated locally and the user has authorized final Git synchronization. Confirm the successful push and final commit hash from the handoff before cloning on Mac.
 
 ## Versions and tools
