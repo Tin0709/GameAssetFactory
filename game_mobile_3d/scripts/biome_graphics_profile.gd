@@ -33,6 +33,9 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Local diffuse response around a map-authored opening.
 @export_range(0., .65, .01) var local_diffuse_strength := 0.
 @export var local_diffuse_by_hour: Curve
+## Portable character ground return by normalized hour. An empty track disables it.
+@export var actor_ground_light_by_hour: Curve
+@export_range(0., 2., .01) var actor_ground_light_cloudy_scale := 1.
 ## Optional normalized-hour blend towards stronger sunlight in openings of a map's projection.
 @export var projected_opening_recovery_by_hour: Curve
 ## Scales the baked directional diffuse return on shadowed stone walls.

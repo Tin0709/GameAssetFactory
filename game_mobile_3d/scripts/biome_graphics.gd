@@ -6,6 +6,7 @@ const RenderSettings = preload("res://scripts/biome_render_settings.gd")
 const Weather = preload("res://scripts/biome_weather.gd")
 const DayNight = preload("res://scripts/biome_day_night.gd")
 const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
+const ActorGroundLight = preload("res://scripts/world_map_actor_ground_light.gd")
 const Palette = preload("res://scripts/world_map_showcase_palette.gd")
 const MistVolume = preload("res://scripts/world_map_atmosphere_volume.gd")
 const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
@@ -31,6 +32,9 @@ var _choices: Array[Profile] = []
 var _settings_status: Label
 var _settings_preset: OptionButton
 var _settings_quality: OptionButton
+var _actor_ground_light: ActorGroundLight
+var _actor_ground_scale := 1.
+var _actor_ground_slider: HSlider
 var _mist: MistVolume
 var _allow_spatial_mist := true
 var _path_fixture := PathFixture.new()
@@ -80,6 +84,19 @@ func add_settings_controls(parent: VBoxContainer) -> Label:
 	_settings_quality.item_selected.connect(func(index: int) -> void: set_quality(index as Quality))
 	parent.add_child(_settings_quality)
 
+	if _actor_ground_light != null and _actor_ground_light.supported:
+		var label := Label.new()
+		label.text = "Ánh hắt từ nền lên nhân vật"
+		parent.add_child(label)
+		_actor_ground_slider = HSlider.new()
+		_actor_ground_slider.name = "ActorGroundLightScale"
+		_actor_ground_slider.max_value = 1.
+		_actor_ground_slider.step = .05
+		_actor_ground_slider.value = _actor_ground_scale
+		_actor_ground_slider.tooltip_text = "Kéo về 0 để so sánh với ánh sáng gốc. Áp dụng lúc thiếu sáng."
+		_actor_ground_slider.value_changed.connect(set_actor_ground_scale)
+		parent.add_child(_actor_ground_slider)
+
 	_settings_status = Label.new()
 	parent.add_child(_settings_status)
 	_refresh_settings()
@@ -96,6 +113,8 @@ func _refresh_settings() -> void:
 		_settings_preset.select(index)
 	if _settings_quality.selected != quality:
 		_settings_quality.select(quality)
+	if _actor_ground_slider != null:
+		_actor_ground_slider.editable = quality != Quality.ESSENTIAL and _profile.actor_ground_light_by_hour != null
 
 func set_profile(profile: Profile) -> void:
 	if profile == null or profile.use_forest_reference:
@@ -147,8 +166,32 @@ func _process(delta: float) -> void:
 	if _weather.advance(delta) and _profile.overcast != null:
 		refresh()
 
+func set_actor_ground_scale(value: float) -> void:
+	_actor_ground_scale = clampf(value, 0., 1.)
+	if _actor_ground_slider != null:
+		_actor_ground_slider.set_value_no_signal(_actor_ground_scale)
+	_update_actor_ground_light(_world.showcase.hour)
+
+
+func _update_actor_ground_light(hour: float) -> void:
+	var curve := _profile.actor_ground_light_by_hour
+	if _actor_ground_light == null and curve != null and ActorGroundLight.available() \
+			and _world.player.get("using_original_source") != true:
+		_actor_ground_light = ActorGroundLight.new()
+		add_child(_actor_ground_light)
+		_actor_ground_light.setup(_world)
+	if _actor_ground_light == null:
+		return
+	var power := 0.
+	if quality != Quality.ESSENTIAL and _world.look.stage == 2 and _world.view_mode == "gameplay":
+		power = DayNight.sample_curve(curve, hour / 24., 0.)
+		power *= lerpf(1., _profile.actor_ground_light_cloudy_scale, weather_weight) * _actor_ground_scale
+	_actor_ground_light.set_power(power)
+
+
 func refresh() -> void:
 	var hour: float = _world.showcase.hour
+	_update_actor_ground_light(hour)
 	_refresh_settings()
 	if _world.look.stage != 2:
 		_world.showcase.sync_cliff_vista(false)

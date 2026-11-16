@@ -327,9 +327,9 @@ func _play_heavy_landing(point: Vector3, _forward: Vector3, _serial: int, _fall_
 	if not contact.is_empty():
 		heavy_landing_audio.slam_landed(contact.position, contact.surface)
 
-func terrain_contact_at(sole: Vector3) -> Dictionary:
-	# Follow the support immediately below the foot, including slabs under a ledge.
-	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * 0.08, sole - Vector3.UP * 0.30, 1)
+func terrain_contact_at(sole: Vector3, depth := .30, clearance := .08) -> Dictionary:
+	# Follow the support below the foot, including slabs under a ledge.
+	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * clearance, sole - Vector3.UP * depth, 1)
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	if hit.is_empty() or hit.normal.y < 0.7:
 		return {}
