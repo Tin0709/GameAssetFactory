@@ -5,6 +5,25 @@ func _initialize()->void:call_deferred("run")
 func check(ok:bool,message:String)->void:
 	checks+=1
 	if not ok:failures.append(message)
+
+func check_noon_bounce(world: Node3D) -> void:
+	var material: ShaderMaterial = world.look.terrain_materials[0][3]
+	var noon_key: Vector3 = material.get_shader_parameter("terrain_key_radiance")
+	var samples := PackedVector3Array()
+	for tick in range(-25, 26):
+		world.showcase.set_hour(12. + float(tick) * .01)
+		await process_frame
+		world.terrain_light.bind()
+		samples.append(material.get_shader_parameter("terrain_key_radiance"))
+	var max_step := 0.
+	for i in range(1, samples.size()):
+		max_step = maxf(max_step, samples[i].distance_to(samples[i - 1]))
+	var peak := noon_key.length()
+	check(peak > .001 and samples[25].is_equal_approx(noon_key), "Exact Noon retains baked terrain energy")
+	check(max_step < .2 * peak, "Terrain energy changes smoothly around Noon (%f of peak)" % (max_step / maxf(peak, .0001)))
+	world.showcase.set_hour(12.)
+	await process_frame
+
 func run()->void:
 	var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w)
 	await create_timer(.3).timeout
@@ -37,6 +56,7 @@ func run()->void:
 		check(w.look.terrain_materials[0][3].get_shader_parameter("terrain_key_radiance")==Vector3.ZERO,"Shift F1 also gates new reflected sunlight")
 		w.look.set_ground_bounce(true)
 		check(w.terrain_light.error.is_empty(),"Cache validates all source data")
+		await check_noon_bounce(w)
 		for energy in [0.,NAN,INF]:
 			var probe=load("res://scripts/world_map_terrain_transport.gd").new();probe.level=w;probe.cache=w.terrain_light.cache.duplicate(true);probe.cache.set_meta("ambient_energy",energy)
 			check(not probe._install() and "normalization" in probe.error,"Invalid normalization metadata fails closed");probe.free()
