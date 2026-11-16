@@ -88,6 +88,10 @@ var biome_controller: BiomeGraphics
 @export var forest_replay_surface_source := Vector3.INF
 ## Optional translation in the two axes of the projected sunlight plane.
 @export var projected_sun_shift := Vector2.ZERO
+## Optional center X/Z and inner/outer radius in world metres for the projected mask.
+@export var projected_sun_local_region := Vector4.ZERO
+## Local translation in the two axes of the projected sunlight plane.
+@export var projected_sun_local_shift := Vector2.ZERO
 ## Optional verified, editor-only extension of the directional fog atlas.
 @export var directional_air_region_profile := ""
 @export var directional_air_region_sha256 := ""

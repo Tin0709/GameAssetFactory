@@ -7,6 +7,8 @@ const SOFT_MASK_SHA256 := "4e0055e4b615efb5ba3993b4b2e953ff1999b2dcac19e336944ab
 const MASK_SIZE := Vector2i(512, 512)
 const STRENGTH := &"gaf_projected_sun_strength"
 const SHIFT := &"gaf_projected_sun_shift"
+const LOCAL_REGION := &"gaf_projected_sun_local_region"
+const LOCAL_SHIFT := &"gaf_projected_sun_local_shift"
 const SOFTNESS := &"gaf_projected_sun_softness"
 const MASK := &"gaf_projected_sun_mask"
 const OPENINGS := &"gaf_projected_sun_openings"
@@ -15,6 +17,8 @@ var _path := ""
 var _texture: ImageTexture
 var _weight := 0.0
 var _shift := Vector2.ZERO
+var _local_region := Vector4.ZERO
+var _local_shift := Vector2.ZERO
 var _soft_path := ""
 var _softness := 0.0
 var _softness_loaded := false
@@ -79,6 +83,8 @@ func set_weight(weight: float) -> void:
 		RenderingServer.global_shader_parameter_set(MASK, _texture)
 	_weight = weight
 	RenderingServer.global_shader_parameter_set(STRENGTH, weight)
+	if _weight <= 0.0:
+		set_local_alignment(Vector4.ZERO, Vector2.ZERO)
 
 func set_opening_recovery(amount: float, phase_response: float = 0.) -> void:
 	var projection_weight := clampf(_weight / .40, 0., 1.)
@@ -98,15 +104,36 @@ func set_shift(shift: Vector2) -> void:
 	_shift = applied
 	RenderingServer.global_shader_parameter_set(SHIFT, _shift)
 
+static func valid_local_alignment(region: Vector4, offset: Vector2) -> bool:
+	return region.is_finite() and region.z >= 0.0 and region.w > region.z \
+		and is_finite(region.w * region.w) and offset.is_finite() and offset != Vector2.ZERO
+
+func set_local_alignment(region: Vector4, offset: Vector2) -> void:
+	var radii := Vector4.ZERO
+	var shift := Vector2.ZERO
+	if _weight > 0.0 and valid_local_alignment(region, offset):
+		radii = Vector4(region.x, region.y, region.z * region.z, region.w * region.w)
+		shift = offset
+	if radii != _local_region:
+		_local_region = radii
+		RenderingServer.global_shader_parameter_set(LOCAL_REGION, radii)
+	if shift != _local_shift:
+		_local_shift = shift
+		RenderingServer.global_shader_parameter_set(LOCAL_SHIFT, shift)
+
 func release() -> void:
 	RenderingServer.global_shader_parameter_set(STRENGTH, 0.)
 	RenderingServer.global_shader_parameter_set(SHIFT, Vector2.ZERO)
+	RenderingServer.global_shader_parameter_set(LOCAL_REGION, Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set(LOCAL_SHIFT, Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set(SOFTNESS, 0.)
 	RenderingServer.global_shader_parameter_set(OPENINGS, 0.)
 	RenderingServer.global_shader_parameter_set(MASK, null)
 	_weight = 0.
 	_opening_recovery = 0.
 	_shift = Vector2.ZERO
+	_local_region = Vector4.ZERO
+	_local_shift = Vector2.ZERO
 	_softness = 0.
 	_softness_loaded = false
 	_soft_path = ""

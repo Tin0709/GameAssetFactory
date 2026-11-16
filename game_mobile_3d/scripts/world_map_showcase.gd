@@ -114,6 +114,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"projected_sun": ["Projected sunlight", 1.],
 	&"noon_projected_sun": ["Vệt nắng buổi trưa", 1.],
 	&"projected_sun_position": ["Projected sunlight placement", 1.],
+	&"projected_sun_region_alignment": ["Vị trí vệt nắng cục bộ", 1.],
 	&"projected_sun_softness": ["Projected sunlight softness", 1.],
 	&"projected_sun_openings": ["Projected sunlight openings", 1.],
 	&"moon": ["Moonlight", 2.],
@@ -297,7 +298,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 193
+const LIGHTING_MIX_VERSION := 194
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1885,6 +1886,12 @@ func refresh_daylight_shading() -> void:
 	projected_sun.set_weight(_lighting_scale(&"projected_sun") * (phase + noon_projection))
 	var shift := Vector2.ZERO if _flat_lab else level.projected_sun_shift as Vector2
 	projected_sun.set_shift(shift * _lighting_scale(&"projected_sun_position"))
+	var region_available := _projected_region_available()
+	if region_available and phase > 0.:
+		var local_strength := _lighting_scale(&"projected_sun_region_alignment") * phase
+		projected_sun.set_local_alignment(level.projected_sun_local_region, level.projected_sun_local_shift * local_strength)
+	else:
+		projected_sun.set_local_alignment(Vector4.ZERO, Vector2.ZERO)
 	projected_sun.set_softness(0. if _balanced_preview else _lighting_scale(&"projected_sun_softness"))
 	var opening_phase := phase * (1. - smoothstep(16.5, 18.5, hour))
 	var opening_response := 0.
@@ -1904,6 +1911,9 @@ func refresh_daylight_shading() -> void:
 	var placement: HSlider = _lighting_sliders.get(&"projected_sun_position")
 	if placement != null:
 		placement.editable = _projected_placement_available()
+	var alignment: HSlider = _lighting_sliders.get(&"projected_sun_region_alignment")
+	if alignment != null:
+		alignment.editable = region_available
 	var softness: HSlider = _lighting_sliders.get(&"projected_sun_softness")
 	if softness != null:
 		softness.editable = not _balanced_preview and projected_sun.softness_available()
@@ -1911,6 +1921,10 @@ func refresh_daylight_shading() -> void:
 func _projected_placement_available() -> bool:
 	return not _balanced_preview and projected_sun.available() and level != null \
 		and level.projected_sun_shift.is_finite() and level.projected_sun_shift != Vector2.ZERO
+
+func _projected_region_available() -> bool:
+	return not _balanced_preview and not _flat_lab and level != null and projected_sun.available() \
+		and projected_sun.valid_local_alignment(level.projected_sun_local_region, level.projected_sun_local_shift)
 
 func local_exposure_mix_scale() -> float:
 	if forest_active() and atmosphere_review in ["haze", "combined"]:
@@ -2561,6 +2575,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 194 and effect == &"projected_sun_region_alignment":
+			missing_value = 0.
 		if version < 193 and effect == &"daylight_air_chroma":
 			missing_value = 0.
 		if version < 192 and effect == &"day_grass_shadow_footprint":
@@ -2853,6 +2869,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and projected_sun.available()
 		if effect == &"projected_sun_position":
 			slider.editable = _projected_placement_available()
+		if effect == &"projected_sun_region_alignment":
+			slider.editable = _projected_region_available()
 		if effect == &"projected_sun_softness":
 			slider.editable = slider.editable and projected_sun.softness_available()
 		if effect == &"regional_sky":
@@ -2898,7 +2916,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		level.look.set_stone_detail_softness(_lighting_scale(&"stone_detail_softness"))
 		if changed_effect == &"stone_detail_softness":
 			return
-	if changed_effect in [&"projected_sun", &"noon_projected_sun", &"projected_sun_position", &"projected_sun_softness", &"projected_sun_openings", &"sun_opening"]:
+	if changed_effect in [&"projected_sun", &"noon_projected_sun", &"projected_sun_position", &"projected_sun_region_alignment", &"projected_sun_softness", &"projected_sun_openings", &"sun_opening"]:
 		refresh_daylight_shading()
 		return
 	if changed_effect == &"day_cycle_pacing":
