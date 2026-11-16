@@ -94,7 +94,7 @@ dedicated_server=false
 custom_features="gaf_device_review"
 export_filter="all_resources"
 include_filter="assets/maps/world_map/*.json,assets/environment/litematic_m2_v1/*.json"
-exclude_filter="*.private.*,private_*,tests/*,tools/*,scenes/dev/*"
+exclude_filter="*.private.*,private_*,tests/*,tools/*,scenes/dev/*,scripts/world_map_source_reference.gd"
 export_path=""
 script_export_mode=2
 
@@ -106,6 +106,8 @@ application/bundle_identifier="{bundle}"
 application/export_project_only=true
 architectures/arm64=true
 '''
+    else:
+        contents += 'binary_format/architecture="x86_64"\n'
     (target / "export_presets.cfg").write_text(contents, encoding="utf-8")
 
 
@@ -136,7 +138,8 @@ def export(args: argparse.Namespace) -> None:
                 log = run(godot, "--headless", "--path", empty, "--main-pack", pack, "--audio-driver",
                           "Dummy", "--rendering-method", "gl_compatibility", "--quit-after", "60",
                           "--log-file", output / "pack_smoke.log", capture=True)
-                if "WORLD_MAP_READY" not in log or "GAF_DEVICE_REVIEW " not in log:
+                errors = (output / "pack_smoke.log").read_text(encoding="utf-8", errors="replace")
+                if "WORLD_MAP_READY" not in log or "GAF_DEVICE_REVIEW " not in log or "ERROR:" in errors:
                     raise ValueError(f"Pack smoke failed. See {output / 'pack_smoke.log'}.")
                 print(log.strip())
             return

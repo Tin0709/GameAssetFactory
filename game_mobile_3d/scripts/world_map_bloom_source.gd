@@ -1,6 +1,6 @@
 extends "res://scripts/world_map_multiscale_bloom.gd"
 ## Original source-order experiment. Native clock/radiometry are not established.
-const EXPOSURE_REFERENCE = preload("res://scripts/world_map_source_reference.gd")
+const GREEN_SHADOW_TRIM = preload("res://scripts/world_map_green_shadow_trim.gd")
 var _source_reference:WeakRef
 var _source_requested:=false
 var _source_weight:=0.
@@ -103,7 +103,7 @@ layout(set=0,binding=2)uniform sampler2D raw_scene;
 layout(set=0,binding=3)uniform sampler3D source_statistics;
 layout(set=0,binding=4)uniform sampler2D source_broad_log;
 layout(set=0,binding=5,std430)readonly buffer SourceSettings{vec4 s[];};
-""" + EXPOSURE_REFERENCE.GREEN_SHADOW_TRIM_SHADER + """
+""" + GREEN_SHADOW_TRIM.GREEN_SHADOW_TRIM_SHADER + """
 float source_gain(vec3 rgb,vec2 uv){
  float value=log2(max(dot(rgb*s[2].w,s[3].xyz),s[2].z));
  float depth=(value*s[1].z+s[1].w)*s[2].x+s[2].y;

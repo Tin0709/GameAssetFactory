@@ -1,11 +1,13 @@
 extends Node
 ## Owns an original phase bridge, never light/materials or source assets.
-const REFERENCE=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/local_exposure_v001/local_exposure_effect.gd")
-const SOURCE_REFERENCE=preload("res://scripts/world_map_source_reference.gd")
+const REFERENCE_PATH := "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/local_exposure_v001/local_exposure_effect.gd"
+const SOURCE_REFERENCE_PATH := "res://scripts/world_map_source_reference.gd"
 const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
 const PROFILE="godot_lab/world_map_unified_showcase_v001/native_exposure_transfer_v001/parameters_v002.private.json"
 const SHA="c82d5489028813cdd1a2061d845fabca43789112e2a96e67dfe8eba80f8c71a3"
 var showcase:Node
+var REFERENCE: Script
+var _source_reference: Script
 var requested:=true
 var active:=false
 var edge_softening:=false
@@ -47,13 +49,16 @@ func setup(value:Node)->void:
   _profile_sha=profile.finish_reference_sha256
  _profile_path=root.path_join(relative_path)
  _verified=not _profile_sha.is_empty()and FileAccess.file_exists(_profile_path)and FileAccess.get_sha256(_profile_path)==_profile_sha
+ if _verified and ResourceLoader.exists(REFERENCE_PATH):
+  REFERENCE = load(REFERENCE_PATH)
+  _source_reference = load(SOURCE_REFERENCE_PATH)
 func available()->bool:
- if not _verified or showcase==null or showcase.level==null or not showcase.unavailable_reason.is_empty():return false
+ if not _verified or REFERENCE == null or _source_reference == null or showcase==null or showcase.level==null or not showcase.unavailable_reason.is_empty():return false
  var effect=showcase.level.look._exposure_effect
  var compositor:Compositor=showcase.level.look._exposure_compositor
  if compositor!=null:
   for item in compositor.compositor_effects:
-   if item is REFERENCE and item!=_native:return false
+   if is_instance_of(item, REFERENCE) and item!=_native:return false
  return effect!=null and effect.has_method("configure_finish")and effect.get("reference_available")==true and effect.failure().is_empty()and str(effect.snapshot().get("reference_failure","")).is_empty()and RenderingServer.get_current_rendering_method()=="mobile"and RenderingServer.get_rendering_device()!=null
 func owns_grade()->bool:return _grade_owned
 func set_requested(value:bool)->void:
@@ -105,7 +110,7 @@ func refresh()->void:
  if not wanted:return
  if _native==null:
   if FileAccess.get_sha256(_profile_path)!=_profile_sha:_fail("Private phase-finishing profile changed");return
-  _native=SOURCE_REFERENCE.new()
+  _native=_source_reference.new()
   if not _native.configure_external(_profile_path):_fail(_native.snapshot().error);return
   _native.set_strength(0.)
   _effect=effect;_compositor=compositor
