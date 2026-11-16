@@ -113,6 +113,7 @@ day_path_chroma_by_hour = SubResource("ForestDayPathChroma")
 shadow_grade_recovery_by_hour = SubResource("ShadowGradeRecovery")
 daylight_shadow_luminance_scale = 0.3
 daylight_shade_retention = 0.55
+daylight_air_chroma = 0.36
 green_shadow_exposure_trim = 0.16
 stone_sun_warmth = 0.38
 daylight_green_grade_scale = 1.0

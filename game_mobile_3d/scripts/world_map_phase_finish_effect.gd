@@ -3,11 +3,12 @@ extends "res://scripts/world_map_reference_grade.gd"
 ## The Filmic/BCS order follows Godot's public mathematical operations; verified on GPU.
 const EDGES=preload("res://scripts/world_map_display_edges.gd")
 const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
-const BASELINE_BYTES := 80
+const BASELINE_BYTES := 96
 const DAYLIGHT_SHADOW_GRADE_OFFSET := 64
 const DAYLIGHT_GREEN_GRADE_OFFSET := 68
 const DAYLIGHT_SHADOW_LUMINANCE_OFFSET := 72
 const DAYLIGHT_SHADE_RETENTION_OFFSET := 76
+const DAYLIGHT_AIR_CHROMA_OFFSET := 80
 var _edge_requested:=false
 var _render_edge:=false
 var _reported_size:=Vector2i.ZERO
@@ -26,6 +27,7 @@ var _humid_weight := 0.
 var _daylight_haze_weight := 0.
 var _daylight_haze_spill := 0.
 var _daylight_shade_retention := 0.
+var _daylight_air_chroma := 0.
 var _humid_actor := Vector4.ZERO
 var _twilight_shadow_weight := 0.
 var _daylight_shadow_grade := 0.
@@ -37,14 +39,15 @@ var _humid_depth := PackedByteArray()
 var _humid_mist: CompositorEffect
 var _render_humid_spread := false
 
-func set_humid_light(weight: float, actor: Vector4 = Vector4.ZERO, depth := PackedByteArray(), mist: CompositorEffect = null, daylight_weight := 0., daylight_spill := 0., shade_retention := 0.) -> void:
+func set_humid_light(weight: float, actor: Vector4 = Vector4.ZERO, depth := PackedByteArray(), mist: CompositorEffect = null, daylight_weight := 0., daylight_spill := 0., shade_retention := 0., air_chroma := 0.) -> void:
  var amount := clampf(weight, 0., 1.) if is_finite(weight) and actor.is_finite() else 0.
  _guard.lock()
  _humid_weight = amount
  _daylight_haze_weight = clampf(daylight_weight, 0., 1.) if is_finite(daylight_weight) and actor.is_finite() else 0.
  _daylight_haze_spill = clampf(daylight_spill, 0., 1.) if is_finite(daylight_spill) else 0.
  _daylight_shade_retention = clampf(shade_retention, 0., 1.) if is_finite(shade_retention) else 0.
- _humid_actor = actor if maxf(amount, _daylight_haze_weight) > 0. else Vector4.ZERO
+ _daylight_air_chroma = clampf(air_chroma, 0., .64) if is_finite(air_chroma) and actor.is_finite() else 0.
+ _humid_actor = actor if maxf(maxf(amount, _daylight_haze_weight), _daylight_air_chroma) > 0. else Vector4.ZERO
  _humid_depth = depth
  _humid_mist = mist
  _guard.unlock()
@@ -120,7 +123,8 @@ func _render_callback(kind:int,data:RenderData)->void:
  var daylight_haze := _daylight_haze_weight if diffusion_active else 0.
  var daylight_spill := _daylight_haze_spill if daylight_haze > 0. else 0.
  var shade_retention := _daylight_shade_retention if daylight_haze > 0. else 0.
- var use_diffusion := maxf(humid_weight, daylight_haze) > 0.
+ var air_chroma := _daylight_air_chroma if diffusion_active else 0.
+ var use_diffusion := maxf(maxf(humid_weight, daylight_haze), air_chroma) > 0.
  var humid_actor := _humid_actor if use_diffusion else Vector4.ZERO
  var depth_data := _humid_depth
  var depth_mist := _humid_mist if use_diffusion else null
@@ -144,10 +148,11 @@ func _render_callback(kind:int,data:RenderData)->void:
   baseline.encode_float(DAYLIGHT_GREEN_GRADE_OFFSET, daylight_green_grade)
   baseline.encode_float(DAYLIGHT_SHADOW_LUMINANCE_OFFSET, daylight_shadow_luminance)
   baseline.encode_float(DAYLIGHT_SHADE_RETENTION_OFFSET, shade_retention)
+  baseline.encode_float(DAYLIGHT_AIR_CHROMA_OFFSET, air_chroma)
  var depth_changed := _depth_diffusion.refresh_sources(rd, buffers, depth_mist)
  if depth_changed or wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
- _render_humid_spread = humid_weight > 0.0 or (daylight_haze > 0.0 and _depth_diffusion.depth.is_valid()
+ _render_humid_spread = humid_weight > 0.0 or (maxf(daylight_haze, air_chroma) > 0.0 and _depth_diffusion.depth.is_valid()
   and _depth_diffusion.volume.is_valid() and depth_data.size() == DepthDiffusion.SETTINGS_SIZE)
  _depth_diffusion.write(rd, depth_data)
  if _baseline_buffer.is_valid()and baseline!=_last_baseline:
@@ -156,6 +161,8 @@ func _render_callback(kind:int,data:RenderData)->void:
  super(kind,data)
  _report("humid_light_weight", _last_baseline.decode_float(28) if _baseline_buffer.is_valid() and failure().is_empty() else 0.)
  var depth_applied := _depth_diffusion.applied
+ _report("daylight_air_chroma", _last_baseline.decode_float(DAYLIGHT_AIR_CHROMA_OFFSET)
+  if depth_applied.size() == DepthDiffusion.SETTINGS_SIZE and _baseline_buffer.is_valid() and failure().is_empty() else 0.)
  _report("daylight_haze_weight", _last_baseline.decode_float(52) if not depth_applied.is_empty() and _baseline_buffer.is_valid() and failure().is_empty() else 0.)
  _report("daylight_haze_spill", _last_baseline.decode_float(56) if not depth_applied.is_empty() and _baseline_buffer.is_valid() and failure().is_empty() else 0.)
  _report("humid_depth_weight", depth_applied.decode_float(28) if depth_applied.size() == DepthDiffusion.SETTINGS_SIZE and failure().is_empty() else 0.)
@@ -175,6 +182,7 @@ func _release(rd:RenderingDevice)->void:
  _report("daylight_shadow_luminance",0.)
  _report("daylight_haze_weight",0.)
  _report("daylight_haze_spill",0.)
+ _report("daylight_air_chroma",0.)
  super(rd)
 func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUniform])->String:
  if not _render_finish or not fragment.contains("inverse_display(clamp(display,0.,1.))"):return fragment
@@ -196,7 +204,7 @@ func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUnifor
 layout(set=0,binding=6,std430)readonly buffer Baseline{vec4 base[];};
 vec3 gaf_display(vec3 c){return mix(12.92*c,1.055*pow(max(c,vec3(0.)),vec3(1./2.4))-.055,greaterThan(c,vec3(.0031308)));}
 vec3 gaf_filmic(vec3 c){return ((c*(.88*c+.06)+.002)/(c*(.88*c+.6)+.06))-(.01/.3);}
-vec3 diffuse_humid_light(vec3 source, vec3 surrounding, vec2 uv, inout float shadow_depth){
+vec3 diffuse_humid_light(vec3 source, vec3 surrounding, vec2 uv, inout float shadow_depth, inout vec3 incident_air){
  float y = dot(source, luma);
  float nearby = dot(surrounding, luma);
  float separation = length((uv - base[2].xy) * base[2].zw);
@@ -258,6 +266,19 @@ vec3 recover_green_shade(vec3 graded, vec3 original) {
  float y_restore = clamp((original_y - y) * .50, 0.0, .022);
  return chroma * (1.0 + weight * y_restore / y);
 }
+// Bring distant shaded colors towards the integrated fog source at fixed luminance.
+vec3 match_air_chroma(vec3 color, vec3 incident_air, float depth_weight, vec2 uv) {
+ if (base[5].x <= 0.0 || depth_weight <= 0.0) return color;
+ float air_y = dot(incident_air, luma);
+ float y = dot(color, luma);
+ if (air_y < 0.00001 || y < 0.003 || y > 0.24) return color;
+ float actor = smoothstep(1.0, 1.85, length((uv - base[2].xy) * base[2].zw));
+ float shade = smoothstep(0.003, 0.024, y) * (1.0 - smoothstep(0.075, 0.240, y));
+ vec3 target = clamp(incident_air / air_y, vec3(0.54), vec3(1.68));
+ target *= y / max(dot(target, luma), 0.00001);
+ float mix_weight = clamp(base[5].x * depth_weight * actor * shade, 0.0, 0.72);
+ return mix(color, target, mix_weight);
+}
 vec3 lift_shaded_detail(vec3 color, float shadow_depth) {
  // Keep the foreground's detail lift. Reduce it smoothly where the existing mist builds up.
  float gain = base[4].z * (1.0 - base[4].w * shadow_depth);
@@ -270,7 +291,7 @@ vec3 lift_shaded_detail(vec3 color, float shadow_depth) {
 """
  var diffusion_condition := "base[1].w > 0."
  if not depth_shader.is_empty():
-  helpers = depth_shader + helpers.replace("float limit = .58 * max(y, .022);", """vec2 depth_sample = gaf_diffusion_depth_sample(uv);
+  helpers = depth_shader + helpers.replace("float limit = .58 * max(y, .022);", """vec2 depth_sample = gaf_diffusion_depth_sample(uv, incident_air);
  shadow_depth = depth_sample.y;
  float depth_scale = depth_sample.x;
  weight *= mix(1.0, depth_scale, diffusion_depth.layer.w);
@@ -284,10 +305,10 @@ vec3 lift_shaded_detail(vec3 color, float shadow_depth) {
   return max(source + weight * symmetric + day_mix * mix(symmetric, incident, base[3].z), vec3(0.0));
  }
  weight += day_mix;""")
-  diffusion_condition += " || base[3].y > 0."
+  diffusion_condition += " || base[3].y > 0. || base[5].x > 0."
  fragment=fragment.replace("void main() {",helpers+"void main() {")
- fragment=fragment.replace("if (air.x > 0.0) {", "float shadow_depth = 0.0; if (air.x > 0.0 || air.y >= 2.0) {")
- fragment=fragment.replace("adjusted += spread * (air.x * bloom_gain);","if (" + diffusion_condition + ") adjusted = diffuse_humid_light(adjusted, spread, uv_air, shadow_depth);" + """
+ fragment=fragment.replace("if (air.x > 0.0) {", "vec2 shade_uv = vec2(0.0); vec3 incident_air = vec3(0.0); float shadow_depth = 0.0; if (air.x > 0.0 || air.y >= 2.0) {")
+ fragment=fragment.replace("adjusted += spread * (air.x * bloom_gain);","if (" + diffusion_condition + ") { shade_uv = uv_air; adjusted = diffuse_humid_light(adjusted, spread, uv_air, shadow_depth, incident_air); }" + """
   // Use the existing bloom samples to soften bright-to-dark transitions before tonemapping.
   if (base[3].w > 0.0 && air.x > 0.0) {
    adjusted += (spread - adjusted) * min(air.x * base[3].w, 0.48);
@@ -301,7 +322,8 @@ vec3 lift_shaded_detail(vec3 color, float shadow_depth) {
   vec3 previous_finish = recover_twilight_shadow_color(mixed_finish, original_finish);
   vec3 neutral_finish = recover_daylight_shadow_color(mixed_finish, original_finish, previous_finish);
   vec3 finish = recover_green_shade(neutral_finish, original_finish);
-  result = vec4(lift_shaded_detail(finish, shadow_depth), color.a);
+  vec3 shaded = lift_shaded_detail(finish, shadow_depth);
+  result = vec4(match_air_chroma(shaded, incident_air, shadow_depth, shade_uv), color.a);
  """)
  if _render_edge:
   fragment=fragment.replace("color.a);", "color.a);result.rgb=clamp(gaf_display(result.rgb),0.,1.);")

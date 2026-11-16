@@ -7,7 +7,8 @@ layout(set=0,binding=7) uniform sampler2DMS gaf_diffusion_depth;
 layout(set=0,binding=8) uniform sampler3D gaf_diffusion_mist;
 layout(set=0,binding=9,std430) readonly buffer DiffusionDepth { vec4 projection; vec4 layer; vec4 samples; } diffusion_depth;
 
-vec2 gaf_diffusion_depth_sample(vec2 uv) {
+vec2 gaf_diffusion_depth_sample(vec2 uv, out vec3 incident_air) {
+	incident_air = vec3(0.0);
 	ivec2 extent = textureSize(gaf_diffusion_depth);
 	ivec2 pixel = clamp(ivec2(uv * vec2(extent)), ivec2(0), extent - 1);
 	// Reverse Z: favor the near surface at mixed-coverage edges.
@@ -31,7 +32,9 @@ vec2 gaf_diffusion_depth_sample(vec2 uv) {
 		if (entry_m > 0.0 && depth_m < next_m) {
 			slice = previous + (depth_m - entry_m) / max(next_m - entry_m, 0.00001);
 		}
-		opacity = clamp(1.0 - textureLod(gaf_diffusion_mist, vec3(uv, (slice + 0.5) / 32.0), 0.0).a, 0.0, 1.0);
+		vec4 medium = textureLod(gaf_diffusion_mist, vec3(uv, (slice + 0.5) / 32.0), 0.0);
+		incident_air = max(medium.rgb, vec3(0.0));
+		opacity = clamp(1.0 - medium.a, 0.0, 1.0);
 	}
 	float distance_weight = smoothstep(0.6, 6.0, depth_m - diffusion_depth.layer.x);
 	float haze_weight = smoothstep(0.004, 0.035, opacity);
