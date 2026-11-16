@@ -148,6 +148,7 @@ func refresh()->void:
  if camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
   blur_scale = lerpf(1., 18. / clampf(camera.size, 18., 26.), showcase.zoom_exposure_blur_weight())
  _native.set_blur_scale(blur_scale)
+ _native.set_neighborhood_limit(_exposure_neighborhood(camera))
  effect.set_review_strength(_saved_strength*(1.-weight)*gain_scale)
  effect.set_finish_weight(weight*finish_scale);effect.set_reference_grade(true)
  var shadow_color: float = showcase.shadow_color_detail_weight() if finish_scale > 0. else 0.
@@ -165,6 +166,18 @@ func refresh()->void:
  for key in ["tonemap_exposure","adjustment_enabled"]:
   if showcase._forest_expected.has(key):showcase._forest_expected[key]=env.get(key)
  active=true
+
+func _exposure_neighborhood(camera: Camera3D) -> Vector4:
+ var limit: float = showcase.daylight_exposure_neighborhood()
+ var level: Node = showcase.level
+ if limit <= 0. or level.view_mode != "gameplay" or camera == null or camera.projection != Camera3D.PROJECTION_ORTHOGONAL:
+  return Vector4.ZERO
+ var extent := camera.get_viewport().get_visible_rect().size
+ var actor: Vector3 = level.presentation.player_position() + Vector3.UP
+ if extent.x <= 0. or extent.y <= 0. or camera.is_position_behind(actor):
+  return Vector4.ZERO
+ var position := camera.unproject_position(actor) / extent
+ return Vector4(position.x, position.y, limit, camera.size)
 
 func _publish_humid_light(effect: CompositorEffect) -> void:
  var level: Node = showcase.level

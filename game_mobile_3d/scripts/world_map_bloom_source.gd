@@ -1,6 +1,8 @@
 extends "res://scripts/world_map_multiscale_bloom.gd"
 ## Original source-order experiment. Native clock/radiometry are not established.
 const GREEN_SHADOW_TRIM = preload("res://scripts/world_map_green_shadow_trim.gd")
+const Neighborhood := preload("res://scripts/world_map_exposure_neighborhood.gd")
+const SOURCE_PARAMETER_BYTES := 96
 var _source_reference:WeakRef
 var _source_requested:=false
 var _source_weight:=0.
@@ -47,7 +49,9 @@ func _candidate(data:RenderData)->Dictionary:
 	var green_shadow_trim := float(state.get("green_shadow_trim", 0.))
 	if not is_finite(green_shadow_trim) or green_shadow_trim < 0. or green_shadow_trim > .40001:
 		return {}
-	bytes.append_array(PackedFloat32Array([strength,strength,shadow_lift,green_shadow_trim]).to_byte_array())
+	var neighborhood: Vector4 = state.get("neighborhood", Vector4.ZERO)
+	bytes.append_array(PackedFloat32Array([strength, strength, shadow_lift, green_shadow_trim,
+		neighborhood.x, neighborhood.y, neighborhood.z, neighborhood.w]).to_byte_array())
 	return {"raw":raw,"grid":grid,"blur":blur,"parameters":bytes}
 
 func _render_callback(kind:int,data:RenderData)->void:
@@ -59,10 +63,10 @@ func _render_callback(kind:int,data:RenderData)->void:
 	if key!=_source_key:_release(rd);_source_key=key
 	_source_inputs=candidate;_source_render=not candidate.is_empty()
 	if _source_buffer.is_valid()and _source_render and candidate.parameters!=_source_last:
-		rd.buffer_update(_source_buffer,0,80,candidate.parameters);_source_last=candidate.parameters
+		rd.buffer_update(_source_buffer,0,SOURCE_PARAMETER_BYTES,candidate.parameters);_source_last=candidate.parameters
 	super(kind,data)
 	_report("source_order_active",_source_render and _source_buffer.is_valid())
-	_report("source_order_bytes",80 if _source_buffer.is_valid()else 0)
+	_report("source_order_bytes",SOURCE_PARAMETER_BYTES if _source_buffer.is_valid() else 0)
 
 func _release(rd:RenderingDevice)->void:
 	# Native texture teardown can already have invalidated this dependent set.
@@ -103,9 +107,10 @@ layout(set=0,binding=2)uniform sampler2D raw_scene;
 layout(set=0,binding=3)uniform sampler3D source_statistics;
 layout(set=0,binding=4)uniform sampler2D source_broad_log;
 layout(set=0,binding=5,std430)readonly buffer SourceSettings{vec4 s[];};
-""" + GREEN_SHADOW_TRIM.GREEN_SHADOW_TRIM_SHADER + """
-float source_gain(vec3 rgb,vec2 uv){
- float value=log2(max(dot(rgb*s[2].w,s[3].xyz),s[2].z));
+""" + GREEN_SHADOW_TRIM.GREEN_SHADOW_TRIM_SHADER + Neighborhood.SHADER + """
+float source_gain(vec3 rgb,vec2 uv,vec2 extent){
+ float luminance=max(dot(rgb*s[2].w,s[3].xyz),s[2].z);
+ float value=log2(luminance);
  float depth=(value*s[1].z+s[1].w)*s[2].x+s[2].y;
  vec2 pair=textureLod(source_statistics,vec3(uv,depth),0.).rg;
  float broad=textureLod(source_broad_log,uv,0.).r;
@@ -114,7 +119,7 @@ float source_gain(vec3 rgb,vec2 uv){
  float strength=delta>0.?s[4].x:s[4].x*s[4].z;
  if (delta < 0.0) strength *= gaf_green_shadow_lift(rgb,s[3].xyz,s[4].w);
  float contrast=mix(1.,delta>0.?s[0].z:s[0].w,strength);
- return exp2((contrast-1.)*delta);
+ return exp2(gaf_limit_neighborhood_gain((contrast-1.)*delta,luminance,broad-local,uv,extent,s[5]));
 }
 """
 	source=source.replace("void main(){",helpers+"void main(){")
@@ -125,7 +130,7 @@ float source_gain(vec3 rgb,vec2 uv){
  // Quarter-resolution support and the phase crossfade are original adaptations.
  vec2 center=vec2(first)+vec2(HALF_BLOCK);
  vec2 stat_uv=(center-vec2(1.))/vec2(dimensions);
- vec3 candidate=mean_raw*source_gain(mean_raw,stat_uv);
+ vec3 candidate=mean_raw*source_gain(mean_raw,stat_uv,vec2(dimensions));
  candidate*=scene_gain(candidate,center);
  result=vec4(prefilter_air(mix(sum/AREA,candidate,s[4].y)),1.);"""
 	body=body.replace("HALF_BLOCK",str(float(block)*.5)).replace("BLOCK",str(block)).replace("AREA",str(float(block*block)))
@@ -137,7 +142,7 @@ func _prepare_pass(rd:RenderingDevice,fragment:String,framebuffer:RID,uniforms:A
 		var sampler:RID=uniforms[0].get_ids()[0]
 		uniforms=uniforms.duplicate()
 		uniforms.append(_sample(2,sampler,_source_inputs.raw));uniforms.append(_sample(3,sampler,_source_inputs.grid));uniforms.append(_sample(4,sampler,_source_inputs.blur))
-		_source_last=_source_inputs.parameters;_source_buffer=_keep(rd.storage_buffer_create(80,_source_last))
+		_source_last=_source_inputs.parameters;_source_buffer=_keep(rd.storage_buffer_create(SOURCE_PARAMETER_BYTES,_source_last))
 		if not _source_buffer.is_valid():_report("error","Optional source parameter allocation failed");return false
 		var setting:=RDUniform.new();setting.uniform_type=RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER;setting.binding=5;setting.add_id(_source_buffer);uniforms.append(setting)
 	var valid:=super(rd,fragment,framebuffer,uniforms)

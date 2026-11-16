@@ -115,6 +115,7 @@ daylight_shadow_luminance_scale = 0.3
 daylight_shade_retention = 0.55
 daylight_air_chroma = 0.36
 green_shadow_exposure_trim = 0.16
+exposure_neighborhood_limit = 0.2
 stone_sun_warmth = 0.38
 stone_bounce_focus = 1.25
 grass_sky_height = 0.36

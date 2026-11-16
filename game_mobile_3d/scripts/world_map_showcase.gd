@@ -228,6 +228,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"cliff_vista": ["Địa hình xa sau bậc đá", 1.],
 	&"cliff_vista_feather": ["Dịu mép địa hình khi zoom xa", 1.],
 	&"zoom_exposure_guide": ["Ổn định sáng tối khi zoom xa", 1.],
+	&"exposure_neighborhood_limit": ["Giữ chiều sâu dưới tán", 1.],
 	&"zoom_exposure_blur": ["Giữ ánh sáng ổn định khi cuộn zoom", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
@@ -300,7 +301,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 196
+const LIGHTING_MIX_VERSION := 197
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2587,6 +2588,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 197 and effect == &"exposure_neighborhood_limit":
+			default_value = 0.
 		if version < 196 and effect == &"day_grass_sky_height":
 			missing_value = 0.
 		if version < 195 and effect == &"day_stone_bounce_focus":
@@ -2850,6 +2853,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 				and _biome_profile != null and _biome_profile.day_grass_shadow_footprint_reduction > 0.
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
+		if effect == &"exposure_neighborhood_limit":
+			slider.editable = slider.editable and _exposure_neighborhood_editable()
 		if effect == &"green_shadow_exposure_trim":
 			slider.editable = slider.editable and _green_shadow_exposure_editable()
 		if effect == &"daylight_air_chroma":
@@ -2997,7 +3002,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"cliff_vista", &"cliff_vista_feather"]:
 		_update_mist()
 		return
-	if changed_effect in [&"zoom_exposure_guide", &"zoom_exposure_blur", &"green_shadow_exposure_trim"]:
+	if changed_effect in [&"zoom_exposure_guide", &"zoom_exposure_blur", &"green_shadow_exposure_trim", &"exposure_neighborhood_limit"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -3303,6 +3308,19 @@ func green_shadow_exposure_trim() -> float:
 	var phase := DayNight.sample_curve(_biome_profile.shadow_grade_recovery_by_hour, hour / 24., 0.)
 	return clampf(phase, 0., 1.) * _biome_profile.green_shadow_exposure_trim * _lighting_scale(&"green_shadow_exposure_trim")
 
+func daylight_exposure_neighborhood() -> float:
+	if _biome_profile == null or _balanced_preview:
+		return 0.
+	var time := fposmod(hour, 24.)
+	var daylight := smoothstep(5.5, 7., time) * (1. - smoothstep(17.5, 19.5, time))
+	var away_from_noon := smoothstep(.25, 3.4, absf(time - 12.))
+	return _biome_profile.exposure_neighborhood_limit * _lighting_scale(&"exposure_neighborhood_limit") \
+		* daylight * away_from_noon
+
+func _exposure_neighborhood_editable() -> bool:
+	return _biome_profile != null and _biome_profile.exposure_neighborhood_limit > 0. \
+		and phase_finish != null and phase_finish.available()
+
 func _green_shadow_exposure_editable() -> bool:
 	return _biome_profile != null and _biome_profile.green_shadow_exposure_trim > 0. \
 		and phase_finish != null and phase_finish.available()
@@ -3474,6 +3492,9 @@ func _update_shape_control()->void:
 	var stone_warmth: HSlider = _lighting_sliders.get(&"stone_sun_warmth")
 	if stone_warmth != null:
 		stone_warmth.editable = not _balanced_preview and _stone_sun_warmth_available()
+	var neighborhood: HSlider = _lighting_sliders.get(&"exposure_neighborhood_limit")
+	if neighborhood != null:
+		neighborhood.editable = not _balanced_preview and _exposure_neighborhood_editable()
 	var green_shadow: HSlider = _lighting_sliders.get(&"green_shadow_exposure_trim")
 	if green_shadow != null:
 		green_shadow.editable = not _balanced_preview and _green_shadow_exposure_editable()

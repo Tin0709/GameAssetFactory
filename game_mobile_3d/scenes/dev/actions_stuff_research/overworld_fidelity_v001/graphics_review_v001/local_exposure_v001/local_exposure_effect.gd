@@ -77,6 +77,12 @@ func _sampler_uniform(binding:int,texture:RID,sampler:RID)->RDUniform:
  var u:=RDUniform.new();u.uniform_type=RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE;u.binding=binding;u.add_id(sampler);u.add_id(texture);return u
 func _storage_uniform(rd:RenderingDevice,binding:int,bytes:PackedByteArray)->RDUniform:
  var buffer:=rd.storage_buffer_create(bytes.size(),bytes);_owned.append(buffer);var u:=RDUniform.new();u.uniform_type=RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER;u.binding=binding;u.add_id(buffer);return u
+func _neighborhood_shader() -> String:
+ return ""
+
+func _neighborhood_gain() -> String:
+ return ""
+
 func _initialize_live(rd:RenderingDevice)->bool:
  var f:=RDTextureFormat.new();f.width=1024;f.height=576;f.format=RenderingDevice.DATA_FORMAT_B10G11R11_UFLOAT_PACK32;f.usage_bits=RenderingDevice.TEXTURE_USAGE_COLOR_ATTACHMENT_BIT|RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT
  if not rd.texture_is_format_supported_for_usage(f.format,f.usage_bits):_error="R11 reference work target unsupported";return false
@@ -101,7 +107,7 @@ layout(set=0,binding=2)uniform sampler2D blurred_log;
 layout(std430,set=0,binding=3)readonly buffer Parameters{vec4 p[];};
 layout(push_constant,std430)uniform Control{vec4 value;}control;
 layout(location=0)out vec4 output_color;
-""" + GREEN_SHADOW_TRIM_SHADER + """
+""" + GREEN_SHADOW_TRIM_SHADER + _neighborhood_shader() + """
 void main(){
  ivec2 pixel=ivec2(gl_FragCoord.xy);vec2 uv=gl_FragCoord.xy/vec2(textureSize(source_color,0));
  vec4 color=texelFetch(source_color,pixel,0);
@@ -114,7 +120,9 @@ void main(){
  float strength=delta>0.?control.value.y:control.value.y*control.value.z;
  if (delta < 0.0) strength *= gaf_green_shadow_lift(color.rgb,p[3].xyz,control.value.w);
  float contrast=delta>0.?p[0].z:p[0].w;if(strength<1.)contrast=mix(1.,contrast,strength);if(control.value.x==0.)contrast=1.;
- float gain=exp2((contrast-1.)*delta);output_color=vec4(color.rgb*gain,color.a);
+ float gain_ev=(contrast-1.)*delta;
+""" + _neighborhood_gain() + """
+ float gain=exp2(gain_ev);output_color=vec4(color.rgb*gain,color.a);
 }
 """
  var final_shader:=_compile_raster(rd,fragment)

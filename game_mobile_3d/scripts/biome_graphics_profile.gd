@@ -127,6 +127,7 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Blends the mist source color into normally exposed distant shadows in the depth-aware finish.
 @export_range(0., .64, .01) var daylight_air_chroma := 0.
 @export_range(0., .4, .01) var green_shadow_exposure_trim := 0.
+@export_range(0., .32, .01) var exposure_neighborhood_limit := 0.
 @export_range(0., .65, .01) var stone_sun_warmth := 0.
 ## Extra baked directional bounce on stone sides during morning and afternoon.
 @export_range(0., 2., .01) var stone_bounce_focus := 0.
