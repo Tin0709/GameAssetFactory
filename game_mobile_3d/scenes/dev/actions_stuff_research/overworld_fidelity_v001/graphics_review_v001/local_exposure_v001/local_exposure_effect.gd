@@ -2,15 +2,7 @@ extends "hdr_raster_gain.gd"
 ## Original opt-in live effect, same conformed graph as frozen-input validation.
 const Pipeline=preload("exposure_pipeline.gd")
 const KERNEL_FOLDER="res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/local_exposure_v001/shaders"
-const GREEN_SHADOW_TRIM_SHADER := """
-float gaf_green_shadow_lift(vec3 color, vec3 luma, float amount) {
- if (amount <= 0.0) return 1.0;
- float y = max(dot(color, luma), 0.00001);
- float hue = smoothstep(.09,.29,(color.g-color.r)/y)*smoothstep(.12,.34,(color.g-color.b)/y);
- float shade = smoothstep(.002,.007,y)*(1.0-smoothstep(.014,.049,y));
- return 1.0 - amount*hue*shade;
-}
-"""
+const GREEN_SHADOW_TRIM_SHADER := preload("res://scripts/world_map_green_shadow_trim.gd").GREEN_SHADOW_TRIM_SHADER
 var _graph=Pipeline.new()
 var _parameters:Dictionary={}
 var _kernel_folder:=""

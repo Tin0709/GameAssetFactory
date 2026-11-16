@@ -1,7 +1,7 @@
 extends RefCounted
 ## Private Sword equipment and timing for MechanicLab.
 
-const ReferenceAudio := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
+const SourceFilePath := preload("res://scripts/source_file_path.gd")
 const ASSET_DIR := "extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Characters/Player/Equipment/Weapons/Sword/"
 const MESH_HASH := "edfc3fb347433f2d7280be333662eb98c42c16249ff53a0392f71f60c40c1686"
 const TEXTURE_HASH := "54ffa5916a618407d5b50faecce35c01c8626ffa3537c7078d0b5d9ea463c737"
@@ -19,8 +19,8 @@ static func load_mesh(actor: CharacterBody3D, research_root: String) -> Mesh:
 static func load_verified_mesh(actor: CharacterBody3D, research_root: String, directory: String,
 		weapon_name: String, mesh_hash: String, texture_hash: String) -> Mesh:
 	var mesh_name := "SM_" + weapon_name
-	var path := ReferenceAudio.resolve_private_file(research_root, directory + mesh_name + ".glb")
-	var texture := ReferenceAudio.resolve_private_file(research_root, directory + "T_" + weapon_name + ".png")
+	var path := SourceFilePath.resolve_private_file(research_root, directory + mesh_name + ".glb")
+	var texture := SourceFilePath.resolve_private_file(research_root, directory + "T_" + weapon_name + ".png")
 	if path.is_empty() or texture.is_empty() or not FileAccess.file_exists(path) or not FileAccess.file_exists(texture):
 		return null
 	if FileAccess.get_sha256(path) != mesh_hash or FileAccess.get_sha256(texture) != texture_hash:

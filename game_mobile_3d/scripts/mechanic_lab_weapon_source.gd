@@ -1,7 +1,7 @@
 extends RefCounted
 ## External MD2 assets shared by the two requested MechanicLab weapon adapters.
 
-const ReferenceAudio := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
+const SourceFilePath := preload("res://scripts/source_file_path.gd")
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/"
 const PLAYER := SOURCE + "Art/Characters/Player/"
 const ANIMATIONS := PLAYER + "Animations/"
@@ -15,7 +15,7 @@ static func research_root() -> String:
 static func verified_path(root: String, relative: String, hash_value: String) -> String:
 	if not OS.has_feature("editor"):
 		return ""
-	var path := ReferenceAudio.resolve_private_file(root, relative)
+	var path := SourceFilePath.resolve_private_file(root, relative)
 	if path.is_empty() or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != hash_value:
 		return ""
 	return path
@@ -55,7 +55,7 @@ static func icon(directory: String, stem: String, hash_value: String) -> Texture
 static func clip(root: String, directory: String, stem: String, semantic: String, frames: int,
 		hash_value: String, category: String, loop := false) -> Dictionary:
 	return {
-		"path": ReferenceAudio.resolve_private_file(root, directory + stem + ".glb"),
+		"path": SourceFilePath.resolve_private_file(root, directory + stem + ".glb"),
 		"semantic": semantic, "source_name": stem, "sha256": hash_value,
 		"duration": frames / 30.0, "category": category, "loop": loop, "vfx_window": [0.0, 0.0],
 	}

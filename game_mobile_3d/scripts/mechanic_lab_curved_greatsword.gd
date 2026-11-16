@@ -2,7 +2,7 @@ extends RefCounted
 ## Verified MD2 Curved Greatsword equipment and grounded clips for MechanicLab.
 
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
-const ReferenceAudio := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
+const SourceFilePath := preload("res://scripts/source_file_path.gd")
 const SourceGait := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Characters/Player/"
 const MEDIUM_CLIPS := SOURCE + "Animations/Weapons_Melee/2H_Medium/"
@@ -58,7 +58,7 @@ static func load_locomotion(actor: CharacterBody3D, research_root: String) -> Di
 	for slot: String in LOCOMOTION:
 		var source: Array = LOCOMOTION[slot]
 		entries.append({
-			"path": ReferenceAudio.resolve_private_file(research_root, source[0] + source[1] + ".glb"),
+			"path": SourceFilePath.resolve_private_file(research_root, source[0] + source[1] + ".glb"),
 			"semantic": "NativeCurved" + slot, "source_name": source[1],
 			"duration": source[2] / 30.0, "loop": source[3], "category": source[4], "sha256": source[5],
 		})
@@ -97,12 +97,12 @@ static func combat_profile(research_root: String) -> Dictionary:
 		var duration: float = ATTACK_FRAMES[i] / 30.0
 		var trail := [TRAIL_FRAMES[i].x / 30.0, TRAIL_FRAMES[i].y / 30.0]
 		profile.additional_clips.append({
-			"path": ReferenceAudio.resolve_private_file(research_root, CLIPS + stem + ".glb"),
+			"path": SourceFilePath.resolve_private_file(research_root, CLIPS + stem + ".glb"),
 			"semantic": attack, "source_name": stem, "sha256": ATTACK_HASHES[i],
 			"duration": duration, "loop": false, "category": "attack", "vfx_window": trail,
 		})
 		profile.additional_clips.append({
-			"path": ReferenceAudio.resolve_private_file(research_root, CLIPS + stem + "Recovery.glb"),
+			"path": SourceFilePath.resolve_private_file(research_root, CLIPS + stem + "Recovery.glb"),
 			"semantic": recovery, "source_name": stem + "Recovery", "sha256": RECOVERY_HASHES[i],
 			"duration": RECOVERY_DURATION, "loop": false, "category": "recovery", "vfx_window": [0.0, 0.0],
 		})

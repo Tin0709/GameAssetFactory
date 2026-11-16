@@ -24,13 +24,10 @@ var enabled:=true:
 var _voice:=0
 var _choices:Dictionary={}
 
-static func resolve_private_file(research_root:String,relative:String)->String:
-	if not research_root.is_absolute_path() or relative.is_absolute_path():return ""
-	var normalized:=research_root.replace("\\","/").simplify_path().trim_suffix("/")+"/"
-	var project:=ProjectSettings.globalize_path("res://").replace("\\","/").simplify_path().trim_suffix("/")+"/"
-	if normalized.to_lower().begins_with(project.to_lower()):return ""
-	var target:=normalized.path_join(relative).simplify_path()
-	return target if target.to_lower().begins_with(normalized.to_lower()) else ""
+const SourceFilePath := preload("res://scripts/source_file_path.gd")
+
+static func resolve_private_file(research_root: String, relative: String) -> String:
+	return SourceFilePath.resolve_private_file(research_root, relative)
 
 func setup(research_root:String)->void:
 	reset();groups.clear();available_count=0;rejected_count=0;_choices.clear()

@@ -1,7 +1,7 @@
 extends Node3D
 ## Extracted MD2 samples. Group selection and gains are local playback settings.
 
-const ReferenceAudio := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
+const SourceFilePath := preload("res://scripts/source_file_path.gd")
 const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd")
 const SOURCE := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events/Spicewood"
 const SABRE := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_sabre_hitmarker_%02d.ogg"
@@ -593,7 +593,7 @@ func _load_surface_landing(root: String, surface: String, group: StringName, has
 		_load_sample(root, group, SURFACE_LANDING % [surface, i + 1], hashes[i])
 
 func _load_sample(root: String, group: StringName, relative: String, checksum: String) -> void:
-	var path := ReferenceAudio.resolve_private_file(root, SOURCE.path_join(relative))
+	var path := SourceFilePath.resolve_private_file(root, SOURCE.path_join(relative))
 	if path.is_empty() or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != checksum:
 		return
 	var stream := AudioStreamOggVorbis.load_from_file(path)
