@@ -46,13 +46,17 @@ func run() -> void:
 	# zombies can finish their spawn and attack before the last batch appears.
 	lab.player_health = FIXTURE_HP
 	var group := lab.get_node("Zombies")
-	var verify_spawn := func(zombie: Node): check_spawn_spacing(group, zombie)
-	group.child_entered_tree.connect(verify_spawn)
 	if OS.get_cmdline_user_args().has("--sync-spawn"):
 		spawn_synchronously(group)
+		# Positions cannot change inside the synchronous burst. Check spacing
+		# after the measurement so the pairwise assertions stay off its clock.
+		for zombie in group.get_children():
+			check_spawn_spacing(group, zombie)
 	else:
+		var verify_spawn := func(zombie: Node): check_spawn_spacing(group, zombie)
+		group.child_entered_tree.connect(verify_spawn)
 		await spawn_crowd(group)
-	group.child_entered_tree.disconnect(verify_spawn)
+		group.child_entered_tree.disconnect(verify_spawn)
 	if group.get_child_count() != COUNT:
 		printerr("Could not spawn all ", COUNT, " zombies: ", failures)
 		quit(1)
