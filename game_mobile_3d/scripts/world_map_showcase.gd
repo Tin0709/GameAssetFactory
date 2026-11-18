@@ -739,10 +739,10 @@ func _apply_captured_key(sun:DirectionalLight3D)->void:
 	key_response_active=false
 	if not captured_key_response or not key_response.available()or is_day_anchor():return
 	var rgb := _captured_key_rgb(hour)
-	if _dusk_key_fade_available():
+	if _dusk_key_fade_active():
 		var hours := _biome_profile.dusk_key_fade_hours
 		var amount := _biome_profile.dusk_key_fade_strength * _lighting_scale(&"dusk_key_fade")
-		if amount > 0. and hour > hours.x and hour < hours.y:
+		if amount > 0.:
 			rgb = key_response.smooth_dusk_energy(rgb, _captured_key_rgb(hours.x),
 				_captured_key_rgb(hours.y), inverse_lerp(hours.x, hours.y, hour), amount)
 	if gentle_noon:
@@ -760,6 +760,13 @@ func _dusk_key_fade_available() -> bool:
 	var hours := _biome_profile.dusk_key_fade_hours
 	return _biome_profile.dusk_key_fade_strength > 0. and hours.is_finite() and hours.x >= 12. \
 		and hours.y <= 19.5 and hours.x < hours.y and _lighting_scale(&"evening_key_response") > 0.
+
+func _dusk_key_fade_active() -> bool:
+	if not _dusk_key_fade_available():
+		return false
+	var hours := _biome_profile.dusk_key_fade_hours
+	return hour > hours.x and hour < hours.y and not is_equal_approx(hour, hours.x) \
+		and not is_equal_approx(hour, hours.y)
 
 func _captured_key_rgb(time:float)->Vector3:
 	var noon:=forest.sample(12.)
@@ -3131,6 +3138,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"dawn_turf_color":
 		_publish_dawn_turf_color()
+		return
+	if changed_effect == &"dusk_key_fade" and not _dusk_key_fade_active():
 		return
 	if changed_effect == &"twilight_ground_transition" and (hour <= 19.0 or hour >= 19.5 or twilight_finish_weight() <= 0.0):
 		return
