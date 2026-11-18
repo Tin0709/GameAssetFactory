@@ -265,28 +265,26 @@ func check_bow_fire_during_crossbow_impacts(bus: int, capture: AudioEffectCaptur
 	var point: Vector3 = lab.player.global_position + Vector3.UP
 	audio.set_enabled(true, point)
 	audio.reset()
+	# Reset selects the first weapon voice. Route it before playback starts
+	# so its short firing onset reaches the capture bus from the first mix.
+	var firing := audio._voices[0] as AudioStreamPlayer3D
+	firing.bus = AudioServer.get_bus_name(bus)
+	capture.clear_buffer()
 	var impact_before: int = audio._next_choice.get(&"crossbow_hit", 0)
 	lab._bow.fire_arrow(point, Vector3.FORWARD, 1, point, true)
 	# Bolts can land on the following physics tick after Bow fires.
 	await physics_frame
 	for i in 25:
 		audio.crossbow_impact(point + Vector3.RIGHT * float(i) * 0.1)
-	var firing: AudioStreamPlayer3D
-	for voice: AudioStreamPlayer3D in audio._voices:
-		if voice.playing and voice.stream in samples:
-			firing = voice
-			break
-	check(firing != null and audio._next_choice.get(&"crossbow_hit", 0) == (impact_before + 2) % 3,
+	check(firing.playing and firing.stream in samples
+		and audio._next_choice.get(&"crossbow_hit", 0) == (impact_before + 2) % 3,
 		"A Bow release keeps its pinned sample through next-tick impacts from old crossbow bolts")
-	if firing != null:
-		firing.bus = AudioServer.get_bus_name(bus)
-		capture.clear_buffer()
-		await create_timer(0.18).timeout
-		var peak := 0.0
-		for value in capture.get_buffer(capture.get_frames_available()):
-			peak = maxf(peak, maxf(absf(value.x), absf(value.y)))
-		check(peak > 0.001 and peak < 0.9, "Standard Bow's firing onset reaches the isolated mixer")
-		print("MECHANIC_LAB_BOW_FIRE peak=", peak)
+	await create_timer(0.18).timeout
+	var peak := 0.0
+	for value in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(value.x), absf(value.y)))
+	check(peak > 0.001 and peak < 0.9, "Standard Bow's firing onset reaches the isolated mixer")
+	print("MECHANIC_LAB_BOW_FIRE peak=", peak)
 	audio.reset()
 	for i in 3:
 		audio.crossbow_impact(point)
