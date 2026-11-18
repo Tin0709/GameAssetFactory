@@ -861,6 +861,35 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	check(played_distances == selected_distances,
 		"Same-tick step overflow selects the nearest supported contacts")
 	audio.reset()
+	# Hold the normal render flush while several physics ticks post contacts.
+	lab.set_process(false)
+	var queued_at := Engine.get_physics_frames()
+	var catchup_choice: int = audio._next_choice.get(&"zombie_step", 0)
+	for distances in [[9.0, 10.0, 11.0], [5.0, 6.0, 7.0], [1.0, 2.0, 3.0]]:
+		for distance: float in distances:
+			lab._on_zombie_step(origin + Vector3.FORWARD * distance)
+		await physics_frame
+	check(Engine.get_physics_frames() > queued_at and not voices.any(func(voice): return voice.playing)
+		and audio._next_choice.get(&"zombie_step", 0) == catchup_choice,
+		"Catch-up steps wait for the render flush before choosing streams")
+	capture.clear_buffer()
+	audio.flush_zombie_steps()
+	lab.set_process(true)
+	played_distances.clear()
+	for voice in voices:
+		if voice.playing and voice.stream in step_samples:
+			played_distances.append(absf(voice.global_position.z - origin.z))
+	played_distances.sort()
+	check(played_distances == [1.0, 2.0, 3.0]
+		and audio._next_choice.get(&"zombie_step", 0) == (catchup_choice + 3) % step_samples.size(),
+		"A slow render frame plays the nearest grounded steps across its physics ticks")
+	await create_timer(0.12).timeout
+	var catchup_peak := 0.0
+	for sample in capture.get_buffer(capture.get_frames_available()):
+		catchup_peak = maxf(catchup_peak, maxf(absf(sample.x), absf(sample.y)))
+	check(catchup_peak > 0.001 and catchup_peak < 0.35, "The selected catch-up steps reach the silent mixer")
+	print("MECHANIC_LAB_STEP_CATCHUP distances=", played_distances, " peak=", catchup_peak)
+	audio.reset()
 	var before_reset: int = audio._next_choice.get(&"zombie_step", 0)
 	lab._on_zombie_step(near)
 	lab.reset_player()
