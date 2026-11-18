@@ -40,34 +40,107 @@ const TOOL_SWING_AUDIO := "6_weapons_melee_basicCombo/Attack%d/"
 const TOOL_AIR_AUDIO := "7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/"
 const TOOL_SAMPLES := {
 	&"cleaver": [
-		["sfx_cleaver_attack1_01", "a5c93722ef4eadbe6764d08d300deab01a7760232d1b485c98e926af8c65b152"],
-		["sfx_cleaver_attack2_01", "5f16fcbc14c5bd7de9882d0cbfde5fa981742a38c84ce88b3f3be43c46cbcee5"],
-		["sfx_cleaver_attack3_01", "2b8c40a503378fd04f1d9aad2549ec3d6907b64ffc320f362326df4cc39cbb53"],
-		[], ["sfx_cleaver_HJA_01", "45a8f478c1d583be77d7ad91e0edce7ceb006a508c549f0828ca77ef51fe7ebb"], [],
+		["sfx_cleaver_attack1_%02d", [
+			"a5c93722ef4eadbe6764d08d300deab01a7760232d1b485c98e926af8c65b152",
+			"8afe9966b8372fa93ffef44eb1a910e2bf22adf51d861aad4de23e29805e3b4a",
+			"f2bdcb51148b71fc723a059ca03717eae04bf248d9d0ff54f84512d9dbb60bcf",
+		]],
+		["sfx_cleaver_attack2_%02d", [
+			"5f16fcbc14c5bd7de9882d0cbfde5fa981742a38c84ce88b3f3be43c46cbcee5",
+			"fc4efd16b687ae27280a136619c0d51df7ce651d54847b54514fbca5323af430",
+			"3a7fa08bfcd0e9e32fd3aade5213cefc167560ba2ea482ba6d0cdf329cdbf9dd",
+		]],
+		["sfx_cleaver_attack3_%02d", [
+			"2b8c40a503378fd04f1d9aad2549ec3d6907b64ffc320f362326df4cc39cbb53",
+			"054d570d118ff6b0bf07e6bc73adc840b595bcb2ff878183a5968ea3b28c951e",
+		]],
+		[],
+		["sfx_cleaver_HJA_%02d", [
+			"45a8f478c1d583be77d7ad91e0edce7ceb006a508c549f0828ca77ef51fe7ebb",
+			"56df3b34cff5fca7a3ae9f1e3eb199a940e023f7aacbf62d68f00ef8930bd6ac",
+		]],
+		[],
 	],
 	&"gauntlet": [
-		["sfx_gauntlet_attack_combo2_light_01", "218f1dadb43722675b3d5a4883a539d18f03e9631fbfcbec074ccad253e1dec0"],
-		["sfx_gauntlet_attack_combo2_mid_01", "1fb81a7b84c1fc590df8db448a2645f2b77054f303cb1b826fb819834a9b563f"],
-		["sfx_gauntlet_attack_combo2_heavy_01", "481cc404977d9f0e0dceddae00277c19d0da5efa59ed4e6545801bb3d8b82bb9"],
-		["sfx_gauntlet_HJA_start_01", "3481d1af85e89dec658a34e234c04ec684b87a2c0d220ed90eb65b2d5db16237"],
-		["sfx_gauntlet_HJA_hit_01", "dfe9012b79877af6c4f5ed76bc5838df1f2b2f5c7e10cd4f40e5a9deceacdb8a"],
-		["sfx_weapon_hitmarker_gauntlets_01", GAUNTLET_HIT_HASHES[0]],
+		["sfx_gauntlet_attack_combo2_light_%02d", [
+			"218f1dadb43722675b3d5a4883a539d18f03e9631fbfcbec074ccad253e1dec0",
+			"233a5c346ccd4117b81bd78b7e53bf7826679bfd98438302b57c0aeef4568aac",
+			"ae3029801547f549e1a7c00bfeee7a2b96b439c30f7a389691f9a49bb035f4f7",
+			"98aa2df629b1197c1fcf59e45fa4ad105ff6fd41c1012ea90ec0471a8c5e7708",
+		]],
+		["sfx_gauntlet_attack_combo2_mid_%02d", [
+			"1fb81a7b84c1fc590df8db448a2645f2b77054f303cb1b826fb819834a9b563f",
+			"3337a7982f9dc4274a92d75cffbf771c6a438b857637bdfd96e4cea885ae6b6c",
+			"5af48a7254a2918a7125c4ac5884045e91c96f88508b7423402862c87bc700e6",
+		]],
+		["sfx_gauntlet_attack_combo2_heavy_%02d", [
+			"481cc404977d9f0e0dceddae00277c19d0da5efa59ed4e6545801bb3d8b82bb9",
+			"fc9cd25c8934b3d9f2d8ea8c77440de0fba7a0ce54138233cd35fe1fc56cdede",
+			"2514e92c3c58a0be99fb0b464d5f105353d53e889a6755303e1c5e5c5d3a4f65",
+		]],
+		["sfx_gauntlet_HJA_start_%02d", [
+			"3481d1af85e89dec658a34e234c04ec684b87a2c0d220ed90eb65b2d5db16237",
+			"f8edb35576db3acc0329ccd2095540d92dd837e8444888aa4345bb6ce0b85f1c",
+			"f963b957d47a6992ca67b65a10e7529c3d8d2e3784b69d3420e9e5ebc09be653",
+		]],
+		["sfx_gauntlet_HJA_hit_%02d", [
+			"dfe9012b79877af6c4f5ed76bc5838df1f2b2f5c7e10cd4f40e5a9deceacdb8a",
+			"d90eb9f888690a83dc65741c8d1d0e3d252e57adce586740a6b2d078fe038374",
+			"2c7faf3251ce5f504b38c4a398c303804196b4293be24fd2388417521a979419",
+		]],
+		["sfx_weapon_hitmarker_gauntlets_%02d", GAUNTLET_HIT_HASHES],
 	],
 	&"pickaxe": [
-		["sfx_pickaxe_attack_light_01", "528918dca461fb901e0879484cdf4caf94849db40365a74270838ea5d1694dc4"],
-		["sfx_pickaxe_attack_medium_01", "a070a153337e7d2ad13bae9bf23e41cfb88463a47e620a76df592b836300464c"],
-		["sfx_pickaxe_attack_heavy_01", "ef31d6f07ecfe34df7cf701c431fd4eab06507c7348c1465f15dbe463b6e7d3c"],
-		["sfx_pickaxe_HJA_start_01", "e8e913bb5589730e09e8ae741c8a40284edd33e844ba19ea759364029d12774e"],
-		["sfx_pickaxe_jump_attack_01", "ed9e8c6b6bca74c3cba8ea718c6297b2595b4473ba8e384647ede2295e506fd5"],
-		["sfx_weapon_hitmarker_pickaxe_01", "be899f24da74a5463b02ef7eda01f27db723118091bd9b97dfcb52a250add2db"],
+		["sfx_pickaxe_attack_light_%02d", [
+			"528918dca461fb901e0879484cdf4caf94849db40365a74270838ea5d1694dc4",
+			"e91697a592464de43426ee035b85aff693b4abeac1c71b8b1fb3fe069b8b59b0",
+			"6ae329b0c28af8d7f366c9abfa5aa3219bb18f0e8c63a0b8cd665c5f407bb46b",
+		]],
+		["sfx_pickaxe_attack_medium_%02d", [
+			"a070a153337e7d2ad13bae9bf23e41cfb88463a47e620a76df592b836300464c",
+			"50aeaf01882a2d505bb3f078832118cf1cb764356b93747f8132a61a908f1093",
+			"b77c131f51b47c8cf364a0b27a90f75fb363c7c52bb12ba24d8edcd7fbc531e9",
+		]],
+		["sfx_pickaxe_attack_heavy_%02d", [
+			"ef31d6f07ecfe34df7cf701c431fd4eab06507c7348c1465f15dbe463b6e7d3c",
+			"a8360a7f2f890b0091c0ce220da5fd0d09a701baab0d468a8b6fb8b2334cf50b",
+			"c0ea2b2f0b9bc67b7d21a4e03a6ac69021ae25fb3e7335eaeb2929c9b3bde045",
+		]],
+		["sfx_pickaxe_HJA_start_%02d", [
+			"e8e913bb5589730e09e8ae741c8a40284edd33e844ba19ea759364029d12774e",
+			"78626aa82479c7995bfbf089c22abce164ecdad3bd6e6a04883592fa0c7febd7",
+			"ceeccf383c963a688d4b624844116d5729327b375e167ddf07f984ffe324efa6",
+		]],
+		["sfx_pickaxe_jump_attack_%02d", [
+			"ed9e8c6b6bca74c3cba8ea718c6297b2595b4473ba8e384647ede2295e506fd5",
+			"ab51b7299db4b970b634dcc52f4356b3d6169ecf5e220d83e166362b92f52f9d",
+			"1fa91cfcb519e976d417193adf864400242dc357858acf8ad4b32940b26da451",
+		]],
+		["sfx_weapon_hitmarker_pickaxe_%02d", [
+			"be899f24da74a5463b02ef7eda01f27db723118091bd9b97dfcb52a250add2db",
+			"824b527be4da9ed633bf615ef7626ae36346a58deaa200aec4410c98ed816aab",
+			"77dcf17ae4580a27a0015b3fa64e1dbb850e8ea36c438aab86a07bc72b2756a5",
+		]],
 	],
 	&"shovel": [
-		["sfx_shovel_attack1", "068fc26cf43f010435cc4c19e8bf204a5d9281cd33e675dab8b302a5fe04a94d"],
-		["sfx_shovel_attack2_01", "a825cb79c2985ab7d5615369a185fc4501cacac9dd3cd0eeda82ad10cc2d1bdb"],
-		["sfx_shovel_attack3_01", "5d7d66541a8e9c240b5ae55ca445e0882386db11016d9116857e3281b0fbe304"],
-		["sfx_shovel_HJA_whoosh", "45f1af854a05e277a7a97f5ff03eb1d65fbcd7e9214c4069833454424decf695"],
-		["sfx_shovel_HJA_hit_02", "275f098f77c8191adfda4e4aa18decd64be0485ea389d26ff49337a4ee6a6749"],
-		["sfx_weapon_hitmarker_shovel_01", "4453bb081a04947d98270b92b3ca5fd40b7425e47446289c81d7b61c06baa09b"],
+		["sfx_shovel_attack1", ["068fc26cf43f010435cc4c19e8bf204a5d9281cd33e675dab8b302a5fe04a94d"]],
+		["sfx_shovel_attack2_%02d", [
+			"a825cb79c2985ab7d5615369a185fc4501cacac9dd3cd0eeda82ad10cc2d1bdb",
+			"28e01aef3b1bb798cb2318641d2d2e25f4e6df21798e7ae037fd38dd29315a53",
+			"399bedc3c2374f614e24f2b7e7a31a59de611134835c12187d99d63029479742",
+		]],
+		["sfx_shovel_attack3_%02d", [
+			"5d7d66541a8e9c240b5ae55ca445e0882386db11016d9116857e3281b0fbe304",
+			"60c5f1b61bfc7eb619797a1c5ee53bd1cbae1711eebb91915183d2a6239e76ea",
+			"1900f93e191075c783fa92f17cb6be77ac0118783736e4779d477f3625ecc438",
+		]],
+		["sfx_shovel_HJA_whoosh", ["45f1af854a05e277a7a97f5ff03eb1d65fbcd7e9214c4069833454424decf695"]],
+		["sfx_shovel_HJA_hit_02", ["275f098f77c8191adfda4e4aa18decd64be0485ea389d26ff49337a4ee6a6749"]],
+		["sfx_weapon_hitmarker_shovel_%02d", [
+			"4453bb081a04947d98270b92b3ca5fd40b7425e47446289c81d7b61c06baa09b",
+			"81f6c1432abe583495723495b4f246e376d58931ba2ad3fd325ddcd6976d57ec",
+			"9cc6d9d3cef4f4672ef1f647cdb2789d3138853d41cfc3b647ea23096b1e0d38",
+		]],
 	],
 }
 const GAUNTLET_SWING_HASHES := {
@@ -348,7 +421,12 @@ func load_melee_tool(root: String, tool: StringName) -> void:
 		var folder := TOOL_SWING_AUDIO % (slot + 1) if slot < 3 else TOOL_AIR_AUDIO
 		if slot == 5:
 			folder = "5_weapons_melee_hitmarkers/"
-		_load_sample(root, _tool_group(tool, slot), TOOL_AUDIO + folder + sample[0] + ".ogg", sample[1])
+		var group := _tool_group(tool, slot)
+		var pattern: String = sample[0]
+		var hashes: Array = sample[1]
+		for i in hashes.size():
+			var stem := pattern % (i + 1) if "%02d" in pattern else pattern
+			_load_sample(root, group, TOOL_AUDIO + folder + stem + ".ogg", hashes[i])
 
 static func _tool_group(tool: StringName, slot: int) -> StringName:
 	return StringName("tool_%s_%d" % [tool, slot])
