@@ -1030,6 +1030,43 @@ func wait_for_zombie_onset(voices: Array[AudioStreamPlayer3D]) -> bool:
 		await process_frame
 	return false
 
+func check_melee_tool_variants(audio: Node3D, capture: AudioEffectCapture) -> void:
+	var counts := {
+		&"cleaver": [3, 3, 2, 0, 2, 0],
+		&"gauntlet": [4, 3, 3, 3, 3, 3],
+		&"pickaxe": [3, 3, 3, 3, 3, 3],
+		&"shovel": [1, 3, 3, 1, 1, 3],
+	}
+	for tool: StringName in counts:
+		audio.reset()
+		audio.load_melee_tool(audio._research_root(), tool)
+		for slot in counts[tool].size():
+			var group := StringName("tool_%s_%d" % [tool, slot])
+			check(audio._groups.get(group, []).size() == counts[tool][slot],
+				"%s keeps all verified variants in its source audio family" % group)
+		var middle := StringName("tool_%s_1" % tool)
+		var variants: Array = audio._groups.get(middle, [])
+		if variants.size() < 2:
+			continue
+		var selected: Array[AudioStream] = []
+		for i in variants.size():
+			audio.reset()
+			audio.tool_swung(tool, Vector3.FORWARD * 2.0, 1, false)
+			selected.append(audio._voices[0].stream)
+		check(selected == variants, "%s rotates through its grounded swing variants" % tool)
+		audio.reset()
+		await create_timer(0.06).timeout
+		capture.clear_buffer()
+		audio.tool_swung(tool, Vector3.FORWARD * 2.0, 1, false)
+		await create_timer(0.25).timeout
+		var peak := 0.0
+		for frame in capture.get_buffer(capture.get_frames_available()):
+			peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
+		check(audio._voices[0].stream == variants[0] and peak > 0.001 and peak < 0.9,
+			"%s wraps to the first variant and produces PCM without clipping" % tool)
+		print("MELEE_TOOL_AUDIO ", tool, " variants=", variants.size(), " peak=", peak)
+	audio.reset()
+
 func run() -> void:
 	var camera := Camera3D.new()
 	root.add_child(camera)
@@ -1107,6 +1144,7 @@ func run() -> void:
 	check(peak > 0.01 and peak < 0.9, "Simultaneous MD2 impact, slam and reactions have mix headroom")
 	await check_crossbow_fire_under_impact_burst(audio, bus, capture)
 	await check_weapon_onsets_under_mixed_impacts(audio, bus, capture)
+	await check_melee_tool_variants(audio, capture)
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
 	await check_bow_fire_during_crossbow_impacts(bus, capture)
