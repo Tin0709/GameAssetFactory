@@ -128,6 +128,9 @@ func check_running_wake_support(lab, wind) -> void:
 	var velocity: Vector3 = lab.player.get_real_velocity().slide(Vector3.UP)
 	check(not supported_steps.is_empty() and wake.mesh.visible and wake.trailing.dot(-velocity.normalized()) > 0.999,
 		"After turning, the wake trails the actual movement on a supported foot contact")
+	# The reflected M_WhirlWind_Emissive renders the same texture on both faces.
+	check(wake.material.cull_mode == BaseMaterial3D.CULL_DISABLED,
+		"The Lab wake renders both sides of the source wind material")
 	check(is_equal_approx(wake.origin.y, 0.25 + 0.38),
 		"The wake's height is measured from the grass under the foot")
 	var age_before: float = wake.age
