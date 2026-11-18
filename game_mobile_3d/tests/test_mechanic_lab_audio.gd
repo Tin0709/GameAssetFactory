@@ -846,6 +846,7 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 	for frame in capture.get_buffer(capture.get_frames_available()):
 		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
 	check(peak > 0.005 and peak < 0.9, "The contact pool produces PCM with headroom")
+	await check_zombie_attack_onsets(audio, group, voices)
 	audio.reset()
 	var windup_choice: int = audio._next_choice.get(&"zombie_windup", 0)
 	group.zombie_attack_audio.emit(lab.player.global_position + Vector3.RIGHT * 40.0, false)
@@ -866,6 +867,43 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 		"Muting clears queued contact cues")
 	print("MECHANIC_LAB_ZOMBIE_ATTACK_OVERFLOW peak=", peak)
 	lab.free()
+
+func check_zombie_attack_onsets(audio: COMBAT_AUDIO, group: Node,
+		voices: Array[AudioStreamPlayer3D]) -> void:
+	var ear := audio.zombie_listener.global_position
+	var near := [ear + Vector3.RIGHT, ear + Vector3.RIGHT * 2.0, ear + Vector3.RIGHT * 3.0]
+	var closest := ear + Vector3.RIGHT * 0.5
+	var far := ear + Vector3.RIGHT * 10.0
+	var catch_up_ticks := ceili(0.10 * Engine.physics_ticks_per_second)
+	for confirmed in [false, true]:
+		audio.reset()
+		var cue := &"zombie_hit" if confirmed else &"zombie_windup"
+		var gain := COMBAT_AUDIO.ZOMBIE_HIT_GAIN_DB if confirmed else COMBAT_AUDIO.ZOMBIE_WINDUP_GAIN_DB
+		for point: Vector3 in near:
+			group.zombie_attack_audio.emit(point, confirmed)
+		audio.flush_zombie_combat_cues()
+		var choice: int = audio._next_choice.get(cue, 0)
+		await physics_frame
+		for i in 100:
+			group.zombie_attack_audio.emit(far + Vector3.BACK * i * 0.12, confirmed)
+		audio.flush_zombie_combat_cues()
+		check(voices.all(func(voice): return voice.global_position in near)
+			and audio._next_choice.get(cue, 0) == choice,
+			"Nearby %s onsets survive a distant burst on the next tick" % cue)
+
+		# Schedule several physics ticks in one mixer window.
+		var frame := Engine.get_physics_frames()
+		var future := frame + catch_up_ticks
+		check(audio._play(cue, far, gain, future) == null
+			and audio._next_choice.get(cue, 0) == choice,
+			"An unaudible %s onset survives simulation catch-up" % cue)
+		var closer := audio._play(cue, closest, gain, future)
+		var positions := voices.map(func(voice): return voice.global_position)
+		check(closer != null and positions.has(closest) and positions.has(near[0]) and positions.has(near[1]),
+			"A closer %s replaces the farthest protected voice" % cue)
+		await create_timer(0.16).timeout
+		check(audio._play(cue, far, gain, future + catch_up_ticks) != null,
+			"Later %s cues can use voices once the onset has mixed" % cue)
 
 func run() -> void:
 	var camera := Camera3D.new()
