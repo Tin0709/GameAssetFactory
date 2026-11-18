@@ -167,7 +167,7 @@ func check_running_wake_render_clock(lab, wind, dust) -> void:
 		# The render delta may include time before the planted foot event.
 		dust._process(0.15)
 		wind._process(0.15)
-		var progress := float(puff.age) / wind.LIFETIME
+		var progress: float = puff.age / wind.LIFETIME
 		if progress >= 1.0:
 			continue
 		var expected: Vector3 = wake.origin + wake.trailing * progress * 0.16
