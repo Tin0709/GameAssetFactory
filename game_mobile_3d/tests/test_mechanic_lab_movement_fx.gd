@@ -88,6 +88,7 @@ func run() -> void:
 	check(visible_particles(dust) == 0 and visible_particles(wind) == 0, "Reset clears both movement effects")
 	await check_heavy_dust_timing(lab, dust)
 	await check_running_wake_support(lab, wind)
+	await check_running_wake_render_clock(lab, wind, dust)
 	await check_floor_edge_landing(lab, dust)
 	await check_non_grass_landing(lab, dust)
 	await check_non_grass_steps(lab, dust, wind)
@@ -148,6 +149,40 @@ func check_running_wake_support(lab, wind) -> void:
 		await physics_frame
 	check(not wake.mesh.visible and not wind.is_processing() and not wind.is_physics_processing(),
 		"The last wake expires and stops both callbacks")
+
+func check_running_wake_render_clock(lab, wind, dust) -> void:
+	lab.reset_player()
+	for i in 12:
+		await physics_frame
+	var samples := 0
+	var max_position_error := 0.0
+	var max_alpha_error := 0.0
+	Input.action_press("move_forward")
+	for i in 115:
+		await process_frame
+		var wake = wind._wakes[posmod(wind._next - 1, wind._wakes.size())]
+		var puff = dust._particles[posmod(dust._next - 1, dust._particles.size())]
+		if not wake.mesh.visible or not puff.sprite.visible or wake.contact_tick != puff.contact_tick:
+			continue
+		# The render delta may include time before the planted foot event.
+		dust._process(0.15)
+		wind._process(0.15)
+		var progress := float(puff.age) / wind.LIFETIME
+		if progress >= 1.0:
+			continue
+		var expected: Vector3 = wake.origin + wake.trailing * progress * 0.16
+		var alpha: float = wind.TINT.a * (1.0 - smoothstep(0.12, 1.0, progress))
+		max_position_error = maxf(max_position_error, wake.mesh.global_position.distance_to(expected))
+		max_alpha_error = maxf(max_alpha_error, absf(wake.material.albedo_color.a - alpha))
+		samples += 1
+		if samples >= 12:
+			break
+	Input.action_release("move_forward")
+	check(samples >= 8 and max_position_error < 0.0001 and max_alpha_error < 0.0001,
+		"Varying render intervals keep the running wake aligned with dust from the same contact")
+	print("MECHANIC_LAB_WAKE_RENDER_CLOCK samples=", samples, " position_error_m=", max_position_error,
+		" alpha_error=", max_alpha_error)
+	lab.reset_player()
 
 func check_source_run_dust(lab, dust) -> void:
 	var listen := func(_point: Vector3, landed: bool):
