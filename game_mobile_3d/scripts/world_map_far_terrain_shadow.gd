@@ -250,7 +250,7 @@ func _promote_one(keys: Array, zone: Dictionary) -> void:
 		_tiles[id]={"texture":texture,"key":key.duplicate(),"zone":zone.id}
 		_last_upload_frame=frame
 		if record_metrics:
-		upload_us.append(Time.get_ticks_usec()-before)
+			upload_us.append(Time.get_ticks_usec()-before)
 		peak_resident=maxi(peak_resident,_tiles.size())
 		return
 
