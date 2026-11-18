@@ -1802,7 +1802,10 @@ func set_atmosphere_review(mode:String)->void:
 
 func set_full_direct_shadows(value:bool)->void:
 	full_direct_shadows=value
-	if _time_applied and forest_active() and atmosphere_review in ["lighting","combined"]:
+	_refresh_direct_shadow_opacity()
+
+func _refresh_direct_shadow_opacity() -> void:
+	if _time_applied and forest_active() and atmosphere_review in ["lighting", "combined"]:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
@@ -3085,6 +3088,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		refresh_daylight_shading()
 		return
 	if changed_effect == &"day_cycle_pacing":
+		return
+	if changed_effect == &"overcast_shadow":
+		_refresh_direct_shadow_opacity()
 		return
 	if changed_effect == &"shadow_diffuse_return":
 		_sync_shadow_diffuse()
