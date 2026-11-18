@@ -738,8 +738,7 @@ func _apply_player_materials(direct:bool,sky:bool)->void:
 			row[0].set_surface_override_material(row[1],row[2]);continue
 		var visible_sky:bool=sky and not _flat_lab and is_instance_valid(level.grove) and level.grove.is_visible_in_tree()
 		var source: BaseMaterial3D = row[3]
-		m.shader=player_material.variant(source.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,
-			direct and player_cloud_enabled,visible_sky,source.cull_mode==BaseMaterial3D.CULL_BACK,source.texture_repeat)
+		m.shader=_player_lighting_variant(source, direct and player_cloud_enabled, visible_sky)
 		m.set_shader_parameter("albedo_tint",row[4])
 		var verified:bool=m.get_meta("verified_valorie",false) and player_effects_available()
 		m.set_shader_parameter("recovered_roughness",verified and player_roughness_enabled)
@@ -749,6 +748,18 @@ func _apply_player_materials(direct:bool,sky:bool)->void:
 		m.set_shader_parameter("clouds_enabled",true)
 		row[0].set_surface_override_material(row[1],m)
 	if level.get("player_light")!=null:level.player_light.refresh(true)
+
+func _player_lighting_variant(source: BaseMaterial3D, direct: bool, sky: bool) -> Shader:
+	return player_material.variant(source.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,
+		direct,sky,source.cull_mode==BaseMaterial3D.CULL_BACK,source.texture_repeat)
+
+func far_shadow_actor_shaders() -> Array[Shader]:
+	var sources: Array[Shader] = []
+	if not _private_player_material_scope() or not player_material.available() or not player_adapter_enabled:
+		return sources
+	for row: Array in actor_materials:
+		sources.append(_player_lighting_variant(row[3], player_cloud_enabled, false))
+	return sources
 
 func set_player_material_review(mode:String)->void:
 	if not mode in ["original","neutral","cloud","roughness","self_light","combined"]:return

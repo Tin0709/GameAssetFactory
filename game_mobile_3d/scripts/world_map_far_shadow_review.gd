@@ -25,7 +25,7 @@ func configure(world: Node, directory: String) -> bool:
 	if is_instance_valid(world.showcase.mist):
 		_receivers.mist_variant = world.showcase.mist.material_variant
 	var started := Time.get_ticks_usec()
-	_receivers.prepare(world.showcase.far_terrain_shading_materials())
+	_receivers.prepare(world.showcase.far_terrain_shading_materials(), world.look.far_shadow_actor_shaders())
 	prepare_usec = Time.get_ticks_usec() - started
 	add_child(cache)
 	process_priority = 110 # After the atmosphere has chosen its material variants.

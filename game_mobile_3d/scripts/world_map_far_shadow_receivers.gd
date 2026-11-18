@@ -27,15 +27,14 @@ static func authored_shader(shader: Shader) -> Shader:
 	return base.get_meta(SOURCE, base)
 
 
-func prepare(materials: Array) -> void:
-	var prepared := {}
+func prepare(materials: Array, other_shaders: Array[Shader]) -> void:
+	var sources := {}
 	for material: ShaderMaterial in materials:
-		if material == null or material.shader == null:
-			continue
-		var source: Shader = material.shader.get_meta(MIST_BASE, material.shader)
-		if prepared.has(source):
-			continue
-		prepared[source] = true
+		if material != null and material.shader != null:
+			sources[material.shader.get_meta(MIST_BASE, material.shader)] = true
+	for shader in other_shaders:
+		sources[shader] = true
+	for source: Shader in sources:
 		var variant := _variant_for(source)
 		if variant == null:
 			continue
