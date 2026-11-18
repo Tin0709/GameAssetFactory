@@ -518,7 +518,6 @@ func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depth
 	var local_lift := lerpf(shared_lift, LOCAL_FLOOR_SHARED_LIFT, local_weight * blend)
 	_distribute_floor_lift(lifts, depths, shared_lift, slop, minf(reduced_lift, local_lift), anchor_limit)
 
-
 func _distribute_floor_lift(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
 		shared_lift: float, slop: float, reduced_lift: float, anchor_limit: float) -> void:
 	# All five MD2 zombie joints share one spine body. Solve its minimum
