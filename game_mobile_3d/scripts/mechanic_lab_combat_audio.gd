@@ -129,7 +129,7 @@ const SLAM_GAIN_DB := -10.0
 const SURFACE_LANDING_GAIN_DB := -16.0
 const HURT_GAIN_DB := -20.0
 const DEATH_GAIN_DB := -14.0
-const DEATH_ONSET_SECONDS := 0.05
+const ZOMBIE_ONSET_SECONDS := 0.05
 const ZOMBIE_WINDUP_GAIN_DB := -16.0
 const ZOMBIE_HIT_GAIN_DB := -14.0
 const PLAYER_HURT_GAIN_DB := -14.0
@@ -647,7 +647,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 			REACTION_POOL:
 				slot = _replace_priority_slot(first, start, &"death", group, frame, point)
 			ATTACK_POOL:
-				slot = _replace_priority_slot(first, start, &"zombie_hit", group, frame)
+				slot = _replace_priority_slot(first, start, &"zombie_hit", group, frame, point)
 			WEAPON_POOL:
 				slot = _replace_weapon_slot(start, weapon_onset, frame)
 		if slot == -1:
@@ -683,29 +683,31 @@ func _replace_weapon_slot(start: int, onset: bool, frame: int) -> int:
 	return older_slot
 
 func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName,
-		frame: int, point := Vector3.ZERO) -> int:
-	# Same-tick cues already arrive nearest first. Preserve nearby death onsets
-	# across short gaps between ticks, too, while the mixer starts the samples.
+		frame: int, point: Vector3) -> int:
+	# Same-tick cues already arrive nearest first. Across ticks, preserve
+	# nearby attack and death onsets while the mixer starts the samples.
 	var priority_streams: Array = _groups.get(priority_group, [])
 	var priority := group == priority_group
-	var compare_onsets := priority and group == &"death" and is_instance_valid(zombie_listener)
+	var compare_onsets := (priority_group == &"zombie_hit" or group == &"death") and is_instance_valid(zombie_listener)
 	var listener := zombie_listener.global_position if compare_onsets else Vector3.ZERO
-	var onset_ticks := ceili(DEATH_ONSET_SECONDS * Engine.physics_ticks_per_second)
+	var onset_ticks := ceili(ZOMBIE_ONSET_SECONDS * Engine.physics_ticks_per_second)
 	var farthest := point.distance_squared_to(listener)
 	var farther_onset := -1
 	var older_slot := -1
 	for offset in VOICES_PER_POOL:
 		var slot := (start + offset) % VOICES_PER_POOL
 		var voice_index := first + slot
-		var stream := _voices[voice_index].stream
-		var playing_priority := stream in priority_streams
+		var voice := _voices[voice_index]
+		var playing_priority := voice.stream in priority_streams
 		if priority and not playing_priority:
 			return slot
 		var age := frame - _started_frames[voice_index]
 		if priority != playing_priority or age <= 0:
 			continue
-		if compare_onsets and age <= onset_ticks:
-			var distance := _voices[voice_index].global_position.distance_squared_to(listener)
+		# Physics can catch up several ticks while the audio mixer is still
+		# at the start of a voice. Check the stream's playhead as well.
+		if compare_onsets and (age <= onset_ticks or voice.get_playback_position() < ZOMBIE_ONSET_SECONDS):
+			var distance := voice.global_position.distance_squared_to(listener)
 			if distance > farthest:
 				farthest = distance
 				farther_onset = slot
