@@ -279,7 +279,12 @@ func check_bow_fire_during_crossbow_impacts(bus: int, capture: AudioEffectCaptur
 	check(firing.playing and firing.stream in samples
 		and audio._next_choice.get(&"crossbow_hit", 0) == (impact_before + 2) % 3,
 		"A Bow release keeps its pinned sample through next-tick impacts from old crossbow bolts")
-	await create_timer(0.18).timeout
+	# Wait for the mixer to advance, since the headless audio driver can
+	# deliver several physics ticks' worth of audio in one batch.
+	for i in 30:
+		if firing.get_playback_position() >= 0.1 and capture.get_frames_available() > 0:
+			break
+		await physics_frame
 	var peak := 0.0
 	for value in capture.get_buffer(capture.get_frames_available()):
 		peak = maxf(peak, maxf(absf(value.x), absf(value.y)))
