@@ -16,7 +16,19 @@ func run():
  var node=MeshInstance3D.new();var quad=QuadMesh.new();quad.size=Vector2(2,2);node.mesh=quad;vp.add_child(node)
  var shader=Shader.new();shader.code="shader_type spatial;render_mode cull_disabled,ambient_light_disabled; uniform int ground_grade=3;
 "+FileAccess.get_file_as_string("res://materials/world_map_terrain_transport.gdshaderinc")+"
-uniform vec3 test_color=vec3(.3,.2,.1);uniform float test_contact=1.;uniform float test_metal=0.;void vertex(){terrain_sky_light=vec3(.1,.2,.3);terrain_sun_bounce=vec3(.2,.15,.1);}void fragment(){ALBEDO=vec3(0);EMISSION=terrain_indirect(test_color,test_metal,.8,.6,test_contact,1.0,CAMERA_POSITION_WORLD);}";
+uniform vec3 test_color=vec3(.3,.2,.1);
+uniform float test_contact=1.;
+uniform float test_metal=0.;
+void vertex(){
+ terrain_sky_light=vec3(.1,.2,.3);
+ terrain_sun_bounce=vec3(.2,.15,.1);
+}
+void fragment(){
+ ALBEDO=vec3(0);
+ vec3 visibility=terrain_diffuse_visibility(test_color,test_contact);
+ EMISSION=FRAGCOORD.x<8.0 ? terrain_opening_fill(visibility,.65)
+  : terrain_indirect(test_color,test_metal,.8,.6,visibility,1.0,CAMERA_POSITION_WORLD);
+}";
  var m=ShaderMaterial.new();m.shader=shader;node.material_override=m;m.set_shader_parameter("terrain_ambient_scale",.7);m.set_shader_parameter("terrain_key_radiance",Vector3(.3,.4,.5))
  var rows=[];var worst:=0.
  for enabled in [false,true]:
@@ -27,10 +39,18 @@ uniform vec3 test_color=vec3(.3,.2,.1);uniform float test_contact=1.;uniform flo
     m.set_shader_parameter("test_contact",contact)
     for i in 4:await process_frame
     await RenderingServer.frame_post_draw
-    var pixel=vp.get_texture().get_image().get_pixel(8,8);var actual=Vector3(pixel.r,pixel.g,pixel.b)
+    var image:=vp.get_texture().get_image()
+    var pixel:=image.get_pixel(8,8);var actual=Vector3(pixel.r,pixel.g,pixel.b)
+    var opening_pixel:=image.get_pixel(4,8)
+    var actual_opening:=Vector3(opening_pixel.r,opening_pixel.g,opening_pixel.b)
     var expected=color*(Vector3(.1,.2,.3)*.7*.8+Vector3(.2,.15,.1)*Vector3(.3,.4,.5)*.6)
-    if enabled:expected*=reference(color,contact)
-    var err:Vector3=(actual-expected).abs();var error:float=maxf(err.x,maxf(err.y,err.z));worst=maxf(worst,error)
+    var expected_opening:=Vector3(.1,.2,.3)*.7*.65
+    if enabled:
+     var visibility:=reference(color,contact)
+     expected*=visibility
+     expected_opening*=visibility
+    var err:Vector3=(actual-expected).abs().max((actual_opening-expected_opening).abs())
+    var error:float=maxf(err.x,maxf(err.y,err.z));worst=maxf(worst,error)
     rows.append({"enabled":enabled,"color":str(color),"contact":contact,"actual":str(actual),"expected":str(expected),"error":error})
  m.set_shader_parameter("test_metal",1.)
  for i in 4:await process_frame
