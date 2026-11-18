@@ -192,8 +192,8 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int, 
 	if idle.size() != source.size():
 		idle = capture_wall_handoff_idle(skeleton, wall_handoff_animation, wall_handoff_idle)
 	else:
-		wall_handoff_animation.stop()
-		wall_handoff_animation.play(wall_handoff_idle)
+		# The cached pose drives every bone in the blend below. Keep the
+		# living animation paused while ownership transfers to the simulator.
 		wall_handoff_animation.pause()
 	# Search from the least visible correction. Interpolating bone-local
 	# transforms retains the source hierarchy while retracting the limbs.
