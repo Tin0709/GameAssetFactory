@@ -102,6 +102,7 @@ func check_new_weapons(lab: Node3D, menu: OptionButton, target: Node3D) -> void:
 		attack(false)
 		await ticks(25)
 		check(bow.ammo == 15 and target.health == 28, "Reset cancels a draw before it fires")
+		await check_bow_wall_impact_frame(lab, bow)
 	target.health = 100
 	target.position = Vector3(0.0, 0.0, 5.0)
 
@@ -411,12 +412,49 @@ func check_crossbow_impact_burst(lab: Node3D, sparks: MultiMeshInstance3D) -> vo
 	for index in 25:
 		var origin := Vector3(15.0 + index * 0.25, 1.25, 0.0)
 		crossbow.fire(origin, Vector3.BACK, -300 - index, origin)
-	await ticks(8)
+	for i in 8:
+		await physics_frame
+		if crossbow._bolts.is_empty():
+			break
 	check(crossbow._bolts.is_empty() and sparks.multimesh.visible_instance_count in range(200, 251),
 		"One batch can draw both emitters for all 25 simultaneous arrow impacts")
+	check(crossbow._embedded.visible_instance_count == crossbow.EMBEDDED_CAPACITY,
+		"The first frame after mass impact draws all 24 retained wall props")
 	crossbow.reset()
 	check(sparks.multimesh.visible_instance_count == 0,
 		"Reset clears the whole batch immediately")
+	wall.queue_free()
+
+func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
+	var wall := StaticBody3D.new()
+	var collision := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(2.0, 2.0, 0.1)
+	collision.shape = box
+	wall.add_child(collision)
+	wall.position = Vector3(18.0, 1.25, 3.0)
+	lab.add_child(wall)
+	await ticks(2)
+	var hits: Array[Dictionary] = []
+	var record := func(hit: Dictionary, _direction: Vector3, _serial: int, _strike: Dictionary):
+		hits.append(hit)
+	bow.arrow_impact.connect(record)
+	var origin := Vector3(18.0, 1.25, 0.0)
+	var fired: bool = bow.fire_arrow(origin, Vector3.BACK, -400, origin, true)
+	for i in 10:
+		await physics_frame
+		if not hits.is_empty():
+			break
+	check(fired and hits.size() == 1 and hits[0].collider == wall, "A charged Bow arrow hits the wall once")
+	check(bow._embedded.visible_instance_count == 1 and bow._embedded_arrows.size() == 1
+		and is_zero_approx(bow._embedded_arrows[0].age),
+		"The Bow wall prop appears on impact at the start of its wobble")
+	await ticks(1)
+	if not bow._embedded_arrows.is_empty():
+		check(bow._embedded_arrows[0].age > 0.0, "The Bow wall prop ages from the next physics tick")
+	print("MECHANIC_LAB_BOW_WALL_CONTACT hits=", hits.size(), " props=", bow._embedded.visible_instance_count)
+	bow.arrow_impact.disconnect(record)
+	bow.reset()
 	wall.queue_free()
 
 func check_crossbow_trail(lab: Node3D) -> void:
