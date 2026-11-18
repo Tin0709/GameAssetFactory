@@ -486,13 +486,9 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 	var hit_section := LAB_ATTACK_HIT_SECTION if lab else TELEGRAPH_END
 	var windup_rate := TELEGRAPH_RATE * montage_rate
 	var telegraph_seconds := clampf((hit_section - before) / windup_rate, 0.0, delta)
-	if lab and telegraph_seconds > 0.0 and _target_visible:
-		var target_position := _last_seen_position
-		var target_travel := target_position - _windup_target_start
-		# Keep the entry heading for a stationary target. AN_FocusOnTarget
-		# disables any tracking at the start of Attack_Hit.
-		if Vector2(target_travel.x, target_travel.z).length_squared() > 0.0001:
-			_face_target(target_position - global_position, telegraph_seconds)
+	# AN_FocusOnTarget disables tracking at the start of Attack_Hit.
+	if lab and telegraph_seconds > 0.0 and _target_visible and _windup_target_has_moved(_last_seen_position):
+		_face_target(_last_seen_position - global_position, telegraph_seconds)
 	var advance_seconds := telegraph_seconds * windup_rate + (delta - telegraph_seconds) * montage_rate
 	animation.advance(advance_seconds)
 	if before < MELEE_CONTACT_TIME and before + advance_seconds >= MELEE_CONTACT_TIME:
@@ -555,7 +551,7 @@ func _update_target_sight(delta: float, sample_ai: bool) -> void:
 	var delay := LAB_SIGHT_LOSS_DELAY if _target_aggressive else LAB_SIGHT_DELAY
 	if global_position.distance_squared_to(point) > LAB_SIGHT_RADIUS_SQUARED:
 		_target_visible = false
-	elif sample_ai or (_target_visible != _target_aggressive
+	elif sample_ai or _needs_windup_sight(point) or (_target_visible != _target_aggressive
 			and _sight_state_seconds + delta >= delay - 0.000001):
 		# A staggered sample can be stale when the pending state change is due.
 		_target_visible = _clear_sight_to(point)
@@ -569,6 +565,17 @@ func _update_target_sight(delta: float, sample_ai: bool) -> void:
 			_target_aggressive = _target_visible
 			_sight_state_seconds = 0.0
 			_reset_roam()
+
+func _needs_windup_sight(point: Vector3) -> bool:
+	if animation.current_animation != ATTACK or animation.current_animation_position >= LAB_ATTACK_HIT_SECTION:
+		return false
+	# A moving target can sidestep or enter cover before the next crowd ray.
+	# Check both positions so a return to the start also stops the old turn.
+	return _windup_target_has_moved(point) or _windup_target_has_moved(_last_seen_position)
+
+func _windup_target_has_moved(point: Vector3) -> bool:
+	var travel := point - _windup_target_start
+	return Vector2(travel.x, travel.z).length_squared() > 0.0001
 
 func _reset_roam() -> void:
 	_roam_destination = Vector3.INF
