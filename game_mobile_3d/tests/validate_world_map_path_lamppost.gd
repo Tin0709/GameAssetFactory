@@ -49,6 +49,9 @@ func verify_device_review(world: Node3D) -> void:
 				"Device review never requests the external firepit")
 			check(graphics._fixture_air().is_empty(), "Device mist has no external fixture light")
 			check(not world.showcase.air_light.source_ready, "Device review skips the external air light proof")
+			var distant = world.showcase.distant_terrain
+			check(not distant._attempted and distant.vista == null and distant.visual == null,
+				"Device review never requests the external terrain mesh or texture atlas")
 		world.free()
 		await process_frame
 		if i == 0:
