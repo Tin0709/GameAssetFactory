@@ -1067,7 +1067,7 @@ func _preempt_floor_penetration(floor_half: Vector3, floor_inverse: Transform3D,
 				impulse -= unit * minf(tangent_speed / tangent_inverse_mass, normal_impulse * FLOOR_PREDICTION_FRICTION)
 		state.apply_impulse(impulse, lever + state.center_of_mass)
 
-func contact_motion() -> Dictionary:
+func contact_motion(require_support := false) -> Dictionary:
 	var contacts := 0
 	var core_contacts := 0
 	var supports := 0
@@ -1075,17 +1075,16 @@ func contact_motion() -> Dictionary:
 	var leg_supports := 0
 	var core_support_sum := Vector3.ZERO
 	var leg_support_sum := Vector3.ZERO
-	var peak_linear := 0.0
-	var peak_angular := 0.0
-	for name in bodies:
-		var body: PhysicalBone3D = bodies[name]
-		var direct := PhysicsServer3D.body_get_direct_state(body.get_rid())
-		if direct and direct.get_contact_count() > 0:
+	for part in _physical_parts:
+		var direct := PhysicsServer3D.body_get_direct_state(part.rid)
+		var contact_count := direct.get_contact_count() if direct != null else 0
+		if contact_count > 0:
 			contacts += 1
-			var is_core: bool = name in ["Hips", "Chest", "Head"]
-			var is_leg: bool = name in ["Leg.L", "Leg.R"]
-			if is_core: core_contacts += 1
-			for index in direct.get_contact_count():
+			var is_core := part.name == "Hips" or part.name == "Chest" or part.name == "Head"
+			var is_leg := part.name == "Leg.L" or part.name == "Leg.R"
+			if is_core:
+				core_contacts += 1
+			for index in contact_count:
 				# The contact normal is reported in world axes by the lab backend.
 				if direct.get_contact_local_normal(index).y < MIN_SUPPORT_NORMAL_Y:
 					continue
@@ -1097,8 +1096,15 @@ func contact_motion() -> Dictionary:
 					leg_supports += 1
 					leg_support_sum += direct.get_contact_collider_position(index)
 				break
-		peak_linear = maxf(peak_linear,body.linear_velocity.length())
-		peak_angular = maxf(peak_angular,body.angular_velocity.length())
+	# Before landing, the Lab only needs motion data when a part has support.
+	if require_support and supports == 0:
+		return {}
+
+	var peak_linear := 0.0
+	var peak_angular := 0.0
+	for part in _physical_parts:
+		peak_linear = maxf(peak_linear, part.body.linear_velocity.length())
+		peak_angular = maxf(peak_angular, part.body.angular_velocity.length())
 	var support_span := Vector3.ZERO
 	if core_supports > 0 and leg_supports > 0:
 		support_span = core_support_sum / core_supports - leg_support_sum / leg_supports

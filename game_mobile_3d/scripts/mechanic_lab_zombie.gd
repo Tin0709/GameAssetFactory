@@ -921,7 +921,10 @@ func _update_death(delta: float) -> void:
 				_corpse_floor, floor_impact_limb_share, sabre_finisher, cos(angle) * launch_impulse, sin(angle) * launch_impulse):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
-	var contact := ragdoll.contact_motion()
+	var contact := ragdoll.contact_motion(not _corpse_landed and is_instance_valid(_corpse_floor))
+	if contact.is_empty():
+		_limb_support_age = 0.0
+		return
 	if not _corpse_landed:
 		# On a terrace, limbs can carry the body before the core reaches a surface.
 		# Require sustained support so a brief grazing hit keeps its flight response.
