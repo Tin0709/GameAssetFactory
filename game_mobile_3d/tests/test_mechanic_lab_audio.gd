@@ -546,6 +546,10 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		audio.contact(point, 1100, true)
 	audio.flush_zombie_combat_cues()
 	var death_variant: int = audio._next_choice[&"death"]
+	var future := onset_frame + ceili(0.10 * Engine.physics_ticks_per_second)
+	check(audio._play(&"death", ear + Vector3.RIGHT * 20.0, COMBAT_AUDIO.DEATH_GAIN_DB, future) == null
+		and audio._next_choice[&"death"] == death_variant,
+		"A fresh death onset survives simulation catch-up")
 	await physics_frame
 	audio.contact(ear + Vector3.RIGHT * 20.0, 1101, true)
 	audio.flush_zombie_combat_cues()
@@ -553,10 +557,6 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		and reactions.all(func(voice): return voice.global_position in near_death_points)
 		and audio._next_choice[&"death"] == death_variant,
 		"A distant death on the next physics tick preserves the three nearby death onsets")
-	var future := Engine.get_physics_frames() + ceili(0.10 * Engine.physics_ticks_per_second)
-	check(audio._play(&"death", ear + Vector3.RIGHT * 20.0, COMBAT_AUDIO.DEATH_GAIN_DB, future) == null
-		and audio._next_choice[&"death"] == death_variant,
-		"A fresh death onset survives simulation catch-up")
 	var closest := ear + Vector3.RIGHT * 0.5
 	audio.contact(closest, 1102, true)
 	audio.flush_zombie_combat_cues()
@@ -888,6 +888,12 @@ func check_zombie_attack_onsets(audio: COMBAT_AUDIO, group: Node,
 			group.zombie_attack_audio.emit(point, confirmed)
 		audio.flush_zombie_combat_cues()
 		var choice: int = audio._next_choice.get(cue, 0)
+
+		# Schedule several physics ticks before yielding to the mixer.
+		var future := Engine.get_physics_frames() + catch_up_ticks
+		check(audio._play(cue, far, gain, future) == null
+			and audio._next_choice.get(cue, 0) == choice,
+			"A fresh %s onset survives simulation catch-up" % cue)
 		await physics_frame
 		for i in 100:
 			group.zombie_attack_audio.emit(far + Vector3.BACK * i * 0.12, confirmed)
@@ -896,13 +902,7 @@ func check_zombie_attack_onsets(audio: COMBAT_AUDIO, group: Node,
 			and audio._next_choice.get(cue, 0) == choice,
 			"Nearby %s onsets survive a distant burst on the next tick" % cue)
 
-		# Schedule several physics ticks in one mixer window.
-		var frame := Engine.get_physics_frames()
-		var future := frame + catch_up_ticks
-		check(audio._play(cue, far, gain, future) == null
-			and audio._next_choice.get(cue, 0) == choice,
-			"A fresh %s onset survives simulation catch-up" % cue)
-		var closer := audio._play(cue, closest, gain, future)
+		var closer := audio._play(cue, closest, gain)
 		var positions := voices.map(func(voice): return voice.global_position)
 		check(closer != null and positions.has(closest) and positions.has(near[0]) and positions.has(near[1]),
 			"A closer %s replaces the farthest protected voice" % cue)
