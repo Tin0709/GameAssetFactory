@@ -15,6 +15,9 @@ const BOUND_DEGREES := .55
 # Same endpoints as the one-sample branches in cached_receiver.gdshaderinc.
 const SINGLE_KEY_EPSILON := .0001
 
+static var _global_owner: WeakRef
+static var _globals_registered := false
+
 var sun: DirectionalLight3D
 var record_metrics := false
 var fade_in_minutes := 24.0
@@ -47,13 +50,28 @@ var _last_bound: Array[String] = []
 var _source_scale := -1.
 
 
-func register_globals() -> void:
+func register_globals() -> bool:
+	if RenderingServer.get_current_rendering_method() != "mobile" or RenderingServer.get_rendering_device() == null:
+		return false
+	if _global_owner != null:
+		var owner: Variant = _global_owner.get_ref()
+		if is_instance_valid(owner):
+			return owner == self
+	_global_owner = weakref(self)
 	_dummy = ImageTexture.create_from_image(Image.create_empty(1,1,false,Image.FORMAT_RH))
 	for name: String in ["gaf_far_depth","gaf_far_depth_next"]:
-		RenderingServer.global_shader_parameter_add(name,RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D,_dummy)
+		if _globals_registered:
+			RenderingServer.global_shader_parameter_set(name, _dummy)
+		else:
+			RenderingServer.global_shader_parameter_add(name,RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D,_dummy)
 	for name: String in ["gaf_far_x","gaf_far_y","gaf_far_z","gaf_far_filter","gaf_far_x_next","gaf_far_y_next",
 			"gaf_far_z_next","gaf_far_filter_next","gaf_far_fit","gaf_far_key"]:
-		RenderingServer.global_shader_parameter_add(name,RenderingServer.GLOBAL_VAR_TYPE_VEC4,Vector4.ZERO)
+		if _globals_registered:
+			RenderingServer.global_shader_parameter_set(name, Vector4.ZERO)
+		else:
+			RenderingServer.global_shader_parameter_add(name,RenderingServer.GLOBAL_VAR_TYPE_VEC4,Vector4.ZERO)
+	_globals_registered = true
+	return true
 
 
 func configure(light: DirectionalLight3D, view: Camera3D, terrain_chunks: Array,
@@ -397,7 +415,7 @@ func _restore(minute := 0., drop_textures := true) -> void:
 
 func update_shadow(delta: float, player: Vector3, velocity: Vector3,
 		minute: float, context_allows_shadows: bool) -> void:
-	if _stream == null or _dummy == null or not is_instance_valid(sun):
+	if _stream == null or _dummy == null or _global_owner == null or _global_owner.get_ref() != self or not is_instance_valid(sun):
 		return
 	if not enabled or not context_allows_shadows or not sun.shadow_enabled \
 			or not is_finite(minute) or minute < _first or minute >= _last:
@@ -459,7 +477,9 @@ func snapshot() -> Dictionary:
 		"stream":_stream.snapshot() if _stream!=null else {}}
 
 func _exit_tree() -> void:
-	if _dummy != null:
+	if _dummy != null and _global_owner != null and _global_owner.get_ref() == self:
 		_restore()
+		_global_owner = null
+		_dummy = null
 	if _stream != null:
 		_stream.close()

@@ -20,20 +20,20 @@ class DecodeJob extends RefCounted:
 		queue_us = start - queued_at_us
 		if delay_ms > 0:
 			OS.delay_msec(delay_ms)
-		if not FileAccess.file_exists(path):
+		var file := FileAccess.open(path, FileAccess.READ)
+		if file == null:
 			error = "A depth tile is unavailable"
+		elif file.get_length() != encoded_length:
+			error = "A depth tile size differs from its manifest"
 		else:
-			var compressed := FileAccess.get_file_as_bytes(path)
-			if compressed.size() != encoded_length:
-				error = "A depth tile size differs from its manifest"
+			var packed := file.get_buffer(encoded_length)
+			var raw := packed.decompress(expected_length,FileAccess.COMPRESSION_DEFLATE)
+			var hasher := HashingContext.new()
+			hasher.start(HashingContext.HASH_SHA256)
+			if raw.size() != expected_length or hasher.update(raw) != OK or hasher.finish().hex_encode() != checksum:
+				error = "A depth tile failed verification"
 			else:
-				var raw := compressed.decompress(expected_length,FileAccess.COMPRESSION_DEFLATE)
-				var hasher := HashingContext.new()
-				hasher.start(HashingContext.HASH_SHA256)
-				if raw.size()!=expected_length or hasher.update(raw)!=OK or hasher.finish().hex_encode()!=checksum:
-					error = "A depth tile failed verification"
-				else:
-					bytes = raw
+				bytes = raw
 		elapsed_us = Time.get_ticks_usec()-start
 
 var directory := ""
