@@ -5,6 +5,7 @@ const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshad
 const ACTOR_SKY_SHADER=preload("res://materials/world_map_actor_sky.gdshader")
 const PLAYER_MATERIAL=preload("res://scripts/world_map_player_material.gd")
 const TERRAIN_MATERIAL=preload("res://scripts/world_map_terrain_material.gd")
+const SURFACE_RECIPE = preload("res://materials/world_map_surface_v5.gdshaderinc")
 var terrain_review:="combined"
 var terrain_visibility_response:=true
 var terrain_dielectric_response:=true
@@ -646,8 +647,15 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 		if flat_turf:defines+="\n#define GAF_WORLD_FLAT_TURF"
 		if (direct or foliage) and ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
 			defines += "\n#define GAF_WORLD_FORCE_LAMBERT"
-		shader.code = original.code.replace("shader_type spatial;", defines)
-		if spatial:shader.code=shader.code.replace("render_mode ","render_mode ambient_light_disabled, ")
+		var code := original.code.replace("shader_type spatial;", defines)
+		if flat_turf and not spatial:
+			# Keep the recipe that the Overworld's irradiance bake validates intact.
+			var flat_surface := SURFACE_RECIPE.code.replace("uniform int ground_grade = 0;", "const int ground_grade = 1;")
+			flat_surface = flat_surface.replace("uniform bool path_blending = false;", "const bool path_blending = false;")
+			code = code.replace('#include "%s"' % SURFACE_RECIPE.resource_path, flat_surface)
+		if spatial:
+			code = code.replace("render_mode ", "render_mode ambient_light_disabled, ")
+		shader.code = code
 		variants[key] = shader
 	return variants[key]
 
