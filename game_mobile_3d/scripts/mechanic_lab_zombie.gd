@@ -211,7 +211,7 @@ static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
 static var _corpse_base_material: ShaderMaterial
 static var _live_capsule: CapsuleShape3D
-# These queries run synchronously on the physics thread and keep no results.
+# These main-thread queries run synchronously and store no results.
 static var _sight_ray: PhysicsRayQueryParameters3D
 static var _roam_sweep: PhysicsShapeQueryParameters3D
 
