@@ -214,8 +214,8 @@ static func _find_spawn_point(player_position: Vector3, facing: Basis, search: S
 	var preferred := player_position + facing * Vector3(0.42, 0.0, 1.78)
 	preferred.x = clampf(preferred.x, -FLOOR_LIMIT, FLOOR_LIMIT)
 	preferred.z = clampf(preferred.z, -FLOOR_LIMIT, FLOOR_LIMIT)
-	# Occupancy only grows inside a batch. Continue after the last checked
-	# candidate and rebuild the snapshot when physics can move the crowd.
+	# Earlier candidates stay occupied while the search only adds zombies.
+	# A changed occupancy or facing gets a new search from the first slot.
 	if search.ring == 0:
 		search.ring = 1
 		if _spawn_point_clear(preferred, player_position, search.occupied):
