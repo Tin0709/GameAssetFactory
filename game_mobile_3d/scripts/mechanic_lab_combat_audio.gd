@@ -267,6 +267,7 @@ const SLAM_GAIN_DB := -10.0
 const SURFACE_LANDING_GAIN_DB := -16.0
 const HURT_GAIN_DB := -20.0
 const DEATH_GAIN_DB := -14.0
+const WEAPON_ONSET_SECONDS := 0.05
 const ZOMBIE_ONSET_SECONDS := 0.05
 const ZOMBIE_WINDUP_GAIN_DB := -16.0
 const ZOMBIE_HIT_GAIN_DB := -14.0
@@ -875,9 +876,12 @@ func _replace_weapon_slot(start: int, onset: bool, frame: int) -> int:
 		var playing_onset := _weapon_onsets[slot]
 		if onset and not playing_onset:
 			return slot
-		# Equal-priority cues from this tick still need time to start mixing.
-		if older_slot == -1 and onset == playing_onset and _started_frames[slot] < frame:
-			older_slot = slot
+		if older_slot >= 0 or onset != playing_onset or _started_frames[slot] >= frame:
+			continue
+		# Physics may advance several ticks before the mixer starts a queued voice.
+		if onset and _voices[slot].get_playback_position() < WEAPON_ONSET_SECONDS:
+			continue
+		older_slot = slot
 	return older_slot
 
 func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName,
