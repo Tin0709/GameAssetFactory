@@ -205,6 +205,76 @@ func check_landing_voice_under_step_burst(bus: int, capture: AudioEffectCapture)
 	await create_timer(0.08).timeout
 	lab.free()
 
+func check_run_step_after_landing(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var movement = lab.get_node("MovementAudio")
+	var player = lab.player
+	lab.reset_player()
+	lab.get_node("HUD/CombatAudioToggle").button_pressed = true
+	for voice: AudioStreamPlayer3D in movement.step_voices:
+		voice.bus = AudioServer.get_bus_name(bus)
+	for i in 3:
+		await physics_frame
+	Input.action_press("move_forward")
+	for i in 28:
+		await physics_frame
+	var landing_before: int = movement.event_count.landing
+	Input.action_press("jump")
+	for i in 9:
+		await physics_frame
+		if not player._grounded:
+			break
+	Input.action_release("jump")
+	for i in 75:
+		await physics_frame
+		if movement.event_count.landing > landing_before:
+			break
+	var steps_before: int = movement.event_count.grass
+	var touchdown: float = player.simulation_clock
+	var landing: AudioStreamPlayer3D
+	for voice: AudioStreamPlayer3D in movement.step_voices:
+		if voice.playing and movement.groups.land_grass.any(func(row): return row.stream == voice.stream):
+			landing = voice
+			break
+	check(landing != null and movement.event_count.landing == landing_before + 1,
+		"The running jump queues one grass landing")
+	if landing == null:
+		Input.action_release("move_forward")
+		lab.free()
+		return
+	var landing_source := landing.stream
+	await physics_frame
+	check(movement.event_count.grass == steps_before, "The touchdown pose does not add an immediate footstep")
+
+	var zombies := lab.get_node("Zombies")
+	var ear: Vector3 = lab.get_node("CombatAudio").zombie_listener.global_position
+	capture.clear_buffer()
+	for tick in 7:
+		for i in 100:
+			zombies.zombie_attack_audio.emit(ear + Vector3(2.0, 0.0, i * 0.08), true)
+		await physics_frame
+	var step_voice: AudioStreamPlayer3D
+	for voice: AudioStreamPlayer3D in movement.step_voices:
+		if voice.playing and movement.groups.grass.any(func(row): return row.stream == voice.stream):
+			step_voice = voice
+			break
+	check(movement.event_count.grass == steps_before + 1 and step_voice != null
+		and landing.playing and landing.stream == landing_source,
+		"The first new running plant plays alongside the landing during a zombie cue burst")
+	check(player.simulation_clock - touchdown < 0.15, "The fixture samples the first tenth-second after touchdown")
+	Input.action_release("move_forward")
+	await create_timer(0.10).timeout
+	if step_voice != null:
+		check(step_voice.get_playback_position() > 0.0, "The first new running step reaches the mixer")
+	var peak := 0.0
+	for sample in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+	check(peak > 0.001 and peak < 0.9, "The post-landing movement mix has headroom")
+	print("MECHANIC_LAB_POST_LANDING_STEP count=", movement.event_count.grass - steps_before, " peak=", peak)
+	lab.free()
+
 func check_crossbow_fire_under_impact_burst(audio: Node, bus: int, capture: AudioEffectCapture) -> void:
 	audio.load_crossbow(audio._research_root())
 	audio.reset()
@@ -1002,6 +1072,7 @@ func run() -> void:
 	await check_local_hurt(bus, capture)
 	await check_movement_audio(bus, capture)
 	await check_landing_voice_under_step_burst(bus, capture)
+	await check_run_step_after_landing(bus, capture)
 	await check_sabre_debris_audio(bus, capture)
 	await check_sabre_crowd_audio(bus, capture)
 	await check_zombie_steps(bus, capture)
