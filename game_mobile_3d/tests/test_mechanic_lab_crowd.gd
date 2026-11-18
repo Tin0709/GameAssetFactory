@@ -145,11 +145,29 @@ func check_crowd_roam(group: Node) -> void:
 	var moved := 0
 	var peak_radius := 0.0
 	var outside := 0
+	var pending_floor: Array[ZOMBIE] = []
 	for i in group.get_child_count():
 		var zombie := group.get_child(i) as ZOMBIE
 		moved += int(zombie.global_position.distance_to(starts[i]) > 0.5)
 		peak_radius = maxf(peak_radius, zombie.global_position.distance_to(zombie._roam_origin))
-		outside += int(zombie._target_aggressive or not zombie.is_on_floor())
+		if zombie._target_aggressive:
+			outside += 1
+		elif not zombie.is_on_floor():
+			pending_floor.append(zombie)
+	# A packed capsule can temporarily report only a side collision on the
+	# grass. Require floor contact to return while it stays within the margin.
+	for tick in 4:
+		for i in range(pending_floor.size() - 1, -1, -1):
+			var zombie := pending_floor[i]
+			if zombie._target_aggressive or absf(zombie.global_position.y) > zombie.safe_margin:
+				outside += 1
+				pending_floor.remove_at(i)
+			elif zombie.is_on_floor():
+				pending_floor.remove_at(i)
+		if pending_floor.is_empty() or tick == 3:
+			break
+		await physics_frame
+	outside += pending_floor.size()
 	if group.get_child_count() != COUNT or moved < 90 or peak_radius > 10.05 or outside != 0:
 		failures.append("The 100-zombie patrol stays on the floor and moves within its spawn radius")
 	print("CROWD_ROAM moved=", moved, " max_radius=", peak_radius, " chasing_or_off_floor=", outside)
