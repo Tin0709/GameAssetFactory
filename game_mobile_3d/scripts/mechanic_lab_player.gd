@@ -13,6 +13,7 @@ const BOW_MIN_DRAW_SECONDS := 0.10
 const BOW_DRAW_BLEND_SECONDS := 0.12
 const IDLE_GESTURE_BLEND_SECONDS := 0.18
 const MIN_WALL_STEP_PROGRESS := 0.10
+const POST_LANDING_STEP_INTERVAL := 0.10
 
 var crossbow_equipped := false
 var gauntlets_equipped := false
@@ -97,6 +98,10 @@ func _refresh_markers() -> void:
 
 func _create_hybrid_motion() -> RefCounted:
 	return LabLocomotion.new()
+
+func _post_landing_step_interval() -> float:
+	# Absorb the touchdown settling pose and admit the first running stride.
+	return POST_LANDING_STEP_INTERVAL
 
 func _physics_process(delta: float) -> void:
 	var planted_bow := _bow_locks_ground_movement()

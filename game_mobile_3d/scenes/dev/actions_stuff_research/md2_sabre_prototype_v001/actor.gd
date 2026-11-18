@@ -31,6 +31,7 @@ const SOURCE_JUMP_APEX_SECONDS:=.25
 const SOURCE_MOVING_LAND_SECONDS:=.05
 const COMBAT_STEP_DISTANCE:=.45 # Reconstructed interval; no native value recovered.
 const COMBAT_STEP_TIMEOUT:=.30
+const SURFACE_STEP_MIN_INTERVAL := 0.12
 var combo=Combo.new()
 var grounded_melee_aim: Callable
 var clips:Dictionary={}
@@ -148,6 +149,7 @@ var _step_elapsed:=0.
 var _step_ready:=false
 var _surface_feet: Array[bool] = [false, false]
 var _last_surface_contact := -INF
+var _surface_step_min_interval := SURFACE_STEP_MIN_INTERVAL
 
 func _ready()->void:
 	collision_layer=2;collision_mask=1;add_to_group("player")
@@ -594,10 +596,15 @@ func _emit_surface_contact(soles: Array, landed: bool) -> void:
 		return
 	if landed:
 		_last_surface_contact = simulation_clock
+		_surface_step_min_interval = _post_landing_step_interval()
 		surface_contact.emit(soles[0].center.lerp(soles[1].center, 0.5), true)
-	elif planted_foot >= 0 and current_speed > 0.4 and simulation_clock - _last_surface_contact > 0.12:
+	elif planted_foot >= 0 and current_speed > 0.4 and simulation_clock - _last_surface_contact > _surface_step_min_interval:
 		_last_surface_contact = simulation_clock
+		_surface_step_min_interval = SURFACE_STEP_MIN_INTERVAL
 		surface_contact.emit(soles[planted_foot].center, false)
+
+func _post_landing_step_interval() -> float:
+	return SURFACE_STEP_MIN_INTERVAL
 
 func _uses_native_jump_pose(key:String)->bool:
 	return native_jump_pose_enabled and using_original_source and key in ["JumpTakeoff","JumpAirborne","JumpLanding"]
@@ -908,6 +915,7 @@ func reset_actor()->void:
 	expression_clock=0.;simulation_clock=0.;focus_value=0.;blink_value=0.;_forced_blink=0.
 	_surface_feet = [false, false]
 	_last_surface_contact = simulation_clock
+	_surface_step_min_interval = SURFACE_STEP_MIN_INTERVAL
 	_play("Idle",0.);_apply_face(0.);reset_physics_interpolation()
 	reset_movement_measurements()
 	presentation_reset.emit()
