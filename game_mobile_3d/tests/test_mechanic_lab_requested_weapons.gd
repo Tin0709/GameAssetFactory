@@ -129,6 +129,7 @@ func run() -> void:
 	await check_bow_movement(lab, menu)
 	await check_crossbow_settle(lab, menu)
 	check_crossbow_equip_audio(lab, menu)
+	await check_melee_equip_audio(lab, menu)
 	var group := lab.get_node("Zombies")
 	group.sabre_contact.connect(func(_p, _d, clip, _i, _s, _k): contacts.append(clip))
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
@@ -989,3 +990,42 @@ func check_crossbow_equip_audio(lab: Node3D, menu: OptionButton) -> void:
 	equip(menu, 3)
 	equip(menu, 0)
 	check(not audio._voices.any(func(voice): return voice.playing), "Combat mute suppresses weapon switch cues")
+
+func switch_cue_is_playing(audio: Node, group: StringName, count: int) -> bool:
+	var samples: Array = audio._groups.get(group, [])
+	return samples.size() == count and (count == 0 or audio._voices.any(
+		func(voice): return voice.playing and voice.stream in samples))
+
+func check_melee_equip_audio(lab: Node3D, menu: OptionButton) -> void:
+	var audio := lab.get_node("CombatAudio")
+	var sound := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	lab.reset_player()
+	await ticks(12)
+	equip(menu, 8)
+	check(menu.selected == 8 and not audio._groups.has(&"pickaxe_equip")
+		and not audio._voices.any(func(voice): return voice.playing),
+		"Changing melee tools while muted does not decode or play switch audio")
+	equip(menu, 0)
+	sound.button_pressed = true
+	var fixtures := [[1, &"sword", 1, 1], [2, &"curved_greatsword", 1, 1],
+		[4, &"prime_gauntlet", 3, 4], [5, &"cleaver", 1, 1],
+		[7, &"gauntlet", 0, 1], [8, &"pickaxe", 3, 3], [9, &"shovel", 1, 1]]
+	for spec: Array in fixtures:
+		var tool: StringName = spec[1]
+		equip(menu, spec[0])
+		check(menu.selected == spec[0] and switch_cue_is_playing(audio, &"sabre_unequip", 1)
+			and switch_cue_is_playing(audio, StringName(tool + "_equip"), spec[2]),
+			"%s commits its verified equip family beside the outgoing Sabre cue" % tool)
+		equip(menu, 0)
+		check(menu.selected == 0 and switch_cue_is_playing(audio, StringName(tool + "_unequip"), spec[3])
+			and switch_cue_is_playing(audio, &"sabre_equip", 1),
+			"%s commits its verified unequip family beside the incoming Sabre cue" % tool)
+	check(lab.player.drop_for_lab(3.0), "Can enter the rejected weapon switch fixture")
+	await ticks(5)
+	var choice: Dictionary = audio._next_choice.duplicate()
+	equip(menu, 8)
+	check(menu.selected == 0 and audio._next_choice == choice,
+		"Rejecting a weapon switch while airborne never consumes a sample")
+	sound.button_pressed = false
+	lab.reset_player()
+	await ticks(12)
