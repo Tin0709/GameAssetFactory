@@ -28,7 +28,7 @@ var _sample_bone_ids: Array[int]
 var _sample_body_offsets: Array[Transform3D]
 var _sampled_skeleton_transform: Transform3D
 var _source_joint_biases: Dictionary[RID, float]
-var _prepared_source_joints: Array[SourceAnchorProjection]
+var _prepared_source_joints: Array[PhysicalPart]
 var _wall_handoff_frame := -1
 var _launch_frame := -1
 var wall_handoff_animation: AnimationPlayer

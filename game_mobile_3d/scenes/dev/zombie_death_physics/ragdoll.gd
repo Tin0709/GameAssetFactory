@@ -72,10 +72,10 @@ var joint_rest_rotations: Dictionary = {}
 var resistance_gain := 0.0
 var resistance_age := 0.0
 var _parts: Array = PARTS
-var _floor_projection_parts: Array[FloorProjectionPart]
+var _physical_parts: Array[PhysicalPart]
 var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
-var _source_anchor_projections: Array[SourceAnchorProjection]
+var _source_anchor_projections: Array[PhysicalPart]
 var _flat_floor: CollisionShape3D
 var _floor_impact_limb_share := 0.0
 var _flat_floor_has_contact := false
@@ -150,11 +150,18 @@ func _make_physical_body(target: Skeleton3D, part: Array, bone_names: Dictionary
 	body.add_child(collider)
 	return body
 
-class FloorProjectionPart:
+class PhysicalPart:
+	var name: String
 	var body: PhysicalBone3D
 	var rid: RID
 	var half_size: Vector3
 	var radius: float
+	var joint: RID
+	var parent_rid: RID
+	var child_frame: Transform3D
+	var parent_frame: Transform3D
+	var swing_span: float
+	var twist_span: float
 
 func _register_body(part: Array, body: PhysicalBone3D) -> void:
 	var part_name: String = part[0]
@@ -165,12 +172,13 @@ func _register_body(part: Array, body: PhysicalBone3D) -> void:
 		# The utility carrier uses torso-like inertia.
 		PhysicsServer3D.body_set_param(rid, PhysicsServer3D.BODY_PARAM_INERTIA, Vector3(0.6, 0.4, 0.6))
 	bodies[part_name] = body
-	var projection := FloorProjectionPart.new()
+	var projection := PhysicalPart.new()
+	projection.name = part_name
 	projection.body = body
 	projection.rid = rid
 	projection.half_size = part[2] * 0.5
 	projection.radius = projection.half_size.length()
-	_floor_projection_parts.append(projection)
+	_physical_parts.append(projection)
 
 func _make_body_shape(size: Vector3) -> BoxShape3D:
 	var shape := BoxShape3D.new()
@@ -311,17 +319,6 @@ func _handoff_clearance_depth(space: PhysicsDirectSpaceState3D, depths: Dictiona
 		peak = maxf(peak, after)
 	return peak
 
-class SourceAnchorProjection:
-	var joint: RID
-	var child_name: String
-	var child: PhysicalBone3D
-	var child_rid: RID
-	var parent_rid: RID
-	var child_frame: Transform3D
-	var parent_frame: Transform3D
-	var swing_span: float
-	var twist_span: float
-
 func _build_source_joints() -> void:
 	# PhysicalBone3D's automatic joint follows the Skeleton3D hierarchy and
 	# derives one frame from the current pose. MD2 legs connect to J_Spine,
@@ -329,27 +326,28 @@ func _build_source_joints() -> void:
 	for child_name: String in source_joints:
 		_attach_source_joint(_prepare_source_joint(child_name))
 
-func _prepare_source_joint(child_name: String) -> SourceAnchorProjection:
+func _prepare_source_joint(child_name: String) -> PhysicalPart:
 	var spec: Dictionary = source_joints[child_name]
-	var projection := SourceAnchorProjection.new()
-	projection.child_name = child_name
-	projection.child = bodies[child_name]
-	projection.child_rid = projection.child.get_rid()
-	projection.parent_rid = bodies[spec.parent].get_rid()
-	projection.child_frame = spec.child_frame
-	projection.parent_frame = spec.parent_frame
-	projection.swing_span = deg_to_rad(spec.swing)
-	projection.twist_span = deg_to_rad(spec.twist)
-	return projection
+	for part in _physical_parts:
+		if part.name != child_name:
+			continue
+		part.parent_rid = bodies[spec.parent].get_rid()
+		part.child_frame = spec.child_frame
+		part.parent_frame = spec.parent_frame
+		part.swing_span = deg_to_rad(spec.swing)
+		part.twist_span = deg_to_rad(spec.twist)
+		return part
+	assert(false, "No physical body for authored joint " + child_name)
+	return null
 
-func _attach_source_joint(projection: SourceAnchorProjection) -> void:
+func _attach_source_joint(projection: PhysicalPart) -> void:
 	var joint := PhysicsServer3D.joint_create()
 	PhysicsServer3D.joint_make_cone_twist(joint, projection.parent_rid, projection.parent_frame,
-		projection.child_rid, projection.child_frame)
+		projection.rid, projection.child_frame)
 	PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_SWING_SPAN, projection.swing_span)
 	PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_TWIST_SPAN, projection.twist_span)
 	projection.joint = joint
-	source_joint_rids[projection.child_name] = joint
+	source_joint_rids[projection.name] = joint
 	_source_anchor_projections.append(projection)
 
 func _physics_process(delta: float) -> void:
@@ -506,7 +504,7 @@ func _project_source_anchors() -> void:
 	var last_parent := RID()
 	var parent_state: PhysicsDirectBodyState3D
 	for projection in _source_anchor_projections:
-		var state := PhysicsServer3D.body_get_direct_state(projection.child_rid)
+		var state := PhysicsServer3D.body_get_direct_state(projection.rid)
 		# The five zombie limbs share a parent. Read its live transform
 		# again for each joint while reusing the parent state handle.
 		if projection.parent_rid != last_parent:
@@ -531,7 +529,7 @@ func _project_source_anchors() -> void:
 		var contacting := contact_count > 0
 		if contacting and flat_floor and not can_slide_floor:
 			continue
-		var child := projection.child
+		var child := projection.body
 		var correction := parent_frame.origin - child_frame.origin
 		var distance := correction.length()
 		if contacting and flat_floor:
@@ -912,7 +910,7 @@ func _project_floor_contact() -> void:
 	var min_depth := FLOOR_REST_SLOP if landing_blended else FLOOR_CONTACT_SLOP
 	var depths: Dictionary[PhysicalBone3D, float] = {}
 	var slow := true
-	for part in _floor_projection_parts:
+	for part in _physical_parts:
 		var body := part.body
 		var state := PhysicsServer3D.body_get_direct_state(part.rid)
 		if state == null:
@@ -968,7 +966,7 @@ func _project_floor_contact() -> void:
 			_limit_floor_anchor_stretch(anchor_lifts, depths, shared_lift, slop, anchor_limit)
 			if not landing_blended and floor_impact_blend <= 0.0:
 				_limit_shared_first_contact_lift(anchor_lifts, depths, shared_lift, slop)
-		for part in _floor_projection_parts:
+		for part in _physical_parts:
 			var body := part.body
 			var correction: float = anchor_lifts.get(body, maxf(shared_lift, depths.get(body, 0.0) - slop))
 			if correction <= 0.0:
@@ -1014,7 +1012,7 @@ func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depth
 func _preempt_floor_penetration(floor_half: Vector3, floor_inverse: Transform3D, floor_y: float) -> void:
 	# During the Sabre roll, a rotating box can dig in again before the next
 	# contact solve. Predict its lowest corner and oppose only the closing speed.
-	for part in _floor_projection_parts:
+	for part in _physical_parts:
 		var body := part.body
 		var state := PhysicsServer3D.body_get_direct_state(part.rid)
 		if state == null or state.sleeping:
@@ -1184,7 +1182,7 @@ func release(visible_world_pose: Array[Transform3D] = []) -> void:
 		simulator.free()
 	simulator = null
 	bodies.clear()
-	_floor_projection_parts.clear()
+	_physical_parts.clear()
 	_terrain_poses.clear()
 	anchors.clear()
 	joint_rest_rotations.clear()
