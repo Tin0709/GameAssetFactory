@@ -72,6 +72,7 @@ forest_preferred_layout_profile = "graphics_vfx/acquisition_20261114/analysis/fo
 forest_preferred_layout_sha256 = "cda92ba1376a5dcd8d1bae4eb2c4ca3ea1f5cb04c6b77e498ef0a27302432ccf"
 forest_road_layout_profile = "graphics_vfx/acquisition_20261114/analysis/forest_walkable_path_1794754860257/matched_layout/layout.private.json"
 forest_road_layout_sha256 = "302d1e76450bc295ca16be0286e5b7d481b09684bc77d0675663fade2f2fbb31"
+far_terrain_shadow_cache = "graphics_vfx/acquisition_20261114/analysis/forest_shadow_walk_coverage_20261118/expanded"
 forest_basin_layout_profile = "graphics_vfx/acquisition_20261114/analysis/forest_canopy_openings_v200/bake/composed/layout.private.json"
 forest_basin_layout_sha256 = "93734f3aa165447dcd8d2964bfb8703d1a3c5287c8c5a35b7f9bd77b64e70c7f"
 forest_basin_fallback_profile = "graphics_vfx/forest_pix_capture_20261112/forest_morning_depth/basin_day_layout/composed/layout.private.json"

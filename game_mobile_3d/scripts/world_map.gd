@@ -47,6 +47,8 @@ var biome_controller: BiomeGraphics
 ## Scene placement only. The renderer skips this layer when the map layout changes.
 @export var distant_terrain_origin := Vector3.INF
 @export var distant_terrain_layout_sha := ""
+## Optional terrain shadow cache relative to the local research directory.
+@export var far_terrain_shadow_cache := ""
 @export var cliff_vista_origin := Vector3.INF
 @export var cliff_vista_scale := Vector3.ONE
 @export var cliff_vista_mesh_anchor := Vector3.ZERO
@@ -274,16 +276,24 @@ func _ready() -> void:
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func _setup_far_shadow_review() -> void:
-	if not OS.has_feature("editor") or _uses_portable_biome():
+	if not OS.has_feature("editor") or _uses_portable_biome() or not showcase.private_primary:
+		return
+	if RenderingServer.get_current_rendering_method() != "mobile" or RenderingServer.get_rendering_device() == null:
 		return
 	var directory := OS.get_environment("GAF_FAR_SHADOW_CACHE")
 	if directory.is_empty():
-		return
+		if far_terrain_shadow_cache.is_empty():
+			return
+		var research := OS.get_environment("MD2_RESEARCH_ROOT")
+		if research.is_empty():
+			research = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
+		directory = research.path_join(far_terrain_shadow_cache)
 	var review := preload("res://scripts/world_map_far_shadow_review.gd").new()
 	if review.configure(self, directory):
 		far_shadow_review = review
 		review.name = "FarTerrainShadows"
 		add_child(review)
+		$HUD/Help.text += "\nCtrl+J so bóng địa hình xa"
 	else:
 		review.free()
 
