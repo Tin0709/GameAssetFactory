@@ -86,10 +86,11 @@ func configure(light: DirectionalLight3D, view: Camera3D, terrain_chunks: Array,
 	if manifest_file == null or manifest_file.get_length() > MAX_MANIFEST_BYTES:
 		return _reject("Shadow manifest is unavailable or too large")
 	var manifest: Variant = JSON.parse_string(manifest_file.get_as_text())
-	if not manifest is Dictionary or manifest.get("format") != 1 or manifest.get("resolution") != RESOLUTION:
+	if not manifest is Dictionary or not _number(manifest.get("format")) or not _number(manifest.get("resolution")) \
+			or manifest.format != 1 or manifest.resolution != RESOLUTION:
 		return _reject("Invalid shadow manifest")
 	var layout_hash := FileAccess.get_sha256(layout_path)
-	if layout_hash.is_empty() or manifest.get("layout_sha256") != layout_hash:
+	if layout_hash.is_empty() or not manifest.get("layout_sha256") is String or manifest.layout_sha256 != layout_hash:
 		return _reject("Shadow manifest layout does not match this map")
 	if view.cull_mask & RIDGE_LAYER == 0 or light.light_cull_mask & RIDGE_LAYER == 0:
 		return _reject("The camera or light cannot use the reserved terrain layer")
@@ -102,7 +103,9 @@ func configure(light: DirectionalLight3D, view: Camera3D, terrain_chunks: Array,
 		return _reject("Shadow manifest has an invalid zone list")
 
 	var geometry := {}
-	for entry: Dictionary in terrain_chunks:
+	for entry: Variant in terrain_chunks:
+		if not entry is Dictionary or not entry.get("visual") is MeshInstance3D or not entry.get("caster") is MeshInstance3D:
+			return _reject("Shadow cache could not identify the map terrain")
 		var mesh: MeshInstance3D = entry.visual
 		if mesh.layers & RIDGE_LAYER != 0 or entry.caster.layers & RIDGE_LAYER != 0:
 			return _reject("The map already uses the reserved terrain layer")
@@ -176,7 +179,8 @@ func _valid_key(key: Variant) -> bool:
 		return false
 	if key.packed_bytes != floorf(key.packed_bytes) or key.packed_bytes < 1 or key.packed_bytes > TEXTURE_BYTES + 1024:
 		return false
-	if String(key.raw_sha256).length() != 64 or String(key.raw_sha256).hex_decode().size() != 32:
+	var checksum := String(key.raw_sha256)
+	if checksum.length() != 64 or not checksum.is_valid_hex_number(false) or checksum.begins_with("+") or checksum.begins_with("-"):
 		return false
 	if not _numeric_array(key.get("axis_x"), 4) or not _numeric_array(key.get("axis_y"), 4) \
 			or not _numeric_array(key.get("axis_z"), 4) or not _numeric_array(key.get("light"), 3):
