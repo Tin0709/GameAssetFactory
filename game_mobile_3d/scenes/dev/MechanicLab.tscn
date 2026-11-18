@@ -190,6 +190,14 @@ fit_to_longest_item = false
 text_overrun_behavior = 3
 tooltip_text = "Đổi ngoại hình giữa MD2 và Kai ngay trong MechanicLab."
 
+[node name="RenderScale" type="OptionButton" parent="HUD"]
+offset_left = 990.0
+offset_top = 145.0
+offset_right = 1238.0
+offset_bottom = 179.0
+focus_mode = 0
+tooltip_text = "Giảm độ phân giải cảnh 3D để thử hiệu năng. Chữ và nút HUD giữ độ phân giải gốc."
+
 [node name="CrossbowAmmo" type="Label" parent="HUD"]
 visible = false
 offset_left = 794.0
