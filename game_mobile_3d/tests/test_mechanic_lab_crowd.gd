@@ -125,15 +125,21 @@ func check_crowd_roam(group: Node) -> void:
 		child.free()
 	lab.reset_player()
 	lab.player.set_physics_process(false)
+	# A slow renderer may simulate several seconds between the first and last
+	# spawn. Start the patrol fixture with the whole crowd in the same state.
+	var hold_until_ready := func(zombie: Node): zombie.set_physics_process(false)
+	group.child_entered_tree.connect(hold_until_ready)
 	lab.get_node("HUD/SpawnCrowd").pressed.emit()
 	for frame in 180:
 		await process_frame
 		if group.get_child_count() == COUNT:
 			break
+	group.child_entered_tree.disconnect(hold_until_ready)
 	lab.player.global_position = Vector3(34.0, 0.02, 34.0)
 	var starts: PackedVector3Array = []
 	for zombie: ZOMBIE in group.get_children():
 		starts.append(zombie.global_position)
+		zombie.set_physics_process(true)
 	await measure("crowd_roam", 300)
 	var moved := 0
 	var peak_radius := 0.0
