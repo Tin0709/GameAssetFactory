@@ -143,10 +143,14 @@ func check_running_wake_support(lab, wind) -> void:
 	floor_body.position.y -= 0.25
 	for i in 6:
 		await physics_frame
+	await process_frame
+	wind._process(0.0)
 	check(wake.mesh.visible and wake.age >= 0.08 and wake.material.albedo_color.a < wind.TINT.a,
 		"The wake moves through its fade on the physics clock after input stops")
 	for i in 9:
 		await physics_frame
+	await process_frame
+	wind._process(0.0)
 	check(not wake.mesh.visible and not wind.is_processing() and not wind.is_physics_processing(),
 		"The last wake expires and stops both callbacks")
 
@@ -170,6 +174,7 @@ func check_running_wake_render_clock(lab, wind, dust) -> void:
 		var progress: float = puff.age / wind.LIFETIME
 		if progress >= 1.0:
 			continue
+		check(wake.mesh.visible, "The wake stays visible for its full lifetime from contact")
 		var expected: Vector3 = wake.origin + wake.trailing * progress * 0.16
 		var alpha: float = wind.TINT.a * (1.0 - smoothstep(0.12, 1.0, progress))
 		max_position_error = maxf(max_position_error, wake.mesh.global_position.distance_to(expected))
