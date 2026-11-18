@@ -679,13 +679,14 @@ func check_zombie_dust_contact_clock(lab) -> void:
 	for i in dust.CAPACITY:
 		dust.burst(Vector3(float(i) * 0.1, 0.0, 0.0))
 	dust._process(0.0)
-	var expected_first = dust._puffs[300]
+	const OVERFLOW := 300
+	var expected_first = dust._puffs[OVERFLOW]
 	var expected_last = dust._puffs.back()
-	for i in 300:
+	for i in OVERFLOW:
 		dust.burst(Vector3(float(i) * 0.1, 0.0, -3.0))
 	dust._process(0.0)
 	check(dust.multimesh.visible_instance_count == dust.CAPACITY
-		and dust._puffs[0] == expected_first and dust._puffs[dust.CAPACITY - 301] == expected_last,
+		and dust._puffs[0] == expected_first and dust._puffs[dust.CAPACITY - OVERFLOW - 1] == expected_last,
 		"An overflowing dust batch evicts the oldest puffs in spawn order")
 	for puff in dust._puffs:
 		puff.lifetime = 0.0
