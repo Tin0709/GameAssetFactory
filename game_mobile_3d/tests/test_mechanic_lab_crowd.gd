@@ -740,7 +740,7 @@ func check_crowd_windup_focus(group: Node) -> void:
 		if covered:
 			# The cached target was at a clear point to the right before stepping behind cover.
 			player.global_position += Vector3.RIGHT * 0.32
-			zombie._crowd_slot = (Engine.get_physics_frames() + 1) % stride
+			zombie._crowd_slot = Engine.get_physics_frames() % stride
 			await physics_frame
 			if not zombie._last_seen_position.is_equal_approx(player.global_position):
 				failures.append("The crowd focus fixture samples the clear target before cover")
