@@ -45,9 +45,12 @@ func _process(delta: float) -> void:
 		_cache.update_shadow(delta, player.global_position, player.velocity, minute, false)
 		_release_receivers()
 		return
-	# A frame with native casters lets the renderer see the material variant before switching shadows.
-	var changed := _receivers.bind(_world.showcase.far_terrain_shading_materials())
-	_cache.update_shadow(delta, player.global_position, player.velocity, minute, not changed and _receivers.bound_count > 0)
+	# Give the renderer one frame to see the first receiver set.
+	# Cutaway changes publish new material assignments before the same draw without clearing an active tile.
+	var receivers_ready := _receivers.bound_count > 0
+	_receivers.bind(_world.showcase.far_terrain_shading_materials())
+	_cache.update_shadow(delta, player.global_position, player.velocity, minute,
+		receivers_ready and _receivers.bound_count > 0)
 
 
 func _release_receivers() -> void:
