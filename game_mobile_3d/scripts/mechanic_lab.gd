@@ -310,6 +310,7 @@ func _ready() -> void:
 		$Zombies.player_hit.connect(_on_player_hit)
 		$Zombies.zombie_attack_audio.connect(_combat_audio.zombie_attack)
 		$Zombies.zombie_step_audio.connect(_on_zombie_step)
+		$Zombies.zombie_idle_audio.connect(_combat_audio.queue_zombie_idle)
 		_setup_weapon_selector()
 	_setup_skin_selector(using_private and player_ready)
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
@@ -873,6 +874,7 @@ func _process(delta: float) -> void:
 	if _combat_audio != null:
 		_combat_audio.flush_zombie_combat_cues()
 		_combat_audio.flush_zombie_steps()
+		_combat_audio.flush_zombie_idle()
 	if _crowd_spawns_left > 0:
 		_spawn_crowd_frame()
 	var focus: Vector3 = presentation.player_position()

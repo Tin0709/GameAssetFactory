@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 signal melee_hit(amount: int)
 signal step_audio(point: Vector3)
+signal idle_audio(point: Vector3)
 
 enum DeathStrike { GROUND, AIR, SABRE_FINISHER, SABRE_GROUND }
 signal melee_audio(point: Vector3, contact: bool)
@@ -15,6 +16,8 @@ const CORPSE_SHADER := preload("res://materials/mechanic_lab_zombie_corpse.gdsha
 const LAB_SKIN_SHADER := preload("res://materials/mechanic_lab_zombie_skin.gdshader")
 const HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_zombie_hit_flash.gdshader")
 const IDLE := &"Zombie_Idle"
+const IDLE_AUDIO_NOTIFY_TIME := 0.066887535
+const IDLE_AUDIO_CHANCE := 0.5
 const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Variant2"]
 # PlayDebrisEffect notifies in the MD2 walk sequences, with UE X offsets in metres.
 const WALK_STEP_NOTIFIES := {
@@ -188,6 +191,7 @@ var _roam_destination := Vector3.INF
 var _roam_wait := LAB_ROAM_DELAY
 var _roam_blocked_seconds := 0.0
 var _roam_rng := RandomNumberGenerator.new()
+var _idle_audio_index := 0
 var _crowd_slot := 0
 var _blocked_walk := false
 var _blocking_zombie_id := 0
@@ -467,10 +471,13 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 			play_steps = motion.length_squared() >= STEP_MIN_SPEED_SQUARED \
 				and (not is_on_wall() or motion.dot(travel) >= MIN_WALL_PROGRESS_SPEED * travel.length()) \
 				and not travel.is_zero_approx()
-		var previous_phase := animation.current_animation_position if play_steps else 0.0
+		var play_idle := clip == IDLE and idle_audio.has_connections()
+		var previous_phase := animation.current_animation_position if play_steps or play_idle else 0.0
 		animation.advance(delta)
 		if play_steps:
 			_emit_walk_step(clip, previous_phase)
+		elif play_idle:
+			_emit_idle_audio(previous_phase)
 		return
 	var before := animation.current_animation_position
 	var lab := is_instance_valid(_corpse_floor)
@@ -489,6 +496,18 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 	animation.advance(advance_seconds)
 	if before < MELEE_CONTACT_TIME and before + advance_seconds >= MELEE_CONTACT_TIME:
 		_check_melee_contact()
+
+func _emit_idle_audio(previous_phase: float) -> void:
+	var phase := animation.current_animation_position
+	var crossed := IDLE_AUDIO_NOTIFY_TIME > previous_phase and IDLE_AUDIO_NOTIFY_TIME <= phase
+	if phase < previous_phase:
+		crossed = IDLE_AUDIO_NOTIFY_TIME > previous_phase or IDLE_AUDIO_NOTIFY_TIME <= phase
+	if crossed:
+		_idle_audio_index += 1
+		# Keep idle chance independent of the zombie's patrol and ragdoll draws.
+		var roll := float(hash(Vector2i(_crowd_slot, _idle_audio_index))) / 4294967296.0
+		if roll < IDLE_AUDIO_CHANCE:
+			idle_audio.emit(global_position + Vector3.UP * (HEIGHT * 0.5))
 
 func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
 	var phase := animation.current_animation_position

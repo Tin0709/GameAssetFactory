@@ -6,6 +6,7 @@ signal sabre_landing(point: Vector3, serial: int)
 signal player_hit(amount: int)
 signal zombie_attack_audio(point: Vector3, contact: bool)
 signal zombie_step_audio(point: Vector3, actor: CharacterBody3D)
+signal zombie_idle_audio(point: Vector3)
 
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const Ragdoll := preload("res://scripts/mechanic_lab_ragdoll.gd")
@@ -183,6 +184,8 @@ func _spawn_at(point: Vector3, floor_position: Vector3, player: CharacterBody3D,
 	zombie.melee_audio.connect(zombie_attack_audio.emit)
 	if zombie_step_audio.has_connections():
 		zombie.step_audio.connect(zombie_step_audio.emit.bind(zombie))
+	if zombie_idle_audio.has_connections():
+		zombie.idle_audio.connect(zombie_idle_audio.emit)
 	_spawn_serial += 1
 	add_child(zombie, true)
 	zombie.look_at(floor_position, Vector3.UP, true)

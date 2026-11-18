@@ -243,6 +243,13 @@ const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.
 const ZOMBIE_ATTACK := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%sAttack-%03d_soundWave.ogg"
 # Zombie.Step names the adult event. The exported generic candidate is under BabyZombie.
 const ZOMBIE_STEP := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombieStepGeneric-%03d_soundWave.ogg"
+# Three raw variants corroborated by the adult event duration and quest exports.
+const ZOMBIE_IDLE := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombieIdle-%03d_soundWave.ogg"
+const ZOMBIE_IDLE_HASHES := [
+	"d1becf75743e832d27e853b9a7532d5510a0beba2bd3d12763c29f31690bc56d",
+	"92c73a27e23c316cb75585e11817c61ed54b68804b1f682de5cb759a264dce73",
+	"d74e22c23a173ebaf65382cdf55f72423ec1e1dcddeaac142673f45bdd8691a8",
+]
 const PLAYER_HURT := "Player/Hurt/sfx_multi_hit-%03d_soundWave.ogg"
 const PLAYER_DEFEAT := "Player/Death/sfx_playerDeath.ogg"
 const PLAYER_DEFEAT_HASH := "3c15d66e2b2ce0bc571a8bfa3cadc7d532d2f559ecd45e894a0e44d7c2e0882c"
@@ -267,6 +274,11 @@ const PLAYER_HURT_GAIN_DB := -14.0
 const PLAYER_DEFEAT_GAIN_DB := -16.0
 const ZOMBIE_STEP_GAIN_DB := -21.0
 const ZOMBIE_STEP_DISTANCE := 12.0
+const ZOMBIE_IDLE_GAIN_DB := -24.0
+const ZOMBIE_IDLE_DISTANCE := 12.0
+# Inferred from raw sample lengths and the adult event's cooked duration range.
+const ZOMBIE_IDLE_PITCH_MIN_CENTS := -200.0
+const ZOMBIE_IDLE_PITCH_MAX_CENTS := 300.0
 
 const HIT_HASHES := [
 	"01b446de1994e109804c1379e19d13b93d271d826e30bfe211d2f560e4651cb9",
@@ -358,6 +370,10 @@ var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _player_hurt_voice: AudioStreamPlayer
 var _player_defeat_voice: AudioStreamPlayer
+var _zombie_idle_voice: AudioStreamPlayer3D
+var _zombie_idle_point := Vector3.INF
+var _zombie_idle_distance_squared := INF
+var _zombie_idle_pitch := RandomNumberGenerator.new()
 var _next_choice: Dictionary[StringName, int] = {}
 var _next_voice: Array[int] = [0, 0, 0, 0, 0]
 var _flight_targets: Dictionary[AudioStreamPlayer3D, Node3D]
@@ -625,6 +641,26 @@ func _play_zombie_cues(pending: Array[Dictionary], group: StringName, gain: floa
 		_play(group, cue.point, gain, _zombie_cue_frame)
 	pending.clear()
 
+func queue_zombie_idle(point: Vector3) -> void:
+	if not enabled or _zombie_idle_voice == null or _zombie_idle_voice.playing or not is_instance_valid(zombie_listener):
+		return
+	var distance := point.distance_squared_to(zombie_listener.global_position)
+	if distance <= ZOMBIE_IDLE_DISTANCE * ZOMBIE_IDLE_DISTANCE and distance < _zombie_idle_distance_squared:
+		_zombie_idle_point = point
+		_zombie_idle_distance_squared = distance
+
+func flush_zombie_idle() -> void:
+	if not _zombie_idle_point.is_finite():
+		return
+	var voice := _zombie_idle_voice
+	voice.stream = _next_stream(&"zombie_idle")
+	voice.global_position = _zombie_idle_point
+	var cents := _zombie_idle_pitch.randf_range(ZOMBIE_IDLE_PITCH_MIN_CENTS, ZOMBIE_IDLE_PITCH_MAX_CENTS)
+	voice.pitch_scale = pow(2.0, cents / 1200.0)
+	voice.play()
+	_zombie_idle_point = Vector3.INF
+	_zombie_idle_distance_squared = INF
+
 func queue_zombie_step(sole: Vector3, listener: Vector3, find_support: Callable, known_support: Variant = null) -> void:
 	if not enabled or not _groups.has(&"zombie_step"):
 		return
@@ -665,6 +701,11 @@ func reset() -> void:
 	_attack_windups.clear()
 	_reaction_deaths.clear()
 	_reaction_hurts.clear()
+	_zombie_idle_point = Vector3.INF
+	_zombie_idle_distance_squared = INF
+	if _zombie_idle_voice != null:
+		_zombie_idle_voice.stop()
+		_zombie_idle_voice.stream = null
 	_zombie_cue_frame = -1
 	_step_points.clear()
 	_step_distances.clear()
@@ -726,17 +767,28 @@ func _load_audio() -> void:
 		_load_sample(root, &"zombie_hit", ZOMBIE_ATTACK % ["", i + 1], ZOMBIE_HIT_HASHES[i])
 	for i in ZOMBIE_STEP_HASHES.size():
 		_load_sample(root, &"zombie_step", ZOMBIE_STEP % (i + 1), ZOMBIE_STEP_HASHES[i])
+	if is_instance_valid(zombie_listener):
+		for i in ZOMBIE_IDLE_HASHES.size():
+			_load_sample(root, &"zombie_idle", ZOMBIE_IDLE % (i + 1), ZOMBIE_IDLE_HASHES[i])
+		if _groups.has(&"zombie_idle"):
+			_zombie_idle_voice = _new_spatial_voice(ZOMBIE_IDLE_DISTANCE)
+			_zombie_idle_voice.name = "ZombieIdle"
+			_zombie_idle_voice.volume_db = ZOMBIE_IDLE_GAIN_DB
+			_zombie_idle_voice.max_db = ZOMBIE_IDLE_GAIN_DB
 
 func _create_voices(count: int) -> void:
 	for i in count:
-		var voice := AudioStreamPlayer3D.new()
-		voice.unit_size = 4.5
-		voice.max_distance = SPATIAL_VOICE_DISTANCE
-		# Preserve the source transient spectrum with distance and panning.
-		voice.attenuation_filter_db = 0.0
-		voice.attenuation_filter_cutoff_hz = 20500.0
-		add_child(voice)
-		_voices.append(voice)
+		_voices.append(_new_spatial_voice(SPATIAL_VOICE_DISTANCE))
+
+func _new_spatial_voice(max_distance: float) -> AudioStreamPlayer3D:
+	var voice := AudioStreamPlayer3D.new()
+	voice.unit_size = 4.5
+	voice.max_distance = max_distance
+	# Preserve the source transient spectrum with distance and panning.
+	voice.attenuation_filter_db = 0.0
+	voice.attenuation_filter_cutoff_hz = 20500.0
+	add_child(voice)
+	return voice
 
 func _load_surface_landing(root: String, surface: String, group: StringName, hashes: Array) -> void:
 	for i in hashes.size():
