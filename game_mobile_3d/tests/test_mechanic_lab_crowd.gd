@@ -4,6 +4,9 @@ const LAB = preload("res://scenes/dev/MechanicLab.tscn")
 const ZOMBIE = preload("res://scripts/mechanic_lab_zombie.gd")
 const COUNT := 100
 const FIXTURE_HP := 10000
+# Clip, heading in sixteenths of a turn, and source frame at 30 FPS.
+const WALL_HANDOFF_POSES := [[ZOMBIE.ATTACK, 3, 17],
+	[ZOMBIE.WALK_CLIPS[0], 2, 11], [ZOMBIE.STAGGER, 11, 7]]
 var lab: Node3D
 var first_tick_started := 0
 var ticks_in_frame := 0
@@ -227,9 +230,15 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 	var start := spacing * 4.5
 	for i in COUNT:
 		var zombie := group.get_child(i) as ZOMBIE
+		var clip := ZOMBIE.IDLE
+		var start_time := 0.0
 		if wall_handoff:
-			zombie.global_position = Vector3(4.31, 0.02, (i - 49.5) * spacing)
-			zombie.rotation.y = (i % 4) * PI / 2.0
+			# Match the legal capsule clearance from the straddled-wall tests.
+			var pose: Array = WALL_HANDOFF_POSES[i % WALL_HANDOFF_POSES.size()]
+			zombie.global_position = Vector3(3.90, 0.02, (i - 49.5) * spacing)
+			zombie.rotation.y = TAU * float(pose[1]) / 16.0
+			clip = pose[0]
+			start_time = float(pose[2]) / 30.0
 		else:
 			zombie.global_position = Vector3(i % 10 * spacing - start, 0.02, int(i / 10) * spacing - start)
 			if packed:
@@ -240,12 +249,10 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 			# Start from a known pose and remove teleport velocity.
 			zombie.animation.stop()
 			zombie.ragdoll.skeleton.reset_bone_poses()
-			var clip := zombie._walk_clip if wall_handoff else ZOMBIE.IDLE
 			zombie.animation.play(clip, 0.0)
 			zombie.animation.advance(0.0)
 			if wall_handoff:
-				var duration := zombie.animation.get_animation(clip).length
-				zombie.animation.seek(duration * float(i % 11) / 11.0, true)
+				zombie.animation.seek(start_time, true)
 			zombie.ragdoll.sample(1.0 / 60.0)
 			zombie.ragdoll.sample(1.0 / 60.0)
 	for zombie: ZOMBIE in group.get_children():
