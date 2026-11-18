@@ -265,6 +265,19 @@ func check_spawn_batch_order(group: Node) -> void:
 			failures.append("Batch search preserves individual spawn positions and order at the corner")
 		expected = positions
 	print("CROWD_CORNER_PARITY samples=", expected.size())
+	# Moving one live zombie can free an earlier candidate even within the
+	# same physics tick and with the same player position and heading.
+	for zombie in group.get_children():
+		zombie.free()
+	lab.player.global_position = Vector3.ZERO
+	if not lab._spawn_one_zombie(false):
+		failures.append("The spawn-search fixture places its first zombie")
+		return
+	var first := group.get_child(0) as ZOMBIE
+	var vacant := first.position
+	first.position += Vector3.RIGHT * 5.0
+	if not lab._spawn_one_zombie(false) or group.get_child(1).position != vacant:
+		failures.append("Single spawn reuses an earlier spot vacated within the same tick")
 
 func spawn_crowd(group: Node) -> void:
 	var button := lab.get_node_or_null("HUD/SpawnCrowd") as Button
