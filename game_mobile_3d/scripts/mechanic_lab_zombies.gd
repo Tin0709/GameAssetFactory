@@ -495,6 +495,9 @@ func _load_assets() -> void:
 	var player := model.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	if player != null and player.has_animation(Zombie.IDLE) and _add_clips(directory, player):
 		_digits = Feedback.load_digits(digit_path)
+		var in_lab := get_node_or_null("../Ground/Collision") is CollisionShape3D
+		if in_lab:
+			Zombie.prepare_lab_skin(model)
 		var packed := PackedScene.new()
 		if _digits.size() == 10 and packed.pack(model) == OK:
 			_visual = packed
@@ -505,7 +508,7 @@ func _load_assets() -> void:
 					# Every instance uses this packed rig, so verify its source bind pose once.
 					var skeleton := model.find_child("Skeleton3D", true, false) as Skeleton3D
 					_ragdoll_layout = Zombie.source_ragdoll_layout(skeleton, decoded)
-					if not _ragdoll_layout.is_empty() and get_node_or_null("../Ground/Collision") is CollisionShape3D:
+					if not _ragdoll_layout.is_empty() and in_lab:
 						var builder := Ragdoll.new()
 						_ragdoll_layout.simulator_template = builder.pack_dormant_simulator(skeleton,
 							_ragdoll_layout.parts, _ragdoll_layout.bones, _ragdoll_layout.offsets)

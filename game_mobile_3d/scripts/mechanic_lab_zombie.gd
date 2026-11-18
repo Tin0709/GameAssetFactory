@@ -12,6 +12,7 @@ const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
 const Ragdoll := preload("res://scripts/mechanic_lab_ragdoll.gd")
 const DeathProfile := preload("res://scenes/dev/zombie_death_physics/death_profile.gd")
 const CORPSE_SHADER := preload("res://materials/mechanic_lab_zombie_corpse.gdshader")
+const LAB_SKIN_SHADER := preload("res://materials/mechanic_lab_zombie_skin.gdshader")
 const HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_zombie_hit_flash.gdshader")
 const IDLE := &"Zombie_Idle"
 const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Variant2"]
@@ -214,6 +215,18 @@ static var _live_capsule: CapsuleShape3D
 # These main-thread queries run synchronously and store no results.
 static var _sight_ray: PhysicsRayQueryParameters3D
 static var _roam_sweep: PhysicsShapeQueryParameters3D
+
+static func prepare_lab_skin(model: Node) -> void:
+	var mesh := model.find_child("SK_Zombie", true, false) as MeshInstance3D
+	var skin := mesh.get_active_material(0) as StandardMaterial3D if mesh != null else null
+	if skin == null or skin.albedo_texture == null:
+		return
+	# Pack the same material for the living and ragdoll states.
+	var material := ShaderMaterial.new()
+	material.shader = LAB_SKIN_SHADER
+	material.set_shader_parameter("living_skin", skin.albedo_texture)
+	material.set_shader_parameter("corpse_skin", skin.albedo_texture)
+	mesh.material_override = material
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D],
 		serial: int, ragdoll_layout: Dictionary = {}, corpse_floor: CollisionShape3D = null,
