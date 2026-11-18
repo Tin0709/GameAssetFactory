@@ -12,7 +12,7 @@ var origin:Vector3
 var step:Vector3
 var dimensions:Vector3i
 var _grid_ready:=false
-func _init():
+func _load_source() -> void:
  if not OS.has_feature("editor"):return
  var research:=OS.get_environment("MD2_RESEARCH_ROOT")
  if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
@@ -27,6 +27,7 @@ func _init():
  source_rgb=Vector3(rgb[0],rgb[1],rgb[2]);source_ready=true
 func setup(world:Node3D):
  level=world
+ if not level.is_device_review():_load_source()
  if RenderingServer.get_current_rendering_method()!="mobile"or RenderingServer.get_rendering_device()==null or not ResourceLoader.exists(GRID):return
  cache=load(GRID)
  if cache.get_meta("scope","")!="Original GAF static sun visibility, not native light shafts":return

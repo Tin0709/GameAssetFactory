@@ -368,6 +368,9 @@ func _exit_tree() -> void:
 		RenderingServer.call_on_render_thread(_finish_effect.release_on_render_thread)
 
 func _update_fixture(time: float) -> void:
+	# Device review mirrors the exported build even when started from the editor.
+	if _world.is_device_review():
+		return
 	var curve := _profile.path_fixture_by_hour
 	var phase := clampf(curve.sample(time), 0., 1.) if curve != null and _world.look.stage == 2 else 0.
 	var lamp_wanted: bool = _world.biome_path_lamp_xz.is_finite() and curve != null and _world.look.stage == 2
