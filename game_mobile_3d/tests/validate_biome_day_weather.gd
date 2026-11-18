@@ -266,6 +266,18 @@ func verify() -> void:
 		check(is_equal_approx(near_layer.z, 6.) and is_equal_approx(graphics._mist._base, 6.)
 			and haze.size() == 8 and is_equal_approx(haze[2], 6.4),
 			"Near transmission and twilight scattering use the same map-authored height")
+	var shadow_profile = world.biome_graphics.duplicate()
+	shadow_profile.overcast = FOREST.overcast
+	graphics.set_profile(shadow_profile)
+	world.showcase.set_hour(12.)
+	graphics.set_weather(1., 0.)
+	for i in 3:
+		graphics.refresh()
+	check(is_equal_approx(light.shadow_opacity, shadow_profile.shadow_opacity * .82),
+		"An imported map applies its weather curve without accumulating the multiplier")
+	graphics.set_weather(0., 0.)
+	check(is_equal_approx(light.shadow_opacity, shadow_profile.shadow_opacity),
+		"Returning to clear weather restores the imported map's shadow opacity")
 	finish(world)
 
 func finish(world: Node = null) -> void:
