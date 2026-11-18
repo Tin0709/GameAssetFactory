@@ -238,7 +238,6 @@ var _attack_contacts: Array[Dictionary] = []
 var _attack_windups: Array[Dictionary] = []
 var _reaction_deaths: Array[Dictionary] = []
 var _reaction_hurts: Array[Dictionary] = []
-var _zombie_step_frame := -1
 var _step_points: Array[Vector3] = []
 var _step_distances: Array[float] = []
 var _last_weapon_serial := -1
@@ -479,10 +478,8 @@ func _play_zombie_cues(pending: Array[Dictionary], group: StringName, gain: floa
 func queue_zombie_step(sole: Vector3, listener: Vector3, find_support: Callable, known_support: Variant = null) -> void:
 	if not enabled or not _groups.has(&"zombie_step"):
 		return
-	var frame := Engine.get_physics_frames()
-	if frame != _zombie_step_frame:
-		flush_zombie_steps()
-		_zombie_step_frame = frame
+	# Rank pending steps until the Lab flushes them on the render frame.
+	# A catch-up physics tick can still contribute a closer contact.
 	var distance := sole.distance_squared_to(listener)
 	if distance > ZOMBIE_STEP_DISTANCE * ZOMBIE_STEP_DISTANCE:
 		return
@@ -521,7 +518,6 @@ func reset() -> void:
 	_zombie_cue_frame = -1
 	_step_points.clear()
 	_step_distances.clear()
-	_zombie_step_frame = -1
 	_started_frames.fill(-1)
 	_weapon_onsets.fill(false)
 	_player_hurt_frame = -1
