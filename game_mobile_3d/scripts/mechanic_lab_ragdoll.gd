@@ -33,6 +33,7 @@ var _wall_handoff_frame := -1
 var _launch_frame := -1
 var wall_handoff_animation: AnimationPlayer
 var wall_handoff_idle: StringName
+var wall_handoff_idle_pose: Array[Transform3D]
 
 static var _handoff_bounds_shape: BoxShape3D
 static var _handoff_bounds_query: PhysicsShapeQueryParameters3D
@@ -156,6 +157,18 @@ func _is_floor_top_overlap(hit: RID, bounds: AABB) -> bool:
 	return bounds.position.x > low.x + depth and bounds.end.x < high.x - depth \
 		and bounds.position.z > low.z + depth and bounds.end.z < high.z - depth
 
+static func capture_wall_handoff_idle(rig: Skeleton3D, animation: AnimationPlayer,
+		clip: StringName) -> Array[Transform3D]:
+	animation.stop()
+	rig.reset_bone_poses()
+	animation.play(clip)
+	animation.advance(0.0)
+	animation.pause()
+	var pose: Array[Transform3D] = []
+	for bone in rig.get_bone_count():
+		pose.append(rig.get_bone_pose(bone))
+	return pose
+
 func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int, overlaps: Array[Dictionary]) -> Vector3:
 	var wall := RID()
 	var wall_bounds := AABB()
@@ -175,14 +188,13 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int, 
 	var source: Array[Transform3D] = []
 	for bone in skeleton.get_bone_count():
 		source.append(skeleton.get_bone_pose(bone))
-	wall_handoff_animation.stop()
-	skeleton.reset_bone_poses()
-	wall_handoff_animation.play(wall_handoff_idle)
-	wall_handoff_animation.advance(0.0)
-	wall_handoff_animation.pause()
-	var idle: Array[Transform3D] = []
-	for bone in source.size():
-		idle.append(skeleton.get_bone_pose(bone))
+	var idle := wall_handoff_idle_pose
+	if idle.size() != source.size():
+		idle = capture_wall_handoff_idle(skeleton, wall_handoff_animation, wall_handoff_idle)
+	else:
+		wall_handoff_animation.stop()
+		wall_handoff_animation.play(wall_handoff_idle)
+		wall_handoff_animation.pause()
 	# Search from the least visible correction. Interpolating bone-local
 	# transforms retains the source hierarchy while retracting the limbs.
 	var shift := Vector3.ZERO

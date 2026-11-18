@@ -288,6 +288,8 @@ func _ready() -> void:
 	else:
 		var prepared := source.get("simulator_template") as PackedScene if is_instance_valid(_corpse_floor) else null
 		ragdoll.setup(skeleton, source.parts, source.bones, source.offsets, source.joints, prepared)
+		if source.has("wall_handoff_idle_pose"):
+			ragdoll.wall_handoff_idle_pose = source.wall_handoff_idle_pose
 	for body: PhysicalBone3D in ragdoll.bodies.values():
 		body.collision_layer = 0
 		body.collision_mask = 0

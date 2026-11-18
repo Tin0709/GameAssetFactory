@@ -518,6 +518,9 @@ func _load_assets() -> void:
 						_ragdoll_layout.simulator_template = builder.pack_dormant_simulator(skeleton,
 							_ragdoll_layout.parts, _ragdoll_layout.bones, _ragdoll_layout.offsets)
 						builder.free()
+						# The scene is already packed. Capture the authored Idle pose once
+						# on the disposable source rig for lethal wall handoffs.
+						_ragdoll_layout.wall_handoff_idle_pose = Ragdoll.capture_wall_handoff_idle(skeleton, player, Zombie.IDLE)
 	model.free()
 
 func _add_clips(directory: String, player: AnimationPlayer) -> bool:
