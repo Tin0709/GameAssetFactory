@@ -86,6 +86,9 @@ var player_health := MAX_PLAYER_HEALTH
 var _crowd_spawns_left := 0
 var _crowd_base_health := false
 var _previous_msaa: Viewport.MSAA
+var _previous_3d_scale: float
+var _previous_3d_scaling_mode: Viewport.Scaling3DMode
+var _render_scale_overridden := false
 var _combat_audio: CombatAudio
 var _zombie_step_dust: ZombieStepDust
 var _slam_swing_frame := -1
@@ -180,6 +183,7 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_setup_world_look()
+	_setup_render_scale()
 	var material := $Ground/Mesh.material_override as ShaderMaterial
 	var tiles := SourceTerrain.load_tiles()
 	if tiles != null:
@@ -813,8 +817,37 @@ func _setup_world_look() -> void:
 	showcase.setup_flat_lab(self)
 	_update_time_label()
 
+func _setup_render_scale() -> void:
+	var picker: OptionButton = $HUD/RenderScale
+	if RenderingServer.get_current_rendering_method() != &"mobile":
+		picker.hide()
+		return
+	var viewport := get_viewport()
+	_previous_3d_scale = viewport.scaling_3d_scale
+	_previous_3d_scaling_mode = viewport.scaling_3d_mode
+	picker.add_item("3D · Mặc định (%d%%)" % roundi(_previous_3d_scale * 100.0), 0)
+	for percent in [85, 75]:
+		picker.add_item("3D · %d%%" % percent, percent)
+	picker.select(0)
+	picker.item_selected.connect(_set_render_scale)
+
+func _set_render_scale(index: int) -> void:
+	var percent: int = $HUD/RenderScale.get_item_id(index)
+	var viewport := get_viewport()
+	_render_scale_overridden = percent > 0
+	if _render_scale_overridden:
+		viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+		viewport.scaling_3d_scale = percent * 0.01
+	else:
+		viewport.scaling_3d_mode = _previous_3d_scaling_mode
+		viewport.scaling_3d_scale = _previous_3d_scale
+
 func _exit_tree() -> void:
-	get_viewport().msaa_3d = _previous_msaa
+	var viewport := get_viewport()
+	viewport.msaa_3d = _previous_msaa
+	if _render_scale_overridden:
+		viewport.scaling_3d_mode = _previous_3d_scaling_mode
+		viewport.scaling_3d_scale = _previous_3d_scale
 
 func _update_time_label() -> void:
 	var minutes := roundi(showcase.hour * 60.0)
