@@ -74,6 +74,7 @@ var resistance_age := 0.0
 var _parts: Array = PARTS
 var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
+var _source_anchor_projections: Array[SourceAnchorProjection]
 var _flat_floor: CollisionShape3D
 var _floor_impact_limb_share := 0.0
 var _flat_floor_has_contact := false
@@ -296,6 +297,14 @@ func _handoff_clearance_depth(space: PhysicsDirectSpaceState3D, depths: Dictiona
 		peak = maxf(peak, after)
 	return peak
 
+class SourceAnchorProjection:
+	var joint: RID
+	var child: PhysicalBone3D
+	var child_rid: RID
+	var parent_rid: RID
+	var child_frame: Transform3D
+	var parent_frame: Transform3D
+
 func _build_source_joints() -> void:
 	# PhysicalBone3D's automatic joint follows the Skeleton3D hierarchy and
 	# derives one frame from the current pose. MD2 legs connect to J_Spine,
@@ -310,6 +319,14 @@ func _build_source_joints() -> void:
 		PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_SWING_SPAN, deg_to_rad(spec.swing))
 		PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_TWIST_SPAN, deg_to_rad(spec.twist))
 		source_joint_rids[child_name] = joint
+		var projection := SourceAnchorProjection.new()
+		projection.joint = joint
+		projection.child = child
+		projection.child_rid = child.get_rid()
+		projection.parent_rid = parent.get_rid()
+		projection.child_frame = spec.child_frame
+		projection.parent_frame = spec.parent_frame
+		_source_anchor_projections.append(projection)
 
 func _physics_process(delta: float) -> void:
 	if not running: return
@@ -460,23 +477,21 @@ func _correct_physical_pose() -> void:
 
 func _project_source_anchors() -> void:
 	var flat_floor := is_instance_valid(_flat_floor)
-	var last_parent := ""
+	var can_slide_floor := flat_floor and _limit_first_contact_stretch \
+		and not floor_landing_blended and floor_impact_blend <= 0.0 and not _flat_floor.disabled
+	var last_parent := RID()
 	var parent_state: PhysicsDirectBodyState3D
-	for name: String in source_joint_rids:
-		var spec: Dictionary = source_joints[name]
-		var child: PhysicalBone3D = bodies[name]
-		var state := PhysicsServer3D.body_get_direct_state(child.get_rid())
-		# The five zombie limbs share a parent. Reuse its live state within
-		# this pass, reading the transform afresh for every joint.
-		var parent_name: String = spec.parent
-		if parent_name != last_parent:
-			var parent: PhysicalBone3D = bodies[parent_name]
-			parent_state = PhysicsServer3D.body_get_direct_state(parent.get_rid())
-			last_parent = parent_name
+	for projection in _source_anchor_projections:
+		var state := PhysicsServer3D.body_get_direct_state(projection.child_rid)
+		# The five zombie limbs share a parent. Read its live transform
+		# again for each joint while reusing the parent state handle.
+		if projection.parent_rid != last_parent:
+			last_parent = projection.parent_rid
+			parent_state = PhysicsServer3D.body_get_direct_state(last_parent)
 		if state == null or parent_state == null:
 			continue
-		var parent_frame: Transform3D = parent_state.transform * spec.parent_frame
-		var child_frame: Transform3D = state.transform * spec.child_frame
+		var parent_frame := parent_state.transform * projection.parent_frame
+		var child_frame := state.transform * projection.child_frame
 		# Godot's cone solver flips its swing axis past perpendicular. A limb
 		# braced against terrain can wrench the anchor apart before that flip.
 		var contact_count := state.get_contact_count()
@@ -488,13 +503,15 @@ func _project_source_anchors() -> void:
 					overshot = true
 					break
 		var bias := CONE_OVERSHOOT_BIAS if overshot else CONE_DEFAULT_BIAS
-		_set_source_joint_bias(source_joint_rids[name], bias)
+		_set_source_joint_bias(projection.joint, bias)
 		var contacting := contact_count > 0
+		if contacting and flat_floor and not can_slide_floor:
+			continue
+		var child := projection.child
 		var correction := parent_frame.origin - child_frame.origin
 		var distance := correction.length()
 		if contacting and flat_floor:
-			if _limit_first_contact_stretch and not floor_landing_blended and floor_impact_blend <= 0.0 \
-					and distance > 2.0 * SOURCE_ANCHOR_TOLERANCE and not _flat_floor.disabled:
+			if distance > 2.0 * SOURCE_ANCHOR_TOLERANCE:
 				var floor_body := _flat_floor.get_parent() as StaticBody3D
 				if floor_body != null and _body_supported_by(child, floor_body):
 					_slide_supported_anchor(child, state, correction, distance, floor_body.get_rid())
@@ -1134,6 +1151,7 @@ func release(visible_world_pose: Array[Transform3D] = []) -> void:
 	for joint: RID in source_joint_rids.values():
 		PhysicsServer3D.free_rid(joint)
 	source_joint_rids.clear()
+	_source_anchor_projections.clear()
 	if is_instance_valid(simulator):
 		simulator.physical_bones_stop_simulation()
 		simulator.active = false

@@ -58,6 +58,14 @@ func _release_receivers() -> void:
 		_world.showcase.mist._process(0.)
 
 
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.ctrl_pressed and event.pressed and not event.echo \
+			and event.physical_keycode == KEY_J:
+		enabled = not enabled
+		get_viewport().set_input_as_handled()
+
+
+
 func snapshot() -> Dictionary:
 	var result := _cache.snapshot() if _cache != null else {}
 	result["receivers"] = _receivers.bound_count
