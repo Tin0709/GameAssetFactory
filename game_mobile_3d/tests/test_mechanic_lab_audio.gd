@@ -407,9 +407,17 @@ func check_weapon_onsets_under_mixed_impacts(audio: Node, bus: int, capture: Aud
 			landing_voice = voice
 	check(sword_voice != null and landing_voice != null,
 		"The confirmed sword hit and heavy landing each claim a bolt impact voice")
+	var catch_up_frame := Engine.get_physics_frames() + ceili(0.10 * Engine.physics_ticks_per_second)
 	if sword_voice != null and landing_voice != null:
 		var hit_stream := sword_voice.stream
 		var landing_stream := landing_voice.stream
+		var choice: int = audio._next_choice.get(&"crossbow_fire", 0)
+		# Advance multiple simulation ticks without yielding to the mixer.
+		var next_shot: AudioStreamPlayer3D = audio._play(&"crossbow_fire", point, -9.0, catch_up_frame)
+		check(next_shot == null and audio._next_choice.get(&"crossbow_fire", 0) == choice
+			and firing.stream == fire_stream and sword_voice.stream == hit_stream
+			and landing_voice.stream == landing_stream,
+			"Later simulation ticks cannot steal weapon onsets that have yet to mix")
 		await physics_frame
 		for i in 25:
 			audio.crossbow_impact(point + Vector3.RIGHT * i * 0.1)
@@ -425,6 +433,15 @@ func check_weapon_onsets_under_mixed_impacts(audio: Node, bus: int, capture: Aud
 			break
 	check(firing.stream == fire_stream and peak > 0.001 and peak < 0.9,
 		"The protected firing stream reaches the Dummy mixer during mixed weapon cues")
+	var deadline := Time.get_ticks_msec() + 500
+	while firing.playing and firing.get_playback_position() < 0.08 and Time.get_ticks_msec() < deadline:
+		await process_frame
+	var firing_tail_ready := firing.playing and firing.get_playback_position() >= 0.08
+	var all_slots_playing := weapon_voices.all(func(voice): return voice.playing)
+	var next_shot: AudioStreamPlayer3D = audio._play(&"crossbow_fire", point, -9.0, catch_up_frame)
+	check(firing_tail_ready and all_slots_playing and next_shot != null
+		and next_shot.stream in audio._groups[&"crossbow_fire"],
+		"A later shot can reclaim a weapon tail once its onset has reached the mixer")
 	print("MECHANIC_LAB_MIXED_WEAPON_ONSETS peak=", peak)
 	firing.bus = &"Master"
 	audio.reset()
