@@ -11,6 +11,7 @@ const LOCAL_FLOOR_LIFT_START := 0.057
 const LOCAL_FLOOR_LIFT_FULL := 0.066
 const LOCAL_FLOOR_SHARED_LIFT := 0.033
 const FLOOR_CONTACT_GAP_DEPTH := 0.10
+const EARLY_FLOOR_WALL_LOOKAHEAD := 5.0 / 60.0
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
@@ -504,19 +505,35 @@ func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depth
 		return
 	# A deeply overlapping single part can briefly have no solver contact
 	# even though the prior contact has already started the landing blend.
-	var supported := depths.size() == 1 and float(depths.values()[0]) - slop >= FLOOR_CONTACT_GAP_DEPTH
+	var floor_body := _flat_floor.get_parent()
+	var deep_overlap := depths.size() == 1 and float(depths.values()[0]) - slop >= FLOOR_CONTACT_GAP_DEPTH
+	var supported := false
+	for body: PhysicalBone3D in bodies.values():
+		if _body_supported_by(body, floor_body):
+			supported = true
+			break
 	if not supported:
-		var floor_body := _flat_floor.get_parent()
-		for body: PhysicalBone3D in bodies.values():
-			if _body_supported_by(body, floor_body):
-				supported = true
-				break
-	if not supported:
-		return
+		regular_weight = 0.0
+		if not deep_overlap:
+			return
 	var blend := 1.0 - smoothstep(EARLY_FLOOR_LIFT_BLEND_END * 0.5, EARLY_FLOOR_LIFT_BLEND_END, floor_impact_blend)
 	var reduced_lift := lerpf(shared_lift, EARLY_FLOOR_SHARED_LIFT, regular_weight * blend)
 	var local_lift := lerpf(shared_lift, LOCAL_FLOOR_SHARED_LIFT, local_weight * blend)
-	_distribute_floor_lift(lifts, depths, shared_lift, slop, minf(reduced_lift, local_lift), anchor_limit)
+	if local_lift < reduced_lift and not _floor_roll_nears_obstacle(floor_body.get_rid()):
+		reduced_lift = local_lift
+	if reduced_lift < shared_lift:
+		_distribute_floor_lift(lifts, depths, shared_lift, slop, reduced_lift, anchor_limit)
+
+func _floor_roll_nears_obstacle(floor: RID) -> bool:
+	# Preserve the incoming pose of a roll that is about to contact a wall.
+	for part in _physical_parts:
+		var state := PhysicsServer3D.body_get_direct_state(part.rid)
+		if state == null:
+			continue
+		var travel := state.linear_velocity.slide(Vector3.UP) * EARLY_FLOOR_WALL_LOOKAHEAD
+		if _test_projection_motion(part.body, state.transform, travel, floor):
+			return true
+	return false
 
 func _distribute_floor_lift(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
 		shared_lift: float, slop: float, reduced_lift: float, anchor_limit: float) -> void:
