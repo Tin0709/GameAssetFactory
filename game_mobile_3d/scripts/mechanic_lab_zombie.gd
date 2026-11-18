@@ -544,6 +544,7 @@ func _reset_roam() -> void:
 	_roam_destination = Vector3.INF
 	_roam_wait = LAB_ROAM_DELAY
 	_roam_blocked_seconds = 0.0
+	_clear_chase_detour()
 
 func _roam_velocity(delta: float, sample_ai: bool) -> Vector3:
 	if not is_on_floor() or _corpse_floor.disabled:
@@ -579,12 +580,7 @@ func _pick_roam_destination() -> Vector3:
 		return Vector3.INF
 	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
 	var space := get_world_3d().direct_space_state
-	var sweep := _roam_sweep
-	sweep.transform = Transform3D(Basis.IDENTITY, global_position + Vector3.UP * (HEIGHT * 0.5))
-	# The support plane already bounds the patrol. Other terrain still
-	# participates in both the sweep and the destination overlap check.
-	var floor_body := _corpse_floor.get_parent() as StaticBody3D
-	sweep.exclude = [floor_body.get_rid()] if floor_body != null else []
+	_prepare_lab_path_sweep()
 	for i in LAB_ROAM_ATTEMPTS:
 		var angle := _roam_rng.randf_range(0.0, TAU)
 		var radius := sqrt(_roam_rng.randf()) * LAB_ROAM_RADIUS
@@ -596,16 +592,90 @@ func _pick_roam_destination() -> Vector3:
 		var travel := (point - global_position).slide(Vector3.UP)
 		if travel.length_squared() <= 1.0:
 			continue
-		sweep.motion = travel
-		var fractions := space.cast_motion(sweep)
-		if fractions.is_empty() or fractions[0] < 1.0:
-			continue
-		var start := sweep.transform
-		sweep.transform = start.translated(travel)
-		if space.intersect_shape(sweep, 1).is_empty():
+		if _lab_path_fraction(space, travel) >= 1.0 and _lab_path_end_clear(space, travel):
 			return point
-		sweep.transform = start
 	return Vector3.INF
+
+func _prepare_lab_path_sweep() -> void:
+	_roam_sweep.transform = Transform3D(Basis.IDENTITY, global_position + Vector3.UP * (HEIGHT * 0.5))
+	# Keep terrain in the query and exclude the flat floor supporting the capsule.
+	var floor_body := _corpse_floor.get_parent() as StaticBody3D
+	_roam_sweep.exclude = [floor_body.get_rid()] if floor_body != null else []
+
+func _lab_path_fraction(space: PhysicsDirectSpaceState3D, travel: Vector3) -> float:
+	_roam_sweep.motion = travel
+	var fractions := space.cast_motion(_roam_sweep)
+	return 0.0 if fractions.is_empty() else fractions[0]
+
+func _lab_path_end_clear(space: PhysicsDirectSpaceState3D, travel: Vector3) -> bool:
+	var start := _roam_sweep.transform
+	_roam_sweep.transform = start.translated(travel)
+	var clear := space.intersect_shape(_roam_sweep, 1).is_empty()
+	_roam_sweep.transform = start
+	return clear
+
+func _clear_chase_detour() -> void:
+	_chase_detour = Vector3.INF
+	_chase_detour_time = 0.0
+	_chase_stalled_seconds = 0.0
+
+func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool) -> Vector3:
+	var space := get_world_3d().direct_space_state
+	if _chase_detour.is_finite():
+		_chase_detour_time -= delta
+		var travel := (_chase_detour - global_position).slide(Vector3.UP)
+		var distance := travel.length()
+		if _chase_detour_time > 0.0 and distance > LAB_ROAM_ARRIVAL:
+			var direct_clear := false
+			if sample_ai:
+				_prepare_lab_path_sweep()
+				direct_clear = _lab_path_fraction(space, offset) >= 1.0 and _lab_path_end_clear(space, offset)
+			if not direct_clear:
+				return travel * (minf(CHASE_SPEED, (distance - LAB_ROAM_ARRIVAL) / delta) / distance)
+		_clear_chase_detour()
+
+	if not is_on_wall() or get_real_velocity().dot(offset) >= MIN_WALL_PROGRESS_SPEED * offset.length():
+		_chase_stalled_seconds = 0.0
+		return Vector3.ZERO
+	_chase_stalled_seconds += delta
+	if not sample_ai or _chase_stalled_seconds < LAB_ROAM_BLOCKED_TIME:
+		return Vector3.ZERO
+	_chase_stalled_seconds = 0.0
+
+	var bounds := _corpse_floor.shape as BoxShape3D
+	if bounds == null:
+		return Vector3.ZERO
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		var wall := collision.get_collider() as StaticBody3D
+		var normal := collision.get_normal().slide(Vector3.UP)
+		if wall == null or wall == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
+			continue
+		_chase_detour = _choose_detour_waypoint(space, bounds, normal)
+		if _chase_detour.is_finite():
+			_chase_detour_time = LAB_DETOUR_TIMEOUT
+			return (_chase_detour - global_position).slide(Vector3.UP).normalized() * CHASE_SPEED
+		break
+	return Vector3.ZERO
+
+func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3) -> Vector3:
+	_prepare_lab_path_sweep()
+	var lateral := normal.cross(Vector3.UP).normalized()
+	if _crowd_slot % 2 != 0:
+		lateral = -lateral
+	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
+	var best := Vector3.INF
+	var best_distance := LAB_DETOUR_MIN_LENGTH * LAB_DETOUR_MIN_LENGTH
+	for direction in [lateral, -lateral]:
+		var local := _corpse_floor.to_local(global_position + direction * LAB_DETOUR_LENGTH)
+		local.x = clampf(local.x, -extent.x, extent.x)
+		local.z = clampf(local.z, -extent.z, extent.z)
+		var travel := (_corpse_floor.to_global(local) - global_position).slide(Vector3.UP)
+		travel *= _lab_path_fraction(space, travel)
+		if travel.length_squared() > best_distance and _lab_path_end_clear(space, travel):
+			best = global_position + travel
+			best_distance = travel.length_squared()
+	return best
 
 func _is_in_melee_cone(planar_offset: Vector3) -> bool:
 	return global_basis.z.dot(planar_offset) >= planar_offset.length() * MELEE_HALF_ANGLE_COS
@@ -628,8 +698,16 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	var height_delta := absf(offset.y)
 	offset.y = 0.0
 	var distance := offset.length()
-	_face_target(offset, delta)
 	var stop_distance := MELEE_RANGE if target_visible else LAB_LAST_SEEN_STOP_DISTANCE
+	if in_lab and target_visible and distance > stop_distance + MELEE_RANGE_TOLERANCE +			and is_on_floor() and not _corpse_floor.disabled:
+		var detour := _chase_detour_velocity(offset, delta, sample_ai)
+		if not detour.is_zero_approx():
+			_face_target(detour, delta)
+			_play_loop(_walk_clip)
+			return detour
+	elif in_lab:
+		_clear_chase_detour()
+	_face_target(offset, delta)
 	if distance > stop_distance + MELEE_RANGE_TOLERANCE:
 		_play_loop(_walk_clip)
 		return offset.normalized() * minf(CHASE_SPEED, (distance - stop_distance) / delta)
