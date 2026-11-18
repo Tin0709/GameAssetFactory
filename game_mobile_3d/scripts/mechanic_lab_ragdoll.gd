@@ -28,6 +28,7 @@ var _sample_bone_ids: Array[int]
 var _sample_body_offsets: Array[Transform3D]
 var _sampled_skeleton_transform: Transform3D
 var _source_joint_biases: Dictionary[RID, float]
+var _prepared_source_joints: Array[SourceAnchorProjection]
 var _wall_handoff_frame := -1
 var _launch_frame := -1
 var wall_handoff_animation: AnimationPlayer
@@ -62,6 +63,20 @@ func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionar
 		_sample_names.append(name)
 		_sample_bone_ids.append(body.get_bone_id())
 		_sample_body_offsets.append(body.body_offset)
+
+func prepare_source_joints() -> void:
+	# Bind the authored data at spawn. Attach the native joints after simulation starts.
+	_prepared_source_joints.clear()
+	for child_name: String in source_joints:
+		_prepared_source_joints.append(_prepare_source_joint(child_name))
+
+func _build_source_joints() -> void:
+	if _prepared_source_joints.is_empty():
+		super._build_source_joints()
+		return
+	for projection in _prepared_source_joints:
+		_attach_source_joint(projection)
+	_prepared_source_joints.clear()
 
 func sample(delta: float) -> void:
 	# Both dictionaries keep the same body keys, so the older buffer can be overwritten.
@@ -955,6 +970,7 @@ func _set_source_joint_bias(joint: RID, bias: float) -> void:
 	_source_joint_biases[joint] = bias
 
 func release(visible_world_pose: Array[Transform3D] = []) -> void:
+	_prepared_source_joints.clear()
 	super.release(visible_world_pose)
 	_source_joint_biases.clear()
 	_sample_names.clear()

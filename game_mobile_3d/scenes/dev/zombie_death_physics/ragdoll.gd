@@ -313,34 +313,44 @@ func _handoff_clearance_depth(space: PhysicsDirectSpaceState3D, depths: Dictiona
 
 class SourceAnchorProjection:
 	var joint: RID
+	var child_name: String
 	var child: PhysicalBone3D
 	var child_rid: RID
 	var parent_rid: RID
 	var child_frame: Transform3D
 	var parent_frame: Transform3D
+	var swing_span: float
+	var twist_span: float
 
 func _build_source_joints() -> void:
 	# PhysicalBone3D's automatic joint follows the Skeleton3D hierarchy and
 	# derives one frame from the current pose. MD2 legs connect to J_Spine,
 	# so supply both authored frames to the Godot physics server explicitly.
 	for child_name: String in source_joints:
-		var spec: Dictionary = source_joints[child_name]
-		var child: PhysicalBone3D = bodies[child_name]
-		var parent: PhysicalBone3D = bodies[spec.parent]
-		var joint := PhysicsServer3D.joint_create()
-		PhysicsServer3D.joint_make_cone_twist(joint, parent.get_rid(), spec.parent_frame,
-			child.get_rid(), spec.child_frame)
-		PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_SWING_SPAN, deg_to_rad(spec.swing))
-		PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_TWIST_SPAN, deg_to_rad(spec.twist))
-		source_joint_rids[child_name] = joint
-		var projection := SourceAnchorProjection.new()
-		projection.joint = joint
-		projection.child = child
-		projection.child_rid = child.get_rid()
-		projection.parent_rid = parent.get_rid()
-		projection.child_frame = spec.child_frame
-		projection.parent_frame = spec.parent_frame
-		_source_anchor_projections.append(projection)
+		_attach_source_joint(_prepare_source_joint(child_name))
+
+func _prepare_source_joint(child_name: String) -> SourceAnchorProjection:
+	var spec: Dictionary = source_joints[child_name]
+	var projection := SourceAnchorProjection.new()
+	projection.child_name = child_name
+	projection.child = bodies[child_name]
+	projection.child_rid = projection.child.get_rid()
+	projection.parent_rid = bodies[spec.parent].get_rid()
+	projection.child_frame = spec.child_frame
+	projection.parent_frame = spec.parent_frame
+	projection.swing_span = deg_to_rad(spec.swing)
+	projection.twist_span = deg_to_rad(spec.twist)
+	return projection
+
+func _attach_source_joint(projection: SourceAnchorProjection) -> void:
+	var joint := PhysicsServer3D.joint_create()
+	PhysicsServer3D.joint_make_cone_twist(joint, projection.parent_rid, projection.parent_frame,
+		projection.child_rid, projection.child_frame)
+	PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_SWING_SPAN, projection.swing_span)
+	PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_TWIST_SPAN, projection.twist_span)
+	projection.joint = joint
+	source_joint_rids[projection.child_name] = joint
+	_source_anchor_projections.append(projection)
 
 func _physics_process(delta: float) -> void:
 	if not running: return

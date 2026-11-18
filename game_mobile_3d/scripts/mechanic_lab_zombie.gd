@@ -291,6 +291,8 @@ func _ready() -> void:
 	for body: PhysicalBone3D in ragdoll.bodies.values():
 		body.collision_layer = 0
 		body.collision_mask = 0
+	if is_instance_valid(_corpse_floor):
+		ragdoll.prepare_source_joints()
 	if _death_profile == null:
 		_death_profile = DeathProfile.new()
 		_death_profile.angular_impulse = 0.8
