@@ -1072,6 +1072,93 @@ func check_melee_tool_variants(audio: Node3D, bus: int, capture: AudioEffectCapt
 	audio.reset()
 	voice.bus = previous_bus
 
+func check_zombie_idle_audio(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	var audio = lab.get_node("CombatAudio")
+	var idle := audio.get_node_or_null("ZombieIdle") as AudioStreamPlayer3D
+	var samples: Array = audio._groups.get(&"zombie_idle", [])
+	check(idle != null and samples.size() == 3, "The Lab decodes three corroborated zombie idle samples")
+	if idle == null or samples.size() != 3:
+		lab.free()
+		return
+	var group := lab.get_node("Zombies")
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie := group.get_child(0) as ZOMBIE
+	zombie.set_physics_process(false)
+	zombie.global_position = lab.player.global_position + Vector3.FORWARD * 3.0
+	var idle_events: Array[float] = []
+	var idle_point: Array[Vector3] = []
+	zombie.connect(&"idle_audio", func(point: Vector3):
+		idle_events.append(zombie.animation.current_animation_position)
+		idle_point.append(point))
+	zombie.animation.play(ZOMBIE.IDLE, 0.0)
+	var early_events := 0
+	for i in 64:
+		zombie.animation.seek(0.0, true)
+		var count := idle_events.size()
+		zombie._advance_animation(0.05, Vector3.ZERO)
+		early_events += idle_events.size() - count
+		zombie._advance_animation(0.02, Vector3.ZERO)
+	check(early_events == 0 and idle_events.size() in range(18, 47)
+		and idle_events.all(func(t): return absf(t - 0.07) < 0.0001),
+		"Idle vocalization rolls its chance only on the authored 0.0669 second contact")
+	var idle_index := zombie._idle_audio_index
+	var idle_length := zombie.animation.get_animation(ZOMBIE.IDLE).length
+	zombie.animation.seek(idle_length - 0.03, true)
+	zombie._advance_animation(0.10, Vector3.ZERO)
+	check(zombie._idle_audio_index == idle_index + 1, "Loop wrap rechecks the authored idle cue once")
+	var cue_count := idle_events.size()
+	zombie.animation.play(ZOMBIE.WALK_CLIPS[0], 0.0)
+	zombie.animation.seek(0.0, true)
+	zombie._advance_animation(0.10, Vector3.ZERO)
+	check(idle_events.size() == cue_count, "Walking does not post the idle vocalization")
+	idle.bus = AudioServer.get_bus_name(bus)
+	capture.clear_buffer()
+	audio.flush_zombie_idle()
+	check(idle.playing and idle.stream in samples and not idle_point.is_empty()
+		and idle.global_position == idle_point[0] and idle.pitch_scale >= pow(2.0, -200.0 / 1200.0) - 0.0001
+		and idle.pitch_scale <= pow(2.0, 300.0 / 1200.0) + 0.0001,
+		"The nearest idle cue posts a source-family sample inside the inferred pitch envelope")
+	await create_timer(0.32).timeout
+	var peak := 0.0
+	for frame in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
+	check(peak > 0.001 and peak < 0.35, "The idle voice reaches the silent mixer with headroom")
+	audio.reset()
+	var listener: Vector3 = audio.zombie_listener.global_position
+	var before: int = audio._next_choice.get(&"zombie_idle", 0)
+	audio.queue_zombie_idle(listener + Vector3.FORWARD * (COMBAT_AUDIO.ZOMBIE_IDLE_DISTANCE + 1.0))
+	audio.flush_zombie_idle()
+	check(not idle.playing and audio._next_choice.get(&"zombie_idle", 0) == before,
+		"An idle zombie outside the hearing range uses no voice")
+	for i in range(100, 0, -1):
+		audio.queue_zombie_idle(listener + Vector3.FORWARD * i * 0.25)
+	audio.flush_zombie_idle()
+	var closest := listener + Vector3.FORWARD * 0.25
+	check(idle.global_position == closest and idle.playing
+		and audio._next_choice.get(&"zombie_idle", 0) == (before + 1) % samples.size(),
+		"A hundred idle notifies share a single voice and the nearest one wins")
+	var idle_stream := idle.stream
+	audio.queue_zombie_idle(closest)
+	audio.zombie_attack(closest, false)
+	audio.flush_zombie_combat_cues()
+	audio.flush_zombie_idle()
+	check(idle.playing and idle.stream == idle_stream and audio._next_choice.get(&"zombie_windup", 0) == 1,
+		"Idle overflow leaves the attack pool available and the idle voice playing")
+	audio.reset()
+	audio.queue_zombie_idle(closest)
+	toggle.button_pressed = false
+	audio.flush_zombie_idle()
+	check(not idle.playing and idle.stream == null, "Muting clears queued and active zombie idle sounds")
+	print("MECHANIC_LAB_ZOMBIE_IDLE events=", cue_count, " peak=", peak)
+	# Let the Dummy mixer release playback before freeing the scene.
+	await create_timer(0.10).timeout
+	lab.free()
+
 func run() -> void:
 	var camera := Camera3D.new()
 	root.add_child(camera)
@@ -1161,6 +1248,7 @@ func run() -> void:
 	await check_sabre_crowd_audio(bus, capture)
 	await check_zombie_steps(bus, capture)
 	await check_zombie_attack_overflow(bus, capture)
+	await check_zombie_idle_audio(bus, capture)
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
