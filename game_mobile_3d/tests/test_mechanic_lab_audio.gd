@@ -299,6 +299,56 @@ func check_bow_fire_during_crossbow_impacts(bus: int, capture: AudioEffectCaptur
 	audio.set_enabled(false, point)
 	lab.free()
 
+func check_weapon_onsets_under_mixed_impacts(audio: Node, bus: int, capture: AudioEffectCapture) -> void:
+	audio.set_enabled(true, Vector3.ZERO)
+	audio.reset()
+	audio.sword_equipped = true
+	var point := Vector3.FORWARD * 2.0
+	var weapon_voices := audio._voices.slice(0, audio.VOICES_PER_POOL)
+	var firing := weapon_voices[0] as AudioStreamPlayer3D
+	firing.bus = AudioServer.get_bus_name(bus)
+	capture.clear_buffer()
+	audio.crossbow_fired(point)
+	var fire_stream := firing.stream
+	audio.crossbow_impact(point)
+	audio.crossbow_impact(point)
+	audio.contact(point, 601, false)
+	audio.slam_landed(point)
+	check(fire_stream in audio._groups[&"crossbow_fire"] and firing.playing and firing.stream == fire_stream,
+		"A melee hit and landing preserve a crossbow firing onset queued on the same tick")
+	var sword_voice: AudioStreamPlayer3D
+	var landing_voice: AudioStreamPlayer3D
+	for voice: AudioStreamPlayer3D in weapon_voices:
+		if voice.stream in audio._groups[&"sword_hit"]:
+			sword_voice = voice
+		elif voice.stream in audio._groups[&"slam"]:
+			landing_voice = voice
+	check(sword_voice != null and landing_voice != null,
+		"The confirmed sword hit and heavy landing each claim an older impact voice")
+	if sword_voice != null and landing_voice != null:
+		var hit_stream := sword_voice.stream
+		var landing_stream := landing_voice.stream
+		await physics_frame
+		for i in 25:
+			audio.crossbow_impact(point + Vector3.RIGHT * i * 0.1)
+		check(firing.stream == fire_stream and sword_voice.playing and sword_voice.stream == hit_stream
+			and landing_voice.playing and landing_voice.stream == landing_stream,
+			"Following-tick bolt impacts cannot steal the three active weapon onsets")
+	var peak := 0.0
+	for i in 24:
+		await physics_frame
+		for sample in capture.get_buffer(capture.get_frames_available()):
+			peak = maxf(peak, absf(sample.x), absf(sample.y))
+		if peak > 0.001:
+			break
+	check(firing.stream == fire_stream and peak > 0.001 and peak < 0.9,
+		"The protected firing stream reaches the Dummy mixer during mixed weapon cues")
+	print("MECHANIC_LAB_MIXED_WEAPON_ONSETS peak=", peak)
+	firing.bus = &"Master"
+	audio.reset()
+	audio.sword_equipped = false
+	audio.set_enabled(false, point)
+
 func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -893,6 +943,7 @@ func run() -> void:
 		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
 	check(peak > 0.01 and peak < 0.9, "Simultaneous MD2 impact, slam and reactions have mix headroom")
 	await check_crossbow_fire_under_impact_burst(audio, bus, capture)
+	await check_weapon_onsets_under_mixed_impacts(audio, bus, capture)
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
 	await check_bow_fire_during_crossbow_impacts(bus, capture)
