@@ -222,6 +222,11 @@ func check_zombie_dust() -> void:
 		failures.append("Clearing the crowd dust removes all instances and stops processing")
 
 func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
+	var wall_members := COUNT
+	if wall_handoff:
+		for arg in OS.get_cmdline_user_args():
+			if arg.begins_with("--wall-handoff-members="):
+				wall_members = clampi(int(arg.trim_prefix("--wall-handoff-members=")), 0, COUNT)
 	if packed:
 		var wall := StaticBody3D.new()
 		var collider := CollisionShape3D.new()
@@ -239,7 +244,7 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 		var zombie := group.get_child(i) as ZOMBIE
 		var clip := ZOMBIE.IDLE
 		var start_time := 0.0
-		if wall_handoff:
+		if wall_handoff and i < wall_members:
 			# Match the legal capsule clearance from the straddled-wall tests.
 			var pose: Array = WALL_HANDOFF_POSES[i % WALL_HANDOFF_POSES.size()]
 			zombie.global_position = Vector3(3.90, 0.02, (i - 49.5) * spacing)
@@ -247,7 +252,9 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 			clip = pose[0]
 			start_time = float(pose[2]) / 30.0
 		else:
-			zombie.global_position = Vector3(i % 10 * spacing - start, 0.02, int(i / 10) * spacing - start)
+			# Leave the rest of the same 100-zombie burst in open space.
+			var grid_offset := start * 2.0 if wall_handoff else start
+			zombie.global_position = Vector3(i % 10 * spacing - grid_offset, 0.02, int(i / 10) * spacing - start)
 			if packed:
 				zombie.rotation.y = atan2(-zombie.position.x, -zombie.position.z)
 		zombie.velocity = Vector3.ZERO
@@ -258,24 +265,26 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 			zombie.ragdoll.skeleton.reset_bone_poses()
 			zombie.animation.play(clip, 0.0)
 			zombie.animation.advance(0.0)
-			if wall_handoff:
+			if wall_handoff and i < wall_members:
 				zombie.animation.seek(start_time, true)
 			zombie.ragdoll.sample(1.0 / 60.0)
 			zombie.ragdoll.sample(1.0 / 60.0)
+	var hit_start := Time.get_ticks_usec()
 	for zombie: ZOMBIE in group.get_children():
 		zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
 	if wall_handoff:
 		# Register during the physics signal, before the actor handoffs run.
 		var started := Time.get_ticks_usec()
+		var hit_ms := (started - hit_start) / 1000.0
 		process_frame.connect(func():
 			var elapsed := (Time.get_ticks_usec() - started) / 1000.0
 			var blended := 0
 			for zombie: ZOMBIE in group.get_children():
 				blended += int(zombie.ragdoll._wall_handoff_frame >= 0)
-			print("CROWD_WALL_HANDOFF ", JSON.stringify({"blended": blended,
-				"after_hits_to_process_ms": elapsed}))
-			if blended < COUNT / 2:
-				failures.append("The wall fixture must exercise pose recovery for most zombies")
+			print("CROWD_WALL_HANDOFF ", JSON.stringify({"blended": blended, "wall_members": wall_members,
+				"hit_ms": hit_ms, "after_hits_to_process_ms": elapsed, "lethal_burst_ms": hit_ms + elapsed}))
+			if blended != wall_members:
+				failures.append("The wall fixture must correct each configured wall member")
 		, CONNECT_ONE_SHOT)
 
 func spawn_synchronously(group: Node) -> void:
