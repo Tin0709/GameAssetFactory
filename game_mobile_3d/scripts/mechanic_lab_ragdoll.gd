@@ -154,14 +154,18 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) 
 		idle.append(skeleton.get_bone_pose(bone))
 	# Search from the least visible correction. Interpolating bone-local
 	# transforms retains the source hierarchy while retracting the limbs.
+	var shift := Vector3.ZERO
 	for idle_weight: float in [0.25, 0.50, 0.75, 1.0]:
 		for bone in source.size():
 			skeleton.set_bone_pose(bone, source[bone].interpolate_with(idle[bone], idle_weight))
 		sample(sample_delta)
-		var shift := super._handoff_wall_clearance()
-		if idle_weight == 1.0 or _wall_handoff_is_clear(space, collision_mask, shift):
-			return _preserve_wall_handoff_branches(space, collision_mask, source, shift)
-	return Vector3.ZERO
+		# A blend can produce the same collider poses, especially from Idle.
+		if idle_weight != 0.25 and current == previous:
+			continue
+		shift = super._handoff_wall_clearance()
+		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift):
+			break
+	return _preserve_wall_handoff_branches(space, collision_mask, source, shift)
 
 func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		source: Array[Transform3D], shift: Vector3) -> Vector3:

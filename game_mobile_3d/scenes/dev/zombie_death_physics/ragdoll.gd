@@ -266,25 +266,32 @@ func _handoff_wall_clearance() -> Vector3:
 			var clearance := (depth - HANDOFF_WALL_REST_OVERLAP) * depth / horizontal.length()
 			wall_motion = horizontal.normalized() * minf(clearance, HANDOFF_MAX_SHIFT)
 			deepest_wall = depth
-		if not wall_motion.is_zero_approx():
+		if not wall_motion.is_zero_approx() and not candidates.has(wall_motion):
 			candidates.append(wall_motion)
 	var best := Vector3.ZERO
 	var best_depth := initial_peak
 	for motion in candidates:
-		var peak := _handoff_clearance_depth(space, depths, motion)
-		if peak < best_depth - FLOOR_CONTACT_SLOP:
+		var cutoff := best_depth - FLOOR_CONTACT_SLOP
+		var peak := _handoff_clearance_depth(space, depths, motion, cutoff)
+		if peak < cutoff:
 			best = motion
 			best_depth = peak
 	return best
 
-func _handoff_clearance_depth(space: PhysicsDirectSpaceState3D, depths: Dictionary[String, float], motion: Vector3) -> float:
+func _handoff_clearance_depth(space: PhysicsDirectSpaceState3D, depths: Dictionary[String, float],
+		motion: Vector3, cutoff: float) -> float:
 	var peak := 0.0
+	var half_motion := motion * 0.5
 	for name in depths:
 		var pose: Transform3D = current[name]
+		var body: PhysicalBone3D = bodies[name]
 		var limit := maxf(depths[name], FLOOR_CONTACT_SLOP) + PROJECTION_COLLISION_MARGIN
-		var midway := _deepest_contact(_terrain_contacts_at(bodies[name], space, pose.translated(motion * 0.5)))
-		var after := _deepest_contact(_terrain_contacts_at(bodies[name], space, pose.translated(motion)))
-		if maxf(midway, after) > limit:
+		# No later part can rescue a candidate whose deepest overlap is already too large.
+		var after := _deepest_contact(_terrain_contacts_at(body, space, pose.translated(motion)))
+		if after >= cutoff or after > limit:
+			return INF
+		var midway := _deepest_contact(_terrain_contacts_at(body, space, pose.translated(half_motion)))
+		if midway > limit:
 			return INF
 		peak = maxf(peak, after)
 	return peak
