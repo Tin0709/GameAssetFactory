@@ -70,6 +70,20 @@ func sample_afternoon(hour: float, evening_strength: float, afternoon_weight: fl
   return baseline
  return _blend_evening_anchor(hour, baseline, minf(afternoon_weight, 1.0))
 
+static func smooth_dusk_energy(color: Vector3, start: Vector3, finish: Vector3,
+		progress: float, strength: float) -> Vector3:
+	if strength <= 0. or progress <= 0. or progress >= 1.:
+		return color
+	const LUMA := Vector3(.2126,.7152,.0722)
+	var entry := start.dot(LUMA)
+	var exit := finish.dot(LUMA)
+	var current := color.dot(LUMA)
+	if entry <= exit or exit < 0. or current <= .00001:
+		return color
+	var remaining := pow(1. - smoothstep(0.,1.,progress), 1.5)
+	var target := lerpf(exit, entry, remaining)
+	return color * (lerpf(current, target, strength) / current)
+
 func _blend_evening_anchor(hour: float, baseline: Vector3, weight: float) -> Vector3:
  for i in range(1, evening_anchors.size()):
   var end: Dictionary = evening_anchors[i]

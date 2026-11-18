@@ -246,6 +246,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"pre_twilight_air": ["Ánh sương xa trước chạng vạng", 1.],
 	&"pre_twilight_midair": ["Sương trung cảnh chiều muộn", 1.],
 	&"evening_key_response": ["Ánh trực tiếp lúc chạng vạng", 1.],
+	&"dusk_key_fade": ["Tắt nắng dần lúc chạng vạng", 1.],
 	&"afternoon_key_response": ["Nắng cuối chiều", 1.],
 	&"sunrise_key_response": ["Nắng chuyển lúc bình minh", 1.],
 	&"sunrise_elevation": ["Góc nắng rạng sáng", 1.],
@@ -307,7 +308,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 201
+const LIGHTING_MIX_VERSION := 202
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -737,11 +738,28 @@ func _apply_twilight_sky(env: Environment) -> void:
 func _apply_captured_key(sun:DirectionalLight3D)->void:
 	key_response_active=false
 	if not captured_key_response or not key_response.available()or is_day_anchor():return
-	var rgb:=_captured_key_rgb(hour)*(noon_direct_scale(hour)if gentle_noon else 1.)
+	var rgb := _captured_key_rgb(hour)
+	if _dusk_key_fade_available():
+		var hours := _biome_profile.dusk_key_fade_hours
+		var amount := _biome_profile.dusk_key_fade_strength * _lighting_scale(&"dusk_key_fade")
+		if amount > 0. and hour > hours.x and hour < hours.y:
+			rgb = key_response.smooth_dusk_energy(rgb, _captured_key_rgb(hours.x),
+				_captured_key_rgb(hours.y), inverse_lerp(hours.x, hours.y, hour), amount)
+	if gentle_noon:
+		rgb *= noon_direct_scale(hour)
 	var peak:=maxf(rgb.x,maxf(rgb.y,rgb.z))
 	if peak<=0. or not rgb.is_finite():return
 	sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb();sun.light_energy=peak
 	key_response_active=true
+
+func _dusk_key_fade_available() -> bool:
+	if _biome_profile == null or _balanced_preview or atmosphere_review != "combined" \
+			or not captured_key_response or not key_response.evening_available() \
+			or RenderingServer.get_current_rendering_method() != &"mobile":
+		return false
+	var hours := _biome_profile.dusk_key_fade_hours
+	return _biome_profile.dusk_key_fade_strength > 0. and hours.is_finite() and hours.x >= 12. \
+		and hours.y <= 19.5 and hours.x < hours.y and _lighting_scale(&"evening_key_response") > 0.
 
 func _captured_key_rgb(time:float)->Vector3:
 	var noon:=forest.sample(12.)
@@ -2656,6 +2674,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 202 and effect == &"dusk_key_fade":
+			missing_value = 0.
 		if version < 201 and effect == &"mist_rear_chroma":
 			missing_value = 0.
 		if version < 200 and effect == &"turf_sun_chroma":
@@ -2891,6 +2911,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and key_response.sunrise_available()
 		if effect == &"sunrise_elevation":
 			slider.editable = slider.editable and key_response.sunrise_elevation_available() and direction_response.available()
+		if effect == &"dusk_key_fade":
+			slider.editable = slider.editable and _dusk_key_fade_available()
 		if effect == &"evening_key_response":
 			slider.editable = slider.editable and key_response.evening_available()
 		if effect == &"afternoon_key_response":
