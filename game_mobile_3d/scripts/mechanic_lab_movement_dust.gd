@@ -4,6 +4,9 @@ const EffectSource := preload("res://scripts/mechanic_lab_effect_source.gd")
 const WeaponSource := preload("res://scripts/mechanic_lab_weapon_source.gd")
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Smoke/T_SmokePixel.png"
 const SOURCE_SHA256 := "78d326787c4065d70e227ec386a7330f53621c8733ad114bc80eaea7f7f1b5fc"
+const GAUNTLET_DEBRIS_SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Explosion/Materials/Debris/T_GenericDebris.png"
+const GAUNTLET_DEBRIS_HASH := "b700bc41b85fd6afb00a76bdf7966d708557ac11b01b54eeab4330932e3639f4"
+const GAUNTLET_DEBRIS_GRAVITY := 14.7
 const FRAMES := [0, 9, 10, 16, 24, 25]
 const CAPACITY := 16
 const HEAVY_PARTICLE_COUNT := 10
@@ -29,6 +32,7 @@ class Particle:
 	var duration := 0.0
 	var opacity := 0.0
 	var run_drag := 0.0
+	var debris_drag := 0.0
 	var landing_tick := -1
 	var landing_position: Vector3
 
@@ -52,6 +56,9 @@ var _run_alpha_duration := 1.0
 var _landing_alpha := PackedFloat32Array()
 var _landing_alpha_duration := 1.0
 var _landing_drag := PackedFloat32Array()
+var _smoke_texture: Texture2D
+var _gauntlet_debris_texture: Texture2D
+var _using_gauntlets: Callable
 
 func _ready() -> void:
 	set_physics_process(false)
@@ -61,6 +68,7 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 	var texture := _load_mask()
 	if texture == null:
 		return false
+	_smoke_texture = texture
 	_actor = actor
 	_ground = ground
 	_terrain_contact = terrain_contact
@@ -103,7 +111,13 @@ func use_source_landing() -> void:
 	_landing_drag = PackedFloat32Array(data.drag)
 
 func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:
-	return batch.setup(_particles[0].sprite.texture, _run_alpha, _run_alpha_duration)
+	return batch.setup(_smoke_texture, _run_alpha, _run_alpha_duration)
+
+func use_gauntlet_debris(equipped: Callable) -> void:
+	var image := EffectSource.load_image(GAUNTLET_DEBRIS_SOURCE, GAUNTLET_DEBRIS_HASH, Vector2i(16, 16))
+	if image != null:
+		_gauntlet_debris_texture = ImageTexture.create_from_image(image)
+		_using_gauntlets = equipped
 
 static func _load_mask() -> Texture2D:
 	var atlas := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(128, 64))
@@ -149,6 +163,9 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		if absf(local.x) > half.x or absf(local.z) > half.z:
 			return
 		ground_point = _ground.to_global(Vector3(local.x, half.y, local.z))
+	if heavy and _gauntlet_debris_texture != null and _using_gauntlets.call():
+		_emit_gauntlet_debris(ground_point, surface)
+		return
 	if heavy and _heavy_delay.is_valid():
 		var delay_ticks := ceili(float(_heavy_delay.call()) * Engine.physics_ticks_per_second)
 		if delay_ticks > 0:
@@ -171,6 +188,40 @@ func _physics_process(_delta: float) -> void:
 	set_physics_process(false)
 	_emit_dust(_burst_point, _burst_surface, true, true)
 
+func _next_particle(texture: Texture2D) -> Particle:
+	var particle := _particles[_next]
+	_next = (_next + 1) % _particles.size()
+	if particle.sprite.texture != texture:
+		particle.sprite.frame = 0
+		particle.sprite.hframes = 8 if texture == _smoke_texture else 1
+		particle.sprite.vframes = 4 if texture == _smoke_texture else 1
+		particle.sprite.texture = texture
+	particle.debris_drag = 0.0
+	return particle
+
+func _emit_gauntlet_debris(ground_point: Vector3, surface: String) -> void:
+	# NS_Debris_Generic_Small, CPUCollisions_Low_Med:
+	# 3–5 sprites, 15 cm, 1–1.5 s, and 350–650 cm/s in an upward cone.
+	var tint: Color = SURFACE_DUST.get(surface, SURFACE_DUST.grass)
+	for i in _random.randi_range(3, 5):
+		var particle := _next_particle(_gauntlet_debris_texture)
+		var yaw := _random.randf_range(0.0, TAU)
+		var outer_angle := deg_to_rad(_random.randf_range(17.5, 25.0))
+		var up := _random.randf_range(cos(outer_angle), 1.0)
+		var planar := sqrt(1.0 - up * up)
+		particle.velocity = Vector3(cos(yaw) * planar, up, sin(yaw) * planar) * _random.randf_range(3.5, 6.5)
+		particle.origin = ground_point
+		particle.age = 0.0
+		particle.contact_tick = Engine.get_physics_frames()
+		particle.duration = _random.randf_range(1.0, 1.5)
+		particle.debris_drag = _random.randf_range(0.8, 1.2)
+		particle.sprite.global_position = ground_point
+		particle.sprite.pixel_size = 0.15 / 16.0
+		particle.sprite.scale = Vector3.ONE
+		particle.sprite.modulate = tint
+		particle.sprite.show()
+	set_process(true)
+
 func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: bool) -> void:
 	var tint: Color = SURFACE_DUST.get(surface, SURFACE_DUST.grass)
 	var motion := _actor.get_real_velocity()
@@ -184,8 +235,7 @@ func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: boo
 		count = HEAVY_PARTICLE_COUNT
 		spread = 0.42
 	for i in count:
-		var particle := _particles[_next]
-		_next = (_next + 1) % _particles.size()
+		var particle := _next_particle(_smoke_texture)
 		var angle := _random.randf_range(0.0, TAU)
 		var radial := Vector3(cos(angle), 0.0, sin(angle))
 		particle.origin = ground_point + radial * _random.randf_range(0.02, spread) + Vector3.UP * 0.05
@@ -212,8 +262,7 @@ func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: boo
 func _emit_run_dust(ground_point: Vector3, surface: String, size: float) -> void:
 	# NS_Step_Dust spawns one sprite 20 cm above the supported foot, with
 	# zero initial velocity and an upward acceleration of 100 cm/s².
-	var particle := _particles[_next]
-	_next = (_next + 1) % _particles.size()
+	var particle := _next_particle(_smoke_texture)
 	particle.origin = ground_point + Vector3.UP * 0.20
 	particle.velocity = Vector3.ZERO
 	particle.age = 0.0
@@ -228,8 +277,7 @@ func _emit_source_landing(ground_point: Vector3, surface: String) -> void:
 	# NS_PlayerLanding_Medium_Dust at full scalability. The launch occupies
 	# the band from 85 to 90 degrees about the vertical axis.
 	for i in _random.randi_range(4, 6):
-		var particle := _particles[_next]
-		_next = (_next + 1) % _particles.size()
+		var particle := _next_particle(_smoke_texture)
 		particle.origin = ground_point + Vector3.UP * 0.50
 		particle.landing_position = particle.origin
 		particle.landing_tick = 0
@@ -298,6 +346,14 @@ func _process(delta: float) -> void:
 			particle.sprite.hide()
 			continue
 		var progress := particle.age / particle.duration
+		if particle.debris_drag > 0.0:
+			var drag := particle.debris_drag
+			var terminal := Vector3.DOWN * (GAUNTLET_DEBRIS_GRAVITY / drag)
+			var travel := (1.0 - exp(-drag * particle.age)) / drag
+			particle.sprite.global_position = particle.origin + terminal * particle.age + (particle.velocity - terminal) * travel
+			particle.sprite.modulate.a = 1.0 - smoothstep(0.8, 1.0, progress)
+			active = true
+			continue
 		if particle.landing_tick >= 0:
 			_update_source_landing(particle)
 			active = true
