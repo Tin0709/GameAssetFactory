@@ -227,15 +227,17 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 	var start := spacing * 4.5
 	for i in COUNT:
 		var zombie := group.get_child(i) as ZOMBIE
-		zombie.global_position = Vector3(i % 10 * spacing - start, 0.02, int(i / 10) * spacing - start)
+		if wall_handoff:
+			zombie.global_position = Vector3(4.31, 0.02, (i - 49.5) * spacing)
+			zombie.rotation.y = (i % 4) * PI / 2.0
+		else:
+			zombie.global_position = Vector3(i % 10 * spacing - start, 0.02, int(i / 10) * spacing - start)
+			if packed:
+				zombie.rotation.y = atan2(-zombie.position.x, -zombie.position.z)
 		zombie.velocity = Vector3.ZERO
 		zombie.reset_physics_interpolation()
 		if packed:
 			# Start from a known pose and remove teleport velocity.
-			zombie.rotation.y = atan2(-zombie.position.x, -zombie.position.z)
-			if wall_handoff:
-				zombie.global_position = Vector3(4.31, 0.02, (i - 49.5) * spacing)
-				zombie.rotation.y = (i % 4) * PI / 2.0
 			zombie.animation.stop()
 			zombie.ragdoll.skeleton.reset_bone_poses()
 			var clip := zombie._walk_clip if wall_handoff else ZOMBIE.IDLE
