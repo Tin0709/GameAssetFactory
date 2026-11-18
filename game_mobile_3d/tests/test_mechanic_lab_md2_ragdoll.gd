@@ -234,14 +234,14 @@ func check_moving_pose_history(lab, group) -> void:
 	var zombie := group.get_child(0) as ZOMBIE
 	zombie.global_position = Vector3(0.0, 0.02, 9.0)
 	for i in 150:
-		await process_frame
+		await physics_frame
 		if zombie.animation.current_animation in ZOMBIE.WALK_CLIPS and zombie.get_real_velocity().length() > 1.0:
 			break
 	var ragdoll := zombie.ragdoll
 	var previous := ragdoll.previous
 	var current := ragdoll.current
 	var saved := current.duplicate()
-	await process_frame
+	await physics_frame
 	check(is_same(previous, ragdoll.current) and is_same(current, ragdoll.previous),
 		"Consecutive pose samples reuse the same pair of buffers")
 	var skeleton_pose := ragdoll.skeleton.global_transform
@@ -257,7 +257,7 @@ func check_moving_pose_history(lab, group) -> void:
 			ragdoll.maximum_inherited_linear_speed)
 	check(transforms_match, "Both snapshots retain the evaluated world poses of all six bodies")
 	zombie.take_hit(100, Vector3.RIGHT)
-	await process_frame
+	await physics_frame
 	var launch_matches := ragdoll.running and ragdoll.handoff_error < 0.005
 	for name in expected_velocity:
 		var inherited: Dictionary = ragdoll.inherited.get(name, {})
@@ -267,15 +267,16 @@ func check_moving_pose_history(lab, group) -> void:
 	zombie.free()
 
 func check_fresh_spawn_handoff(lab, group, living_ticks: int) -> void:
+	# Spawn before the living callbacks so each wait spans one full tick.
+	await physics_frame
 	lab.reset_player()
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
-	# The physics_frame signal runs before the zombie's physics callback.
 	for i in living_ticks:
-		await process_frame
+		await physics_frame
 	check(zombie.ragdoll.sample_count == living_ticks, "The fresh-spawn fixture has the expected pose history")
 	zombie.take_hit(100, Vector3.RIGHT)
-	await process_frame
+	await physics_frame
 	var inherited_motion := false
 	for sample: Dictionary in zombie.ragdoll.inherited.values():
 		inherited_motion = inherited_motion or not sample.linear.is_zero_approx() or not sample.angular.is_zero_approx()
