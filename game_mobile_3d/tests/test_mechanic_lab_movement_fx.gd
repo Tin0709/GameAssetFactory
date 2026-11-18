@@ -655,6 +655,45 @@ func check_zombie_dust_contact_clock(lab) -> void:
 	check(dust.multimesh.visible_instance_count == 0 and not dust.is_processing(),
 		"The zombie dust batch expires by its source lifetime")
 
+	# Retain the current ages and source data when a puff in the middle expires.
+	for i in 128:
+		dust.burst(Vector3(float(i) * 0.1, 0.0, 0.0))
+	dust._process(0.0)
+	var expired = dust._puffs[24]
+	var previous_slots := {}
+	for puff in dust._puffs:
+		previous_slots[puff] = puff.slot
+	expired.lifetime = 0.0
+	dust._process(0.0)
+	var moved := 0
+	var used := {}
+	for puff in dust._puffs:
+		moved += int(puff.slot != previous_slots[puff])
+		used[puff.slot] = true
+	check(dust.multimesh.visible_instance_count == 127 and used.size() == 127
+		and not expired in dust._puffs and moved <= 1,
+		"Expiring one of 128 puffs keeps the remaining render slots stable")
+	print("MECHANIC_LAB_DUST_REUSE relocated=", moved, " visible=", used.size())
+	dust.clear()
+
+	for i in dust.CAPACITY:
+		dust.burst(Vector3(float(i) * 0.1, 0.0, 0.0))
+	dust._process(0.0)
+	var expected_first = dust._puffs[300]
+	var expected_last = dust._puffs.back()
+	for i in 300:
+		dust.burst(Vector3(float(i) * 0.1, 0.0, -3.0))
+	dust._process(0.0)
+	check(dust.multimesh.visible_instance_count == dust.CAPACITY
+		and dust._puffs[0] == expected_first and dust._puffs[dust.CAPACITY - 301] == expected_last,
+		"An overflowing dust batch evicts the oldest puffs in spawn order")
+	for puff in dust._puffs:
+		puff.lifetime = 0.0
+	dust._process(0.0)
+	check(dust.multimesh.visible_instance_count == 0 and not dust.is_processing(),
+		"Simultaneous expiry empties the draw batch")
+	dust.clear()
+
 func start_heavy_drop(lab) -> void:
 	lab.get_node("HUD/DropMedium").pressed.emit()
 	await press_heavy_attack()

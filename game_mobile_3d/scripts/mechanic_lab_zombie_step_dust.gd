@@ -5,6 +5,8 @@ const SHADER := preload("res://materials/mechanic_lab_zombie_step_dust.gdshader"
 const CAPACITY := 512
 const ALPHA_SAMPLES := 54
 const TICK_WRAP := 2048
+const INSTANCE_FLOATS := 16
+const BUFFER_UPLOAD_MIN := 48
 
 class Puff:
 	var origin: Vector3
@@ -15,7 +17,11 @@ class Puff:
 	var cell: int
 	var slot := -1
 
+# Spawn order handles eviction. The draw slots can move independently.
 var _puffs: Array[Puff] = []
+var _rendered: Array[Puff] = []
+var _vacant_slots := PackedInt32Array()
+var _instance_buffer := PackedFloat32Array()
 var _material: ShaderMaterial
 var _random := RandomNumberGenerator.new()
 
@@ -49,7 +55,10 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float)
 
 func burst(ground_point: Vector3) -> void:
 	if _puffs.size() == CAPACITY:
-		_puffs.pop_front()
+		var oldest: Puff = _puffs.pop_front()
+		if oldest.slot >= 0:
+			_vacant_slots.append(oldest.slot)
+			oldest.slot = -1
 	var puff := Puff.new()
 	puff.origin = to_local(ground_point + Vector3.UP * 0.20)
 	puff.contact_tick = Engine.get_physics_frames()
@@ -67,22 +76,86 @@ func _process(_delta: float) -> void:
 	var step := get_physics_process_delta_time()
 	_material.set_shader_parameter("contact_clock", Vector3(physics_tick % TICK_WRAP, fraction, step))
 	var count := 0
-	for puff in _puffs:
+	for index in _puffs.size():
+		var puff := _puffs[index]
 		puff.age = maxf(render_tick - puff.contact_tick, 0.0) * step
 		if puff.age >= puff.lifetime:
+			if puff.slot >= 0:
+				_vacant_slots.append(puff.slot)
+				puff.slot = -1
 			continue
-		if puff.slot != count:
+		if index != count:
 			_puffs[count] = puff
-			puff.slot = count
-			multimesh.set_instance_transform(count, Transform3D(Basis.IDENTITY, puff.origin))
-			multimesh.set_instance_custom_data(count,
-				Color(puff.cell, puff.contact_tick % TICK_WRAP, puff.lifetime, puff.drag))
 		count += 1
-	_puffs.resize(count)
-	multimesh.visible_instance_count = count
-	set_process(count > 0)
+	if _puffs.size() != count:
+		_puffs.resize(count)
+
+	if not _vacant_slots.is_empty():
+		# Rebuild the draw buffer when at least half its slots expire or are evicted.
+		if _vacant_slots.size() * 2 >= _rendered.size():
+			_rebuild_slots(count)
+		else:
+			_fill_vacant_slots()
+		_vacant_slots.clear()
+
+	# Newly spawned puffs are at the end in spawn order.
+	for index in range(_rendered.size(), count):
+		var puff := _puffs[index]
+		_upload(puff, index)
+		_rendered.append(puff)
+	if multimesh.visible_instance_count != count:
+		multimesh.visible_instance_count = count
+	if count == 0:
+		set_process(false)
+
+func _rebuild_slots(count: int) -> void:
+	if count >= BUFFER_UPLOAD_MIN:
+		# MultiMesh rows are three transform rows followed by custom data.
+		if _instance_buffer.is_empty():
+			_instance_buffer.resize(CAPACITY * INSTANCE_FLOATS)
+			for index in CAPACITY:
+				var offset := index * INSTANCE_FLOATS
+				_instance_buffer[offset] = 1.0
+				_instance_buffer[offset + 5] = 1.0
+				_instance_buffer[offset + 10] = 1.0
+		for index in count:
+			var puff := _puffs[index]
+			puff.slot = index
+			var offset := index * INSTANCE_FLOATS
+			_instance_buffer[offset + 3] = puff.origin.x
+			_instance_buffer[offset + 7] = puff.origin.y
+			_instance_buffer[offset + 11] = puff.origin.z
+			_instance_buffer[offset + 12] = puff.cell
+			_instance_buffer[offset + 13] = puff.contact_tick % TICK_WRAP
+			_instance_buffer[offset + 14] = puff.lifetime
+			_instance_buffer[offset + 15] = puff.drag
+		multimesh.buffer = _instance_buffer
+	else:
+		for index in count:
+			var puff := _puffs[index]
+			if puff.slot != index:
+				_upload(puff, index)
+	_rendered.assign(_puffs)
+
+func _fill_vacant_slots() -> void:
+	# All dust billboards use the same tint, so a survivor can fill a hole.
+	for slot in _vacant_slots:
+		while not _rendered.is_empty() and _rendered.back().slot < 0:
+			_rendered.pop_back()
+		if slot < _rendered.size():
+			var last: Puff = _rendered.pop_back()
+			_rendered[slot] = last
+			_upload(last, slot)
+
+func _upload(puff: Puff, slot: int) -> void:
+	puff.slot = slot
+	multimesh.set_instance_transform(slot, Transform3D(Basis.IDENTITY, puff.origin))
+	multimesh.set_instance_custom_data(slot,
+		Color(puff.cell, puff.contact_tick % TICK_WRAP, puff.lifetime, puff.drag))
 
 func clear() -> void:
 	_puffs.clear()
+	_rendered.clear()
+	_vacant_slots.clear()
 	multimesh.visible_instance_count = 0
 	set_process(false)
