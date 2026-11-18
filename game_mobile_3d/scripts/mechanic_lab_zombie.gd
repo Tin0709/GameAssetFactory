@@ -396,7 +396,9 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * _gravity_scale(ZOMBIE_GRAVITY) * delta
 	var crowd_walking := crowd and not pushed and controlled_time == delta and not travel.is_zero_approx() \
 		and animation.current_animation in WALK_CLIPS
-	var destination := _last_seen_position if _target_aggressive else _roam_destination
+	var destination := _roam_destination
+	if _target_aggressive:
+		destination = _chase_detour if _chase_detour.is_finite() else _last_seen_position
 	_skipped_blocked_step = false
 	if crowd_walking and _blocked_walk and is_on_floor() and (_target_aggressive or _blocking_zombie_id != 0):
 		# Spread collision retries across zombies. Keep animation and pose history
@@ -627,7 +629,7 @@ func _clear_chase_detour() -> void:
 	_chase_detour_time = 0.0
 	_chase_stalled_seconds = 0.0
 
-func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool) -> Vector3:
+func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool, target_visible: bool) -> Vector3:
 	if _chase_detour.is_finite():
 		_chase_detour_time -= delta
 		var travel := (_chase_detour - global_position).slide(Vector3.UP)
@@ -645,6 +647,10 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool) -> V
 				return travel * (minf(CHASE_SPEED, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
 		_clear_chase_detour()
 
+	# During sight loss, a committed leg still leads toward the last seen
+	# position. Start a new flank only while the target can be seen.
+	if not target_visible:
+		return Vector3.ZERO
 	if not is_on_wall() or get_real_velocity().dot(offset) >= MIN_WALL_PROGRESS_SPEED * offset.length():
 		_chase_stalled_seconds = 0.0
 		return Vector3.ZERO
@@ -713,9 +719,9 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	offset.y = 0.0
 	var distance := offset.length()
 	var stop_distance := MELEE_RANGE if target_visible else LAB_LAST_SEEN_STOP_DISTANCE
-	if (in_lab and target_visible and distance > stop_distance + MELEE_RANGE_TOLERANCE
+	if (in_lab and (target_visible or _chase_detour.is_finite()) and distance > stop_distance + MELEE_RANGE_TOLERANCE
 			and is_on_floor() and not _corpse_floor.disabled):
-		var detour := _chase_detour_velocity(offset, delta, sample_ai)
+		var detour := _chase_detour_velocity(offset, delta, sample_ai, target_visible)
 		if not detour.is_zero_approx():
 			_face_target(detour, delta)
 			_play_loop(_walk_clip)
