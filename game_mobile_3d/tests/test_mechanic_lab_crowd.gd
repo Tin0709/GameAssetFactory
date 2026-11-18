@@ -5,9 +5,12 @@ const ZOMBIE = preload("res://scripts/mechanic_lab_zombie.gd")
 const COUNT := 100
 const FIXTURE_HP := 10000
 var lab: Node3D
-var tick_started := 0
+var first_tick_started := 0
+var ticks_in_frame := 0
+var max_ticks_in_frame := 0
 var frame_started := 0
-var physics_ms: Array[float] = []
+var physics_window_ms: Array[float] = []
+var frame_with_physics_ms: Array[float] = []
 var frame_ms: Array[float] = []
 var render_gpu_ms: Array[float] = []
 var draws: Array[float] = []
@@ -29,13 +32,20 @@ func run() -> void:
 	root.size = Vector2i(960, 540)
 	var rid := root.get_viewport_rid()
 	RenderingServer.viewport_set_measure_render_time(rid, true)
-	physics_frame.connect(func(): tick_started = Time.get_ticks_usec())
+	physics_frame.connect(func():
+		if ticks_in_frame == 0:
+			first_tick_started = Time.get_ticks_usec()
+		ticks_in_frame += 1)
 	process_frame.connect(func():
 		var now := Time.get_ticks_usec()
 		if frame_started > 0:
-			frame_ms.append((now - frame_started) / 1000.0)
-			if tick_started > frame_started:
-				physics_ms.append((now - tick_started) / 1000.0)
+			var elapsed := (now - frame_started) / 1000.0
+			frame_ms.append(elapsed)
+			if ticks_in_frame > 0:
+				physics_window_ms.append((now - first_tick_started) / 1000.0)
+				frame_with_physics_ms.append(elapsed)
+				max_ticks_in_frame = maxi(max_ticks_in_frame, ticks_in_frame)
+		ticks_in_frame = 0
 		frame_started = now
 		render_gpu_ms.append(RenderingServer.viewport_get_measured_render_time_gpu(rid))
 		draws.append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
@@ -624,7 +634,9 @@ func check_spawn_spacing(group: Node, zombie: Node3D) -> void:
 
 func measure(label: String, ticks: int, group: Node = null) -> void:
 	frame_ms.clear()
-	physics_ms.clear()
+	physics_window_ms.clear()
+	frame_with_physics_ms.clear()
+	max_ticks_in_frame = 0
 	render_gpu_ms.clear()
 	draws.clear()
 	active_peak = 0
@@ -649,7 +661,9 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 			if label == "simultaneous_ragdolls" and numbers != null:
 				peak_damage_glyphs = maxi(peak_damage_glyphs, numbers.multimesh.visible_instance_count)
 	print("CROWD_PHASE ", JSON.stringify({"phase": label, "frame_ms": stats(frame_ms),
-		"physics_to_process_ms": stats(physics_ms), "gpu_ms": stats(render_gpu_ms),
+		"physics_window_ms": stats(physics_window_ms), "frame_with_physics_ms": stats(frame_with_physics_ms),
+		"frames_with_physics": frame_with_physics_ms.size(), "max_ticks_in_frame": max_ticks_in_frame,
+		"gpu_ms": stats(render_gpu_ms),
 		"draws": stats(draws), "samples": frame_ms.size(), "active_ragdolls_peak": active_peak}))
 
 func check_crowd_corpse_fade(group: Node) -> void:
