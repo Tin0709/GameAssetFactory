@@ -9,6 +9,8 @@ extends Resource
 @export_range(0., 1.) var additional_fog := .13
 @export_range(0., 2., .01) var spatial_extinction_scale := 1.
 @export_range(0., 1.) var saturation_scale := .90
+## Fraction of directional shadow opacity removed at full cloud cover, by normalized hour.
+@export var shadow_reduction_by_hour: Curve
 
 @export_group("Phase color")
 ## Restores some of the resolved time-of-day key hue at the cloudy key's luminance.

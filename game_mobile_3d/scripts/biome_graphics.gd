@@ -218,7 +218,7 @@ func refresh() -> void:
 	RenderSettings.apply_lighting(sun, env, p, _noon, _profile.noon_sun_rotation, _profile.noon_sun_color,
 		_profile.noon_sun_energy, _profile.noon_ambient_color, _profile.noon_ambient_energy)
 	sun.shadow_blur = _profile.shadow_blur
-	sun.shadow_opacity = _profile.shadow_opacity
+	sun.shadow_opacity = _weather.shadow_opacity(_profile.overcast, _profile.shadow_opacity, hour)
 	var sky := _profile.noon_sky_color * Color(p.sky) / Color(_noon.sky)
 	var fog_color := _profile.noon_fog_color * Color(p.fog) / Color(_noon.fog)
 	var time := hour / 24.

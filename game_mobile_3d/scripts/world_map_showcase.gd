@@ -110,6 +110,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
 	&"sun": ["Direct sunlight", 2.],
 	&"overcast_phase_color": ["Giữ sắc nắng theo giờ khi nhiều mây", 1.],
+	&"overcast_shadow": ["Dịu bóng trưa nhiều mây", 1.],
 	&"overcast_mist_phase_color": ["Giữ sắc sương theo giờ khi nhiều mây", 1.],
 	&"sun_pockets": ["Sunlight pockets", 1.5],
 	&"sun_opening": ["Sunlit openings", 1.],
@@ -309,7 +310,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 203
+const LIGHTING_MIX_VERSION := 204
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2703,6 +2704,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 203 and effect == &"actor_sunset_sun_shoulder":
 			missing_value = 0.
+		if version < 204 and effect == &"overcast_shadow":
+			missing_value = 0.
 		if version < 202 and effect == &"dusk_key_fade":
 			missing_value = 0.
 		if version < 201 and effect == &"mist_rear_chroma":
@@ -3260,7 +3263,9 @@ func _apply_direct_shadow_opacity(sun:DirectionalLight3D)->void:
 	var opacity:=float(_day.sun_shadow_opacity)
 	if full_direct_shadows and not is_day_anchor():
 		opacity=lerpf(opacity,1.,PHASE_FINISH.phase_weight(hour))
-	sun.shadow_opacity=opacity * _lighting_scale(&"shadow")
+	opacity *= _lighting_scale(&"shadow")
+	sun.shadow_opacity = _weather.shadow_opacity(_weather_profile, opacity, hour,
+		0. if _balanced_preview else _lighting_scale(&"overcast_shadow"))
 	_forest_shadow_opacity=sun.shadow_opacity
 
 func terrain_ambient_reference()->Color:
