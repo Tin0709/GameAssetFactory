@@ -72,7 +72,7 @@ func sample_afternoon(hour: float, evening_strength: float, afternoon_weight: fl
 
 static func smooth_dusk_energy(color: Vector3, start: Vector3, finish: Vector3,
   progress: float, strength: float) -> Vector3:
- if strength <= 0. or progress <= 0. or progress >= 1.:
+ if strength <= 0. or progress <= .000001 or progress >= .999999:
   return color
  const LUMA := Vector3(.2126,.7152,.0722)
  var entry := start.dot(LUMA)
