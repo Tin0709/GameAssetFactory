@@ -302,6 +302,7 @@ func has_flat_corner_brace() -> bool:
 		return false
 	var normal := Vector3.ZERO
 	var wall := RID()
+	var wall_shape := -1
 	for name in ["Head", "Chest"]:
 		var body: PhysicalBone3D = bodies[name]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
@@ -312,10 +313,13 @@ func has_flat_corner_brace() -> bool:
 			if absf(next.y) >= MAX_WALL_NORMAL_Y or not state.get_contact_collider_object(i) is StaticBody3D:
 				continue
 			var collider := state.get_contact_collider(i)
+			var shape := state.get_contact_collider_shape(i)
 			if not wall.is_valid():
 				wall = collider
+				wall_shape = shape
 				normal = next
-			elif collider != wall and absf(normal.dot(next)) < 0.25:
+			# A single static body can contain box colliders for both walls.
+			elif (collider != wall or shape != wall_shape) and absf(normal.dot(next)) < 0.25:
 				return true
 	return false
 
