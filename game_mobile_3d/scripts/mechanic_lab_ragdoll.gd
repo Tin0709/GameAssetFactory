@@ -211,25 +211,39 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		# The cached pose drives every bone in the blend below. Keep the
 		# living animation paused while ownership transfers to the simulator.
 		wall_handoff_animation.pause()
-	# Search from the least visible correction. Interpolating bone-local
-	# transforms retains the source hierarchy while retracting the limbs.
+	# Collision depends only on the sampled bones and their ancestors.
+	var collision_bones := PackedInt32Array()
+	for sampled_bone in _sample_bone_ids:
+		var bone := sampled_bone
+		while bone >= 0 and not collision_bones.has(bone):
+			collision_bones.append(bone)
+			bone = skeleton.get_bone_parent(bone)
+	collision_bones.sort()
+
+	# Search from the least visible correction. Interpolate the remaining
+	# bones once the chosen blend is known.
+	var selected_weight := 1.0
 	var shift := Vector3.ZERO
 	var shift_known := true
 	for idle_weight: float in [0.25, 0.50, 0.75, 1.0]:
-		for bone in source.size():
+		selected_weight = idle_weight
+		for bone in collision_bones:
 			skeleton.set_bone_pose(bone, source[bone].interpolate_with(idle[bone], idle_weight))
 		sample(sample_delta)
 		# A blend can produce the same collider poses, especially from Idle.
 		if idle_weight != 0.25 and current == previous and (idle_weight < 1.0 or shift_known):
 			continue
 		if idle_weight < 1.0 and wall.is_valid() \
-				and _wall_blocks_every_handoff_shift(space, collision_mask, wall, wall_bounds):
+				and _wall_blocks_every_handoff_shift(space, collision_mask, wall, wall_bounds, region, floor_bounds):
 			shift_known = false
 			continue
 		shift = _solve_handoff_clearance(_find_clear_handoff_parts(region, floor_bounds, wall_bounds))
 		shift_known = true
 		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift, "", {}):
 			break
+	for bone in source.size():
+		if not collision_bones.has(bone):
+			skeleton.set_bone_pose(bone, source[bone].interpolate_with(idle[bone], selected_weight))
 	return _preserve_wall_handoff_branches(space, collision_mask, source, shift)
 
 func _handoff_floor_bounds() -> AABB:
@@ -277,7 +291,7 @@ func _find_clear_handoff_parts(region: AABB, floor_bounds: AABB,
 	return clear_parts
 
 func _wall_blocks_every_handoff_shift(space: PhysicsDirectSpaceState3D, collision_mask: int,
-		wall: RID, bounds: AABB) -> bool:
+		wall: RID, bounds: AABB, region: AABB, floor_bounds: AABB) -> bool:
 	# Handoff shifts translate both ends of the ray by at most 12 cm horizontally.
 	# Require the whole shifted segment to enter the same side face of the box.
 	var margin := HANDOFF_MAX_SHIFT + PROJECTION_COLLISION_MARGIN
@@ -299,6 +313,9 @@ func _wall_blocks_every_handoff_shift(space: PhysicsDirectSpaceState3D, collisio
 			continue
 		# Another collider in the swept ray can change which side the ray sees.
 		var envelope := ray_bounds.grow(margin)
+		# This region has already been tested with the wall and floor excluded.
+		if region.has_volume() and region.encloses(envelope) and not envelope.intersects(floor_bounds):
+			return true
 		_handoff_bounds_shape.size = envelope.size
 		_handoff_bounds_query.transform = Transform3D(Basis.IDENTITY, envelope.get_center())
 		_handoff_bounds_query.collision_mask = collision_mask
