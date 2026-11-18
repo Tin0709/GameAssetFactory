@@ -84,6 +84,7 @@ func run() -> void:
 	await check_blocked_chase(group)
 	await check_crowd_windup_occlusion(group)
 	await check_crowd_windup_range(group)
+	await check_crowd_windup_focus(group)
 	var wall_handoff := OS.get_cmdline_user_args().has("--wall-handoff-ragdolls")
 	var packed := wall_handoff or OS.get_cmdline_user_args().has("--packed-ragdolls")
 	await launch_ragdolls(group, packed, wall_handoff)
@@ -699,6 +700,74 @@ func check_crowd_windup_range(group: Node) -> void:
 		print("CROWD_WINDUP_RANGE escape=", escape, " invalid=", escaped_windups,
 			" valid=", windups.size() - escaped_windups)
 	zombie.melee_audio.disconnect(listen)
+	player.set_physics_process(true)
+	for member in group.get_children():
+		member.set_physics_process(true)
+
+func check_crowd_windup_focus(group: Node) -> void:
+	var player: CharacterBody3D = lab.player
+	var player_origin := player.global_position
+	player.set_physics_process(false)
+	for member in group.get_children():
+		member.set_physics_process(false)
+	var zombie := group.get_child(0) as ZOMBIE
+	var stride := roundi(Engine.physics_ticks_per_second / ZOMBIE.LAB_CROWD_SIGHT_HZ)
+	var delta := 1.0 / Engine.physics_ticks_per_second
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(0.52, 3.0, 0.15)
+	collider.shape = box
+	wall.add_child(collider)
+	wall.position = player_origin + Vector3(-0.38, 1.5, -0.67)
+	lab.add_child(wall)
+	for covered: bool in [false, true]:
+		player.global_position = player_origin
+		zombie.global_position = player_origin + Vector3.FORWARD * 1.34
+		zombie.velocity = Vector3.ZERO
+		zombie.rotation.y = 0.0
+		zombie.animation.play(ZOMBIE.IDLE, 0.0)
+		zombie.animation.advance(0.0)
+		zombie._attack_cooldown = 1.0
+		zombie.set_physics_process(true)
+		for i in stride + 1:
+			await physics_frame
+		zombie._attack_cooldown = 0.0
+		await physics_frame
+		if zombie.animation.current_animation != ZOMBIE.ATTACK:
+			failures.append("The crowd focus fixture starts a real windup")
+			continue
+		if covered:
+			# The cached target was at a clear point to the right before stepping behind cover.
+			player.global_position += Vector3.RIGHT * 0.32
+			zombie._crowd_slot = (Engine.get_physics_frames() + 1) % stride
+			await physics_frame
+			if not zombie._last_seen_position.is_equal_approx(player.global_position):
+				failures.append("The crowd focus fixture samples the clear target before cover")
+		var remembered := zombie._last_seen_position
+		var yaw := zombie.rotation.y
+		var before_release := ZOMBIE.LAB_ATTACK_HIT_SECTION - delta * 0.5
+		zombie.animation.seek(before_release, true)
+		player.global_position = player_origin + Vector3.RIGHT * (-0.70 if covered else 0.70)
+		zombie._crowd_slot = (Engine.get_physics_frames() + 2) % stride
+		await physics_frame
+		var turned := angle_difference(yaw, zombie.rotation.y)
+		if zombie.animation.current_animation_position < ZOMBIE.LAB_ATTACK_HIT_SECTION:
+			failures.append("The focus test advances across the authored release marker")
+		if covered:
+			if zombie._target_visible or not zombie._last_seen_position.is_equal_approx(remembered) or absf(turned) > 0.001:
+				failures.append("A last-tick sidestep behind cover stops the windup turn")
+		else:
+			if not zombie._last_seen_position.is_equal_approx(player.global_position) or turned <= 0.005:
+				failures.append("A visible sidestep turns the zombie on the last tick before focus release")
+			yaw = zombie.rotation.y
+			player.global_position = player_origin + Vector3.LEFT * 0.70
+			await physics_frame
+			if absf(angle_difference(yaw, zombie.rotation.y)) > 0.001:
+				failures.append("Crowd windup focus stops at the authored marker")
+		print("CROWD_WINDUP_FOCUS covered=", covered, " turn_rad=", turned)
+	wall.free()
+	player.global_position = player_origin
 	player.set_physics_process(true)
 	for member in group.get_children():
 		member.set_physics_process(true)
