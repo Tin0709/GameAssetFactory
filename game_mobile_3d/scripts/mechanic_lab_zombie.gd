@@ -24,6 +24,7 @@ const WALK_STEP_NOTIFIES := {
 }
 const STEP_MIN_SPEED_SQUARED := 0.15 * 0.15
 const SPAWN := &"Zombie_Spawn"
+const PREPARED_SPAWN_POSE := &"lab_spawn_pose_prepared"
 const ATTACK := &"Zombie_BasicAttack"
 const STAGGER := &"Zombie_Staggered"
 const BASE_HEALTH := 8
@@ -267,7 +268,8 @@ func _ready() -> void:
 	_roam_origin = global_position
 	health = max_health
 	animation.play(SPAWN)
-	animation.advance(0)
+	if not animation.get_parent().has_meta(PREPARED_SPAWN_POSE):
+		animation.advance(0)
 	ragdoll = Ragdoll.new()
 	ragdoll.wall_handoff_animation = animation
 	ragdoll.wall_handoff_idle = IDLE

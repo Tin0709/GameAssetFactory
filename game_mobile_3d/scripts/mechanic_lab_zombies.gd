@@ -498,6 +498,11 @@ func _load_assets() -> void:
 		var in_lab := get_node_or_null("../Ground/Collision") is CollisionShape3D
 		if in_lab:
 			Zombie.prepare_lab_skin(model)
+			# Keep the first authored pose in the in-memory scene template.
+			player.play(Zombie.SPAWN)
+			player.advance(0.0)
+			player.stop(true)
+			model.set_meta(Zombie.PREPARED_SPAWN_POSE, true)
 		var packed := PackedScene.new()
 		if _digits.size() == 10 and packed.pack(model) == OK:
 			_visual = packed
