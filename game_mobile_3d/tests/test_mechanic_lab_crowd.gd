@@ -127,7 +127,8 @@ func check_crowd_roam(group: Node) -> void:
 	lab.player.set_physics_process(false)
 	# A slow renderer may simulate several seconds between the first and last
 	# spawn. Start the patrol fixture with the whole crowd in the same state.
-	var hold_until_ready := func(zombie: Node): zombie.set_physics_process(false)
+	var hold_until_ready := func(zombie: Node):
+		zombie.ready.connect(func(): zombie.set_physics_process(false), CONNECT_ONE_SHOT)
 	group.child_entered_tree.connect(hold_until_ready)
 	lab.get_node("HUD/SpawnCrowd").pressed.emit()
 	for frame in 180:
