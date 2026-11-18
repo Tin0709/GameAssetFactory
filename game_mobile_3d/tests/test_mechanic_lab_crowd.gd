@@ -81,8 +81,9 @@ func run() -> void:
 	await check_blocked_chase(group)
 	await check_crowd_windup_occlusion(group)
 	await check_crowd_windup_range(group)
-	var packed := OS.get_cmdline_user_args().has("--packed-ragdolls")
-	await launch_ragdolls(group, packed)
+	var wall_handoff := OS.get_cmdline_user_args().has("--wall-handoff-ragdolls")
+	var packed := wall_handoff or OS.get_cmdline_user_args().has("--packed-ragdolls")
+	await launch_ragdolls(group, packed, wall_handoff)
 	var bars := group.get_node_or_null("../ZombieHealthBars") as MultiMeshInstance3D
 	if bars != null and bars.multimesh.visible_instance_count != 0:
 		failures.append("A lethal hit immediately removes the zombie's overhead bar")
@@ -210,12 +211,12 @@ func check_zombie_dust() -> void:
 	if dust.multimesh.visible_instance_count != 0 or dust.is_processing():
 		failures.append("Clearing the crowd dust removes all instances and stops processing")
 
-func launch_ragdolls(group: Node, packed: bool) -> void:
+func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 	if packed:
 		var wall := StaticBody3D.new()
 		var collider := CollisionShape3D.new()
 		var box := BoxShape3D.new()
-		box.size = Vector3(0.30, 3.0, 18.0)
+		box.size = Vector3(0.30, 3.0, 96.0 if wall_handoff else 18.0)
 		collider.shape = box
 		wall.add_child(collider)
 		wall.position = Vector3(4.5, 1.5, 0)
@@ -225,20 +226,41 @@ func launch_ragdolls(group: Node, packed: bool) -> void:
 	var spacing := 0.9 if packed else 4.0
 	var start := spacing * 4.5
 	for i in COUNT:
-		var zombie = group.get_child(i)
+		var zombie := group.get_child(i) as ZOMBIE
 		zombie.global_position = Vector3(i % 10 * spacing - start, 0.02, int(i / 10) * spacing - start)
 		zombie.velocity = Vector3.ZERO
 		zombie.reset_physics_interpolation()
 		if packed:
-			# Start from the known idle pose and remove teleport velocity.
+			# Start from a known pose and remove teleport velocity.
 			zombie.rotation.y = atan2(-zombie.position.x, -zombie.position.z)
+			if wall_handoff:
+				zombie.global_position = Vector3(4.31, 0.02, (i - 49.5) * spacing)
+				zombie.rotation.y = (i % 4) * PI / 2.0
 			zombie.animation.stop()
 			zombie.ragdoll.skeleton.reset_bone_poses()
-			zombie.animation.play(ZOMBIE.IDLE, 0.0)
+			var clip := zombie._walk_clip if wall_handoff else ZOMBIE.IDLE
+			zombie.animation.play(clip, 0.0)
 			zombie.animation.advance(0.0)
+			if wall_handoff:
+				var duration := zombie.animation.get_animation(clip).length
+				zombie.animation.seek(duration * float(i % 11) / 11.0, true)
 			zombie.ragdoll.sample(1.0 / 60.0)
 			zombie.ragdoll.sample(1.0 / 60.0)
+	for zombie: ZOMBIE in group.get_children():
 		zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
+	if wall_handoff:
+		# Register during the physics signal, before the actor handoffs run.
+		var started := Time.get_ticks_usec()
+		process_frame.connect(func():
+			var elapsed := (Time.get_ticks_usec() - started) / 1000.0
+			var blended := 0
+			for zombie: ZOMBIE in group.get_children():
+				blended += int(zombie.ragdoll._wall_handoff_frame >= 0)
+			print("CROWD_WALL_HANDOFF ", JSON.stringify({"blended": blended,
+				"after_hits_to_process_ms": elapsed}))
+			if blended < COUNT / 2:
+				failures.append("The wall fixture must exercise pose recovery for most zombies")
+		, CONNECT_ONE_SHOT)
 
 func spawn_synchronously(group: Node) -> void:
 	var spawn := lab.get_node("HUD/SpawnZombie") as Button
