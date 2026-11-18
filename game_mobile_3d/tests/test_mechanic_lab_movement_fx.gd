@@ -614,6 +614,15 @@ func check_zombie_dust_contact_clock(lab) -> void:
 	dust._process(0.15)
 	check(oldest.age > 0.20 and oldest.age < 0.30 and is_zero_approx(dust._puffs[1].age),
 		"Existing zombie dust advances from its own step while a new puff starts at age zero")
+	var second = dust._puffs[1]
+	var second_transform := dust.multimesh.get_instance_transform(1)
+	var second_data := dust.multimesh.get_instance_custom_data(1)
+	oldest.lifetime = 0.1
+	dust._process(0.0)
+	check(dust.multimesh.visible_instance_count == 1 and dust._puffs[0] == second and second.slot == 0
+		and dust.multimesh.get_instance_transform(0) == second_transform
+		and dust.multimesh.get_instance_custom_data(0) == second_data,
+		"An expired zombie puff yields its render slot and data to the surviving puff")
 	var expiry := Engine.get_physics_frames() + ceili(Engine.physics_ticks_per_second * 1.80)
 	while Engine.get_physics_frames() < expiry:
 		await physics_frame
