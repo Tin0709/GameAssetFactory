@@ -152,5 +152,6 @@ func run() -> void:
 	await check_detour(100, deg_to_rad(27.0), true, false, true)
 	await check_connected_side(1, 0.0, 1.0)
 	await check_connected_side(100, deg_to_rad(27.0), -1.0)
+	await check_connected_side(1, deg_to_rad(52.0), 1.0)
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)

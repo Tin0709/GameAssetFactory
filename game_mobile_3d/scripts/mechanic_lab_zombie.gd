@@ -96,6 +96,7 @@ const LAB_ROAM_ATTEMPTS := 4
 const LAB_DETOUR_LENGTH := 3.0
 const LAB_DETOUR_MIN_LENGTH := 0.6
 const LAB_DETOUR_TIMEOUT := 1.4
+const LAB_DETOUR_WALL_CLEARANCE := 0.035
 const CROWD_RETRY_MIN_ZOMBIES := 32
 const BLOCKED_CHASE_RETRY_HZ := 30.0
 const PACKED_WALK_RETRY_HZ := 15.0
@@ -682,19 +683,28 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool, targ
 func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3,
 		target_offset: Vector3) -> Vector3:
 	_prepare_lab_path_sweep(true)
+	# Open a small gap beside the wall before testing the two legs.
+	# A shape cast can omit contacts already touching its start.
+	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
+	var clearance := normal.normalized() * LAB_DETOUR_WALL_CLEARANCE
+	var clear_origin := _corpse_floor.to_local(global_position + clearance)
+	if absf(clear_origin.x) > extent.x or absf(clear_origin.z) > extent.z \
+			or not _lab_path_end_clear(space, clearance):
+		clearance = Vector3.ZERO
+	_lab_path_sweep.transform = _lab_path_sweep.transform.translated(clearance)
+	var origin := global_position + clearance
 	var lateral := normal.cross(Vector3.UP).normalized()
 	if _crowd_slot % 2 != 0:
 		lateral = -lateral
-	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
 	var best := Vector3.INF
 	var min_distance := LAB_DETOUR_MIN_LENGTH * LAB_DETOUR_MIN_LENGTH
 	var best_distance := min_distance
 	var best_connects := false
 	for direction in [lateral, -lateral]:
-		var local := _corpse_floor.to_local(global_position + direction * LAB_DETOUR_LENGTH)
+		var local := _corpse_floor.to_local(origin + direction * LAB_DETOUR_LENGTH)
 		local.x = clampf(local.x, -extent.x, extent.x)
 		local.z = clampf(local.z, -extent.z, extent.z)
-		var travel := (_corpse_floor.to_global(local) - global_position).slide(Vector3.UP)
+		var travel := (_corpse_floor.to_global(local) - origin).slide(Vector3.UP)
 		if travel.length_squared() <= min_distance:
 			continue
 		travel *= _lab_path_fraction(space, travel)
@@ -702,11 +712,11 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 		if distance <= min_distance or (best_connects and distance <= best_distance) \
 				or not _lab_path_end_clear(space, travel):
 			continue
-		var connects := _detour_reaches_approach(space, travel, target_offset)
+		var connects := _detour_reaches_approach(space, travel, target_offset - clearance)
 		# Prefer a leg that leads back toward melee. Keep the partial-path
 		# choice when both sides still need another corner.
 		if (connects and not best_connects) or (connects == best_connects and distance > best_distance):
-			best = global_position + travel
+			best = origin + travel
 			best_distance = distance
 			best_connects = connects
 	return best
