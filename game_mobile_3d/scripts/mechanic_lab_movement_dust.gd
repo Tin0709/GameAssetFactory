@@ -9,6 +9,8 @@ const GAUNTLET_DEBRIS_HASH := "b700bc41b85fd6afb00a76bdf7966d708557ac11b01b54eea
 const GAUNTLET_DEBRIS_GRAVITY := 14.7
 const FRAMES := [0, 9, 10, 16, 24, 25]
 const CAPACITY := 16
+# Camera distance in NS_Step_Dust, NS_PlayerLanding_Medium_Dust and NS_Debris_Generic_Small.
+const SOURCE_CAMERA_RANGE := 100.0
 const HEAVY_PARTICLE_COUNT := 10
 const STEP_ALPHA_PATH := "reports/depth/vfx/step-dust-alpha.private.json"
 const STEP_ALPHA_HASH := "c2dae47cc6feaad21508e960739ab5451fcdd691bb194b70ffd85380285579ff"
@@ -188,7 +190,7 @@ func _physics_process(_delta: float) -> void:
 	set_physics_process(false)
 	_emit_dust(_burst_point, _burst_surface, true, true)
 
-func _next_particle(texture: Texture2D) -> Particle:
+func _next_particle(texture: Texture2D, camera_range := 0.0) -> Particle:
 	var particle := _particles[_next]
 	_next = (_next + 1) % _particles.size()
 	if particle.sprite.texture != texture:
@@ -197,6 +199,7 @@ func _next_particle(texture: Texture2D) -> Particle:
 		particle.sprite.vframes = 4 if texture == _smoke_texture else 1
 		particle.sprite.texture = texture
 	particle.debris_drag = 0.0
+	particle.sprite.visibility_range_end = camera_range
 	return particle
 
 func _emit_gauntlet_debris(ground_point: Vector3, surface: String) -> void:
@@ -204,7 +207,7 @@ func _emit_gauntlet_debris(ground_point: Vector3, surface: String) -> void:
 	# 3–5 sprites, 15 cm, 1–1.5 s, and 350–650 cm/s in an upward cone.
 	var tint: Color = SURFACE_DUST.get(surface, SURFACE_DUST.grass)
 	for i in _random.randi_range(3, 5):
-		var particle := _next_particle(_gauntlet_debris_texture)
+		var particle := _next_particle(_gauntlet_debris_texture, SOURCE_CAMERA_RANGE)
 		var yaw := _random.randf_range(0.0, TAU)
 		var outer_angle := deg_to_rad(_random.randf_range(17.5, 25.0))
 		var up := _random.randf_range(cos(outer_angle), 1.0)
@@ -262,7 +265,7 @@ func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: boo
 func _emit_run_dust(ground_point: Vector3, surface: String, size: float) -> void:
 	# NS_Step_Dust spawns one sprite 20 cm above the supported foot, with
 	# zero initial velocity and an upward acceleration of 100 cm/s².
-	var particle := _next_particle(_smoke_texture)
+	var particle := _next_particle(_smoke_texture, SOURCE_CAMERA_RANGE)
 	particle.origin = ground_point + Vector3.UP * 0.20
 	particle.velocity = Vector3.ZERO
 	particle.age = 0.0
@@ -277,7 +280,7 @@ func _emit_source_landing(ground_point: Vector3, surface: String) -> void:
 	# NS_PlayerLanding_Medium_Dust at full scalability. The launch occupies
 	# the band from 85 to 90 degrees about the vertical axis.
 	for i in _random.randi_range(4, 6):
-		var particle := _next_particle(_smoke_texture)
+		var particle := _next_particle(_smoke_texture, SOURCE_CAMERA_RANGE)
 		particle.origin = ground_point + Vector3.UP * 0.50
 		particle.landing_position = particle.origin
 		particle.landing_tick = 0

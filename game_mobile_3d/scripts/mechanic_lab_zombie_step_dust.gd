@@ -5,7 +5,6 @@ const SHADER := preload("res://materials/mechanic_lab_zombie_step_dust.gdshader"
 const CAPACITY := 512
 const ALPHA_SAMPLES := 54
 const TICK_WRAP := 2048
-const CAMERA_DISTANCE_SQUARED := 100.0 * 100.0
 
 class Puff:
 	var origin: Vector3
@@ -29,6 +28,8 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float)
 	_material.set_shader_parameter("dust_tint", MovementDust.SURFACE_DUST.grass)
 	_material.set_shader_parameter("alpha_curve", alpha)
 	_material.set_shader_parameter("alpha_duration", alpha_duration)
+	var range_m := MovementDust.SOURCE_CAMERA_RANGE
+	_material.set_shader_parameter("camera_range_squared", range_m * range_m)
 	var quad := QuadMesh.new()
 	quad.material = _material
 	multimesh = MultiMesh.new()
@@ -47,9 +48,6 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float)
 	return true
 
 func burst(ground_point: Vector3) -> void:
-	var camera := get_viewport().get_camera_3d()
-	if camera != null and camera.global_position.distance_squared_to(ground_point) > CAMERA_DISTANCE_SQUARED:
-		return
 	if _puffs.size() == CAPACITY:
 		_puffs.pop_front()
 	var puff := Puff.new()
