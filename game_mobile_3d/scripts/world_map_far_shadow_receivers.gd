@@ -11,6 +11,7 @@ const RECEIVER_INCLUDES := [
 	"world_map_player_light.gdshaderinc",
 ]
 
+var mist_variant: Callable
 var _variants := {}
 var _generated := {}
 var _bound := {}
@@ -24,6 +25,16 @@ static func authored_shader(shader: Shader) -> Shader:
 		return null
 	var base: Shader = shader.get_meta(MIST_BASE, shader)
 	return base.get_meta(SOURCE, base)
+
+
+func prepare(materials: Array) -> void:
+	for material: ShaderMaterial in materials:
+		if material == null or material.shader == null:
+			continue
+		var source: Shader = material.shader.get_meta(MIST_BASE, material.shader)
+		var variant := _variant_for(source)
+		if variant != null and mist_variant.is_valid() and source.code.contains("GAF_SHARED_MIST"):
+			mist_variant.call(variant)
 
 
 func bind(materials: Array) -> bool:
@@ -91,8 +102,12 @@ func _variant_for(source: Shader) -> Shader:
 		if variant_base == null:
 			_variants[source] = null
 			return null
-	var variant := Shader.new()
-	variant.code = source.code.replace("shader_type spatial;", "shader_type spatial;\n" + COMPILE_SWITCH)
+	var variant: Shader
+	if variant_base != null and mist_variant.is_valid():
+		variant = mist_variant.call(variant_base)
+	else:
+		variant = Shader.new()
+		variant.code = source.code.replace("shader_type spatial;", "shader_type spatial;\n" + COMPILE_SWITCH)
 	variant.set_meta(SOURCE, source)
 	if variant_base != null:
 		variant.set_meta(MIST_BASE, variant_base)

@@ -219,11 +219,16 @@ func _sync_materials(active:bool):
    continue
   var target:=base
   if current.has(key):
-   if not _variants.has(base):
-    var wrapped:=Shader.new();wrapped.code=base.code.replace("shader_type spatial;","shader_type spatial;\n#define GAF_SHARED_MIST");wrapped.set_meta("gaf_mist_base",base);_variants[base]=wrapped
-   target=_variants[base]
+   target=material_variant(base)
   else:_bound_materials.erase(key)
   if m.shader!=target:m.shader=target
+func material_variant(base:Shader)->Shader:
+ if not _variants.has(base):
+  var wrapped:=Shader.new()
+  wrapped.code=base.code.replace("shader_type spatial;","shader_type spatial;\n#define GAF_SHARED_MIST")
+  wrapped.set_meta("gaf_mist_base",base)
+  _variants[base]=wrapped
+ return _variants[base]
 static func base_shader(shader:Shader)->Shader:
  return shader.get_meta("gaf_mist_base",shader) if shader!=null else null
 func _set_gate(value:bool):

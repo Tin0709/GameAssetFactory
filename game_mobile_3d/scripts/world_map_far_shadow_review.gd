@@ -8,6 +8,7 @@ var _world: Node
 var _cache: Cache
 var _receivers := Receivers.new()
 var enabled := true
+var prepare_usec := 0
 
 
 func configure(world: Node, directory: String) -> bool:
@@ -21,6 +22,11 @@ func configure(world: Node, directory: String) -> bool:
 		return false
 	_world = world
 	_cache = cache
+	if is_instance_valid(world.showcase.mist):
+		_receivers.mist_variant = world.showcase.mist.material_variant
+	var started := Time.get_ticks_usec()
+	_receivers.prepare(world.showcase.far_terrain_shading_materials())
+	prepare_usec = Time.get_ticks_usec() - started
 	add_child(cache)
 	process_priority = 110 # After the atmosphere has chosen its material variants.
 	return true
