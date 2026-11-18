@@ -553,6 +553,10 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		and reactions.all(func(voice): return voice.global_position in near_death_points)
 		and audio._next_choice[&"death"] == death_variant,
 		"A distant death on the next physics tick preserves the three nearby death onsets")
+	var future := Engine.get_physics_frames() + ceili(0.10 * Engine.physics_ticks_per_second)
+	check(audio._play(&"death", ear + Vector3.RIGHT * 20.0, COMBAT_AUDIO.DEATH_GAIN_DB, future) == null
+		and audio._next_choice[&"death"] == death_variant,
+		"A fresh death onset survives simulation catch-up")
 	var closest := ear + Vector3.RIGHT * 0.5
 	audio.contact(closest, 1102, true)
 	audio.flush_zombie_combat_cues()
@@ -896,7 +900,7 @@ func check_zombie_attack_onsets(audio: COMBAT_AUDIO, group: Node,
 		var future := frame + catch_up_ticks
 		check(audio._play(cue, far, gain, future) == null
 			and audio._next_choice.get(cue, 0) == choice,
-			"An unaudible %s onset survives simulation catch-up" % cue)
+			"A fresh %s onset survives simulation catch-up" % cue)
 		var closer := audio._play(cue, closest, gain, future)
 		var positions := voices.map(func(voice): return voice.global_position)
 		check(closer != null and positions.has(closest) and positions.has(near[0]) and positions.has(near[1]),
