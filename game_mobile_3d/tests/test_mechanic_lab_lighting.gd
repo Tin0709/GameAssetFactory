@@ -6,10 +6,27 @@ func _initialize() -> void:
 	call_deferred("run")
 
 func run() -> void:
+	root.scaling_3d_scale = 0.9
+	var inherited_scale := root.scaling_3d_scale
+	var inherited_mode := root.scaling_3d_mode
 	var lab := preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
 	await settle()
+	var scale_picker := lab.get_node_or_null("HUD/RenderScale") as OptionButton
+	var mobile := RenderingServer.get_current_rendering_method() == &"mobile"
+	check(is_equal_approx(root.scaling_3d_scale, inherited_scale), "Entering the Lab preserves its inherited render scale")
+	check(scale_picker != null and scale_picker.visible == mobile, "Only the Mobile renderer shows the Lab render scale picker")
+	if mobile and scale_picker != null:
+		check(scale_picker.get_item_count() == 3 and scale_picker.selected == 0,
+			"The picker offers the inherited scale and both lower render scales")
+		var original_rect := root.get_visible_rect()
+		for choice in [Vector2(1, 0.85), Vector2(2, 0.75), Vector2(0, inherited_scale)]:
+			scale_picker.select(int(choice.x))
+			scale_picker.item_selected.emit(int(choice.x))
+			await settle()
+			check(is_equal_approx(root.scaling_3d_scale, choice.y), "The selected 3D scale is applied")
+			check(root.get_visible_rect() == original_rect, "3D render scale leaves the canvas dimensions intact")
 	var sun := lab.get_node("Sun") as DirectionalLight3D
 	var environment: Environment = lab.get_node("WorldEnvironment").environment
 	var noon := [sun.basis, sun.light_color, sun.light_energy, environment.ambient_light_color,
@@ -41,7 +58,12 @@ func run() -> void:
 	check(floor_shape.size == Vector3(100.0, 1.0, 100.0), "The lab keeps its flat 100 × 100 collision floor")
 	check(lab.showcase.projected_sun._weight == 0.0 and lab.showcase._dawn_turf_color == 0.0,
 		"Noon restores the neutral sunlight projection and turf color")
+	if mobile and scale_picker != null:
+		scale_picker.select(1)
+		scale_picker.item_selected.emit(1)
 	lab.free()
+	check(is_equal_approx(root.scaling_3d_scale, inherited_scale) and root.scaling_3d_mode == inherited_mode,
+		"Exiting the Lab restores the inherited viewport settings")
 	print("MECHANIC_LAB_LIGHTING failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 
