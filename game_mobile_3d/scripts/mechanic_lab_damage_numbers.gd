@@ -14,7 +14,7 @@ const BUFFER_UPLOAD_MIN_GLYPHS := 48
 const INSTANCE_FLOATS := 16
 
 class DamageNumber:
-	var text: String
+	var ascii_digits: PackedByteArray
 	var origin: Vector3
 	var travel: Vector3
 	var age := 0.0
@@ -48,7 +48,7 @@ func setup(glyphs: Array[Texture2D]) -> void:
 
 func add_number(amount: int, origin: Vector3, lateral: Vector3) -> void:
 	var number := DamageNumber.new()
-	number.text = str(amount)
+	number.ascii_digits = str(amount).to_ascii_buffer()
 	number.origin = origin + lateral * 0.12
 	number.travel = Vector3.UP * 0.74 + lateral * 0.32
 	_numbers.append(number)
@@ -66,7 +66,7 @@ func _process(delta: float) -> void:
 		if number.age >= NUMBER_DURATION:
 			_numbers.remove_at(i)
 		else:
-			glyph_count += number.text.length()
+			glyph_count += number.ascii_digits.size()
 	if glyph_count == 0:
 		multimesh.visible_instance_count = 0
 		set_process(false)
@@ -79,24 +79,32 @@ func _process(delta: float) -> void:
 	var camera := get_viewport().get_camera_3d()
 	var camera_side := camera.global_basis.x if camera != null else Vector3.RIGHT
 	var camera_back := camera.global_basis.z if camera != null else Vector3.BACK
+	var previous_depth := -INF
+	var needs_sort := false
 	for number in _numbers:
 		var offset: Vector3 = Tween.interpolate_value(Vector3.ZERO, number.travel,
 			number.age, NUMBER_DURATION, Tween.TRANS_QUAD, Tween.EASE_OUT)
 		number.centre = number.origin + offset
 		number.depth = number.centre.dot(camera_back)
+		needs_sort = needs_sort or number.depth <= previous_depth
+		previous_depth = number.depth
 	# Draw farther glyphs first, including when two fading numbers overlap.
-	_numbers.sort_custom(func(a: DamageNumber, b: DamageNumber) -> bool: return a.depth < b.depth)
+	# Keep using the same sort when equal-depth numbers overlap.
+	if needs_sort:
+		_numbers.sort_custom(func(a: DamageNumber, b: DamageNumber) -> bool: return a.depth < b.depth)
 	var slot := 0
+	var local_from_world := global_transform.affine_inverse()
 	for number in _numbers:
 		var scale: float = Tween.interpolate_value(0.85, 0.28, minf(number.age, POP_DURATION),
 			POP_DURATION, Tween.TRANS_BACK, Tween.EASE_OUT)
 		var alpha := minf(1.0, (NUMBER_DURATION - number.age) / FADE_DURATION)
 		var spacing := camera_side * (DIGIT_ADVANCE * NUMBER_PIXEL_SIZE * scale)
-		var length := number.text.length()
-		for i in length:
-			var origin := number.centre + spacing * (i - (length - 1) * 0.5)
-			var point := to_local(origin)
-			var digit := number.text.unicode_at(i) - 48
+		var digits := number.ascii_digits
+		var middle := (digits.size() - 1) * 0.5
+		for i in digits.size():
+			var origin := number.centre + spacing * (i - middle)
+			var point := local_from_world * origin
+			var digit := digits[i] - 48
 			if upload_buffer:
 				# MultiMesh stores three row-major transform rows, then four custom floats.
 				var offset := slot * INSTANCE_FLOATS
