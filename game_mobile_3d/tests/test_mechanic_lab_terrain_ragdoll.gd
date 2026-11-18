@@ -486,7 +486,7 @@ func run() -> void:
 	await check_corner_ragdoll(433, 2.0, true, -1.0, 0.20)
 	await check_corner_ragdoll(65, 4.25)
 	await check_corner_ragdoll(29, 4.25, false, 50.0 / float(ProjectSettings.get_setting("physics/3d/default_gravity")))
-	await check_corner_ragdoll(101, 4.05, false, 1.0)
+	await check_corner_ragdoll(101, 4.05)
 	await check_corner_ragdoll(113, 4.95)
 	await check_corner_ragdoll(238, 4.90, false, 1.0)
 	await check_corner_ragdoll(113, 4.60, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
