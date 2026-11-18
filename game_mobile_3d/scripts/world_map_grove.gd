@@ -612,7 +612,7 @@ func publish_crown_wind(enabled: bool, wind_phase: float, breeze_phase: float, t
 		material.set_shader_parameter("travelling_breeze", travelling)
 
 func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D, shape: Vector4, time: float) -> void:
-	if material.shader.get_meta("gaf_mist_base", material.shader) != shader:
+	if preload("res://scripts/world_map_far_shadow_receivers.gd").authored_shader(material.shader) != shader:
 		var parameters := ["reveal_player", "player_view", "native_specular", "crown_dusk_occlusion",
 			"crown_ambient_depth", "canopy_direct", "canopy_direct_height"]
 		var values := parameters.map(material.get_shader_parameter)
@@ -634,19 +634,22 @@ func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D,
 		material.set_shader_parameter("cloud_shape", shape)
 		material.set_shader_parameter("cloud_time", time)
 
-func mist_receivers(strength: float) -> Array[ShaderMaterial]:
-	if strength <= 0.0:
-		return []
+func visible_shading_materials() -> Array[ShaderMaterial]:
 	var receivers: Array[ShaderMaterial] = []
 	if visible:
 		receivers.append_array([_appearance, _canopy_appearance])
 	if spruce_visible():
 		receivers.append(_spruce_appearance)
+	return receivers
+
+func mist_receivers(strength: float) -> Array[ShaderMaterial]:
+	if strength <= 0.0:
+		return []
 	if _mist_strength != strength:
 		_mist_strength = strength
 		for material in [_appearance, _canopy_appearance, _spruce_appearance]:
 			material.set_shader_parameter("grove_mist_strength", strength)
-	return receivers
+	return visible_shading_materials()
 
 func publish_cloud_time(time: float) -> void:
 	if not _direct_clouds: return

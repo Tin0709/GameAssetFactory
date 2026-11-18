@@ -417,6 +417,11 @@ func _restore(minute := 0., drop_textures := true) -> void:
 	RenderingServer.global_shader_parameter_set("gaf_far_depth",_dummy)
 	RenderingServer.global_shader_parameter_set("gaf_far_depth_next",_dummy)
 
+func wants_receivers(player: Vector3, minute: float) -> bool:
+	return _stream != null and sun.shadow_enabled and is_finite(minute) and minute >= _first and minute < _last \
+			and (not _active.is_empty() or not _choose(Vector2(player.x, player.z)).is_empty())
+
+
 func update_shadow(delta: float, player: Vector3, velocity: Vector3,
 		minute: float, context_allows_shadows: bool) -> void:
 	if _stream == null or _dummy == null or _global_owner == null or _global_owner.get_ref() != self or not is_instance_valid(sun):

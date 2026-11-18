@@ -129,6 +129,7 @@ var player_light:Node
 var canopy_player_cue: Node
 var vegetation_visible:=true
 var showcase: Node
+var far_shadow_review: Node
 var heavy_landing_audio: CombatAudio
 var _camera_ground_y := NAN
 var _camera_size_target := CAMERA_SIZE_DEFAULT
@@ -269,7 +270,22 @@ func _ready() -> void:
 		elif spruce_sky.proof_ready:
 			showcase.mist.set_sky_field(spruce_sky.mist_sky_field(), spruce_sky.mist_sky_current)
 		showcase._refresh_lighting_mix(&"mist_sky_scatter")
+	_setup_far_shadow_review()
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
+
+func _setup_far_shadow_review() -> void:
+	if not OS.has_feature("editor") or _uses_portable_biome():
+		return
+	var directory := OS.get_environment("GAF_FAR_SHADOW_CACHE")
+	if directory.is_empty():
+		return
+	var review := preload("res://scripts/world_map_far_shadow_review.gd").new()
+	if review.configure(self, directory):
+		far_shadow_review = review
+		review.name = "FarTerrainShadows"
+		add_child(review)
+	else:
+		review.free()
 
 func _uses_portable_biome() -> bool:
 	return is_device_review() or map_layout_path != DATA or (biome_graphics != null and not biome_graphics.use_forest_reference)

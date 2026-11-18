@@ -1697,7 +1697,7 @@ func _setup_basin_boulders() -> void:
 		rock.name = "BasinBoulders" if i == 0 else "BasinBoulder%d" % (i + 1)
 		level.add_child(rock)
 
-func _mist_materials()->Array:
+func _scene_light_materials() -> Array:
 	var result:Array=level.look.materials.values()
 	result.append_array(level.look._direct_actor_materials)
 	if _flat_lab:
@@ -1719,7 +1719,17 @@ func _mist_materials()->Array:
 	for rock in basin_boulders:
 		if is_instance_valid(rock) and rock.active:
 			result.append(rock.material)
-	if grove_mist_enabled and level.grove != null:
+	return result
+
+func far_terrain_shading_materials() -> Array:
+	var result := _scene_light_materials()
+	if not _flat_lab and is_instance_valid(level.grove):
+		result.append_array(level.grove.visible_shading_materials())
+	return result
+
+func _mist_materials()->Array:
+	var result := _scene_light_materials()
+	if not _flat_lab and grove_mist_enabled and level.grove != null:
 		var tree_weight := PHASE_FINISH.phase_weight(hour)
 		if _biome_profile != null:
 			var authored := DayNight.sample_curve(_biome_profile.grove_mist_by_hour, hour / 24., tree_weight)
