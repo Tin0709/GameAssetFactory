@@ -89,7 +89,7 @@ static func research_root() -> String:
 	return root
 
 func prepare(world: Node3D, origin: Vector3, expected_layout_sha: String, linked_name: StringName = &"") -> void:
-	if _attempted or not is_instance_valid(world) \
+	if _attempted or not is_instance_valid(world) or world.is_device_review() \
 			or not OS.has_feature("editor") or RenderingServer.get_current_rendering_method() != "mobile" \
 			or RenderingServer.get_rendering_device() == null:
 		return
