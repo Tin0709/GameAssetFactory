@@ -25,6 +25,8 @@ func run() -> void:
 	var group = lab.get_node("Zombies")
 	check(group.damage_digits().size() == 10 and group._visual != null and group.get_child_count() == 0,
 		"Lab startup prepares the verified zombie model and digits before the first spawn")
+	check(group._ragdoll_layout.get("simulator_template") is PackedScene,
+		"Lab startup prepares the dormant physics rig before the first spawn")
 	lab.get_node("HUD/BaseZombieToggle").button_pressed = true
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	if group.get_child_count() != 1:
