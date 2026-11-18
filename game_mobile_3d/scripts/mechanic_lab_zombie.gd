@@ -117,6 +117,7 @@ const LAB_ATTACK_HIT_SECTION := 13.0 / 30.0
 const LAB_MELEE_MONTAGE_RATE := 1.1
 const MELEE_CONTACT_TIME := 17.0 / 30.0
 const LEVEL_COLLISION_MASK := 1
+const LIVING_ZOMBIE_LAYER := 4
 const CORPSE_COLLISION_LAYER := 8
 const CORPSE_LIFETIME := 5.0
 const CORPSE_DESATURATION_START := 2.3
@@ -266,8 +267,8 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 	collision.position.y = HEIGHT * 0.5
 	collision.shape = _live_capsule
 	add_child(collision)
-	collision_layer = 4
-	collision_mask = 1 | 2 | 4
+	collision_layer = LIVING_ZOMBIE_LAYER
+	collision_mask = LEVEL_COLLISION_MASK | 2 | LIVING_ZOMBIE_LAYER
 
 func _ready() -> void:
 	set_process(false)
@@ -596,11 +597,18 @@ func _pick_roam_destination() -> Vector3:
 			return point
 	return Vector3.INF
 
-func _prepare_lab_path_sweep() -> void:
+func _prepare_lab_path_sweep(include_zombies := false) -> void:
 	_lab_path_sweep.transform = Transform3D(Basis.IDENTITY, global_position + Vector3.UP * (HEIGHT * 0.5))
 	# Keep terrain in the query and exclude the flat floor supporting the capsule.
 	var floor_body := _corpse_floor.get_parent() as StaticBody3D
-	_lab_path_sweep.exclude = [floor_body.get_rid()] if floor_body != null else []
+	var exclude: Array[RID] = []
+	if floor_body != null:
+		exclude.append(floor_body.get_rid())
+	_lab_path_sweep.collision_mask = LEVEL_COLLISION_MASK
+	if include_zombies:
+		_lab_path_sweep.collision_mask |= LIVING_ZOMBIE_LAYER
+		exclude.append(get_rid())
+	_lab_path_sweep.exclude = exclude
 
 func _lab_path_fraction(space: PhysicsDirectSpaceState3D, travel: Vector3) -> float:
 	_lab_path_sweep.motion = travel
@@ -624,7 +632,10 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool) -> V
 		_chase_detour_time -= delta
 		var travel := (_chase_detour - global_position).slide(Vector3.UP)
 		var distance := travel.length()
-		if _chase_detour_time > 0.0 and distance > LAB_WAYPOINT_ARRIVAL:
+		var stalled := is_on_wall() and get_real_velocity().dot(travel) < MIN_WALL_PROGRESS_SPEED * distance
+		_chase_stalled_seconds = _chase_stalled_seconds + delta if stalled else 0.0
+		if (_chase_detour_time > 0.0 and distance > LAB_WAYPOINT_ARRIVAL
+				and _chase_stalled_seconds < LAB_WALL_STALL_TIME):
 			var direct_clear := false
 			if sample_ai:
 				var space := get_world_3d().direct_space_state
@@ -659,7 +670,7 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool) -> V
 	return Vector3.ZERO
 
 func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3) -> Vector3:
-	_prepare_lab_path_sweep()
+	_prepare_lab_path_sweep(true)
 	var lateral := normal.cross(Vector3.UP).normalized()
 	if _crowd_slot % 2 != 0:
 		lateral = -lateral
