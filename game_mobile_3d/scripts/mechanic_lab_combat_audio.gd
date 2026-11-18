@@ -143,6 +143,64 @@ const TOOL_SAMPLES := {
 		]],
 	],
 }
+# DT_MeleePropertyDefinition uses shared events with a switch for each weapon.
+# The exported samples below match the weapon name and event folder.
+const MELEE_SWITCH_SAMPLES := {
+	&"sabre_equip": {
+		"sfx_sabre_equip_01": "655a0c40a00fc7c223fe3fd746ef24768b4ed6c682c41769085244516620f8ac",
+	},
+	&"sabre_unequip": {
+		"sfx_sabre_unequp_01": "1bc13d53843ff68a30cd0f561b33dbd700e14f6146437cd30663aa91aac47128",
+	},
+	&"sword_equip": {
+		"sfx_sword_equip": "ddbb9925fab548575418e2d7e6bc4bbd26530eba379e2918f38979c40f1c497f",
+	},
+	&"sword_unequip": {
+		"sfx_sword_unequip": "83695d219518b086dfda0205f78a74185a082daa766680fe61adc728cbffebce",
+	},
+	&"curved_greatsword_equip": {
+		"sfx_item_curvedgreatsword_equip": "d70229684a5aa102d48b4218dfb3d7a45a7bf32f0a777f7ae35bf198fd6cd412",
+	},
+	&"curved_greatsword_unequip": {
+		"sfx_item_curvedgreatsword_unequip": "41d2812815ab3511f19f465df52301f8f492c0a40f788bc6bd386f071e27c1c7",
+	},
+	&"cleaver_equip": {
+		"sfx_cleaver_equip": "42fe8c444dd612959bf10263fb1f1ca5ed5d5a800025fbffd5c1371815d3a885",
+	},
+	&"cleaver_unequip": {
+		"sfx_cleaver_unequip": "2075385ebc5ae98c2d6f96358410609a27a9648eb67984f25d80e4a6a52d9817",
+	},
+	&"gauntlet_unequip": {
+		"sfx_gauntlet_unequip": "4d5256b4b2139b02a7e7e0eeec2bfca68f9a6f476a0542be47128558e4f82c31",
+	},
+	&"prime_gauntlet_equip": {
+		"sfx_gauntlets_unique_equip_01": "4a56c22d92d2995009c79ba0a5d41b4ba35f6cdcfb38ec5597102c4b9ca69561",
+		"sfx_gauntlets_unique_equip_02": "b0791549020179df002d1e7b94a2b0f2a3ddaed2f9f5b041ab7e7cb86ee9df07",
+		"sfx_gauntlets_unique_equip_03": "fc5545a4a6597a73eb468ef108853774f60e65e18251d7eff4dee52537cb98d2",
+	},
+	&"prime_gauntlet_unequip": {
+		"sfx_gauntlets_unique_unequip_01": "7d9f48d7548d7287f4a1543679efb091e4065e3d6e6f8cb20c6290d7a5152b78",
+		"sfx_gauntlets_unique_unequip_02": "9a1ac20f78424262d8672ba17a3b1179a875395630511f4eeeec9d091f42b900",
+		"sfx_gauntlets_unique_unequip_03": "72fdc8db62cf7ffb914065c8fee8b0df5793e378bddecfd77e7737d3f63f0e81",
+		"sfx_gauntlets_unique_unequip_04": "c48c4755d82822e60c71d3354116bd8d24c4596938ba5ba34217bad75c61c5ac",
+	},
+	&"pickaxe_equip": {
+		"sfx_pickaxe_equip_01": "02b7945e8fc82f749eb7019fecb442217240f14725a14d2f92aa1c8ea64e4938",
+		"sfx_pickaxe_equip_02": "7a5942053fd6f149d006e534b824b0c870d02c7f7f36eff0e7db596cd1150fe0",
+		"sfx_pickaxe_equip_03": "f1d6a59f8423c03879ad8aba0016107df825130686e9babbc49e946e69c7cfd1",
+	},
+	&"pickaxe_unequip": {
+		"sfx_pickaxe_unequip_01": "6779bdccf10ee49081303ec743c5ca7738dbcc30eea94652ed649652c6aad1ed",
+		"sfx_pickaxe_unequip_02": "2fbf5f60da21602f94f234dbfe2062410845500828b47bf686166d3a573c57e3",
+		"sfx_pickaxe_unequip_03": "0eb88ac3f9a843eed9776340f718661357e196f056e1ccb8dc81524233cbffe3",
+	},
+	&"shovel_equip": {
+		"sfx_shovel_equip": "cca527841a727925f491678f00c01c0674795a08ad29bb089cd50a12c420fed5",
+	},
+	&"shovel_unequip": {
+		"sfx_shovel_unequip": "4ab811f6ef1737cb7702e50f8308c2aaa8186fe3763332d0f43993da44d34c20",
+	},
+}
 const GAUNTLET_SWING_HASHES := {
 	"light": [
 		"5ca970f981961963617c5903b5bb66505e76ceefc41ab0ad52286ecdd738e07f",
@@ -438,6 +496,20 @@ func tool_swung(tool: StringName, point: Vector3, index: int, airborne: bool) ->
 func tool_landed(tool: StringName, point: Vector3) -> void:
 	if enabled:
 		_play(_tool_group(tool, 4), point, SLAM_GAIN_DB, -1, true)
+
+func melee_switched(weapon: StringName, equipped: bool, point: Vector3) -> void:
+	if not enabled or _voices.is_empty() or weapon.is_empty():
+		return
+	var group := StringName("%s_%s" % [weapon, "equip" if equipped else "unequip"])
+	if not _groups.has(group):
+		var samples: Dictionary = MELEE_SWITCH_SAMPLES.get(group, {})
+		if samples.is_empty():
+			return
+		var folder := "3_weapons_melee_equip/" if equipped else "4_weapons_melee_unequip/"
+		var root := _research_root()
+		for stem: String in samples:
+			_load_sample(root, group, TOOL_AUDIO + folder + stem + ".ogg", samples[stem])
+	_play(group, point, EQUIP_GAIN_DB)
 
 func crossbow_switched(equipped: bool, point: Vector3) -> void:
 	if enabled:

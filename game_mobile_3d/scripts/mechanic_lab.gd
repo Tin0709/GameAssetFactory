@@ -75,6 +75,17 @@ const MELEE_AUDIO_NAMES := {
 	Weapon.PICKAXE: &"pickaxe", Weapon.SHOVEL: &"shovel",
 }
 
+const MELEE_EQUIPMENT_NAMES := {
+	Weapon.SABRE: &"sabre",
+	Weapon.SWORD: &"sword",
+	Weapon.CURVED_GREATSWORD: &"curved_greatsword",
+	Weapon.GAUNTLETS: &"prime_gauntlet",
+	Weapon.CLEAVER: &"cleaver",
+	Weapon.BASIC_GAUNTLETS: &"gauntlet",
+	Weapon.PICKAXE: &"pickaxe",
+	Weapon.SHOVEL: &"shovel",
+}
+
 var presentation: Node
 var look: WorldLook
 var showcase: WorldShowcase
@@ -461,16 +472,20 @@ func _select_weapon(index: int) -> void:
 	player.effects.reset()
 	_cancel_slam_audio()
 	_combat_audio.reset()
-	var was_crossbow := _equipped_weapon == Weapon.CROSS_POLLINATOR
-	var was_bow := _equipped_weapon == Weapon.BOW
+	var previous := _equipped_weapon
+	var was_crossbow := previous == Weapon.CROSS_POLLINATOR
+	var was_bow := previous == Weapon.BOW
 	_equipped_weapon = index as Weapon
 	var sword_equipped := index == Weapon.SWORD
 	var curved_equipped := index == Weapon.CURVED_GREATSWORD
 	var crossbow_equipped := index == Weapon.CROSS_POLLINATOR
+	var switch_point := player.global_position + Vector3.UP
+	_combat_audio.melee_switched(MELEE_EQUIPMENT_NAMES.get(previous, &""), false, switch_point)
 	if crossbow_equipped != was_crossbow:
-		_combat_audio.crossbow_switched(crossbow_equipped, player.global_position + Vector3.UP)
+		_combat_audio.crossbow_switched(crossbow_equipped, switch_point)
 	if bow_equipped != was_bow:
-		_bow.play_switch(bow_equipped, player.global_position + Vector3.UP)
+		_bow.play_switch(bow_equipped, switch_point)
+	_combat_audio.melee_switched(MELEE_EQUIPMENT_NAMES.get(index, &""), true, switch_point)
 	player.active_clip = ""
 	# Switching out of a special locomotion profile restores the source slots first.
 	player.crossbow_equipped = crossbow_equipped
