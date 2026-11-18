@@ -49,7 +49,6 @@ func setup(actor: CharacterBody3D, terrain_contact := Callable(), physics_clock 
 	actor.surface_contact.connect(_on_surface_contact)
 	actor.presentation_reset.connect(clear)
 	set_process(false)
-	set_physics_process(false)
 	return true
 
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
@@ -77,37 +76,34 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	wake.material.albedo_color = TINT
 	wake.mesh.show()
 	set_process(true)
-	set_physics_process(_physics_clock)
-
-func _physics_process(delta: float) -> void:
-	var tick := Engine.get_physics_frames()
-	for wake in _wakes:
-		if wake.mesh.visible and wake.contact_tick != tick:
-			wake.age += delta
 
 func _process(delta: float) -> void:
 	var active := false
-	var render_offset := 0.0
-	if _physics_clock and not Engine.is_in_physics_frame():
-		render_offset = Engine.get_physics_interpolation_fraction() * get_physics_process_delta_time()
+	var render_tick := 0.0
+	var step := 0.0
+	if _physics_clock:
+		# Match the player's interpolated pose and the dust from the same step.
+		render_tick = float(Engine.get_physics_frames())
+		if not Engine.is_in_physics_frame():
+			render_tick += Engine.get_physics_interpolation_fraction() - 1.0
+		step = get_physics_process_delta_time()
 	for wake in _wakes:
 		if not wake.mesh.visible:
 			continue
-		if not _physics_clock:
+		if _physics_clock:
+			wake.age = maxf(render_tick - wake.contact_tick, 0.0) * step
+		else:
 			wake.age += delta
-		var age := wake.age + render_offset
-		if age >= LIFETIME:
+		if wake.age >= LIFETIME:
 			wake.mesh.hide()
 			continue
-		var progress := age / LIFETIME
+		var progress := wake.age / LIFETIME
 		wake.mesh.global_position = wake.origin + wake.trailing * progress * 0.16
 		wake.material.albedo_color.a = TINT.a * (1.0 - smoothstep(0.12, 1.0, progress))
 		active = true
 	set_process(active)
-	set_physics_process(active and _physics_clock)
 
 func clear() -> void:
 	for wake in _wakes:
 		wake.mesh.hide()
 	set_process(false)
-	set_physics_process(false)
