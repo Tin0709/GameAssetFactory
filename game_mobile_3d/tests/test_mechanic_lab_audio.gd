@@ -211,6 +211,10 @@ func check_run_step_after_landing(bus: int, capture: AudioEffectCapture) -> void
 	current_scene = lab
 	var movement = lab.get_node("MovementAudio")
 	var player = lab.player
+	var step_ticks: Array[int] = []
+	player.surface_contact.connect(func(_point: Vector3, landed: bool):
+		if not landed:
+			step_ticks.append(Engine.get_physics_frames()))
 	lab.reset_player()
 	lab.get_node("HUD/CombatAudioToggle").button_pressed = true
 	for voice: AudioStreamPlayer3D in movement.step_voices:
@@ -233,6 +237,7 @@ func check_run_step_after_landing(bus: int, capture: AudioEffectCapture) -> void
 			break
 	var steps_before: int = movement.event_count.grass
 	var touchdown: float = player.simulation_clock
+	step_ticks.clear()
 	var landing: AudioStreamPlayer3D
 	for voice: AudioStreamPlayer3D in movement.step_voices:
 		if voice.playing and movement.groups.land_grass.any(func(row): return row.stream == voice.stream):
@@ -263,6 +268,13 @@ func check_run_step_after_landing(bus: int, capture: AudioEffectCapture) -> void
 	check(movement.event_count.grass == steps_before + 1 and step_voice != null
 		and landing.playing and landing.stream == landing_source,
 		"The first new running plant plays alongside the landing during a zombie cue burst")
+	var dust := lab.get_node("MovementDust")
+	var wind := lab.get_node("MovementWind")
+	var contact_tick := step_ticks[0] if not step_ticks.is_empty() else -1
+	check(step_ticks.size() == 1
+		and dust._particles.any(func(puff): return puff.contact_tick == contact_tick and puff.sprite.visible)
+		and wind._wakes.any(func(wake): return wake.contact_tick == contact_tick and wake.mesh.visible),
+		"The restored running plant starts dust and wind on the same physics tick")
 	check(player.simulation_clock - touchdown < 0.15, "The fixture samples the first tenth-second after touchdown")
 	Input.action_release("move_forward")
 	await create_timer(0.10).timeout
