@@ -1,3 +1,4 @@
+#include "res://materials/world_map_far_terrain_shadow.gdshaderinc"
 #include "res://materials/world_map_point_kernel.gdshaderinc"
 #include "res://materials/world_map_sun_opening.gdshaderinc"
 // Original WorldMap direct-light response. Godot still resolves ambient, fog and shadows.
@@ -30,9 +31,10 @@ float world_cloud_fresnel(float cosine) {
 #endif
 
 void light() {
+	float shadow_attenuation = GAF_RESOLVE_TERRAIN_SHADOW;
 	float point_transfer=gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
-	float point_attenuation=ATTENUATION*point_transfer;
-	vec3 key_color = LIGHT_COLOR * gaf_opening_gain(LIGHT_IS_DIRECTIONAL, ATTENUATION * cloud_transmission);
+	float point_attenuation=shadow_attenuation*point_transfer;
+	vec3 key_color = LIGHT_COLOR * gaf_opening_gain(LIGHT_IS_DIRECTIONAL, shadow_attenuation * cloud_transmission);
 #ifdef GAF_WORLD_CANOPY_DIRECT_SOFTNESS
 	if (LIGHT_IS_DIRECTIONAL && canopy_direct_coverage > 0.0 &&
 			dot(mat3(INV_VIEW_MATRIX) * LIGHT, canopy_direct.xyz) > 0.9999) {
@@ -50,12 +52,12 @@ void light() {
 	float nl = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	DIFFUSE_LIGHT += gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
-		ATTENUATION, cloud_transmission, nl, terrain_direct_contact);
+		shadow_attenuation, cloud_transmission, nl, terrain_direct_contact);
 	// The same directional light and shadow term shape both the original key and the warmth.
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sun_warmth.w > 0.0
 			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sun_warmth.xyz) > 0.9999
 			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
-		float open_sun = smoothstep(.38, .91, ATTENUATION * cloud_transmission);
+		float open_sun = smoothstep(.38, .91, shadow_attenuation * cloud_transmission);
 		float facing = smoothstep(.08, .43, nl);
 		vec3 warm_key = key_color * (1.0 + gaf_stone_sun_warmth.w * open_sun * facing * vec3(1.15, .72, .08));
 		if (gaf_stone_warmth_luma_trim > 0.0) {
@@ -70,7 +72,7 @@ void light() {
 			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
 		vec2 offset = (stone_sunset_position - gaf_stone_sunset_region.xy) / gaf_stone_sunset_region.zw;
 		float region = 1.0 - smoothstep(0.08, 1.0, dot(offset, offset));
-		float direct = smoothstep(0.16, 0.80, ATTENUATION) * smoothstep(0.09, 0.45, nl);
+		float direct = smoothstep(0.16, 0.80, shadow_attenuation) * smoothstep(0.09, 0.45, nl);
 		key_color *= 1.0 - gaf_stone_sunset_beam.w * region * direct;
 	}
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL &&
@@ -78,7 +80,7 @@ void light() {
 		max(LIGHT_COLOR.r, max(LIGHT_COLOR.g, LIGHT_COLOR.b)) > 0.0 &&
 		dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_shade_fill.xyz) > 0.9999 &&
 		distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
-		float shade = 1.0 - smoothstep(.04, .68, ATTENUATION);
+		float shade = 1.0 - smoothstep(.04, .68, shadow_attenuation);
 		if (gaf_stone_shade_fill.w > 0.0) {
 			// Use the receiver's existing sky and contact terms on sun-facing rock in shadow.
 			float facing = smoothstep(.03, .38, nl);
@@ -102,7 +104,7 @@ void light() {
 				vec3 returned = mix(source, vec3(source_y), .30);
 				DIFFUSE_LIGHT += returned * terrain_direct_contact * (wall * shade * gaf_stone_wall_return);
 			}
-			if (gaf_sheltered_stone_return > 0.0 && wall > 0.0 && ATTENUATION < .36) {
+			if (gaf_sheltered_stone_return > 0.0 && wall > 0.0 && shadow_attenuation < .36) {
 				// Fill the part of the shaded receiver's sky contribution that lacks a
 				// directional return. Preserve contrast where the baked return is already strong.
 				vec3 sky = terrain_opening_incident;
@@ -110,14 +112,14 @@ void light() {
 				float existing_return = source_y * (1.0 + gaf_stone_wall_return * shade);
 				float gap = max(.72 * sky_y - existing_return, 0.0);
 				vec3 tint = mix(vec3(1.0), sky / max(sky_y, .00001), .45);
-				float inner_shade = 1.0 - smoothstep(.035, .36, ATTENUATION);
+				float inner_shade = 1.0 - smoothstep(.035, .36, shadow_attenuation);
 				float recovery = min(gap * gaf_sheltered_stone_return, .085);
 				DIFFUSE_LIGHT += tint * (recovery * wall * inner_shade * terrain_direct_contact);
 			}
 		}
 #endif
 	}
-	float opening_fill = gaf_diffuse_opening_weight(LIGHT_IS_DIRECTIONAL, LIGHT, LIGHT_COLOR, INV_VIEW_MATRIX, ATTENUATION * cloud_transmission);
+	float opening_fill = gaf_diffuse_opening_weight(LIGHT_IS_DIRECTIONAL, LIGHT, LIGHT_COLOR, INV_VIEW_MATRIX, shadow_attenuation * cloud_transmission);
 	if (opening_fill > 0.0) {
 		DIFFUSE_LIGHT += terrain_opening_incident * (opening_fill * smoothstep(0.0, 0.22, nl));
 	}
@@ -147,7 +149,7 @@ void light() {
 		if (gaf_turf_sun_chroma.w > 0.0 && use_source_terrain && surface_top > 0.998 &&
 				(ground_grade == 1 || ground_grade == 2) &&
 				ALBEDO.g > ALBEDO.r * 1.22 && ALBEDO.g > ALBEDO.b * 1.35) {
-			float tint = gaf_turf_sun_weight(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX, ATTENUATION * cloud_transmission);
+			float tint = gaf_turf_sun_weight(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX, shadow_attenuation * cloud_transmission);
 			if (tint > 0.0) diffuse_incident *= gaf_diffuse_chroma_scale(ALBEDO, incident, vec3(1.67, 1.0, 1.75), tint);
 		}
 		if (gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && surface_top > 0.998 && ground_grade == 1
