@@ -453,28 +453,36 @@ func _correct_physical_pose() -> void:
 
 func _project_source_anchors() -> void:
 	var flat_floor := is_instance_valid(_flat_floor)
+	var last_parent := ""
+	var parent_state: PhysicsDirectBodyState3D
 	for name: String in source_joint_rids:
 		var spec: Dictionary = source_joints[name]
 		var child: PhysicalBone3D = bodies[name]
-		var parent: PhysicalBone3D = bodies[spec.parent]
 		var state := PhysicsServer3D.body_get_direct_state(child.get_rid())
-		var parent_state := PhysicsServer3D.body_get_direct_state(parent.get_rid())
+		# The five zombie limbs share a parent. Reuse its live state within
+		# this pass, reading the transform afresh for every joint.
+		var parent_name: String = spec.parent
+		if parent_name != last_parent:
+			var parent: PhysicalBone3D = bodies[parent_name]
+			parent_state = PhysicsServer3D.body_get_direct_state(parent.get_rid())
+			last_parent = parent_name
 		if state == null or parent_state == null:
 			continue
 		var parent_frame: Transform3D = parent_state.transform * spec.parent_frame
 		var child_frame: Transform3D = state.transform * spec.child_frame
 		# Godot's cone solver flips its swing axis past perpendicular. A limb
 		# braced against terrain can wrench the anchor apart before that flip.
+		var contact_count := state.get_contact_count()
 		var alignment := child_frame.basis.x.dot(parent_frame.basis.x)
 		var overshot := alignment <= 0.0
 		if not overshot and alignment < CONE_SUPPORT_OVERSHOOT_COS:
-			for index in state.get_contact_count():
+			for index in contact_count:
 				if state.get_contact_local_normal(index).y > MIN_SUPPORT_NORMAL_Y:
 					overshot = true
 					break
 		var bias := CONE_OVERSHOOT_BIAS if overshot else CONE_DEFAULT_BIAS
 		_set_source_joint_bias(source_joint_rids[name], bias)
-		var contacting := state.get_contact_count() > 0
+		var contacting := contact_count > 0
 		var correction := parent_frame.origin - child_frame.origin
 		var distance := correction.length()
 		if contacting and flat_floor:
