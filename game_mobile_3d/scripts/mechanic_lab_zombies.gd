@@ -94,6 +94,9 @@ const IMPULSE_PER_STRENGTH := 0.43
 const MELEE_CONTACT_HEIGHT := Vector3.UP * (Zombie.HEIGHT * 0.5)
 
 class SpawnSearch:
+	var player_position: Vector3
+	var facing: Basis
+	var positions: PackedVector3Array
 	var occupied: Dictionary[Vector2i, PackedVector3Array] = {}
 	var ring := 0
 	var slot := 0
@@ -113,6 +116,7 @@ var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
 var _ragdoll_layout: Dictionary
 var _digits: Array[Texture2D]
+var _last_spawn_search: SpawnSearch
 var _spawn_serial := 0
 var _attack_serial := -1
 var _landing_serial := -1
@@ -137,10 +141,12 @@ func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie:
 	if _visual == null:
 		return false
 	var floor_position := Vector3(player.global_position.x, 0.0, player.global_position.z)
-	var point := _find_spawn_point(floor_position, facing, _build_spawn_search())
+	var search := _spawn_search_for(floor_position, facing)
+	var point := _find_spawn_point(floor_position, facing, search)
 	if not point.is_finite():
 		return false
 	_spawn_at(point, floor_position, player, effects, base_zombie)
+	_mark_spawn_position(search, point)
 	return true
 
 func spawn_batch(player: CharacterBody3D, facing: Basis, effects: Node3D,
@@ -149,8 +155,8 @@ func spawn_batch(player: CharacterBody3D, facing: Basis, effects: Node3D,
 		_load_assets()
 	if _visual == null:
 		return {"count": 0, "blocked": true}
-	var search := _build_spawn_search()
 	var floor_position := Vector3(player.global_position.x, 0.0, player.global_position.z)
+	var search := _spawn_search_for(floor_position, facing)
 	var count := 0
 	for i in limit:
 		var point := _find_spawn_point(floor_position, facing, search)
@@ -180,14 +186,25 @@ func _spawn_at(point: Vector3, floor_position: Vector3, player: CharacterBody3D,
 	add_child(zombie, true)
 	zombie.look_at(floor_position, Vector3.UP, true)
 
-func _build_spawn_search() -> SpawnSearch:
-	var search := SpawnSearch.new()
+func _spawn_search_for(floor_position: Vector3, facing: Basis) -> SpawnSearch:
+	var positions: PackedVector3Array = []
 	for zombie: Zombie in get_children():
 		if zombie.health > 0:
-			_mark_spawn_position(search, zombie.position)
-	return search
+			positions.append(zombie.position)
+	# A move, death, or turn can make an earlier candidate available again,
+	# including when those changes happen between calls in the same frame.
+	if _last_spawn_search != null and _last_spawn_search.player_position == floor_position \
+			and _last_spawn_search.facing == facing and _last_spawn_search.positions == positions:
+		return _last_spawn_search
+	_last_spawn_search = SpawnSearch.new()
+	_last_spawn_search.player_position = floor_position
+	_last_spawn_search.facing = facing
+	for point: Vector3 in positions:
+		_mark_spawn_position(_last_spawn_search, point)
+	return _last_spawn_search
 
 static func _mark_spawn_position(search: SpawnSearch, point: Vector3) -> void:
+	search.positions.append(point)
 	var cell := _spawn_cell(point)
 	var positions: PackedVector3Array = search.occupied.get(cell, PackedVector3Array())
 	positions.append(point)
