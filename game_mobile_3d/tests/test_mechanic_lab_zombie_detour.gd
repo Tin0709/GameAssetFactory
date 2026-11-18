@@ -19,7 +19,7 @@ func add_wall(lab: Node3D, point: Vector3, size: Vector3, yaw: float) -> void:
 	wall.rotation.y = yaw
 	lab.add_child(wall)
 
-func check_detour(member_count: int, yaw: float, block_right: bool) -> void:
+func check_detour(member_count: int, yaw: float, block_right: bool, block_with_zombie := false) -> void:
 	var lab := LAB.instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -37,7 +37,10 @@ func check_detour(member_count: int, yaw: float, block_right: bool) -> void:
 		member.set_physics_process(i == 0)
 	var heading := Basis(Vector3.UP, yaw)
 	add_wall(lab, heading * Vector3(0.0, 0.35, -2.25), Vector3(2.5, 0.7, 0.3), yaw)
-	if block_right:
+	if block_with_zombie:
+		var blocker := zombies.get_child(1) as ZOMBIE
+		blocker.position = heading * Vector3(0.95, 0.02, -2.84)
+	elif block_right:
 		add_wall(lab, heading * Vector3(0.95, 0.4, -3.3), Vector3(0.3, 0.8, 2.2), yaw)
 	var chaser := zombies.get_child(0) as ZOMBIE
 	chaser.position = heading * Vector3(0.0, 0.02, -4.2)
@@ -60,7 +63,8 @@ func check_detour(member_count: int, yaw: float, block_right: bool) -> void:
 		failures.append("A blocked right side should send the chaser around the left edge")
 	if not hits.all(func(damage): return damage == ZOMBIE.MELEE_DAMAGE):
 		failures.append("Detouring should preserve the normal melee hit")
-	print("LAB_VISIBLE_DETOUR members=", member_count, " yaw=", rad_to_deg(yaw), " cross_x=", crossing_x,
+	print("LAB_VISIBLE_DETOUR members=", member_count, " yaw=", rad_to_deg(yaw),
+		" zombie_blocker=", block_with_zombie, " cross_x=", crossing_x,
 		" hits=", hits.size(), " visible=", visible_ticks)
 	lab.free()
 	await physics_frame
@@ -68,5 +72,6 @@ func check_detour(member_count: int, yaw: float, block_right: bool) -> void:
 func run() -> void:
 	await check_detour(1, 0.0, false)
 	await check_detour(100, deg_to_rad(27.0), true)
+	await check_detour(100, 0.0, true, true)
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
