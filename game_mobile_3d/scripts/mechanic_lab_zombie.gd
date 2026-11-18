@@ -978,6 +978,10 @@ func _queue_corpse_pose_capture() -> void:
 	var skeleton := ragdoll.skeleton
 	if not skeleton.skeleton_updated.is_connected(_capture_corpse_pose):
 		skeleton.skeleton_updated.connect(_capture_corpse_pose, CONNECT_ONE_SHOT)
+		if is_instance_valid(_corpse_floor):
+			# Queue the final Lab pose from this physics tick, even when the
+			# renderer processes several physics ticks in one frame.
+			skeleton.advance(0.0)
 
 func _capture_corpse_pose() -> void:
 	# Read the evaluated physical pose while the skeleton modifiers are applied.
