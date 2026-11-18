@@ -108,4 +108,3 @@ func run() -> void:
 func finish() -> void:
 	print("FAR_PROJECT_CONTRACT ",checks," checks, failures=",failures)
 	quit(0 if failures.is_empty() else 1)
-
