@@ -89,8 +89,8 @@ const LAB_LAST_SEEN_STOP_DISTANCE := 0.10
 const LAB_ROAM_RADIUS := 10.0
 const LAB_ROAM_DELAY := 1.0
 const LAB_ROAM_SPEED := 3.0
-const LAB_ROAM_ARRIVAL := 0.10
-const LAB_ROAM_BLOCKED_TIME := 0.25
+const LAB_WAYPOINT_ARRIVAL := 0.10
+const LAB_WALL_STALL_TIME := 0.25
 const MIN_WALL_PROGRESS_SPEED := LAB_ROAM_SPEED * 0.10
 const LAB_ROAM_ATTEMPTS := 4
 const LAB_DETOUR_LENGTH := 3.0
@@ -221,7 +221,7 @@ static var _corpse_base_material: ShaderMaterial
 static var _live_capsule: CapsuleShape3D
 # These main-thread queries run synchronously and store no results.
 static var _sight_ray: PhysicsRayQueryParameters3D
-static var _roam_sweep: PhysicsShapeQueryParameters3D
+static var _lab_path_sweep: PhysicsShapeQueryParameters3D
 
 static func prepare_lab_skin(model: Node) -> void:
 	var mesh := model.find_child("SK_Zombie", true, false) as MeshInstance3D
@@ -259,9 +259,9 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 		_live_capsule = CapsuleShape3D.new()
 		_live_capsule.radius = 0.43
 		_live_capsule.height = HEIGHT
-		_roam_sweep = PhysicsShapeQueryParameters3D.new()
-		_roam_sweep.shape = _live_capsule
-		_roam_sweep.collision_mask = LEVEL_COLLISION_MASK
+		_lab_path_sweep = PhysicsShapeQueryParameters3D.new()
+		_lab_path_sweep.shape = _live_capsule
+		_lab_path_sweep.collision_mask = LEVEL_COLLISION_MASK
 	var collision := CollisionShape3D.new()
 	collision.position.y = HEIGHT * 0.5
 	collision.shape = _live_capsule
@@ -564,13 +564,13 @@ func _roam_velocity(delta: float, sample_ai: bool) -> Vector3:
 	# A wall slide can have speed without making meaningful progress to the goal.
 	var stalled := is_on_wall() and get_real_velocity().dot(offset) < MIN_WALL_PROGRESS_SPEED * distance
 	_roam_blocked_seconds = _roam_blocked_seconds + delta if stalled else 0.0
-	if distance <= LAB_ROAM_ARRIVAL or _roam_blocked_seconds >= LAB_ROAM_BLOCKED_TIME:
+	if distance <= LAB_WAYPOINT_ARRIVAL or _roam_blocked_seconds >= LAB_WALL_STALL_TIME:
 		_reset_roam()
 		_play_loop(IDLE)
 		return Vector3.ZERO
 	_face_target(offset, delta)
 	_play_loop(_walk_clip)
-	return offset * (minf(LAB_ROAM_SPEED, (distance - LAB_ROAM_ARRIVAL) / delta) / distance)
+	return offset * (minf(LAB_ROAM_SPEED, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
 
 func _pick_roam_destination() -> Vector3:
 	# Keep the capsule inside the flat Lab floor and test the body along
@@ -597,21 +597,21 @@ func _pick_roam_destination() -> Vector3:
 	return Vector3.INF
 
 func _prepare_lab_path_sweep() -> void:
-	_roam_sweep.transform = Transform3D(Basis.IDENTITY, global_position + Vector3.UP * (HEIGHT * 0.5))
+	_lab_path_sweep.transform = Transform3D(Basis.IDENTITY, global_position + Vector3.UP * (HEIGHT * 0.5))
 	# Keep terrain in the query and exclude the flat floor supporting the capsule.
 	var floor_body := _corpse_floor.get_parent() as StaticBody3D
-	_roam_sweep.exclude = [floor_body.get_rid()] if floor_body != null else []
+	_lab_path_sweep.exclude = [floor_body.get_rid()] if floor_body != null else []
 
 func _lab_path_fraction(space: PhysicsDirectSpaceState3D, travel: Vector3) -> float:
-	_roam_sweep.motion = travel
-	var fractions := space.cast_motion(_roam_sweep)
+	_lab_path_sweep.motion = travel
+	var fractions := space.cast_motion(_lab_path_sweep)
 	return 0.0 if fractions.is_empty() else fractions[0]
 
 func _lab_path_end_clear(space: PhysicsDirectSpaceState3D, travel: Vector3) -> bool:
-	var start := _roam_sweep.transform
-	_roam_sweep.transform = start.translated(travel)
-	var clear := space.intersect_shape(_roam_sweep, 1).is_empty()
-	_roam_sweep.transform = start
+	var start := _lab_path_sweep.transform
+	_lab_path_sweep.transform = start.translated(travel)
+	var clear := space.intersect_shape(_lab_path_sweep, 1).is_empty()
+	_lab_path_sweep.transform = start
 	return clear
 
 func _clear_chase_detour() -> void:
@@ -624,21 +624,21 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool) -> V
 		_chase_detour_time -= delta
 		var travel := (_chase_detour - global_position).slide(Vector3.UP)
 		var distance := travel.length()
-		if _chase_detour_time > 0.0 and distance > LAB_ROAM_ARRIVAL:
+		if _chase_detour_time > 0.0 and distance > LAB_WAYPOINT_ARRIVAL:
 			var direct_clear := false
 			if sample_ai:
 				var space := get_world_3d().direct_space_state
 				_prepare_lab_path_sweep()
 				direct_clear = _lab_path_fraction(space, offset) >= 1.0 and _lab_path_end_clear(space, offset)
 			if not direct_clear:
-				return travel * (minf(CHASE_SPEED, (distance - LAB_ROAM_ARRIVAL) / delta) / distance)
+				return travel * (minf(CHASE_SPEED, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
 		_clear_chase_detour()
 
 	if not is_on_wall() or get_real_velocity().dot(offset) >= MIN_WALL_PROGRESS_SPEED * offset.length():
 		_chase_stalled_seconds = 0.0
 		return Vector3.ZERO
 	_chase_stalled_seconds += delta
-	if not sample_ai or _chase_stalled_seconds < LAB_ROAM_BLOCKED_TIME:
+	if not sample_ai or _chase_stalled_seconds < LAB_WALL_STALL_TIME:
 		return Vector3.ZERO
 	_chase_stalled_seconds = 0.0
 
@@ -671,10 +671,13 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 		local.x = clampf(local.x, -extent.x, extent.x)
 		local.z = clampf(local.z, -extent.z, extent.z)
 		var travel := (_corpse_floor.to_global(local) - global_position).slide(Vector3.UP)
+		if travel.length_squared() <= best_distance:
+			continue
 		travel *= _lab_path_fraction(space, travel)
-		if travel.length_squared() > best_distance and _lab_path_end_clear(space, travel):
+		var distance := travel.length_squared()
+		if distance > best_distance and _lab_path_end_clear(space, travel):
 			best = global_position + travel
-			best_distance = travel.length_squared()
+			best_distance = distance
 	return best
 
 func _is_in_melee_cone(planar_offset: Vector3) -> bool:
