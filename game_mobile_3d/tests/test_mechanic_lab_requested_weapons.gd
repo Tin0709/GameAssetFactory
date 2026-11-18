@@ -446,13 +446,14 @@ func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
 		if not hits.is_empty():
 			break
 	check(fired and hits.size() == 1 and hits[0].collider == wall, "A charged Bow arrow hits the wall once")
-	check(bow._embedded.visible_instance_count == 1 and bow._embedded_arrows.size() == 1
+	var props_on_contact: int = bow._embedded.visible_instance_count
+	check(props_on_contact == 1 and bow._embedded_arrows.size() == 1
 		and is_zero_approx(bow._embedded_arrows[0].age),
 		"The Bow wall prop appears on impact at the start of its wobble")
 	await ticks(1)
 	if not bow._embedded_arrows.is_empty():
 		check(bow._embedded_arrows[0].age > 0.0, "The Bow wall prop ages from the next physics tick")
-	print("MECHANIC_LAB_BOW_WALL_CONTACT hits=", hits.size(), " props=", bow._embedded.visible_instance_count)
+	print("MECHANIC_LAB_BOW_WALL_CONTACT hits=", hits.size(), " props_on_contact=", props_on_contact)
 	bow.arrow_impact.disconnect(record)
 	bow.reset()
 	wall.queue_free()

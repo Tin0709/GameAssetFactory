@@ -236,8 +236,6 @@ func reset() -> void:
 	set_physics_process(false)
 
 func _physics_process(delta: float) -> void:
-	if not _embedded_arrows.is_empty():
-		_update_embedded_arrows(delta)
 	var capacity := _ammo_capacity()
 	if ammo < capacity:
 		_recharge_remaining -= delta
@@ -273,6 +271,8 @@ func _physics_process(delta: float) -> void:
 		else:
 			node.global_position = end
 			trail.distance += start.distance_to(end)
+	if not _embedded_arrows.is_empty():
+		_update_embedded_arrows(delta)
 	if not _trails.is_empty():
 		_update_trails()
 	var sparks_active := impact_sparks != null and impact_sparks.advance(delta)
@@ -358,13 +358,20 @@ func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
 	var up := Vector3.UP if absf(direction.y) < 0.999 else Vector3.FORWARD
 	var basis := Basis.looking_at(direction, up, true) * Basis(Vector3.UP, -PI * 0.5)
 	var pose := Transform3D(basis, Vector3(hit.position) - direction * EMBEDDED_OFFSET)
-	_embedded_arrows.append({"pose": global_transform.affine_inverse() * pose, "age": 0.0})
+	_embedded_arrows.append({
+		"pose": global_transform.affine_inverse() * pose,
+		"age": 0.0,
+		"contact_tick": Engine.get_physics_frames(),
+	})
 
 func _update_embedded_arrows(delta: float) -> void:
+	# Publish wall props with the other impact effects, starting at zero wobble age.
+	var tick := Engine.get_physics_frames()
 	var index := 0
 	while index < _embedded_arrows.size():
 		var arrow := _embedded_arrows[index]
-		arrow.age += delta
+		if arrow.contact_tick != tick:
+			arrow.age += delta
 		if arrow.age >= EMBEDDED_WOBBLE_SECONDS:
 			_embedded_arrows.remove_at(index)
 			continue
