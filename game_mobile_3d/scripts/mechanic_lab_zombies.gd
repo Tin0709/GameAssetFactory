@@ -8,6 +8,7 @@ signal zombie_attack_audio(point: Vector3, contact: bool)
 signal zombie_step_audio(point: Vector3, actor: CharacterBody3D)
 
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
+const Ragdoll := preload("res://scripts/mechanic_lab_ragdoll.gd")
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
@@ -502,7 +503,13 @@ func _load_assets() -> void:
 				var decoded: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 				if decoded is Dictionary and decoded.get("idle_glb_sha256") == CLIP_HASHES[Zombie.IDLE]:
 					# Every instance uses this packed rig, so verify its source bind pose once.
-					_ragdoll_layout = Zombie.source_ragdoll_layout(model.find_child("Skeleton3D", true, false), decoded)
+					var skeleton := model.find_child("Skeleton3D", true, false) as Skeleton3D
+					_ragdoll_layout = Zombie.source_ragdoll_layout(skeleton, decoded)
+					if not _ragdoll_layout.is_empty() and get_node_or_null("../Ground/Collision") is CollisionShape3D:
+						var builder := Ragdoll.new()
+						_ragdoll_layout.simulator_template = builder.pack_dormant_simulator(skeleton,
+							_ragdoll_layout.parts, _ragdoll_layout.bones, _ragdoll_layout.offsets)
+						builder.free()
 	model.free()
 
 func _add_clips(directory: String, player: AnimationPlayer) -> bool:

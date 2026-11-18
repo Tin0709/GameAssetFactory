@@ -87,45 +87,75 @@ var _projection_hit: PhysicsTestMotionResult3D
 const JOINT_RESPONSE := {"Chest": Vector2(18,5.4), "Head": Vector2(4,2.4), "Arm.L": Vector2(3,2.1), "Arm.R": Vector2(3,2.1), "Leg.L": Vector2(6,2.7), "Leg.R": Vector2(6,2.7)}
 
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
-		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}) -> void:
+		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}, prepared: PackedScene = null) -> void:
 	set_physics_process(false)
 	skeleton = target
 	_parts = part_layout
 	source_joints = authored_joints
 	# Reject unsupported rigs instead of quietly binding the wrong bones/scale.
 	assert(skeleton.global_basis.get_scale().is_equal_approx(Vector3.ONE), "Ragdoll requires unit-scale hierarchy")
+	if prepared != null:
+		simulator = prepared.instantiate() as PhysicalBoneSimulator3D
+		skeleton.add_child(simulator)
+		for i in _parts.size():
+			_register_body(_parts[i][0], simulator.get_child(i) as PhysicalBone3D)
+		return
 	simulator = PhysicalBoneSimulator3D.new()
 	simulator.name = "DeathPhysicsSimulator"
 	skeleton.add_child(simulator)
 	simulator.active = false
 	for part in _parts:
-		var bone_name: String = bone_names.get(part[0], part[0])
-		var id := skeleton.find_bone(bone_name)
-		assert(id >= 0, "Missing ragdoll bone: " + bone_name)
-		var body := PhysicalBone3D.new()
-		body.set_script(PHYSICAL_PART)
-		body.name = "Corpse_" + part[0]
-		body.set("bone_name", bone_name)
-		body.body_offset = body_offsets.get(part[0],
-			skeleton.get_bone_global_rest(id).affine_inverse() * Transform3D(Basis.IDENTITY, part[1]))
-		body.mass = part[3]
-		body.friction = 0.75
-		body.bounce = 0.0
-		body.collision_layer = 2
-		body.collision_mask = 1 # Ground only. No self/corpse/live-controller collisions.
-		body.can_sleep = true
-		body.linear_damp_mode = PhysicalBone3D.DAMP_MODE_REPLACE
-		body.angular_damp_mode = PhysicalBone3D.DAMP_MODE_REPLACE
-		var collider := CollisionShape3D.new()
-		collider.shape = _make_body_shape(part[2])
-		body.add_child(collider)
+		var body := _make_physical_body(target, part, bone_names, body_offsets)
 		simulator.add_child(body)
-		PhysicsServer3D.body_set_enable_continuous_collision_detection(body.get_rid(), true)
-		PhysicsServer3D.body_set_max_contacts_reported(body.get_rid(), 4)
-		if part[0] == "Hips":
-			# Utility carrier supports the torso: use finite torso-like inertia, not a tiny hinge.
-			PhysicsServer3D.body_set_param(body.get_rid(), PhysicsServer3D.BODY_PARAM_INERTIA, Vector3(0.6, 0.4, 0.6))
-		bodies[part[0]] = body
+		_register_body(part[0], body)
+
+func pack_dormant_simulator(target: Skeleton3D, part_layout: Array, bone_names: Dictionary,
+		body_offsets: Dictionary) -> PackedScene:
+	var template := PhysicalBoneSimulator3D.new()
+	template.name = "DeathPhysicsSimulator"
+	template.active = false
+	for part: Array in part_layout:
+		var body := _make_physical_body(target, part, bone_names, body_offsets)
+		template.add_child(body)
+		body.owner = template
+		body.get_child(0).owner = template
+	var packed := PackedScene.new()
+	var status := packed.pack(template)
+	template.free()
+	return packed if status == OK else null
+
+func _make_physical_body(target: Skeleton3D, part: Array, bone_names: Dictionary,
+		body_offsets: Dictionary) -> PhysicalBone3D:
+	var bone_name: String = bone_names.get(part[0], part[0])
+	var id := target.find_bone(bone_name)
+	assert(id >= 0, "Missing ragdoll bone: " + bone_name)
+	var body := PhysicalBone3D.new()
+	body.set_script(PHYSICAL_PART)
+	body.name = "Corpse_" + part[0]
+	body.set("bone_name", bone_name)
+	body.body_offset = body_offsets.get(part[0],
+		target.get_bone_global_rest(id).affine_inverse() * Transform3D(Basis.IDENTITY, part[1]))
+	body.mass = part[3]
+	body.friction = 0.75
+	body.bounce = 0.0
+	body.collision_layer = 2
+	body.collision_mask = 1 # Ground only. No self/corpse/live-controller collisions.
+	body.can_sleep = true
+	body.linear_damp_mode = PhysicalBone3D.DAMP_MODE_REPLACE
+	body.angular_damp_mode = PhysicalBone3D.DAMP_MODE_REPLACE
+	var collider := CollisionShape3D.new()
+	collider.shape = _make_body_shape(part[2])
+	body.add_child(collider)
+	return body
+
+func _register_body(part_name: String, body: PhysicalBone3D) -> void:
+	var rid := body.get_rid()
+	PhysicsServer3D.body_set_enable_continuous_collision_detection(rid, true)
+	PhysicsServer3D.body_set_max_contacts_reported(rid, 4)
+	if part_name == "Hips":
+		# The utility carrier uses torso-like inertia.
+		PhysicsServer3D.body_set_param(rid, PhysicsServer3D.BODY_PARAM_INERTIA, Vector3(0.6, 0.4, 0.6))
+	bodies[part_name] = body
 
 func _make_body_shape(size: Vector3) -> BoxShape3D:
 	var shape := BoxShape3D.new()

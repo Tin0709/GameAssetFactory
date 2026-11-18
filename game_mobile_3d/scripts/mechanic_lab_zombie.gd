@@ -258,7 +258,8 @@ func _ready() -> void:
 	if source.is_empty():
 		ragdoll.setup(skeleton, RAGDOLL_PARTS, RAGDOLL_BONES)
 	else:
-		ragdoll.setup(skeleton, source.parts, source.bones, source.offsets, source.joints)
+		var prepared := source.get("simulator_template") as PackedScene if is_instance_valid(_corpse_floor) else null
+		ragdoll.setup(skeleton, source.parts, source.bones, source.offsets, source.joints, prepared)
 	for body: PhysicalBone3D in ragdoll.bodies.values():
 		body.collision_layer = 0
 		body.collision_mask = 0

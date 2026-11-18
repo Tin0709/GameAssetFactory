@@ -52,8 +52,8 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	return true
 
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
-		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}) -> void:
-	super.setup(target, part_layout, bone_names, body_offsets, authored_joints)
+		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}, prepared: PackedScene = null) -> void:
+	super.setup(target, part_layout, bone_names, body_offsets, authored_joints, prepared)
 	_sample_names.clear()
 	_sample_bone_ids.clear()
 	_sample_body_offsets.clear()
