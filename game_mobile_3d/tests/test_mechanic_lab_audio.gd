@@ -564,10 +564,11 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		"A closer death can replace the farthest recent onset")
 	for i in 6:
 		await physics_frame
+	var onset_mixed := await wait_for_zombie_onset(reactions)
 	var later_death := ear + Vector3.RIGHT * 10.0
 	audio.contact(later_death, 1103, true)
 	audio.flush_zombie_combat_cues()
-	check(reactions.any(func(voice): return voice.global_position == later_death),
+	check(onset_mixed and reactions.any(func(voice): return voice.global_position == later_death),
 		"A later kill can use a reaction voice after the earlier onsets")
 	audio.reset()
 	var death_choice: int = audio._next_choice.get(&"death", 0)
@@ -905,9 +906,18 @@ func check_zombie_attack_onsets(audio: COMBAT_AUDIO, group: Node,
 		var positions := voices.map(func(voice): return voice.global_position)
 		check(closer != null and positions.has(closest) and positions.has(near[0]) and positions.has(near[1]),
 			"A closer %s replaces the farthest protected voice" % cue)
-		await create_timer(0.16).timeout
-		check(audio._play(cue, far, gain, future + catch_up_ticks) != null,
+		var onset_mixed := await wait_for_zombie_onset(voices)
+		check(onset_mixed and audio._play(cue, far, gain, future + catch_up_ticks) != null,
 			"Later %s cues can use voices once the onset has mixed" % cue)
+
+func wait_for_zombie_onset(voices: Array[AudioStreamPlayer3D]) -> bool:
+	var deadline := Time.get_ticks_msec() + 500
+	while Time.get_ticks_msec() < deadline:
+		for voice in voices:
+			if not voice.playing or voice.get_playback_position() >= COMBAT_AUDIO.ZOMBIE_ONSET_SECONDS:
+				return true
+		await process_frame
+	return false
 
 func run() -> void:
 	var camera := Camera3D.new()
