@@ -381,12 +381,16 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 
 func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true, landing_gravity := -1.0,
 		max_anchor_gap := INF, strike: Zombie.DeathStrike = Zombie.DeathStrike.SABRE_FINISHER,
-		strength := 1150.0) -> void:
+		strength := 1150.0, shared_wall := false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
 	var first_wall := terrain(lab, Vector3(4.5, 1.5, -1.85), Vector3(0.30, 3.0, 12.4), 0.0)
 	var second_wall := terrain(lab, Vector3(-1.70, 1.5, 4.5), Vector3(12.7, 3.0, 0.30), 0.0)
+	if shared_wall:
+		second_wall.get_child(0).reparent(first_wall)
+		second_wall.free()
+		second_wall = first_wall
 	var group := lab.get_node("Zombies")
 	group._spawn_serial = 1800 + seed
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
@@ -434,8 +438,10 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 			var state := PhysicsServer3D.body_get_direct_state(part.get_rid())
 			for index in state.get_contact_count():
 				var collider := state.get_contact_collider_object(index)
-				if collider == first_wall or collider == second_wall:
-					walls_hit[collider] = true
+				if collider == first_wall:
+					walls_hit[state.get_contact_collider_shape(index) if shared_wall else 0] = true
+				elif collider == second_wall:
+					walls_hit[1] = true
 	check(walls_hit.size() == 2 and farthest < 4.65,
 		"The ragdoll meets both faces of the closed corner and stays on the near side")
 	check(zombie._corpse_parked == should_settle and (not should_settle or zombie.ragdoll.bodies.is_empty()),
@@ -451,7 +457,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 	if landing_gravity >= 0.0 and not zombie._corpse_parked:
 		var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
 		check(is_equal_approx(head.gravity_scale, landing_gravity), "The corner ragdoll %d uses the expected gravity" % seed)
-	print("LAB_CORNER seed=", seed, " gap=", peak_gap, " farthest=", farthest, " walls=", walls_hit.size(),
+	print("LAB_CORNER seed=", seed, " shared_wall=", shared_wall, " gap=", peak_gap, " farthest=", farthest, " walls=", walls_hit.size(),
 		" parked=", zombie._corpse_parked, " seconds=", zombie._corpse_age)
 	lab.free()
 
@@ -483,6 +489,7 @@ func run() -> void:
 	await check_corner_ragdoll(101, 4.05, false, 1.0)
 	await check_corner_ragdoll(113, 4.95)
 	await check_corner_ragdoll(238, 4.90, false, 1.0)
+	await check_corner_ragdoll(113, 4.60, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
 	await check_wall_rebound(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,
