@@ -312,7 +312,7 @@ static func source_step_height(age: float, drag: float) -> float:
 	return (age - (1.0 - exp(-drag * age)) / drag) / drag
 
 static func _source_debris_offset(velocity: Vector3, drag: float, age: float) -> Vector3:
-	# Sum the cooked 60 Hz solve as a geometric series. Between ticks,
+	# Sum the cooked update on the Lab clock as a geometric series. Between ticks,
 	# interpolate with the velocity from the next semi-implicit step.
 	var ticks := floori(age / SOURCE_PHYSICS_STEP)
 	var elapsed := ticks * SOURCE_PHYSICS_STEP
