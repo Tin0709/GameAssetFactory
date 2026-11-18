@@ -172,6 +172,7 @@ func check_crowd_roam(group: Node) -> void:
 		failures.append("The 100-zombie patrol stays on the floor and moves within its spawn radius")
 	print("CROWD_ROAM moved=", moved, " max_radius=", peak_radius, " chasing_or_off_floor=", outside)
 	await check_packed_patrol(group)
+	await check_crowd_sight_deadline(group)
 
 func check_packed_patrol(group: Node) -> void:
 	for zombie: ZOMBIE in group.get_children():
@@ -218,6 +219,51 @@ func check_packed_patrol(group: Node) -> void:
 		print("CROWD_PACKED_PATROL persistent=", keep_blocked, " skipped=", skipped,
 			" active=", follower._roam_destination.is_finite())
 		follower.set_physics_process(false)
+
+func check_crowd_sight_deadline(group: Node) -> void:
+	var player: CharacterBody3D = lab.player
+	var zombie := group.get_child(0) as ZOMBIE
+	var start := Vector3(25.0, 0.02, -25.0)
+	var open := start + Vector3.BACK * 1.5
+	var hidden := start + Vector3.BACK * 3.0
+	var remembered := open + Vector3.RIGHT * 0.5
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(4.0, 3.0, 0.20)
+	collider.shape = box
+	wall.add_child(collider)
+	wall.position = start + Vector3(0.0, 1.5, 2.0)
+	lab.add_child(wall)
+	await physics_frame
+	await physics_frame
+	var stride := roundi(Engine.physics_ticks_per_second / ZOMBIE.LAB_CROWD_SIGHT_HZ)
+	var observed: Array[bool] = []
+	for scenario in [[false, false], [true, true], [false, true], [true, false]]:
+		var was_aggressive: bool = scenario[0]
+		var visible: bool = scenario[1]
+		var delay := ZOMBIE.LAB_SIGHT_LOSS_DELAY if was_aggressive else ZOMBIE.LAB_SIGHT_DELAY
+		zombie.global_position = start
+		zombie.velocity = Vector3.ZERO
+		player.global_position = open if visible else hidden
+		zombie._target_aggressive = was_aggressive
+		zombie._target_visible = not was_aggressive
+		zombie._last_seen_position = remembered
+		zombie._sight_state_seconds = delay - 1.0 / Engine.physics_ticks_per_second
+		zombie._attack_cooldown = 10.0
+		# The deadline lands on this tick. The next routine sight ray is a tick later.
+		zombie._crowd_slot = (Engine.get_physics_frames() + 1) % stride
+		zombie.set_physics_process(true)
+		await physics_frame
+		zombie.set_physics_process(false)
+		observed.append(zombie._target_aggressive)
+		var expected_point := open if visible else remembered
+		if (zombie._target_aggressive != visible or zombie._target_visible != visible
+				or zombie._last_seen_position != expected_point or zombie._sight_state_seconds != 0.0):
+			failures.append("Crowd sight deadline must validate current cover (was aggressive %s, now visible %s)"
+				% [was_aggressive, visible])
+	print("CROWD_SIGHT_DEADLINE states=", observed)
+	wall.free()
 
 func check_zombie_dust() -> void:
 	var dust := lab.get_node_or_null("ZombieStepDust") as MultiMeshInstance3D

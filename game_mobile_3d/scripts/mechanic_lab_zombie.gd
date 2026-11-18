@@ -551,9 +551,12 @@ func _update_target_sight(delta: float, sample_ai: bool) -> void:
 		_sight_state_seconds = 0.0
 		return
 	var point := target.global_position
+	var delay := LAB_SIGHT_LOSS_DELAY if _target_aggressive else LAB_SIGHT_DELAY
 	if global_position.distance_squared_to(point) > LAB_SIGHT_RADIUS_SQUARED:
 		_target_visible = false
-	elif sample_ai:
+	elif sample_ai or (_target_visible != _target_aggressive
+			and _sight_state_seconds + delta >= delay - 0.000001):
+		# A staggered sample can be stale when the pending state change is due.
 		_target_visible = _clear_sight_to(point)
 		if _target_visible:
 			_last_seen_position = point
@@ -561,7 +564,6 @@ func _update_target_sight(delta: float, sample_ai: bool) -> void:
 		_sight_state_seconds = 0.0
 	else:
 		_sight_state_seconds += delta
-		var delay := LAB_SIGHT_DELAY if _target_visible else LAB_SIGHT_LOSS_DELAY
 		if _sight_state_seconds >= delay - 0.000001:
 			_target_aggressive = _target_visible
 			_sight_state_seconds = 0.0
