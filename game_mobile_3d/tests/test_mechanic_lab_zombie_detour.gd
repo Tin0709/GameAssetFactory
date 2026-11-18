@@ -8,7 +8,7 @@ var failures: Array[String] = []
 func _initialize() -> void:
 	run.call_deferred()
 
-func add_wall(lab: Node3D, point: Vector3, size: Vector3, yaw: float) -> void:
+func add_wall(lab: Node3D, point: Vector3, size: Vector3, yaw: float) -> StaticBody3D:
 	var wall := StaticBody3D.new()
 	var collider := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -18,8 +18,35 @@ func add_wall(lab: Node3D, point: Vector3, size: Vector3, yaw: float) -> void:
 	wall.position = point
 	wall.rotation.y = yaw
 	lab.add_child(wall)
+	return wall
 
-func check_detour(member_count: int, yaw: float, block_right: bool, block_with_zombie := false) -> void:
+func check_brief_occlusion(lab: Node3D, chaser: ZOMBIE, heading: Basis) -> void:
+	var start := chaser.global_position
+	var known := chaser._last_seen_position
+	var waypoint := chaser._chase_detour
+	var toward_waypoint := (waypoint - start).normalized()
+	# Cover the player beyond the low barrier, leaving the selected side lane open.
+	var screen := add_wall(lab, heading * Vector3(0.0, 1.5, -0.95), Vector3(9.0, 3.0, 0.2), heading.get_euler().y)
+	for i in 8:
+		await physics_frame
+		if not chaser._target_visible:
+			break
+	var stayed_hidden := not chaser._target_visible
+	for i in 18:
+		lab.player.global_position += heading.x * 0.03
+		await physics_frame
+		stayed_hidden = stayed_hidden and not chaser._target_visible
+	var advance := (chaser.global_position - start).dot(toward_waypoint)
+	if not stayed_hidden or not chaser._target_aggressive or chaser._last_seen_position != known:
+		failures.append("A brief occlusion must preserve aggression and the last observed position")
+	if chaser._chase_detour != waypoint or advance < 0.6:
+		failures.append("A brief loss of sight must not discard the open route around the barrier")
+	print("LAB_DETOUR_OCCLUSION visible=", not stayed_hidden, " same_waypoint=", chaser._chase_detour == waypoint,
+		" advance_m=", advance, " cached=", chaser._last_seen_position)
+	screen.free()
+
+func check_detour(member_count: int, yaw: float, block_right: bool,
+		block_with_zombie := false, brief_occlusion := false) -> void:
 	var lab := LAB.instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -49,13 +76,19 @@ func check_detour(member_count: int, yaw: float, block_right: bool, block_with_z
 	var crossing_x := INF
 	var hits: Array[int] = []
 	var visible_ticks := 0
+	var covered := false
 	chaser.melee_hit.connect(func(damage): hits.append(damage))
 	for i in 240:
 		await physics_frame
+		if brief_occlusion and not covered and chaser._target_visible and chaser._chase_detour.is_finite():
+			covered = true
+			await check_brief_occlusion(lab, chaser, heading)
 		var local := heading.inverse() * chaser.global_position
 		visible_ticks += int(chaser._target_visible)
 		if not is_finite(crossing_x) and local.z > -2.25:
 			crossing_x = local.x
+	if brief_occlusion and not covered:
+		failures.append("The brief-occlusion replay must exercise a chosen route")
 	if visible_ticks < 220 or absf(crossing_x) < 1.55 or not is_finite(crossing_x) or hits.is_empty():
 		failures.append("Visible chaser should walk around the wall and reach melee with %d members, yaw %s"
 			% [member_count, rad_to_deg(yaw)])
@@ -73,5 +106,6 @@ func run() -> void:
 	await check_detour(1, 0.0, false)
 	await check_detour(100, deg_to_rad(27.0), true)
 	await check_detour(100, 0.0, true, true)
+	await check_detour(100, deg_to_rad(27.0), true, false, true)
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
