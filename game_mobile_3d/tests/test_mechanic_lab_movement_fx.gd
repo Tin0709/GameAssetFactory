@@ -87,6 +87,7 @@ func run() -> void:
 	await physics_frame
 	check(visible_particles(dust) == 0 and visible_particles(wind) == 0, "Reset clears both movement effects")
 	await check_heavy_dust_timing(lab, dust)
+	await check_gauntlet_debris(lab, dust)
 	await check_running_wake_support(lab, wind)
 	await check_running_wake_render_clock(lab, wind, dust)
 	await check_floor_edge_landing(lab, dust)
@@ -246,6 +247,30 @@ func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 		await physics_frame
 	check(visible_particles(dust) == 0 and not dust.is_physics_processing(),
 		"Reset cancels heavy dust that has not appeared yet")
+
+func check_gauntlet_debris(lab, dust: Node3D) -> void:
+	for weapon in [lab.Weapon.GAUNTLETS, lab.Weapon.BASIC_GAUNTLETS]:
+		lab._select_weapon(weapon)
+		lab.reset_player()
+		await start_heavy_drop(lab)
+		for i in 65:
+			await physics_frame
+			if visible_particles(dust) > 0:
+				break
+		var particles: Array = dust._particles.filter(func(p): return p.sprite.visible)
+		check(lab._equipped_weapon == weapon and lab.player.is_on_floor()
+			and particles.size() in [3, 4, 5], "A Gauntlets dive emits one compact ground debris burst")
+		for particle in particles:
+			check(is_equal_approx(particle.sprite.pixel_size * 16.0, 0.15)
+				and particle.duration >= 1.0 and particle.duration <= 1.5
+				and particle.velocity.length() >= 3.49 and particle.velocity.length() <= 6.51
+				and absf(particle.origin.y) < 0.02,
+				"Gauntlets debris uses the source size, lifetime and speed at the ground contact")
+		print("MECHANIC_LAB_GAUNTLET_DEBRIS weapon=", weapon, " count=", particles.size())
+		lab.reset_player()
+		await physics_frame
+		check(visible_particles(dust) == 0 and not dust.is_processing(), "Reset clears Gauntlets debris")
+	lab._select_weapon(lab.Weapon.SABRE)
 
 func check_floor_edge_landing(lab, dust: Node3D) -> void:
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
