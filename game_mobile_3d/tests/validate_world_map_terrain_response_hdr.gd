@@ -25,7 +25,7 @@ void vertex(){
 }
 void fragment(){
  ALBEDO=vec3(0);
- vec3 visibility=terrain_diffuse_visibility(test_color,test_contact);
+ vec3 visibility=terrain_colored_visibility ? terrain_contact_response(test_color,test_contact) : vec3(1.0);
  EMISSION=FRAGCOORD.x<8.0 ? terrain_opening_fill(visibility,.65)
   : terrain_indirect(test_color,test_metal,.8,.6,visibility,1.0,CAMERA_POSITION_WORLD);
 }";

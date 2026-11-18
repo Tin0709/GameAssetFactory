@@ -128,7 +128,7 @@ void fragment() {
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	stone_sunset_position = cutaway_world.xz;
 #endif
-	vec3 receiver_visibility = terrain_diffuse_visibility(ALBEDO, receiver_contact);
+	vec3 receiver_visibility = terrain_colored_visibility ? terrain_contact_response(ALBEDO, receiver_contact) : vec3(1.0);
 	if (gaf_diffuse_opening.w > 0.0 || (ground_grade == 3 && max(gaf_stone_shade_fill.w, gaf_sheltered_stone_return) > 0.0)) {
 		terrain_opening_incident = terrain_opening_fill(receiver_visibility, sole);
 	}
