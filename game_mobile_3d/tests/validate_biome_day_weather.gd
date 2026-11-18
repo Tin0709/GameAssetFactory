@@ -4,6 +4,7 @@ const MAP := preload("res://scenes/maps/m2_v1/MeadowBiomeReview.tscn")
 const MEADOW := preload("res://assets/graphics/biomes/meadow.tres")
 const PROFILE := preload("res://scripts/biome_graphics_profile.gd")
 const FOREST := preload("res://assets/graphics/biomes/forest_reference.tres")
+const WEATHER := preload("res://scripts/biome_weather.gd")
 var failures: Array[String] = []
 
 func _initialize() -> void:
@@ -13,7 +14,25 @@ func check(condition: bool, message: String) -> void:
 	if not condition:
 		failures.append(message)
 
+func verify_weather_shadow() -> void:
+	var blend = WEATHER.new()
+	check(blend.has_method("shadow_opacity"), "Weather resolves shadow opacity from the authored base")
+	if not blend.has_method("shadow_opacity"):
+		return
+	var base := .782
+	check(blend.shadow_opacity(FOREST.overcast, base, 12.) == base, "Clear Noon keeps the base opacity exactly")
+	blend.set_target(.5, 0.)
+	check(is_equal_approx(blend.shadow_opacity(FOREST.overcast, base, 12.), base * .91), "Half cloud applies half the Noon response")
+	blend.set_target(1., 0.)
+	check(is_equal_approx(blend.shadow_opacity(FOREST.overcast, base, 12.), base * .82), "Full cloud softens Noon shadows by 18 percent")
+	check(blend.shadow_opacity(FOREST.overcast, base, 12., 0.) == base, "The adjustment can be disabled")
+	for hour: float in [7., 10.25, 13.75, 16.5, 19.5, 22.]:
+		check(is_equal_approx(blend.shadow_opacity(FOREST.overcast, base, hour), base), "The Forest response is neutral at %s" % hour)
+	check(blend.shadow_opacity(MEADOW.overcast, base, 12.) == base, "A weather profile without a shadow curve stays neutral")
+	check(blend.shadow_opacity(null, base, 12.) == base, "A map without weather stays neutral")
+
 func verify() -> void:
+	verify_weather_shadow()
 	check("day_night" in PROFILE.new(), "Biome must accept a day/night resource")
 	check("start_overcast" in PROFILE.new(), "Starting weather must be a biome setting")
 	if not failures.is_empty():
