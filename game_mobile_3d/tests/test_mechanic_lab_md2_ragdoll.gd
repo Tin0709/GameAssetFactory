@@ -34,6 +34,7 @@ func run() -> void:
 		quit(1)
 		return
 	var zombie = group.get_child(0)
+	var skin_material: Material = zombie._mesh.get_active_material(0)
 	check(zombie.ragdoll.bodies.size() == 6 and not zombie.ragdoll.bodies.has("Hips"),
 		"Verified SK_Zombie asset supplies six rigid bodies without a hip collider")
 	check(zombie.ragdoll.bodies.Chest.get("bone_name") == "J_Spine" and zombie.ragdoll.bodies.Head.get("bone_name") == "J_Neck",
@@ -122,13 +123,17 @@ func run() -> void:
 	var follow_through_speed := -INF
 	var lowest_corner := 0.0
 	var last_anchor_error := INF
-	var first_desaturation := INF
+	var maximum_fade_error := 0.0
+	var kept_skin_material := skin_material is ShaderMaterial
 	for i in 60:
 		await physics_frame
 		if not zombie.ragdoll.running:
 			break
-		if is_inf(first_desaturation) and zombie._mesh.material_override is ShaderMaterial:
-			first_desaturation = zombie._corpse_age
+		kept_skin_material = kept_skin_material and zombie._mesh.get_active_material(0) == skin_material
+		var parameter: Variant = zombie._mesh.get_instance_shader_parameter("desaturation")
+		var actual := float(parameter) if parameter is float else 0.0
+		var expected := smoothstep(0.1, ZOMBIE.CORPSE_DESATURATION_END, zombie._corpse_age) * 0.80
+		maximum_fade_error = maxf(maximum_fade_error, absf(actual - expected))
 		lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
 		last_anchor_error = zombie.ragdoll.max_anchor_error()
 		var momentum := Vector3.ZERO
@@ -146,8 +151,8 @@ func run() -> void:
 			continue
 		fastest_descent = maxf(fastest_descent, -velocity.y)
 	check(fastest_descent > 5.0, "The corpse falls faster than 5 m/s before head or chest contact")
-	check(absf(first_desaturation - 0.1) < 0.00001,
-		"MechanicLab starts corpse desaturation at the source 100 ms delay")
+	check(maximum_fade_error < 0.00001, "MechanicLab follows the color fade curve from the source 100 ms delay")
+	check(kept_skin_material, "The zombie prepares its fade material while alive and keeps it through ragdoll")
 	# A tilted pose can find support before it rolls into the visible low pose.
 	check(landing_time >= 0.33 and landing_time <= low_pose_time and low_pose_time < 0.55,
 		"A grounded Sabre strike reaches support and then a low pose within 550 ms")
