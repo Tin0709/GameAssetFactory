@@ -490,6 +490,7 @@ func run() -> void:
 	await check_corner_ragdoll(113, 4.95)
 	await check_corner_ragdoll(238, 4.90, false, 1.0)
 	await check_corner_ragdoll(113, 4.60, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
+	await check_corner_ragdoll(108, 4.90, false, 1.0, 0.09, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
 	await check_wall_rebound(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,
