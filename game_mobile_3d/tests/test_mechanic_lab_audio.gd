@@ -304,7 +304,7 @@ func check_weapon_onsets_under_mixed_impacts(audio: Node, bus: int, capture: Aud
 	audio.reset()
 	audio.sword_equipped = true
 	var point := Vector3.FORWARD * 2.0
-	var weapon_voices := audio._voices.slice(0, audio.VOICES_PER_POOL)
+	var weapon_voices: Array[AudioStreamPlayer3D] = audio._voices.slice(0, audio.VOICES_PER_POOL)
 	var firing := weapon_voices[0] as AudioStreamPlayer3D
 	firing.bus = AudioServer.get_bus_name(bus)
 	capture.clear_buffer()
@@ -324,7 +324,7 @@ func check_weapon_onsets_under_mixed_impacts(audio: Node, bus: int, capture: Aud
 		elif voice.stream in audio._groups[&"slam"]:
 			landing_voice = voice
 	check(sword_voice != null and landing_voice != null,
-		"The confirmed sword hit and heavy landing each claim an older impact voice")
+		"The confirmed sword hit and heavy landing each claim a bolt impact voice")
 	if sword_voice != null and landing_voice != null:
 		var hit_stream := sword_voice.stream
 		var landing_stream := landing_voice.stream
@@ -338,7 +338,7 @@ func check_weapon_onsets_under_mixed_impacts(audio: Node, bus: int, capture: Aud
 	for i in 24:
 		await physics_frame
 		for sample in capture.get_buffer(capture.get_frames_available()):
-			peak = maxf(peak, absf(sample.x), absf(sample.y))
+			peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
 		if peak > 0.001:
 			break
 	check(firing.stream == fire_stream and peak > 0.001 and peak < 0.9,
