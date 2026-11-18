@@ -14,6 +14,11 @@ func run() -> void:
 	root.add_child(world)
 	current_scene = world
 	await process_frame
+	if world.is_device_review():
+		await verify_device_review(world)
+		print("DEVICE_PATH_LAMPPOST failures=", failures)
+		quit(int(not failures.is_empty()))
+		return
 	var review = world.showcase
 	var lamp = review.get("path_lamppost")
 	var mobile := RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
@@ -30,6 +35,27 @@ func run() -> void:
 		await verify_portable()
 	print("PATH_LAMPPOST failures=", failures)
 	quit(int(not failures.is_empty()))
+
+func verify_device_review(world: Node3D) -> void:
+	for i in 2:
+		var graphics = world.biome_controller
+		check(world.map_ready and graphics != null, "Device review opens the portable biome")
+		if graphics != null:
+			world.showcase.set_hour(22.)
+			await process_frame
+			check(not graphics._path_lamppost._attempted and graphics._path_lamppost.fixture == null,
+				"Device review never requests the external lamppost or its collider")
+			check(not graphics._path_fixture._attempted and graphics._path_fixture.fixture == null,
+				"Device review never requests the external firepit")
+			check(graphics._fixture_air().is_empty(), "Device mist has no external fixture light")
+			check(not world.showcase.air_light.source_ready, "Device review skips the external air light proof")
+		world.free()
+		await process_frame
+		if i == 0:
+			world = load("res://scenes/maps/m2_v1/MeadowBiomeReview.tscn").instantiate()
+			root.add_child(world)
+			current_scene = world
+			await process_frame
 
 func verify_lamp(world: Node3D, review, lamp) -> void:
 	review.set_hour(19.15)
