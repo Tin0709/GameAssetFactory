@@ -526,7 +526,7 @@ func _add_clips(directory: String, player: AnimationPlayer) -> bool:
 	for name: StringName in CLIP_HASHES:
 		if name == Zombie.IDLE:
 			continue
-		var imported := _import_gltf(_clip_path(directory, name))
+		var imported := _import_gltf(_clip_path(directory, name), GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS)
 		if imported == null:
 			return false
 		var clip_player := imported.get_node_or_null("AnimationPlayer") as AnimationPlayer
@@ -545,9 +545,9 @@ func _clip_path(directory: String, clip: StringName) -> String:
 func _verified(path: String, expected_hash: String) -> bool:
 	return FileAccess.file_exists(path) and FileAccess.get_sha256(path) == expected_hash
 
-func _import_gltf(path: String) -> Node3D:
+func _import_gltf(path: String, flags := 0) -> Node3D:
 	var document := GLTFDocument.new()
 	var state := GLTFState.new()
-	if document.append_from_file(path, state) != OK:
+	if document.append_from_file(path, state, flags) != OK:
 		return null
 	return document.generate_scene(state) as Node3D

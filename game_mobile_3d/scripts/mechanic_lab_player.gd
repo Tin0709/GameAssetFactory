@@ -99,6 +99,9 @@ func _refresh_markers() -> void:
 func _create_hybrid_motion() -> RefCounted:
 	return LabLocomotion.new()
 
+func _import_private_clip_scene(path: String) -> Node3D:
+	return load_private_model(path, GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS)
+
 func _post_landing_step_interval() -> float:
 	# Absorb the touchdown settling pose and admit the first running stride.
 	return POST_LANDING_STEP_INTERVAL

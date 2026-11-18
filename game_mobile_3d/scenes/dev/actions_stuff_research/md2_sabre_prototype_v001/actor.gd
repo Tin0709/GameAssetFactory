@@ -294,7 +294,7 @@ static func read_runtime_locomotion_profile(path:String)->Dictionary:
 		var value:Variant=data.ground.get(key)
 		if not (value is float or value is int) or not is_finite(float(value)) or float(value)<=0.:return {}
 	return data
-static func load_private_model(path:String)->Node3D:
+static func load_private_model(path:String, flags := 0)->Node3D:
 	# Parse directly into transient in-memory resources. No ResourceSaver,
 	# editor importer, texture extraction, or project cache is used for this file.
 	if not path.is_absolute_path() or not FileAccess.file_exists(path):return null
@@ -303,9 +303,12 @@ static func load_private_model(path:String)->Node3D:
 		push_warning("Private reference must remain outside the game project");return null
 	var document:=GLTFDocument.new();var state:=GLTFState.new()
 	state.handle_binary_image_mode=GLTFState.HANDLE_BINARY_IMAGE_MODE_EMBED_AS_UNCOMPRESSED
-	var error:=document.append_from_file(path,state)
+	var error:=document.append_from_file(path,state,flags)
 	if error!=OK:push_warning("External private appearance could not load: "+str(error));return null
 	return document.generate_scene(state,120.)
+
+func _import_private_clip_scene(path: String) -> Node3D:
+	return load_private_model(path)
 
 static func read_ground_graph(value:Variant)->Dictionary:
 	if not value is Dictionary or value.get("schema")!="private-ground-graph/1" or value.get("curve") not in ["linear","smoothstep"]:return {}
@@ -390,7 +393,7 @@ func _load_private_clip_library(entries:Array, library_name:StringName, combat_c
 		var path:String=value.path
 		if not path.is_absolute_path() or not path.replace("\\","/").simplify_path().to_lower().begins_with(research) or not path.ends_with(".glb"):return false
 		if FileAccess.get_sha256(path)!=value.sha256:return false
-		var imported:=load_private_model(path)
+		var imported:=_import_private_clip_scene(path)
 		if imported==null:return false
 		var player:AnimationPlayer;var rig:Skeleton3D
 		for node:Node in imported.find_children("*","",true,false):
