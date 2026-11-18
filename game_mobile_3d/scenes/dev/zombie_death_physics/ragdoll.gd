@@ -72,6 +72,7 @@ var joint_rest_rotations: Dictionary = {}
 var resistance_gain := 0.0
 var resistance_age := 0.0
 var _parts: Array = PARTS
+var _floor_projection_parts: Array[FloorProjectionPart]
 var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
 var _source_anchor_projections: Array[SourceAnchorProjection]
@@ -99,7 +100,7 @@ func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionar
 		simulator = prepared.instantiate() as PhysicalBoneSimulator3D
 		skeleton.add_child(simulator)
 		for i in _parts.size():
-			_register_body(_parts[i][0], simulator.get_child(i) as PhysicalBone3D)
+			_register_body(_parts[i], simulator.get_child(i) as PhysicalBone3D)
 		return
 	simulator = PhysicalBoneSimulator3D.new()
 	simulator.name = "DeathPhysicsSimulator"
@@ -108,7 +109,7 @@ func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionar
 	for part in _parts:
 		var body := _make_physical_body(target, part, bone_names, body_offsets)
 		simulator.add_child(body)
-		_register_body(part[0], body)
+		_register_body(part, body)
 
 func pack_dormant_simulator(target: Skeleton3D, part_layout: Array, bone_names: Dictionary,
 		body_offsets: Dictionary) -> PackedScene:
@@ -149,7 +150,14 @@ func _make_physical_body(target: Skeleton3D, part: Array, bone_names: Dictionary
 	body.add_child(collider)
 	return body
 
-func _register_body(part_name: String, body: PhysicalBone3D) -> void:
+class FloorProjectionPart:
+	var body: PhysicalBone3D
+	var rid: RID
+	var half_size: Vector3
+	var radius: float
+
+func _register_body(part: Array, body: PhysicalBone3D) -> void:
+	var part_name: String = part[0]
 	var rid := body.get_rid()
 	PhysicsServer3D.body_set_enable_continuous_collision_detection(rid, true)
 	PhysicsServer3D.body_set_max_contacts_reported(rid, 4)
@@ -157,6 +165,12 @@ func _register_body(part_name: String, body: PhysicalBone3D) -> void:
 		# The utility carrier uses torso-like inertia.
 		PhysicsServer3D.body_set_param(rid, PhysicsServer3D.BODY_PARAM_INERTIA, Vector3(0.6, 0.4, 0.6))
 	bodies[part_name] = body
+	var projection := FloorProjectionPart.new()
+	projection.body = body
+	projection.rid = rid
+	projection.half_size = part[2] * 0.5
+	projection.radius = projection.half_size.length()
+	_floor_projection_parts.append(projection)
 
 func _make_body_shape(size: Vector3) -> BoxShape3D:
 	var shape := BoxShape3D.new()
@@ -888,22 +902,23 @@ func _project_floor_contact() -> void:
 	var min_depth := FLOOR_REST_SLOP if landing_blended else FLOOR_CONTACT_SLOP
 	var depths: Dictionary[PhysicalBone3D, float] = {}
 	var slow := true
-	for part in _parts:
-		var body: PhysicalBone3D = bodies[part[0]]
-		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+	for part in _floor_projection_parts:
+		var body := part.body
+		var state := PhysicsServer3D.body_get_direct_state(part.rid)
 		if state == null:
 			continue
 		slow = slow and state.linear_velocity.length_squared() < 0.6 * 0.6 \
 			and state.angular_velocity.length_squared() < 2.0 * 2.0
 		var pose := floor_inverse * state.transform
-		var half: Vector3 = part[2] * 0.5
-		var extent_y := Vector3(absf(pose.basis.x.y), absf(pose.basis.y.y), absf(pose.basis.z.y)).dot(half)
+		var half := part.half_size
+		var rows := pose.basis.transposed()
+		var extent_y := rows.y.abs().dot(half)
 		var depth := floor_half.y - (pose.origin.y - extent_y)
 		if depth <= min_depth or pose.origin.y + extent_y < -floor_half.y:
 			continue
 		# The finite platform only supports boxes whose footprints fit on it.
-		var extent_x := Vector3(absf(pose.basis.x.x), absf(pose.basis.y.x), absf(pose.basis.z.x)).dot(half)
-		var extent_z := Vector3(absf(pose.basis.x.z), absf(pose.basis.y.z), absf(pose.basis.z.z)).dot(half)
+		var extent_x := rows.x.abs().dot(half)
+		var extent_z := rows.z.abs().dot(half)
 		if absf(pose.origin.x) + extent_x <= floor_half.x and absf(pose.origin.z) + extent_z <= floor_half.z:
 			lift = maxf(lift, depth)
 			if landing_blended or _flat_floor_has_contact:
@@ -943,11 +958,12 @@ func _project_floor_contact() -> void:
 			_limit_floor_anchor_stretch(anchor_lifts, depths, shared_lift, slop, anchor_limit)
 			if not landing_blended and floor_impact_blend <= 0.0:
 				_limit_shared_first_contact_lift(anchor_lifts, depths, shared_lift, slop)
-		for body: PhysicalBone3D in bodies.values():
+		for part in _floor_projection_parts:
+			var body := part.body
 			var correction: float = anchor_lifts.get(body, maxf(shared_lift, depths.get(body, 0.0) - slop))
 			if correction <= 0.0:
 				continue
-			var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+			var state := PhysicsServer3D.body_get_direct_state(part.rid)
 			if state:
 				state.transform = state.transform.translated(Vector3.UP * correction)
 	if _flat_floor_has_contact and not landing_blended and floor_impact_blend > 0.0:
@@ -988,13 +1004,13 @@ func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depth
 func _preempt_floor_penetration(floor_half: Vector3, floor_inverse: Transform3D, floor_y: float) -> void:
 	# During the Sabre roll, a rotating box can dig in again before the next
 	# contact solve. Predict its lowest corner and oppose only the closing speed.
-	for part in _parts:
-		var body: PhysicalBone3D = bodies[part[0]]
-		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+	for part in _floor_projection_parts:
+		var body := part.body
+		var state := PhysicsServer3D.body_get_direct_state(part.rid)
 		if state == null or state.sleeping:
 			continue
-		var half: Vector3 = part[2] * 0.5
-		var radius := half.length()
+		var half := part.half_size
+		var radius := part.radius
 		var pose := state.transform
 		if pose.origin.y + radius < floor_y:
 			continue
@@ -1158,6 +1174,7 @@ func release(visible_world_pose: Array[Transform3D] = []) -> void:
 		simulator.free()
 	simulator = null
 	bodies.clear()
+	_floor_projection_parts.clear()
 	_terrain_poses.clear()
 	anchors.clear()
 	joint_rest_rotations.clear()
