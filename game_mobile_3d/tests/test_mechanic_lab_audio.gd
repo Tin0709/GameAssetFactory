@@ -1030,7 +1030,11 @@ func wait_for_zombie_onset(voices: Array[AudioStreamPlayer3D]) -> bool:
 		await process_frame
 	return false
 
-func check_melee_tool_variants(audio: Node3D, capture: AudioEffectCapture) -> void:
+func check_melee_tool_variants(audio: Node3D, bus: int, capture: AudioEffectCapture) -> void:
+	audio.set_enabled(true, Vector3.FORWARD * 2.0)
+	var voice: AudioStreamPlayer3D = audio._voices[0]
+	var previous_bus := voice.bus
+	voice.bus = AudioServer.get_bus_name(bus)
 	var counts := {
 		&"cleaver": [3, 3, 2, 0, 2, 0],
 		&"gauntlet": [4, 3, 3, 3, 3, 3],
@@ -1066,6 +1070,7 @@ func check_melee_tool_variants(audio: Node3D, capture: AudioEffectCapture) -> vo
 			"%s wraps to the first variant and produces PCM without clipping" % tool)
 		print("MELEE_TOOL_AUDIO ", tool, " variants=", variants.size(), " peak=", peak)
 	audio.reset()
+	voice.bus = previous_bus
 
 func run() -> void:
 	var camera := Camera3D.new()
@@ -1144,7 +1149,7 @@ func run() -> void:
 	check(peak > 0.01 and peak < 0.9, "Simultaneous MD2 impact, slam and reactions have mix headroom")
 	await check_crossbow_fire_under_impact_burst(audio, bus, capture)
 	await check_weapon_onsets_under_mixed_impacts(audio, bus, capture)
-	await check_melee_tool_variants(audio, capture)
+	await check_melee_tool_variants(audio, bus, capture)
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
 	await check_bow_fire_during_crossbow_impacts(bus, capture)
