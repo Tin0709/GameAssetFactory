@@ -77,6 +77,7 @@ const SABRE_BRACE_MIN_AGE := 0.82
 const SABRE_CORNER_LANDING_MIN_AGE := 1.5
 const SABRE_CORNER_LANDING_MAX_SPEED := 0.60
 const SABRE_BRACE_GRAVITY_SHARE := 0.65
+const SABRE_BRACE_LIMB_SPEED_SHARE := 0.60
 const SABRE_BRACE_BLEND_TIME := 0.10
 const SABRE_ROLL_RESPONSE_TIME := 0.10
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
@@ -988,7 +989,14 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		and contact_age >= gravity_blend_end - 0.00001 and _corpse_age >= SABRE_BRACE_MIN_AGE \
 		and motion.core_supports > 0 and motion.supports == 2 and not motion.leg_supported
 	_had_upper_body_brace = _had_upper_body_brace or braced
-	var brace_target := 1.0 - smoothstep(0.6, 1.6, motion.linear) if braced else 0.0
+	var brace_target := 0.0
+	if braced:
+		# Free limbs can still swing while the floor carries the upper body.
+		var head: PhysicalBone3D = ragdoll.bodies.Head
+		var chest: PhysicalBone3D = ragdoll.bodies.Chest
+		var core_speed := maxf(head.linear_velocity.length(), chest.linear_velocity.length())
+		var brace_speed := maxf(core_speed, motion.linear * SABRE_BRACE_LIMB_SPEED_SHARE)
+		brace_target = 1.0 - smoothstep(0.6, 1.6, brace_speed)
 	var flat_brace_weight := move_toward(_flat_brace_weight, brace_target, delta / SABRE_BRACE_BLEND_TIME)
 	var late_roll_damping := 0.0
 	if flat_sabre_finisher and contact_age >= DEATH_LANDING_BLEND_TIME and motion.leg_supported and motion.core_supports > 0:

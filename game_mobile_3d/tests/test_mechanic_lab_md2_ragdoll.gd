@@ -86,7 +86,7 @@ func run() -> void:
 	check(zombie.ragdoll.running and zombie.health == 0, "Lethal contact transfers the live pose to physics")
 	var head_state := PhysicsServer3D.body_get_direct_state(zombie.ragdoll.bodies.Head.get_rid())
 	check(head_state and is_equal_approx(head_state.total_gravity.y, -50.0),
-		"Grounded hits use 50 m/s² of downward gravity in flight")
+		"Grounded hits use 50 m/sÂ² of downward gravity in flight")
 	check(is_equal_approx(zombie.ragdoll.bodies.Head.linear_damp, 0.01),
 		"The ragdoll uses the authored air drag during launch")
 	var impulse: Vector3 = zombie.ragdoll.total_applied_impulse
@@ -214,6 +214,7 @@ func run() -> void:
 	await check_sabre_floor_lift(lab, group, 514, 0.036)
 	await check_sabre_first_support_lift(lab, group)
 	await check_sabre_head_and_arm_brace(lab, group)
+	await check_sabre_head_and_arm_brace(lab, group, 2309, 102)
 	await check_sabre_late_roll(lab, group)
 	await check_sabre_grounded_slide(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
@@ -652,11 +653,11 @@ func check_sabre_first_support_lift(lab, group) -> void:
 		" anchor_m=", peak_anchor, " release_s=", zombie._corpse_age)
 	zombie.free()
 
-func check_sabre_head_and_arm_brace(lab, group) -> void:
-	var zombie = await replay_offset_sabre_finisher(lab, group, 464)
+func check_sabre_head_and_arm_brace(lab, group, serial := 464, release_ticks := 130) -> void:
+	var zombie = await replay_offset_sabre_finisher(lab, group, serial)
 	var braced := false
 	var leg_supported_after_brace := false
-	for i in 130:
+	for i in release_ticks:
 		await physics_frame
 		if zombie._corpse_parked:
 			break
@@ -668,8 +669,9 @@ func check_sabre_head_and_arm_brace(lab, group) -> void:
 		if braced and contact.leg_supported:
 			leg_supported_after_brace = true
 	check(braced and leg_supported_after_brace and zombie._corpse_parked,
-		"Sabre's head-and-arm brace rolls onto leg support and releases within 130 ticks")
-	print("SABRE_HEAD_ARM_REST seconds=", zombie._corpse_age,
+		"Sabre's head-and-arm brace rolls onto leg support and releases within %d ticks (seed %d)"
+			% [release_ticks, serial])
+	print("SABRE_HEAD_ARM_REST seed=", serial, " seconds=", zombie._corpse_age,
 		" braced=", braced, " leg_supported_after_brace=", leg_supported_after_brace)
 	zombie.free()
 
