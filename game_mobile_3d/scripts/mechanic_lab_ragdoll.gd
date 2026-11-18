@@ -118,7 +118,7 @@ func _handoff_wall_clearance() -> Vector3:
 	if wall_handoff_animation != null and _handoff_straddles_wall(
 			space, collision_mask, Vector3.ZERO, SOURCE_ANCHOR_TOLERANCE, {}):
 		_wall_handoff_frame = Engine.get_physics_frames()
-		return _blend_wall_handoff(space, collision_mask)
+		return _blend_wall_handoff(space, collision_mask, overlaps)
 	return super._handoff_wall_clearance()
 
 func _is_floor_top_overlap(hit: RID, bounds: AABB) -> bool:
@@ -141,7 +141,22 @@ func _is_floor_top_overlap(hit: RID, bounds: AABB) -> bool:
 	return bounds.position.x > low.x + depth and bounds.end.x < high.x - depth \
 		and bounds.position.z > low.z + depth and bounds.end.z < high.z - depth
 
-func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) -> Vector3:
+func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int, overlaps: Array[Dictionary]) -> Vector3:
+	var wall := RID()
+	var wall_bounds := AABB()
+	for overlap in overlaps:
+		var candidate := overlap.collider as StaticBody3D
+		if candidate == null or candidate == _flat_floor.get_parent() or not _is_single_box(candidate.get_rid()):
+			continue
+		var rid := candidate.get_rid()
+		var pose: Transform3D = PhysicsServer3D.body_get_state(rid, PhysicsServer3D.BODY_STATE_TRANSFORM)
+		pose *= PhysicsServer3D.body_get_shape_transform(rid, 0)
+		if pose.basis != Basis.IDENTITY:
+			continue
+		var half: Vector3 = PhysicsServer3D.shape_get_data(PhysicsServer3D.body_get_shape(rid, 0))
+		wall = rid
+		wall_bounds = AABB(pose.origin - half, half * 2.0)
+		break
 	var source: Array[Transform3D] = []
 	for bone in skeleton.get_bone_count():
 		source.append(skeleton.get_bone_pose(bone))
@@ -156,17 +171,56 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) 
 	# Search from the least visible correction. Interpolating bone-local
 	# transforms retains the source hierarchy while retracting the limbs.
 	var shift := Vector3.ZERO
+	var shift_known := true
 	for idle_weight: float in [0.25, 0.50, 0.75, 1.0]:
 		for bone in source.size():
 			skeleton.set_bone_pose(bone, source[bone].interpolate_with(idle[bone], idle_weight))
 		sample(sample_delta)
 		# A blend can produce the same collider poses, especially from Idle.
-		if idle_weight != 0.25 and current == previous:
+		if idle_weight != 0.25 and current == previous and (idle_weight < 1.0 or shift_known):
+			continue
+		if idle_weight < 1.0 and wall.is_valid() \
+				and _wall_blocks_every_handoff_shift(space, collision_mask, wall, wall_bounds):
+			shift_known = false
 			continue
 		shift = super._handoff_wall_clearance()
+		shift_known = true
 		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift, "", {}):
 			break
 	return _preserve_wall_handoff_branches(space, collision_mask, source, shift)
+
+func _wall_blocks_every_handoff_shift(space: PhysicsDirectSpaceState3D, collision_mask: int,
+		wall: RID, bounds: AABB) -> bool:
+	# Handoff shifts translate both ends of the ray by at most 12 cm horizontally.
+	# Require the whole shifted segment to enter the same side face of the box.
+	var margin := HANDOFF_MAX_SHIFT + PROJECTION_COLLISION_MARGIN
+	var origin := skeleton.global_position
+	var low := bounds.position
+	var high := bounds.end
+	for pose: Transform3D in current.values():
+		var endpoint := pose.origin
+		if endpoint.y <= low.y + PROJECTION_COLLISION_MARGIN or endpoint.y >= high.y - PROJECTION_COLLISION_MARGIN:
+			continue
+		var start := Vector3(origin.x, endpoint.y, origin.z)
+		var ray_bounds := AABB(start.min(endpoint), (endpoint - start).abs())
+		var crosses_x := (start.x < low.x - margin and endpoint.x > low.x + margin) \
+			or (start.x > high.x + margin and endpoint.x < high.x - margin)
+		var crosses_z := (start.z < low.z - margin and endpoint.z > low.z + margin) \
+			or (start.z > high.z + margin and endpoint.z < high.z - margin)
+		if not ((crosses_x and ray_bounds.position.z > low.z + margin and ray_bounds.end.z < high.z - margin)
+				or (crosses_z and ray_bounds.position.x > low.x + margin and ray_bounds.end.x < high.x - margin)):
+			continue
+		# Another collider in the swept ray can change which side the ray sees.
+		var envelope := ray_bounds.grow(margin)
+		_handoff_bounds_shape.size = envelope.size
+		_handoff_bounds_query.transform = Transform3D(Basis.IDENTITY, envelope.get_center())
+		_handoff_bounds_query.collision_mask = collision_mask
+		_handoff_bounds_query.exclude = [wall]
+		var unobstructed := space.intersect_shape(_handoff_bounds_query, 1).is_empty()
+		_handoff_bounds_query.exclude = []
+		if unobstructed:
+			return true
+	return false
 
 func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		source: Array[Transform3D], shift: Vector3) -> Vector3:
