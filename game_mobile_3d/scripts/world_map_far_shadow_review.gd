@@ -32,6 +32,10 @@ func configure(world: Node, directory: String) -> bool:
 	return true
 
 
+func prepare_actor_shaders() -> void:
+	_receivers.prepare([], _world.look.far_shadow_actor_shaders())
+
+
 func _process(delta: float) -> void:
 	if _cache == null or not is_instance_valid(_world):
 		return

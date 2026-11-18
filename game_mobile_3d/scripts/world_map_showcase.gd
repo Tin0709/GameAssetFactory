@@ -4149,6 +4149,8 @@ func _select_player_skin(index: int) -> void:
 			if mesh.skin != null:
 				_md2_skin_visibility[mesh] = mesh.visible
 		level.look.register_kai_materials(_kai_skin.meshes)
+		if level.get("far_shadow_review") != null:
+			level.far_shadow_review.prepare_actor_shaders()
 		level.canopy_player_cue.set_alternate(_kai_skin, _kai_skin.canopy_silhouette())
 	var use_kai := index == PlayerSkin.KAI
 	for mesh in _md2_skin_visibility:
