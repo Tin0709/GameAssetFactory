@@ -257,7 +257,8 @@ func _ready() -> void:
 			dust.free()
 		var wind := MovementWind.new()
 		wind.name = "MovementWind"
-		if wind.setup(player, _player_foot_contact_at, true):
+		# M_WhirlWind_Emissive uses a two-sided material.
+		if wind.setup(player, _player_foot_contact_at, true, BaseMaterial3D.CULL_DISABLED):
 			add_child(wind)
 		else:
 			wind.free()

@@ -22,7 +22,8 @@ var _wakes: Array[Wake] = []
 var _next := 0
 var _physics_clock := false
 
-func setup(actor: CharacterBody3D, terrain_contact := Callable(), physics_clock := false) -> bool:
+func setup(actor: CharacterBody3D, terrain_contact := Callable(), physics_clock := false,
+		cull_mode: BaseMaterial3D.CullMode = BaseMaterial3D.CULL_BACK) -> bool:
 	var image := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(64, 64))
 	if image == null:
 		return false
@@ -38,6 +39,7 @@ func setup(actor: CharacterBody3D, terrain_contact := Callable(), physics_clock 
 		wake.material = StandardMaterial3D.new()
 		wake.material.albedo_texture = texture
 		wake.material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		wake.material.cull_mode = cull_mode
 		wake.material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		wake.mesh = MeshInstance3D.new()
 		wake.mesh.mesh = quad
