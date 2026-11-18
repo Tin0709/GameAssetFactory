@@ -263,6 +263,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"canopy_cue_clarity": ["Độ rõ dáng sau tán ban ngày", 1.],
 	&"canopy_cue_softness": ["Dịu dáng xanh khi nhìn gần", 1.],
 	&"player_sun_shoulder": ["Dịu nắng trên nhân vật", .4],
+	&"actor_sunset_sun_shoulder": ["Dịu nắng thấp trên nhân vật", 1.],
 	&"player_sun_specular": ["Dịu phản sáng nắng trên Valorie", 1.],
 	&"player_canopy_color": ["Sắc ánh trời trên nhân vật", 1.],
 	&"actor_shade_sky": ["Ánh trời dịu trên Valorie dưới tán", 1.],
@@ -308,7 +309,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 202
+const LIGHTING_MIX_VERSION := 203
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2047,7 +2048,16 @@ func player_sky_fill_mix_scale() -> float:
 func player_sun_shoulder_weight() -> float:
 	if _balanced_preview or not forest_spatial_sky_context() or not level.look.player_material.available():
 		return 0.
-	return _lighting_scale(&"player_sun_shoulder") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+	var daylight := _lighting_scale(&"player_sun_shoulder") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+	if not _actor_sunset_sun_shoulder_available():
+		return daylight
+	var amount := DayNight.sample_curve(_biome_profile.actor_sunset_sun_shoulder_by_hour, hour / 24., 0.)
+	return maxf(daylight, clampf(amount, 0., .6) * _lighting_scale(&"actor_sunset_sun_shoulder"))
+
+func _actor_sunset_sun_shoulder_available() -> bool:
+	return not _balanced_preview and atmosphere_review == "combined" and forest_spatial_sky_context() \
+		and _biome_profile != null and _biome_profile.actor_sunset_sun_shoulder_by_hour != null \
+		and level.look.player_material.available() and RenderingServer.get_current_rendering_method() == &"mobile"
 
 func canopy_cue_day_tone_weight() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_active():
@@ -2681,6 +2691,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 180 and effect == &"mist_dusk_sky_scatter":
 			missing_value = 0.
+		if version < 203 and effect == &"actor_sunset_sun_shoulder":
+			missing_value = 0.
 		if version < 202 and effect == &"dusk_key_fade":
 			missing_value = 0.
 		if version < 201 and effect == &"mist_rear_chroma":
@@ -2937,6 +2949,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and _leaf_lamp_editable(effect)
 		if effect in [&"canopy_direct_softness", &"late_canopy_sun"]:
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks
+		if effect == &"actor_sunset_sun_shoulder":
+			slider.editable = slider.editable and _actor_sunset_sun_shoulder_available()
 		if effect in [&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 			slider.editable = slider.editable and level.look.player_material.available()
 		if effect == &"actor_shade_sky":
@@ -3201,7 +3215,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			level.player_light.refresh_shade_sky()
 		return
 	if changed_effect in [&"player_sky", &"player_bounce", &"kai_ground_bounce", &"kai_twilight_ground_bounce",
-			&"player_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
+			&"player_sun_shoulder", &"actor_sunset_sun_shoulder", &"player_sun_specular", &"player_canopy_color", &"actor_view_fill_chroma", &"actor_twilight_view_fill"]:
 		if level.player_light != null:
 			level.player_light.refresh()
 		return

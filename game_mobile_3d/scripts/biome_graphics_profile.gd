@@ -60,6 +60,8 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 ## Additional diffuse sky on supported player materials under canopy.
 ## Curve X is normalized hour and Y is a gain from 0 to 1.
 @export var actor_shade_sky_by_hour: Curve
+## Optional late-sun highlight shoulder for the existing actor shader. Zero keeps the daylight curve.
+@export var actor_sunset_sun_shoulder_by_hour: Curve
 ## Fraction of the local upper-sky deficit returned to shaded lateral faces.
 @export var actor_side_sky_by_hour: Curve
 ## Ground reflection from the player's lantern during the handoff to night.
