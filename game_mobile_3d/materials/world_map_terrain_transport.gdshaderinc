@@ -56,7 +56,11 @@ vec3 terrain_contact_response(vec3 albedo,float contact){
 	vec3 reflectance=clamp(albedo,vec3(0.0),vec3(0.5));
 	return vec3(single)+returned*reflectance/max(vec3(1.0)-(1.0-return_ratio)*reflectance,vec3(0.00001));
 }
-vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,float contact,float face_y,vec3 camera_position){
+vec3 terrain_diffuse_visibility(vec3 albedo, float contact) {
+	return terrain_colored_visibility ? terrain_contact_response(albedo, contact) : vec3(1.0);
+}
+
+vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec3 receiver_visibility,float face_y,vec3 camera_position){
 	vec3 sky = terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
@@ -132,13 +136,13 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 	}
 	irradiance += day_return;
 #endif
-	if(terrain_colored_visibility)irradiance*=terrain_contact_response(color,contact);
+	irradiance *= receiver_visibility;
 	return color*(1.0-metallic)*irradiance;
 }
 
-vec3 terrain_opening_fill(vec3 albedo, float contact, float sole) {
+vec3 terrain_opening_fill(vec3 receiver_visibility, float sole) {
 	vec3 incident = terrain_sky_light * terrain_ambient_scale * terrain_ambient_tint * sole;
-	return terrain_colored_visibility ? incident * terrain_contact_response(albedo, contact) : incident;
+	return incident * receiver_visibility;
 }
 #ifdef GAF_WORLD_TERRAIN_PBR
 // Recovered split-sum consumer form; independently integrated GGX LUT.

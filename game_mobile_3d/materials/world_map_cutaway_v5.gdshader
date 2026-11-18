@@ -128,10 +128,11 @@ void fragment() {
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	stone_sunset_position = cutaway_world.xz;
 #endif
+	vec3 receiver_visibility = terrain_diffuse_visibility(ALBEDO, receiver_contact);
 	if (gaf_diffuse_opening.w > 0.0 || (ground_grade == 3 && max(gaf_stone_shade_fill.w, gaf_sheltered_stone_return) > 0.0)) {
-		terrain_opening_incident = terrain_opening_fill(ALBEDO, receiver_contact, sole);
+		terrain_opening_incident = terrain_opening_fill(receiver_visibility, sole);
 	}
-	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top,CAMERA_POSITION_WORLD)*sole;
+	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD)*sole;
 	vec3 local_diffuse = gaf_local_diffuse(diffuse_fill, cutaway_world, surface_normal);
 	EMISSION += gaf_dawn_turf_chroma(local_diffuse, vec3(1.42, 1.0, .65), .55 * dawn_turf);
 	EMISSION+=ALBEDO*(1.0-METALLIC)*gaf_replay_incident(cutaway_world,surface_normal)*receiver_contact*sole;
