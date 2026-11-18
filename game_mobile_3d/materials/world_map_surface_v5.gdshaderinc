@@ -1,10 +1,18 @@
 // Scene-local, reversible grade of authored texels. No replacement texture/UV.
+#ifdef GAF_LAB_FLAT_TERRAIN_SPECIALIZED
+const int ground_grade = 1;
+#else
 uniform int ground_grade = 0; // 1 grass/dirt, 2 dirt, 3 mineral
+#endif
 uniform float texture_contrast = 0.58;
 uniform sampler2D path_surface_map : filter_nearest, repeat_disable;
 uniform sampler2D path_grass_atlas : source_color, filter_linear_mipmap, repeat_enable;
 uniform sampler2D path_dirt_atlas : source_color, filter_linear_mipmap, repeat_enable;
+#ifdef GAF_LAB_FLAT_TERRAIN_SPECIALIZED
+const bool path_blending = false;
+#else
 uniform bool path_blending = false;
+#endif
 uniform float path_verge = 0.0;
 uniform vec2 path_map_origin = vec2(0.0);
 uniform vec2 path_map_size = vec2(1.0);

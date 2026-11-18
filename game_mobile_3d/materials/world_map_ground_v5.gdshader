@@ -1,14 +1,26 @@
 shader_type spatial;
+
+// MechanicLab's flat floor has no path map, cliff outlines or terrain PBR maps.
+#if defined(GAF_WORLD_FLAT_TURF) && !defined(GAF_WORLD_SPATIAL_TERRAIN)
+#define GAF_LAB_FLAT_TERRAIN_SPECIALIZED
+#endif
+
+#ifndef GAF_LAB_FLAT_TERRAIN_SPECIALIZED
 #define GAF_WORLD_TERRAIN_PBR
+#endif
 #ifdef GAF_SHARED_MIST
 #include "res://materials/world_map_mist.gdshaderinc"
 #endif
 render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_surface_v5.gdshaderinc"
+#ifndef GAF_LAB_FLAT_TERRAIN_SPECIALIZED
 #include "res://materials/world_map_terrain_outline.gdshaderinc"
+#endif
 #include "res://materials/world_map_source_terrain.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
+#ifndef GAF_LAB_FLAT_TERRAIN_SPECIALIZED
 #include "res://materials/world_map_terrain_pbr.gdshaderinc"
+#endif
 #ifdef GAF_WORLD_FLAT_TURF
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
 #endif
@@ -98,19 +110,28 @@ void fragment() {
 		ALBEDO = gaf_dawn_turf_chroma(ALBEDO, vec3(1.68, 1.0, 2.37), 0.68 * dawn_turf);
 	}
 #endif
+#ifndef GAF_LAB_FLAT_TERRAIN_SPECIALIZED
 	vec3 outline_ray = PROJECTION_MATRIX[3][3] > 0.5 ? -INV_VIEW_MATRIX[2].xyz : normalize(surface_world - CAMERA_POSITION_WORLD);
 	ALBEDO *= terrain_outline(surface_world, surface_normal, outline_ray);
+#endif
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	cloud_transmission=world_cloud_shade(surface_world);
 #else
 	ALBEDO*=world_cloud_shade(surface_world);
 #endif
+#ifdef GAF_LAB_FLAT_TERRAIN_SPECIALIZED
+	ROUGHNESS = native_roughness;
+	METALLIC = native_metallic;
+	SPECULAR = native_specular;
+	EMISSION = vec3(0.0);
+#else
 	float receiver_contact=terrain_contact_shade(surface_world,surface_normal);
 	vec2 packed_pbr=terrain_pbr(UV);
 	ROUGHNESS = native_roughness*packed_pbr.y;
 	METALLIC = native_metallic*packed_pbr.x;
 	SPECULAR = native_specular;
 	EMISSION=terrain_emission(UV);
+#endif
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	terrain_direct_contact=terrain_colored_visibility ? 1.0 : receiver_contact;
 	float sole = surface_top > 0.9 ? gaf_player_contact(surface_world, CAMERA_POSITION_WORLD) : 1.0;
@@ -129,7 +150,9 @@ void fragment() {
 		EMISSION += gaf_stone_reflection_balance(reflected, diffuse_fill);
 	}
 #else
+#ifndef GAF_LAB_FLAT_TERRAIN_SPECIALIZED
 	ALBEDO*=receiver_contact;
+#endif
 	EMISSION += gaf_local_environment_delta(ALBEDO, METALLIC, surface_world, surface_normal) * AO;
 #endif
 #ifdef GAF_SHARED_MIST
