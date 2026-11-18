@@ -7,6 +7,10 @@ const EARLY_FLOOR_LIFT_START := 0.065
 const EARLY_FLOOR_LIFT_FULL := 0.095
 const EARLY_FLOOR_SHARED_LIFT := 0.045
 const EARLY_FLOOR_LIFT_BLEND_END := 0.16
+const LOCAL_FLOOR_LIFT_START := 0.057
+const LOCAL_FLOOR_LIFT_FULL := 0.066
+const LOCAL_FLOOR_SHARED_LIFT := 0.033
+const FLOOR_CONTACT_GAP_DEPTH := 0.10
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
@@ -482,18 +486,38 @@ func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depth
 		shared_lift: float, slop: float, anchor_limit: float) -> void:
 	super._limit_floor_anchor_stretch(lifts, depths, shared_lift, slop, anchor_limit)
 	if floor_landing_blended or floor_impact_blend <= 0.0 or floor_impact_blend >= EARLY_FLOOR_LIFT_BLEND_END \
-			or shared_lift <= EARLY_FLOOR_LIFT_START:
+			or shared_lift <= LOCAL_FLOOR_LIFT_START:
 		return
-	# Keep the correction local while the first roll still has floor support.
-	# An airborne frame between contacts can need the existing shared lift.
-	var floor_body := _flat_floor.get_parent()
-	for body: PhysicalBone3D in bodies.values():
-		if _body_supported_by(body, floor_body):
-			var weight := smoothstep(EARLY_FLOOR_LIFT_START, EARLY_FLOOR_LIFT_FULL, shared_lift)
-			weight *= 1.0 - smoothstep(EARLY_FLOOR_LIFT_BLEND_END * 0.5, EARLY_FLOOR_LIFT_BLEND_END, floor_impact_blend)
-			var reduced_lift := lerpf(shared_lift, EARLY_FLOOR_SHARED_LIFT, weight)
-			_distribute_floor_lift(lifts, depths, shared_lift, slop, reduced_lift, anchor_limit)
-			return
+	# Concentrated penetration needs more clearance at the deepest part.
+	# Spread the remaining lift through the existing joint-limit pass.
+	var concentration := 0.0
+	if depths.size() == 1:
+		concentration = 1.0
+	elif depths.size() == 2:
+		var depth := depths.values()
+		var shallow := minf(depth[0], depth[1])
+		var deep := maxf(depth[0], depth[1])
+		concentration = smoothstep(2.5, 4.0, deep / shallow)
+	var regular_weight := smoothstep(EARLY_FLOOR_LIFT_START, EARLY_FLOOR_LIFT_FULL, shared_lift)
+	var local_weight := smoothstep(LOCAL_FLOOR_LIFT_START, LOCAL_FLOOR_LIFT_FULL, shared_lift) * concentration
+	if regular_weight <= 0.0 and local_weight <= 0.0:
+		return
+	# A deeply overlapping single part can briefly have no solver contact
+	# even though the prior contact has already started the landing blend.
+	var supported := depths.size() == 1 and float(depths.values()[0]) - slop >= FLOOR_CONTACT_GAP_DEPTH
+	if not supported:
+		var floor_body := _flat_floor.get_parent()
+		for body: PhysicalBone3D in bodies.values():
+			if _body_supported_by(body, floor_body):
+				supported = true
+				break
+	if not supported:
+		return
+	var blend := 1.0 - smoothstep(EARLY_FLOOR_LIFT_BLEND_END * 0.5, EARLY_FLOOR_LIFT_BLEND_END, floor_impact_blend)
+	var reduced_lift := lerpf(shared_lift, EARLY_FLOOR_SHARED_LIFT, regular_weight * blend)
+	var local_lift := lerpf(shared_lift, LOCAL_FLOOR_SHARED_LIFT, local_weight * blend)
+	_distribute_floor_lift(lifts, depths, shared_lift, slop, minf(reduced_lift, local_lift), anchor_limit)
+
 
 func _distribute_floor_lift(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
 		shared_lift: float, slop: float, reduced_lift: float, anchor_limit: float) -> void:

@@ -224,6 +224,8 @@ func run() -> void:
 	await check_sabre_fixed_pose_anchor(lab, group, 703, 0.11, "arm sliding during the first roll", 0.013)
 	await check_sabre_fixed_pose_anchor(lab, group, 1044, 0.115, "early arm and core roll", 0.013, 0.035)
 	await check_sabre_fixed_pose_anchor(lab, group, 1064, 0.115, "early core landing", 0.013, 0.033)
+	await check_sabre_fixed_pose_anchor(lab, group, 1432, 0.115, "deep supported head contact", 0.013, 0.040)
+	await check_sabre_fixed_pose_anchor(lab, group, 1473, 0.115, "intermittent floor contact", 0.013, 0.032, ZOMBIE.WALK_CLIPS[0])
 	await check_sabre_walking_arm_slide(lab, group)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
@@ -742,7 +744,7 @@ func check_flat_rest_after_tumble(lab, group) -> void:
 	zombie.free()
 
 func check_sabre_fixed_pose_anchor(lab, group, serial: int, gap_limit: float, impact: String,
-		overlap_limit := INF, rise_limit := INF) -> void:
+		overlap_limit := INF, rise_limit := INF, pose_clip: StringName = ZOMBIE.ATTACK) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 120011 + serial
 	group._spawn_serial = serial
@@ -751,8 +753,8 @@ func check_sabre_fixed_pose_anchor(lab, group, serial: int, gap_limit: float, im
 	zombie.set_physics_process(false)
 	zombie.global_position = Vector3(2.0, 0.02, 0.0)
 	zombie.rotation.y = rng.randf_range(0.0, TAU)
-	zombie.animation.play(ZOMBIE.ATTACK)
-	zombie.animation.advance(rng.randf_range(0.05, 0.3))
+	zombie.animation.play(pose_clip)
+	zombie.animation.advance(rng.randf_range(0.05, 0.3 if pose_clip == ZOMBIE.ATTACK else 1.70))
 	zombie.reset_physics_interpolation()
 	await ticks(4)
 	for i in 2:
