@@ -620,7 +620,6 @@ func _clear_chase_detour() -> void:
 	_chase_stalled_seconds = 0.0
 
 func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool) -> Vector3:
-	var space := get_world_3d().direct_space_state
 	if _chase_detour.is_finite():
 		_chase_detour_time -= delta
 		var travel := (_chase_detour - global_position).slide(Vector3.UP)
@@ -628,6 +627,7 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool) -> V
 		if _chase_detour_time > 0.0 and distance > LAB_ROAM_ARRIVAL:
 			var direct_clear := false
 			if sample_ai:
+				var space := get_world_3d().direct_space_state
 				_prepare_lab_path_sweep()
 				direct_clear = _lab_path_fraction(space, offset) >= 1.0 and _lab_path_end_clear(space, offset)
 			if not direct_clear:
@@ -651,7 +651,7 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool) -> V
 		var normal := collision.get_normal().slide(Vector3.UP)
 		if wall == null or wall == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
 			continue
-		_chase_detour = _choose_detour_waypoint(space, bounds, normal)
+		_chase_detour = _choose_detour_waypoint(get_world_3d().direct_space_state, bounds, normal)
 		if _chase_detour.is_finite():
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
 			return (_chase_detour - global_position).slide(Vector3.UP).normalized() * CHASE_SPEED
@@ -699,7 +699,8 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	offset.y = 0.0
 	var distance := offset.length()
 	var stop_distance := MELEE_RANGE if target_visible else LAB_LAST_SEEN_STOP_DISTANCE
-	if in_lab and target_visible and distance > stop_distance + MELEE_RANGE_TOLERANCE +			and is_on_floor() and not _corpse_floor.disabled:
+	if (in_lab and target_visible and distance > stop_distance + MELEE_RANGE_TOLERANCE
+			and is_on_floor() and not _corpse_floor.disabled):
 		var detour := _chase_detour_velocity(offset, delta, sample_ai)
 		if not detour.is_zero_approx():
 			_face_target(detour, delta)
