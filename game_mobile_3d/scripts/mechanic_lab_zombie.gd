@@ -211,6 +211,9 @@ static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
 static var _corpse_base_material: ShaderMaterial
 static var _live_capsule: CapsuleShape3D
+# These queries run synchronously on the physics thread and keep no results.
+static var _sight_ray: PhysicsRayQueryParameters3D
+static var _roam_sweep: PhysicsShapeQueryParameters3D
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D],
 		serial: int, ragdoll_layout: Dictionary = {}, corpse_floor: CollisionShape3D = null,
@@ -236,6 +239,9 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 		_live_capsule = CapsuleShape3D.new()
 		_live_capsule.radius = 0.43
 		_live_capsule.height = HEIGHT
+		_roam_sweep = PhysicsShapeQueryParameters3D.new()
+		_roam_sweep.shape = _live_capsule
+		_roam_sweep.collision_mask = LEVEL_COLLISION_MASK
 	var collision := CollisionShape3D.new()
 	collision.position.y = HEIGHT * 0.5
 	collision.shape = _live_capsule
@@ -480,9 +486,13 @@ func _check_melee_contact() -> void:
 
 func _clear_sight_to(point: Vector3) -> bool:
 	var height := Vector3.UP * (HEIGHT * 0.5)
-	var ray := PhysicsRayQueryParameters3D.create(global_position + height, point + height, LEVEL_COLLISION_MASK)
-	ray.hit_from_inside = true
-	return get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
+	if _sight_ray == null:
+		_sight_ray = PhysicsRayQueryParameters3D.new()
+		_sight_ray.collision_mask = LEVEL_COLLISION_MASK
+		_sight_ray.hit_from_inside = true
+	_sight_ray.from = global_position + height
+	_sight_ray.to = point + height
+	return get_world_3d().direct_space_state.intersect_ray(_sight_ray).is_empty()
 
 func _update_target_sight(delta: float, sample_ai: bool) -> void:
 	if target.get("is_dead") == true:
@@ -548,15 +558,12 @@ func _pick_roam_destination() -> Vector3:
 		return Vector3.INF
 	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
 	var space := get_world_3d().direct_space_state
-	var sweep := PhysicsShapeQueryParameters3D.new()
-	sweep.shape = _live_capsule
-	sweep.collision_mask = LEVEL_COLLISION_MASK
+	var sweep := _roam_sweep
 	sweep.transform = Transform3D(Basis.IDENTITY, global_position + Vector3.UP * (HEIGHT * 0.5))
 	# The support plane already bounds the patrol. Other terrain still
 	# participates in both the sweep and the destination overlap check.
 	var floor_body := _corpse_floor.get_parent() as StaticBody3D
-	if floor_body != null:
-		sweep.exclude = [floor_body.get_rid()]
+	sweep.exclude = [floor_body.get_rid()] if floor_body != null else []
 	for i in LAB_ROAM_ATTEMPTS:
 		var angle := _roam_rng.randf_range(0.0, TAU)
 		var radius := sqrt(_roam_rng.randf()) * LAB_ROAM_RADIUS
