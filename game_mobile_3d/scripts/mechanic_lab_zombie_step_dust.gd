@@ -34,6 +34,7 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float)
 	_material.set_shader_parameter("dust_tint", MovementDust.SURFACE_DUST.grass)
 	_material.set_shader_parameter("alpha_curve", alpha)
 	_material.set_shader_parameter("alpha_duration", alpha_duration)
+	_material.set_shader_parameter("source_step_seconds", MovementDust.SOURCE_PHYSICS_STEP)
 	var range_m := MovementDust.SOURCE_CAMERA_RANGE
 	_material.set_shader_parameter("camera_range_squared", range_m * range_m)
 	var quad := QuadMesh.new()

@@ -308,19 +308,21 @@ static func _sample_curve(curve: PackedFloat32Array, normalized_age: float) -> f
 	var index := floori(cursor)
 	return lerpf(curve[index], curve[mini(index + 1, curve.size() - 1)], cursor - index)
 
-static func source_step_height(age: float, drag: float) -> float:
-	return (age - (1.0 - exp(-drag * age)) / drag) / drag
-
-static func _source_debris_offset(velocity: Vector3, drag: float, age: float) -> Vector3:
-	# Sum the cooked update on the Lab clock as a geometric series. Between ticks,
-	# interpolate with the velocity from the next semi-implicit step.
+static func _source_damped_travel(age: float, drag: float) -> float:
+	# Sum the cooked velocity update on the Lab clock, then interpolate
+	# with the next solved velocity between ticks.
 	var ticks := floori(age / SOURCE_PHYSICS_STEP)
 	var elapsed := ticks * SOURCE_PHYSICS_STEP
 	var divisor := 1.0 + drag * SOURCE_PHYSICS_STEP
 	var decay := pow(divisor, -ticks)
+	return (1.0 - decay) / drag + (age - elapsed) * decay / divisor
+
+static func source_step_height(age: float, drag: float) -> float:
+	return (age - _source_damped_travel(age, drag)) / drag
+
+static func _source_debris_offset(velocity: Vector3, drag: float, age: float) -> Vector3:
 	var terminal := Vector3.DOWN * (GAUNTLET_DEBRIS_GRAVITY / drag)
-	var travel := (1.0 - decay) / drag + (age - elapsed) * decay / divisor
-	return terminal * age + (velocity - terminal) * travel
+	return terminal * age + (velocity - terminal) * _source_damped_travel(age, drag)
 
 func _update_source_landing(particle: Particle) -> void:
 	# Use the cooked semi-implicit velocity update on a fixed clock, with
@@ -371,8 +373,7 @@ func _process(delta: float) -> void:
 			active = true
 			continue
 		if particle.run_drag > 0.0:
-			# Closed form of upward acceleration with linear drag, sampled
-			# by age so the rendered path is independent of render cadence.
+			# Sample the damped rise from the foot-contact clock.
 			var height := source_step_height(particle.age, particle.run_drag)
 			particle.sprite.global_position = particle.origin + Vector3.UP * height
 			particle.sprite.modulate.a = _sample_curve(_run_alpha, progress / _run_alpha_duration)

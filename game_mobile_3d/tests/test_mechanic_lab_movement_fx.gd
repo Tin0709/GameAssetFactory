@@ -207,6 +207,27 @@ func check_source_run_dust(lab, dust) -> void:
 			break
 	lab.player.surface_contact.disconnect(listen)
 	check(dust._next != before, "The source Run emitter starts at a supported step")
+	var samples := 0
+	var max_error := 0.0
+	for particle in dust._particles:
+		if particle.sprite.visible and particle.run_drag > 0.0 and particle.age >= 0.08:
+			var height := expected_step_rise(particle.age, particle.run_drag)
+			var expected: Vector3 = particle.origin + Vector3.UP * height
+			max_error = maxf(max_error, expected.distance_to(particle.sprite.global_position))
+			samples += 1
+	check(samples > 0 and max_error <= 0.00002, "Running dust follows the decoded fixed-step rise")
+	print("MECHANIC_LAB_RUN_DUST_RISE samples=", samples, " max_error_m=", max_error)
+
+func expected_step_rise(age: float, drag: float) -> float:
+	const STEP := 1.0 / 60.0
+	var ticks := floori(age / STEP)
+	var speed := 0.0
+	var height := 0.0
+	var divisor := 1.0 + drag * STEP
+	for tick in ticks:
+		speed = (speed + STEP) / divisor
+		height += speed * STEP
+	return height + (speed + STEP) / divisor * (age - ticks * STEP)
 
 func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 	for i in 8:

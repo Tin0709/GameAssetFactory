@@ -6,6 +6,7 @@ uniform vec4 dust_tint : source_color;
 uniform float alpha_curve[54];
 uniform float alpha_duration;
 uniform float camera_range_squared;
+uniform float source_step_seconds;
 // Integer physics tick modulo 2048, interpolation offset in ticks, seconds per tick.
 uniform vec3 contact_clock;
 varying flat vec3 sprite_data;
@@ -16,7 +17,13 @@ void vertex() {
 	float lifetime = INSTANCE_CUSTOM.z;
 	float drag = INSTANCE_CUSTOM.w;
 	float age = max(mod(contact_clock.x - INSTANCE_CUSTOM.y, 2048.0) + contact_clock.y, 0.0) * contact_clock.z;
-	float lift = (age - (1.0 - exp(-drag * age)) / drag) / drag;
+	// Match the player's semi-implicit velocity solve and tick interpolation.
+	float tick = floor(age / source_step_seconds);
+	float divisor = 1.0 + drag * source_step_seconds;
+	float decay = pow(divisor, -tick);
+	float inv_drag = 1.0 / drag;
+	float travel = (1.0 - decay) * inv_drag + (age - tick * source_step_seconds) * decay / divisor;
+	float lift = (age - travel) * inv_drag;
 	vec4 origin = MODEL_MATRIX[3] + MODEL_MATRIX[1] * lift;
 	vec3 to_camera = origin.xyz - CAMERA_POSITION_WORLD;
 	if (dot(to_camera, to_camera) > camera_range_squared) {
