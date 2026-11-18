@@ -170,6 +170,8 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) 
 func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		source: Array[Transform3D], shift: Vector3) -> Vector3:
 	# Keep source rotation on branches that can move without reopening the overlap.
+	# The ray origin, shift, mask and terrain stay fixed throughout this search.
+	var wall_crossings: Dictionary[Vector3, bool] = {}
 	for name in ["Head", "Arm.L", "Arm.R", "Leg.L", "Leg.R"]:
 		var bone: int = bodies[name].get_bone_id()
 		var safe_pose := skeleton.get_bone_pose(bone)
@@ -179,7 +181,7 @@ func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision
 			var basis := Basis(rotation) * Basis.from_scale(safe_pose.basis.get_scale())
 			skeleton.set_bone_pose(bone, Transform3D(basis, safe_pose.origin))
 			sample(sample_delta)
-			if _wall_handoff_is_clear(space, collision_mask, shift, name):
+			if _wall_handoff_is_clear(space, collision_mask, shift, name, wall_crossings):
 				safe_pose = skeleton.get_bone_pose(bone)
 				break
 		skeleton.set_bone_pose(bone, safe_pose)
@@ -189,8 +191,8 @@ func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision
 	return shift
 
 func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: int,
-		shift: Vector3, changed_part := "") -> bool:
-	if _handoff_straddles_wall(space, collision_mask, shift, 0.0):
+		shift: Vector3, changed_part := "", wall_crossings: Dictionary[Vector3, bool] = {}) -> bool:
+	if _handoff_straddles_wall(space, collision_mask, shift, 0.0, wall_crossings):
 		return false
 	for name: String in current:
 		if not changed_part.is_empty() and name != changed_part:
@@ -205,21 +207,25 @@ func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: in
 	return true
 
 func _handoff_straddles_wall(space: PhysicsDirectSpaceState3D, collision_mask: int,
-		shift := Vector3.ZERO, tolerance := SOURCE_ANCHOR_TOLERANCE) -> bool:
+		shift := Vector3.ZERO, tolerance := SOURCE_ANCHOR_TOLERANCE,
+		wall_crossings: Dictionary[Vector3, bool] = {}) -> bool:
 	var ray := PhysicsRayQueryParameters3D.new()
 	ray.collision_mask = collision_mask
 	var origin := skeleton.global_position + shift
 	for pose: Transform3D in current.values():
-		ray.from = Vector3(origin.x, pose.origin.y, origin.z)
-		ray.to = pose.origin + shift
-		if ray.from.distance_squared_to(ray.to) <= SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
-			continue
-		var hit := space.intersect_ray(ray)
-		if hit.is_empty() or not hit.collider is StaticBody3D:
-			continue
-		var normal: Vector3 = hit.normal
-		var point: Vector3 = hit.position
-		if absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - ray.to) > tolerance:
+		var crosses: Variant = wall_crossings.get(pose.origin)
+		if crosses == null:
+			ray.from = Vector3(origin.x, pose.origin.y, origin.z)
+			ray.to = pose.origin + shift
+			crosses = false
+			if ray.from.distance_squared_to(ray.to) > SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
+				var hit := space.intersect_ray(ray)
+				if not hit.is_empty() and hit.collider is StaticBody3D:
+					var normal: Vector3 = hit.normal
+					var point: Vector3 = hit.position
+					crosses = absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - ray.to) > tolerance
+			wall_crossings[pose.origin] = crosses
+		if crosses:
 			return true
 	return false
 
