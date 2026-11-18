@@ -100,6 +100,12 @@ func check_damage_numbers_during_render_hitch() -> void:
 		"A long frame expires the earlier number while displaying all 300 new digits")
 	check(numbers._numbers.all(func(number): return number.age == 0.0 and number.centre == number.origin),
 		"New numbers begin at the hit position before their pop and rise")
+	var farthest = numbers._numbers.front()
+	var nearest = numbers._numbers.back()
+	lab.camera.rotation.y += PI
+	numbers._process(0.0)
+	check(numbers._numbers.front() == nearest and numbers._numbers.back() == farthest,
+		"Damage numbers update their depth order when the camera reverses")
 	numbers._process(1.0 / 30.0)
 	check(numbers._numbers.all(func(number): return number.age > 0.0 and number.centre.y > number.origin.y),
 		"New numbers rise on the next frame")
