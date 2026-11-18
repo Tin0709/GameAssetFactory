@@ -28,13 +28,21 @@ static func authored_shader(shader: Shader) -> Shader:
 
 
 func prepare(materials: Array) -> void:
+	var prepared := {}
 	for material: ShaderMaterial in materials:
 		if material == null or material.shader == null:
 			continue
 		var source: Shader = material.shader.get_meta(MIST_BASE, material.shader)
+		if prepared.has(source):
+			continue
+		prepared[source] = true
 		var variant := _variant_for(source)
-		if variant != null and mist_variant.is_valid() and source.code.contains("GAF_SHARED_MIST"):
-			mist_variant.call(variant)
+		if variant == null:
+			continue
+		variant.get_shader_uniform_list()
+		if mist_variant.is_valid() and source.code.contains("GAF_SHARED_MIST"):
+			var wrapped: Shader = mist_variant.call(variant)
+			wrapped.get_shader_uniform_list()
 
 
 func bind(materials: Array) -> bool:
