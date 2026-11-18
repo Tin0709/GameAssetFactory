@@ -134,7 +134,7 @@ func _handoff_wall_clearance() -> Vector3:
 	if wall_handoff_animation != null and _handoff_straddles_wall(
 			space, collision_mask, Vector3.ZERO, SOURCE_ANCHOR_TOLERANCE, {}):
 		_wall_handoff_frame = Engine.get_physics_frames()
-		return _blend_wall_handoff(space, collision_mask, overlaps)
+		return _blend_wall_handoff(space, collision_mask, overlaps, bounds)
 	return super._handoff_wall_clearance()
 
 func _is_floor_top_overlap(hit: RID, bounds: AABB) -> bool:
@@ -169,7 +169,8 @@ static func capture_wall_handoff_idle(rig: Skeleton3D, animation: AnimationPlaye
 		pose.append(rig.get_bone_pose(bone))
 	return pose
 
-func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int, overlaps: Array[Dictionary]) -> Vector3:
+func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
+		overlaps: Array[Dictionary], initial_bounds: AABB) -> Vector3:
 	var wall := RID()
 	var wall_bounds := AABB()
 	for overlap in overlaps:
@@ -185,6 +186,16 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int, 
 		wall = rid
 		wall_bounds = AABB(pose.origin - half, half * 2.0)
 		break
+	var region := AABB()
+	var floor_bounds := AABB()
+	if wall.is_valid():
+		floor_bounds = _handoff_floor_bounds()
+		if floor_bounds.has_volume():
+			# Check one neighborhood for every blend. Only limbs fully within
+			# this volume qualify for skipping the subsequent contact queries.
+			region = initial_bounds.grow(0.45)
+			if not _handoff_region_is_clear(space, collision_mask, wall, region):
+				region = AABB()
 	var source: Array[Transform3D] = []
 	for bone in skeleton.get_bone_count():
 		source.append(skeleton.get_bone_pose(bone))
@@ -210,11 +221,55 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int, 
 				and _wall_blocks_every_handoff_shift(space, collision_mask, wall, wall_bounds):
 			shift_known = false
 			continue
-		shift = super._handoff_wall_clearance()
+		shift = _solve_handoff_clearance(_find_clear_handoff_parts(region, floor_bounds, wall_bounds))
 		shift_known = true
 		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift, "", {}):
 			break
 	return _preserve_wall_handoff_branches(space, collision_mask, source, shift)
+
+func _handoff_floor_bounds() -> AABB:
+	var floor := _flat_floor.get_parent() as StaticBody3D
+	if floor == null or not _is_single_box(floor.get_rid()):
+		return AABB()
+	var rid := floor.get_rid()
+	var pose: Transform3D = PhysicsServer3D.body_get_state(rid, PhysicsServer3D.BODY_STATE_TRANSFORM)
+	pose *= PhysicsServer3D.body_get_shape_transform(rid, 0)
+	if pose.basis != Basis.IDENTITY:
+		return AABB()
+	var half: Vector3 = PhysicsServer3D.shape_get_data(PhysicsServer3D.body_get_shape(rid, 0))
+	return AABB(pose.origin - half, half * 2.0)
+
+func _handoff_region_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: int,
+		wall: RID, region: AABB) -> bool:
+	var floor := _flat_floor.get_parent() as StaticBody3D
+	_handoff_bounds_shape.size = region.size
+	_handoff_bounds_query.transform = Transform3D(Basis.IDENTITY, region.get_center())
+	_handoff_bounds_query.collision_mask = collision_mask
+	_handoff_bounds_query.exclude = [wall, floor.get_rid()]
+	var clear := space.intersect_shape(_handoff_bounds_query, 1).is_empty()
+	_handoff_bounds_query.exclude = []
+	return clear
+
+func _find_clear_handoff_parts(region: AABB, floor_bounds: AABB,
+		wall_bounds: AABB) -> Dictionary[String, bool]:
+	var clear_parts: Dictionary[String, bool] = {}
+	if not region.has_volume():
+		return clear_parts
+	# Endpoints and midpoints can translate horizontally by at most HANDOFF_MAX_SHIFT.
+	var margin := Vector3(HANDOFF_MAX_SHIFT, 0.0, HANDOFF_MAX_SHIFT) + Vector3.ONE * PROJECTION_COLLISION_MARGIN
+	for name: String in current:
+		var body: PhysicalBone3D = bodies[name]
+		var collider := body.get_child(0) as CollisionShape3D
+		var box := collider.shape as BoxShape3D
+		if box == null:
+			continue
+		var pose: Transform3D = current[name] * collider.transform
+		var bounds := pose * AABB(-0.5 * box.size, box.size)
+		bounds.position -= margin
+		bounds.size += 2.0 * margin
+		if region.encloses(bounds) and not bounds.intersects(floor_bounds) and not bounds.intersects(wall_bounds):
+			clear_parts[name] = true
+	return clear_parts
 
 func _wall_blocks_every_handoff_shift(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		wall: RID, bounds: AABB) -> bool:

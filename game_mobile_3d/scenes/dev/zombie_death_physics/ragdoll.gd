@@ -267,6 +267,10 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	return true
 
 func _handoff_wall_clearance() -> Vector3:
+	return _solve_handoff_clearance()
+
+func _solve_handoff_clearance(clear_parts: Dictionary[String, bool] = {}) -> Vector3:
+	# A caller may omit limbs whose full shift range has already been cleared.
 	# The living capsule can clear the wall while an animated limb overlaps it.
 	# Test the captured boxes before the solver can turn that overlap into a kick.
 	var space := skeleton.get_world_3d().direct_space_state
@@ -275,6 +279,8 @@ func _handoff_wall_clearance() -> Vector3:
 	var initial_peak := 0.0
 	for part in _parts:
 		var name: String = part[0]
+		if clear_parts.has(name):
+			continue
 		var points := _terrain_contacts_at(bodies[name], space, current[name])
 		depths[name] = _deepest_contact(points)
 		initial_peak = maxf(initial_peak, depths[name])
