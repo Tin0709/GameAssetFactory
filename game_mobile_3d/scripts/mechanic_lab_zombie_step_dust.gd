@@ -3,6 +3,8 @@ extends MultiMeshInstance3D
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
 const SHADER := preload("res://materials/mechanic_lab_zombie_step_dust.gdshader")
 const CAPACITY := 512
+const ALPHA_SAMPLES := 54
+const TICK_WRAP := 2048
 const CAMERA_DISTANCE_SQUARED := 100.0 * 100.0
 
 class Puff:
@@ -11,24 +13,24 @@ class Puff:
 	var age := 0.0
 	var lifetime: float
 	var drag: float
-	var cell: Vector2
+	var cell: int
+	var slot := -1
 
 var _puffs: Array[Puff] = []
-var _alpha: PackedFloat32Array
-var _alpha_duration: float
+var _material: ShaderMaterial
 var _random := RandomNumberGenerator.new()
 
 func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float) -> bool:
-	if alpha.is_empty():
+	if alpha.size() != ALPHA_SAMPLES:
 		return false
-	_alpha = alpha
-	_alpha_duration = alpha_duration
-	var material := ShaderMaterial.new()
-	material.shader = SHADER
-	material.set_shader_parameter("smoke_mask", texture)
-	material.set_shader_parameter("dust_tint", MovementDust.SURFACE_DUST.grass)
+	_material = ShaderMaterial.new()
+	_material.shader = SHADER
+	_material.set_shader_parameter("smoke_mask", texture)
+	_material.set_shader_parameter("dust_tint", MovementDust.SURFACE_DUST.grass)
+	_material.set_shader_parameter("alpha_curve", alpha)
+	_material.set_shader_parameter("alpha_duration", alpha_duration)
 	var quad := QuadMesh.new()
-	quad.material = material
+	quad.material = _material
 	multimesh = MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	multimesh.use_custom_data = true
@@ -38,6 +40,8 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float)
 	# Include the full flat Lab and room for the billboard at the edge.
 	multimesh.custom_aabb = AABB(Vector3(-51.0, -8.0, -51.0), Vector3(102.0, 40.0, 102.0))
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# Reusing an instance slot must not blend with its previous puff.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_random.seed = 78105
 	set_process(false)
 	return true
@@ -53,27 +57,28 @@ func burst(ground_point: Vector3) -> void:
 	puff.contact_tick = Engine.get_physics_frames()
 	puff.lifetime = _random.randf_range(0.80, 1.75)
 	puff.drag = _random.randf_range(4.0, 10.0)
-	var frame: int = MovementDust.FRAMES[_random.randi_range(0, MovementDust.FRAMES.size() - 1)]
-	puff.cell = Vector2(frame % 8, floori(float(frame) / 8.0))
+	puff.cell = MovementDust.FRAMES[_random.randi_range(0, MovementDust.FRAMES.size() - 1)]
 	_puffs.append(puff)
 	set_process(true)
 
 func _process(_delta: float) -> void:
 	# Use the same interpolated contact clock as the player's dust.
-	var render_tick := float(Engine.get_physics_frames())
-	if not Engine.is_in_physics_frame():
-		render_tick += Engine.get_physics_interpolation_fraction() - 1.0
+	var physics_tick := Engine.get_physics_frames()
+	var fraction := 0.0 if Engine.is_in_physics_frame() else Engine.get_physics_interpolation_fraction() - 1.0
+	var render_tick := float(physics_tick) + fraction
 	var step := get_physics_process_delta_time()
+	_material.set_shader_parameter("contact_clock", Vector3(physics_tick % TICK_WRAP, fraction, step))
 	var count := 0
 	for puff in _puffs:
 		puff.age = maxf(render_tick - puff.contact_tick, 0.0) * step
 		if puff.age >= puff.lifetime:
 			continue
-		_puffs[count] = puff
-		var point := puff.origin + Vector3.UP * MovementDust.source_step_height(puff.age, puff.drag)
-		var opacity := MovementDust._sample_curve(_alpha, puff.age / (puff.lifetime * _alpha_duration))
-		multimesh.set_instance_transform(count, Transform3D(Basis.IDENTITY, point))
-		multimesh.set_instance_custom_data(count, Color(puff.cell.x, puff.cell.y, opacity, 0.0))
+		if puff.slot != count:
+			_puffs[count] = puff
+			puff.slot = count
+			multimesh.set_instance_transform(count, Transform3D(Basis.IDENTITY, puff.origin))
+			multimesh.set_instance_custom_data(count,
+				Color(puff.cell, puff.contact_tick % TICK_WRAP, puff.lifetime, puff.drag))
 		count += 1
 	_puffs.resize(count)
 	multimesh.visible_instance_count = count
