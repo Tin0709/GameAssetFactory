@@ -16,7 +16,7 @@ const STEP_ALPHA_PATH := "reports/depth/vfx/step-dust-alpha.private.json"
 const STEP_ALPHA_HASH := "c2dae47cc6feaad21508e960739ab5451fcdd691bb194b70ffd85380285579ff"
 const LANDING_CURVES_PATH := "reports/depth/vfx/landing-dust-curves.private.json"
 const LANDING_CURVES_HASH := "c3144bc6635533a38f59e99fc7b63037beb00209fad19295ff0e37a8156151a3"
-const LANDING_STEP := 1.0 / 60.0
+const SOURCE_PHYSICS_STEP := 1.0 / 60.0
 # Keep the lab grass tint. The dirt and stone tints lift the source tile
 # medians toward a lighter, less saturated dust color.
 const SURFACE_DUST := {
@@ -311,19 +311,30 @@ static func _sample_curve(curve: PackedFloat32Array, normalized_age: float) -> f
 static func source_step_height(age: float, drag: float) -> float:
 	return (age - (1.0 - exp(-drag * age)) / drag) / drag
 
+static func _source_debris_offset(velocity: Vector3, drag: float, age: float) -> Vector3:
+	# Sum the cooked 60 Hz solve as a geometric series. Between ticks,
+	# interpolate with the velocity from the next semi-implicit step.
+	var ticks := floori(age / SOURCE_PHYSICS_STEP)
+	var elapsed := ticks * SOURCE_PHYSICS_STEP
+	var divisor := 1.0 + drag * SOURCE_PHYSICS_STEP
+	var decay := pow(divisor, -ticks)
+	var terminal := Vector3.DOWN * (GAUNTLET_DEBRIS_GRAVITY / drag)
+	var travel := (1.0 - decay) / drag + (age - elapsed) * decay / divisor
+	return terminal * age + (velocity - terminal) * travel
+
 func _update_source_landing(particle: Particle) -> void:
 	# Use the cooked semi-implicit velocity update on a fixed clock, with
 	# interpolation to the current render time between simulation ticks.
-	var tick := floori(particle.age / LANDING_STEP)
+	var tick := floori(particle.age / SOURCE_PHYSICS_STEP)
 	while particle.landing_tick < tick:
 		particle.landing_tick += 1
-		var progress := particle.landing_tick * LANDING_STEP / particle.duration
+		var progress := particle.landing_tick * SOURCE_PHYSICS_STEP / particle.duration
 		var drag := _sample_curve(_landing_drag, progress)
-		particle.velocity = (particle.velocity + Vector3.UP * 0.50 * LANDING_STEP) / (1.0 + drag * LANDING_STEP)
-		particle.landing_position += particle.velocity * LANDING_STEP
-	var remainder := particle.age - particle.landing_tick * LANDING_STEP
-	var next_drag := _sample_curve(_landing_drag, (particle.landing_tick + 1) * LANDING_STEP / particle.duration)
-	var next_velocity := (particle.velocity + Vector3.UP * 0.50 * LANDING_STEP) / (1.0 + next_drag * LANDING_STEP)
+		particle.velocity = (particle.velocity + Vector3.UP * 0.50 * SOURCE_PHYSICS_STEP) / (1.0 + drag * SOURCE_PHYSICS_STEP)
+		particle.landing_position += particle.velocity * SOURCE_PHYSICS_STEP
+	var remainder := particle.age - particle.landing_tick * SOURCE_PHYSICS_STEP
+	var next_drag := _sample_curve(_landing_drag, (particle.landing_tick + 1) * SOURCE_PHYSICS_STEP / particle.duration)
+	var next_velocity := (particle.velocity + Vector3.UP * 0.50 * SOURCE_PHYSICS_STEP) / (1.0 + next_drag * SOURCE_PHYSICS_STEP)
 	particle.sprite.global_position = particle.landing_position + next_velocity * remainder
 	particle.sprite.modulate.a = _sample_curve(_landing_alpha, particle.age / (particle.duration * _landing_alpha_duration))
 
@@ -350,10 +361,8 @@ func _process(delta: float) -> void:
 			continue
 		var progress := particle.age / particle.duration
 		if particle.debris_drag > 0.0:
-			var drag := particle.debris_drag
-			var terminal := Vector3.DOWN * (GAUNTLET_DEBRIS_GRAVITY / drag)
-			var travel := (1.0 - exp(-drag * particle.age)) / drag
-			particle.sprite.global_position = particle.origin + terminal * particle.age + (particle.velocity - terminal) * travel
+			var offset := _source_debris_offset(particle.velocity, particle.debris_drag, particle.age)
+			particle.sprite.global_position = particle.origin + offset
 			particle.sprite.modulate.a = 1.0 - smoothstep(0.8, 1.0, progress)
 			active = true
 			continue

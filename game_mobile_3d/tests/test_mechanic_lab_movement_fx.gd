@@ -266,11 +266,36 @@ func check_gauntlet_debris(lab, dust: Node3D) -> void:
 				and particle.velocity.length() >= 3.49 and particle.velocity.length() <= 6.51
 				and absf(particle.origin.y) < 0.02,
 				"Gauntlets debris uses the source size, lifetime and speed at the ground contact")
-		print("MECHANIC_LAB_GAUNTLET_DEBRIS weapon=", weapon, " count=", particles.size())
+		var motion_error := 0.0
+		var samples := 0
+		for tick in 40:
+			await physics_frame
+			for particle in particles:
+				if particle.age < 0.08 or not particle.sprite.visible:
+					continue
+				var expected := gauntlet_debris_position(particle.origin, particle.velocity, particle.debris_drag, particle.age)
+				motion_error = maxf(motion_error, expected.distance_to(particle.sprite.global_position))
+				samples += 1
+		check(samples > 20 and motion_error <= 0.00005,
+			"Gauntlets debris follows the cooked solve between fixed updates")
+		print("MECHANIC_LAB_GAUNTLET_DEBRIS weapon=", weapon, " count=", particles.size(),
+			" samples=", samples, " motion_error_m=", motion_error)
 		lab.reset_player()
 		await physics_frame
 		check(visible_particles(dust) == 0 and not dust.is_processing(), "Reset clears Gauntlets debris")
 	lab._select_weapon(lab.Weapon.SABRE)
+
+func gauntlet_debris_position(origin: Vector3, velocity: Vector3, drag: float, age: float) -> Vector3:
+	const STEP := 1.0 / 60.0
+	const ACCELERATION := Vector3.DOWN * 14.7
+	var position := origin
+	var elapsed_ticks := floori(age / STEP)
+	var divisor := 1.0 + drag * STEP
+	for i in elapsed_ticks:
+		velocity = (velocity + ACCELERATION * STEP) / divisor
+		position += velocity * STEP
+	var next_velocity := (velocity + ACCELERATION * STEP) / divisor
+	return position + next_velocity * (age - elapsed_ticks * STEP)
 
 func check_floor_edge_landing(lab, dust: Node3D) -> void:
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
