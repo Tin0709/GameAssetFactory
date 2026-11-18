@@ -84,9 +84,9 @@ func _variant_for(source: Shader) -> Shader:
 	if not _supports(source.code):
 		_variants[source] = null
 		return null
-	var base: Shader = source.get_meta(MIST_BASE, null)
+	var base: Shader = source.get_meta(MIST_BASE, source)
 	var variant_base: Shader
-	if base != null:
+	if base != source:
 		variant_base = _variant_for(base)
 		if variant_base == null:
 			_variants[source] = null
