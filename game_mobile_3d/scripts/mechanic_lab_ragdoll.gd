@@ -296,9 +296,16 @@ func has_wall_rest_with_near_foot() -> bool:
 		and box.position.z >= -half.z and box.end.z <= half.z \
 		and absf(box.position.y - half.y) <= FLOOR_CONTACT_SLOP
 
-func has_flat_corner_brace() -> bool:
+func has_flat_corner_brace(max_linear := INF, max_angular := INF) -> bool:
 	var floor_body := _flat_floor.get_parent()
-	if not _body_supported_by(bodies["Leg.L"], floor_body) and not _body_supported_by(bodies["Leg.R"], floor_body):
+	var foot_supported := false
+	for name in ["Leg.L", "Leg.R"]:
+		var body: PhysicalBone3D = bodies[name]
+		if _body_supported_by(body, floor_body) and _body_below_speed(body, max_linear, max_angular):
+			foot_supported = true
+			break
+	if not foot_supported or not _body_below_speed(bodies.Head, max_linear, max_angular) \
+			or not _body_below_speed(bodies.Chest, max_linear, max_angular):
 		return false
 	var normal := Vector3.ZERO
 	var wall := RID()
@@ -322,6 +329,10 @@ func has_flat_corner_brace() -> bool:
 			elif (collider != wall or shape != wall_shape) and absf(normal.dot(next)) < 0.25:
 				return true
 	return false
+
+static func _body_below_speed(body: PhysicalBone3D, max_linear: float, max_angular: float) -> bool:
+	return body.linear_velocity.length_squared() < max_linear * max_linear \
+		and body.angular_velocity.length_squared() < max_angular * max_angular
 
 func _limit_shared_first_contact_lift(lifts: Dictionary[PhysicalBone3D, float],
 		depths: Dictionary[PhysicalBone3D, float], shared_lift: float, slop: float) -> void:

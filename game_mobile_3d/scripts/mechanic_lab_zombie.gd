@@ -864,13 +864,12 @@ func _update_death(delta: float) -> void:
 		# On a terrace, limbs can carry the body before the core reaches a surface.
 		# Require sustained support so a brief grazing hit keeps its flight response.
 		var limbs_supporting: bool = contact.supports >= 2 and contact.linear < DEATH_LIMB_SUPPORT_MAX_SPEED
-		# An upright corpse can stop on one foot when the corner carries its
-		# upper body. Give it the same sustained-support landing transition.
+		# A corner can carry the upper body and one planted foot while a free
+		# limb still swings. Measure the brace before blending landing gravity.
 		if not limbs_supporting and sabre_finisher and source_rig and is_instance_valid(_corpse_floor) \
 				and not _corpse_floor.disabled and _corpse_age >= SABRE_CORNER_LANDING_MIN_AGE \
-				and contact.supports == 1 and contact.leg_supported \
-				and contact.linear < SABRE_CORNER_LANDING_MAX_SPEED and contact.angular < CORPSE_SETTLE_SPIN:
-			limbs_supporting = ragdoll.has_flat_corner_brace()
+				and contact.supports == 1 and contact.leg_supported:
+			limbs_supporting = ragdoll.has_flat_corner_brace(SABRE_CORNER_LANDING_MAX_SPEED, CORPSE_SETTLE_SPIN)
 		_limb_support_age = _limb_support_age + delta if limbs_supporting else 0.0
 	if not _corpse_landed and (contact.core_supports > 0 or _limb_support_age >= DEATH_LIMB_SUPPORT_DURATION - 0.00001):
 		_corpse_landed = true
