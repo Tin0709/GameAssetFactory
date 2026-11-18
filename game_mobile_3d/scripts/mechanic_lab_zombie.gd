@@ -672,34 +672,61 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool, targ
 		var normal := collision.get_normal().slide(Vector3.UP)
 		if wall == null or wall == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
 			continue
-		_chase_detour = _choose_detour_waypoint(get_world_3d().direct_space_state, bounds, normal)
+		_chase_detour = _choose_detour_waypoint(get_world_3d().direct_space_state, bounds, normal, offset)
 		if _chase_detour.is_finite():
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
 			return (_chase_detour - global_position).slide(Vector3.UP).normalized() * CHASE_SPEED
 		break
 	return Vector3.ZERO
 
-func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3) -> Vector3:
+func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3,
+		target_offset: Vector3) -> Vector3:
 	_prepare_lab_path_sweep(true)
 	var lateral := normal.cross(Vector3.UP).normalized()
 	if _crowd_slot % 2 != 0:
 		lateral = -lateral
 	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
 	var best := Vector3.INF
-	var best_distance := LAB_DETOUR_MIN_LENGTH * LAB_DETOUR_MIN_LENGTH
+	var min_distance := LAB_DETOUR_MIN_LENGTH * LAB_DETOUR_MIN_LENGTH
+	var best_distance := min_distance
+	var best_connects := false
 	for direction in [lateral, -lateral]:
 		var local := _corpse_floor.to_local(global_position + direction * LAB_DETOUR_LENGTH)
 		local.x = clampf(local.x, -extent.x, extent.x)
 		local.z = clampf(local.z, -extent.z, extent.z)
 		var travel := (_corpse_floor.to_global(local) - global_position).slide(Vector3.UP)
-		if travel.length_squared() <= best_distance:
+		if travel.length_squared() <= min_distance:
 			continue
 		travel *= _lab_path_fraction(space, travel)
 		var distance := travel.length_squared()
-		if distance > best_distance and _lab_path_end_clear(space, travel):
+		if distance <= min_distance or (best_connects and distance <= best_distance) \
+				or not _lab_path_end_clear(space, travel):
+			continue
+		var connects := _detour_reaches_approach(space, travel, target_offset)
+		# Prefer a leg that leads back toward melee. Keep the partial-path
+		# choice when both sides still need another corner.
+		if (connects and not best_connects) or (connects == best_connects and distance > best_distance):
 			best = global_position + travel
 			best_distance = distance
+			best_connects = connects
 	return best
+
+func _detour_reaches_approach(space: PhysicsDirectSpaceState3D, detour: Vector3, target_offset: Vector3) -> bool:
+	var approach := target_offset - detour
+	var distance := approach.length()
+	if distance <= MELEE_RANGE:
+		return true
+	approach *= (distance - MELEE_RANGE) / distance
+	var start := _lab_path_sweep.transform
+	var mask := _lab_path_sweep.collision_mask
+	# Test the remainder against terrain. Other zombies can move by the
+	# time the current chaser reaches the waypoint.
+	_lab_path_sweep.transform = start.translated(detour)
+	_lab_path_sweep.collision_mask = LEVEL_COLLISION_MASK
+	var clear := _lab_path_fraction(space, approach) >= 1.0 and _lab_path_end_clear(space, approach)
+	_lab_path_sweep.transform = start
+	_lab_path_sweep.collision_mask = mask
+	return clear
 
 func _is_in_melee_cone(planar_offset: Vector3) -> bool:
 	return global_basis.z.dot(planar_offset) >= planar_offset.length() * MELEE_HALF_ANGLE_COS

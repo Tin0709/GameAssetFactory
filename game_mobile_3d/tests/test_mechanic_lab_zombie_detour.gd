@@ -20,6 +20,19 @@ func add_wall(lab: Node3D, point: Vector3, size: Vector3, yaw: float) -> StaticB
 	lab.add_child(wall)
 	return wall
 
+func spawn_detour_group(lab: Node3D, member_count: int) -> Node3D:
+	var zombies := lab.get_node("Zombies")
+	var effects := lab.get_node("CombatEffects") as Node3D
+	for i in member_count:
+		if not zombies.spawn(lab.player, Basis.IDENTITY, effects, true):
+			failures.append("Could not spawn the detour fixture")
+			return null
+	for i in member_count:
+		var member := zombies.get_child(i) as ZOMBIE
+		member.position = Vector3(16.0 + i % 10 * 2.0, 0.02, 12.0 + floorf(i / 10.0) * 2.0)
+		member.set_physics_process(i == 0)
+	return zombies
+
 func check_brief_occlusion(lab: Node3D, chaser: ZOMBIE, heading: Basis) -> void:
 	var start := chaser.global_position
 	var known := chaser._last_seen_position
@@ -51,17 +64,10 @@ func check_detour(member_count: int, yaw: float, block_right: bool,
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
-	var zombies := lab.get_node("Zombies")
-	var effects := lab.get_node("CombatEffects") as Node3D
-	for i in member_count:
-		if not zombies.spawn(lab.player, Basis.IDENTITY, effects, true):
-			failures.append("Could not spawn the detour fixture")
-			lab.free()
-			return
-	for i in member_count:
-		var member := zombies.get_child(i) as ZOMBIE
-		member.position = Vector3(16.0 + i % 10 * 2.0, 0.02, 12.0 + floorf(i / 10.0) * 2.0)
-		member.set_physics_process(i == 0)
+	var zombies := spawn_detour_group(lab, member_count)
+	if zombies == null:
+		lab.free()
+		return
 	var heading := Basis(Vector3.UP, yaw)
 	add_wall(lab, heading * Vector3(0.0, 0.35, -2.25), Vector3(2.5, 0.7, 0.3), yaw)
 	if block_with_zombie:
@@ -102,10 +108,49 @@ func check_detour(member_count: int, yaw: float, block_right: bool,
 	lab.free()
 	await physics_frame
 
+func check_connected_side(member_count: int, yaw: float, side: float) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var zombies := spawn_detour_group(lab, member_count)
+	if zombies == null:
+		lab.free()
+		return
+	var heading := Basis(Vector3.UP, yaw)
+	add_wall(lab, heading * Vector3(-2.75 * side, 0.35, -2.25), Vector3(8.0, 0.7, 0.3), yaw)
+	add_wall(lab, heading * Vector3(3.28 * side, 0.4, -3.65), Vector3(0.20, 0.8, 2.3), yaw)
+	var chaser := zombies.get_child(0) as ZOMBIE
+	chaser.position = heading * Vector3(0.0, 0.02, -4.2)
+	chaser.animation.play(ZOMBIE.IDLE)
+	chaser.animation.advance(0.0)
+	var chosen := INF
+	var crossed := INF
+	var hits: Array[int] = []
+	chaser.melee_hit.connect(func(damage): hits.append(damage))
+	for i in 190:
+		await physics_frame
+		if not is_finite(chosen) and chaser._chase_detour.is_finite():
+			chosen = (heading.inverse() * chaser._chase_detour).x
+		var local := heading.inverse() * chaser.global_position
+		if not is_finite(crossed) and local.z > -2.25:
+			crossed = local.x
+		if not hits.is_empty():
+			break
+	if not is_finite(chosen) or chosen * side <= 1.55 or not is_finite(crossed) or crossed * side <= 1.55 \
+			or hits != [ZOMBIE.MELEE_DAMAGE]:
+		failures.append("The short side route should clear the wall and lead to one normal melee hit")
+	print("LAB_CONNECTED_SIDE members=", member_count, " yaw=", rad_to_deg(yaw), " side=", side,
+		" chosen_x=", chosen, " cross_x=", crossed, " hits=", hits)
+	lab.free()
+	await physics_frame
+
 func run() -> void:
 	await check_detour(1, 0.0, false)
 	await check_detour(100, deg_to_rad(27.0), true)
 	await check_detour(100, 0.0, true, true)
 	await check_detour(100, deg_to_rad(27.0), true, false, true)
+	await check_connected_side(1, 0.0, 1.0)
+	await check_connected_side(100, deg_to_rad(27.0), -1.0)
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
