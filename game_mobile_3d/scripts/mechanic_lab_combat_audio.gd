@@ -116,6 +116,7 @@ const PLAYER_HURT := "Player/Hurt/sfx_multi_hit-%03d_soundWave.ogg"
 const PLAYER_DEFEAT := "Player/Death/sfx_playerDeath.ogg"
 const PLAYER_DEFEAT_HASH := "3c15d66e2b2ce0bc571a8bfa3cadc7d532d2f559ecd45e894a0e44d7c2e0882c"
 const VOICES_PER_POOL := 3
+const WEAPON_POOL := 0
 const REACTION_POOL := 1
 const ATTACK_POOL := 2
 const STEP_POOL := 3
@@ -230,6 +231,7 @@ var _next_choice: Dictionary[StringName, int] = {}
 var _next_voice: Array[int] = [0, 0, 0, 0, 0]
 var _flight_targets: Dictionary[AudioStreamPlayer3D, Node3D]
 var _started_frames: PackedInt64Array
+var _weapon_onsets: Array[bool] = []
 var _player_hurt_frame := -1
 var _zombie_cue_frame := -1
 var _attack_contacts: Array[Dictionary] = []
@@ -295,7 +297,7 @@ func contact(point: Vector3, serial: int, lethal: bool, clip := "", tool := &"")
 			group = _tool_group(tool, 5)
 		elif clip.begins_with("NativeGauntlet"):
 			group = &"gauntlet_hit"
-		_play(group, point, HIT_GAIN_DB)
+		_play(group, point, HIT_GAIN_DB, -1, true)
 	var reaction := &"death" if lethal else &"hurt"
 	if not is_instance_valid(zombie_listener):
 		_play(reaction, point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
@@ -358,7 +360,7 @@ func tool_swung(tool: StringName, point: Vector3, index: int, airborne: bool) ->
 
 func tool_landed(tool: StringName, point: Vector3) -> void:
 	if enabled:
-		_play(_tool_group(tool, 4), point, SLAM_GAIN_DB)
+		_play(_tool_group(tool, 4), point, SLAM_GAIN_DB, -1, true)
 
 func crossbow_switched(equipped: bool, point: Vector3) -> void:
 	if enabled:
@@ -408,14 +410,14 @@ func gauntlet_swung(point: Vector3, index: int, airborne: bool) -> void:
 
 func gauntlet_slam_landed(point: Vector3) -> void:
 	if enabled:
-		_play(&"gauntlet_slam", point, SLAM_GAIN_DB)
+		_play(&"gauntlet_slam", point, SLAM_GAIN_DB, -1, true)
 		_play(&"mauler_dive", point, SLAM_GAIN_DB)
 
 func slam_landed(point: Vector3, surface: String = "grass") -> void:
 	if not enabled:
 		return
 	if sword_equipped:
-		_play(&"slam", point, SLAM_GAIN_DB)
+		_play(&"slam", point, SLAM_GAIN_DB, -1, true)
 	_play(StringName("slam_" + surface), point, SURFACE_LANDING_GAIN_DB)
 
 func player_hurt() -> void:
@@ -521,6 +523,7 @@ func reset() -> void:
 	_step_distances.clear()
 	_zombie_step_frame = -1
 	_started_frames.fill(-1)
+	_weapon_onsets.fill(false)
 	_player_hurt_frame = -1
 	_last_weapon_serial = -1
 	_next_voice.fill(0)
@@ -543,6 +546,7 @@ func _load_audio() -> void:
 		return
 	_started_frames.resize(_next_voice.size() * VOICES_PER_POOL)
 	_started_frames.fill(-1)
+	_weapon_onsets.resize(VOICES_PER_POOL)
 	var root := _research_root()
 	# DefaultPlayer routes SW.Audio.Generic.Hurt to SW.Audio.Category.Player.Local.
 	_player_hurt_voice = AudioStreamPlayer.new()
@@ -611,11 +615,12 @@ func _next_stream(group: StringName) -> AudioStream:
 	_next_choice[group] = (choice + 1) % choices.size()
 	return choices[choice]
 
-func _play(group: StringName, point: Vector3, gain: float, event_frame := -1) -> AudioStreamPlayer3D:
+func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
+		weapon_onset := false) -> AudioStreamPlayer3D:
 	if not _groups.has(group):
 		return null
 	# Separate enemy attack and reaction budgets keep the weapon tails audible.
-	var pool := 0
+	var pool := WEAPON_POOL
 	match group:
 		&"hurt", &"death":
 			pool = REACTION_POOL
@@ -636,19 +641,15 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1) ->
 			slot = candidate
 			break
 	var frame := Engine.get_physics_frames() if event_frame < 0 else event_frame
+	weapon_onset = weapon_onset or group == &"crossbow_fire" or group == &"bow_fire"
 	if slot == -1:
 		match pool:
 			REACTION_POOL:
 				slot = _replace_priority_slot(first, start, &"death", group, frame, point)
 			ATTACK_POOL:
 				slot = _replace_priority_slot(first, start, &"zombie_hit", group, frame)
-			0:
-				if group == &"crossbow_hit" or group == &"crossbow_fire" or group == &"bow_fire":
-					# Bolts can still land after the player switches to Bow.
-					# Give both firing cues priority in the shared weapon pool.
-					slot = _replace_priority_slot(first, start, &"crossbow_fire", group, frame)
-				else:
-					slot = start
+			WEAPON_POOL:
+				slot = _replace_weapon_slot(start, weapon_onset, frame)
 		if slot == -1:
 			return null
 	var stream := _next_stream(group)
@@ -657,6 +658,8 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1) ->
 	_next_voice[pool] = (slot + 1) % VOICES_PER_POOL
 	if voice_index < _started_frames.size():
 		_started_frames[voice_index] = frame
+	if pool == WEAPON_POOL and not _weapon_onsets.is_empty():
+		_weapon_onsets[slot] = weapon_onset
 	voice.stop()
 	voice.stream = stream
 	voice.global_position = point
@@ -665,14 +668,26 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1) ->
 	voice.play()
 	return voice
 
+func _replace_weapon_slot(start: int, onset: bool, frame: int) -> int:
+	if _weapon_onsets.is_empty():
+		return start # Surface-only audio uses round-robin.
+	var older_slot := -1
+	for offset in VOICES_PER_POOL:
+		var slot := (start + offset) % VOICES_PER_POOL
+		var playing_onset := _weapon_onsets[slot]
+		if onset and not playing_onset:
+			return slot
+		# Equal-priority cues from this tick still need time to start mixing.
+		if older_slot == -1 and onset == playing_onset and _started_frames[slot] < frame:
+			older_slot = slot
+	return older_slot
+
 func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName,
 		frame: int, point := Vector3.ZERO) -> int:
 	# Same-tick cues already arrive nearest first. Preserve nearby death onsets
 	# across short gaps between ticks, too, while the mixer starts the samples.
 	var priority_streams: Array = _groups.get(priority_group, [])
-	var ranged_fire := priority_group == &"crossbow_fire"
-	var bow_streams: Array = _groups.get(&"bow_fire", []) if ranged_fire else []
-	var priority := group == priority_group or (ranged_fire and group == &"bow_fire")
+	var priority := group == priority_group
 	var compare_onsets := priority and group == &"death" and is_instance_valid(zombie_listener)
 	var listener := zombie_listener.global_position if compare_onsets else Vector3.ZERO
 	var onset_ticks := ceili(DEATH_ONSET_SECONDS * Engine.physics_ticks_per_second)
@@ -683,7 +698,7 @@ func _replace_priority_slot(first: int, start: int, priority_group: StringName, 
 		var slot := (start + offset) % VOICES_PER_POOL
 		var voice_index := first + slot
 		var stream := _voices[voice_index].stream
-		var playing_priority := stream in priority_streams or (ranged_fire and stream in bow_streams)
+		var playing_priority := stream in priority_streams
 		if priority and not playing_priority:
 			return slot
 		var age := frame - _started_frames[voice_index]
