@@ -115,7 +115,8 @@ func _handoff_wall_clearance() -> Vector3:
 		return Vector3.ZERO
 	if overlaps.size() == 1 and _is_floor_top_overlap(overlaps[0].rid, bounds):
 		return Vector3.ZERO
-	if wall_handoff_animation != null and _handoff_straddles_wall(space, collision_mask):
+	if wall_handoff_animation != null and _handoff_straddles_wall(
+			space, collision_mask, Vector3.ZERO, SOURCE_ANCHOR_TOLERANCE, {}):
 		_wall_handoff_frame = Engine.get_physics_frames()
 		return _blend_wall_handoff(space, collision_mask)
 	return super._handoff_wall_clearance()
@@ -163,7 +164,7 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int) 
 		if idle_weight != 0.25 and current == previous:
 			continue
 		shift = super._handoff_wall_clearance()
-		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift):
+		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift, "", {}):
 			break
 	return _preserve_wall_handoff_branches(space, collision_mask, source, shift)
 
@@ -191,7 +192,7 @@ func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision
 	return shift
 
 func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: int,
-		shift: Vector3, changed_part := "", wall_crossings: Dictionary[Vector3, bool] = {}) -> bool:
+		shift: Vector3, changed_part: String, wall_crossings: Dictionary[Vector3, bool]) -> bool:
 	if _handoff_straddles_wall(space, collision_mask, shift, 0.0, wall_crossings):
 		return false
 	for name: String in current:
@@ -207,8 +208,7 @@ func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: in
 	return true
 
 func _handoff_straddles_wall(space: PhysicsDirectSpaceState3D, collision_mask: int,
-		shift := Vector3.ZERO, tolerance := SOURCE_ANCHOR_TOLERANCE,
-		wall_crossings: Dictionary[Vector3, bool] = {}) -> bool:
+		shift: Vector3, tolerance: float, wall_crossings: Dictionary[Vector3, bool]) -> bool:
 	var ray := PhysicsRayQueryParameters3D.new()
 	ray.collision_mask = collision_mask
 	var origin := skeleton.global_position + shift
