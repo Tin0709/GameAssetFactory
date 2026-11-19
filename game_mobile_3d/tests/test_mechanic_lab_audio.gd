@@ -795,6 +795,7 @@ func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
 		COMBAT_AUDIO.VOICES_PER_POOL, COMBAT_AUDIO.VOICES_PER_POOL * 2)
 	for voice in reactions:
 		voice.bus = AudioServer.get_bus_name(bus)
+	await create_timer(0.08).timeout
 	var ear: Vector3 = audio.zombie_listener.global_position
 	var strike := {"damage": 1, "stagger": 0.0, "strength": 500.0, "angle": 15.0}
 	for case: Array in [[0, false, &"hurt", 3], [1, false, &"baby_hurt", 2],
