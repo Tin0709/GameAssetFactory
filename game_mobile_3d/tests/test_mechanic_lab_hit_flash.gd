@@ -164,6 +164,17 @@ func check_damage_numbers_during_render_hitch() -> void:
 	numbers._process(0.70)
 	check(numbers.multimesh.visible_instance_count == 0 and not numbers.is_processing(),
 		"The last numbers expire and stop updating")
+	lab.camera.rotation = Vector3.ZERO
+	for i in 64:
+		numbers.add_number(i + 10, origin + Vector3.RIGHT * (i % 4) * 0.08, Vector3.ZERO)
+	var queued: Array = numbers._numbers.duplicate()
+	numbers._process(0.0)
+	check(numbers._numbers == queued,
+		"Overlapping numbers at the same depth draw in hit order")
+	var first_frame: Array = numbers._numbers.duplicate()
+	numbers._process(0.0)
+	check(numbers._numbers == first_frame and numbers.multimesh.visible_instance_count == 128,
+		"An unchanged view keeps the same ordering of stacked damage glyphs")
 	lab.free()
 
 func check_crowd_sparks() -> void:
