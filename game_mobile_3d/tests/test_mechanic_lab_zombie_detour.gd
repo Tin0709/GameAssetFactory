@@ -145,6 +145,52 @@ func check_connected_side(member_count: int, yaw: float, side: float) -> void:
 	lab.free()
 	await physics_frame
 
+func check_floor_edge_pursuit(member_count: int, yaw: float, corner: bool) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var zombies := spawn_detour_group(lab, member_count)
+	if zombies == null:
+		lab.free()
+		return
+	var chaser := zombies.get_child(0) as ZOMBIE
+	var floor_body := lab.get_node("Ground") as StaticBody3D
+	floor_body.rotation.y = yaw
+	var heading := Basis(Vector3.UP, yaw)
+	chaser.position = heading * Vector3(47.0, 0.02, 47.0 if corner else 0.0)
+	chaser.animation.play(ZOMBIE.IDLE)
+	chaser.animation.advance(0.0)
+	lab.player.position = heading * Vector3(53.2, 0.02, 53.2 if corner else 0.0)
+	var hits: Array[int] = []
+	chaser.melee_hit.connect(func(damage): hits.append(damage))
+	var farthest := -INF
+	var lost_floor := false
+	for i in 150:
+		await physics_frame
+		if not is_instance_valid(chaser):
+			failures.append("A chaser pursued the target off the Lab platform")
+			lab.free()
+			return
+		var position := heading.inverse() * chaser.global_position
+		farthest = maxf(farthest, maxf(position.x, position.z))
+		lost_floor = lost_floor or (i > 2 and not chaser.is_on_floor())
+	var waiting := chaser.animation.current_animation == ZOMBIE.IDLE
+	if lost_floor or farthest < 49.46 or farthest > 49.61 or not waiting \
+			or not chaser._target_aggressive or not hits.is_empty():
+		failures.append("A partial pursuit should stop at supported ground and preserve real melee range")
+	lab.player.position = heading * Vector3(46.5, 0.02, 46.5 if corner else 0.0)
+	for i in 190:
+		await physics_frame
+		if not hits.is_empty():
+			break
+	if hits != [ZOMBIE.MELEE_DAMAGE]:
+		failures.append("The chaser should resume pursuit when the player returns to the platform")
+	print("LAB_EDGE_PURSUIT members=", member_count, " farthest=", farthest,
+		" lost_floor=", lost_floor, " idle=", waiting, " returned_hits=", hits)
+	lab.free()
+	await physics_frame
+
 func run() -> void:
 	await check_detour(1, 0.0, false)
 	await check_detour(100, deg_to_rad(27.0), true)
@@ -156,6 +202,8 @@ func run() -> void:
 	await check_living_blocker(2, 0.0)
 	await check_living_blocker(100, deg_to_rad(38.0))
 	await check_living_blocker(100, deg_to_rad(-27.0), true)
+	await check_floor_edge_pursuit(1, 0.0, false)
+	await check_floor_edge_pursuit(100, deg_to_rad(27.0), true)
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 
