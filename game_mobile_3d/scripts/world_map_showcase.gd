@@ -1589,13 +1589,16 @@ func _sync_shadow_diffuse() -> void:
 		RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", state)
 	var reduction := Vector2.ZERO
 	if _ground_shadow_fill_available() and (state.w > 0. or _stone_shade_fill.w > 0.):
-		reduction = _biome_profile.ground_shadow_fill_reduction.clamp(Vector2.ZERO, Vector2.ONE) +			* _lighting_scale(&"ground_shadow_fill_reduction")
+		reduction = _biome_profile.ground_shadow_fill_reduction.clamp(Vector2.ZERO, Vector2.ONE)
+		reduction *= _lighting_scale(&"ground_shadow_fill_reduction")
 	if reduction != _ground_shadow_fill_reduction:
 		_ground_shadow_fill_reduction = reduction
 		RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", reduction)
 
 func _ground_shadow_fill_available() -> bool:
-	return _shadow_diffuse_available() and not _balanced_preview and atmosphere_review == "combined" +		and forest_active() and _biome_profile.ground_shadow_fill_reduction.is_finite() +		and _biome_profile.ground_shadow_fill_reduction != Vector2.ZERO
+	return (_shadow_diffuse_available() and not _balanced_preview and atmosphere_review == "combined"
+		and forest_active() and _biome_profile.ground_shadow_fill_reduction.is_finite()
+		and _biome_profile.ground_shadow_fill_reduction != Vector2.ZERO)
 
 func _sync_stone_shade_fill() -> void:
 	var state := Vector4.ZERO
