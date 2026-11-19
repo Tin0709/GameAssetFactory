@@ -418,8 +418,7 @@ var _next_surface_landing_voice := 0
 var _player_hurt_voice: AudioStreamPlayer
 var _player_defeat_voice: AudioStreamPlayer
 var _zombie_idle_voice: AudioStreamPlayer3D
-var _zombie_idle_point := Vector3.INF
-var _zombie_idle_distance_squared := INF
+var _zombie_idle_points := PackedVector3Array()
 var _zombie_idle_pitch := RandomNumberGenerator.new()
 var _zombie_vocal_pitch := RandomNumberGenerator.new()
 var _next_choice: Dictionary[StringName, int] = {}
@@ -434,8 +433,7 @@ var _attack_windups := ZombieCueBatch.new()
 var _attack_swings := ZombieCueBatch.new()
 var _reaction_deaths := ZombieCueBatch.new()
 var _reaction_hurts := ZombieCueBatch.new()
-var _step_points: Array[Vector3] = []
-var _step_distances: Array[float] = []
+var _step_points := PackedVector3Array()
 var _last_weapon_serial := -1
 var _master_was_muted := false
 
@@ -707,7 +705,7 @@ func _queue_zombie_cue(group: StringName, point: Vector3, pending: ZombieCueBatc
 func flush_zombie_combat_cues() -> void:
 	if not enabled:
 		return
-	var ear := zombie_listener.global_position if is_instance_valid(zombie_listener) else Vector3.INF
+	var ear := _zombie_listener_position()
 	_play_zombie_cues(_attack_contacts, ear, ZOMBIE_HIT_GAIN_DB)
 	_play_zombie_cues(_attack_windups, ear, ZOMBIE_WINDUP_GAIN_DB)
 	_play_zombie_cues(_attack_swings, ear, BABY_SWING_GAIN_DB)
@@ -717,82 +715,69 @@ func flush_zombie_combat_cues() -> void:
 func _play_zombie_cues(pending: ZombieCueBatch, ear: Vector3, gain: float) -> void:
 	if pending.points.is_empty():
 		return
-	if not ear.is_finite():
-		pending.clear()
-		return
+	for i in _closest_audible_points(pending.points, ear, SPATIAL_VOICE_DISTANCE, VOICES_PER_POOL):
+		_play(pending.groups[i], pending.points[i], gain)
+	pending.clear()
+
+func _zombie_listener_position() -> Vector3:
+	return zombie_listener.global_position if is_instance_valid(zombie_listener) else Vector3.INF
+
+static func _closest_audible_points(points: PackedVector3Array, ear: Vector3, radius: float, limit: int) -> Array[int]:
 	# Physics catch-up can move the listener between requests. Rank every
 	# cue against the same ear position, keeping event order on a tie.
 	var closest: Array[int] = []
+	if limit <= 0 or not ear.is_finite():
+		return closest
+	var radius_squared := radius * radius
 	var distances: Array[float] = []
-	for i in pending.points.size():
-		var distance := pending.points[i].distance_squared_to(ear)
-		if distance > SPATIAL_VOICE_DISTANCE * SPATIAL_VOICE_DISTANCE:
+	for i in points.size():
+		var distance := points[i].distance_squared_to(ear)
+		if distance > radius_squared:
 			continue
 		var rank := distances.size()
 		while rank > 0 and distance < distances[rank - 1]:
 			rank -= 1
-		if rank < VOICES_PER_POOL:
+		if rank < limit:
 			distances.insert(rank, distance)
 			closest.insert(rank, i)
-			if closest.size() > VOICES_PER_POOL:
+			if closest.size() > limit:
 				distances.pop_back()
 				closest.pop_back()
-	for i in closest:
-		_play(pending.groups[i], pending.points[i], gain)
-	pending.clear()
+	return closest
 
 func queue_zombie_idle(point: Vector3) -> void:
 	if not enabled or _zombie_idle_voice == null or _zombie_idle_voice.playing or not is_instance_valid(zombie_listener):
 		return
-	var distance := point.distance_squared_to(zombie_listener.global_position)
-	if distance <= ZOMBIE_IDLE_DISTANCE * ZOMBIE_IDLE_DISTANCE and distance < _zombie_idle_distance_squared:
-		_zombie_idle_point = point
-		_zombie_idle_distance_squared = distance
+	_zombie_idle_points.append(point)
 
 func flush_zombie_idle() -> void:
-	if not _zombie_idle_point.is_finite():
+	if _zombie_idle_points.is_empty():
+		return
+	var nearest := _closest_audible_points(_zombie_idle_points, _zombie_listener_position(), ZOMBIE_IDLE_DISTANCE, 1)
+	if nearest.is_empty() or _zombie_idle_voice.playing:
+		_zombie_idle_points.clear()
 		return
 	var voice := _zombie_idle_voice
 	voice.stream = _next_stream(&"zombie_idle")
-	voice.global_position = _zombie_idle_point
+	voice.global_position = _zombie_idle_points[nearest[0]]
 	var cents := _zombie_idle_pitch.randf_range(ZOMBIE_PITCH_MIN_CENTS, ZOMBIE_PITCH_MAX_CENTS)
 	voice.pitch_scale = pow(2.0, cents / 1200.0)
 	voice.play()
-	_zombie_idle_point = Vector3.INF
-	_zombie_idle_distance_squared = INF
+	_zombie_idle_points.clear()
 
-func queue_zombie_step(sole: Vector3, listener: Vector3, find_support: Callable, known_support: Variant = null) -> void:
-	if not enabled or not _groups.has(&"zombie_step"):
-		return
-	# Rank pending steps until the Lab flushes them on the render frame.
-	# A catch-up physics tick can still contribute a closer contact.
-	var distance := sole.distance_squared_to(listener)
-	if distance > ZOMBIE_STEP_DISTANCE * ZOMBIE_STEP_DISTANCE:
+func queue_zombie_step(point: Vector3) -> void:
+	if enabled and _groups.has(&"zombie_step") and is_instance_valid(zombie_listener):
+		_step_points.append(point)
+
+func flush_zombie_steps() -> void:
+	if _step_points.is_empty():
 		return
 	var available := 0
 	for slot in VOICES_PER_POOL:
 		available += int(not _voices[STEP_POOL * VOICES_PER_POOL + slot].playing)
-	if available == 0:
-		return
-	var index := _step_distances.size()
-	while index > 0 and distance < _step_distances[index - 1]:
-		index -= 1
-	if index >= available:
-		return
-	var support: Dictionary = find_support.call(sole) if known_support == null else known_support
-	if support.is_empty():
-		return
-	_step_distances.insert(index, distance)
-	_step_points.insert(index, support.position)
-	if _step_points.size() > available:
-		_step_distances.pop_back()
-		_step_points.pop_back()
-
-func flush_zombie_steps() -> void:
-	for point: Vector3 in _step_points:
-		_play(&"zombie_step", point, ZOMBIE_STEP_GAIN_DB)
+	for i in _closest_audible_points(_step_points, _zombie_listener_position(), ZOMBIE_STEP_DISTANCE, available):
+		_play(&"zombie_step", _step_points[i], ZOMBIE_STEP_GAIN_DB)
 	_step_points.clear()
-	_step_distances.clear()
 
 func reset() -> void:
 	_flight_targets.clear()
@@ -802,13 +787,11 @@ func reset() -> void:
 	_attack_swings.clear()
 	_reaction_deaths.clear()
 	_reaction_hurts.clear()
-	_zombie_idle_point = Vector3.INF
-	_zombie_idle_distance_squared = INF
+	_zombie_idle_points.clear()
 	if _zombie_idle_voice != null:
 		_zombie_idle_voice.stop()
 		_zombie_idle_voice.stream = null
 	_step_points.clear()
-	_step_distances.clear()
 	_started_frames.fill(-1)
 	_voice_groups.fill(&"")
 	_weapon_onsets.fill(false)

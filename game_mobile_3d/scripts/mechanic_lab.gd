@@ -1065,12 +1065,15 @@ func _actor_floor_support(actor: CharacterBody3D, point: Vector3, verify_snap :=
 	return {"position": nearest, "body": floor_body} if floor_body != null else {}
 
 func _on_zombie_step(sole: Vector3, actor: CharacterBody3D = null) -> void:
-	var support: Variant = null
+	if _zombie_step_dust == null and not _combat_audio.enabled:
+		return
+	# Snapshot the support now, before later physics ticks move the actor.
+	var support := _grass_step_contact_at(sole, actor)
+	if support.is_empty():
+		return
 	if _zombie_step_dust != null:
-		support = _grass_step_contact_at(sole, actor)
-		if not support.is_empty():
-			_zombie_step_dust.burst(support.position)
-	_combat_audio.queue_zombie_step(sole, player.global_position, _grass_step_contact_at.bind(actor), support)
+		_zombie_step_dust.burst(support.position)
+	_combat_audio.queue_zombie_step(support.position)
 
 func _heavy_debris_delay() -> float:
 	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
