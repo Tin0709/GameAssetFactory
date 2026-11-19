@@ -264,10 +264,10 @@ func check_first_wall_neck_contact(frozen := false) -> void:
 		("frozen" if frozen else "static"))
 	print("LAB_BABY_FIRST_WALL frozen=", frozen, " gap=", peak, " crossed=", crossed, " parked=", baby._corpse_parked)
 	if frozen:
-		await check_lower_wall_edge(lab, group)
+		await check_lower_wall_edge(lab, group, wall)
 	lab.free()
 
-func check_lower_wall_edge(lab: Node3D, group: Node) -> void:
+func check_lower_wall_edge(lab: Node3D, group: Node, wall: PhysicsBody3D) -> void:
 	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
 	var baby := group.get_child(-1) as Zombie
 	baby.set_physics_process(false)
@@ -290,9 +290,11 @@ func check_lower_wall_edge(lab: Node3D, group: Node) -> void:
 	# This pose hits the underside with a purely vertical contact normal.
 	var underside_basis := Basis(Vector3(0.136516, 0.244008, -0.960117),
 		Vector3(0.976023, 0.132734, 0.172511), Vector3(0.169534, -0.960647, -0.220037)).orthonormalized()
-	state.transform = Transform3D(underside_basis, Vector3(4.364025, 0.088364, 44.055260))
+	var underside_pose := Transform3D(underside_basis, Vector3(4.364025, 0.088364, 44.055260))
+	var underside_motion := Vector3(-0.291128, 0.186346, 0.054950)
+	state.transform = underside_pose
 	var underside: Vector3 = baby.ragdoll._slide_floor_wall_part(leg, state, box.size * 0.5,
-		Vector3(-0.291128, 0.186346, 0.054950), 0.0, floor.get_rid())
+		underside_motion, 0.0, floor.get_rid())
 	check(underside.x < -0.20 and underside.y >= 0.0,
 		"The leg can withdraw from the wall's underside without a horizontal contact normal")
 	var obstruction := StaticBody3D.new()
@@ -310,6 +312,34 @@ func check_lower_wall_edge(lab: Node3D, group: Node) -> void:
 		correction, 0.0, floor.get_rid())
 	check(blocked.is_zero_approx(), "A second obstacle prevents the outward leg correction")
 	print("LAB_BABY_LOWER_WALL_EDGE moved=", moved, " underside=", underside, " blocked=", blocked)
+
+	# Rotate the same contact geometry without changing the floor height.
+	var yaw := Basis(Vector3.UP, deg_to_rad(27.0))
+	var rotated := Transform3D(yaw, Vector3.ZERO)
+	wall.global_transform = rotated * wall.global_transform
+	obstruction.global_transform = rotated * obstruction.global_transform
+	await physics_frame
+	await physics_frame
+	state = PhysicsServer3D.body_get_direct_state(leg.get_rid())
+	state.transform = rotated * pose
+	var rotated_blocked: Vector3 = baby.ragdoll._slide_floor_wall_part(leg, state, box.size * 0.5,
+		yaw * correction, 0.0, floor.get_rid())
+	check(rotated_blocked.is_zero_approx(), "A second obstacle still blocks retreat at a rotated wall")
+	obstruction.free()
+	await physics_frame
+	state = PhysicsServer3D.body_get_direct_state(leg.get_rid())
+	state.transform = rotated * pose
+	var rotated_edge: Vector3 = yaw.transposed() * baby.ragdoll._slide_floor_wall_part(
+		leg, state, box.size * 0.5, yaw * correction, 0.0, floor.get_rid())
+	state.transform = rotated * underside_pose
+	var rotated_underside: Vector3 = yaw.transposed() * baby.ragdoll._slide_floor_wall_part(
+		leg, state, box.size * 0.5, yaw * underside_motion, 0.0, floor.get_rid())
+	check(rotated_edge.x < -0.18 and rotated_edge.y >= 0.0,
+		"The leg clears the lower edge of a 27-degree wall")
+	check(rotated_underside.x < -0.20 and rotated_underside.y >= 0.0,
+		"The leg clears the underside of a rotated wall with a vertical contact normal")
+	print("LAB_BABY_ROTATED_WALL_EDGE moved=", rotated_edge, " underside=", rotated_underside,
+		" blocked=", rotated_blocked)
 
 
 func add_contact_corner(lab: Node3D, yaw: float) -> Node3D:
