@@ -1262,9 +1262,9 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 		and absf(_corpse_axis().normalized().y) <= CORPSE_SETTLE_MAX_AXIS_Y \
 		and ragdoll.has_flat_limb_support() \
 		and Ragdoll._body_supported_by(ragdoll.bodies.Chest, _corpse_floor.get_parent())
-	var slow_support: bool = not ragdoll.source_joints.is_empty() \
-		and (grounded_baby or (not normally_supported and (motion.supports >= 2 or intermittent_foot) \
-		and (slow_motion or measure_supported_pose)))
+	var slow_support: bool = (not normally_supported or grounded_baby) and not ragdoll.source_joints.is_empty() \
+		and (motion.supports >= 2 or intermittent_foot) \
+		and (slow_motion or measure_supported_pose)
 	var corner_support := false
 	if slow_support:
 		if flat_floor:
