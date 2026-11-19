@@ -11,13 +11,18 @@ func check(value: bool, message: String) -> void:
 
 func run() -> void:
 	var world = load("res://scenes/WorldMap.tscn").instantiate()
+	var unconfigured := "unconfigured" in OS.get_cmdline_user_args()
+	if unconfigured:
+		world.cliff_relief_reach = 0
 	root.add_child(world)
 	current_scene = world
 	await process_frame
 	var candidate := world.get_node_or_null("NorthernRidgeline") as Node3D
 	var button := world.find_child("NorthernRidgelineToggle",true,false) as CheckButton
 	var review = world.showcase
-	if "absent" in OS.get_cmdline_user_args():
+	if unconfigured:
+		check(candidate == null and button == null and review.distant_terrain.vista.visible,"Unconfigured maps keep their existing background")
+	elif "absent" in OS.get_cmdline_user_args():
 		check(candidate == null and button == null,"No private horizon when sources or Mobile are unavailable")
 	else:
 		check(candidate != null and button != null and button.button_pressed,"F5 enables the new ridge")
