@@ -189,6 +189,46 @@ func check_connected_side(member_count: int, yaw: float, side: float) -> void:
 	lab.free()
 	await physics_frame
 
+func check_short_static_detour(member_count: int, yaw: float, wall_width: float,
+		target_offset: Vector3, latest_hit_tick: int) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var heading := Basis(Vector3.UP, yaw)
+	lab.player.position = heading * target_offset
+	var zombies := spawn_detour_group(lab, member_count)
+	if zombies == null:
+		lab.free()
+		return
+	add_wall(lab, heading * Vector3(0.0, 0.35, -2.25), Vector3(wall_width, 0.7, 0.3), yaw)
+	var chaser := zombies.get_child(0) as ZOMBIE
+	chaser.position = heading * Vector3(0.0, 0.02, -4.2)
+	chaser.animation.play(ZOMBIE.IDLE)
+	chaser.animation.advance(0.0)
+	var chosen_x := INF
+	var crossing_x := INF
+	var hit_tick := -1
+	var hits: Array[int] = []
+	chaser.melee_hit.connect(func(damage): hits.append(damage))
+	for tick in 300:
+		await physics_frame
+		if not is_finite(chosen_x) and chaser._chase_detour.is_finite():
+			chosen_x = (heading.inverse() * chaser._chase_detour).x
+		var local := heading.inverse() * chaser.global_position
+		if not is_finite(crossing_x) and local.z > -2.25:
+			crossing_x = local.x
+		if not hits.is_empty():
+			hit_tick = tick
+			break
+	if chosen_x >= 0.0 or crossing_x >= -wall_width * 0.5 or hits != [ZOMBIE.MELEE_DAMAGE] \
+			or hit_tick > latest_hit_tick:
+		failures.append("The nearer side of the %s m static wall should lead to a timely melee hit" % wall_width)
+	print("LAB_SHORT_STATIC_DETOUR members=", member_count, " width=", wall_width,
+		" chosen_x=", chosen_x, " cross_x=", crossing_x, " hit_tick=", hit_tick, " hits=", hits)
+	lab.free()
+	await physics_frame
+
 func check_route_to_last_sighting(member_count: int, yaw: float, baby_chaser: bool,
 		wall_width := 1.4, target_distance := 0.0) -> void:
 	var lab := LAB.instantiate()
@@ -382,6 +422,8 @@ func check_direct_approach_after_cover_opens(member_count: int, yaw: float) -> v
 	await physics_frame
 
 func run() -> void:
+	await check_short_static_detour(1, 0.0, 2.5, Vector3(-1.25, 0.02, 3.5), 232)
+	await check_short_static_detour(100, deg_to_rad(-52.0), 4.1, Vector3(-0.8, 0.02, 0.0), 225)
 	await check_direct_approach_after_cover_opens(1, 0.0)
 	await check_direct_approach_after_cover_opens(100, deg_to_rad(27.0))
 	await check_detour(1, 0.0, false)
