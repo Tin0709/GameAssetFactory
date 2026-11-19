@@ -29,8 +29,10 @@ func configure(world: Node3D, placements: PackedVector4Array) -> bool:
 	var poses := {}
 	var occupied := {}
 	for placement: Vector4 in placements:
+		if not placement.is_finite():
+			return false
 		var variant := int(placement.w)
-		if not placement.is_finite() or placement.w != float(variant) or not MESHES.has(variant):
+		if placement.w != float(variant) or not MESHES.has(variant):
 			return false
 		if not meshes.has(variant):
 			var entry: Array = MESHES[variant]
