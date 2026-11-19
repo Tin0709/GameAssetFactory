@@ -27,7 +27,7 @@ func run()->void:
 	check(p.instance_count+p.fern_reserved_cells.size()==8418 and p.grass_splay_active(),"Dense grass and fern clearings preserve the approved coverage")
 	check(AudioServer.is_bus_mute(0) and w.player.active_clip=="Idle","Quiet grounded startup preserved")
 	check_shadow_wind(w, p)
-	check_sunlight_stability(w, p)
+	await check_sunlight_stability(w, p)
 	print("GRASS_WIND_RESULT ",JSON.stringify({"failures":failures,"wind":p.grass_wind.snapshot()}))
 	w.free();await process_frame;await create_timer(.2).timeout;quit(0 if failures.is_empty() else 1)
 
@@ -79,6 +79,8 @@ func check_sunlight_stability(world: Node, plants: Node3D) -> void:
 		"Forest exposes the default grass sunlight motion control")
 	for hour: float in [7., 12., 16.5, 19.5, 22.]:
 		showcase.set_hour(hour)
+		await process_frame
+		await process_frame
 		check(sunlight_matches(plants, .5 if hour in [7., 16.5] else 0.),
 			"Grass sunlight follows its daylight window at %s" % hour)
 	showcase.set_hour(16.5)
