@@ -1037,6 +1037,7 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
 	check(peak > 0.005 and peak < 0.9, "The contact pool produces PCM with headroom")
 	await check_zombie_attack_onsets(audio, group, voices)
+	await check_zombie_cue_catchup(lab, audio, group)
 	audio.reset()
 	var windup_choice: int = audio._next_choice.get(&"zombie_windup", 0)
 	group.zombie_attack_audio.emit(lab.player.global_position + Vector3.RIGHT * 40.0, false)
@@ -1057,6 +1058,68 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 		"Muting clears queued contact cues")
 	print("MECHANIC_LAB_ZOMBIE_ATTACK_OVERFLOW peak=", peak)
 	lab.free()
+
+func check_zombie_cue_catchup(lab: Node, audio: COMBAT_AUDIO, group: Node) -> void:
+	var ear := audio.zombie_listener.global_position
+	var near := [ear + Vector3.RIGHT, ear + Vector3.RIGHT * 2.0, ear + Vector3.RIGHT * 3.0]
+	var far := [ear + Vector3.LEFT * 10.0, ear + Vector3.LEFT * 11.0, ear + Vector3.LEFT * 12.0]
+	var attacks := audio._voices.slice(COMBAT_AUDIO.ATTACK_POOL * COMBAT_AUDIO.VOICES_PER_POOL,
+		(COMBAT_AUDIO.ATTACK_POOL + 1) * COMBAT_AUDIO.VOICES_PER_POOL)
+	var reactions := audio._voices.slice(COMBAT_AUDIO.REACTION_POOL * COMBAT_AUDIO.VOICES_PER_POOL,
+		(COMBAT_AUDIO.REACTION_POOL + 1) * COMBAT_AUDIO.VOICES_PER_POOL)
+	var emit_cues := func(points: Array, confirmed: bool):
+		for point: Vector3 in points:
+			group.zombie_attack_audio.emit(point, confirmed)
+			audio.contact(point, 1, confirmed, "NativeBowAction")
+
+	# Hold the normal render flush while the events cross physics ticks.
+	lab.set_process(false)
+	for confirmed in [false, true]:
+		audio.reset()
+		var attack := &"zombie_hit" if confirmed else &"zombie_windup"
+		var reaction := &"death" if confirmed else &"hurt"
+		var attack_before: int = audio._next_choice.get(attack, 0)
+		var reaction_before: int = audio._next_choice.get(reaction, 0)
+		emit_cues.call(far, confirmed)
+		await physics_frame
+		emit_cues.call(near, confirmed)
+		check(audio._next_choice.get(attack, 0) == attack_before
+			and audio._next_choice.get(reaction, 0) == reaction_before,
+			"Older physics ticks reserve no attack or reaction voice before the render flush")
+		audio.flush_zombie_combat_cues()
+		check(audio._next_choice.get(attack, 0) == attack_before + 3
+			and attacks.all(func(voice): return voice.global_position in near and voice.stream in audio._groups[attack]),
+			"The render flush selects the three nearest %s cues across ticks" % attack)
+		check(audio._next_choice.get(reaction, 0) == reaction_before + 3
+			and reactions.all(func(voice): return voice.global_position in near and voice.stream in audio._groups[reaction]),
+			"The render flush selects the three nearest %s cues across ticks" % reaction)
+
+	audio.reset()
+	var windups_before: int = audio._next_choice.get(&"zombie_windup", 0)
+	var hurts_before: int = audio._next_choice.get(&"hurt", 0)
+	emit_cues.call(near, false)
+	await physics_frame
+	emit_cues.call(far, true)
+	audio.flush_zombie_combat_cues()
+	check(audio._next_choice.get(&"zombie_windup", 0) == windups_before
+		and attacks.all(func(voice): return voice.stream in audio._groups[&"zombie_hit"]),
+		"Confirmed contacts win over queued telegraphs across ticks without starting the telegraphs")
+	check(audio._next_choice.get(&"hurt", 0) == hurts_before
+		and reactions.all(func(voice): return voice.stream in audio._groups[&"death"]),
+		"Lethal reactions win over queued hurt cues across ticks without starting them")
+
+	audio.reset()
+	emit_cues.call(near, false)
+	audio.flush_zombie_combat_cues()
+	hurts_before = audio._next_choice.get(&"hurt", 0)
+	var future := Engine.get_physics_frames() + ceili(0.1 * Engine.physics_ticks_per_second)
+	check(audio._play(&"hurt", far[0], COMBAT_AUDIO.HURT_GAIN_DB, future) == null
+		and reactions.all(func(voice): return voice.global_position in near)
+		and audio._next_choice.get(&"hurt", 0) == hurts_before,
+		"A distant hurt cue cannot replace a nearby onset the mixer has not played yet")
+	print("MECHANIC_LAB_ZOMBIE_CUE_CATCHUP attacks=", attacks.size(), " reactions=", reactions.size())
+	audio.reset()
+	lab.set_process(true)
 
 func check_zombie_attack_onsets(audio: COMBAT_AUDIO, group: Node,
 		voices: Array[AudioStreamPlayer3D]) -> void:
