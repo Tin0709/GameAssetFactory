@@ -186,6 +186,7 @@ var _sight_state_seconds := 0.0
 var _last_seen_position := Vector3.ZERO
 var _chase_detour := Vector3.INF
 var _chase_detour_time := 0.0
+var _chase_detour_around_zombie := false
 var _chase_stalled_seconds := 0.0
 var _roam_origin := Vector3.ZERO
 var _roam_destination := Vector3.INF
@@ -662,6 +663,7 @@ func _clear_chase_detour() -> void:
 	_chase_detour = Vector3.INF
 	_chase_detour_time = 0.0
 	_chase_stalled_seconds = 0.0
+	_chase_detour_around_zombie = false
 
 func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool, target_visible: bool) -> Vector3:
 	if _chase_detour.is_finite():
@@ -675,7 +677,7 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool, targ
 			var direct_clear := false
 			if sample_ai:
 				var space := get_world_3d().direct_space_state
-				_prepare_lab_path_sweep()
+				_prepare_lab_path_sweep(_chase_detour_around_zombie)
 				direct_clear = _lab_path_fraction(space, offset) >= 1.0 and _lab_path_end_clear(space, offset)
 			if not direct_clear:
 				return travel * (minf(CHASE_SPEED, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
@@ -698,13 +700,18 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool, targ
 		return Vector3.ZERO
 	for i in get_slide_collision_count():
 		var collision := get_slide_collision(i)
-		var wall := collision.get_collider() as StaticBody3D
+		var obstacle := collision.get_collider() as CollisionObject3D
+		var living_blocker := obstacle is CharacterBody3D and obstacle.get_parent() == get_parent() \
+			and (obstacle.collision_layer & LIVING_ZOMBIE_LAYER) != 0
 		var normal := collision.get_normal().slide(Vector3.UP)
-		if wall == null or wall == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
+		if (not obstacle is StaticBody3D and not living_blocker) \
+				or obstacle == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
 			continue
 		_chase_detour = _choose_detour_waypoint(get_world_3d().direct_space_state, bounds, normal, offset)
 		if _chase_detour.is_finite():
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
+			# Returning directly through the blocker would undo this side step.
+			_chase_detour_around_zombie = living_blocker
 			return (_chase_detour - global_position).slide(Vector3.UP).normalized() * CHASE_SPEED
 		break
 	return Vector3.ZERO
