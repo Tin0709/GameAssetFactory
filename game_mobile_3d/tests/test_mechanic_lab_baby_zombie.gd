@@ -92,6 +92,7 @@ func run() -> void:
 	await check_tuned_contact(58, 27.0, 0.35, true)
 	await check_tuned_contact(73, 27.0, 0.18, false, -58.0)
 	await check_tuned_contact(81, 27.0, 0.35, true, -58.0)
+	await check_tuned_contact(19, 27.0, 0.35, false, -58.0, true)
 	await check_first_wall_neck_contact()
 	await check_first_wall_neck_contact(true)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
@@ -146,7 +147,7 @@ func check_walk_contacts(baby: Zombie) -> void:
 			"The Baby Zombie step matches the source sole and phase at frame 2 or 8")
 
 func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_attack := false,
-		strike_yaw := INF) -> void:
+		strike_yaw := INF, sword_attack := false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -180,7 +181,10 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_atta
 		direction = Vector3(cos(angle), 0.0, sin(angle))
 	var origin := baby.global_position if corner == null else baby.global_position - direction
 	var attack := "AirAttack" if air_attack else "Attack"
+	group.sword_equipped = sword_attack
 	var strike: Dictionary = group.AIR_STRIKE if air_attack else group.SABRE_STRIKES[0]
+	if sword_attack:
+		strike = group.SWORD_STRIKES[0]
 	group._apply_contact(baby, baby.combat_center(), attack, 0, seed, strike, direction, false, origin)
 	baby.set_physics_process(true)
 	var gap := 0.0
