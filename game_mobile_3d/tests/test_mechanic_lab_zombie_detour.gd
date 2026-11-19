@@ -215,16 +215,18 @@ func check_active_crowd_at_floor_edge() -> void:
 		member.animation.play(ZOMBIE.IDLE)
 		member.animation.advance(0.0)
 	lab.player.position = Vector3(53.2, 0.02, 0.0)
+	var approach_health: int = lab.player_health
 	for i in 240:
 		await physics_frame
 	var supported := zombies.get_child_count() == 100 and zombies.get_children().all(
 		func(member: ZOMBIE) -> bool: return member.is_on_floor() and member.position.x < 50.0)
-	if not supported or lab.player_health != 10000:
+	if not supported or lab.player_health != approach_health:
 		failures.append("The active crowd should stay supported at the edge without hitting a distant target")
+	var return_health: int = lab.player_health
 	lab.player.position = Vector3(45.9, 0.02, 0.0)
 	for i in 240:
 		await physics_frame
-	var damage: int = 10000 - lab.player_health
+	var damage: int = return_health - lab.player_health
 	if zombies.get_child_count() != 100 or damage <= 0 or damage % ZOMBIE.MELEE_DAMAGE != 0:
 		failures.append("All 100 zombies should remain and resume normal attacks after the player returns")
 	print("LAB_EDGE_CROWD supported=", supported, " alive=", zombies.get_child_count(), " damage=", damage)
