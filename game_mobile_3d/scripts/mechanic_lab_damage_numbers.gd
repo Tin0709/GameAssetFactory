@@ -21,9 +21,11 @@ class DamageNumber:
 	var pending := true
 	var centre: Vector3
 	var depth: float
+	var hit_order: int
 
 var _numbers: Array[DamageNumber] = []
 var _instance_buffer := PackedFloat32Array()
+var _next_hit_order := 0
 
 func setup(glyphs: Array[Texture2D]) -> void:
 	var atlas := Image.create_empty(DIGIT_SIZE * DIGIT_COUNT, DIGIT_SIZE, false, Image.FORMAT_RGBA8)
@@ -48,6 +50,8 @@ func setup(glyphs: Array[Texture2D]) -> void:
 
 func add_number(amount: int, origin: Vector3, lateral: Vector3) -> void:
 	var number := DamageNumber.new()
+	number.hit_order = _next_hit_order
+	_next_hit_order += 1
 	number.ascii_digits = str(amount).to_ascii_buffer()
 	number.origin = origin + lateral * 0.12
 	number.travel = Vector3.UP * 0.74 + lateral * 0.32
@@ -80,18 +84,22 @@ func _process(delta: float) -> void:
 	var camera_side := camera.global_basis.x if camera != null else Vector3.RIGHT
 	var camera_back := camera.global_basis.z if camera != null else Vector3.BACK
 	var previous_depth := -INF
+	var previous_hit_order := -1
 	var needs_sort := false
 	for number in _numbers:
 		var offset: Vector3 = Tween.interpolate_value(Vector3.ZERO, number.travel,
 			number.age, NUMBER_DURATION, Tween.TRANS_QUAD, Tween.EASE_OUT)
 		number.centre = number.origin + offset
 		number.depth = number.centre.dot(camera_back)
-		needs_sort = needs_sort or number.depth <= previous_depth
+		needs_sort = needs_sort or number.depth < previous_depth \
+			or (number.depth == previous_depth and number.hit_order < previous_hit_order)
 		previous_depth = number.depth
+		previous_hit_order = number.hit_order
 	# Draw farther glyphs first, including when two fading numbers overlap.
-	# Keep using the same sort when equal-depth numbers overlap.
+	# At the same depth, later hits draw over earlier hits.
 	if needs_sort:
-		_numbers.sort_custom(func(a: DamageNumber, b: DamageNumber) -> bool: return a.depth < b.depth)
+		_numbers.sort_custom(func(a: DamageNumber, b: DamageNumber) -> bool:
+			return a.depth < b.depth or (a.depth == b.depth and a.hit_order < b.hit_order))
 	var slot := 0
 	var local_from_world := global_transform.affine_inverse()
 	for number in _numbers:
