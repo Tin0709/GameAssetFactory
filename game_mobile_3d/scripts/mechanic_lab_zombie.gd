@@ -1174,11 +1174,14 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var roll_weight := 1.0 if damp_supported_roll else 0.0
 	if flat_sabre_finisher and not ragdoll.source_joints.is_empty():
 		roll_weight = _sabre_roll_weight(delta, contact_age, motion, damp_supported_roll) if supported else 0.0
-	# A late wall brace can keep one leg oscillating even after gravity
-	# has blended. Ease into the existing supported-roll damping.
-	if contact_age >= gravity_blend_end - 0.00001 and motion.linear < DEATH_LIMB_SUPPORT_MAX_SPEED \
-			and _has_tuned_wall_brace(motion):
-		roll_weight = maxf(roll_weight, move_toward(_roll_damping_weight, 1.0, delta / DEATH_LANDING_BLEND_TIME))
+	# Ease into supported-roll damping when the wall carries the upper body.
+	if contact_age >= gravity_blend_end - 0.00001 and _corpse_age >= WALL_BRACE_MIN_AGE:
+		var planted_wall_brace: bool = flat_floor and not ragdoll.use_tuned_wall_sweep and not ragdoll.source_joints.is_empty() \
+			and motion.supports == 2 and motion.core_supports == 0 and motion.leg_supported \
+			and motion.linear <= CORPSE_SETTLE_SPEED and motion.angular <= CORPSE_SETTLE_SPIN \
+			and ragdoll.has_flat_wall_rest_support(false)
+		if planted_wall_brace or (motion.linear < DEATH_LIMB_SUPPORT_MAX_SPEED and _has_tuned_wall_brace(motion)):
+			roll_weight = maxf(roll_weight, move_toward(_roll_damping_weight, 1.0, delta / DEATH_LANDING_BLEND_TIME))
 	if flat_sabre_finisher and damp_supported_roll and roll_weight > 0.9 and not _had_upper_body_brace:
 		# Keep the existing fall from an upper-body brace through its roll.
 		var drag := smoothstep(0.78, 1.00, _corpse_age) * (1.0 - smoothstep(0.9, 2.0, motion.linear))

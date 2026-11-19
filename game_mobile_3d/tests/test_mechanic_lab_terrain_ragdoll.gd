@@ -495,15 +495,15 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		" parked=", zombie._corpse_parked, " seconds=", zombie._corpse_age)
 	lab.free()
 
-func check_tuned_wall_brace(seed: int, wall_angle: float, strike_angle: float, attack: String,
-		sword: bool, clip: StringName) -> void:
+func check_wall_brace_impact(seed: int, wall_angle: float, strike_angle: float, attack: String,
+		sword: bool, clip: StringName, launch_percent := 1000.0, combo_index := 0) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
 	for frame in 10:
 		await process_frame
-	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = 1000.0
+	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = launch_percent
 	var corner := Node3D.new()
 	lab.add_child(corner)
 	corner.rotation.y = deg_to_rad(wall_angle)
@@ -529,11 +529,11 @@ func check_tuned_wall_brace(seed: int, wall_angle: float, strike_angle: float, a
 	var angle := deg_to_rad(strike_angle)
 	var direction := Vector3(cos(angle), 0.0, sin(angle))
 	group.sword_equipped = sword
-	var strike: Dictionary = group.AIR_STRIKE if attack == "AirAttack" else group.SABRE_STRIKES[0]
+	var strike: Dictionary = group.AIR_STRIKE if attack == "AirAttack" else group.SABRE_STRIKES[combo_index]
 	if sword:
 		strike = group.SWORD_STRIKES[0]
 	zombie.health = 1
-	group._apply_contact(zombie, zombie.combat_center(), attack, 0, seed, strike, direction, false,
+	group._apply_contact(zombie, zombie.combat_center(), attack, combo_index, seed, strike, direction, false,
 		zombie.global_position - direction)
 	zombie.set_physics_process(true)
 
@@ -554,7 +554,7 @@ func check_tuned_wall_brace(seed: int, wall_angle: float, strike_angle: float, a
 			crossed = crossed or (local.y > 0.0 and local.y < 7.9 and (local.x > 6.13 or local.z < 0.07))
 	check(landed > 20 and parked > landed + 30 and zombie.ragdoll.bodies.is_empty() and not crossed,
 		"An adult zombie braced against a wall settles after the initial bounce (case %d)" % seed)
-	print("LAB_TUNED_WALL_BRACE seed=", seed, " landed=", landed, " parked=", parked, " crossed=", crossed)
+	print("LAB_WALL_BRACE_IMPACT launch=", launch_percent, " seed=", seed, " landed=", landed, " parked=", parked, " crossed=", crossed)
 	lab.free()
 
 
@@ -631,8 +631,9 @@ func run() -> void:
 		&"Zombie_Walk_Variant1", 0.10000019868214, "Head", 0.13, false, INF, true)
 	await check_corner_ragdoll(101, 4.95, true, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
 		1150.0, false, CornerFixture.FROZEN_WALLS)
-	await check_tuned_wall_brace(20, 27.0, -58.0, "Attack", true, Zombie.ATTACK)
-	await check_tuned_wall_brace(69, 45.0, -85.0, "AirAttack", false, Zombie.IDLE)
-	await check_tuned_wall_brace(74, 45.0, -85.0, "Attack", false, Zombie.ATTACK)
+	await check_wall_brace_impact(20, 27.0, -58.0, "Attack", true, Zombie.ATTACK)
+	await check_wall_brace_impact(69, 45.0, -85.0, "AirAttack", false, Zombie.IDLE)
+	await check_wall_brace_impact(74, 45.0, -85.0, "Attack", false, Zombie.ATTACK)
+	await check_wall_brace_impact(29, 27.0, -58.0, "Attack", false, Zombie.ATTACK, 100.0, 2)
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
