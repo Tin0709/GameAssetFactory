@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
+
 var failures: Array[String] = []
 
 func _initialize() -> void:
@@ -55,6 +57,7 @@ func run() -> void:
 		print("RAGDOLL_TUNING flight=", [baseline.flight, stronger.flight, lighter.flight, heavier.flight],
 			" impulse=", [baseline.impulse.length(), stronger.impulse.length()],
 			" ground_scales=", [lighter.ground_scale, heavier.ground_scale])
+		await check_first_wall_shoulder(lab)
 	lab.free()
 	print("MECHANIC_LAB_RAGDOLL_TUNING failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -114,3 +117,58 @@ func replay_combo(lab) -> Dictionary:
 	zombie.free()
 	await physics_frame
 	return result
+
+
+func check_first_wall_shoulder(lab) -> void:
+	lab.reset_player()
+	var wall := StaticBody3D.new()
+	wall.position = Vector3(4.5, 1.5, 0.0)
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(0.30, 3.0, 96.0)
+	collider.shape = box
+	wall.add_child(collider)
+	lab.add_child(wall)
+	var group := lab.get_node("Zombies")
+	# Replay the recorded adult walk pose and oblique Sabre finisher by this face.
+	group._spawn_serial = 88
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	if group.get_child_count() != 1:
+		check(false, "The shoulder test loads a verified adult zombie")
+		wall.free()
+		return
+	var zombie := group.get_child(0) as Zombie
+	for i in 65:
+		await physics_frame
+	zombie.global_position = Vector3(3.9, 0.02, 34.65)
+	zombie.rotation.y = TAU * 2.0 / 16.0
+	zombie.velocity = Vector3.ZERO
+	zombie.reset_physics_interpolation()
+	zombie.animation.stop()
+	zombie.ragdoll.skeleton.reset_bone_poses()
+	zombie.animation.play(Zombie.WALK_CLIPS[0], 0.0)
+	zombie.animation.advance(0.0)
+	zombie.animation.seek(11.0 / 30.0, true)
+	zombie.ragdoll.sample(1.0 / 60.0)
+	zombie.ragdoll.sample(1.0 / 60.0)
+	zombie.ragdoll_launch_multiplier = group.ragdoll_launch_multiplier
+	zombie.ragdoll_gravity_multiplier = group.ragdoll_gravity_multiplier
+	var direction := Vector3.RIGHT.rotated(Vector3.UP, deg_to_rad(25.0))
+	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 800.0, Zombie.DeathStrike.SABRE_FINISHER)
+	var peak := 0.0
+	var active := false
+	var crossed := false
+	for i in 201:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+		if not zombie.ragdoll.running:
+			continue
+		active = true
+		peak = maxf(peak, zombie.ragdoll.max_anchor_error())
+		for part: PhysicalBone3D in zombie.ragdoll.bodies.values():
+			crossed = crossed or part.global_position.x > 4.655
+	check(active and zombie.ragdoll._wall_handoff_frame >= 0 and peak < 0.35,
+		"The first oblique wall hit keeps the adult rig joined at both 1000% settings")
+	check(zombie._corpse_parked and not crossed, "The tuned adult wall ragdoll settles without crossing the wall")
+	print("RAGDOLL_TUNED_WALL_SHOULDER gap_m=", peak, " parked=", zombie._corpse_parked)
