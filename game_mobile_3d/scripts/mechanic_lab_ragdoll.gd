@@ -134,6 +134,9 @@ func _sweep_tuned_lab_walls() -> void:
 			_handoff_ray.from = start
 			_handoff_ray.to = finish
 			var hit := space.intersect_ray(_handoff_ray)
+			if not hit.is_empty() and is_instance_valid(_flat_floor) \
+					and hit.collider == _flat_floor.get_parent() and hit.normal.is_equal_approx(Vector3.UP):
+				hit = _wall_after_flat_floor(space, body, state.transform, hit.position, finish)
 			if hit.is_empty() or not _is_fixed_wall(hit.collider) or absf(hit.normal.y) >= MAX_WALL_NORMAL_Y:
 				start = finish
 				break
@@ -154,6 +157,34 @@ func _sweep_tuned_lab_walls() -> void:
 			pose.origin = start
 			state.transform = pose
 			state.linear_velocity = velocity
+
+
+func _wall_after_flat_floor(space: PhysicsDirectSpaceState3D, body: PhysicalBone3D,
+		pose: Transform3D, contact: Vector3, finish: Vector3) -> Dictionary:
+	var floor_box := _flat_floor.shape as BoxShape3D
+	var floor_pose := _flat_floor.global_transform
+	if floor_box == null or _flat_floor.disabled or not floor_pose.basis.y.is_equal_approx(Vector3.UP) \
+			or not floor_pose.basis.get_scale().is_equal_approx(Vector3.ONE):
+		return {}
+	var half := floor_box.size * 0.5
+	if absf(contact.y - floor_pose.origin.y - half.y) > PROJECTION_COLLISION_MARGIN:
+		return {}
+	var collider := body.get_child(0) as CollisionShape3D
+	var shape := collider.shape as BoxShape3D
+	pose.origin = finish
+	var bounds := (floor_pose.affine_inverse() * pose * collider.transform) * AABB(-shape.size * 0.5, shape.size)
+	if bounds.position.x < -half.x or bounds.end.x > half.x \
+			or bounds.position.z < -half.z or bounds.end.z > half.z:
+		return {}
+	# Follow the rest of the horizontal path across the floor. Only an
+	# obstacle that reaches the ground can block this part of the sweep.
+	var height := contact.y + 2.0 * PROJECTION_COLLISION_MARGIN
+	_handoff_ray.from = Vector3(contact.x, height, contact.z)
+	_handoff_ray.to = Vector3(finish.x, height, finish.z)
+	var wall := space.intersect_ray(_handoff_ray)
+	if not wall.is_empty() and is_zero_approx(wall.normal.y):
+		return wall
+	return {}
 
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
 		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}, prepared: PackedScene = null) -> void:
