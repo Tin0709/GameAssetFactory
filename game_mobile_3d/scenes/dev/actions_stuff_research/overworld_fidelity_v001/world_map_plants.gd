@@ -77,9 +77,9 @@ func set_forest_fern(value: bool) -> void:
 		return
 	forest_fern_enabled = value
 	if dense_grass_review and not forest_fern_asset.is_empty():
-		_rebuild_planting()
+		_rebuild_planting(false)
 
-func _rebuild_planting()->void:
+func _rebuild_planting(reset_interaction := true)->void:
 	for child:Node in get_children():
 		remove_child(child);child.queue_free()
 	placements.clear();_groups.clear();_plant_cells.clear();species_counts.clear();flower_colors.clear()
@@ -90,7 +90,9 @@ func _rebuild_planting()->void:
 	if dense_grass_review:
 		_build_native_patches();_build_dense_planting()
 	else:_build_cell_planting()
-	_prepare_materials();_refresh_grass_lighting();_flush_cell_batches();_refresh_grass_wind();reset()
+	_prepare_materials();_refresh_grass_lighting();_flush_cell_batches();_refresh_grass_wind()
+	if reset_interaction:
+		reset()
 
 func set_recovered_wind(value:bool)->void:
 	recovered_wind_enabled=value;_refresh_grass_wind()
