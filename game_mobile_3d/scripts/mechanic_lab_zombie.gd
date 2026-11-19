@@ -678,7 +678,11 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool, targ
 			if sample_ai:
 				var space := get_world_3d().direct_space_state
 				_prepare_lab_path_sweep(_chase_detour_around_zombie)
-				direct_clear = _lab_path_fraction(space, offset) >= 1.0 and _lab_path_end_clear(space, offset)
+				if _chase_detour_around_zombie:
+					# A crowded destination often rejects the route before the sweep.
+					direct_clear = _lab_path_end_clear(space, offset) and _lab_path_fraction(space, offset) >= 1.0
+				else:
+					direct_clear = _lab_path_fraction(space, offset) >= 1.0 and _lab_path_end_clear(space, offset)
 			if not direct_clear:
 				return travel * (minf(CHASE_SPEED, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
 		_clear_chase_detour()
@@ -741,7 +745,9 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 		local.x = clampf(local.x, -extent.x, extent.x)
 		local.z = clampf(local.z, -extent.z, extent.z)
 		var travel := (_corpse_floor.to_global(local) - origin).slide(Vector3.UP)
-		if travel.length_squared() <= min_distance:
+		var max_distance := travel.length_squared()
+		# A sweep can only shorten this leg. Keep the earlier connected leg on a tie.
+		if max_distance <= min_distance or (best_connects and max_distance <= best_distance):
 			continue
 		travel *= _lab_path_fraction(space, travel)
 		var distance := travel.length_squared()
