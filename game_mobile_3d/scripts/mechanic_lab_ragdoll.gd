@@ -37,6 +37,9 @@ const BABY_WALL_CHEST_SHIFT := 0.10
 const BABY_WALL_MAX_RECOVERY_TRAVEL := 0.20
 
 var _handoff_query_snapshot: Dictionary[PhysicalBone3D, PhysicsShapeQueryParameters3D]
+var _handoff_ray_region: AABB
+var _handoff_region_floor: AABB
+var _handoff_region_wall: AABB
 var _sample_names: Array[String]
 var _sample_bone_ids: Array[int]
 var _sample_body_offsets: Array[Transform3D]
@@ -322,6 +325,9 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 			region = initial_bounds.grow(0.45)
 			if not _handoff_region_is_clear(space, collision_mask, wall, region):
 				region = AABB()
+	_handoff_ray_region = region
+	_handoff_region_floor = floor_bounds
+	_handoff_region_wall = wall_bounds
 	var source: Array[Transform3D] = []
 	for bone in skeleton.get_bone_count():
 		source.append(skeleton.get_bone_pose(bone))
@@ -371,7 +377,9 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 	for bone in source.size():
 		if not collision_bones.has(bone):
 			skeleton.set_bone_pose(bone, source[bone].interpolate_with(idle[bone], selected_weight))
-	return _preserve_wall_handoff_branches(space, collision_mask, source, shift, parent_bones, rays_clear)
+	var final_shift := _preserve_wall_handoff_branches(space, collision_mask, source, shift, parent_bones, rays_clear)
+	_handoff_ray_region = AABB()
+	return final_shift
 
 func _handoff_floor_bounds() -> AABB:
 	var floor := _flat_floor.get_parent() as StaticBody3D
@@ -547,6 +555,13 @@ func _wall_ray_crosses(space: PhysicsDirectSpaceState3D, origin: Vector3, endpoi
 		return cached
 	var start := Vector3(origin.x, endpoint.y, origin.z)
 	var finish := endpoint + shift
+	if _handoff_ray_region.has_volume():
+		# The region query excluded only the known floor and wall boxes.
+		var ray_bounds := AABB(start.min(finish), (finish - start).abs()).grow(PROJECTION_COLLISION_MARGIN)
+		if _handoff_ray_region.encloses(ray_bounds) and not _handoff_region_wall.intersects(ray_bounds) \
+				and not _handoff_region_floor.intersects(ray_bounds):
+			wall_crossings[endpoint] = false
+			return false
 	var crosses := false
 	if start.distance_squared_to(finish) > SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
 		_handoff_ray.from = start
