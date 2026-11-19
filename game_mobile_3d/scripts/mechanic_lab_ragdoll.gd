@@ -33,6 +33,7 @@ const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
 const BABY_FLOOR_ANCHOR_GAP := 0.08
+const BABY_SUPPORTED_LEG_SLIDE_GAP := 3.0 * EARLY_ROLL_ANCHOR_LIMIT
 const BABY_FLOOR_ANCHOR_CLEARANCE := 0.02
 const BABY_WALL_LIMB_SHIFT := 0.35
 const BABY_WALL_CHEST_SHIFT := 0.10
@@ -914,6 +915,9 @@ func _recover_early_floor_arm_gap() -> void:
 			_slide_supported_anchor(arm, state, gap, gap.length(), floor_body.get_rid())
 
 func _recover_baby_floor_anchors() -> void:
+	var tuned := use_tuned_wall_sweep
+	if not tuned and (floor_landing_blended or floor_impact_blend >= EARLY_ROLL_ANCHOR_BLEND_END):
+		return
 	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
 		return
 	var floor_body := _flat_floor.get_parent() as StaticBody3D
@@ -927,23 +931,31 @@ func _recover_baby_floor_anchors() -> void:
 	var floor_rid := floor_body.get_rid()
 	var chest: PhysicalBone3D = bodies.Chest
 	var parent := PhysicsServer3D.body_get_direct_state(chest.get_rid())
-	if parent == null:
+	if parent == null or (not tuned and parent.get_contact_count() > 0):
 		return
+	var gap_limit := BABY_FLOOR_ANCHOR_GAP if tuned else BABY_SUPPORTED_LEG_SLIDE_GAP
 	var checked_obstacles := false
 	for joint in _source_anchor_projections:
+		var leg := joint.name == "Leg.L" or joint.name == "Leg.R"
+		if not tuned and not leg:
+			continue
 		var state := PhysicsServer3D.body_get_direct_state(joint.rid)
 		if state == null:
 			continue
 		var gap := (parent.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
+		if not tuned:
+			# Keep a planted leg on the floor when a large sideways error
+			# opens ahead of the chest contact.
+			gap.y = 0.0
 		var distance := gap.length()
-		if distance <= BABY_FLOOR_ANCHOR_GAP:
+		if distance <= gap_limit or (not tuned and not _body_supported_by(joint.body, floor_body)):
 			continue
 		var local := floor_inverse * state.transform
 		var extent := Basis(local.basis.x.abs(), local.basis.y.abs(), local.basis.z.abs()) * joint.half_size
 		var clearance := local.origin.y - extent.y - floor_half.y
-		var above_floor := clearance > BABY_FLOOR_ANCHOR_CLEARANCE and not _body_supported_by(joint.body, floor_body)
+		var above_floor := tuned and clearance > BABY_FLOOR_ANCHOR_CLEARANCE and not _body_supported_by(joint.body, floor_body)
 		if above_floor and (not use_tuned_floor_support or distance <= TUNED_LIMB_RECOVERY_GAP
-				or (joint.name != "Leg.L" and joint.name != "Leg.R")):
+				or not leg):
 			continue
 		if local.origin.y + extent.y < floor_half.y:
 			continue
@@ -959,7 +971,7 @@ func _recover_baby_floor_anchors() -> void:
 		if above_floor:
 			_recover_raised_leg_wall_overlap(joint, state, motion, floor_rid)
 			continue
-		if not checked_obstacles:
+		if tuned and not checked_obstacles:
 			if _floor_roll_nears_obstacle(floor_rid, true):
 				use_baby_floor_anchors = false
 				_baby_wall_anchors = use_tuned_floor_support

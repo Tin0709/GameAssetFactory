@@ -1077,7 +1077,7 @@ func _update_death(delta: float) -> void:
 		ragdoll.use_tuned_floor_support = lab_floor and ragdoll_gravity_multiplier > 1.0
 		ragdoll.use_tuned_wall_sweep = lab_floor and (
 			ragdoll_launch_multiplier > 1.0 or ragdoll_gravity_multiplier > 1.0)
-		ragdoll.use_baby_floor_anchors = is_baby and ragdoll.use_tuned_wall_sweep
+		ragdoll.use_baby_floor_anchors = is_baby and lab_floor
 		var mass := 0.0
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			# The player uses layer 2, which the living controllers can stand on.
