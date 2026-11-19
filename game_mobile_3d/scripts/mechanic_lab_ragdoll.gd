@@ -245,8 +245,11 @@ func _handoff_wall_clearance() -> Vector3:
 
 func _handoff_arm_is_pinched(space: PhysicsDirectSpaceState3D, overlaps: Array[Dictionary]) -> bool:
 	var wall_shapes := 0
+	var floor_body := _flat_floor.get_parent()
 	for hit in overlaps:
-		if hit.collider is StaticBody3D and hit.collider != _flat_floor.get_parent():
+		var blocker: Object = hit.collider
+		# Frozen props hold their shape against an arm just like fixed terrain.
+		if blocker != floor_body and (blocker is StaticBody3D or (blocker is RigidBody3D and blocker.freeze)):
 			wall_shapes += PhysicsServer3D.body_get_shape_count(hit.rid)
 	if wall_shapes < 2:
 		return false
