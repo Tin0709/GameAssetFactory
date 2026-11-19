@@ -10,6 +10,8 @@ func run()->void:
 	check(plants!=null,"Primary map has the private grass and flower planting")
 	if plants==null:w.free();await process_frame;quit(1);return
 	check(plants.error.is_empty(),"Existing external Blender bundle loads without extraction")
+	var grove_visible: bool = w.grove != null and w.grove.visible
+	var canopy_contact: bool = w.look.canopy_contact_active()
 	check(plants.get("dense_grass_review")==true,"Dense grass-only review is the current default")
 	if plants.get("dense_grass_review")==true:
 		check(plants.flower_colors.is_empty(),"No flowers in dense review")
@@ -47,16 +49,14 @@ func run()->void:
 	check(bounds_ok,"Every static plant footprint stays inside its own block")
 	check(ground_ok,"Plants sit on the actual terrain elevation")
 	for color:String in ["pink","yellow","white","purple"]:check(plants.flower_colors.get(color,0)>0,"Flower cluster color "+color)
-	check(not w.grove.visible and not w.look.canopy_contact_active(),"No trees or ghost canopy shading")
+	check((w.grove != null and w.grove.visible) == grove_visible and w.look.canopy_contact_active() == canopy_contact,
+		"Ground planting mode preserves the independent tree and canopy settings")
 	check(AudioServer.is_bus_mute(0),"Test remains muted")
 	check(w.player.active_clip=="Idle" and w.player.is_on_floor(),"Startup Idle preserved")
 	check(plants.materials.size()>0 and plants.interaction.texture!=null,"Shared animated materials and interaction field")
 	for material:ShaderMaterial in plants.materials:check(material.get_shader_parameter("cell_limited_motion")==true,"Animated tips bounded to their assigned block")
-	var wind_toggle:CheckButton
-	var contact_toggle:CheckButton
-	for node:Node in w.showcase.panel.find_children("*","CheckButton",true,false):
-		if node.text=="Grass wind":wind_toggle=node
-		if node.text=="Player grass / flower interaction":contact_toggle=node
+	var wind_toggle := w.find_child("GrassWind", true, false) as CheckButton
+	var contact_toggle := w.find_child("GrassContact", true, false) as CheckButton
 	check(wind_toggle!=null and contact_toggle!=null,"Wind/contact controls available")
 	if wind_toggle!=null and contact_toggle!=null:
 		wind_toggle.button_pressed=false

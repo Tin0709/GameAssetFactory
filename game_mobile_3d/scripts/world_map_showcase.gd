@@ -4477,6 +4477,7 @@ func _build_ui()->void:
 			cover.toggled.connect(plants.set_forest_cover)
 		for option:String in ["wind_enabled","interactions_enabled"]:
 			var toggle:=CheckButton.new();toggle.text="Grass wind" if option=="wind_enabled" else "Player grass / flower interaction"
+			toggle.name = "GrassWind" if option == "wind_enabled" else "GrassContact"
 			toggle.button_pressed=true;toggle.focus_mode=Control.FOCUS_NONE;box.add_child(toggle)
 			toggle.toggled.connect(func(value:bool):plants.set(option,value))
 	panel.hide()
