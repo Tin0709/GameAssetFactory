@@ -69,6 +69,17 @@ void vertex() {
 #include "res://materials/world_map_direct_cloud.gdshaderinc"
 #endif
 
+float player_reveal_coverage(vec3 point, vec3 view_axis) {
+	// Project a standing character's vertical span onto the camera plane.
+	// A solid rim outside this capsule leaves the surrounding terrain intact.
+	vec3 travel = point - cutaway_start;
+	vec3 plane = travel - view_axis * dot(travel, view_axis);
+	vec3 vertical = vec3(0.0, 1.0, 0.0) - view_axis * view_axis.y;
+	float height = clamp(dot(plane, vertical) / max(dot(vertical, vertical), 0.001), -0.72, 0.88);
+	float radius = length(plane - vertical * height);
+	return 1.0 - smoothstep(0.82, 1.38, radius);
+}
+
 void fragment() {
 #ifdef GAF_WORLD_GROUND_BOUNCE
 	ground_reflection = ground_bounce(cutaway_world, normalize(surface_normal));
@@ -117,6 +128,9 @@ void fragment() {
 	// player's lower body; otherwise transparent floor exposes buried faces and
 	// draws a rectangular seam where the neighbouring chunk stays opaque.
 	float wall_height=smoothstep(cutaway_start.y-0.3,cutaway_start.y+0.3,cutaway_world.y);
+	if (cutaway_enabled && PROJECTION_MATRIX[3][3] > 0.5) {
+		wall_height *= player_reveal_coverage(cutaway_world, INV_VIEW_MATRIX[2].xyz);
+	}
 	ALPHA = color.a * mix(1.0,cliff_visibility(),wall_height);
 	vec2 packed_pbr=terrain_pbr(UV);
 	ROUGHNESS = native_roughness*packed_pbr.y;
