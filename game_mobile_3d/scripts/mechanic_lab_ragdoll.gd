@@ -25,6 +25,7 @@ const WALL_NECK_LANDING_BLEND_END := 0.5
 const WALL_SHOULDER_SLIDE_WINDOW := 5.0 / 60.0
 const WALL_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
 const FIRST_WALL_SHOULDER_SLIDE_MIN_GAP := 0.17
+const TUNED_WALL_SHOULDER_RECOVERY_GAP := 8.0 * SOURCE_ANCHOR_TOLERANCE
 const WALL_SLIDE_MAX := 0.08
 const REBOUND_SLIDE_MAX_NORMAL_FRACTION := 0.65
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
@@ -991,7 +992,7 @@ func _recover_tuned_wall_shoulders() -> void:
 			continue
 		var gap := (core.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
 		var distance := gap.length()
-		if distance <= WALL_SLIDE_MIN_GAP:
+		if distance <= TUNED_WALL_SHOULDER_RECOVERY_GAP:
 			continue
 		for i in state.get_contact_count():
 			var normal := state.get_contact_local_normal(i)
