@@ -138,6 +138,7 @@ var ragdoll_gravity_multiplier := 1.0
 var _ragdoll_layout: Dictionary
 var _baby_visual: PackedScene
 var _baby_ragdoll_layout: Dictionary
+var _baby_prepared_clips: Dictionary[String, Animation]
 var _digits: Array[Texture2D]
 var _last_spawn_search: SpawnSearch
 var _spawn_serial := 0
@@ -157,6 +158,7 @@ func setup_combat(attacker: CharacterBody3D) -> void:
 	_attacker_visual = attacker.get("visual") as Node3D
 	if _visual == null:
 		_load_assets()
+	_prewarm_baby_assets()
 
 func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie := false, baby := false) -> bool:
 	if baby:
@@ -561,6 +563,31 @@ func _load_assets() -> void:
 						_ragdoll_layout.wall_handoff_idle_pose = Ragdoll.capture_wall_handoff_idle(skeleton, player, Zombie.IDLE)
 	model.free()
 
+func _prewarm_baby_assets() -> void:
+	var root := _private_research_root()
+	if root.is_empty() or _baby_visual != null:
+		return
+	var directory := root.path_join(SOURCE_DIR).path_join(BABY_DIR)
+	var tree := get_tree()
+	# Let the scene draw before beginning to import one clip per frame.
+	await tree.process_frame
+	for name: StringName in BABY_CLIPS:
+		if name == Zombie.IDLE:
+			continue
+		await tree.process_frame
+		if not is_inside_tree() or _baby_visual != null:
+			return
+		var path := _clip_path(directory, BABY_CLIPS[name][0])
+		var clip := _load_baby_clip(path, name)
+		if clip == null:
+			_baby_prepared_clips.clear()
+			return
+		_baby_prepared_clips[path] = clip
+	await tree.process_frame
+	if is_inside_tree() and _baby_visual == null:
+		_load_baby_assets()
+	_baby_prepared_clips.clear()
+
 func _load_baby_assets() -> void:
 	var root := _private_research_root()
 	if root.is_empty():
@@ -571,10 +598,10 @@ func _load_baby_assets() -> void:
 	if not _verified(source.path_join(ZOMBIE_DIR).path_join("T_Zombie.png"), SKIN_HASH) \
 			or not _verified(digit_path, DIGIT_HASH):
 		return
-	for row: Array in BABY_CLIPS.values():
-		if not _verified(_clip_path(directory, row[0]), row[1]):
-			return
-	var model := _import_gltf(_clip_path(directory, BABY_IDLE), 0, false)
+	var idle_path := _clip_path(directory, BABY_IDLE)
+	if not _verified(idle_path, BABY_CLIPS[Zombie.IDLE][1]):
+		return
+	var model := _import_gltf(idle_path, 0, false)
 	if model == null:
 		return
 	var player := model.get_node_or_null("AnimationPlayer") as AnimationPlayer
@@ -594,6 +621,7 @@ func _load_baby_assets() -> void:
 			_baby_ragdoll_layout = layout
 			_baby_visual = packed
 	model.free()
+	_baby_prepared_clips.clear()
 
 func _add_baby_clips(directory: String, player: AnimationPlayer) -> bool:
 	if not player.has_animation(BABY_IDLE):
@@ -604,22 +632,29 @@ func _add_baby_clips(directory: String, player: AnimationPlayer) -> bool:
 	for name: StringName in BABY_CLIPS:
 		if name == Zombie.IDLE:
 			continue
-		var source_name: StringName = BABY_CLIPS[name][0]
-		# The spawn clip sets the hip to 5% scale. Other clips need their
-		# authored constant hip keys to restore the full-size pose afterward.
-		var imported := _import_gltf(_clip_path(directory, source_name),
-			GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS, false)
-		if imported == null:
-			return false
-		var source_player := imported.get_node_or_null("AnimationPlayer") as AnimationPlayer
-		var clip := source_player.get_animation(source_name) if source_player != null and source_player.has_animation(source_name) else null
-		imported.free()
+		var path := _clip_path(directory, BABY_CLIPS[name][0])
+		var clip: Animation = _baby_prepared_clips.get(path)
+		if clip == null:
+			clip = _load_baby_clip(path, name)
 		if clip == null:
 			return false
 		if name in Zombie.WALK_CLIPS:
 			clip.loop_mode = Animation.LOOP_LINEAR
 		library.add_animation(name, clip)
 	return true
+
+func _load_baby_clip(path: String, name: StringName) -> Animation:
+	var source: Array = BABY_CLIPS[name]
+	if not _verified(path, source[1]):
+		return null
+	# Keep constant hip keys so clips can restore the full-size pose after spawn.
+	var imported := _import_gltf(path, GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS, false)
+	if imported == null:
+		return null
+	var source_player := imported.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	var clip := source_player.get_animation(source[0]) if source_player != null and source_player.has_animation(source[0]) else null
+	imported.free()
+	return clip
 
 func _fit_baby_ragdoll(skeleton: Skeleton3D) -> Dictionary:
 	var offsets := {}
