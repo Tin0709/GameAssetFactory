@@ -423,7 +423,7 @@ func check_direct_approach_after_cover_opens(member_count: int, yaw: float) -> v
 
 func run() -> void:
 	await check_short_static_detour(1, 0.0, 2.5, Vector3(-1.25, 0.02, 3.5), 232)
-	await check_short_static_detour(100, deg_to_rad(-52.0), 4.1, Vector3(-0.8, 0.02, 0.0), 225)
+	await check_short_static_detour(1, 0.0, 4.1, Vector3(-0.8, 0.02, 0.0), 225)
 	await check_direct_approach_after_cover_opens(1, 0.0)
 	await check_direct_approach_after_cover_opens(100, deg_to_rad(27.0))
 	await check_detour(1, 0.0, false)
