@@ -64,6 +64,44 @@ func check_brief_occlusion(lab: Node3D, chaser: ZOMBIE, heading: Basis) -> void:
 		" advance_m=", advance, " cached=", chaser._last_seen_position)
 	screen.free()
 
+func check_sight_after_crowd_dies() -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var group := spawn_detour_group(lab, ZOMBIE.CROWD_RETRY_MIN_ZOMBIES)
+	if group == null:
+		lab.free()
+		return
+	var chaser := group.get_child(0) as ZOMBIE
+	chaser.set_physics_process(false)
+	chaser.position = Vector3(0.0, 0.02, -4.0)
+	chaser.animation.play(ZOMBIE.IDLE, 0.0)
+	chaser.animation.advance(0.0)
+	await physics_frame
+	var stride := roundi(Engine.physics_ticks_per_second / ZOMBIE.LAB_CROWD_SIGHT_HZ)
+	while Engine.get_physics_frames() % stride == chaser._crowd_slot % stride:
+		await physics_frame
+
+	var known: Vector3 = lab.player.global_position
+	chaser._target_aggressive = true
+	chaser._target_visible = true
+	chaser._last_seen_position = known
+	lab.player.global_position += Vector3.RIGHT * 0.4
+	chaser._physics_process(1.0 / Engine.physics_ticks_per_second)
+	if chaser._last_seen_position != known:
+		failures.append("A living crowd still uses its staggered sight schedule")
+
+	for i in range(1, group.get_child_count()):
+		var member := group.get_child(i) as ZOMBIE
+		member.take_hit(member.health, Vector3.RIGHT)
+	chaser._physics_process(1.0 / Engine.physics_ticks_per_second)
+	if chaser._last_seen_position != lab.player.global_position:
+		failures.append("Retained corpses do not delay the last living zombie's sight check")
+	print("LAB_CROWD_AFTER_DEATH children=", group.get_child_count(),
+		" immediate=", chaser._last_seen_position == lab.player.global_position)
+	lab.free()
+
 func check_detour(member_count: int, yaw: float, block_right: bool,
 		block_with_zombie := false, brief_occlusion := false, frozen_wall := false) -> void:
 	var lab := LAB.instantiate()
@@ -365,6 +403,7 @@ func run() -> void:
 	await check_floor_edge_pursuit(100, deg_to_rad(27.0), true)
 	await check_active_crowd_at_floor_edge()
 	await check_paired_blocker_release()
+	await check_sight_after_crowd_dies()
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 
