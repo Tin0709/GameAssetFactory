@@ -30,6 +30,8 @@ const REBOUND_SLIDE_MAX_NORMAL_FRACTION := 0.65
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
+const BABY_FLOOR_ANCHOR_GAP := 0.08
+const BABY_FLOOR_ANCHOR_CLEARANCE := 0.02
 
 var _handoff_query_snapshot: Dictionary[PhysicalBone3D, PhysicsShapeQueryParameters3D]
 var _sample_names: Array[String]
@@ -43,6 +45,7 @@ var _launch_frame := -1
 var _tuned_wall_poses: Dictionary[String, Vector3]
 var use_tuned_wall_sweep := false
 var use_tuned_floor_support := false
+var use_baby_floor_anchors := false
 var wall_handoff_animation: AnimationPlayer
 var wall_handoff_idle: StringName
 var wall_handoff_idle_pose: Array[Transform3D]
@@ -753,12 +756,16 @@ func _resolve_floor_anchor_lifts(lifts: Dictionary[PhysicalBone3D, float], depth
 	_distribute_floor_lift(lifts, depths, shared_lift, slop, local_lift, EARLY_ROLL_ANCHOR_LIMIT)
 
 
-func _floor_roll_nears_obstacle(floor: RID) -> bool:
+func _floor_roll_nears_obstacle(floor: RID, include_contacts := false) -> bool:
 	# Preserve the incoming pose of a roll that is about to contact a wall.
 	for part in _physical_parts:
 		var state := PhysicsServer3D.body_get_direct_state(part.rid)
 		if state == null:
 			continue
+		if include_contacts:
+			for index in state.get_contact_count():
+				if state.get_contact_collider(index) != floor:
+					return true
 		var travel := state.linear_velocity.slide(Vector3.UP) * EARLY_FLOOR_WALL_LOOKAHEAD
 		if _test_projection_motion(part.body, state.transform, travel, floor):
 			return true
@@ -863,6 +870,58 @@ func _recover_early_floor_arm_gap() -> void:
 					continue
 			_slide_supported_anchor(arm, state, gap, gap.length(), floor_body.get_rid())
 
+func _recover_baby_floor_anchors() -> void:
+	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return
+	var floor_body := _flat_floor.get_parent() as StaticBody3D
+	var floor_box := _flat_floor.shape as BoxShape3D
+	var floor_pose := _flat_floor.global_transform
+	if floor_body == null or floor_box == null or not floor_pose.basis.y.is_equal_approx(Vector3.UP) \
+			or not floor_pose.basis.get_scale().is_equal_approx(Vector3.ONE):
+		return
+	var floor_inverse := floor_pose.affine_inverse()
+	var floor_half := floor_box.size * 0.5
+	var floor_rid := floor_body.get_rid()
+	var chest: PhysicalBone3D = bodies.Chest
+	var parent := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if parent == null:
+		return
+	var checked_obstacles := false
+	for joint in _source_anchor_projections:
+		var state := PhysicsServer3D.body_get_direct_state(joint.rid)
+		if state == null:
+			continue
+		var gap := (parent.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
+		var distance := gap.length()
+		if distance <= BABY_FLOOR_ANCHOR_GAP:
+			continue
+		var local := floor_inverse * state.transform
+		var extent := Basis(local.basis.x.abs(), local.basis.y.abs(), local.basis.z.abs()) * joint.half_size
+		var clearance := local.origin.y - extent.y - floor_half.y
+		if clearance > BABY_FLOOR_ANCHOR_CLEARANCE and not _body_supported_by(joint.body, floor_body):
+			continue
+		if local.origin.y + extent.y < floor_half.y:
+			continue
+		# Resolve the gap while the floor is carrying this limb. Bound the
+		# correction by the travel the two pieces can cover in one solver step.
+		var motion := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
+		motion.y = maxf(motion.y, -maxf(clearance + FLOOR_REST_SLOP, 0.0))
+		var speed_sum := float(chest.get("maximum_linear_speed")) + float(joint.body.get("maximum_linear_speed"))
+		motion = motion.limit_length(speed_sum * state.step)
+		var end := local.origin + floor_inverse.basis * motion
+		if maxf(absf(end.x), absf(local.origin.x)) + extent.x > floor_half.x \
+				or maxf(absf(end.z), absf(local.origin.z)) + extent.z > floor_half.z:
+			continue
+		if not checked_obstacles:
+			if _floor_roll_nears_obstacle(floor_rid, true):
+				use_baby_floor_anchors = false
+				return
+			checked_obstacles = true
+		if _test_projection_motion(joint.body, state.transform, motion, floor_rid):
+			motion *= _projection_hit.get_collision_safe_fraction()
+		if not motion.is_zero_approx():
+			state.transform = state.transform.translated(motion)
+
 func _project_source_anchors() -> void:
 	var lab_floor := not floor_landing_blended and is_instance_valid(_flat_floor) and not _flat_floor.disabled
 	var sabre_floor := _limit_first_contact_stretch and lab_floor
@@ -874,6 +933,8 @@ func _project_source_anchors() -> void:
 	if sabre_flight:
 		_recover_leading_head_wall_overlap()
 	super._project_source_anchors()
+	if use_baby_floor_anchors:
+		_recover_baby_floor_anchors()
 	if first_wall_window:
 		_slide_wall_shoulder_anchors()
 	elif lab_floor and floor_impact_blend <= 0.0:
