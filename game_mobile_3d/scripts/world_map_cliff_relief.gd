@@ -41,14 +41,15 @@ func build_relief(world: Node3D, reach: int, tree_sites: PackedVector2Array) -> 
 			var broad := noise.get_noise_2d(point.x * .60, point.y * .60)
 			var detail := noise.get_noise_2d(point.x, point.y)
 			var climb := smoothstep(4., 43., outside)
-			var elevation := roundi(rise_y + (.5 + climb) * (broad * 6.8 + detail * 2.3) + 12.4 * climb)
+			var elevation := clampi(roundi(rise_y + (.5 + climb) * (broad * 6.8 + detail * 2.3) + 12.4 * climb),
+				lower_y - 1, lower_y + 23)
 			# The overlap under the existing crest is below the source map's bottom surfaces.
 			if outside <= 8.:
 				elevation = mini(elevation, lower_y)
 				if point.x >= high.x - 5.:
 					# Pass below the east foothills where the two background layers meet.
 					elevation = mini(elevation, lower_y - 4)
-			heights[Vector2i(x,z)] = clampi(elevation, lower_y - 4, lower_y + 23)
+			heights[Vector2i(x,z)] = elevation
 	var grove := _make_grove(trees.mesh, tree_sites, heights)
 	if grove == null or heights.is_empty():
 		return false
