@@ -224,7 +224,7 @@ func check_active_crowd_at_floor_edge() -> void:
 	lab.player.position = Vector3(45.9, 0.02, 0.0)
 	for i in 240:
 		await physics_frame
-	var damage := 10000 - lab.player_health
+	var damage: int = 10000 - lab.player_health
 	if zombies.get_child_count() != 100 or damage <= 0 or damage % ZOMBIE.MELEE_DAMAGE != 0:
 		failures.append("All 100 zombies should remain and resume normal attacks after the player returns")
 	print("LAB_EDGE_CROWD supported=", supported, " alive=", zombies.get_child_count(), " damage=", damage)
