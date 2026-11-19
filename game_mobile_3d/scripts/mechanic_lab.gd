@@ -877,6 +877,9 @@ func _set_render_scale(index: int) -> void:
 		viewport.scaling_3d_scale = _previous_3d_scale
 
 func _exit_tree() -> void:
+	# Drop the tool override before Forward Mobile tears down the mount's dependencies.
+	if is_instance_valid(_weapon_mesh) and _weapon_mesh.material_override != null:
+		_weapon_mesh.material_override = null
 	var viewport := get_viewport()
 	viewport.msaa_3d = _previous_msaa
 	if _render_scale_overridden:
