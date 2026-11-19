@@ -5,6 +5,7 @@ signal sabre_contact(point: Vector3, direction: Vector3, clip: String, index: in
 signal sabre_landing(point: Vector3, serial: int)
 signal player_hit(amount: int)
 signal zombie_attack_audio(point: Vector3, contact: bool)
+signal zombie_reaction_audio(point: Vector3, lethal: bool, baby: bool)
 signal zombie_step_audio(point: Vector3, actor: CharacterBody3D)
 signal zombie_idle_audio(point: Vector3)
 
@@ -501,7 +502,9 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	var stagger := float(strike.stagger) * float(strike.get("splash_stagger", 0.0)) if splash else float(strike.stagger)
 	zombie.take_hit(damage, direction, impulse, stagger,
 		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)))
-	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
+	var lethal := zombie.health <= 0
+	sabre_contact.emit(point, direction, clip, index, serial, lethal)
+	zombie_reaction_audio.emit(point, lethal, zombie.is_baby)
 
 func _private_research_root() -> String:
 	if not OS.has_feature("editor"):

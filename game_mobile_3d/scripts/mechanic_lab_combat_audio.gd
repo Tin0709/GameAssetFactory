@@ -261,6 +261,7 @@ const MAULER_DIVE_HASHES := [
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
 const SURFACE_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttackDebris/sfx_HJA_impact debris_%s_%02d.ogg"
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
+const BABY_REACTION := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%s-%03d_soundWave.ogg"
 # The exported waveforms matching the Zombie event names sit under BabyZombie.
 const ZOMBIE_ATTACK := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%sAttack-%03d_soundWave.ogg"
 # Zombie.Step names the adult event. The exported generic candidate is under BabyZombie.
@@ -333,6 +334,15 @@ const DEATH_HASHES := [
 	"fe805a6d33650af6613dd4b837b88a6e0caa659192cf53af6dadd0b5d0f6dfad",
 	"5c1aa88a0ba5306620d56247eb5a4a3fe7978fe233bf7ae9e5541f1670b20ef8",
 	"f5350c3cc4af912ea411d5c5d921bf63a635f9686240669029d80cf2d6e74b52",
+]
+const BABY_HURT_HASHES := [
+	"88bacea29d9cdd5ed5edfe75fa260b8f49a7d5b3adf98f488173848784647f10",
+	"c67b02cd19dfdc1a83f8cd3d295ce28a74ac7a63010628880ffd017655207e23",
+]
+const BABY_DEATH_HASHES := [
+	"4f37c8fbfa63b116cc7afe6930ba1d403a54cf32bb19e04db4a4815ae2628deb",
+	"0396d7f66dd11827ac94b1384b9a8ecf55127d9072363ec259ad01f8bb32e1e4",
+	"578017fb1cc8213e1b15f39f8208a6c947fa705bb8e603c242c5091e6377ee72",
 ]
 const LANDING_HASHES := [
 	"ef64187aa4ff1b50d32fcfe617d04b3bde4ac7f8e045bbb687895ea60e3b81ab",
@@ -467,6 +477,10 @@ func _exit_tree() -> void:
 	_restore_master()
 
 func contact(point: Vector3, serial: int, lethal: bool, clip := "", tool := &"") -> void:
+	weapon_contact(point, serial, clip, tool)
+	zombie_reaction(point, lethal)
+
+func weapon_contact(point: Vector3, serial: int, clip := "", tool := &"") -> void:
 	if not enabled:
 		return
 	# Projectiles and the gauntlet slam play their impact at the collision itself.
@@ -480,7 +494,13 @@ func contact(point: Vector3, serial: int, lethal: bool, clip := "", tool := &"")
 		elif clip.begins_with("NativeGauntlet"):
 			group = &"gauntlet_hit"
 		_play(group, point, HIT_GAIN_DB, -1, true)
+
+func zombie_reaction(point: Vector3, lethal: bool, baby := false) -> void:
+	if not enabled:
+		return
 	var reaction := &"death" if lethal else &"hurt"
+	if baby:
+		reaction = &"baby_death" if lethal else &"baby_hurt"
 	if not is_instance_valid(zombie_listener):
 		_play(reaction, point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
 	else:
@@ -675,19 +695,19 @@ func _queue_zombie_cue(group: StringName, point: Vector3, pending: Array[Diction
 	while index > 0 and distance < float(pending[index - 1].distance):
 		index -= 1
 	if index < VOICES_PER_POOL:
-		pending.insert(index, {"point": point, "distance": distance})
+		pending.insert(index, {"point": point, "distance": distance, "group": group})
 		if pending.size() > VOICES_PER_POOL:
 			pending.pop_back()
 
 func flush_zombie_combat_cues() -> void:
-	_play_zombie_cues(_attack_contacts, &"zombie_hit", ZOMBIE_HIT_GAIN_DB)
-	_play_zombie_cues(_attack_windups, &"zombie_windup", ZOMBIE_WINDUP_GAIN_DB)
-	_play_zombie_cues(_reaction_deaths, &"death", DEATH_GAIN_DB)
-	_play_zombie_cues(_reaction_hurts, &"hurt", HURT_GAIN_DB)
+	_play_zombie_cues(_attack_contacts, ZOMBIE_HIT_GAIN_DB)
+	_play_zombie_cues(_attack_windups, ZOMBIE_WINDUP_GAIN_DB)
+	_play_zombie_cues(_reaction_deaths, DEATH_GAIN_DB)
+	_play_zombie_cues(_reaction_hurts, HURT_GAIN_DB)
 
-func _play_zombie_cues(pending: Array[Dictionary], group: StringName, gain: float) -> void:
+func _play_zombie_cues(pending: Array[Dictionary], gain: float) -> void:
 	for cue: Dictionary in pending:
-		_play(group, cue.point, gain)
+		_play(cue.group, cue.point, gain)
 	pending.clear()
 
 func queue_zombie_idle(point: Vector3) -> void:
@@ -809,6 +829,8 @@ func _queue_base_samples() -> void:
 	_queue_series(root, &"zombie_step", ZOMBIE_STEP, ZOMBIE_STEP_HASHES)
 	if is_instance_valid(zombie_listener):
 		_queue_series(root, &"zombie_idle", ZOMBIE_IDLE, ZOMBIE_IDLE_HASHES)
+		_queue_series(root, &"baby_hurt", BABY_REACTION.replace("%s", "Hurt"), BABY_HURT_HASHES)
+		_queue_series(root, &"baby_death", BABY_REACTION.replace("%s", "Death"), BABY_DEATH_HASHES)
 
 func _queue_series(root: String, group: StringName, pattern: String, hashes: Array) -> void:
 	for index in hashes.size():
@@ -897,7 +919,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 	# Separate enemy attack and reaction budgets keep the weapon tails audible.
 	var pool := WEAPON_POOL
 	match group:
-		&"hurt", &"death":
+		&"hurt", &"death", &"baby_hurt", &"baby_death":
 			pool = REACTION_POOL
 		&"zombie_windup", &"zombie_hit":
 			pool = ATTACK_POOL
@@ -920,7 +942,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 	if slot == -1:
 		match pool:
 			REACTION_POOL:
-				slot = _replace_priority_slot(first, start, &"death", group, frame, point)
+				slot = _replace_priority_slot(first, start, &"death", group, frame, point, &"baby_death")
 			ATTACK_POOL:
 				slot = _replace_priority_slot(first, start, &"zombie_hit", group, frame, point)
 			WEAPON_POOL:
@@ -964,11 +986,12 @@ func _replace_weapon_slot(start: int, onset: bool, frame: int) -> int:
 	return older_slot
 
 func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName,
-		frame: int, point: Vector3) -> int:
+		frame: int, point: Vector3, secondary_priority := &"") -> int:
 	# Each render flush submits the nearest cues first. Protect a nearby
 	# voice from later frames while the mixer starts its sample.
 	var priority_streams: Array = _groups.get(priority_group, [])
-	var priority := group == priority_group
+	var secondary_streams: Array = _groups.get(secondary_priority, [])
+	var priority := group == priority_group or group == secondary_priority
 	var compare_onsets := is_instance_valid(zombie_listener)
 	var listener := zombie_listener.global_position if compare_onsets else Vector3.ZERO
 	var onset_ticks := ceili(ZOMBIE_ONSET_SECONDS * Engine.physics_ticks_per_second)
@@ -979,7 +1002,7 @@ func _replace_priority_slot(first: int, start: int, priority_group: StringName, 
 		var slot := (start + offset) % VOICES_PER_POOL
 		var voice_index := first + slot
 		var voice := _voices[voice_index]
-		var playing_priority := voice.stream in priority_streams
+		var playing_priority := voice.stream in priority_streams or voice.stream in secondary_streams
 		if priority and not playing_priority:
 			return slot
 		var age := frame - _started_frames[voice_index]

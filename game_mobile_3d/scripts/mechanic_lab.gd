@@ -314,6 +314,7 @@ func _ready() -> void:
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
 		$Zombies.zombie_attack_audio.connect(_combat_audio.zombie_attack)
+		$Zombies.zombie_reaction_audio.connect(_combat_audio.zombie_reaction)
 		$Zombies.zombie_step_audio.connect(_on_zombie_step)
 		$Zombies.zombie_idle_audio.connect(_combat_audio.queue_zombie_idle)
 		_setup_weapon_selector()
@@ -1055,7 +1056,7 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 		else:
 			player.effects.contact(point, direction)
 	var tool_hit: StringName = MELEE_AUDIO_NAMES.get(_equipped_weapon, &"") if clip != Bow.ACTION and clip != CrossPollinator.SHOT else &""
-	_combat_audio.contact(point, serial, lethal, clip, tool_hit)
+	_combat_audio.weapon_contact(point, serial, clip, tool_hit)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3",
 		"NativeCleaverAttack3", "NativeAxeAttack3"]
 	if clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
