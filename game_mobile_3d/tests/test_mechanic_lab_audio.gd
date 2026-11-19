@@ -699,7 +699,7 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 		voice.bus = AudioServer.get_bus_name(bus)
 	for i in 20:
 		await physics_frame
-	var hit_choice: int = audio._next_choice[&"hit"]
+	var hit_choice: int = audio._next_choice.get(&"hit", 0)
 	var forward: Vector3 = lab.player.visual.global_basis.z
 	var centre: Vector3 = lab.player.global_position + forward * 1.5
 	var right := Vector3.UP.cross(forward)
