@@ -500,6 +500,8 @@ func _select_weapon(index: int) -> void:
 	var curved_equipped := index == Weapon.CURVED_GREATSWORD
 	var crossbow_equipped := index == Weapon.CROSS_POLLINATOR
 	var switch_point := player.global_position + Vector3.UP
+	if _combat_audio.enabled and MELEE_AUDIO_NAMES.has(index):
+		_combat_audio.load_melee_tool(_private_research_root(), MELEE_AUDIO_NAMES[index])
 	_combat_audio.melee_switched(MELEE_EQUIPMENT_NAMES.get(previous, &""), false, switch_point)
 	if crossbow_equipped != was_crossbow:
 		_combat_audio.crossbow_switched(crossbow_equipped, switch_point)
@@ -718,7 +720,7 @@ func _load_gauntlets(root: String, basic := false) -> bool:
 		_left_gauntlet = _mount_gauntlet(mesh, true)
 		_right_gauntlet = _mount_gauntlet(mesh, false)
 		_gauntlet_profile = profile
-	_combat_audio.load_gauntlets(root, basic)
+		_combat_audio.load_gauntlets(root)
 	return true
 
 func _mount_gauntlet(mesh: Mesh, left: bool, basic := false) -> MeshInstance3D:
@@ -747,7 +749,6 @@ func _load_tool(index: int, root: String) -> bool:
 	if index == Weapon.SHOVEL and locomotion.is_empty():
 		return false
 	_tools[index] = {"mesh": mesh, "profile": profile, "locomotion": locomotion}
-	_combat_audio.load_melee_tool(root, MELEE_AUDIO_NAMES[index])
 	return true
 
 func _load_bow(root: String) -> bool:

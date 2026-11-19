@@ -410,6 +410,7 @@ var curved_equipped := false
 var gauntlets_equipped := false
 var zombie_listener: AudioListener3D
 var _groups: Dictionary[StringName, Array] = {}
+var _loaded_melee_tools: Dictionary[StringName, bool] = {}
 var _base_sample_jobs: Array[Callable] = []
 var _base_samples_queued := false
 var _voices: Array[AudioStreamPlayer3D] = []
@@ -450,6 +451,8 @@ func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"") -> void
 		return
 	if _voices.is_empty():
 		_load_audio()
+	if not melee_tool.is_empty():
+		load_melee_tool(_research_root(), melee_tool)
 	# The project starts with Master muted for quiet tests.
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
@@ -529,10 +532,7 @@ func load_crossbow(root: String) -> void:
 	for i in CROSSBOW_FLIGHT_HASHES.size():
 		_load_sample(root, &"crossbow_flight", CROSSBOW + ("arrow_whoosh_%02d.ogg" % (i + 1)), CROSSBOW_FLIGHT_HASHES[i])
 
-func load_gauntlets(root: String, basic := false) -> void:
-	if basic:
-		load_melee_tool(root, &"gauntlet")
-		return
+func load_gauntlets(root: String) -> void:
 	var weights := ["light", "medium", "heavy"]
 	for i in weights.size():
 		var weight: String = weights[i]
@@ -550,6 +550,9 @@ func load_gauntlets(root: String, basic := false) -> void:
 		_load_sample(root, &"mauler_dive", MAULER_DIVE % (i + 1), MAULER_DIVE_HASHES[i])
 
 func load_melee_tool(root: String, tool: StringName) -> void:
+	if root.is_empty() or not TOOL_SAMPLES.has(tool) or _loaded_melee_tools.has(tool):
+		return
+	_loaded_melee_tools[tool] = true
 	var samples: Array = TOOL_SAMPLES[tool]
 	for slot in samples.size():
 		var sample: Array = samples[slot]
