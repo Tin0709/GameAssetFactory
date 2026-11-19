@@ -1249,6 +1249,7 @@ func check_melee_tool_variants(audio: Node3D, bus: int, capture: AudioEffectCapt
 		&"gauntlet": [4, 3, 3, 3, 3, 3],
 		&"pickaxe": [3, 3, 3, 3, 3, 3],
 		&"shovel": [1, 3, 3, 1, 1, 3],
+		&"axe": [1, 1, 1, 3, 3, 0],
 	}
 	for tool: StringName in counts:
 		audio.reset()
