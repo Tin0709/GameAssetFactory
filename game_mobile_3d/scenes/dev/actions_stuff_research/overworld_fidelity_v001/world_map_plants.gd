@@ -183,8 +183,8 @@ func _build_dense_planting()->void:
 			transform.basis = Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale_factor)
 			forest_cover_counts[asset] = int(forest_cover_counts.get(asset, 0)) + 1
 		var bounds:AABB=transform*bundle.meshes[asset].get_aabb()
-		var bucket := 50. if cover >= 0 else TILE
-		var key:=asset+"/"+str(Vector2i(floori(position.x/bucket),floori(position.z/bucket)))
+		# Sparse cover grass uses one batch per species. The dense carpet stays tiled.
+		var key := asset if cover >= 0 else asset + "/" + str(Vector2i(floori(position.x / TILE), floori(position.z / TILE)))
 		if not _groups.has(key):_groups[key]={"asset":asset,"transforms":[],"custom":[]}
 		_groups[key].transforms.append(transform);_groups[key].custom.append(Color(phase,cell.x+.5,cell.y+.5,scale_factor))
 		placements.append({"cell":cell,"root":position,"asset":asset,"bounds":bounds,"flower":"","carpet":true,

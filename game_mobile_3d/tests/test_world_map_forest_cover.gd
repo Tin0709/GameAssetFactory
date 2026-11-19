@@ -17,6 +17,7 @@ func run() -> void:
 	var plants = world.showcase.plants
 	check(plants != null and plants.has_method("set_forest_cover"), "F5 Forest can toggle the extra source plants")
 	if plants != null and plants.has_method("set_forest_cover"):
+		var batches: int = plants.batch_count
 		var by_asset := {}
 		var occupied := {}
 		var quadrants := {}
@@ -44,6 +45,7 @@ func run() -> void:
 					"Every ForestA1 species uses the shared grass lighting pipeline")
 		plants.set_forest_cover(false)
 		check(plants.placements.size() == occupied.size(), "Disabling replaces the variants with regular dense grass")
+		check(batches <= plants.batch_count + by_asset.size(), "Sparse additions use one batch per species")
 		for row: Dictionary in plants.placements:
 			if saved.has(row.cell):
 				var before: Dictionary = saved[row.cell]
