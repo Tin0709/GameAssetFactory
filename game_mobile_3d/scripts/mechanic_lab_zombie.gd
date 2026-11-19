@@ -736,11 +736,14 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 			if sample_ai:
 				var space := get_world_3d().direct_space_state
 				_prepare_lab_path_sweep(_chase_detour_around_zombie)
+				# Chase stops at the approach margin, even if the target's center
+				# has no room for this zombie's capsule.
+				var approach := offset.move_toward(Vector3.ZERO, stop_distance)
 				if _chase_detour_around_zombie:
 					# A crowded destination often rejects the route before the sweep.
-					direct_clear = _lab_path_end_clear(space, offset) and _lab_path_fraction(space, offset) >= 1.0
+					direct_clear = _lab_path_end_clear(space, approach) and _lab_path_fraction(space, approach) >= 1.0
 				else:
-					direct_clear = _lab_path_fraction(space, offset) >= 1.0 and _lab_path_end_clear(space, offset)
+					direct_clear = _lab_path_fraction(space, approach) >= 1.0 and _lab_path_end_clear(space, approach)
 			if not direct_clear:
 				return travel * (minf(_chase_speed, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
 		_clear_chase_detour()
