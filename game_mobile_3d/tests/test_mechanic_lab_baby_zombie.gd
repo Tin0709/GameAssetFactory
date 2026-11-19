@@ -17,7 +17,7 @@ func run() -> void:
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
-	var group := lab.get_node("Zombies")
+	var group: Node = lab.get_node("Zombies")
 	var button := lab.get_node_or_null("HUD/SpawnBabyZombie") as Button
 	check(button != null and not button.disabled, "The Lab offers a separate Baby Zombie button")
 	if button == null or button.disabled:
@@ -76,12 +76,11 @@ func run() -> void:
 	var peak_gap := 0.0
 	for i in 220:
 		await physics_frame
-		if baby._corpse_parked or not baby.ragdoll.running:
-			if baby._corpse_parked:
-				break
-			continue
-		landed = landed or baby._corpse_landed
-		peak_gap = maxf(peak_gap, baby.ragdoll.max_anchor_error())
+		if baby._corpse_parked:
+			break
+		if baby.ragdoll.running:
+			landed = landed or baby._corpse_landed
+			peak_gap = maxf(peak_gap, baby.ragdoll.max_anchor_error())
 	check(landed and baby._corpse_parked and baby.ragdoll.bodies.is_empty() and peak_gap < 0.18,
 		"The baby lands with the full rig connected and releases the simulation at rest")
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
