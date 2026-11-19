@@ -5,7 +5,7 @@ const WALK_SOURCES := [
 	"Player_Master_Walk", "Player_Master_Walk", "Player_2H_Medium_Walk",
 	"Player_Crossbow_Walk", "Player_Master_Walk",
 ]
-const NEW_WEAPON_NAMES := ["Meat Cleaver", "Bow", "Gauntlets", "Pickaxe", "Shovel"]
+const NEW_WEAPON_NAMES := ["Meat Cleaver", "Bow", "Gauntlets", "Pickaxe", "Shovel", "Axe"]
 
 var failures := 0
 var contacts: Array[String] = []
@@ -40,7 +40,8 @@ func equip(menu: OptionButton, index: int) -> void:
 func check_new_weapons(lab: Node3D, menu: OptionButton, target: Node3D) -> void:
 	var weapon_mesh := lab._weapon_mesh as MeshInstance3D
 	for sample: Array in [[5, 13, "NativeCleaverAttack1", 20, 0.0], [7, 9, "NativeGauntletAttack1", 22, 1.25],
-			[8, 16, "NativePickaxeAttack1", 28, 1.5], [9, 15, "NativeShovelAttack1", 30, 0.25]]:
+			[8, 16, "NativePickaxeAttack1", 28, 1.5], [9, 15, "NativeShovelAttack1", 30, 0.25],
+			[10, 14, "NativeAxeAttack1", 21, 1.6]]:
 		var index: int = sample[0]
 		equip(menu, index)
 		await ticks(10)
@@ -113,8 +114,8 @@ func run() -> void:
 	await ticks(12)
 	var menu := lab.get_node("HUD/Weapon") as OptionButton
 	var original_air: Dictionary = lab.player.clips.AirAttack
-	check(not menu.disabled and menu.item_count == 10, "All ten weapons appear in the live selector")
-	if menu.item_count != 10:
+	check(not menu.disabled and menu.item_count == 11, "All eleven weapons appear in the live selector")
+	if menu.item_count != 11:
 		quit(1)
 		return
 	check(menu.get_item_text(3) == "The Cross Pollinator", "The Cross Pollinator is named correctly")
@@ -1009,7 +1010,7 @@ func check_melee_equip_audio(lab: Node3D, menu: OptionButton) -> void:
 	sound.button_pressed = true
 	var fixtures := [[1, &"sword", 1, 1], [2, &"curved_greatsword", 1, 1],
 		[4, &"prime_gauntlet", 3, 4], [5, &"cleaver", 1, 1],
-		[7, &"gauntlet", 0, 1], [8, &"pickaxe", 3, 3], [9, &"shovel", 1, 1]]
+		[7, &"gauntlet", 0, 1], [8, &"pickaxe", 3, 3], [9, &"shovel", 1, 1], [10, &"axe", 1, 1]]
 	for spec: Array in fixtures:
 		var tool: StringName = spec[1]
 		equip(menu, spec[0])
