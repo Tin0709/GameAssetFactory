@@ -1,6 +1,6 @@
 extends SceneTree
 
-enum CornerBevel { NONE, SUPPORT, PINCHED_ARM }
+enum CornerBevel { NONE, SUPPORT, PINCHED_ARM, PINCHED_ARM_FROZEN_WALL }
 
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const MeleeTools := preload("res://scripts/mechanic_lab_melee_tools.gd")
@@ -19,8 +19,14 @@ func ticks(count: int) -> void:
 	for i in count:
 		await physics_frame
 
-func terrain(lab: Node3D, at: Vector3, size: Vector3, angle: float) -> StaticBody3D:
-	var body := StaticBody3D.new()
+func terrain(lab: Node3D, at: Vector3, size: Vector3, angle: float, frozen := false) -> PhysicsBody3D:
+	var body: PhysicsBody3D
+	if frozen:
+		var blocker := RigidBody3D.new()
+		blocker.freeze = true
+		body = blocker
+	else:
+		body = StaticBody3D.new()
 	var collision := CollisionShape3D.new()
 	var box := BoxShape3D.new()
 	box.size = size
@@ -388,7 +394,8 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 	root.add_child(lab)
 	current_scene = lab
 	var first_wall := terrain(lab, Vector3(4.5, 1.5, -1.85), Vector3(0.30, 3.0, 12.4), 0.0)
-	var second_wall := terrain(lab, Vector3(-1.70, 1.5, 4.5), Vector3(12.7, 3.0, 0.30), 0.0)
+	var second_wall := terrain(lab, Vector3(-1.70, 1.5, 4.5), Vector3(12.7, 3.0, 0.30), 0.0,
+		bevel == CornerBevel.PINCHED_ARM_FROZEN_WALL)
 	if shared_wall:
 		second_wall.get_child(0).reparent(first_wall)
 		second_wall.free()
@@ -470,7 +477,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		check(corner_samples > 0 and missed_corner_samples == 0,
 			"The bevel leaves both supporting wall faces visible to the corner check")
 		print("LAB_BEVELED_CORNER samples=", corner_samples, " missed=", missed_corner_samples)
-	elif bevel == CornerBevel.PINCHED_ARM:
+	elif bevel in [CornerBevel.PINCHED_ARM, CornerBevel.PINCHED_ARM_FROZEN_WALL]:
 		check(used_handoff, "The pinched right arm is corrected before the first ragdoll step")
 	if should_settle and zombie._corpse_parked:
 		var pose_matches := last_simulated.size() == skeleton.get_bone_count()
@@ -522,6 +529,8 @@ func run() -> void:
 		1150.0, true, CornerBevel.SUPPORT)
 	await check_corner_ragdoll(141, 2.0, true, -1.0, 0.18, Zombie.DeathStrike.SABRE_FINISHER,
 		1150.0, true, CornerBevel.PINCHED_ARM)
+	await check_corner_ragdoll(141, 2.0, true, -1.0, 0.18, Zombie.DeathStrike.SABRE_FINISHER,
+		1150.0, false, CornerBevel.PINCHED_ARM_FROZEN_WALL)
 	for seed: int in [5, 13, 36, 43]:
 		await check_corner_ragdoll(seed, 0.40, false, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
 			1150.0, true, CornerBevel.NONE, Vector2(10.0, 10.0))
