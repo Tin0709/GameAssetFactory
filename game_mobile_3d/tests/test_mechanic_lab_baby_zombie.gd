@@ -260,7 +260,7 @@ func check_first_wall_neck_contact(frozen := false) -> void:
 		for part: PhysicalBone3D in baby.ragdoll.bodies.values():
 			crossed = crossed or part.global_position.x > 4.655
 	check(peak > 0.0 and peak < 0.20 and baby._corpse_parked and not crossed,
-		"At 1000% launch and gravity the Baby Zombie keeps its neck connected against a %s wall" %
+		"At 1000%% launch and gravity the Baby Zombie keeps its neck connected against a %s wall" %
 		("frozen" if frozen else "static"))
 	print("LAB_BABY_FIRST_WALL frozen=", frozen, " gap=", peak, " crossed=", crossed, " parked=", baby._corpse_parked)
 	lab.free()
