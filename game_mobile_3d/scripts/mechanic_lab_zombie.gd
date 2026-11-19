@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 signal melee_hit(amount: int)
+signal living_changed(alive: bool)
 signal step_audio(point: Vector3)
 signal idle_audio(point: Vector3)
 signal swing_audio(point: Vector3)
@@ -180,7 +181,13 @@ var target: CharacterBody3D
 var animation: AnimationPlayer
 var ragdoll: Ragdoll
 var max_health := TRAINING_HEALTH
-var health := TRAINING_HEALTH
+var health := TRAINING_HEALTH:
+	set(value):
+		var was_alive := health > 0
+		health = value
+		var alive := health > 0
+		if alive != was_alive:
+			living_changed.emit(alive)
 var is_baby := false
 var _body_height := HEIGHT
 var _chase_speed := CHASE_SPEED
@@ -463,7 +470,7 @@ func _physics_process(delta: float) -> void:
 	_poise = minf(_max_poise, _poise + POISE_RECOVERY_PER_SECOND * recovery_time)
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 	var in_lab := is_instance_valid(_corpse_floor)
-	var crowd := in_lab and get_parent().get_child_count() >= CROWD_RETRY_MIN_ZOMBIES
+	var crowd: bool = in_lab and get_parent().has_living_crowd
 	var sample_ai := true
 	if crowd:
 		var stride := maxi(1, roundi(Engine.physics_ticks_per_second / LAB_CROWD_SIGHT_HZ))
@@ -830,7 +837,7 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 				or obstacle == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
 			continue
 		var space := get_world_3d().direct_space_state
-		var packed_blocker := living_blocker and get_parent().get_child_count() >= CROWD_RETRY_MIN_ZOMBIES
+		var packed_blocker: bool = living_blocker and get_parent().has_living_crowd
 		_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, packed_blocker)
 		if not _chase_detour.is_finite() and not _target_visible and not living_blocker:
 			# The remembered route can reach farther with a faster chaser.

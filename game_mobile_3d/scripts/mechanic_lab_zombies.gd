@@ -152,6 +152,28 @@ var _aim_serial := -1
 var _aim_target: Zombie
 var _attacker: CharacterBody3D
 var _attacker_visual: Node3D
+var _living_count := 0
+var has_living_crowd := false
+
+func _init() -> void:
+	child_entered_tree.connect(_track_living_zombie)
+	child_exiting_tree.connect(_untrack_living_zombie)
+
+func _track_living_zombie(child: Node) -> void:
+	if child is Zombie:
+		child.living_changed.connect(_update_living_count)
+		if child.health > 0:
+			_update_living_count(true)
+
+func _untrack_living_zombie(child: Node) -> void:
+	if child is Zombie:
+		child.living_changed.disconnect(_update_living_count)
+		if child.health > 0:
+			_update_living_count(false)
+
+func _update_living_count(alive: bool) -> void:
+	_living_count += 1 if alive else -1
+	has_living_crowd = _living_count >= Zombie.CROWD_RETRY_MIN_ZOMBIES
 
 func damage_digits() -> Array[Texture2D]:
 	return _digits
