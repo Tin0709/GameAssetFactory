@@ -941,12 +941,13 @@ func _recover_baby_floor_anchors() -> void:
 		var local := floor_inverse * state.transform
 		var extent := Basis(local.basis.x.abs(), local.basis.y.abs(), local.basis.z.abs()) * joint.half_size
 		var clearance := local.origin.y - extent.y - floor_half.y
-		if clearance > BABY_FLOOR_ANCHOR_CLEARANCE and not _body_supported_by(joint.body, floor_body):
+		var above_floor := clearance > BABY_FLOOR_ANCHOR_CLEARANCE and not _body_supported_by(joint.body, floor_body)
+		if above_floor and (not use_tuned_floor_support or distance <= TUNED_LIMB_RECOVERY_GAP
+				or (joint.name != "Leg.L" and joint.name != "Leg.R")):
 			continue
 		if local.origin.y + extent.y < floor_half.y:
 			continue
-		# Resolve the gap while the floor is carrying this limb. Bound the
-		# correction by the travel the two pieces can cover in one solver step.
+		# Bound the anchor correction by the travel the two pieces can cover in one step.
 		var motion := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
 		motion.y = maxf(motion.y, -maxf(clearance + FLOOR_REST_SLOP, 0.0))
 		var speed_sum := float(chest.get("maximum_linear_speed")) + float(joint.body.get("maximum_linear_speed"))
@@ -954,6 +955,9 @@ func _recover_baby_floor_anchors() -> void:
 		var end := local.origin + floor_inverse.basis * motion
 		if maxf(absf(end.x), absf(local.origin.x)) + extent.x > floor_half.x \
 				or maxf(absf(end.z), absf(local.origin.z)) + extent.z > floor_half.z:
+			continue
+		if above_floor:
+			_recover_raised_leg_wall_overlap(joint, state, motion, floor_rid)
 			continue
 		if not checked_obstacles:
 			if _floor_roll_nears_obstacle(floor_rid, true):
@@ -965,6 +969,25 @@ func _recover_baby_floor_anchors() -> void:
 			motion *= _projection_hit.get_collision_safe_fraction()
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
+
+func _recover_raised_leg_wall_overlap(joint: PhysicalPart, state: PhysicsDirectBodyState3D,
+		motion: Vector3, floor: RID) -> void:
+	var pose := state.transform
+	if not _test_projection_motion(joint.body, pose, motion) or _projection_hit.get_collision_safe_fraction() > 0.0:
+		return
+	var normal := _projection_hit.get_collision_normal()
+	if absf(normal.y) >= MAX_WALL_NORMAL_Y or not _is_fixed_wall(_projection_hit.get_collider()):
+		return
+	# The solver can report a side hit at zero distance even while the leg
+	# is moving away. Clear the initial box overlap and sweep the remainder.
+	var retreat := _wall_overlap_retreat(joint.body, pose, joint.half_size, motion, normal, floor)
+	if retreat.is_zero_approx():
+		return
+	var separated := pose.translated(retreat)
+	var remainder := motion - retreat
+	if _test_projection_motion(joint.body, separated, remainder):
+		remainder *= _projection_hit.get_collision_safe_fraction()
+	state.transform = separated.translated(remainder)
 
 func _baby_neck_needs_wall_recovery() -> bool:
 	var head: PhysicalBone3D = bodies.Head
@@ -1167,7 +1190,7 @@ func _slide_floor_wall_part(body: PhysicalBone3D, state: PhysicsDirectBodyState3
 		var normal := _projection_hit.get_collision_normal()
 		var fraction := _projection_hit.get_collision_safe_fraction()
 		if fraction == 0.0 and normal.y <= -MAX_WALL_NORMAL_Y and _is_fixed_wall(_projection_hit.get_collider()):
-			var retreat := _lower_wall_retreat(body, state.transform, half_size, motion, normal, floor)
+			var retreat := _wall_overlap_retreat(body, state.transform, half_size, motion, normal, floor)
 			if not retreat.is_zero_approx():
 				state.transform = state.transform.translated(retreat)
 				motion -= retreat
@@ -1192,10 +1215,9 @@ func _slide_floor_wall_part(body: PhysicalBone3D, state: PhysicsDirectBodyState3
 		motion = (motion * (1.0 - fraction)).slide(normal)
 	return state.transform.origin - start
 
-func _lower_wall_retreat(body: PhysicalBone3D, pose: Transform3D, half_size: Vector3,
+func _wall_overlap_retreat(body: PhysicalBone3D, pose: Transform3D, half_size: Vector3,
 		motion: Vector3, normal: Vector3, floor: RID) -> Vector3:
-	# A lower edge can separate the box downward into the floor. Clear the
-	# current side along the requested horizontal motion in the wall's frame.
+	# Clear the overlapping box along the requested horizontal motion in the wall's frame.
 	var wall := _projection_hit.get_collider_rid()
 	var collider := body.get_child(0) as CollisionShape3D
 	if collider == null or collider.transform != Transform3D.IDENTITY or not _is_single_box(wall):
