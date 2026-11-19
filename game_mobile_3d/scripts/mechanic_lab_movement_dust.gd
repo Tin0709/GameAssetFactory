@@ -9,6 +9,7 @@ const GAUNTLET_DEBRIS_HASH := "b700bc41b85fd6afb00a76bdf7966d708557ac11b01b54eea
 const GAUNTLET_DEBRIS_GRAVITY := 14.7
 const FRAMES := [0, 9, 10, 16, 24, 25]
 const CAPACITY := 16
+const SOURCE_LANDING_CAPACITY := 24
 # Camera distance in NS_Step_Dust, NS_PlayerLanding_Medium_Dust and NS_Debris_Generic_Small.
 const SOURCE_CAMERA_RANGE := 100.0
 const HEAVY_PARTICLE_COUNT := 10
@@ -85,10 +86,18 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 			_run_alpha_duration = float(data.alpha_duration)
 			_run_profile = run_profile
 	_random.seed = 27381
-	for i in CAPACITY:
+	_grow_particle_pool(CAPACITY)
+	actor.surface_contact.connect(_on_surface_contact)
+	actor.heavy_jump_landed.connect(_on_heavy_jump_landed)
+	actor.presentation_reset.connect(clear)
+	set_process(false)
+	return true
+
+func _grow_particle_pool(capacity: int) -> void:
+	for i in range(_particles.size(), capacity):
 		var particle := Particle.new()
 		particle.sprite = Sprite3D.new()
-		particle.sprite.texture = texture
+		particle.sprite.texture = _smoke_texture
 		particle.sprite.hframes = 8
 		particle.sprite.vframes = 4
 		particle.sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -97,11 +106,6 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 		particle.sprite.hide()
 		add_child(particle.sprite)
 		_particles.append(particle)
-	actor.surface_contact.connect(_on_surface_contact)
-	actor.heavy_jump_landed.connect(_on_heavy_jump_landed)
-	actor.presentation_reset.connect(clear)
-	set_process(false)
-	return true
 
 func use_source_landing() -> void:
 	var path := WeaponSource.verified_path(WeaponSource.research_root(), LANDING_CURVES_PATH, LANDING_CURVES_HASH)
@@ -111,6 +115,7 @@ func use_source_landing() -> void:
 	_landing_alpha = PackedFloat32Array(data.alpha)
 	_landing_alpha_duration = float(data.alpha_duration)
 	_landing_drag = PackedFloat32Array(data.drag)
+	_grow_particle_pool(SOURCE_LANDING_CAPACITY)
 
 func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:
 	return batch.setup(_smoke_texture, _run_alpha, _run_alpha_duration)
@@ -191,6 +196,8 @@ func _physics_process(_delta: float) -> void:
 	_emit_dust(_burst_point, _burst_surface, true, true)
 
 func _next_particle(texture: Texture2D, camera_range := 0.0) -> Particle:
+	if _contact_clock and _particles[_next].sprite.visible:
+		_next = _reusable_particle_slot()
 	var particle := _particles[_next]
 	_next = (_next + 1) % _particles.size()
 	if particle.sprite.texture != texture:
@@ -201,6 +208,24 @@ func _next_particle(texture: Texture2D, camera_range := 0.0) -> Particle:
 	particle.debris_drag = 0.0
 	particle.sprite.visibility_range_end = camera_range
 	return particle
+
+func _reusable_particle_slot() -> int:
+	var tick := Engine.get_physics_frames()
+	var step := get_physics_process_delta_time()
+	var soonest := _next
+	var shortest_remaining := INF
+	for offset in _particles.size():
+		var index := (_next + offset) % _particles.size()
+		var particle := _particles[index]
+		if not particle.sprite.visible:
+			return index
+		var remaining := particle.duration - (tick - particle.contact_tick) * step
+		if remaining <= 0.0:
+			return index
+		if remaining < shortest_remaining:
+			soonest = index
+			shortest_remaining = remaining
+	return soonest
 
 func _emit_gauntlet_debris(ground_point: Vector3, surface: String) -> void:
 	# NS_Debris_Generic_Small, CPUCollisions_Low_Med:
