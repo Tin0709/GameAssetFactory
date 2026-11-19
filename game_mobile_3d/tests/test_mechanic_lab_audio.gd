@@ -827,6 +827,7 @@ func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 		check(audio._next_choice.get(&"zombie_windup", 0) == 2
 			and audio._next_choice.get(&"zombie_hit", 0) == 1 and lab.player_health == before_miss,
 			"A windup plays once when the player leaves reach, without a contact cue")
+		await check_local_hurt_onset(lab, audio, local_voice, capture)
 		lab._on_player_hit(lab.player_health)
 		check(lab.player_health == 0 and local_voice.playing, "The final hit plays through the defeat transition")
 		var defeat_voice := audio.get_node_or_null("PlayerDefeat") as AudioStreamPlayer
@@ -862,6 +863,30 @@ func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 			"Turning audio off stops a live player-hurt cue and restores mute")
 		await create_timer(0.1).timeout
 	lab.free()
+
+func check_local_hurt_onset(lab, audio, voice: AudioStreamPlayer, capture: AudioEffectCapture) -> void:
+	await physics_frame
+	capture.clear_buffer()
+	lab._on_player_hit(6)
+	var frame := Engine.get_physics_frames()
+	var playback := voice.get_stream_playback()
+	var choice: int = audio._next_choice[&"player_hurt"]
+	var health: int = lab.player_health
+	await physics_frame
+	var onset := voice.get_playback_position()
+	lab._on_player_hit(5)
+	var held: bool = voice.get_stream_playback() == playback and audio._next_choice[&"player_hurt"] == choice
+	check(Engine.get_physics_frames() > frame and onset < 0.05 and held and lab.player_health == health - 5,
+		"A hit on the next physics tick keeps the pending local hurt onset and still applies damage")
+	await create_timer(0.10).timeout
+	var peak := 0.0
+	for sample in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+	check(peak > 0.005 and peak < 0.5, "The protected local hurt reaches the mixer with headroom")
+	lab._on_player_hit(6)
+	check(voice.get_stream_playback() != playback and audio._next_choice[&"player_hurt"] != choice,
+		"A later hit can play a fresh local hurt cue")
+	print("MECHANIC_LAB_PLAYER_HURT_ONSET seconds=", onset, " held=", held, " peak=", peak)
 
 func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
