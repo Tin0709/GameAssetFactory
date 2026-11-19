@@ -85,6 +85,7 @@ func run() -> void:
 		"The baby lands with the full rig connected and releases the simulation at rest")
 	lab.free()
 	await check_prewarmed_spawn()
+	await check_tuned_floor_contact()
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -135,6 +136,51 @@ func check_walk_contacts(baby: Zombie) -> void:
 		check(absf(phases[contact] - expected_phase) <= step + 0.00001
 			and points[contact].distance_to(authored_contacts[contact % 2]) < 0.005,
 			"The Baby Zombie step matches the source sole and phase at frame 2 or 8")
+
+func check_tuned_floor_contact() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = 1000.0
+	lab.get_node("HUD/RagdollTuning/Gravity/Slider").value = 1000.0
+	var group: Node = lab.get_node("Zombies")
+	group._spawn_serial = 26
+	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
+	var baby := group.get_child(0) as Zombie
+	baby.set_physics_process(false)
+	baby.position = Vector3(3.0, 0.02, 2.0)
+	baby.rotation.y = 26 * 0.47
+	baby.animation.play(Zombie.ATTACK)
+	baby.animation.advance(0.0)
+	baby.animation.seek(baby.animation.get_animation(Zombie.ATTACK).length * 0.6, true)
+	await physics_frame
+	for sample in 2:
+		baby.ragdoll.sample(1.0 / 60.0)
+	var direction := Vector3(0.91, 0.0, -0.22).normalized()
+	group._apply_contact(baby, baby.combat_center(), "Attack", 0, 1,
+		group.SABRE_STRIKES[0], direction, false, baby.global_position)
+	baby.set_physics_process(true)
+	var gap := 0.0
+	var impulse := 0.0
+	var gravity := 0.0
+	for tick in 120:
+		await physics_frame
+		if baby._corpse_parked:
+			break
+		if not baby.ragdoll.running:
+			continue
+		gap = maxf(gap, baby.ragdoll.max_anchor_error())
+		if impulse == 0.0:
+			impulse = baby.ragdoll.total_applied_impulse.length()
+			var chest: PhysicalBone3D = baby.ragdoll.bodies.Chest
+			gravity = PhysicsServer3D.body_get_direct_state(chest.get_rid()).total_gravity.y
+	check(baby.health == 0 and is_equal_approx(impulse, 987.36) and is_equal_approx(gravity, -500.0),
+		"The Baby Zombie receives both 1000% settings from the Sabre contact")
+	check(gap < 0.20 and baby._corpse_landed and baby._corpse_parked,
+		"At 1000% launch and gravity the braced Baby Zombie lands with its legs connected")
+	print("LAB_BABY_TUNED_CONTACT gap=", gap, " impulse=", impulse, " gravity=", gravity)
+	lab.free()
 
 func attack_key(pressed: bool) -> void:
 	var event := InputEventKey.new()
