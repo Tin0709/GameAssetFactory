@@ -259,6 +259,7 @@ const REACTION_POOL := 1
 const ATTACK_POOL := 2
 const STEP_POOL := 3
 const FLIGHT_POOL := 4
+const SURFACE_LANDING_VOICE_COUNT := 2
 const SPATIAL_VOICE_DISTANCE := 35.0
 const FLIGHT_GAIN_DB := -17.0
 const HIT_GAIN_DB := -9.0
@@ -369,6 +370,8 @@ var gauntlets_equipped := false
 var zombie_listener: AudioListener3D
 var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
+var _surface_landing_voices: Array[AudioStreamPlayer3D] = []
+var _next_surface_landing_voice := 0
 var _player_hurt_voice: AudioStreamPlayer
 var _player_defeat_voice: AudioStreamPlayer
 var _zombie_idle_voice: AudioStreamPlayer3D
@@ -584,7 +587,22 @@ func slam_landed(point: Vector3, surface: String = "grass") -> void:
 		return
 	if sword_equipped:
 		_play(&"slam", point, SLAM_GAIN_DB, -1, true)
-	_play(StringName("slam_" + surface), point, SURFACE_LANDING_GAIN_DB)
+	var group := StringName("slam_" + surface)
+	if _surface_landing_voices.is_empty():
+		_play(group, point, SURFACE_LANDING_GAIN_DB)
+		return
+	var stream := _next_stream(group)
+	if stream == null:
+		return
+	# Ground contacts have independent spatial tails, even during weapon bursts.
+	var slot := _next_surface_landing_voice
+	for offset in _surface_landing_voices.size():
+		var candidate := (slot + offset) % _surface_landing_voices.size()
+		if not _surface_landing_voices[candidate].playing:
+			slot = candidate
+			break
+	_next_surface_landing_voice = (slot + 1) % _surface_landing_voices.size()
+	_start_spatial_voice(_surface_landing_voices[slot], stream, point, SURFACE_LANDING_GAIN_DB)
 
 func player_hurt() -> void:
 	if not enabled or _player_hurt_voice == null:
@@ -715,7 +733,8 @@ func reset() -> void:
 	_player_hurt_frame = -1
 	_last_weapon_serial = -1
 	_next_voice.fill(0)
-	for voice in _voices:
+	_next_surface_landing_voice = 0
+	for voice in _voices + _surface_landing_voices:
 		voice.stop()
 		voice.stream = null
 	if _player_hurt_voice != null:
@@ -759,6 +778,11 @@ func _load_audio() -> void:
 	for i in LANDING_HASHES.size():
 		_load_sample(root, &"slam", HEAVY_LANDING % (i + 1), LANDING_HASHES[i])
 	_load_surface_landing(root, "Grass", &"slam_grass", GRASS_LANDING_HASHES)
+	if _groups.has(&"slam_grass"):
+		for i in SURFACE_LANDING_VOICE_COUNT:
+			var voice := _new_spatial_voice(SPATIAL_VOICE_DISTANCE)
+			voice.name = "HeavyLandingSurface%d" % (i + 1)
+			_surface_landing_voices.append(voice)
 	for i in PLAYER_HURT_HASHES.size():
 		_load_sample(root, &"player_hurt", PLAYER_HURT % (i + 1), PLAYER_HURT_HASHES[i])
 	_load_sample(root, &"player_defeat", PLAYER_DEFEAT, PLAYER_DEFEAT_HASH)
@@ -859,13 +883,16 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 		_started_frames[voice_index] = frame
 	if pool == WEAPON_POOL and not _weapon_onsets.is_empty():
 		_weapon_onsets[slot] = weapon_onset
+	_start_spatial_voice(voice, stream, point, gain)
+	return voice
+
+func _start_spatial_voice(voice: AudioStreamPlayer3D, stream: AudioStream, point: Vector3, gain: float) -> void:
 	voice.stop()
 	voice.stream = stream
 	voice.global_position = point
 	voice.volume_db = gain
 	voice.max_db = gain
 	voice.play()
-	return voice
 
 func _replace_weapon_slot(start: int, onset: bool, frame: int) -> int:
 	if _weapon_onsets.is_empty():
