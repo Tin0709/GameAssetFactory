@@ -88,7 +88,7 @@ func run() -> void:
 	check(visible_particles(dust) == 0 and visible_particles(wind) == 0, "Reset clears both movement effects")
 	await check_heavy_dust_timing(lab, dust)
 	await check_overlapping_landing_dust(lab, dust)
-	await check_landing_draw_batch(lab, dust)
+	await check_source_dust_batch(lab, dust)
 	await check_gauntlet_debris(lab, dust)
 	await check_running_wake_support(lab, wind)
 	await check_running_wake_render_clock(lab, wind, dust)
@@ -108,26 +108,28 @@ func run() -> void:
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
 
-func check_landing_draw_batch(lab, dust) -> void:
+func check_source_dust_batch(lab, dust) -> void:
 	if RenderingServer.get_current_rendering_method() != "mobile":
 		return
 	lab.reset_player()
 	var batch := dust.get_node_or_null("LandingDustBatch") as MultiMeshInstance3D
-	check(batch != null, "Forward Mobile batches source landing dust in MechanicLab")
+	check(batch != null, "Forward Mobile batches source dust in MechanicLab")
 	if batch == null:
 		return
+	dust._emit_run_dust(Vector3.RIGHT, "grass", 0.75)
+	dust._emit_run_dust(Vector3.LEFT, "grass", 1.0)
 	dust._emit_source_landing(Vector3.ZERO, "grass")
 	dust._emit_source_landing(Vector3.FORWARD * 0.5, "grass")
 	await process_frame
 	await process_frame
-	var landing: Array = dust._particles.filter(func(p): return p.sprite.visible)
-	check(landing.size() >= 8 and batch.multimesh.visible_instance_count == landing.size()
-		and landing.all(func(p): return p.sprite.layers == 0),
-		"Overlapping ordinary landings draw once and retain their simulated particles")
+	var smoke: Array = dust._particles.filter(func(p): return p.sprite.visible)
+	check(smoke.size() >= 10 and batch.multimesh.visible_instance_count == smoke.size()
+		and smoke.all(func(p): return p.sprite.layers == 0),
+		"Running dust and overlapping ordinary landings share one draw while retaining all particles")
 	dust._emit_gauntlet_debris(Vector3.ZERO, "grass")
 	await process_frame
 	await process_frame
-	check(batch.multimesh.visible_instance_count == 0 and landing.all(func(p): return p.sprite.layers == 1),
+	check(batch.multimesh.visible_instance_count == 0 and smoke.all(func(p): return p.sprite.layers == 1),
 		"Gauntlet debris restores individual sorting for overlapping smoke")
 	dust.clear()
 	check(not dust.is_processing() and batch.multimesh.visible_instance_count == 0 and not batch.visible,
