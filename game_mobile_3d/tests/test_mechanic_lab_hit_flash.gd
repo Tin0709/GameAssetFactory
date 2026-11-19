@@ -175,6 +175,11 @@ func check_damage_numbers_during_render_hitch() -> void:
 	numbers._process(0.0)
 	check(numbers._numbers == first_frame and numbers.multimesh.visible_instance_count == 128,
 		"An unchanged view keeps the same ordering of stacked damage glyphs")
+	lab.camera.rotate_y(PI * 0.5)
+	numbers._process(0.0)
+	lab.camera.rotation = Vector3.ZERO
+	numbers._process(0.0)
+	check(numbers._numbers == queued, "Returning to equal depth restores the original hit order")
 	lab.free()
 
 func check_crowd_sparks() -> void:
