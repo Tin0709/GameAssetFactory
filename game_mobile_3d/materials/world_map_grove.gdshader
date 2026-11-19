@@ -1,6 +1,8 @@
 shader_type spatial;
 #ifdef GAF_GROVE_REVEAL_COVERAGE
 render_mode alpha_to_coverage_and_one;
+uniform bool spruce_gap_coverage = false;
+uniform sampler2D spruce_leaf_gap_mask : filter_nearest, repeat_disable;
 #endif
 #ifdef GAF_GROVE_PLAYER_CUE
 stencil_mode write, compare_always, 122;
@@ -134,6 +136,13 @@ void fragment() {
 #ifdef GAF_GROVE_REVEAL_COVERAGE
 	float coverage = 1.0;
 #endif
+	// WorldMap uses an orthographic camera. Centre the opening on the actor
+	// even while the camera holds its elevation during a jump.
+	float distance_to_player = 0.80;
+	if (reveal_player && VERTEX.z > player_view.z + 0.01) {
+		vec2 extent = abs(VERTEX.xy - player_view.xy) / vec2(0.70, 1.16);
+		distance_to_player = length(max(extent - 0.48, vec2(0.0)));
+	}
 	vec3 albedo = crown_detail ? crown_color(COLOR.rgb) : COLOR.rgb;
 	vec2 atlas_uv = UV;
 	if (use_source_atlas) {
@@ -160,33 +169,39 @@ void fragment() {
 				texel.a = mix(texel.a, filtered.a, alpha_weight);
 			}
 		}
-		if (texel.a < 0.3333) discard;
+		if (texel.a < 0.3333) {
+#ifdef GAF_GROVE_REVEAL_COVERAGE
+			// Never fill gaps inside the existing player opening.
+			vec2 leaf_uv = vec2(atlas_uv.x * 2.0, atlas_uv.y);
+			if (!spruce_gap_coverage || atlas_leaf < 0.5 || distance_to_player < 0.80
+					|| texture(spruce_leaf_gap_mask, leaf_uv).r < 0.5) {
+				discard;
+			}
+			coverage = 0.5;
+			texel.rgb = textureLod(spruce_leaf_mips, leaf_uv, 0.0).rgb;
+#else
+			discard;
+#endif
+		}
 		albedo = texel.rgb;
 		if (source_leaf_red > 0.0) {
 			albedo = gaf_leaf_color(albedo, source_leaf_hue, source_leaf_red * source_leaf_tint_mix);
 		}
 	}
-	if (reveal_player) {
-		// WorldMap uses an orthographic camera. Keep the opening centred on
-		// the player even while the camera holds its elevation during a jump.
-		vec3 offset = VERTEX - player_view;
-		vec2 extent = abs(offset.xy) / vec2(0.70, 1.16);
-		float distance_to_player = length(max(extent - 0.48, vec2(0.0)));
-		if (offset.z > 0.01 && distance_to_player < 0.80) {
-			float opacity = smoothstep(0.35, 0.80, distance_to_player);
+	if (distance_to_player < 0.80) {
+		float opacity = smoothstep(0.35, 0.80, distance_to_player);
 #ifdef GAF_GROVE_PLAYER_CUE
-			opacity = mix(opacity, 1.0, player_cue_weight);
+		opacity = mix(opacity, 1.0, player_cue_weight);
 #endif
-			float threshold = fract(52.9829189 * fract(dot(floor(FRAGCOORD.xy), vec2(0.06711056, 0.00583715))));
+		float threshold = fract(52.9829189 * fract(dot(floor(FRAGCOORD.xy), vec2(0.06711056, 0.00583715))));
 #ifdef GAF_GROVE_REVEAL_COVERAGE
-			// Share the transition across two MSAA samples, with the original
-			// per-pixel threshold selecting the fractional remainder.
-			float samples = opacity * 2.0;
-			coverage = 0.5 * (floor(samples) + (fract(samples) > threshold ? 1.0 : 0.0));
+		// Share the transition across two MSAA samples, with the original
+		// per-pixel threshold selecting the fractional remainder.
+		float samples = opacity * 2.0;
+		coverage = 0.5 * (floor(samples) + (fract(samples) > threshold ? 1.0 : 0.0));
 #else
-			if (opacity <= threshold) discard;
+		if (opacity <= threshold) discard;
 #endif
-		}
 	}
 #ifdef GAF_GROVE_REVEAL_COVERAGE
 	ALPHA = coverage;

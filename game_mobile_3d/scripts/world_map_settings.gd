@@ -21,6 +21,7 @@ const NAMED := {
 	"ForestUnderstoryToggle": "forest-understory",
 	"ForestFernToggle": "forest-fern",
 	"ForestWallVinesToggle": "forest-wall-vines",
+	"SpruceGapCoverageToggle": "spruce-gap-coverage",
 	"ExteriorGroundToggle": "exterior-ground",
 	"NorthernRidgelineToggle": "northern-ridgeline",
 	"GrassWind": "grass-wind",

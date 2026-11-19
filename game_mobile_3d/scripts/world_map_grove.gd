@@ -116,6 +116,8 @@ var _spruce_root: Node3D
 var _spruce_atlas: ImageTexture
 var _spruce_leaf_mips: ImageTexture
 var _spruce_leaf_filter := 0.0
+var _spruce_leaf_gap_mask: ImageTexture
+var spruce_gap_coverage_enabled := true
 var _spruce_appearance := ShaderMaterial.new()
 var _bark_irradiance := Vector4.ZERO
 var _twilight_leaf_lamp_shoulder := 0.
@@ -267,6 +269,8 @@ func _place_source_spruce(level: Node3D, assets: Array[Node3D], rows: Array, ima
 		leaves.fix_alpha_edges()
 		if leaves.generate_mipmaps() == OK:
 			_spruce_leaf_mips = ImageTexture.create_from_image(leaves)
+			if RenderingServer.get_current_rendering_driver_name() == "d3d12":
+				_spruce_leaf_gap_mask = ImageTexture.create_from_image(small_leaf_gap_mask(leaves))
 	for material: ShaderMaterial in [_spruce_appearance, _spruce_shadow]:
 		material.shader = REVEAL_SHADER
 		_bind_spruce_atlas(material)
@@ -304,6 +308,9 @@ func _bind_spruce_atlas(material: ShaderMaterial) -> void:
 	if material == _spruce_appearance and _spruce_leaf_mips != null:
 		material.set_shader_parameter("spruce_leaf_mips", _spruce_leaf_mips)
 		material.set_shader_parameter("spruce_leaf_filter", _spruce_leaf_filter)
+		if _spruce_leaf_gap_mask != null:
+			material.set_shader_parameter("spruce_leaf_gap_mask", _spruce_leaf_gap_mask)
+			material.set_shader_parameter("spruce_gap_coverage", spruce_gap_coverage_enabled)
 	if _source_crown_pattern != null:
 		material.set_shader_parameter("source_crown_pattern", _source_crown_pattern)
 	if _source_crown_weights != null:
@@ -311,6 +318,44 @@ func _bind_spruce_atlas(material: ShaderMaterial) -> void:
 
 func spruce_leaf_filter_available() -> bool:
 	return _spruce_leaf_mips != null and spruce_available()
+
+func spruce_gap_coverage_available() -> bool:
+	return _spruce_leaf_gap_mask != null and spruce_available()
+
+func set_spruce_gap_coverage(enabled: bool) -> void:
+	spruce_gap_coverage_enabled = enabled
+	if spruce_gap_coverage_available():
+		_spruce_appearance.set_shader_parameter("spruce_gap_coverage", enabled)
+
+static func small_leaf_gap_mask(leaves: Image) -> Image:
+	var region := Rect2i(Vector2i.ZERO, leaves.get_size())
+	var visited: Dictionary[Vector2i, bool] = {}
+	var mask := Image.create_empty(region.size.x, region.size.y, false, Image.FORMAT_L8)
+	mask.fill(Color.BLACK)
+	for y in region.size.y:
+		for x in region.size.x:
+			var seed := Vector2i(x, y)
+			if visited.has(seed) or leaves.get_pixelv(seed).a >= .3333:
+				continue
+			var points: Array[Vector2i] = [seed]
+			visited[seed] = true
+			var enclosed := true
+			var index := 0
+			while index < points.size():
+				var point := points[index]
+				index += 1
+				for offset: Vector2i in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+					var neighbor := point + offset
+					if not region.has_point(neighbor):
+						enclosed = false
+					elif not visited.has(neighbor) and leaves.get_pixelv(neighbor).a < .3333:
+						visited[neighbor] = true
+						points.append(neighbor)
+			# Preserve both large gaps and the outline of the leaf islands.
+			if enclosed and points.size() <= 4:
+				for point: Vector2i in points:
+					mask.set_pixelv(point, Color.WHITE)
+	return mask
 
 func set_spruce_leaf_filter(strength: float) -> void:
 	var weight := strength if spruce_leaf_filter_available() else 0.0

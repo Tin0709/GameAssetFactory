@@ -4359,6 +4359,13 @@ func _build_ui()->void:
 		cover.button_pressed = level.look.grove_reveal_coverage_requested
 		cover.toggled.connect(level.look.set_grove_reveal_coverage)
 		box.add_child(cover)
+		if level.grove.spruce_gap_coverage_available():
+			var gaps := CheckButton.new()
+			gaps.name = "SpruceGapCoverageToggle"
+			gaps.focus_mode = Control.FOCUS_NONE
+			gaps.button_pressed = level.grove.spruce_gap_coverage_enabled
+			gaps.toggled.connect(level.grove.set_spruce_gap_coverage)
+			box.add_child(gaps)
 		shadows.text = "Forest · spruce shadows"
 		shadows.focus_mode = Control.FOCUS_NONE
 		shadows.button_pressed = level.grove.spruce_shadows
