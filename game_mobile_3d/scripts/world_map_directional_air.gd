@@ -6,9 +6,13 @@ const PROOF := "daylight_cycle_v002/bake.private.json"
 const PROOF_SHA := "b42714324d7bf272d0680ead4b1c4877e80851f4cdef509324d47ee6b4d82627"
 const OAK_MANIFEST_SHA := "a0c313c78d5a729f0fd14b245ae0f164d657afa6d6b3a9389e04cb5ad0089cf6"
 const MAX_GAIN := .42
+const EAST_GAIN := .4
 const ZERO := [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]
 
 var texture: ImageTexture3D
+var east_texture: ImageTexture3D
+var _east := PackedFloat32Array()
+var _east_current: Callable
 var research_root: String
 var payload_sha256: String
 var _level: Node3D
@@ -145,11 +149,65 @@ func available() -> bool:
 func region_available() -> bool:
 	return _region.size() == 8
 
+func load_east(relative: String, checksum: String, layout_checksum: String, sky: Node) -> bool:
+	if not region_available() or relative.is_empty() or relative.is_absolute_path() \
+			or checksum.length() != 64 or not checksum.is_valid_hex_number() or not sky.east_casters_current():
+		return false
+	var path := research_root.path_join(relative).simplify_path()
+	if not path.begins_with(research_root + "/") or not FileAccess.file_exists(path) \
+			or FileAccess.get_sha256(path) != checksum:
+		return false
+	var profile: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not profile is Dictionary or profile.get("schema") != "private_forest_directional_air_extension/1" \
+			or profile.get("base_direction_proof_sha256") != PROOF_SHA \
+			or profile.get("forest_layout_sha256") != layout_checksum:
+		return false
+	for key: String in ["dimensions", "size", "origin"]:
+		if not profile.get(key) is Array or profile[key].size() != 3:
+			return false
+	var shape := Vector3i(_vector(profile.dimensions))
+	var tile := Vector3i(_vector(profile.size))
+	var columns := int(profile.get("columns", 0))
+	var slots := int(profile.get("slots", 0))
+	var step := float(profile.get("step", 0.))
+	var origin := _vector(profile.origin)
+	if not origin.is_finite() or not is_finite(step) or step < .25 or step > 4. \
+			or tile.x < 2 or tile.y < 2 or tile.z < 2 or columns < 1 or columns > 16 \
+			or slots != _slots.max() + 1 or shape.x > 256 or shape.y > 256 or shape.z > 128 \
+			or shape != Vector3i(columns * tile.x, ceili(float(slots) / columns) * tile.y, tile.z):
+		return false
+	# With disjoint X intervals the shader samples at most one directional atlas.
+	var west_edge := maxf(_origin.x + (_tile.x - 1.) * _step, _region[0] + (_region[4] - 1.) * _step)
+	if origin.x <= west_edge:
+		return false
+	var payload := path.get_base_dir().path_join("compact.private.r8")
+	if not FileAccess.file_exists(payload) or FileAccess.get_sha256(payload) != profile.get("compact_sha256"):
+		return false
+	var bytes := FileAccess.get_file_as_bytes(payload)
+	if bytes.size() != shape.x * shape.y * shape.z:
+		return false
+	var candidate := _make_texture(bytes, shape)
+	if candidate == null:
+		return false
+	east_texture = candidate
+	_east_current = sky.east_casters_current
+	_east = PackedFloat32Array([origin.x, origin.y, origin.z, step, tile.x, tile.y, tile.z, columns])
+	return true
+
+func east_available() -> bool:
+	return east_texture != null
+
 func volume_parameters() -> PackedFloat32Array:
 	var values := parameters()
 	if region_available():
 		values[15] = _review._lighting_scale(&"basin_sunlit_mist")
 		values.append_array(_region)
+	if east_available():
+		values.append_array(_east)
+		var gain := 0.
+		if values[3] > 0. and _east_current.is_valid() and _east_current.call():
+			gain = EAST_GAIN * _review._lighting_scale(&"east_sunlit_mist")
+		values.append_array(PackedFloat32Array([gain, 0., 0., 0.]))
 	return values
 
 func parameters() -> PackedFloat32Array:
