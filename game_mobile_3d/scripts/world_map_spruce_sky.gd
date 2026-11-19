@@ -219,6 +219,9 @@ func apply_canopy_extension(relative: String, digest: String, parent_path: Strin
 	var field := _layout_texture(directory.path_join("sky.private.r8"), profile.get("sky_sha256", ""), Vector3i(extent))
 	if field == null:
 		return false
+	# The matched directional-air atlas only traces rays toward the west.
+	# Its receivers are west of these trees. The wider field adds diffuse sky
+	# occlusion for foliage, terrain and mist without changing that atlas.
 	var grove = _level.grove
 	for i in placements.size():
 		var placed := placements[i]
@@ -232,7 +235,7 @@ func apply_canopy_extension(relative: String, digest: String, parent_path: Strin
 
 func _check_extension_tree(row: Variant, extent: Vector3) -> Dictionary:
 	if not row is Dictionary or not row.get("source") is String or not row.source.begins_with("MD2Spruce") \
-			or not row.source.get_file() == row.source:
+			or row.source.get_file() != row.source:
 		return {}
 	var position := _checked_vector(row.get("root"))
 	if not position.is_finite() or position.x <= _origin.x + _dimensions.x + 4. \
