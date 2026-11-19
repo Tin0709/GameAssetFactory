@@ -260,10 +260,8 @@ const MAULER_DIVE_HASHES := [
 ]
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
 const SURFACE_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttackDebris/sfx_HJA_impact debris_%s_%02d.ogg"
-const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
-const BABY_CUE := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%s-%03d_soundWave.ogg"
+const ZOMBIE_VOCAL := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%s-%03d_soundWave.ogg"
 # The exported waveforms matching the Zombie event names sit under BabyZombie.
-const ZOMBIE_ATTACK := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%sAttack-%03d_soundWave.ogg"
 # Zombie.Step names the adult event. The exported generic candidate is under BabyZombie.
 const ZOMBIE_STEP := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombieStepGeneric-%03d_soundWave.ogg"
 # Three raw variants corroborated by the adult event duration and quest exports.
