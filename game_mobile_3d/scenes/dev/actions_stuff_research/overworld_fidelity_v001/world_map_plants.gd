@@ -8,6 +8,7 @@ const MEDIUM:=["MD2 | SM_GrassMedium_01","MD2 | SM_GrassMedium_02","MD2 | SM_Gra
 const GRASS_LIGHT=preload("world_map_grass_light.gd")
 const GRASS_SPLAY=preload("world_map_grass_splay.gd")
 const GRASS_WIND=preload("world_map_grass_wind.gd")
+const ForestCover = preload("forest_cover_grass.gd")
 var grass_wind:RefCounted
 var recovered_wind_enabled:=true
 var grass_light:RefCounted
@@ -16,6 +17,9 @@ var grass_edge_sampling_enabled:=true
 var grass_splay:RefCounted
 var grass_splay_enabled:=true
 var dense_grass_review:=true
+var forest_cover_enabled := true
+var forest_cover_species: Array[String] = []
+var forest_cover_counts: Dictionary = {}
 var eligible_grass_cells:=0
 var world:Node3D
 var error:=""
@@ -33,6 +37,7 @@ func setup_world(level:Node3D)->void:
 	if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
 	if bundle.read(research.path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")).is_empty():
 		error=bundle.error;push_warning(error);set_physics_process(false);set_process(false);return
+	forest_cover_species = ForestCover.load_into(bundle)
 	for material:ShaderMaterial in bundle.materials:
 		_native_wind_intensities[material.get_instance_id()]=float(material.get_shader_parameter("wind_intensity"))
 	grass_light=GRASS_LIGHT.new();grass_light.setup(world,bundle)
@@ -51,11 +56,19 @@ func set_dense_review(value:bool)->void:
 	if value==dense_grass_review:return
 	dense_grass_review=value;_rebuild_planting()
 
+func set_forest_cover(value: bool) -> void:
+	if forest_cover_enabled == value:
+		return
+	forest_cover_enabled = value
+	if dense_grass_review and not forest_cover_species.is_empty():
+		_rebuild_planting()
+
 func _rebuild_planting()->void:
 	for child:Node in get_children():
 		remove_child(child);child.queue_free()
 	placements.clear();_groups.clear();_plant_cells.clear();species_counts.clear();flower_colors.clear()
 	materials.clear();_wind_intensities.clear();_flower_centers.clear()
+	forest_cover_counts.clear()
 	instance_count=0;batch_count=0;eligible_grass_cells=0;_rng.seed=110826
 	_build_flower_centers()
 	if dense_grass_review:
@@ -160,13 +173,43 @@ func _build_dense_planting()->void:
 		var asset:=_patch_name(_rng.randi()%6)
 		position+=Vector3(_rng.randf_range(-.09,.09),0.,_rng.randf_range(-.09,.09))
 		var transform:=Transform3D(Basis(Vector3.UP,_rng.randf()*TAU),position)
+		var phase := _rng.randf() * TAU
+		var cover := _cover_index(cell)
+		var scale_factor := 1.
+		if cover >= 0:
+			asset = forest_cover_species[cover]
+			scale_factor = .82 if cover == 2 else 1.
+			var yaw := float(posmod(hash(cell + Vector2i(593, 827)), 4)) * PI * .5
+			transform.basis = Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale_factor)
+			forest_cover_counts[asset] = int(forest_cover_counts.get(asset, 0)) + 1
 		var bounds:AABB=transform*bundle.meshes[asset].get_aabb()
-		var key:=asset+"/"+str(Vector2i(floori(position.x/TILE),floori(position.z/TILE)))
+		var bucket := 50. if cover >= 0 else TILE
+		var key:=asset+"/"+str(Vector2i(floori(position.x/bucket),floori(position.z/bucket)))
 		if not _groups.has(key):_groups[key]={"asset":asset,"transforms":[],"custom":[]}
-		_groups[key].transforms.append(transform);_groups[key].custom.append(Color(_rng.randf()*TAU,cell.x+.5,cell.y+.5,1.))
-		placements.append({"cell":cell,"root":position,"asset":asset,"bounds":bounds,"flower":"","carpet":true,"scale":1.,"cards":4,"ground_kind":kind})
+		_groups[key].transforms.append(transform);_groups[key].custom.append(Color(phase,cell.x+.5,cell.y+.5,scale_factor))
+		placements.append({"cell":cell,"root":position,"asset":asset,"bounds":bounds,"flower":"","carpet":true,
+			"scale":scale_factor,"cards":4 if cover < 0 else 2 if cover < 2 else 3,"ground_kind":kind,
+			"forest_cover":cover >= 0})
 		_add_plant_root(Vector2(position.x,position.z))
 		instance_count+=1;species_counts[asset]=int(species_counts.get(asset,0))+1
+
+func _cover_index(cell: Vector2i) -> int:
+	if not forest_cover_enabled or forest_cover_species.is_empty():
+		return -1
+	var patch := _cluster.get_noise_2d(float(cell.x), float(cell.y))
+	if posmod(hash(cell), 1000) >= (28 if patch > .08 else 7):
+		return -1
+	if Vector2(cell).distance_to(Vector2(world.spawn_position.x, world.spawn_position.z)) < 3.:
+		return -1
+	var source: Image = world.look.path_map_image
+	var pixel := Vector2i(Vector2(cell) - world.look.path_map_origin)
+	var limits := Rect2i(Vector2i.ZERO, source.get_size())
+	for offset: Vector2i in [Vector2i.ZERO, Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+		var neighbor := pixel + offset
+		if not limits.has_point(neighbor) or (int(roundf(source.get_pixelv(neighbor).r)) & 255) != 0:
+			return -1
+	var variant := posmod(hash(cell + Vector2i(741, 129)), 12)
+	return 0 if variant < 5 else 1 if variant < 10 else 2
 
 func _build_flower_centers()->void:
 	var colors:Array=FLOWERS.keys()
@@ -298,6 +341,7 @@ func snapshot()->Dictionary:
 	var data:=super.snapshot()
 	data["one_asset_per_block"]=true;data["trees"]=0
 	data["dense_grass_review"]=dense_grass_review;data["eligible_grass_cells"]=eligible_grass_cells
+	data["forest_cover_species"] = forest_cover_counts.duplicate()
 	data["grass_splay_active"]=grass_splay_active()
 	data["recovered_wind_active"]=grass_wind!=null and grass_wind.configured and recovered_wind_enabled and dense_grass_review
 	if dense_grass_review:

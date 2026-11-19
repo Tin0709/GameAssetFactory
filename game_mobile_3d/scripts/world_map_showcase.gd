@@ -4467,6 +4467,13 @@ func _build_ui()->void:
 		gusts.focus_mode=Control.FOCUS_NONE;box.add_child(gusts);gusts.toggled.connect(plants.set_recovered_wind)
 		var density:=CheckButton.new();density.text="Dense grass only · native card scale";density.button_pressed=plants.dense_grass_review
 		density.focus_mode=Control.FOCUS_NONE;box.add_child(density);density.toggled.connect(plants.set_dense_review)
+		if not plants.forest_cover_species.is_empty():
+			var cover := CheckButton.new()
+			cover.text = "Cỏ phủ đất Forest"
+			cover.button_pressed = plants.forest_cover_enabled
+			cover.focus_mode = Control.FOCUS_NONE
+			box.add_child(cover)
+			cover.toggled.connect(plants.set_forest_cover)
 		for option:String in ["wind_enabled","interactions_enabled"]:
 			var toggle:=CheckButton.new();toggle.text="Grass wind" if option=="wind_enabled" else "Player grass / flower interaction"
 			toggle.button_pressed=true;toggle.focus_mode=Control.FOCUS_NONE;box.add_child(toggle)
