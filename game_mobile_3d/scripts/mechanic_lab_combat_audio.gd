@@ -385,7 +385,6 @@ var _flight_targets: Dictionary[AudioStreamPlayer3D, Node3D]
 var _started_frames: PackedInt64Array
 var _weapon_onsets: Array[bool] = []
 var _player_hurt_frame := -1
-var _zombie_cue_frame := -1
 var _attack_contacts: Array[Dictionary] = []
 var _attack_windups: Array[Dictionary] = []
 var _reaction_deaths: Array[Dictionary] = []
@@ -633,15 +632,11 @@ func zombie_attack(point: Vector3, contact: bool) -> void:
 func _queue_zombie_cue(group: StringName, point: Vector3, pending: Array[Dictionary]) -> void:
 	if not _groups.has(group) or not is_instance_valid(zombie_listener):
 		return
-	var frame := Engine.get_physics_frames()
-	if frame != _zombie_cue_frame:
-		flush_zombie_combat_cues()
-		_zombie_cue_frame = frame
 	var distance := point.distance_squared_to(zombie_listener.global_position)
 	if distance > SPATIAL_VOICE_DISTANCE * SPATIAL_VOICE_DISTANCE:
 		return
-	# Bound each priority to the number of playable voices, preserving ties
-	# in event order. Only cues selected for playback advance sample rotation.
+	# Rank across physics ticks until the Lab flushes on the rendered frame.
+	# Equal distances keep event order and only played cues advance rotation.
 	var index := pending.size()
 	while index > 0 and distance < float(pending[index - 1].distance):
 		index -= 1
@@ -658,7 +653,7 @@ func flush_zombie_combat_cues() -> void:
 
 func _play_zombie_cues(pending: Array[Dictionary], group: StringName, gain: float) -> void:
 	for cue: Dictionary in pending:
-		_play(group, cue.point, gain, _zombie_cue_frame)
+		_play(group, cue.point, gain)
 	pending.clear()
 
 func queue_zombie_idle(point: Vector3) -> void:
@@ -726,7 +721,6 @@ func reset() -> void:
 	if _zombie_idle_voice != null:
 		_zombie_idle_voice.stop()
 		_zombie_idle_voice.stream = null
-	_zombie_cue_frame = -1
 	_step_points.clear()
 	_step_distances.clear()
 	_started_frames.fill(-1)
@@ -914,11 +908,11 @@ func _replace_weapon_slot(start: int, onset: bool, frame: int) -> int:
 
 func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName,
 		frame: int, point: Vector3) -> int:
-	# Same-tick cues already arrive nearest first. Across ticks, preserve
-	# nearby attack and death onsets while the mixer starts the samples.
+	# Each render flush submits the nearest cues first. Protect a nearby
+	# voice from later frames while the mixer starts its sample.
 	var priority_streams: Array = _groups.get(priority_group, [])
 	var priority := group == priority_group
-	var compare_onsets := (priority_group == &"zombie_hit" or group == &"death") and is_instance_valid(zombie_listener)
+	var compare_onsets := is_instance_valid(zombie_listener)
 	var listener := zombie_listener.global_position if compare_onsets else Vector3.ZERO
 	var onset_ticks := ceili(ZOMBIE_ONSET_SECONDS * Engine.physics_ticks_per_second)
 	var farthest := point.distance_squared_to(listener)
