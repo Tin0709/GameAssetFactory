@@ -1,6 +1,7 @@
 extends MultiMeshInstance3D
 
 const HEALTH_SHADER := preload("res://materials/mechanic_lab_zombie_health.gdshader")
+const BATCH_SHADER := preload("res://materials/mechanic_lab_health_bars.gdshader")
 const BAR_HEIGHT := 2.16
 const INITIAL_CAPACITY := 128
 
@@ -15,12 +16,14 @@ static func make_quad() -> QuadMesh:
 
 func _ready() -> void:
 	var material := ShaderMaterial.new()
-	material.shader = HEALTH_SHADER
-	material.set_shader_parameter("use_batched_health", true)
+	material.shader = BATCH_SHADER
 	material_override = material
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var quad := make_quad()
+	# The shader rotates the quad after the usual mesh bounds check.
+	extra_cull_margin = quad.size.length() * 0.5
 	multimesh = MultiMesh.new()
-	multimesh.mesh = make_quad()
+	multimesh.mesh = quad
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	multimesh.use_custom_data = true
 	multimesh.instance_count = INITIAL_CAPACITY

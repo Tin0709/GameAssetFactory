@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode unshaded, depth_draw_never, cull_disabled, shadows_disabled;
 
+#include "res://materials/mechanic_lab_health_fill.gdshaderinc"
+
 instance uniform float health_ratio = 1.0;
 instance uniform float delayed_ratio = 1.0;
 uniform bool use_batched_health = false;
@@ -12,10 +14,6 @@ void vertex() {
 }
 
 void fragment() {
-	vec2 interior = (UV - vec2(0.025, 0.19)) / vec2(0.95, 0.62);
-	bool inside = all(greaterThanEqual(interior, vec2(0.0))) && all(lessThanEqual(interior, vec2(1.0)));
-	vec3 fill = mix(vec3(0.70, 0.035, 0.04), vec3(1.0, 0.24, 0.11), 1.0 - interior.y);
-	vec3 track = interior.x < bar_fill.y ? vec3(0.98, 0.70, 0.28) : vec3(0.12, 0.04, 0.05);
-	ALBEDO = inside ? (interior.x < bar_fill.x ? fill : track) : vec3(0.03, 0.017, 0.023);
+	ALBEDO = health_bar_colour(UV, bar_fill);
 	ALPHA = 1.0;
 }
