@@ -13,6 +13,7 @@ const PlayableBoulder = preload("res://scripts/world_map_boulder.gd")
 const ForestMoss = preload("res://scripts/world_map_forest_moss.gd")
 const ForestUnderstory = preload("res://scripts/world_map_forest_understory.gd")
 const ExteriorGround = preload("res://scripts/world_map_exterior_ground.gd")
+const CliffRelief = preload("res://scripts/world_map_cliff_relief.gd")
 const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
 const BiomeProfile = preload("res://scripts/biome_graphics_profile.gd")
 const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
@@ -78,6 +79,8 @@ var forest := FOREST.new("", "")
 var _biome_profile: BiomeProfile
 var distant_terrain := DistantTerrain.new()
 var _cliff_vista_enabled := false
+var _cliff_relief_enabled := true
+var cliff_relief: CliffRelief
 var playable_terrace: PlayableTerrace
 var playable_boulder: PlayableBoulder
 var basin_boulders: Array[PlayableBoulder] = []
@@ -521,6 +524,15 @@ func setup(world:Node3D)->void:
 	var terrace_profile := PlayableTerrace.read_profile(level, level.playable_terrace_profile, level.playable_terrace_sha256)
 	distant_terrain.prepare(level, level.distant_terrain_origin, level.distant_terrain_layout_sha,
 		StringName(terrace_profile.get("section", "")))
+	if level.cliff_relief_reach > 0 and is_instance_valid(distant_terrain.vista):
+		var ridge := CliffRelief.new()
+		if ridge.build_relief(level, level.cliff_relief_reach, level.cliff_relief_tree_sites):
+			cliff_relief = ridge
+			ridge.name = "NorthernRidgeline"
+			ridge.hide()
+			level.add_child(ridge)
+		else:
+			ridge.free()
 	if level.exterior_ground_reach > 0 and is_instance_valid(distant_terrain.vista):
 		var foothills := ExteriorGround.new()
 		if foothills.build(level, level.exterior_ground_reach):
@@ -1045,7 +1057,13 @@ func refresh_cliff_vista() -> void:
 		return
 	var env: Environment = level.get_node("WorldEnvironment").environment
 	var camera: Camera3D = level.get_node("Camera3D")
-	distant_terrain.update_vista(_cliff_vista_enabled and level.look.stage == 2 and level.view_mode == "gameplay",
+	var active := _cliff_vista_enabled and level.look.stage == 2 and level.view_mode == "gameplay"
+	var use_relief := active and source_terrain_active and _cliff_relief_enabled and is_instance_valid(cliff_relief)
+	if is_instance_valid(cliff_relief):
+		cliff_relief.visible = use_relief
+		if use_relief:
+			cliff_relief.set_air(env, hour)
+	distant_terrain.update_vista(active and not use_relief,
 		env, camera, hour, _lighting_scale(&"cliff_vista_feather") if private_primary else 1.)
 
 func _sync_distant_terrain() -> void:
@@ -1813,6 +1831,8 @@ func set_source_terrain(enabled: bool) -> bool:
 		_source_terrain_tiles = preload("res://scripts/world_map_source_terrain.gd").load_tiles()
 	enabled = enabled and _source_terrain_tiles != null
 	source_terrain_active = enabled
+	if is_instance_valid(cliff_relief):
+		cliff_relief.material.set_shader_parameter("source_terrain_tiles", _source_terrain_tiles if enabled else null)
 	if is_instance_valid(exterior_ground):
 		exterior_ground.material.set_shader_parameter("source_terrain_tiles", _source_terrain_tiles if enabled else null)
 	var bound: Dictionary[ShaderMaterial, bool] = {}
@@ -4481,6 +4501,15 @@ func _build_ui()->void:
 		foothills.toggled.connect(func(enabled: bool):
 			exterior_ground_enabled = enabled
 			refresh_exterior_ground())
+	if is_instance_valid(cliff_relief):
+		var ridge := CheckButton.new()
+		ridge.name = "NorthernRidgelineToggle"
+		ridge.button_pressed = _cliff_relief_enabled
+		ridge.focus_mode = Control.FOCUS_NONE
+		box.add_child(ridge)
+		ridge.toggled.connect(func(enabled: bool):
+			_cliff_relief_enabled = enabled
+			refresh_cliff_vista())
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)

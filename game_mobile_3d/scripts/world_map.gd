@@ -53,6 +53,8 @@ var biome_controller: BiomeGraphics
 @export var cliff_vista_scale := Vector3.ONE
 @export var cliff_vista_mesh_anchor := Vector3.ZERO
 @export var cliff_vista_sections: PackedStringArray
+@export_range(0, 80) var cliff_relief_reach := 0
+@export var cliff_relief_tree_sites: PackedVector2Array
 ## A verified support and sky bake relative to the private research folder.
 @export var playable_terrace_profile := ""
 @export var playable_terrace_sha256 := ""

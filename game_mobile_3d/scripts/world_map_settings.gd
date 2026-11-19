@@ -20,6 +20,7 @@ const NAMED := {
 	"ForestLedgeMossToggle": "forest-ledge-moss",
 	"ForestUnderstoryToggle": "forest-understory",
 	"ExteriorGroundToggle": "exterior-ground",
+	"NorthernRidgelineToggle": "northern-ridgeline",
 	"GrassWind": "grass-wind",
 	"GrassContact": "player-grass-flower-interaction",
 	"ForestWeather": "biome-weather",

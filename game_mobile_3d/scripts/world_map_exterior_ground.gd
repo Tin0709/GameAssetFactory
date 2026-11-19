@@ -85,10 +85,10 @@ func _merge_top(heights: Dictionary, merged: Dictionary, cell: Vector2i, height:
 func _same_top(heights: Dictionary, merged: Dictionary, cell: Vector2i, height: int) -> bool:
 	return heights.get(cell) == height and not merged.has(cell)
 
-func _emit_top(tool: SurfaceTool, face: Array, cell: Vector2i, height: int, span: Vector2i) -> void:
+func _emit_top(tool: SurfaceTool, face: Array, cell: Vector2i, height: int, span: Vector2i, pitch := 1.) -> void:
 	# The approved source atlas is sampled from world position, so merging does not stretch it.
-	var center := Vector3(cell.x + span.x * .5, height - 1., cell.y + span.y * .5)
-	var scale := Vector3(span.x, 1., span.y)
+	var center := Vector3((cell.x + span.x * .5) * pitch, height - 1., (cell.y + span.y * .5) * pitch)
+	var scale := Vector3(span.x * pitch, 1., span.y * pitch)
 	for vertex: Array in face:
 		tool.set_normal(vertex[1])
 		tool.set_uv(vertex[2])
