@@ -62,6 +62,8 @@ var biome_controller: BiomeGraphics
 @export var playable_boulder_layout_sha := ""
 ## X, Z, yaw in degrees, source mesh variant. Each rock must sit on an intact level patch.
 @export var basin_boulder_placements: PackedVector4Array
+## X, Z, yaw in degrees and ForestA1 moss variant. Empty on maps without ledge moss.
+@export var forest_moss_placements: PackedVector4Array
 
 @export var local_mist_region: LocalMistRegion
 @export var alternate_mist_region: LocalMistRegion

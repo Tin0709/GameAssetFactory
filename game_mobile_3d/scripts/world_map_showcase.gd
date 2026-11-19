@@ -10,6 +10,7 @@ const Weather = preload("res://scripts/biome_weather.gd")
 const DistantTerrain = preload("res://scripts/world_map_distant_terrain.gd")
 const PlayableTerrace = preload("res://scripts/world_map_playable_terrace.gd")
 const PlayableBoulder = preload("res://scripts/world_map_boulder.gd")
+const ForestMoss = preload("res://scripts/world_map_forest_moss.gd")
 const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
 const BiomeProfile = preload("res://scripts/biome_graphics_profile.gd")
 const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
@@ -78,6 +79,7 @@ var _cliff_vista_enabled := false
 var playable_terrace: PlayableTerrace
 var playable_boulder: PlayableBoulder
 var basin_boulders: Array[PlayableBoulder] = []
+var forest_moss: ForestMoss
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_replay := preload("res://scripts/world_map_forest_replay.gd").new()
@@ -531,6 +533,14 @@ func setup(world:Node3D)->void:
 		else:
 			boulder.free()
 	_setup_basin_boulders()
+	if not level.forest_moss_placements.is_empty():
+		var moss := ForestMoss.new()
+		if moss.configure(level, level.forest_moss_placements):
+			forest_moss = moss
+			moss.name = "ForestLedgeMoss"
+			level.add_child(moss)
+		else:
+			moss.free()
 	sync_spruce_leaf_filter()
 	_build_ui()
 	set_source_terrain(true)
@@ -1723,6 +1733,8 @@ func _scene_light_materials() -> Array:
 	for rock in basin_boulders:
 		if is_instance_valid(rock) and rock.active:
 			result.append(rock.material)
+	if is_instance_valid(forest_moss) and forest_moss.visible:
+		result.append(forest_moss.material)
 	return result
 
 func far_terrain_shading_materials() -> Array:
@@ -4409,6 +4421,13 @@ func _build_ui()->void:
 		_add_terrain_toggle(box, playable_boulder, "Cụm đá ven đường rừng")
 	if not basin_boulders.is_empty():
 		_add_terrain_toggle(box, basin_boulders[0], "Hai cụm đá ở chân bậc", basin_boulders.slice(1))
+	if is_instance_valid(forest_moss):
+		var moss := CheckButton.new()
+		moss.name = "ForestLedgeMossToggle"
+		moss.button_pressed = forest_moss.visible
+		moss.focus_mode = Control.FOCUS_NONE
+		box.add_child(moss)
+		moss.toggled.connect(forest_moss.set_visible)
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)
