@@ -102,6 +102,7 @@ var _previous_3d_scaling_mode: Viewport.Scaling3DMode
 var _render_scale_overridden := false
 var _combat_audio: CombatAudio
 var _zombie_step_dust: ZombieStepDust
+var _floor_snap_contact := KinematicCollision3D.new()
 var _slam_swing_frame := -1
 var _slam_swing_serial := -1
 var _slam_audio_frame := -1
@@ -941,8 +942,12 @@ func _player_foot_contact_at(sole: Vector3) -> Dictionary:
 func _grass_step_contact_at(sole: Vector3, actor: CharacterBody3D) -> Dictionary:
 	var grass := _grass_contact_at(sole)
 	if not grass.is_empty() and actor != null:
-		var support := _actor_floor_support(actor, sole)
-		if not support.is_empty() and support.body != $Ground:
+		# A snapped capsule can stay on a slope with no recorded floor slide.
+		# Probe when the sole ray lands at a different height from the capsule.
+		var verify_snap: bool = actor.is_on_floor() and absf(actor.global_position.y - grass.position.y) > actor.safe_margin * 2.0
+		var support := _actor_floor_support(actor, sole, verify_snap)
+		var supported_by_grass: bool = not support.is_empty() and support.body == $Ground
+		if not supported_by_grass and (verify_snap or not support.is_empty()):
 			return {}
 	return grass
 
@@ -965,15 +970,24 @@ func _grass_landing_contact_at(point: Vector3) -> Dictionary:
 			_landing_contact = {"position": support.position, "surface": "grass"} if support.body == $Ground else {}
 	return _landing_contact
 
-func _actor_floor_support(actor: CharacterBody3D, point: Vector3) -> Dictionary:
+func _actor_floor_support(actor: CharacterBody3D, point: Vector3, verify_snap := false) -> Dictionary:
 	# A sole outside a ledge can raycast to the grass below. Prefer the
 	# actual floor contact from this move_and_slide, including non-grass.
 	var min_normal_y := cos(actor.floor_max_angle)
 	var closest := INF
 	var nearest := Vector3.ZERO
 	var floor_body: CollisionObject3D
-	for i in actor.get_slide_collision_count():
-		var collision := actor.get_slide_collision(i)
+	var slide_count := actor.get_slide_collision_count()
+	for i in slide_count + int(verify_snap):
+		var collision: KinematicCollision3D
+		if i < slide_count:
+			collision = actor.get_slide_collision(i)
+		else:
+			var snap := -actor.up_direction * maxf(actor.floor_snap_length, actor.safe_margin)
+			if floor_body != null or not actor.test_move(actor.global_transform, snap,
+					_floor_snap_contact, actor.safe_margin, true, 4):
+				break
+			collision = _floor_snap_contact
 		for index in collision.get_collision_count():
 			if collision.get_normal(index).y < min_normal_y:
 				continue
