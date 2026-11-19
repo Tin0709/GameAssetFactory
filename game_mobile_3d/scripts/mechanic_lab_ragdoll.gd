@@ -1022,6 +1022,12 @@ func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState
 			break
 		var normal := _projection_hit.get_collision_normal()
 		var fraction := _projection_hit.get_collision_safe_fraction()
+		if fraction == 0.0 and normal.y <= -MAX_WALL_NORMAL_Y and _is_fixed_wall(_projection_hit.get_collider()):
+			var retreat := _baby_lower_wall_retreat(body, state.transform, half_size, motion, normal, floor)
+			if not retreat.is_zero_approx():
+				state.transform = state.transform.translated(retreat)
+				motion -= retreat
+				continue
 		if fraction == 0.0 and absf(normal.y) < MAX_WALL_NORMAL_Y and _is_fixed_wall(_projection_hit.get_collider()):
 			# The initial overlap can report a zero-distance hit even when
 			# the part has room along the wall. Let the query separate the
@@ -1041,6 +1047,44 @@ func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState
 			break
 		motion = (motion * (1.0 - fraction)).slide(normal)
 	return state.transform.origin - start
+
+func _baby_lower_wall_retreat(body: PhysicalBone3D, pose: Transform3D, half_size: Vector3,
+		motion: Vector3, normal: Vector3, floor: RID) -> Vector3:
+	# A lower edge can separate the box downward into the floor. For an
+	# aligned box wall, clear the current side along the requested horizontal motion.
+	if not is_zero_approx(normal.x) and not is_zero_approx(normal.z):
+		return Vector3.ZERO
+	var axis := Vector3(signf(normal.x), 0.0, 0.0) if is_zero_approx(normal.z) else Vector3(0.0, 0.0, signf(normal.z))
+	var outward_travel := motion.dot(axis)
+	if outward_travel <= 0.0:
+		return Vector3.ZERO
+	var wall := _projection_hit.get_collider_rid()
+	var collider := body.get_child(0) as CollisionShape3D
+	if collider == null or collider.transform != Transform3D.IDENTITY or not _is_single_box(wall):
+		return Vector3.ZERO
+	var wall_pose: Transform3D = PhysicsServer3D.body_get_state(wall, PhysicsServer3D.BODY_STATE_TRANSFORM)
+	wall_pose *= PhysicsServer3D.body_get_shape_transform(wall, 0)
+	if wall_pose.basis != Basis.IDENTITY:
+		return Vector3.ZERO
+	var wall_centre := wall_pose.origin.dot(axis)
+	var part_centre := pose.origin.dot(axis)
+	if part_centre <= wall_centre:
+		return Vector3.ZERO
+	var wall_half: Vector3 = PhysicsServer3D.shape_get_data(PhysicsServer3D.body_get_shape(wall, 0))
+	var face := wall_centre + wall_half.dot(axis.abs())
+	var extent := (pose.basis.transposed() * axis).abs().dot(half_size)
+	var clearance := face - (part_centre - extent) + 2.0 * PROJECTION_COLLISION_MARGIN
+	if clearance <= 0.0 or clearance > outward_travel:
+		return Vector3.ZERO
+	var retreat := axis * clearance
+	# Overlap with this wall only decreases along the retreat. Sweep against
+	# all other obstacles before moving the part.
+	_projection_query.from = pose
+	_projection_query.motion = retreat
+	_projection_query.exclude_bodies = [floor, wall]
+	var blocked := PhysicsServer3D.body_test_motion(body.get_rid(), _projection_query)
+	_projection_query.exclude_bodies = []
+	return Vector3.ZERO if blocked else retreat
 
 func _project_source_anchors() -> void:
 	var lab_floor := not floor_landing_blended and is_instance_valid(_flat_floor) and not _flat_floor.disabled
