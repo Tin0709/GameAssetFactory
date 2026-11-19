@@ -309,6 +309,19 @@ func check_edge_landing_gravity() -> void:
 	zombie._update_landing_forces(1.0 / 60.0, false, false, motion)
 	check(is_equal_approx(head.gravity_scale, zombie._gravity_scale(zombie.ZOMBIE_GRAVITY)),
 		"A corpse entirely beyond the floor edge returns to flight gravity")
+	# On a 45-degree roll, the lowest corner overhangs the edge by 6 cm.
+	# The first part of the head above the platform is therefore 6 cm higher.
+	var tilt := Basis(Vector3.BACK, PI / 4.0)
+	var low_corner := tilt * Vector3(-head_half.x, -head_half.y, 0.0)
+	var floor_top := floor_shape.global_position.y + (floor_shape.shape as BoxShape3D).size.y * 0.5
+	head.global_transform = Transform3D(tilt, Vector3(edge + 0.06, floor_top - 0.05, 0.0) - low_corner)
+	zombie._update_landing_forces(0.2, true, false, motion)
+	check(is_equal_approx(head.gravity_scale, 1.0),
+		"A rolling head 1 cm above the platform retains landing gravity even when its lowest corner overhangs")
+	head.global_position.y += 0.05
+	zombie._update_landing_forces(1.0 / 60.0, true, false, motion)
+	check(is_equal_approx(head.gravity_scale, zombie._gravity_scale(zombie.ZOMBIE_GRAVITY)),
+		"A head 6 cm clear of the platform returns to flight gravity even when its overhanging corner is level with it")
 	print("LAB_EDGE_GRAVITY scale=", head.gravity_scale)
 	lab.free()
 
