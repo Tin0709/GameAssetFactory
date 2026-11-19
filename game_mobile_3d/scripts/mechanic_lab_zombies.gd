@@ -294,30 +294,42 @@ func aim_sabre(index: int, serial: int, movement: Vector3) -> Vector3:
 	if serial != _aim_serial:
 		_aim_serial = serial
 		_aim_target = null
-	if not is_instance_valid(_aim_target) or _aim_target.health <= 0 or _aim_target.is_queued_for_deletion():
+	var has_live_target := is_instance_valid(_aim_target) and _aim_target.health > 0 \
+		and not _aim_target.is_queued_for_deletion()
+	if not crossbow_equipped or not has_live_target:
 		var reach := CrossPollinator.AIM_RANGE if crossbow_equipped else float(_strikes()[index].range_m)
-		_aim_target = _find_attack_target(reach, movement, crossbow_equipped)
-		if _aim_target == null:
-			return Vector3.ZERO
+		var preferred := _aim_target if has_live_target else null
+		_aim_target = _find_attack_target(reach, movement, crossbow_equipped, preferred)
+	if _aim_target == null:
+		return Vector3.ZERO
 	var direction := _aim_target.global_position - _attacker.global_position
 	direction.y = 0.0
 	return direction
 
-func _find_attack_target(reach: float, movement: Vector3, ranged := false) -> Zombie:
+func _find_attack_target(reach: float, movement: Vector3, ranged := false, preferred: Zombie = null) -> Zombie:
 	var origin := _attacker.global_position
 	var space := get_world_3d().direct_space_state
 	var ray := _melee_ray(origin)
+	var reach_squared := reach * reach
+	# Hold a valid melee lock through the windup to avoid switching when
+	# two zombies cross. Reacquire if the locked target can no longer be hit.
+	if preferred != null:
+		var offset := preferred.global_position - origin
+		if absf(offset.y) <= GROUND_HEIGHT_LIMIT and Vector2(offset.x, offset.z).length_squared() <= reach_squared:
+			ray.to = preferred.combat_center()
+			if space.intersect_ray(ray).is_empty():
+				return preferred
 	var nearest: Zombie
 	var nearest_squared := INF
 	for zombie: Zombie in get_children():
-		if zombie.health <= 0 or zombie.is_queued_for_deletion():
+		if zombie == preferred or zombie.health <= 0 or zombie.is_queued_for_deletion():
 			continue
 		var offset := zombie.global_position - origin
 		if not ranged and absf(offset.y) > GROUND_HEIGHT_LIMIT:
 			continue
 		var distance_squared := offset.length_squared() if ranged else Vector2(offset.x, offset.z).length_squared()
 		offset.y = 0.0
-		if distance_squared > reach * reach or distance_squared >= nearest_squared or offset.dot(movement) < 0.0:
+		if distance_squared > reach_squared or distance_squared >= nearest_squared or offset.dot(movement) < 0.0:
 			continue
 		ray.to = zombie.combat_center()
 		if space.intersect_ray(ray).is_empty():
