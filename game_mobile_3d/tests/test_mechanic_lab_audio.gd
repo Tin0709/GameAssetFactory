@@ -451,17 +451,17 @@ func check_weapon_onsets_under_mixed_impacts(audio: Node, bus: int, capture: Aud
 func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffectCapture) -> void:
 	audio.set_enabled(true, Vector3.ZERO)
 	audio.reset()
+	await create_timer(0.08).timeout
 	var point := Vector3.FORWARD * 2.0
 	var grass_samples: Array = audio._groups[&"slam_grass"]
 	var first_choice: int = audio._next_choice.get(&"slam_grass", 0)
-	var weapon_voices: Array[AudioStreamPlayer3D] = []
+	var weapon_voices: Array[AudioStreamPlayer3D] = audio._voices.slice(0, COMBAT_AUDIO.VOICES_PER_POOL)
 	var weapon_buses: Array[StringName] = []
+	for voice in weapon_voices:
+		weapon_buses.append(voice.bus)
+		voice.bus = &"Master"
 	for i in COMBAT_AUDIO.VOICES_PER_POOL:
-		var voice: AudioStreamPlayer3D = audio._play(&"hit", point, -9.0, -1, true)
-		if voice != null:
-			weapon_voices.append(voice)
-			weapon_buses.append(voice.bus)
-			voice.bus = &"Master"
+		audio._play(&"hit", point, -9.0, -1, true)
 	check(weapon_voices.size() == COMBAT_AUDIO.VOICES_PER_POOL and weapon_voices.all(func(voice): return voice.playing),
 		"The weapon pool is filled with three pending hit onsets")
 	var second_point := point + Vector3.RIGHT
