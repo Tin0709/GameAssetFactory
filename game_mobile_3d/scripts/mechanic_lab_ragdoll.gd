@@ -1054,10 +1054,6 @@ func _baby_lower_wall_retreat(body: PhysicalBone3D, pose: Transform3D, half_size
 	# aligned box wall, clear the current side along the requested horizontal motion.
 	if not is_zero_approx(normal.x) and not is_zero_approx(normal.z):
 		return Vector3.ZERO
-	var axis := Vector3(signf(normal.x), 0.0, 0.0) if is_zero_approx(normal.z) else Vector3(0.0, 0.0, signf(normal.z))
-	var outward_travel := motion.dot(axis)
-	if outward_travel <= 0.0:
-		return Vector3.ZERO
 	var wall := _projection_hit.get_collider_rid()
 	var collider := body.get_child(0) as CollisionShape3D
 	if collider == null or collider.transform != Transform3D.IDENTITY or not _is_single_box(wall):
@@ -1066,11 +1062,22 @@ func _baby_lower_wall_retreat(body: PhysicalBone3D, pose: Transform3D, half_size
 	wall_pose *= PhysicsServer3D.body_get_shape_transform(wall, 0)
 	if wall_pose.basis != Basis.IDENTITY:
 		return Vector3.ZERO
+	var wall_half: Vector3 = PhysicsServer3D.shape_get_data(PhysicsServer3D.body_get_shape(wall, 0))
+	var horizontal := Vector3(normal.x, 0.0, normal.z)
+	if horizontal.is_zero_approx():
+		# An underside hit can point straight down. Use the nearest side on
+		# the part's half of the box, subject to the same outward motion check.
+		var relative := pose.origin - wall_pose.origin
+		var face_distance := (wall_half - relative.abs()).abs()
+		horizontal = Vector3(relative.x, 0.0, 0.0) if face_distance.x <= face_distance.z else Vector3(0.0, 0.0, relative.z)
+	var axis := Vector3(signf(horizontal.x), 0.0, 0.0) if is_zero_approx(horizontal.z) else Vector3(0.0, 0.0, signf(horizontal.z))
+	var outward_travel := motion.dot(axis)
+	if outward_travel <= 0.0:
+		return Vector3.ZERO
 	var wall_centre := wall_pose.origin.dot(axis)
 	var part_centre := pose.origin.dot(axis)
 	if part_centre <= wall_centre:
 		return Vector3.ZERO
-	var wall_half: Vector3 = PhysicsServer3D.shape_get_data(PhysicsServer3D.body_get_shape(wall, 0))
 	var face := wall_centre + wall_half.dot(axis.abs())
 	var extent := (pose.basis.transposed() * axis).abs().dot(half_size)
 	var clearance := face - (part_centre - extent) + 2.0 * PROJECTION_COLLISION_MARGIN
