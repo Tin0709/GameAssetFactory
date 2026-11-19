@@ -767,7 +767,15 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 		if (not obstacle is StaticBody3D and not living_blocker) \
 				or obstacle == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
 			continue
-		_chase_detour = _choose_detour_waypoint(get_world_3d().direct_space_state, bounds, normal, offset, stop_distance)
+		var space := get_world_3d().direct_space_state
+		_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance)
+		if not _chase_detour.is_finite() and not _target_visible and not living_blocker:
+			# The remembered route can reach farther with a faster chaser.
+			# Bound the second search by the time left on the sighting.
+			var available := minf(LAB_DETOUR_TIMEOUT, LAB_SIGHT_LOSS_DELAY - _sight_state_seconds)
+			var reach := _chase_speed * available
+			if reach > LAB_DETOUR_LENGTH:
+				_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, reach)
 		if _chase_detour.is_finite():
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
 			# Returning directly through the blocker would undo this side step.
@@ -777,7 +785,7 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 	return Vector3.ZERO
 
 func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3,
-		target_offset: Vector3, stop_distance: float) -> Vector3:
+		target_offset: Vector3, stop_distance: float, search_distance := LAB_DETOUR_LENGTH) -> Vector3:
 	_prepare_lab_path_sweep(true)
 	# Open a small gap beside the wall before testing the two legs.
 	# A shape cast can omit contacts already touching its start.
@@ -797,7 +805,7 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 	var best_distance := min_distance
 	var best_connects := false
 	for direction in [lateral, -lateral]:
-		var local := _corpse_floor.to_local(origin + direction * LAB_DETOUR_LENGTH)
+		var local := _corpse_floor.to_local(origin + direction * search_distance)
 		local.x = clampf(local.x, -extent.x, extent.x)
 		local.z = clampf(local.z, -extent.z, extent.z)
 		var travel := (_corpse_floor.to_global(local) - origin).slide(Vector3.UP)
