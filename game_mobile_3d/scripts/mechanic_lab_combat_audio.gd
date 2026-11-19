@@ -457,7 +457,11 @@ func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"", preview
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
 		AudioServer.set_bus_mute(0, false)
-	var preview := _weapon_hit_group() if preview_group.is_empty() else preview_group
+	if not preview_group.is_empty():
+		# Preview the next sample without spending a combat variant or priority slot.
+		_play(preview_group, preview_point, HIT_GAIN_DB, -1, false, true)
+		return
+	var preview := _weapon_hit_group()
 	if not melee_tool.is_empty():
 		preview = _tool_group(melee_tool, 5)
 		if not _groups.has(preview):
@@ -929,16 +933,17 @@ func _load_sample(root: String, group: StringName, relative: String, checksum: S
 			_groups[group] = []
 		_groups[group].append(stream)
 
-func _next_stream(group: StringName) -> AudioStream:
+func _next_stream(group: StringName, advance := true) -> AudioStream:
 	var choices: Array = _groups.get(group, [])
 	if choices.is_empty():
 		return null
 	var choice: int = _next_choice.get(group, 0)
-	_next_choice[group] = (choice + 1) % choices.size()
+	if advance:
+		_next_choice[group] = (choice + 1) % choices.size()
 	return choices[choice]
 
 func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
-		weapon_onset := false) -> AudioStreamPlayer3D:
+		weapon_onset := false, preview := false) -> AudioStreamPlayer3D:
 	if not _groups.has(group):
 		return null
 	# Separate enemy attack and reaction budgets keep the weapon tails audible.
@@ -963,7 +968,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 			slot = candidate
 			break
 	var frame := Engine.get_physics_frames() if event_frame < 0 else event_frame
-	weapon_onset = weapon_onset or group == &"crossbow_fire" or group == &"bow_fire"
+	weapon_onset = weapon_onset or (not preview and (group == &"crossbow_fire" or group == &"bow_fire"))
 	if slot == -1:
 		match pool:
 			REACTION_POOL:
@@ -974,7 +979,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 				slot = _replace_weapon_slot(start, weapon_onset, frame)
 		if slot == -1:
 			return null
-	var stream := _next_stream(group)
+	var stream := _next_stream(group, not preview)
 	var voice_index := first + slot
 	var voice := _voices[voice_index]
 	_next_voice[pool] = (slot + 1) % VOICES_PER_POOL
