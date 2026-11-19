@@ -508,20 +508,19 @@ func _physics_process(delta: float) -> void:
 	ragdoll.sample(delta)
 
 func _wait_for_walk_retry(destination: Vector3) -> bool:
-	var retry_hz := BLOCKED_CHASE_RETRY_HZ
-	var retry_interval := 1
-	if _blocking_zombie_id != 0:
-		if _walk_blocker_moved(_blocking_zombie_id, _blocking_position) \
-				or destination.distance_squared_to(_blocked_walk_destination) > WALK_DESTINATION_MOVE_DISTANCE_SQUARED:
-			return false
-		retry_hz = PACKED_WALK_RETRY_HZ
-		if _blocking_peer_id != 0:
-			if _walk_blocker_moved(_blocking_peer_id, _blocking_peer_position):
-				return false
-			if _repeated_blocking_pair:
-				retry_interval = 2
-	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / retry_hz)) * retry_interval
-	return Engine.get_physics_frames() % stride != _crowd_slot % stride
+	var retry_hz := BLOCKED_CHASE_RETRY_HZ if _blocking_zombie_id == 0 else PACKED_WALK_RETRY_HZ
+	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / retry_hz))
+	if _blocking_peer_id != 0 and _repeated_blocking_pair:
+		stride *= 2
+	# Blocker movement can only bring a retry forward on an unscheduled tick.
+	if Engine.get_physics_frames() % stride == _crowd_slot % stride:
+		return false
+	if _blocking_zombie_id == 0:
+		return true
+	if destination.distance_squared_to(_blocked_walk_destination) > WALK_DESTINATION_MOVE_DISTANCE_SQUARED \
+			or _walk_blocker_moved(_blocking_zombie_id, _blocking_position):
+		return false
+	return _blocking_peer_id == 0 or not _walk_blocker_moved(_blocking_peer_id, _blocking_peer_position)
 
 func _walk_blocker_moved(id: int, position_at_contact: Vector3) -> bool:
 	var blocker := instance_from_id(id) as CharacterBody3D
