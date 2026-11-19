@@ -573,7 +573,7 @@ func _load_baby_assets() -> void:
 	for row: Array in BABY_CLIPS.values():
 		if not _verified(_clip_path(directory, row[0]), row[1]):
 			return
-	var model := _import_gltf(_clip_path(directory, BABY_IDLE))
+	var model := _import_gltf(_clip_path(directory, BABY_IDLE), 0, false)
 	if model == null:
 		return
 	var player := model.get_node_or_null("AnimationPlayer") as AnimationPlayer
@@ -604,7 +604,10 @@ func _add_baby_clips(directory: String, player: AnimationPlayer) -> bool:
 		if name == Zombie.IDLE:
 			continue
 		var source_name: StringName = BABY_CLIPS[name][0]
-		var imported := _import_gltf(_clip_path(directory, source_name), GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS)
+		# The spawn clip sets the hip to 5% scale. Other clips need their
+		# authored constant hip keys to restore the full-size pose afterward.
+		var imported := _import_gltf(_clip_path(directory, source_name),
+			GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS, false)
 		if imported == null:
 			return false
 		var source_player := imported.get_node_or_null("AnimationPlayer") as AnimationPlayer
@@ -663,9 +666,9 @@ func _clip_path(directory: String, clip: StringName) -> String:
 func _verified(path: String, expected_hash: String) -> bool:
 	return FileAccess.file_exists(path) and FileAccess.get_sha256(path) == expected_hash
 
-func _import_gltf(path: String, flags := 0) -> Node3D:
+func _import_gltf(path: String, flags := 0, remove_immutable_tracks := true) -> Node3D:
 	var document := GLTFDocument.new()
 	var state := GLTFState.new()
 	if document.append_from_file(path, state, flags) != OK:
 		return null
-	return document.generate_scene(state) as Node3D
+	return document.generate_scene(state, 30.0, false, remove_immutable_tracks) as Node3D
