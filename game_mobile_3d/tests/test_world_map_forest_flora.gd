@@ -36,13 +36,18 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 	var sectors := {}
 	var rooted := {}
 	var count := 0
-	var asset := ""
+	var assets := {}
 	for row: Dictionary in plants.placements:
 		check(not rooted.has(row.cell), "Only one plant grows in each grass cell")
 		rooted[row.cell] = row
 		if not row.get("forest_fern", false):
 			continue
-		asset = row.asset
+		if not assets.has(row.asset):
+			assets[row.asset] = {}
+		assets[row.asset][Vector2i(signi(row.cell.x), signi(row.cell.y))] = true
+		if not String(row.asset).ends_with("SM_SF_Fern_Small"):
+			check(row.bounds.size.x <= 1. and row.bounds.size.z <= 1.,
+				"New fern fronds fit within the cell occupied by their root")
 		count += 1
 		sectors[Vector2i(signi(row.cell.x), signi(row.cell.y))] = true
 		var pixel := Vector2i(Vector2(row.cell) - world.look.path_map_origin)
@@ -51,9 +56,10 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 			check(flags == 0, "Ferns keep the path and its immediate margin clear")
 		check(absf(world.surface_height(row.root.x, row.root.z) - row.bounds.position.y) < .002,
 			"Fern roots rest on the terrain")
-	check(count == world.forest_fern_cells.size() and sectors.size() == 4,
-		"Small fern groups appear at every authored cell across all four map sectors")
-	if not asset.is_empty():
+	check(count == 88 and assets.size() == 3 and sectors.size() == 4,
+		"Three fern shapes occupy 88 authored cells across all four sectors")
+	for asset: String in assets:
+		check(assets[asset].size() == 4, "Each fern shape grows in all four sectors")
 		var material: ShaderMaterial = plants.bundle.meshes[asset].surface_get_material(0)
 		check(material.get_shader_parameter("native_grass_albedo") == true, "Fern keeps its verified source color")
 		check(world.showcase._mist_materials().has(material), "Fern participates in shared mist")
