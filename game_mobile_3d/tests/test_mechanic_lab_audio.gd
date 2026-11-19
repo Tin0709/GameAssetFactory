@@ -883,10 +883,16 @@ func check_local_hurt_onset(lab, audio, voice: AudioStreamPlayer, capture: Audio
 	for sample in capture.get_buffer(capture.get_frames_available()):
 		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
 	check(peak > 0.005 and peak < 0.5, "The protected local hurt reaches the mixer with headroom")
+	for i in 24:
+		if not voice.playing or voice.get_playback_position() >= 0.05:
+			break
+		await process_frame
+	var ready_position := voice.get_playback_position()
 	lab._on_player_hit(6)
 	check(voice.get_stream_playback() != playback and audio._next_choice[&"player_hurt"] != choice,
 		"A later hit can play a fresh local hurt cue")
-	print("MECHANIC_LAB_PLAYER_HURT_ONSET seconds=", onset, " held=", held, " peak=", peak)
+	print("MECHANIC_LAB_PLAYER_HURT_ONSET seconds=", onset, " held=", held, " peak=", peak,
+		" next_seconds=", ready_position)
 
 func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
