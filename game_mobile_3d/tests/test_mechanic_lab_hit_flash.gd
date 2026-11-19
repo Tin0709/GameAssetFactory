@@ -109,14 +109,14 @@ func check_health_bar_visibility() -> void:
 	var bars := HealthBars.new()
 	viewport.add_child(bars)
 	var foreground := bars.add_bar(near_owner)
-	var near_colour := (await read_health_viewport(viewport)).get_pixel(160, 160) as Color
+	var near_colour: Color = (await read_health_viewport(viewport)).get_pixel(160, 160)
 	var background := bars.add_bar(far_owner)
 	bars.set_bar_health(background, 0.0, 0.0)
-	var overlap := (await read_health_viewport(viewport)).get_pixel(160, 160) as Color
+	var overlap: Color = (await read_health_viewport(viewport)).get_pixel(160, 160)
 	check(near_colour.r > 0.5 and near_colour.is_equal_approx(overlap),
 		"A full near health bar stays visible when the farther depleted bar is added after it")
+	bars.remove_bar(background)
 	bars.remove_bar(foreground)
-	bars.remove_bar(0)
 	near_owner.position.z = 3.82
 	bars.add_bar(near_owner)
 	var focus := centre + Vector3.BACK * 6.0
@@ -126,7 +126,7 @@ func check_health_bar_visibility() -> void:
 	bars.extra_cull_margin = 1.0
 	var reference := await read_health_viewport(viewport)
 	# The centre is outside the frame, but part of the rotated quad projects inside.
-	check(reference.get_pixel(8, 160).a > 0.5 and edge.get_data() == reference.get_data(),
+	check(reference.get_pixel(311, 160).a > 0.5 and edge.get_data() == reference.get_data(),
 		"A partly visible health bar is rendered when its centre is outside the viewport")
 	viewport.free()
 
