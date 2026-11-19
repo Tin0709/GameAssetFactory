@@ -1241,6 +1241,7 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 		catchup_peak = maxf(catchup_peak, maxf(absf(sample.x), absf(sample.y)))
 	check(catchup_peak > 0.001 and catchup_peak < 0.35, "The selected catch-up steps reach the silent mixer")
 	print("MECHANIC_LAB_STEP_CATCHUP distances=", played_distances, " peak=", catchup_peak)
+	await check_zombie_foley_while_moving(lab, audio, group, voices)
 	audio.reset()
 	var before_reset: int = audio._next_choice.get(&"zombie_step", 0)
 	lab._on_zombie_step(near)
@@ -1348,6 +1349,53 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 		"Muting clears queued contact cues")
 	print("MECHANIC_LAB_ZOMBIE_ATTACK_OVERFLOW peak=", peak)
 	lab.free()
+
+func check_zombie_foley_while_moving(lab: Node, audio: COMBAT_AUDIO, group: Node, voices: Array) -> void:
+	var player := lab.player as CharacterBody3D
+	var original := player.global_position
+	var ear_offset := audio.zombie_listener.global_position - original
+	var idle := audio._zombie_idle_voice
+	var emit := func(offset: Vector3):
+		var point := original + offset
+		lab._on_zombie_step(point)
+		group.zombie_idle_audio.emit(point + ear_offset)
+
+	lab.set_process(false)
+	audio.reset()
+	for i in 96:
+		emit.call(Vector3.FORWARD * (8.0 + i * 0.02))
+	for x in [-1.0, -1.1, -1.2, 1.25]:
+		emit.call(Vector3.RIGHT * x)
+	# The nearest sole is airborne. It never takes a grounded step voice.
+	lab._on_zombie_step(original + Vector3.UP * 2.0)
+	await physics_frame
+	player.global_position = original + Vector3.RIGHT * 0.35
+	audio.flush_zombie_steps()
+	audio.flush_zombie_idle()
+	check(voices.all(func(voice): return voice.playing)
+		and is_equal_approx(voices[0].global_position.x - original.x, 1.25)
+		and is_equal_approx(voices[1].global_position.x - original.x, -1.0)
+		and is_equal_approx(voices[2].global_position.x - original.x, -1.1),
+		"Moving toward a grounded step promotes it into the three closest voices")
+	check(idle.playing and is_equal_approx(idle.global_position.x - original.x, 1.25),
+		"Moving toward an idle zombie gives it the single vocalization voice")
+
+	audio.reset()
+	player.global_position = original
+	var enters := COMBAT_AUDIO.ZOMBIE_STEP_DISTANCE + 0.08
+	emit.call(Vector3.RIGHT * enters)
+	emit.call(Vector3.LEFT * (COMBAT_AUDIO.ZOMBIE_STEP_DISTANCE - 0.10))
+	player.global_position = original + Vector3.RIGHT * 0.35
+	audio.flush_zombie_steps()
+	audio.flush_zombie_idle()
+	check(voices[0].playing and is_equal_approx(voices[0].global_position.x - original.x, enters)
+		and not voices[1].playing and not voices[2].playing,
+		"Step hearing range reflects the new listener position")
+	check(idle.playing and is_equal_approx(idle.global_position.x - original.x, enters),
+		"Idle hearing range reflects the new listener position")
+	audio.reset()
+	player.global_position = original
+	lab.set_process(true)
 
 func check_zombie_cue_catchup(lab: Node, audio: COMBAT_AUDIO, group: Node) -> void:
 	var ear := audio.zombie_listener.global_position
