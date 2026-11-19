@@ -1400,6 +1400,37 @@ func check_zombie_cue_catchup(lab: Node, audio: COMBAT_AUDIO, group: Node) -> vo
 		"Lethal reactions win over queued hurt cues across ticks without starting them")
 
 	audio.reset()
+	var listener := audio.zombie_listener
+	var listener_position := listener.position
+	var right_contact := ear + Vector3.RIGHT * 1.25
+	var left_contact := ear + Vector3.LEFT
+	var next_left_contact := ear + Vector3.LEFT * 1.1
+	for i in 96:
+		emit_cues.call([ear + Vector3.BACK * (10.0 + i * 0.1)], true)
+	emit_cues.call([left_contact, next_left_contact, ear + Vector3.LEFT * 1.2, right_contact], true)
+	await physics_frame
+	listener.global_position = ear + Vector3.RIGHT * 0.35
+	emit_cues.call([far[0]], true)
+	audio.flush_zombie_combat_cues()
+	var closest_at_flush := [right_contact, left_contact, next_left_contact]
+	check(attacks.map(func(voice): return voice.global_position) == closest_at_flush,
+		"A moving listener plays the three closest attack cues in playback order")
+	check(reactions.map(func(voice): return voice.global_position) == closest_at_flush,
+		"A moving listener plays the three closest reactions from a burst of 100 hits")
+
+	audio.reset()
+	listener.global_position = ear
+	var entering := ear + Vector3.RIGHT * (COMBAT_AUDIO.SPATIAL_VOICE_DISTANCE + 0.10)
+	var leaving := ear + Vector3.LEFT * (COMBAT_AUDIO.SPATIAL_VOICE_DISTANCE - 0.10)
+	emit_cues.call([entering, leaving], true)
+	listener.global_position = ear + Vector3.RIGHT * 0.35
+	audio.flush_zombie_combat_cues()
+	check(attacks[0].stream != null and attacks[0].global_position == entering and attacks[1].stream == null
+		and reactions[0].stream != null and reactions[0].global_position == entering and reactions[1].stream == null,
+		"Combat cues enter or leave hearing range at the listener's playback position")
+	listener.position = listener_position
+
+	audio.reset()
 	emit_cues.call(near, false)
 	audio.flush_zombie_combat_cues()
 	hurts_before = audio._next_choice.get(&"hurt", 0)
