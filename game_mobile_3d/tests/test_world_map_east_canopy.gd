@@ -28,6 +28,7 @@ func run() -> void:
 	var sky := world.get_node("SpruceSkyVisibility")
 	var grove: Node3D = world.grove
 	if native and sky.proof_ready:
+		await physics_frame
 		check(sky._dimensions.x == 104 and sky._dimensions.z == 99, "F5 publishes the expanded field")
 		check(sky._geometry_current() and world.showcase.directional_air._geometry_current(), "Both light proofs match their geometry")
 		for i in ROOTS.size():
@@ -36,6 +37,10 @@ func run() -> void:
 			if tree != null:
 				var trunk := tree.get_node("Trunk") as StaticBody3D
 				check(trunk.collision_layer == 1, "A visible tree has a solid trunk")
+				var midpoint := tree.global_position + Vector3.UP
+				var query := PhysicsRayQueryParameters3D.create(midpoint + Vector3.BACK, midpoint + Vector3.FORWARD, 1)
+				var contact := world.get_world_3d().direct_space_state.intersect_ray(query)
+				check(contact.get("collider") == trunk, "The trunk stops a horizontal probe above the grass")
 				var shadows := tree.find_children("*Shadow", "MeshInstance3D", true, false)
 				check(shadows.size() == 1 and shadows[0].material_override == grove._spruce_shadow,
 					"East spruce reuses the live Forest shadow caster")
