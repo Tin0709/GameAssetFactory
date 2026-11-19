@@ -964,8 +964,7 @@ func _recover_baby_floor_anchors() -> void:
 		var extent := Basis(local.basis.x.abs(), local.basis.y.abs(), local.basis.z.abs()) * joint.half_size
 		var clearance := local.origin.y - extent.y - floor_half.y
 		var above_floor := tuned and clearance > BABY_FLOOR_ANCHOR_CLEARANCE and not _body_supported_by(joint.body, floor_body)
-		if above_floor and (not use_tuned_floor_support or distance <= TUNED_LIMB_RECOVERY_GAP
-				or not leg):
+		if above_floor and (not leg or distance <= TUNED_LIMB_RECOVERY_GAP):
 			continue
 		if local.origin.y + extent.y < floor_half.y:
 			continue
@@ -979,7 +978,8 @@ func _recover_baby_floor_anchors() -> void:
 				or maxf(absf(end.z), absf(local.origin.z)) + extent.z > floor_half.z:
 			continue
 		if above_floor:
-			_recover_raised_leg_wall_overlap(joint, state, motion, floor_rid)
+			_recover_raised_leg_wall_overlap(joint, state, motion, floor_rid,
+				floor_pose.origin.y + floor_half.y)
 			continue
 		if tuned and not checked_obstacles:
 			if _floor_roll_nears_obstacle(floor_rid, true):
@@ -992,8 +992,15 @@ func _recover_baby_floor_anchors() -> void:
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
 
+func _leg_has_side_contact(state: PhysicsDirectBodyState3D) -> bool:
+	for contact in state.get_contact_count():
+		if absf(state.get_contact_local_normal(contact).y) < MAX_WALL_NORMAL_Y \
+				and _is_fixed_wall(state.get_contact_collider_object(contact)):
+			return true
+	return false
+
 func _recover_raised_leg_wall_overlap(joint: PhysicalPart, state: PhysicsDirectBodyState3D,
-		motion: Vector3, floor: RID) -> void:
+		motion: Vector3, floor: RID, floor_y: float) -> void:
 	var pose := state.transform
 	if not _test_projection_motion(joint.body, pose, motion) or _projection_hit.get_collision_safe_fraction() > 0.0:
 		return
@@ -1004,6 +1011,12 @@ func _recover_raised_leg_wall_overlap(joint: PhysicalPart, state: PhysicsDirectB
 	# is moving away. Clear the initial box overlap and sweep the remainder.
 	var retreat := _wall_overlap_retreat(joint.body, pose, joint.half_size, motion, normal, floor)
 	if retreat.is_zero_approx():
+		# Give the first-contact solver its existing window. After that,
+		# a limb still braced on a side face can close the gap along it.
+		var first_contact_ticks := roundi(WALL_SHOULDER_SLIDE_WINDOW * Engine.physics_ticks_per_second)
+		if not use_tuned_floor_support and Engine.get_physics_frames() - _launch_frame > first_contact_ticks \
+				and _leg_has_side_contact(state):
+			_slide_floor_wall_part(joint.body, state, joint.half_size, motion, floor_y, floor)
 		return
 	var separated := pose.translated(retreat)
 	var remainder := motion - retreat
