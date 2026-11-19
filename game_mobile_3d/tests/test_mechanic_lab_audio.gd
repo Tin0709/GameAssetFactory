@@ -464,6 +464,24 @@ func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffec
 		audio._play(&"hit", point, -9.0, -1, true)
 	check(weapon_voices.size() == COMBAT_AUDIO.VOICES_PER_POOL and weapon_voices.all(func(voice): return voice.playing),
 		"The weapon pool is filled with three pending hit onsets")
+	var mix_bus := AudioServer.get_bus_name(bus)
+	var surface_voices: Array[AudioStreamPlayer3D] = audio._surface_landing_voices
+	var first_surface_bus := AudioServer.bus_count
+	var surface_captures: Array[AudioEffectCapture] = []
+	var surface_peaks: Array[float] = []
+	for i in surface_voices.size():
+		AudioServer.add_bus()
+		var layer_bus := first_surface_bus + i
+		var bus_name := StringName("HeavyLandingLayer%d" % i)
+		AudioServer.set_bus_name(layer_bus, bus_name)
+		AudioServer.set_bus_send(layer_bus, mix_bus)
+		var layer_capture := AudioEffectCapture.new()
+		layer_capture.buffer_length = 2.0
+		AudioServer.add_bus_effect(layer_bus, layer_capture)
+		surface_voices[i].bus = bus_name
+		surface_captures.append(layer_capture)
+		surface_peaks.append(0.0)
+	capture.clear_buffer()
 	var contacts := [point, point + Vector3.RIGHT, point + Vector3.LEFT]
 	for contact in contacts:
 		audio.slam_landed(contact)
@@ -479,26 +497,31 @@ func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffec
 	check(positions_preserved, "Three recent ground contacts reach separate voices with their original positions")
 	check(weapon_voices.all(func(voice): return voice != null and voice.playing and voice.stream in audio._groups[&"hit"]),
 		"The ground contacts preserve the three pending weapon onsets")
-	capture.clear_buffer()
-	for voice: AudioStreamPlayer3D in layers:
-		voice.bus = AudioServer.get_bus_name(bus)
+	# The audio clock can finish a short voice before a slow frame resumes.
+	# The isolated buses retain the mixed samples from each landing.
 	var peak := 0.0
 	for tick in 24:
 		await physics_frame
 		for sample in capture.get_buffer(capture.get_frames_available()):
 			peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
-		if peak > 0.001 and layers.all(func(voice): return voice.get_playback_position() > 0.0):
+		for i in surface_captures.size():
+			var layer_capture := surface_captures[i]
+			for sample in layer_capture.get_buffer(layer_capture.get_frames_available()):
+				surface_peaks[i] = maxf(surface_peaks[i], maxf(absf(sample.x), absf(sample.y)))
+		if peak > 0.001 and surface_peaks.all(func(value): return value > 0.001):
 			break
-	check(not layers.is_empty() and layers.all(func(voice): return voice.get_playback_position() > 0.0)
+	check(surface_peaks.size() == contacts.size() and surface_peaks.all(func(value): return value > 0.001)
 		and peak > 0.001 and peak < 0.9, "Heavy landing debris alone reaches the silent mixer")
 	audio.set_enabled(false, point)
 	check(layers.all(func(voice): return not voice.playing and voice.stream == null),
 		"Mute clears every active heavy ground contact")
-	for voice: AudioStreamPlayer3D in layers:
+	for voice in surface_voices:
 		voice.bus = &"Master"
+	for i in surface_captures.size():
+		AudioServer.remove_bus(first_surface_bus)
 	for i in weapon_voices.size():
 		weapon_voices[i].bus = weapon_buses[i]
-	print("MECHANIC_LAB_HEAVY_SURFACE layers=", layers.size(), " peak=", peak)
+	print("MECHANIC_LAB_HEAVY_SURFACE layers=", layers.size(), " peaks=", surface_peaks, " mix_peak=", peak)
 
 func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
