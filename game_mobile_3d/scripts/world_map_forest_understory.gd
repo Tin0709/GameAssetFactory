@@ -75,7 +75,7 @@ func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atla
 			if mushroom:
 				continue
 			return false
-		var atlas_index := variant / 2
+		var atlas_index := 2 if mushroom else (0 if variant < 2 else 1)
 		if not shared_materials.has(atlas_index):
 			var atlas := verified_forest_atlas if mushroom else (verified_moss_atlas if atlas_index == 1 else null)
 			if atlas == null:
