@@ -558,7 +558,8 @@ func check_downhill_steps(lab, dust, wind) -> void:
 		await physics_frame
 	var snapped_steps := [0]
 	var on_contact := func(point: Vector3, landed: bool):
-		if not landed and point.x > 0.5 and player.is_on_floor() +				and player.get_slide_collision_count() == 0 and player.global_position.y > 0.05:
+		if (not landed and point.x > 0.5 and player.is_on_floor()
+				and player.get_slide_collision_count() == 0 and player.global_position.y > 0.05):
 			snapped_steps[0] += 1
 	player.surface_contact.connect(on_contact)
 	var before_audio: int = movement.event_count.grass
