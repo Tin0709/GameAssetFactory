@@ -48,7 +48,13 @@ func run() -> void:
 					var disabled: PackedFloat32Array = directional.volume_parameters()
 					check(disabled.size() == 36 and disabled[32] == 0. and disabled.slice(0,24) == values.slice(0,24),
 						"East A/B retains west and basin fields")
-					slider.value = 1.
+					verify_preset_migration(showcase, slider)
+				var tree := level.get_node("ForestSpruce/EastSpruce01") as Node3D
+				tree.hide()
+				var hidden: PackedFloat32Array = directional.volume_parameters()
+				check(hidden[32] == 0. and hidden.slice(0,24) == values.slice(0,24),
+					"A missing east caster disables only the unmatched region")
+				tree.show()
 				for hour: float in [12.,19.5,22.]:
 					showcase.set_hour(hour)
 					await draw_frames(12)
@@ -71,3 +77,20 @@ func run() -> void:
 	await process_frame
 	print("EAST_AIR_TEST ",JSON.stringify(failures))
 	quit(0 if failures.is_empty() else 1)
+
+func verify_preset_migration(showcase: Node, slider: HSlider) -> void:
+	var path := "user://test-east-air-%d.cfg" % OS.get_process_id()
+	slider.value = .5
+	check(showcase.save_lighting_mix(path) == OK, "The preset saves the east strength")
+	slider.value = 1.
+	check(showcase.load_lighting_mix(path) == OK and slider.value == .5, "The preset restores the east strength")
+	var old := ConfigFile.new()
+	if old.load(path) == OK:
+		old.set_value("recipe", "version", 206)
+		old.erase_section_key("strengths", String(CONTROL))
+		check(old.save(path) == OK and showcase.load_lighting_mix(path) == OK and slider.value == 0.,
+			"Older presets keep their east look")
+	else:
+		check(false, "The migration fixture is readable")
+	DirAccess.remove_absolute(path)
+	slider.value = 1.
