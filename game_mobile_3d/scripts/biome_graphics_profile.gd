@@ -51,6 +51,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Blend of the owned sky irradiance on bark, keyed by normalized hour.
 @export var bark_irradiance_by_hour: Curve
 @export_range(0.0, 1.0) var spruce_leaf_filter := 0.0
+## Fraction of enclosed spruce leaf gaps sampled with 2× MSAA, keyed by normalized hour.
+@export var spruce_gap_coverage_by_hour: Curve
 @export var bark_irradiance_tint := Vector3.ONE
 ## Fraction of ambient irradiance returned to diffuse bark above ground contact.
 @export var bark_diffuse_return_by_hour: Curve
