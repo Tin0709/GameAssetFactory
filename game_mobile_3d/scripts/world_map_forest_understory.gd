@@ -18,7 +18,7 @@ const BATCH_NAMES := ["FungusStems", "FungusPads", "CornerMoss", "LedgeMoss"]
 
 var materials: Array[ShaderMaterial] = []
 
-func configure(world: Node3D, placements: PackedVector4Array) -> bool:
+func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atlas: Texture2D) -> bool:
 	var root := ResearchRoot.research_root()
 	if root.is_empty() or placements.is_empty() or RenderingServer.get_rendering_device() == null:
 		return false
@@ -45,25 +45,26 @@ func configure(world: Node3D, placements: PackedVector4Array) -> bool:
 			var lower: float = world.surface_height(anchor.x + direction.x, anchor.y + direction.y)
 			if not is_finite(lower) or ground - lower < 0.99:
 				return false
-			origin += outward * .38
+			origin += outward * .29
+			origin.y -= .05
 			basis = basis.scaled(Vector3.ONE * .72)
 		else:
-			origin.y -= .008
+			origin.y -= .028 if variant == 1 else .008
 			basis = basis.scaled(Vector3.ONE * .76)
 		occupied[cell] = true
 		if not batches.has(variant):
 			batches[variant] = []
 		batches[variant].append(Transform3D(basis, origin))
 
-	var atlases := {}
 	var shared_materials := {}
 	for variant: int in batches:
 		var atlas_index := 0 if variant < 2 else 1
-		if not atlases.has(atlas_index):
-			var atlas := _load_atlas(directory, ATLASES[atlas_index])
+		if not shared_materials.has(atlas_index):
+			var atlas := verified_moss_atlas if atlas_index == 1 else null
+			if atlas == null:
+				atlas = _load_atlas(directory, ATLASES[atlas_index])
 			if atlas == null:
 				return false
-			atlases[atlas_index] = atlas
 			var material := ShaderMaterial.new()
 			material.shader = LeafShader
 			material.set_shader_parameter("source_atlas", atlas)

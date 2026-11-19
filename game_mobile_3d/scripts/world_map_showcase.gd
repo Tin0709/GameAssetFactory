@@ -546,7 +546,8 @@ func setup(world:Node3D)->void:
 			moss.free()
 	if not level.forest_understory_placements.is_empty():
 		var understory := ForestUnderstory.new()
-		if understory.configure(level, level.forest_understory_placements):
+		var moss_atlas: Texture2D = forest_moss.material.get_shader_parameter("source_atlas") if forest_moss != null else null
+		if understory.configure(level, level.forest_understory_placements, moss_atlas):
 			forest_understory = understory
 			understory.name = "ForestUnderstory"
 			level.add_child(understory)
