@@ -1057,8 +1057,8 @@ func refresh_cliff_vista() -> void:
 		return
 	var env: Environment = level.get_node("WorldEnvironment").environment
 	var camera: Camera3D = level.get_node("Camera3D")
-	var active := _cliff_vista_enabled and level.look.stage == 2 and level.view_mode == "gameplay"
-	var use_relief := active and source_terrain_active and _cliff_relief_enabled and is_instance_valid(cliff_relief)
+	var active: bool = _cliff_vista_enabled and level.look.stage == 2 and level.view_mode == "gameplay"
+	var use_relief: bool = active and source_terrain_active and _cliff_relief_enabled and is_instance_valid(cliff_relief)
 	if is_instance_valid(cliff_relief):
 		cliff_relief.visible = use_relief
 		if use_relief:
