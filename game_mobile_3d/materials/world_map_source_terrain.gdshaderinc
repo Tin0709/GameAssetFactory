@@ -5,6 +5,7 @@ uniform float night_path_chroma = 0.0;
 uniform float source_path_chroma = 0.0;
 uniform float stone_twilight_color = 0.0;
 uniform float stone_detail_mip = 0.0;
+uniform float source_path_edge_filter = 0.0;
 
 vec3 grade_stone_twilight(vec3 albedo) {
 	if (ground_grade != 3 || stone_twilight_color <= 0.0) return albedo;
@@ -47,6 +48,8 @@ vec3 grade_source_path(vec3 albedo) {
 }
 
 vec3 source_terrain_color(vec3 world, vec3 normal) {
+	// Derivatives must be taken before pixels diverge at a material or path cell.
+	vec2 path_pixel = fwidth(world.xz);
 	bool horizontal = abs(normal.y) > 0.9;
 	vec2 uv = horizontal ? vec2(world.x, -world.z) :
 		vec2(abs(normal.x) > 0.9 ? -world.z * sign(normal.x) : world.x * sign(normal.z), world.y);
@@ -80,6 +83,14 @@ vec3 source_terrain_color(vec3 world, vec3 normal) {
 	}
 	float signed_distance = field.b > 1.5 ? distance_to_other : -distance_to_other;
 	vec2 patch = floor(world.xz * 10.0) / 10.0;
+	if (source_path_edge_filter > 0.0) {
+		// Retain the authored 10 cm cells. Interpolate their sample position
+		// only within the pixel footprint around each cell boundary.
+		vec2 centered = world.xz * 10.0 + vec2(0.5);
+		vec2 span = clamp(5.0 * path_pixel * source_path_edge_filter, vec2(0.001), vec2(0.5));
+		vec2 transition = smoothstep(vec2(0.5) - span, vec2(0.5) + span, fract(centered));
+		patch = (floor(centered) - 1.0 + transition) / 10.0;
+	}
 	float noise = edge_noise(patch * 2.8) * 0.70 + edge_noise(patch * 7.1) * 0.30;
 	float dirt = smoothstep(-0.035, 0.035, signed_distance + (noise - 0.54) * 0.64);
 	if (path_verge > 0.0) {

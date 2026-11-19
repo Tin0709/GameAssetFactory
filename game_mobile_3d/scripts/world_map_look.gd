@@ -54,6 +54,7 @@ var _night_path_chroma := 0.0
 var _source_path_chroma := 0.0
 var _stone_twilight_color := 0.0
 var _stone_detail_softness := 0.0
+var _source_path_edge_filter := 0.0
 var _terrain_outline := Vector2(0.0, 1.0)
 var plant_meshes: Array[Array]=[]
 var materials: Dictionary={}
@@ -576,6 +577,15 @@ func set_stone_detail_softness(strength: float) -> void:
 
 func _publish_stone_detail_softness() -> void:
 	_set_terrain_color(&"stone_detail_mip", _stone_detail_softness * .9 if stage == 2 else 0.)
+
+func set_source_path_edge_filter(strength: float) -> void:
+	if strength == _source_path_edge_filter:
+		return
+	_source_path_edge_filter = strength
+	_publish_source_path_edge_filter()
+
+func _publish_source_path_edge_filter() -> void:
+	_set_terrain_color(&"source_path_edge_filter", _source_path_edge_filter if stage == 2 else 0.)
 
 func _refresh_cloud_look() -> void:
 	level.geometry.reset_cutaway_materials()
@@ -1184,6 +1194,8 @@ func set_stage(value: int) -> void:
 	_apply_local_exposure()
 	if _stone_detail_softness > 0.0:
 		_publish_stone_detail_softness()
+	if _source_path_edge_filter > 0.0:
+		_publish_source_path_edge_filter()
 	refresh_oak_root_beds()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)

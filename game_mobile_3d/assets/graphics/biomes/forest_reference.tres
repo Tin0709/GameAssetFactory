@@ -120,6 +120,7 @@ display_name = "Forest · Private reference"
 use_forest_reference = true
 twilight_ground_shade_strength = 0.35
 day_grass_shadow_compactness = 2.0
+source_path_edge_filter = 1.0
 day_grass_shadow_footprint_reduction = 0.5
 day_grass_shadow_wind_reduction = 0.5
 daylight_canopy_cue_opacity = 0.75

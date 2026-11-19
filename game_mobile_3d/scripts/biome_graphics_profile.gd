@@ -7,6 +7,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Map-independent art settings. Geometry-derived lighting fields live on each map.
 
 @export var display_name := "Temperate meadow"
+## Screen footprint filtering for the authored source-atlas dirt shoulder.
+@export_range(0., 1., .01) var source_path_edge_filter := 0.
 ## The existing reference route requires matching private Forest data.
 @export var use_forest_reference := false
 @export_group("Private reference data")
