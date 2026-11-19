@@ -1094,9 +1094,14 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 		group.player_hit.emit(ZOMBIE.MELEE_DAMAGE)
 	check(lab.player_health == initial_hp - 24 and audio._next_choice.get(&"player_hurt", 0) == 1,
 		"Same-tick damage is applied fully while the local hurt cue starts once")
-	await physics_frame
+	var local_voice := audio.get_node("PlayerHurt") as AudioStreamPlayer
+	for i in 24:
+		await physics_frame
+		if not local_voice.playing or local_voice.get_playback_position() >= 0.05:
+			break
 	group.player_hit.emit(ZOMBIE.MELEE_DAMAGE)
-	check(audio._next_choice.get(&"player_hurt", 0) == 2, "A later hit can play a new local hurt cue")
+	check(lab.player_health == initial_hp - 30 and audio._next_choice.get(&"player_hurt", 0) == 2,
+		"A later hit starts a new local hurt cue after the onset mixes")
 	await create_timer(0.30).timeout
 	var peak := 0.0
 	for frame in capture.get_buffer(capture.get_frames_available()):
