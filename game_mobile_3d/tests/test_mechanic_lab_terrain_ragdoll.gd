@@ -525,6 +525,9 @@ func run() -> void:
 	for seed: int in [5, 13, 36, 43]:
 		await check_corner_ragdoll(seed, 0.40, false, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
 			1150.0, true, CornerBevel.NONE, Vector2(10.0, 10.0))
+	# The feet and torso stay supported while the head rests against both faces.
+	await check_corner_ragdoll(90, 4.90, true, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
+		1150.0, true, CornerBevel.NONE, Vector2(10.0, 10.0))
 	await check_wall_rebound(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,

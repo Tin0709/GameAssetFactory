@@ -1146,9 +1146,16 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 	var speed_scale := 1.0 if flat_floor else 0.5
 	var intermittent_foot: bool = flat_floor and _death_strike == DeathStrike.SABRE_FINISHER \
 		and motion.supports == 1 and motion.leg_supported
+	# A braced pose under raised gravity can have intermittent solver speed
+	# spikes. With the torso and legs supported, test the sustained pose drift.
+	var measure_supported_pose: bool = flat_floor and ragdoll.use_tuned_floor_support \
+		and ragdoll.floor_landing_blended and not _corpse_floor.disabled \
+		and motion.supports >= 3 and motion.core_supports > 0
+	var slow_motion: bool = motion.linear <= CORPSE_SETTLE_SPEED * speed_scale \
+		and motion.angular <= CORPSE_SETTLE_SPIN * speed_scale
 	var slow_support: bool = not normally_supported and not ragdoll.source_joints.is_empty() \
 		and (motion.supports >= 2 or intermittent_foot) \
-		and motion.linear <= CORPSE_SETTLE_SPEED * speed_scale and motion.angular <= CORPSE_SETTLE_SPIN * speed_scale
+		and (slow_motion or measure_supported_pose)
 	var corner_support := false
 	if slow_support:
 		if flat_floor:
