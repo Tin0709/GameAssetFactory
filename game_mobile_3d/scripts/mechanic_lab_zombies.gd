@@ -17,6 +17,24 @@ const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd
 const Gauntlets := preload("res://scripts/mechanic_lab_gauntlets.gd")
 const SOURCE_DIR := "extracted/2026-10-25 19-26-25/Game/Spicewood"
 const ZOMBIE_DIR := "Art/Characters/Enemies/Zombie"
+const BABY_DIR := "Art/Characters/Enemies/BabyZombie"
+const BABY_IDLE := &"BabyZombie_Idle"
+const BABY_CLIPS := {
+	Zombie.IDLE: [BABY_IDLE, "96a09cee86254292510cef892f61236e8f6cccefd2e82ecd7d60012fa54533ab"],
+	Zombie.SPAWN: [&"BabyZombie_Spawn", "0a2a10ce0f32990e1e45d70010b22accdd3435bc4c9402cf153bf8a34df89fe0"],
+	&"Zombie_Walk": [&"BabyZombie_Walk", "7e26ac62cecb26369533faf482c34777c52f3067afadadeb8a1e040306c22479"],
+	Zombie.ATTACK: [&"BabyZombie_BasicAttack", "7102bdedb8f5050d2e35fcc5b07cba1f1a7c890263950d8664a1792d6cb10574"],
+	Zombie.STAGGER: [&"BabyZombie_Staggered", "9eb4846636634d9b63ddc050c98cccadfcdfbafeb16ea34d983bb4ceda741f8f"],
+}
+# Box centres and extents fitted to the weighted bind mesh.
+const BABY_PARTS := [
+	["Chest", Vector3(0, 0.563, 0), Vector3(0.235, 0.354, 0.116), 3.0, 0.0, 0.0],
+	["Head", Vector3(0, 0.9375, 0), Vector3(0.358, 0.358, 0.358), 5.0, 22.0, 15.0],
+	["Arm.L", Vector3(0.1875, 0.563, 0), Vector3(0.116, 0.354, 0.116), 0.9, 48.0, 18.0],
+	["Arm.R", Vector3(-0.1875, 0.563, 0), Vector3(0.116, 0.354, 0.116), 0.9, 48.0, 18.0],
+	["Leg.L", Vector3(0.0625, 0.1875, 0), Vector3(0.116, 0.354, 0.116), 1.1, 33.0, 14.0],
+	["Leg.R", Vector3(-0.0625, 0.1875, 0), Vector3(0.116, 0.354, 0.116), 1.1, 33.0, 14.0],
+]
 const PHYSICS_PROFILE_PATH := "reports/combat/observations/zombie_physics_asset_20261112.private.json"
 const PHYSICS_PROFILE_HASH := "e0d671c88b3763828679b45ebc0cd084ba0a8ce13060beb757a33b4c329832b2"
 const CLIP_HASHES := {
@@ -117,6 +135,8 @@ var equipped_air_delay := 0.0
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
 var _ragdoll_layout: Dictionary
+var _baby_visual: PackedScene
+var _baby_ragdoll_layout: Dictionary
 var _digits: Array[Texture2D]
 var _last_spawn_search: SpawnSearch
 var _spawn_serial := 0
@@ -137,17 +157,23 @@ func setup_combat(attacker: CharacterBody3D) -> void:
 	if _visual == null:
 		_load_assets()
 
-func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie: bool = false) -> bool:
-	if _visual == null:
-		_load_assets()
-	if _visual == null:
-		return false
+func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie := false, baby := false) -> bool:
+	if baby:
+		if _baby_visual == null:
+			_load_baby_assets()
+		if _baby_visual == null:
+			return false
+	else:
+		if _visual == null:
+			_load_assets()
+		if _visual == null:
+			return false
 	var floor_position := Vector3(player.global_position.x, 0.0, player.global_position.z)
 	var search := _spawn_search_for(floor_position, facing)
 	var point := _find_spawn_point(floor_position, facing, search)
 	if not point.is_finite():
 		return false
-	_spawn_at(point, floor_position, player, effects, base_zombie)
+	_spawn_at(point, floor_position, player, effects, base_zombie, baby)
 	_mark_spawn_position(search, point)
 	return true
 
@@ -172,14 +198,16 @@ func spawn_batch(player: CharacterBody3D, facing: Basis, effects: Node3D,
 	return {"count": count, "blocked": false}
 
 func _spawn_at(point: Vector3, floor_position: Vector3, player: CharacterBody3D,
-		effects: Node3D, base_zombie: bool) -> void:
+		effects: Node3D, base_zombie: bool, baby := false) -> void:
 	var zombie := Zombie.new()
-	zombie.name = "Zombie"
+	zombie.name = "BabyZombie" if baby else "Zombie"
 	zombie.position = point
-	zombie.max_health = Zombie.BASE_HEALTH if base_zombie else Zombie.TRAINING_HEALTH
+	zombie.max_health = Zombie.BASE_HEALTH if baby or base_zombie else Zombie.TRAINING_HEALTH
 	var corpse_floor := get_node_or_null("../Ground/Collision") as CollisionShape3D
-	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial, _ragdoll_layout,
-		corpse_floor, health_bars, damage_numbers)
+	var scene := _baby_visual if baby else _visual
+	var layout := _baby_ragdoll_layout if baby else _ragdoll_layout
+	zombie.configure(scene.instantiate(), player, effects, _digits, _spawn_serial, layout,
+		corpse_floor, health_bars, damage_numbers, baby)
 	zombie.melee_hit.connect(player_hit.emit)
 	zombie.melee_audio.connect(zombie_attack_audio.emit)
 	if zombie_step_audio.has_connections():
@@ -283,7 +311,7 @@ func _find_attack_target(reach: float, movement: Vector3, ranged := false) -> Zo
 		offset.y = 0.0
 		if distance_squared > reach * reach or distance_squared >= nearest_squared or offset.dot(movement) < 0.0:
 			continue
-		ray.to = zombie.global_position + MELEE_CONTACT_HEIGHT
+		ray.to = zombie.combat_center()
 		if space.intersect_ray(ray).is_empty():
 			nearest = zombie
 			nearest_squared = distance_squared
@@ -311,11 +339,11 @@ func bolt_direction(muzzle: Vector3, forward: Vector3, serial: int) -> Vector3:
 		target = _find_attack_target(CrossPollinator.AIM_RANGE, forward, true)
 	if target == null:
 		return forward
-	return (target.global_position + MELEE_CONTACT_HEIGHT - muzzle).normalized()
+	return (target.combat_center() - muzzle).normalized()
 
 func bow_aim_point(reach: float, movement: Vector3) -> Variant:
 	var target := _find_attack_target(reach, movement, true)
-	return target.global_position + MELEE_CONTACT_HEIGHT if target != null else null
+	return target.combat_center() if target != null else null
 
 func strike_bolt(hit: Dictionary, direction: Vector3, serial: int,
 		strike := CrossPollinator.STRIKE, clip := CrossPollinator.SHOT) -> void:
@@ -359,7 +387,7 @@ func strike_sabre(index: int, clip: String, serial: int) -> void:
 		var along_axis := from_apex.dot(forward)
 		if along_axis + 0.00001 < maxf(cone_cutoff, from_apex.length() * half_angle_cos):
 			continue
-		ray.to = zombie.global_position + MELEE_CONTACT_HEIGHT
+		ray.to = zombie.combat_center()
 		if not space.intersect_ray(ray).is_empty():
 			continue
 		candidates.append(zombie)
@@ -370,10 +398,10 @@ func strike_sabre(index: int, clip: String, serial: int) -> void:
 		return
 	if _aim_serial == serial and is_instance_valid(_aim_target) and candidates.has(_aim_target):
 		primary = _aim_target
-	_apply_contact(primary, primary.global_position + MELEE_CONTACT_HEIGHT, clip, index, serial, strike, forward, false, origin)
+	_apply_contact(primary, primary.combat_center(), clip, index, serial, strike, forward, false, origin)
 	for zombie in candidates:
 		if zombie != primary:
-			_apply_contact(zombie, zombie.global_position + MELEE_CONTACT_HEIGHT, clip, index, serial, strike, forward, true, origin)
+			_apply_contact(zombie, zombie.combat_center(), clip, index, serial, strike, forward, true, origin)
 
 func cancel_pending_landings() -> void:
 	_pending_landings.clear()
@@ -436,7 +464,7 @@ func _resolve_landing(position: Vector3, forward: Vector3, serial: int, strike: 
 		var distance := Vector2(offset.x, offset.z).length()
 		if distance > float(strike.range_m) or absf(offset.y) > GROUND_HEIGHT_LIMIT:
 			continue
-		var contact := zombie.global_position + Vector3.UP * 0.65
+		var contact := zombie.combat_center() if zombie.is_baby else zombie.global_position + Vector3.UP * 0.65
 		ray.to = contact
 		if not space.intersect_ray(ray).is_empty():
 			continue
@@ -472,9 +500,9 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)))
 	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
 
-func _load_assets() -> void:
+func _private_research_root() -> String:
 	if not OS.has_feature("editor"):
-		return
+		return ""
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	if root.is_empty():
 		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
@@ -482,6 +510,12 @@ func _load_assets() -> void:
 	var project := ProjectSettings.globalize_path("res://").replace("\\", "/").trim_suffix("/").to_lower()
 	if not root.is_absolute_path() or root.begins_with("res://") or root.begins_with("user://") \
 		or root.to_lower() == project or root.to_lower().begins_with(project + "/"):
+		return ""
+	return root
+
+func _load_assets() -> void:
+	var root := _private_research_root()
+	if root.is_empty():
 		return
 	var source := root.path_join(SOURCE_DIR)
 	var directory := source.path_join(ZOMBIE_DIR)
@@ -525,6 +559,84 @@ func _load_assets() -> void:
 						# on the disposable source rig for lethal wall handoffs.
 						_ragdoll_layout.wall_handoff_idle_pose = Ragdoll.capture_wall_handoff_idle(skeleton, player, Zombie.IDLE)
 	model.free()
+
+func _load_baby_assets() -> void:
+	var root := _private_research_root()
+	if root.is_empty():
+		return
+	var source := root.path_join(SOURCE_DIR)
+	var directory := source.path_join(BABY_DIR)
+	var digit_path := source.path_join("Cues/UI/T_DamageNumbers.png")
+	if not _verified(source.path_join(ZOMBIE_DIR).path_join("T_Zombie.png"), SKIN_HASH) \
+			or not _verified(digit_path, DIGIT_HASH):
+		return
+	for row: Array in BABY_CLIPS.values():
+		if not _verified(_clip_path(directory, row[0]), row[1]):
+			return
+	var model := _import_gltf(_clip_path(directory, BABY_IDLE))
+	if model == null:
+		return
+	var player := model.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	var skeleton := model.find_child("Skeleton3D", true, false) as Skeleton3D
+	if player != null and skeleton != null and _add_baby_clips(directory, player):
+		var layout := _fit_baby_ragdoll(skeleton)
+		Zombie.prepare_lab_skin(model, "SK_BabyZombie")
+		player.play(Zombie.SPAWN)
+		player.advance(0.0)
+		player.stop(true)
+		model.set_meta(Zombie.PREPARED_SPAWN_POSE, true)
+		var packed := PackedScene.new()
+		if _digits.is_empty():
+			_digits = Feedback.load_digits(digit_path)
+		if not layout.is_empty() and _digits.size() == 10 and packed.pack(model) == OK:
+			layout.wall_handoff_idle_pose = Ragdoll.capture_wall_handoff_idle(skeleton, player, Zombie.IDLE)
+			_baby_ragdoll_layout = layout
+			_baby_visual = packed
+	model.free()
+
+func _add_baby_clips(directory: String, player: AnimationPlayer) -> bool:
+	if not player.has_animation(BABY_IDLE):
+		return false
+	var library := player.get_animation_library(&"")
+	library.rename_animation(BABY_IDLE, Zombie.IDLE)
+	player.get_animation(Zombie.IDLE).loop_mode = Animation.LOOP_LINEAR
+	for name: StringName in BABY_CLIPS:
+		if name == Zombie.IDLE:
+			continue
+		var source_name: StringName = BABY_CLIPS[name][0]
+		var imported := _import_gltf(_clip_path(directory, source_name), GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS)
+		if imported == null:
+			return false
+		var source_player := imported.get_node_or_null("AnimationPlayer") as AnimationPlayer
+		var clip := source_player.get_animation(source_name) if source_player != null and source_player.has_animation(source_name) else null
+		imported.free()
+		if clip == null:
+			return false
+		if name in Zombie.WALK_CLIPS:
+			clip.loop_mode = Animation.LOOP_LINEAR
+		library.add_animation(name, clip)
+	return true
+
+func _fit_baby_ragdoll(skeleton: Skeleton3D) -> Dictionary:
+	var offsets := {}
+	var joints := {}
+	var chest := Transform3D(Basis.IDENTITY, BABY_PARTS[0][1])
+	for part: Array in BABY_PARTS:
+		var name: String = part[0]
+		var bone := skeleton.find_bone(Zombie.RAGDOLL_BONES[name])
+		if bone < 0:
+			return {}
+		var rest := skeleton.get_bone_global_rest(bone)
+		var centre := Transform3D(Basis.IDENTITY, part[1])
+		offsets[name] = rest.affine_inverse() * centre
+		if name == "Chest":
+			continue
+		var along := (centre.origin - rest.origin).normalized()
+		var cross := Vector3.RIGHT.slide(along).normalized()
+		var anchor := Transform3D(Basis(along, cross, along.cross(cross)), rest.origin)
+		joints[name] = {"parent": "Chest", "child_frame": centre.affine_inverse() * anchor,
+			"parent_frame": chest.affine_inverse() * anchor, "swing": part[4], "twist": part[5]}
+	return {"parts": BABY_PARTS, "bones": Zombie.RAGDOLL_BONES, "offsets": offsets, "joints": joints}
 
 func _add_clips(directory: String, player: AnimationPlayer) -> bool:
 	var library := player.get_animation_library(&"")
