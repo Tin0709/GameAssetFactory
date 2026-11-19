@@ -913,6 +913,8 @@ func _update_death(delta: float) -> void:
 	var source_rig := not ragdoll.source_joints.is_empty()
 	if not ragdoll.running:
 		ragdoll.prepare_handoff_samples(delta, is_instance_valid(_corpse_floor))
+		ragdoll.use_tuned_wall_sweep = is_instance_valid(_corpse_floor) and (
+			ragdoll_launch_multiplier > 1.0 or ragdoll_gravity_multiplier > 1.0)
 		var mass := 0.0
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			# The player uses layer 2, which the living controllers can stand on.

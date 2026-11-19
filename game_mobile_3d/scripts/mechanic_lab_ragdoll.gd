@@ -40,6 +40,8 @@ var _source_joint_biases: Dictionary[RID, float]
 var _prepared_source_joints: Array[PhysicalPart]
 var _wall_handoff_frame := -1
 var _launch_frame := -1
+var _tuned_wall_poses: Dictionary[String, Vector3]
+var use_tuned_wall_sweep := false
 var wall_handoff_animation: AnimationPlayer
 var wall_handoff_idle: StringName
 var wall_handoff_idle_pose: Array[Transform3D]
@@ -67,7 +69,63 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 			flat_floor, floor_impact_limb_share, limit_first_contact_stretch, linear_override, upward_override):
 		return false
 	_launch_frame = Engine.get_physics_frames()
+	if use_tuned_wall_sweep:
+		for name: String in bodies:
+			var body: PhysicalBone3D = bodies[name]
+			_tuned_wall_poses[name] = body.global_position
 	return true
+
+func _correct_physical_pose() -> void:
+	if not use_tuned_wall_sweep or not running or _pose_correction_frame == Engine.get_physics_frames():
+		super._correct_physical_pose()
+		return
+	_sweep_tuned_lab_walls()
+	super._correct_physical_pose()
+	for name: String in bodies:
+		var body: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state != null:
+			_tuned_wall_poses[name] = state.transform.origin
+
+func _sweep_tuned_lab_walls() -> void:
+	# A fast, rotating part can reach the far side before Godot reports its
+	# first contact. Sweep its centre and leave surface contacts to the solver.
+	for name: String in _tuned_wall_poses:
+		var body: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			continue
+		var start := _tuned_wall_poses[name]
+		var finish := state.transform.origin
+		var travel := finish - start
+		if Vector2(travel.x, travel.z).length_squared() <= PROJECTION_COLLISION_MARGIN ** 2:
+			continue
+		var space := state.get_space_state()
+		_handoff_ray.collision_mask = body.collision_mask
+		var velocity := state.linear_velocity
+		# Sweep the remaining slide from the contact so it cannot cross
+		# another face of the same corner.
+		for sweep in 3:
+			_handoff_ray.from = start
+			_handoff_ray.to = finish
+			var hit := space.intersect_ray(_handoff_ray)
+			if hit.is_empty() or not hit.collider is StaticBody3D or absf(hit.normal.y) >= MAX_WALL_NORMAL_Y:
+				start = finish
+				break
+			var point: Vector3 = hit.position
+			var normal: Vector3 = hit.normal
+			start = point + normal * (2.0 * PROJECTION_COLLISION_MARGIN)
+			finish = start + (finish - point).slide(normal)
+			var closing := velocity.dot(normal)
+			if closing < 0.0:
+				velocity -= normal * closing
+			if start.distance_squared_to(finish) <= PROJECTION_COLLISION_MARGIN ** 2:
+				break
+		if start != state.transform.origin:
+			var pose := state.transform
+			pose.origin = start
+			state.transform = pose
+			state.linear_velocity = velocity
 
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
 		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}, prepared: PackedScene = null) -> void:
@@ -147,8 +205,9 @@ func _handoff_wall_clearance() -> Vector3:
 		return Vector3.ZERO
 	if overlaps.size() == 1 and _is_floor_top_overlap(overlaps[0].rid, bounds):
 		return Vector3.ZERO
+	var wall_tolerance := PROJECTION_COLLISION_MARGIN if use_tuned_wall_sweep else SOURCE_ANCHOR_TOLERANCE
 	if wall_handoff_animation != null and (_handoff_straddles_wall(
-			space, collision_mask, Vector3.ZERO, SOURCE_ANCHOR_TOLERANCE, {})
+			space, collision_mask, Vector3.ZERO, wall_tolerance, {})
 			or _handoff_arm_is_pinched(space, overlaps)):
 		_wall_handoff_frame = Engine.get_physics_frames()
 		# All candidate poses share the rig's collision configuration.
