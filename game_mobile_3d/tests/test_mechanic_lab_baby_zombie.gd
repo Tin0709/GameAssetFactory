@@ -94,6 +94,7 @@ func run() -> void:
 	await check_tuned_contact(81, 27.0, 0.35, true, -58.0)
 	await check_tuned_contact(19, 27.0, 0.35, false, -58.0, true)
 	await check_tuned_contact(60, 27.0, 0.20, false, -58.0, false, 100.0)
+	await check_tuned_contact(58, 13.0, 0.18, true, -44.0, false, 100.0)
 	await check_first_wall_neck_contact()
 	await check_first_wall_neck_contact(true)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
