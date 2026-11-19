@@ -107,7 +107,34 @@ func check_prewarmed_spawn() -> void:
 		var material := zombie._mesh.material_override as ShaderMaterial
 		var skin: Variant = material.get_shader_parameter("living_skin") if material != null else null
 		check(zombie.is_baby and skin is Texture2D, "The prepared Baby Zombie keeps its verified skin")
+	if group.get_child_count() == 2:
+		check_walk_contacts(group.get_child(0) as Zombie)
 	lab.free()
+
+func check_walk_contacts(baby: Zombie) -> void:
+	var clip: StringName = Zombie.WALK_CLIPS[0]
+	var phases: Array[float] = []
+	var points: Array[Vector3] = []
+	baby.step_audio.connect(func(point: Vector3):
+		phases.append(baby.animation.current_animation_position)
+		points.append(baby.to_local(point))
+	)
+	baby.animation.play(clip, 0.0)
+	baby.animation.advance(0.0)
+	var step := 1.0 / 120.0
+	for tick in 96:
+		var previous := baby.animation.current_animation_position
+		baby.animation.advance(step)
+		baby._emit_walk_step(clip, previous)
+	check(points.size() == 4, "The Baby Zombie emits one step per foot in each walk cycle")
+	if points.size() != 4:
+		return
+	var authored_contacts := [Vector3(-0.117, 0.0, 0.116), Vector3(0.102, 0.0, 0.083)]
+	for contact in points.size():
+		var expected_phase := (2.0 if contact % 2 == 0 else 8.0) / 30.0
+		check(absf(phases[contact] - expected_phase) <= step + 0.00001
+			and points[contact].distance_to(authored_contacts[contact % 2]) < 0.005,
+			"The Baby Zombie step matches the source sole and phase at frame 2 or 8")
 
 func attack_key(pressed: bool) -> void:
 	var event := InputEventKey.new()
