@@ -123,6 +123,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"ambient_by_hour": ["Ánh trời sáng và chiều", 1.],
+	&"ambient_tint_by_hour": ["Sắc ánh trời theo giờ", 1.],
 	&"sky_chroma": ["Sky color", 1.],
 	&"noon_sky_chroma": ["Sắc ánh trời buổi trưa", 1.],
 	&"twilight_sky_chroma": ["Sắc ánh sáng hắt chạng vạng", 1.],
@@ -311,7 +312,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 205
+const LIGHTING_MIX_VERSION := 206
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2880,6 +2881,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 205 and effect == &"lantern_exposure":
 			missing_value = 0.
+		if version < 206 and effect == &"ambient_tint_by_hour":
+			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -3370,6 +3373,9 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	_apply_forest_dusk_backdrop(env)
 	if atmosphere_review in ["lighting", "combined"]:
 		_weather.apply_lighting(_weather_profile, sun, env, hour, _lighting_scale(&"overcast_phase_color"))
+		if _biome_profile != null and not _balanced_preview and not _flat_lab:
+			env.ambient_light_color = _biome_profile.tint_ambient(hour, env.ambient_light_color,
+				_lighting_scale(&"ambient_tint_by_hour"))
 	if atmosphere_review in ["haze", "combined"]:
 		if _weather.weight > 0.:
 			_weather.apply_air(_weather_profile, env, _lighting_scale(&"fog"))

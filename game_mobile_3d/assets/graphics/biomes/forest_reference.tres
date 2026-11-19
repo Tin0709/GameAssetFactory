@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=25 format=3]
+[gd_resource type="Resource" load_steps=26 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -48,6 +48,10 @@ point_count = 8
 max_value = 1.35
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.229166667, 1), 0.0, 0.0, 0, 0, Vector2(0.291666667, 1.35), 0.0, 0.0, 0, 0, Vector2(0.4375, 1), 0.0, 0.0, 0, 0, Vector2(0.583333333, 1), 0.0, 0.0, 0, 0, Vector2(0.6875, 1.35), 0.0, 0.0, 0, 0, Vector2(0.78125, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 8
+
+[sub_resource type="Curve" id="ForestAmbientTintHours"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.2125, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.5), 0.0, 0.0, 0, 0, Vector2(0.416666667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
 
 [sub_resource type="Curve" id="ForestDayPathChroma"]
 _data = [Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.32), 0.0, 0.0, 0, 0, Vector2(0.395833333, 0.32), 0.0, 0.0, 0, 0, Vector2(0.46875, 0), 0.0, 0.0, 0, 0, Vector2(0.552083333, 0), 0.0, 0.0, 0, 0, Vector2(0.635416667, 0.32), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.32), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0]
@@ -115,6 +119,8 @@ afternoon_key_by_hour = SubResource("AfternoonKey")
 dusk_key_fade_hours = Vector2(18.9, 19.5)
 dusk_key_fade_strength = 0.7
 ambient_energy_by_hour = SubResource("ForestAmbientHours")
+ambient_tint_by_hour = SubResource("ForestAmbientTintHours")
+ambient_tint_ratio = Vector3(0.79, 1, 1.34)
 day_path_chroma_by_hour = SubResource("ForestDayPathChroma")
 shadow_grade_recovery_by_hour = SubResource("ShadowGradeRecovery")
 daylight_shadow_luminance_scale = 0.3

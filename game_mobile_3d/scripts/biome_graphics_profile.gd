@@ -3,6 +3,7 @@ extends Resource
 const Weather = preload("res://scripts/biome_weather_profile.gd")
 const DayNight = preload("res://scripts/biome_day_night.gd")
 const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
+const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Map-independent art settings. Geometry-derived lighting fields live on each map.
 
 @export var display_name := "Temperate meadow"
@@ -178,6 +179,10 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., 1., .01) var dusk_key_fade_strength := 0.
 ## Ambient multiplier before weather, in normalized hours. An empty track uses 1.
 @export var ambient_energy_by_hour: Curve
+## Optional weight of the ambient color adjustment, in normalized hours.
+@export var ambient_tint_by_hour: Curve
+## Linear RGB channel ratios. The adjustment preserves the incoming luminance.
+@export var ambient_tint_ratio := Vector3.ONE
 @export var day_path_chroma_by_hour: Curve
 @export var fog_density_by_hour: Curve
 
@@ -197,6 +202,24 @@ func ambient_hour_scale(hour: float, strength: float = 1.) -> float:
 	if is_equal_approx(authored, 1.):
 		return 1.
 	return lerpf(1., authored, clampf(strength, 0., 1.))
+
+func tint_ambient(hour: float, color: Color, strength: float = 1.) -> Color:
+	if ambient_tint_by_hour == null or strength <= 0. or ambient_tint_ratio == Vector3.ONE:
+		return color
+	var amount := clampf(DayNight.sample_curve(ambient_tint_by_hour, fposmod(hour, 24.) / 24., 0.), 0., 1.)
+	if amount <= 0. or not ambient_tint_ratio.is_finite():
+		return color
+	if ambient_tint_ratio.x < 0. or ambient_tint_ratio.y < 0. or ambient_tint_ratio.z < 0.:
+		return color
+	var linear := color.srgb_to_linear()
+	var source := Vector3(linear.r, linear.g, linear.b)
+	var target := source * ambient_tint_ratio
+	var target_luma := target.dot(LINEAR_LUMA)
+	if not is_finite(target_luma) or target_luma <= 0.:
+		return color
+	target *= source.dot(LINEAR_LUMA) / target_luma
+	var rgb := source.lerp(target, amount * clampf(strength, 0., 1.))
+	return Color(rgb.x, rgb.y, rgb.z, color.a).linear_to_srgb()
 
 func sample_mist_entry_scatter(time: float) -> float:
 	return clampf(DayNight.sample_curve(mist_entry_scatter_by_hour, time, 0.), 0., 4.)
