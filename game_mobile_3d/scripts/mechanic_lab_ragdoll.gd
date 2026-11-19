@@ -949,6 +949,24 @@ func _recover_baby_floor_anchors() -> void:
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
 
+func _baby_neck_needs_wall_recovery() -> bool:
+	var head: PhysicalBone3D = bodies.Head
+	var state := PhysicsServer3D.body_get_direct_state(head.get_rid())
+	if state == null or state.get_contact_count() == 0:
+		return false
+	for contact in state.get_contact_count():
+		if absf(state.get_contact_local_normal(contact).y) >= MAX_WALL_NORMAL_Y \
+				or not state.get_contact_collider_object(contact) is StaticBody3D:
+			continue
+		var chest: PhysicalBone3D = bodies.Chest
+		var parent := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+		if parent == null:
+			return false
+		var joint: Dictionary = source_joints.Head
+		var gap: Vector3 = (parent.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
+		return gap.length_squared() > WALL_SLIDE_MIN_GAP ** 2
+	return false
+
 func _recover_baby_wall_anchors() -> void:
 	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
 		return
@@ -1032,6 +1050,10 @@ func _project_source_anchors() -> void:
 	super._project_source_anchors()
 	if use_baby_floor_anchors:
 		_recover_baby_floor_anchors()
+	# The head box can touch the wall before its center reaches the wall sweep.
+	if use_baby_floor_anchors and use_tuned_floor_support and _baby_neck_needs_wall_recovery():
+		use_baby_floor_anchors = false
+		_baby_wall_anchors = true
 	if _baby_wall_anchors:
 		_recover_baby_wall_anchors()
 	if first_wall_window:
