@@ -49,7 +49,7 @@ func check_shadow_wind(world: Node, plants: Node3D) -> void:
 	var path := "user://grass_shadow_wind_%s.cfg" % OS.get_process_id()
 	var config := ConfigFile.new()
 	check(showcase.save_lighting_mix(path) == OK and config.load(path) == OK, "The control can be saved")
-	check(config.get_value("recipe", "version", 0) == 210
+	check(config.get_value("recipe", "version", 0) == showcase.LIGHTING_MIX_VERSION
 		and is_equal_approx(float(config.get_value("strengths", id, 0.)), .4), "Recipe stores the amount")
 	showcase.set_lighting_scale(id, 0.)
 	check(shadow_wind_matches(plants, 1.), "Zero restores full shadow motion")

@@ -176,6 +176,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_sun_warmth": ["Nắng ấm trên mặt đá", 1.],
 	&"stone_warmth_luma_trim": ["Giảm chói của nắng ấm trên đá", 1.],
 	&"stone_detail_softness": ["Stone texture softness", 1.],
+	&"source_path_edge_filter": ["Ổn định mép lối đất", 1.],
 	&"night_spatial_sky": ["Night terrain bounce (preview)", 1.],
 	&"night_stone_blue_softness": ["Dịu sắc lam trên đá ban đêm", 1.],
 	&"dawn_stone_sky_color": ["Sắc ánh trời trên đá rạng sáng", 1.],
@@ -328,7 +329,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 210
+const LIGHTING_MIX_VERSION := 211
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1863,6 +1864,7 @@ func set_source_terrain(enabled: bool) -> bool:
 		_source_terrain_tiles = preload("res://scripts/world_map_source_terrain.gd").load_tiles()
 	enabled = enabled and _source_terrain_tiles != null
 	source_terrain_active = enabled
+	_sync_source_path_edge_filter()
 	if is_instance_valid(cliff_relief):
 		cliff_relief.material.set_shader_parameter("source_terrain_tiles", _source_terrain_tiles if enabled else null)
 	if is_instance_valid(exterior_ground):
@@ -1882,6 +1884,9 @@ func set_source_terrain(enabled: bool) -> bool:
 	var stone_detail: HSlider = _lighting_sliders.get(&"stone_detail_softness")
 	if stone_detail != null:
 		stone_detail.editable = _stone_detail_editable()
+	var path_edge_filter: HSlider = _lighting_sliders.get(&"source_path_edge_filter")
+	if path_edge_filter != null:
+		path_edge_filter.editable = _source_path_edge_filter_available() and not _balanced_preview
 	var stone_sky: HSlider = _lighting_sliders.get(&"stone_day_sky")
 	if stone_sky != null:
 		stone_sky.editable = _stone_day_sky_editable()
@@ -2845,6 +2850,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 210 and effect == &"day_grass_shadow_wind":
 			missing_value = 0.
+		if version < 211 and effect == &"source_path_edge_filter":
+			missing_value = 0.
 		if version < 191 and effect == &"night_leaf_lamp_shoulder":
 			missing_value = 0.
 		if version < 190 and effect == &"day_path_chroma":
@@ -3190,6 +3197,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _stone_diffuse_editable() and _stone_detail_editable()
 		if effect == &"stone_detail_softness":
 			slider.editable = _stone_detail_editable()
+		if effect == &"source_path_edge_filter":
+			slider.editable = slider.editable and _source_path_edge_filter_available()
 		if effect == &"stone_day_sky":
 			slider.editable = _stone_day_sky_editable()
 		if effect == &"stone_wall_sky":
@@ -3212,6 +3221,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"", &"stone_detail_softness"] and level != null and level.look != null:
 		level.look.set_stone_detail_softness(_lighting_scale(&"stone_detail_softness"))
 		if changed_effect == &"stone_detail_softness":
+			return
+	if changed_effect in [&"", &"source_path_edge_filter"]:
+		_sync_source_path_edge_filter()
+		if changed_effect == &"source_path_edge_filter":
 			return
 	if changed_effect in [&"projected_sun", &"noon_projected_sun", &"projected_sun_position", &"projected_sun_region_alignment", &"projected_sun_softness", &"projected_sun_openings", &"sun_opening"]:
 		refresh_daylight_shading()
@@ -3879,6 +3892,17 @@ func _stone_bounce_focus_editable() -> bool:
 
 func _stone_diffuse_editable() -> bool:
 	return not _balanced_preview and level != null and level.terrain_light != null and level.terrain_light.stone_diffuse_available()
+
+func _source_path_edge_filter_available() -> bool:
+	return source_terrain_active and _biome_profile != null and _biome_profile.source_path_edge_filter > 0.
+
+func _sync_source_path_edge_filter() -> void:
+	if level == null or level.look == null:
+		return
+	var amount := 0.
+	if _source_path_edge_filter_available() and not _balanced_preview:
+		amount = _biome_profile.source_path_edge_filter * _lighting_scale(&"source_path_edge_filter")
+	level.look.set_source_path_edge_filter(amount)
 
 func _stone_detail_editable() -> bool:
 	return not _balanced_preview and _source_terrain_toggle != null and _source_terrain_toggle.button_pressed
