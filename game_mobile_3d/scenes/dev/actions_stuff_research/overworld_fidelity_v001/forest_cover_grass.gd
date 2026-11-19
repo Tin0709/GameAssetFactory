@@ -1,7 +1,9 @@
 extends RefCounted
-## Adapts three private ForestA1 meshes to the existing grass material and wind attributes.
+## Adapts private Forest ground plants to the shared grass material and wind attributes.
 const MANIFEST := "godot_lab/world_map_unified_showcase_v001/forest_cover_grass_v001/sources.private.json"
 const PlantShader := preload("vegetation.gdshader")
+const ResearchRoot := preload("res://scripts/world_map_forest_path_light.gd")
+const ENVIRONMENT := "extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Environment"
 
 static func load_into(bundle: RefCounted) -> Array[String]:
 	var manifest_path: String = bundle.root.path_join(MANIFEST)
@@ -20,16 +22,7 @@ static func load_into(bundle: RefCounted) -> Array[String]:
 	var image := Image.load_from_file(atlas_path)
 	if image == null or image.is_empty():
 		return []
-	var material := ShaderMaterial.new()
-	material.shader = PlantShader
-	material.set_shader_parameter("atlas", ImageTexture.create_from_image(image))
-	material.set_shader_parameter("tinted_grass", true)
-	material.set_shader_parameter("native_grass_albedo", true)
-	material.set_shader_parameter("cutoff", .5)
-	var motion: Dictionary = bundle.data.motion
-	material.set_shader_parameter("wind_intensity", float(motion.intensity))
-	material.set_shader_parameter("wind_direction", Vector2(motion.direction[0], motion.direction[1]))
-	material.set_shader_parameter("frequency", float(motion.frequency_adapter))
+	var material := plant_material(bundle, image)
 	var names: Array[String] = []
 	var loaded := {}
 	for entry: Variant in entries:
@@ -45,6 +38,43 @@ static func load_into(bundle: RefCounted) -> Array[String]:
 	bundle.meshes.merge(loaded)
 	bundle.materials.append(material)
 	return names
+
+static func load_forest_fern(bundle: RefCounted) -> String:
+	if ResearchRoot.research_root().is_empty() or RenderingServer.get_rendering_device() == null:
+		return ""
+	var directory: String = bundle.root.path_join(ENVIRONMENT)
+	var atlas_path := checked_file(bundle, directory.path_join("ForestA1/Props/Boulder"), {
+		"file": "T_TreesBoulders.png",
+		"sha256": "9b596a2149fcaf999178d6a5557cda9677c204f21848c84c9a30425ad1d850f6"}, "png")
+	var mesh_path := checked_file(bundle, directory.path_join("Generic/Nature/Foliage/Ferns"), {
+		"file": "SM_SF_Fern_Small.glb",
+		"sha256": "46ebb26dff1711472085ed6dea1a2c52e56aa04d9087ebfba4312a6d6fa5876f"}, "glb")
+	if atlas_path.is_empty() or mesh_path.is_empty():
+		return ""
+	var image := Image.load_from_file(atlas_path)
+	if image == null or image.get_size() != Vector2i(128, 128):
+		return ""
+	var material := plant_material(bundle, image)
+	var mesh := load_mesh(mesh_path, material)
+	if mesh == null:
+		return ""
+	var key := "ForestA1 | SM_SF_Fern_Small"
+	bundle.meshes[key] = mesh
+	bundle.materials.append(material)
+	return key
+
+static func plant_material(bundle: RefCounted, image: Image) -> ShaderMaterial:
+	var material := ShaderMaterial.new()
+	material.shader = PlantShader
+	material.set_shader_parameter("atlas", ImageTexture.create_from_image(image))
+	material.set_shader_parameter("tinted_grass", true)
+	material.set_shader_parameter("native_grass_albedo", true)
+	material.set_shader_parameter("cutoff", .5)
+	var wind: Dictionary = bundle.data.motion
+	material.set_shader_parameter("wind_intensity", float(wind.intensity))
+	material.set_shader_parameter("wind_direction", Vector2(wind.direction[0], wind.direction[1]))
+	material.set_shader_parameter("frequency", float(wind.frequency_adapter))
+	return material
 
 static func checked_file(bundle: RefCounted, directory: String, entry: Variant, extension: String) -> String:
 	if not entry is Dictionary or not entry.get("file") is String or not entry.get("sha256") is String:

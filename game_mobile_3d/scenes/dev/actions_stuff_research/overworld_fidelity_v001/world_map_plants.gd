@@ -20,6 +20,9 @@ var dense_grass_review:=true
 var forest_cover_enabled := true
 var forest_cover_species: Array[String] = []
 var forest_cover_counts: Dictionary = {}
+var forest_fern_enabled := true
+var forest_fern_asset := ""
+var _fern_cells: Dictionary[Vector2i, bool] = {}
 var eligible_grass_cells:=0
 var world:Node3D
 var error:=""
@@ -38,6 +41,12 @@ func setup_world(level:Node3D)->void:
 	if bundle.read(research.path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")).is_empty():
 		error=bundle.error;push_warning(error);set_physics_process(false);set_process(false);return
 	forest_cover_species = ForestCover.load_into(bundle)
+	if not world.forest_fern_cells.is_empty():
+		forest_fern_asset = ForestCover.load_forest_fern(bundle)
+		if not forest_fern_asset.is_empty():
+			for cell: Vector2 in world.forest_fern_cells:
+				if cell.is_finite() and cell == cell.floor():
+					_fern_cells[Vector2i(cell)] = true
 	for material:ShaderMaterial in bundle.materials:
 		_native_wind_intensities[material.get_instance_id()]=float(material.get_shader_parameter("wind_intensity"))
 	grass_light=GRASS_LIGHT.new();grass_light.setup(world,bundle)
@@ -61,6 +70,13 @@ func set_forest_cover(value: bool) -> void:
 		return
 	forest_cover_enabled = value
 	if dense_grass_review and not forest_cover_species.is_empty():
+		_rebuild_planting()
+
+func set_forest_fern(value: bool) -> void:
+	if forest_fern_enabled == value:
+		return
+	forest_fern_enabled = value
+	if dense_grass_review and not forest_fern_asset.is_empty():
 		_rebuild_planting()
 
 func _rebuild_planting()->void:
@@ -175,22 +191,28 @@ func _build_dense_planting()->void:
 		var transform:=Transform3D(Basis(Vector3.UP,_rng.randf()*TAU),position)
 		var phase := _rng.randf() * TAU
 		var cover := _cover_index(cell)
+		var fern := forest_fern_enabled and _fern_cells.has(cell) and _off_path(cell)
 		var scale_factor := 1.
-		if cover >= 0:
+		if fern:
+			asset = forest_fern_asset
+			scale_factor = .94 + float(posmod(hash(cell + Vector2i(397, 619)), 13)) * .01
+			transform.origin = Vector3(cell.x + .5, position.y, cell.y + .5)
+			transform.basis = transform.basis.scaled(Vector3.ONE * scale_factor)
+		elif cover >= 0:
 			asset = forest_cover_species[cover]
 			scale_factor = .82 if cover == 2 else 1.
 			var yaw := float(posmod(hash(cell + Vector2i(593, 827)), 4)) * PI * .5
 			transform.basis = Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale_factor)
 			forest_cover_counts[asset] = int(forest_cover_counts.get(asset, 0)) + 1
 		var bounds:AABB=transform*bundle.meshes[asset].get_aabb()
-		# Sparse cover grass uses one batch per species. The dense carpet stays tiled.
-		var key := asset if cover >= 0 else asset + "/" + str(Vector2i(floori(position.x / TILE), floori(position.z / TILE)))
+		# Sparse plants use one batch per species. The dense carpet stays tiled.
+		var key := asset if fern or cover >= 0 else asset + "/" + str(Vector2i(floori(position.x / TILE), floori(position.z / TILE)))
 		if not _groups.has(key):_groups[key]={"asset":asset,"transforms":[],"custom":[]}
 		_groups[key].transforms.append(transform);_groups[key].custom.append(Color(phase,cell.x+.5,cell.y+.5,scale_factor))
-		placements.append({"cell":cell,"root":position,"asset":asset,"bounds":bounds,"flower":"","carpet":true,
-			"scale":scale_factor,"cards":4 if cover < 0 else 2 if cover < 2 else 3,"ground_kind":kind,
-			"forest_cover":cover >= 0})
-		_add_plant_root(Vector2(position.x,position.z))
+		placements.append({"cell":cell,"root":transform.origin,"asset":asset,"bounds":bounds,"flower":"","carpet":true,
+			"scale":scale_factor,"cards":0 if fern else 4 if cover < 0 else 2 if cover < 2 else 3,"ground_kind":kind,
+			"forest_cover":not fern and cover >= 0,"forest_fern":fern})
+		_add_plant_root(Vector2(transform.origin.x,transform.origin.z))
 		instance_count+=1;species_counts[asset]=int(species_counts.get(asset,0))+1
 
 func _cover_index(cell: Vector2i) -> int:
@@ -201,15 +223,20 @@ func _cover_index(cell: Vector2i) -> int:
 		return -1
 	if Vector2(cell).distance_to(Vector2(world.spawn_position.x, world.spawn_position.z)) < 3.:
 		return -1
+	if not _off_path(cell):
+		return -1
+	var variant := posmod(hash(cell + Vector2i(741, 129)), 12)
+	return 0 if variant < 5 else 1 if variant < 10 else 2
+
+func _off_path(cell: Vector2i) -> bool:
 	var source: Image = world.look.path_map_image
 	var pixel := Vector2i(Vector2(cell) - world.look.path_map_origin)
 	var limits := Rect2i(Vector2i.ZERO, source.get_size())
 	for offset: Vector2i in [Vector2i.ZERO, Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
 		var neighbor := pixel + offset
 		if not limits.has_point(neighbor) or (int(roundf(source.get_pixelv(neighbor).r)) & 255) != 0:
-			return -1
-	var variant := posmod(hash(cell + Vector2i(741, 129)), 12)
-	return 0 if variant < 5 else 1 if variant < 10 else 2
+			return false
+	return true
 
 func _build_flower_centers()->void:
 	var colors:Array=FLOWERS.keys()
