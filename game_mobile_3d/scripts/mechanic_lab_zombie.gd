@@ -811,9 +811,10 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 				or not _lab_path_end_clear(space, travel):
 			continue
 		var connects := _detour_reaches_approach(space, travel, target_offset - clearance, stop_distance)
-		# Prefer a leg that leads back toward melee. Keep the partial-path
-		# choice when both sides still need another corner.
-		if (connects and not best_connects) or (connects == best_connects and distance > best_distance):
+		# A remembered position needs a connected route. With fresh sight,
+		# the chaser can use a partial leg and plan again at the next corner.
+		if (connects or _target_visible) and ((connects and not best_connects)
+				or (connects == best_connects and distance > best_distance)):
 			best = origin + travel
 			best_distance = distance
 			best_connects = connects
