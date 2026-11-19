@@ -8,8 +8,14 @@ var failures: Array[String] = []
 func _initialize() -> void:
 	run.call_deferred()
 
-func add_wall(lab: Node3D, point: Vector3, size: Vector3, yaw: float) -> StaticBody3D:
-	var wall := StaticBody3D.new()
+func add_wall(lab: Node3D, point: Vector3, size: Vector3, yaw: float, frozen := false) -> PhysicsBody3D:
+	var wall: PhysicsBody3D
+	if frozen:
+		var body := RigidBody3D.new()
+		body.freeze = true
+		wall = body
+	else:
+		wall = StaticBody3D.new()
 	var collider := CollisionShape3D.new()
 	var box := BoxShape3D.new()
 	box.size = size
@@ -59,7 +65,7 @@ func check_brief_occlusion(lab: Node3D, chaser: ZOMBIE, heading: Basis) -> void:
 	screen.free()
 
 func check_detour(member_count: int, yaw: float, block_right: bool,
-		block_with_zombie := false, brief_occlusion := false) -> void:
+		block_with_zombie := false, brief_occlusion := false, frozen_wall := false) -> void:
 	var lab := LAB.instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -69,7 +75,7 @@ func check_detour(member_count: int, yaw: float, block_right: bool,
 		lab.free()
 		return
 	var heading := Basis(Vector3.UP, yaw)
-	add_wall(lab, heading * Vector3(0.0, 0.35, -2.25), Vector3(2.5, 0.7, 0.3), yaw)
+	add_wall(lab, heading * Vector3(0.0, 0.35, -2.25), Vector3(2.5, 0.7, 0.3), yaw, frozen_wall)
 	if block_with_zombie:
 		var blocker := zombies.get_child(1) as ZOMBIE
 		blocker.position = heading * Vector3(0.95, 0.02, -2.84)
@@ -96,14 +102,14 @@ func check_detour(member_count: int, yaw: float, block_right: bool,
 	if brief_occlusion and not covered:
 		failures.append("The brief-occlusion replay must exercise a chosen route")
 	if visible_ticks < 220 or absf(crossing_x) < 1.55 or not is_finite(crossing_x) or hits.is_empty():
-		failures.append("Visible chaser should walk around the wall and reach melee with %d members, yaw %s"
-			% [member_count, rad_to_deg(yaw)])
+		failures.append("Visible chaser should walk around the wall and reach melee with %d members, yaw %s, frozen %s"
+			% [member_count, rad_to_deg(yaw), frozen_wall])
 	if block_right and crossing_x >= 0.0:
 		failures.append("A blocked right side should send the chaser around the left edge")
 	if not hits.all(func(damage): return damage == ZOMBIE.MELEE_DAMAGE):
 		failures.append("Detouring should preserve the normal melee hit")
 	print("LAB_VISIBLE_DETOUR members=", member_count, " yaw=", rad_to_deg(yaw),
-		" zombie_blocker=", block_with_zombie, " cross_x=", crossing_x,
+		" zombie_blocker=", block_with_zombie, " frozen_wall=", frozen_wall, " cross_x=", crossing_x,
 		" hits=", hits.size(), " visible=", visible_ticks)
 	lab.free()
 	await physics_frame
@@ -342,6 +348,7 @@ func run() -> void:
 	await check_direct_approach_after_cover_opens(100, deg_to_rad(27.0))
 	await check_detour(1, 0.0, false)
 	await check_detour(100, deg_to_rad(27.0), true)
+	await check_detour(100, deg_to_rad(27.0), true, false, false, true)
 	await check_detour(100, 0.0, true, true)
 	await check_detour(100, deg_to_rad(27.0), true, false, true)
 	await check_connected_side(1, 0.0, 1.0)
