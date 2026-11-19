@@ -23,7 +23,7 @@ func run()->void:
 			roots[row.cell]=true
 			var native_height:float=plants.bundle.meshes[plants.MEDIUM[1]].get_aabb().size.y
 			var height_ok:bool=row.bounds.size.y>0. and row.bounds.size.y<=native_height+.001 if plants.grass_splay_active() else absf(row.bounds.size.y-native_height)<.001
-			if not row.get("forest_cover", false):
+			if not row.get("forest_cover", false) and not row.get("forest_fern", false):
 				full_scale=full_scale and is_equal_approx(row.scale,1.) and height_ok
 			supported=supported and row.ground_kind.begins_with("grass_") and absf(row.bounds.position.y-w.surface_height(row.root.x,row.root.z))<.002
 		check(full_scale,"Source-scale patches preserve upright height or its pitched projection")
