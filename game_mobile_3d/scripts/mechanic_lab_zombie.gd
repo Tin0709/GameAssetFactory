@@ -19,11 +19,11 @@ const IDLE := &"Zombie_Idle"
 const IDLE_AUDIO_NOTIFY_TIME := 0.066887535
 const IDLE_AUDIO_CHANCE := 0.5
 const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Variant2"]
-# PlayDebrisEffect notifies in the MD2 walk sequences, with UE X offsets in metres.
+# PlayDebrisEffect notifies store phase in seconds and lateral/forward offsets in metres.
 const WALK_STEP_NOTIFIES := {
-	&"Zombie_Walk": [Vector2(0.427282363, 0.20), Vector2(1.281282187, -0.20)],
-	&"Zombie_Walk_Variant1": [Vector2(0.427282006, 0.20), Vector2(1.281281948, -0.20)],
-	&"Zombie_Walk_Variant2": [Vector2(0.427282006, 0.20), Vector2(1.281281948, -0.20)],
+	&"Zombie_Walk": [Vector3(0.427282363, 0.20, 0.0), Vector3(1.281282187, -0.20, 0.0)],
+	&"Zombie_Walk_Variant1": [Vector3(0.427282006, 0.20, 0.0), Vector3(1.281281948, -0.20, 0.0)],
+	&"Zombie_Walk_Variant2": [Vector3(0.427282006, 0.20, 0.0), Vector3(1.281281948, -0.20, 0.0)],
 }
 const STEP_MIN_SPEED_SQUARED := 0.15 * 0.15
 const SPAWN := &"Zombie_Spawn"
@@ -44,7 +44,8 @@ const BABY_DEATH_LAUNCH_SCALE := 0.85
 # Local contact and focus markers derived from the leading hand's swing.
 const BABY_ATTACK_CONTACT := 20.0 / 30.0
 const BABY_ATTACK_FOCUS_END := 18.0 / 30.0
-const BABY_STEP_CONTACTS := [Vector2(0.2, 0.0625), Vector2(0.4, -0.0625)]
+# First supported source frames and the low-edge centres of the skinned soles.
+const BABY_STEP_CONTACTS := [Vector3(2.0 / 30.0, -0.117, 0.116), Vector3(8.0 / 30.0, 0.102, 0.083)]
 const MAX_POISE := 28.0
 const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
@@ -566,11 +567,11 @@ func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
 	var phase := animation.current_animation_position
 	var wrapped := phase < previous_phase
 	var contacts: Array = BABY_STEP_CONTACTS if is_baby else WALK_STEP_NOTIFIES[clip]
-	for contact: Vector2 in contacts:
+	for contact: Vector3 in contacts:
 		var at := contact.x
 		var crossed := (at > previous_phase or at <= phase) if wrapped else (at > previous_phase and at <= phase)
 		if crossed:
-			step_audio.emit(to_global(Vector3(contact.y, 0.0, 0.0)))
+			step_audio.emit(to_global(Vector3(contact.y, 0.0, contact.z)))
 
 func _check_melee_contact() -> void:
 	if target.get("is_dead") == true:
