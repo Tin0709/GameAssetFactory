@@ -97,6 +97,7 @@ func run() -> void:
 	await check_wall_slide_steps(lab, dust, wind)
 	await check_curved_step_effects(lab, dust, wind)
 	await check_steps_during_attacks(lab, dust)
+	await check_landing_variation_is_independent(lab, dust.get_script())
 	await check_dust_contact_clock(lab, dust)
 	await check_zombie_steps_on_slab(lab)
 	await check_zombie_dust_contact_clock(lab)
@@ -742,6 +743,64 @@ func check_steps_during_attacks(lab, dust: Node3D) -> void:
 	picker.select(selected)
 	picker.item_selected.emit(selected)
 	toggle.button_pressed = sound_was_enabled
+
+func check_landing_variation_is_independent(lab, emitter_script: Script) -> void:
+	var player = lab.player
+	var only_landings: Node3D = emitter_script.new()
+	var with_steps: Node3D = emitter_script.new()
+	for emitter in [only_landings, with_steps]:
+		var step_profile := Callable(player, "source_step_dust_size") if emitter == with_steps else func() -> float: return 0.0
+		var ready: bool = emitter.setup(player, null, lab._player_foot_contact_at,
+			Callable(), lab._grass_landing_contact_at, step_profile, true)
+		check(ready, "The independent landing fixture loads the verified dust")
+		emitter.use_source_landing()
+		lab.add_child(emitter)
+	var without_steps: Array[Array] = []
+	var after_steps: Array[Array] = []
+	var regular_steps := [0]
+	var compare := func(_sole: Vector3, landed: bool):
+		var tick := Engine.get_physics_frames()
+		if landed:
+			without_steps.append(landing_emission_signature(only_landings, tick))
+			after_steps.append(landing_emission_signature(with_steps, tick))
+		elif with_steps._particles.any(func(p): return p.sprite.visible and p.contact_tick == tick and p.run_drag > 0.0):
+			regular_steps[0] += 1
+	player.surface_contact.connect(compare)
+	for trial in 3:
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		Input.action_press("move_forward")
+		for i in 38:
+			await physics_frame
+		Input.action_press("jump")
+		await physics_frame
+		await physics_frame
+		Input.action_release("jump")
+		for i in 70:
+			await physics_frame
+		Input.action_release("move_forward")
+	player.surface_contact.disconnect(compare)
+	check(regular_steps[0] >= 3 and without_steps.size() == 3
+		and without_steps.all(func(row): return row.size() >= 4 and row.size() <= 6),
+		"The replay emits real MD2 run puffs and three ordinary landing bursts")
+	check(without_steps == after_steps and without_steps[0] != without_steps[-1],
+		"Landing particles vary between jumps independently of the run steps")
+	print("MECHANIC_LAB_LANDING_VARIATION steps=", regular_steps[0], " jumps=", without_steps.size(),
+		" independent=", without_steps == after_steps)
+	only_landings.free()
+	with_steps.free()
+	lab.reset_player()
+	await physics_frame
+
+func landing_emission_signature(emitter, tick: int) -> Array[String]:
+	var result: Array[String] = []
+	for particle in emitter._particles:
+		if particle.sprite.visible and particle.contact_tick == tick and particle.landing_tick == 0:
+			result.append(var_to_bytes([particle.origin, particle.velocity, particle.duration, particle.sprite.frame]).hex_encode())
+	# Pool slots can differ because one emitter has live footstep sprites.
+	result.sort()
+	return result
 
 func check_dust_contact_clock(lab, dust) -> void:
 	lab.reset_player()
