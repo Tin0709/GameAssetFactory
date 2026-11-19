@@ -819,9 +819,18 @@ func _load_surface_landing(root: String, surface: String, group: StringName, has
 
 func _load_sample(root: String, group: StringName, relative: String, checksum: String) -> void:
 	var path := SourceFilePath.resolve_private_file(root, SOURCE.path_join(relative))
-	if path.is_empty() or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != checksum:
+	if path.is_empty():
 		return
-	var stream := AudioStreamOggVorbis.load_from_file(path)
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return
+	var data := file.get_buffer(file.get_length())
+	var digest := HashingContext.new()
+	if (digest.start(HashingContext.HASH_SHA256) != OK or digest.update(data) != OK
+			or digest.finish().hex_encode() != checksum):
+		return
+	# Decode the exact bytes that passed verification.
+	var stream := AudioStreamOggVorbis.load_from_buffer(data)
 	if stream != null:
 		stream.loop = false
 		if not _groups.has(group):
