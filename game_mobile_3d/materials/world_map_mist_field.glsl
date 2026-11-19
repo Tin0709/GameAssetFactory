@@ -10,6 +10,9 @@ layout(set=0,binding=5) uniform sampler3D sky_air_field;
 #ifdef GAF_DIRECTIONAL_AIR
 layout(set=0,binding=4) uniform sampler3D directional_field;
 #endif
+#ifdef GAF_EAST_DIRECTIONAL_AIR
+layout(set=0,binding=6) uniform sampler3D east_directional_field;
+#endif
 layout(std140,set=0,binding=2) uniform Parameters{
  vec4 origin;    // World ray origin; near entry distance in w.
  vec4 origin_dx; // Horizontal origin delta; near extinction in w.
@@ -36,6 +39,11 @@ layout(std140,set=0,binding=2) uniform Parameters{
 #ifdef GAF_DIRECTIONAL_REGION
  vec4 region_origin_offset; // region world origin XYZ, Z offset in atlas
  vec4 region_tile_columns; // tile dimensions XYZ, atlas columns
+#endif
+#ifdef GAF_EAST_DIRECTIONAL_AIR
+ vec4 east_origin_step;
+ vec4 east_tile_columns;
+ vec4 east_gain;
 #endif
 #endif
  vec4 local_center_strength; // authored world XYZ and peak extinction per meter
@@ -99,13 +107,30 @@ vec3 path_light(vec3 point){
  return p.path_rgb_gain.rgb*response;
 }
 #ifdef GAF_DIRECTIONAL_AIR
-float directional_visibility(vec3 cell, int slot, int columns, vec2 tile, float z_offset){
+float directional_visibility(sampler3D field, vec3 cell, int slot, int columns, vec2 tile, float z_offset){
  vec2 offset=vec2(slot%columns,slot/columns)*tile;
- vec3 dimensions=vec3(textureSize(directional_field,0));
- return textureLod(directional_field,(cell+vec3(offset,z_offset)+.5)/dimensions,0.).r;
+ vec3 dimensions=vec3(textureSize(field,0));
+ return textureLod(field,(cell+vec3(offset,z_offset)+.5)/dimensions,0.).r;
+}
+float phased_directional_visibility(sampler3D field, vec3 cell, int columns, vec2 tile, float offset){
+ int a=int(p.directional_slots.x), b=int(p.directional_slots.y);
+ float weight=p.directional_slots.z;
+ if(a==b||weight<=0.)return directional_visibility(field,cell,a,columns,tile,offset);
+ if(weight>=1.)return directional_visibility(field,cell,b,columns,tile,offset);
+ return mix(directional_visibility(field,cell,a,columns,tile,offset),
+            directional_visibility(field,cell,b,columns,tile,offset),weight);
 }
 vec3 directional_air(vec3 point){
  if(p.directional_rgb_gain.w<=0.)return vec3(0.);
+#ifdef GAF_EAST_DIRECTIONAL_AIR
+ if(p.east_gain.x>0. && point.x>=p.east_origin_step.x){
+  vec3 east_cell=(point-p.east_origin_step.xyz)/p.east_origin_step.w;
+  vec3 east_tile=p.east_tile_columns.xyz;
+  if(any(lessThan(east_cell,vec3(0)))||any(greaterThan(east_cell,east_tile-1.)))return vec3(0.);
+  float lit=phased_directional_visibility(east_directional_field,east_cell,int(p.east_tile_columns.w),east_tile.xy,0.);
+  return p.directional_rgb_gain.rgb*((p.directional_rgb_gain.w*p.east_gain.x)*lit);
+ }
+#endif
  vec3 cell=(point-p.directional_origin_step.xyz)/p.directional_origin_step.w;
  vec3 tile=p.directional_tile.xyz;
  int columns=int(p.directional_slots.w);
@@ -120,12 +145,7 @@ vec3 directional_air(vec3 point){
  }
 #endif
  if(any(lessThan(cell,vec3(0)))||any(greaterThan(cell,tile-1.)))return vec3(0.);
- int a=int(p.directional_slots.x), b=int(p.directional_slots.y);
- float weight=p.directional_slots.z;
- float visibility;
- if(a==b||weight<=0.)visibility=directional_visibility(cell,a,columns,tile.xy,offset);
- else if(weight>=1.)visibility=directional_visibility(cell,b,columns,tile.xy,offset);
- else visibility=mix(directional_visibility(cell,a,columns,tile.xy,offset),directional_visibility(cell,b,columns,tile.xy,offset),weight);
+ float visibility=phased_directional_visibility(directional_field,cell,columns,tile.xy,offset);
  return p.directional_rgb_gain.rgb*(gain*visibility);
 }
 #endif

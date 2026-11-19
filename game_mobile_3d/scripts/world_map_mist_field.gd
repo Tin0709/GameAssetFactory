@@ -7,6 +7,7 @@ const PATH_SOURCE_BYTES := 48
 const GPU_PARAMETER_BYTES := 224 + PATH_SOURCE_BYTES
 const DIRECTIONAL_PARAMETER_BYTES := 64
 const DIRECTIONAL_REGION_BYTES := 32
+const EAST_DIRECTIONAL_BYTES := 48
 const LOCAL_MIST_BYTES := 48
 const DEPTH_SCATTER_BYTES := 32
 const GROUND_HAZE_BYTES := 32
@@ -17,6 +18,7 @@ const DEPTH_SCATTER_START_M := 2.0
 const DEPTH_SCATTER_RAMP_M := 6.0
 var sky_grid: Texture3D
 var directional_grid: ImageTexture3D
+var east_directional_grid: ImageTexture3D
 var directional_region := false
 var directional_provider: Callable
 var _directional_parameters := PackedByteArray()
@@ -69,7 +71,7 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		if directional_provider.is_valid():
 			var values: PackedFloat32Array = directional_provider.call()
 			directional_bytes = values.to_byte_array()
-		var expected := DIRECTIONAL_PARAMETER_BYTES + (DIRECTIONAL_REGION_BYTES if directional_region else 0)
+		var expected := _directional_byte_count()
 		if directional_bytes.size() != expected:
 			directional_bytes.resize(expected)
 			directional_bytes.fill(0)
@@ -132,6 +134,13 @@ func _report(key:String,value:Variant):
 func _keep(rid:RID)->RID:
 	if rid.is_valid():_resources.append(rid)
 	return rid
+
+func _directional_byte_count() -> int:
+	if directional_grid == null:
+		return 0
+	return DIRECTIONAL_PARAMETER_BYTES + (DIRECTIONAL_REGION_BYTES if directional_region else 0) \
+		+ (EAST_DIRECTIONAL_BYTES if east_directional_grid != null else 0)
+
 func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	var kernel := FileAccess.get_file_as_string("res://materials/world_map_mist_field.glsl")
 	if kernel.is_empty():
@@ -148,6 +157,8 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 		source.source_compute = source.source_compute.replace("#version 450", "#version 450\n#define GAF_DIRECTIONAL_AIR")
 		if directional_region:
 			source.source_compute = source.source_compute.replace("#define GAF_DIRECTIONAL_AIR", "#define GAF_DIRECTIONAL_AIR\n#define GAF_DIRECTIONAL_REGION")
+		if east_directional_grid != null:
+			source.source_compute = source.source_compute.replace("#define GAF_DIRECTIONAL_AIR", "#define GAF_DIRECTIONAL_AIR\n#define GAF_EAST_DIRECTIONAL_AIR")
 	if sky_grid != null:
 		source.source_compute = source.source_compute.replace("#version 450", "#version 450\n#define GAF_SKY_AIR")
 	var spirv:=rd.shader_compile_spirv_from_source(source)
@@ -155,7 +166,7 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	if not error.is_empty():_report("error",error);return false
 	var shader:=_keep(rd.shader_create_from_spirv(spirv));_pipeline=_keep(rd.compute_pipeline_create(shader))
 	var parameter_size := GPU_PARAMETER_BYTES + 2 * LOCAL_MIST_BYTES + DEPTH_SCATTER_BYTES + GROUND_HAZE_BYTES \
-		+ ((DIRECTIONAL_PARAMETER_BYTES + (DIRECTIONAL_REGION_BYTES if directional_region else 0)) if directional_grid != null else 0)
+		+ _directional_byte_count()
 	if sky_grid != null:
 		parameter_size += SKY_AIR_BYTES
 	_buffer=_keep(rd.uniform_buffer_create(parameter_size))
@@ -180,6 +191,16 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 		direction.add_id(sampler)
 		direction.add_id(direction_rd)
 		bindings.append(direction)
+		if east_directional_grid != null:
+			var east_rd := RenderingServer.texture_get_rd_texture(east_directional_grid.get_rid())
+			if not east_rd.is_valid():
+				return false
+			var east := RDUniform.new()
+			east.uniform_type = RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE
+			east.binding = 6
+			east.add_id(sampler)
+			east.add_id(east_rd)
+			bindings.append(east)
 	if sky_grid != null:
 		var sky_rd := RenderingServer.texture_get_rd_texture(sky_grid.get_rid())
 		if not sky_rd.is_valid():
