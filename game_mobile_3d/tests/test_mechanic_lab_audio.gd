@@ -474,7 +474,8 @@ func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffec
 		samples_at[voice.global_position] = voice.stream
 	var positions_preserved := layers.size() == contacts.size()
 	for i in contacts.size():
-		positions_preserved = positions_preserved and samples_at.get(contacts[i]) == grass_samples[(first_choice + i) % grass_samples.size()]
+		var expected: AudioStream = grass_samples[(first_choice + i) % grass_samples.size()]
+		positions_preserved = positions_preserved and samples_at.get(contacts[i]) == expected
 	check(positions_preserved, "Three recent ground contacts reach separate voices with their original positions")
 	check(weapon_voices.all(func(voice): return voice != null and voice.playing and voice.stream in audio._groups[&"hit"]),
 		"The ground contacts preserve the three pending weapon onsets")
