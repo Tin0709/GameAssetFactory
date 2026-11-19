@@ -469,11 +469,12 @@ func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffec
 	audio.slam_landed(second_point)
 	var layers := audio.get_children().filter(func(child):
 		return child is AudioStreamPlayer3D and child.playing and child.stream in grass_samples)
+	var samples_at: Dictionary[Vector3, AudioStream] = {}
+	for voice: AudioStreamPlayer3D in layers:
+		samples_at[voice.global_position] = voice.stream
 	check(layers.size() == 2
-		and layers.any(func(voice): return voice.global_position == point
-			and voice.stream == grass_samples[first_choice])
-		and layers.any(func(voice): return voice.global_position == second_point
-			and voice.stream == grass_samples[(first_choice + 1) % grass_samples.size()]),
+		and samples_at.get(point) == grass_samples[first_choice]
+		and samples_at.get(second_point) == grass_samples[(first_choice + 1) % grass_samples.size()],
 		"Two recent ground contacts reach separate voices with their original positions")
 	check(weapon_voices.all(func(voice): return voice != null and voice.playing and voice.stream in audio._groups[&"hit"]),
 		"The two ground contacts preserve the three pending weapon onsets")
