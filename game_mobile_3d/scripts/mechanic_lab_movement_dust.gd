@@ -18,6 +18,7 @@ const STEP_ALPHA_HASH := "c2dae47cc6feaad21508e960739ab5451fcdd691bb194b70ffd853
 const LANDING_CURVES_PATH := "reports/depth/vfx/landing-dust-curves.private.json"
 const LANDING_CURVES_HASH := "c3144bc6635533a38f59e99fc7b63037beb00209fad19295ff0e37a8156151a3"
 const SOURCE_PHYSICS_STEP := 1.0 / 60.0
+const PARTICLE_SEED := 27381
 # Keep the lab grass tint. The dirt and stone tints lift the source tile
 # medians toward a lighter, less saturated dust color.
 const SURFACE_DUST := {
@@ -53,6 +54,7 @@ var _burst_frame := -1
 var _burst_point: Vector3
 var _burst_surface: String
 var _random := RandomNumberGenerator.new()
+var _landing_random: RandomNumberGenerator
 var _run_profile: Callable
 var _run_alpha := PackedFloat32Array()
 var _run_alpha_duration := 1.0
@@ -85,7 +87,7 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_cont
 			_run_alpha = PackedFloat32Array(data.alpha)
 			_run_alpha_duration = float(data.alpha_duration)
 			_run_profile = run_profile
-	_random.seed = 27381
+	_random.seed = PARTICLE_SEED
 	_grow_particle_pool(CAPACITY)
 	actor.surface_contact.connect(_on_surface_contact)
 	actor.heavy_jump_landed.connect(_on_heavy_jump_landed)
@@ -115,6 +117,9 @@ func use_source_landing() -> void:
 	_landing_alpha = PackedFloat32Array(data.alpha)
 	_landing_alpha_duration = float(data.alpha_duration)
 	_landing_drag = PackedFloat32Array(data.drag)
+	# The source landing emitter has its own particle variation.
+	_landing_random = RandomNumberGenerator.new()
+	_landing_random.seed = PARTICLE_SEED
 	_grow_particle_pool(SOURCE_LANDING_CAPACITY)
 
 func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:
@@ -298,30 +303,30 @@ func _emit_run_dust(ground_point: Vector3, surface: String, size: float) -> void
 	particle.duration = _random.randf_range(0.80, 1.75)
 	particle.run_drag = _random.randf_range(4.0, 10.0)
 	particle.landing_tick = -1
-	_show_source_particle(particle, surface, size, _run_alpha[0])
+	_show_source_particle(particle, surface, size, _run_alpha[0], _random)
 	set_process(true)
 
 func _emit_source_landing(ground_point: Vector3, surface: String) -> void:
 	# NS_PlayerLanding_Medium_Dust at full scalability. The launch occupies
 	# the band from 85 to 90 degrees about the vertical axis.
-	for i in _random.randi_range(4, 6):
+	for i in _landing_random.randi_range(4, 6):
 		var particle := _next_particle(_smoke_texture, SOURCE_CAMERA_RANGE)
 		particle.origin = ground_point + Vector3.UP * 0.50
 		particle.landing_position = particle.origin
 		particle.landing_tick = 0
 		particle.age = 0.0
 		particle.contact_tick = Engine.get_physics_frames()
-		particle.duration = _random.randf_range(1.0, 2.0)
+		particle.duration = _landing_random.randf_range(1.0, 2.0)
 		particle.run_drag = 0.0
-		var yaw := _random.randf_range(0.0, TAU)
-		var up := _random.randf_range(0.0, sin(deg_to_rad(5.0)))
+		var yaw := _landing_random.randf_range(0.0, TAU)
+		var up := _landing_random.randf_range(0.0, sin(deg_to_rad(5.0)))
 		var planar := sqrt(1.0 - up * up)
-		particle.velocity = Vector3(cos(yaw) * planar, up, sin(yaw) * planar) * _random.randf_range(20.0, 35.0)
-		_show_source_particle(particle, surface, 1.0, _landing_alpha[0])
+		particle.velocity = Vector3(cos(yaw) * planar, up, sin(yaw) * planar) * _landing_random.randf_range(20.0, 35.0)
+		_show_source_particle(particle, surface, 1.0, _landing_alpha[0], _landing_random)
 	set_process(true)
 
-func _show_source_particle(particle: Particle, surface: String, size: float, alpha: float) -> void:
-	particle.sprite.frame = FRAMES[_random.randi_range(0, FRAMES.size() - 1)]
+func _show_source_particle(particle: Particle, surface: String, size: float, alpha: float, rng: RandomNumberGenerator) -> void:
+	particle.sprite.frame = FRAMES[rng.randi_range(0, FRAMES.size() - 1)]
 	particle.sprite.pixel_size = size / 16.0
 	particle.sprite.scale = Vector3.ONE
 	particle.sprite.global_position = particle.origin
