@@ -50,8 +50,9 @@ func run() -> void:
 			check(showcase.load_lighting_mix(preset_path) == OK and is_equal_approx(slider.value, .5),
 				"Loading restores the saved strength")
 			var cfg := ConfigFile.new()
+			check(cfg.load(preset_path) == OK, "Read the full saved preset for the migration fixture")
 			cfg.set_value("recipe", "version", 204)
-			cfg.set_value("strengths", "lantern", 1.)
+			cfg.erase_section_key("strengths", String(CONTROL))
 			check(cfg.save(preset_path) == OK and showcase.load_lighting_mix(preset_path) == OK and slider.value == 0.,
 				"Presets from before the change retain their previous look")
 			DirAccess.remove_absolute(preset_path)
