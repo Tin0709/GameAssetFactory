@@ -3,11 +3,13 @@ extends SceneTree
 const LAB = preload("res://scenes/dev/MechanicLab.tscn")
 const ZOMBIE = preload("res://scripts/mechanic_lab_zombie.gd")
 const COUNT := 100
+const MIXED_BABIES := 20
 const FIXTURE_HP := 10000
 # Clip, heading in sixteenths of a turn, and source frame at 30 FPS.
 const WALL_HANDOFF_POSES := [[ZOMBIE.ATTACK, 3, 17],
 	[ZOMBIE.WALK_CLIPS[0], 2, 11], [ZOMBIE.STAGGER, 11, 7]]
 var lab: Node3D
+var mixed_crowd := false
 var first_tick_started := 0
 var ticks_in_frame := 0
 var max_ticks_in_frame := 0
@@ -29,6 +31,8 @@ func _initialize() -> void:
 	call_deferred("run")
 
 func run() -> void:
+	mixed_crowd = OS.get_cmdline_user_args().has("--mixed-crowd")
+	var synchronous := OS.get_cmdline_user_args().has("--sync-spawn")
 	lab = LAB.instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -59,7 +63,7 @@ func run() -> void:
 	# zombies can finish their spawn and attack before the last batch appears.
 	lab.player_health = FIXTURE_HP
 	var group := lab.get_node("Zombies")
-	if OS.get_cmdline_user_args().has("--sync-spawn"):
+	if synchronous and not mixed_crowd:
 		spawn_synchronously(group)
 		# Positions cannot change inside the synchronous burst. Check spacing
 		# after the measurement so the pairwise assertions stay off its clock.
@@ -68,7 +72,10 @@ func run() -> void:
 	else:
 		var verify_spawn := func(zombie: Node): check_spawn_spacing(group, zombie)
 		group.child_entered_tree.connect(verify_spawn)
-		await spawn_crowd(group)
+		if mixed_crowd:
+			await spawn_mixed_crowd(group, synchronous)
+		else:
+			await spawn_crowd(group)
 		group.child_entered_tree.disconnect(verify_spawn)
 	if group.get_child_count() != COUNT:
 		printerr("Could not spawn all ", COUNT, " zombies: ", failures)
@@ -111,7 +118,7 @@ func run() -> void:
 	var clean := group.get_child_count() == 0
 	if not clean:
 		failures.append("Corpses remain after the cleanup window")
-	if not OS.get_cmdline_user_args().has("--sync-spawn"):
+	if not synchronous:
 		await check_reset_during_spawn(group)
 		if OS.get_cmdline_user_args().has("--roam"):
 			await check_crowd_roam(group)
@@ -311,8 +318,10 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 		var start_time := 0.0
 		if wall_handoff and i < wall_members:
 			# Match the legal capsule clearance from the straddled-wall tests.
-			var pose: Array = WALL_HANDOFF_POSES[i % WALL_HANDOFF_POSES.size()]
-			zombie.global_position = Vector3(3.90, 0.02, (i - 49.5) * spacing)
+			# The stagger pose straddles the wall for the shorter Baby Zombie rig.
+			var pose: Array = WALL_HANDOFF_POSES[2 if zombie.is_baby else i % WALL_HANDOFF_POSES.size()]
+			var wall_x := 4.35 - zombie._live_capsule.radius - 0.02
+			zombie.global_position = Vector3(wall_x, 0.02, (i - 49.5) * spacing)
 			zombie.rotation.y = TAU * float(pose[1]) / 16.0
 			clip = pose[0]
 			start_time = float(pose[2]) / 30.0
@@ -351,6 +360,26 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 			if blended != wall_members:
 				failures.append("The wall fixture must correct each configured wall member")
 		, CONNECT_ONE_SHOT)
+
+func spawn_mixed_crowd(group: Node, synchronous: bool) -> void:
+	var adult := lab.get_node("HUD/SpawnZombie") as Button
+	var baby := lab.get_node("HUD/SpawnBabyZombie") as Button
+	if adult.disabled or baby.disabled:
+		failures.append("The mixed crowd needs both of the verified zombie rigs")
+		return
+	lab.get_node("HUD/BaseZombieToggle").button_pressed = true
+	for i in COUNT:
+		# One baby per group of five keeps both rigs distributed across the crowd.
+		var button := baby if (i + 1) % (COUNT / MIXED_BABIES) == 0 else adult
+		button.pressed.emit()
+		if not synchronous and button == baby:
+			await process_frame
+	lab.get_node("HUD/BaseZombieToggle").button_pressed = false
+	var babies := group.get_children().filter(func(zombie): return zombie.is_baby).size()
+	var adults := group.get_child_count() - babies
+	print("CROWD_AGE_MIX adults=", adults, " babies=", babies)
+	if babies != MIXED_BABIES or adults != COUNT - MIXED_BABIES:
+		failures.append("The mixed crowd should contain 80 adults and 20 babies")
 
 func spawn_synchronously(group: Node) -> void:
 	var spawn := lab.get_node("HUD/SpawnZombie") as Button
@@ -501,9 +530,15 @@ func check_crowd_melee(group: Node) -> void:
 	group.player_hit.connect(record_hit)
 	await measure("crowd_melee", 300)
 	group.player_hit.disconnect(record_hit)
-	if group.get_child_count() != COUNT or attacks.size() < 20 or lab.player_health != starting_health - attacks.size() * 6:
-		failures.append("The packed crowd keeps attacking at the verified six HP per hit")
-	print("CROWD_MELEE_HITS ", attacks.size())
+	var adult_hits := attacks.count(6)
+	var baby_hits := attacks.count(ZOMBIE.BABY_MELEE_DAMAGE)
+	var damage := adult_hits * 6 + baby_hits * ZOMBIE.BABY_MELEE_DAMAGE
+	if group.get_child_count() != COUNT or attacks.size() < 20 or adult_hits + baby_hits != attacks.size() \
+			or lab.player_health != starting_health - damage or (not mixed_crowd and baby_hits != 0):
+		failures.append("The packed crowd keeps attacking at its verified damage per hit")
+	if mixed_crowd and (adult_hits == 0 or baby_hits == 0):
+		failures.append("Both ages attack the player in the mixed crowd")
+	print("CROWD_MELEE_HITS ", attacks.size(), " adults=", adult_hits, " babies=", baby_hits)
 	lab.reset_player()
 
 func check_blocked_chase(group: Node) -> void:

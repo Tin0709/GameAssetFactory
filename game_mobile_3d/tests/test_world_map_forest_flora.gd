@@ -92,9 +92,10 @@ func test_wall(world: Node3D, wall: Node3D, toggle: CheckButton) -> void:
 		var behind := pose.origin - outward * .12 + pose.basis.x * .5
 		var ahead := behind + outward
 		var drop: float = world.surface_height(behind.x, behind.z) - world.surface_height(ahead.x, ahead.z)
-		check(drop >= 2., "Every vine hangs on a real stone drop")
+		check(drop >= 1. and pose.basis.z.length() * 3. < drop, "Every vine fits its stone drop above the lower floor")
 		sectors[Vector2i(signf(behind.x), signf(behind.z))] = true
-	check(batch.multimesh.instance_count >= 12 and sectors.size() == 4, "Wall vines cover all four map sectors")
+	check(batch.multimesh.instance_count == world.forest_wall_vine_placements.size() and sectors.size() == 4,
+		"Wall vines cover all four map sectors at every authored anchor")
 	check(batch.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_ON, "Vines cast cutout shadows")
 	check(world.showcase._mist_materials().has(batch.material_override), "Wall vines participate in shared mist")
 	world.look.publish_render_wind(1.)

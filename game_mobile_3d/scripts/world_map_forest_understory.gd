@@ -92,13 +92,15 @@ func configure_wall_vines(world: Node3D, placements: PackedVector3Array) -> bool
 		var yaw := Basis(Vector3.UP, deg_to_rad(slot.z))
 		var outward := yaw.z
 		var lower: float = world.surface_height(anchor.x + outward.x, anchor.z + outward.z)
-		if occupied.has(cell) or not anchor.is_finite() or not is_finite(lower) or anchor.y - lower < 2.:
+		var drop := anchor.y - lower
+		if occupied.has(cell) or not anchor.is_finite() or not is_finite(lower) or drop < 1.:
 			continue
-		if not _stone_cap(world, cell, anchor.y) or not _stone_cap(world, cell, anchor.y - 1.):
+		if not _stone_cap(world, cell, anchor.y) or (drop >= 2. and not _stone_cap(world, cell, anchor.y - 1.)):
 			continue
 		# The source strip starts at (0,0,0) and extends along +Z. Hang it down
 		# the face and keep it within one stone column and clear of the lower floor.
-		var basis := yaw * Basis(Vector3.RIGHT, PI * .5) * Basis.from_scale(Vector3(.82, 1., .58))
+		var length_scale := minf(.58, (drop - .16) / 3.)
+		var basis := yaw * Basis(Vector3.RIGHT, PI * .5) * Basis.from_scale(Vector3(.82, 1., length_scale))
 		var origin := anchor + outward * .53 - basis.x * .5 - Vector3.UP * .03
 		poses.append(Transform3D(basis, origin))
 		occupied[cell] = true
