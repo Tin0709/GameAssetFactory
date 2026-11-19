@@ -1671,6 +1671,8 @@ func check_equipped_weapon_previews(bus: int, capture: AudioEffectCapture) -> vo
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
+	for i in 12:
+		await physics_frame
 	var menu := lab.get_node("HUD/Weapon") as OptionButton
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
 	var audio = lab.get_node("CombatAudio")
@@ -1683,6 +1685,8 @@ func check_equipped_weapon_previews(bus: int, capture: AudioEffectCapture) -> vo
 		var group: StringName = fixture[1]
 		menu.select(index)
 		menu.item_selected.emit(index)
+		check(menu.selected == index and not audio._groups.get(group, []).is_empty(),
+			"%s equips with its verified preview family" % menu.get_item_text(index))
 		await create_timer(0.10).timeout
 		capture.clear_buffer()
 		toggle.button_pressed = true
