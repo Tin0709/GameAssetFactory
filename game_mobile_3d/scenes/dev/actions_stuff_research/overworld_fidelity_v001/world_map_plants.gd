@@ -288,13 +288,14 @@ func _prepare_materials()->void:
 	var ground:Dictionary=bundle.data.materials["OW MD2 | MI_MasterTerrain_Opaque_Overworld"]
 	var uv:=_grass_top_uv()
 	for material:ShaderMaterial in materials:
+		var source_cover: bool = material.get_shader_parameter("native_grass_albedo") == true
 		_wind_intensities.append(float(_native_wind_intensities.get(material.get_instance_id(),bundle.data.motion.intensity)))
 		material.set_shader_parameter("interaction_field",interaction.texture)
 		material.set_shader_parameter("interaction_previous",interaction.previous_texture)
 		material.set_shader_parameter("field_extent",interaction.extent)
 		material.set_shader_parameter("ground_atlas",bundle.textures[ground.texture]);material.set_shader_parameter("ground_uv",uv)
 		material.set_shader_parameter("cell_limited_motion",not dense_grass_review)
-		material.set_shader_parameter("splayed_rest_motion",grass_splay_active())
+		material.set_shader_parameter("splayed_rest_motion",grass_splay_active() and not source_cover)
 		material.set_shader_parameter("ground_mask_enabled",dense_grass_review)
 		material.set_shader_parameter("ground_coverage_map",world.look.path_map)
 		material.set_shader_parameter("ground_coverage_origin",world.look.path_map_origin)
