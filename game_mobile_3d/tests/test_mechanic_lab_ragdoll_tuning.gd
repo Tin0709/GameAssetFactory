@@ -57,7 +57,8 @@ func run() -> void:
 		print("RAGDOLL_TUNING flight=", [baseline.flight, stronger.flight, lighter.flight, heavier.flight],
 			" impulse=", [baseline.impulse.length(), stronger.impulse.length()],
 			" ground_scales=", [lighter.ground_scale, heavier.ground_scale])
-		await check_first_wall_shoulder(lab)
+		await check_tuned_wall_contact(lab, 88, Zombie.WALK_CLIPS[0], 2, 11, 0.35)
+		await check_tuned_wall_contact(lab, 92, Zombie.STAGGER, 11, 7, 0.42)
 	lab.free()
 	print("MECHANIC_LAB_RAGDOLL_TUNING failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -119,7 +120,8 @@ func replay_combo(lab) -> Dictionary:
 	return result
 
 
-func check_first_wall_shoulder(lab) -> void:
+func check_tuned_wall_contact(lab, seed: int, clip: StringName, heading: int, source_frame: int,
+		gap_limit: float) -> void:
 	lab.reset_player()
 	var wall := StaticBody3D.new()
 	wall.position = Vector3(4.5, 1.5, 0.0)
@@ -130,25 +132,25 @@ func check_first_wall_shoulder(lab) -> void:
 	wall.add_child(collider)
 	lab.add_child(wall)
 	var group: Node = lab.get_node("Zombies")
-	# Replay the recorded adult walk pose and oblique Sabre finisher by this face.
-	group._spawn_serial = 88
+	# Replay the recorded adult source pose and oblique Sabre finisher by this face.
+	group._spawn_serial = seed
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	if group.get_child_count() != 1:
-		check(false, "The shoulder test loads a verified adult zombie")
+		check(false, "The tuned wall test loads a verified adult zombie")
 		wall.free()
 		return
 	var zombie := group.get_child(0) as Zombie
 	for i in 65:
 		await physics_frame
-	zombie.global_position = Vector3(3.9, 0.02, 34.65)
-	zombie.rotation.y = TAU * 2.0 / 16.0
+	zombie.global_position = Vector3(3.9, 0.02, (seed - 49.5) * 0.9)
+	zombie.rotation.y = TAU * float(heading) / 16.0
 	zombie.velocity = Vector3.ZERO
 	zombie.reset_physics_interpolation()
 	zombie.animation.stop()
 	zombie.ragdoll.skeleton.reset_bone_poses()
-	zombie.animation.play(Zombie.WALK_CLIPS[0], 0.0)
+	zombie.animation.play(clip, 0.0)
 	zombie.animation.advance(0.0)
-	zombie.animation.seek(11.0 / 30.0, true)
+	zombie.animation.seek(float(source_frame) / 30.0, true)
 	zombie.ragdoll.sample(1.0 / 60.0)
 	zombie.ragdoll.sample(1.0 / 60.0)
 	zombie.ragdoll_launch_multiplier = group.ragdoll_launch_multiplier
@@ -168,7 +170,10 @@ func check_first_wall_shoulder(lab) -> void:
 		peak = maxf(peak, zombie.ragdoll.max_anchor_error())
 		for part: PhysicalBone3D in zombie.ragdoll.bodies.values():
 			crossed = crossed or part.global_position.x > 4.655
-	check(active and zombie.ragdoll._wall_handoff_frame >= 0 and peak < 0.35,
-		"The first oblique wall hit keeps the adult rig joined at both 1000% settings")
+	check(active and zombie.ragdoll._wall_handoff_frame >= 0 and peak < gap_limit,
+		"The %s pose keeps its joint gap below %.2f m at both 1000%% settings" % [clip, gap_limit])
 	check(zombie._corpse_parked and not crossed, "The tuned adult wall ragdoll settles without crossing the wall")
-	print("RAGDOLL_TUNED_WALL_SHOULDER gap_m=", peak, " parked=", zombie._corpse_parked)
+	print("RAGDOLL_TUNED_WALL pose=", clip, " gap_m=", peak, " parked=", zombie._corpse_parked)
+	zombie.free()
+	wall.free()
+	await physics_frame
