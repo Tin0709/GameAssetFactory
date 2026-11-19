@@ -303,9 +303,12 @@ const ZOMBIE_STEP_GAIN_DB := -21.0
 const ZOMBIE_STEP_DISTANCE := 12.0
 const ZOMBIE_IDLE_GAIN_DB := -24.0
 const ZOMBIE_IDLE_DISTANCE := 12.0
-# Inferred from raw sample lengths and the adult event's cooked duration range.
-const ZOMBIE_IDLE_PITCH_MIN_CENTS := -200.0
-const ZOMBIE_IDLE_PITCH_MAX_CENTS := 300.0
+# Inferred from the ordinary zombie's cooked event durations and raw wave lengths.
+const ZOMBIE_PITCH_MIN_CENTS := -200.0
+const ZOMBIE_PITCH_MAX_CENTS := 300.0
+const PITCHED_ZOMBIE_VOCALS := [&"hurt", &"death", &"zombie_windup"]
+const SHARED_BABY_VOCALS := {&"baby_hurt": &"hurt", &"baby_death": &"death",
+	&"baby_windup": &"zombie_windup", &"baby_swing": &"zombie_hit"}
 
 const HIT_HASHES := [
 	"01b446de1994e109804c1379e19d13b93d271d826e30bfe211d2f560e4651cb9",
@@ -325,25 +328,15 @@ const CURVED_HIT_HASHES := [
 	"ccfaa913edee16fa4fcd803855303e71c9a272bc0ff0900a6f1ff54de74c7738",
 ]
 const HURT_HASHES := [
-	"fa84b833daecb58d0f95b6470393732c7f66ef33bb5e27d1b869322586a3fa12",
-	"015324c34aaa5c6d4cba7424f9a785cffe46f775a5270d47555390f052777fcc",
-	"d0eee30a0f359ee3c64678e7c659e280c0abfe7d61b6434ef458b1cd9fbe488a",
-]
-const DEATH_HASHES := [
-	"fe805a6d33650af6613dd4b837b88a6e0caa659192cf53af6dadd0b5d0f6dfad",
-	"5c1aa88a0ba5306620d56247eb5a4a3fe7978fe233bf7ae9e5541f1670b20ef8",
-	"f5350c3cc4af912ea411d5c5d921bf63a635f9686240669029d80cf2d6e74b52",
-]
-const BABY_HURT_HASHES := [
 	"88bacea29d9cdd5ed5edfe75fa260b8f49a7d5b3adf98f488173848784647f10",
 	"c67b02cd19dfdc1a83f8cd3d295ce28a74ac7a63010628880ffd017655207e23",
 ]
-const BABY_DEATH_HASHES := [
+const DEATH_HASHES := [
 	"4f37c8fbfa63b116cc7afe6930ba1d403a54cf32bb19e04db4a4815ae2628deb",
 	"0396d7f66dd11827ac94b1384b9a8ecf55127d9072363ec259ad01f8bb32e1e4",
 	"578017fb1cc8213e1b15f39f8208a6c947fa705bb8e603c242c5091e6377ee72",
 ]
-const BABY_SWING_HASHES := [
+const ZOMBIE_HIT_HASHES := [
 	"5dbc65f67fcd3336628c7a35a4576b237735cb17d209205a8d94e642708be59c",
 	"ae4008449f238d65576d53c99f9dff67fb51151e48df94669a8dedf55bb6e32e",
 	"5a610689ac0dc8ea0100e183e1814c0ed4378bb8bf8a68d4e7a5eeea40b1d3f8",
@@ -389,7 +382,7 @@ const ZOMBIE_WINDUP_HASHES := [
 	"6c3030dd813b6274e29add9e0cbfe8108d06aef8bc4c9a4cee7cc9ef726967a1",
 	"4e9f93c97c06f6c95380e79e5fc468ccbc52e905edf1f75b5117e62a48c8834c",
 ]
-const ZOMBIE_HIT_HASHES := [
+const BABY_HIT_HASHES := [
 	"1404784c14e40432f7b034467ab5193d27e20ab497afcf897824d34da3fc3e1e",
 	"d507d72dbff70da024f4f1da548286b237a87880ed2e0b9e21d30ddadf92d246",
 	"f8916ee7e6e40bc6eee912083d4bd8d67cf2c7fcbab1dab6602dac093f91975f",
@@ -420,10 +413,12 @@ var _zombie_idle_voice: AudioStreamPlayer3D
 var _zombie_idle_point := Vector3.INF
 var _zombie_idle_distance_squared := INF
 var _zombie_idle_pitch := RandomNumberGenerator.new()
+var _zombie_vocal_pitch := RandomNumberGenerator.new()
 var _next_choice: Dictionary[StringName, int] = {}
 var _next_voice: Array[int] = [0, 0, 0, 0, 0]
 var _flight_targets: Dictionary[AudioStreamPlayer3D, Node3D]
 var _started_frames: PackedInt64Array
+var _voice_groups: Array[StringName] = []
 var _weapon_onsets: Array[bool] = []
 var _player_hurt_frame := -1
 var _attack_contacts: Array[Dictionary] = []
@@ -684,8 +679,10 @@ func player_defeated() -> void:
 		_player_defeat_voice.stream = stream
 		_player_defeat_voice.play()
 
-func zombie_attack(point: Vector3, contact: bool) -> void:
+func zombie_attack(point: Vector3, contact: bool, baby := false) -> void:
 	var group := &"zombie_hit" if contact else &"zombie_windup"
+	if baby:
+		group = &"baby_hit" if contact else &"baby_windup"
 	if enabled:
 		_queue_zombie_cue(group, point, _attack_contacts if contact else _attack_windups)
 
@@ -735,7 +732,7 @@ func flush_zombie_idle() -> void:
 	var voice := _zombie_idle_voice
 	voice.stream = _next_stream(&"zombie_idle")
 	voice.global_position = _zombie_idle_point
-	var cents := _zombie_idle_pitch.randf_range(ZOMBIE_IDLE_PITCH_MIN_CENTS, ZOMBIE_IDLE_PITCH_MAX_CENTS)
+	var cents := _zombie_idle_pitch.randf_range(ZOMBIE_PITCH_MIN_CENTS, ZOMBIE_PITCH_MAX_CENTS)
 	voice.pitch_scale = pow(2.0, cents / 1200.0)
 	voice.play()
 	_zombie_idle_point = Vector3.INF
@@ -790,6 +787,7 @@ func reset() -> void:
 	_step_points.clear()
 	_step_distances.clear()
 	_started_frames.fill(-1)
+	_voice_groups.fill(&"")
 	_weapon_onsets.fill(false)
 	_player_hurt_frame = -1
 	_last_weapon_serial = -1
@@ -830,20 +828,19 @@ func _queue_base_samples() -> void:
 	_queue_series(root, &"hit", SABRE, HIT_HASHES)
 	_queue_series(root, &"sword_hit", SWORD, SWORD_HIT_HASHES)
 	_queue_series(root, &"curved_hit", CURVED, CURVED_HIT_HASHES)
-	_queue_series(root, &"hurt", ZOMBIE.replace("%s", "Hurt"), HURT_HASHES)
-	_queue_series(root, &"death", ZOMBIE.replace("%s", "Death"), DEATH_HASHES)
+	_queue_series(root, &"hurt", ZOMBIE_VOCAL.replace("%s", "Hurt"), HURT_HASHES)
+	_queue_series(root, &"death", ZOMBIE_VOCAL.replace("%s", "Death"), DEATH_HASHES)
 	_queue_series(root, &"slam", HEAVY_LANDING, LANDING_HASHES)
 	_queue_series(root, &"slam_grass", SURFACE_LANDING.replace("%s", "Grass"), GRASS_LANDING_HASHES)
 	_queue_series(root, &"player_hurt", PLAYER_HURT, PLAYER_HURT_HASHES)
 	_base_sample_jobs.append(_load_sample.bind(root, &"player_defeat", PLAYER_DEFEAT, PLAYER_DEFEAT_HASH))
-	_queue_series(root, &"zombie_windup", ZOMBIE_ATTACK.replace("%s", "Pre"), ZOMBIE_WINDUP_HASHES)
-	_queue_series(root, &"zombie_hit", ZOMBIE_ATTACK.replace("%s", ""), ZOMBIE_HIT_HASHES)
+	_queue_series(root, &"zombie_windup", ZOMBIE_VOCAL.replace("%s", "PreAttack"), ZOMBIE_WINDUP_HASHES)
+	_queue_series(root, &"zombie_hit", ZOMBIE_VOCAL.replace("%s", "Whoosh"), ZOMBIE_HIT_HASHES)
 	_queue_series(root, &"zombie_step", ZOMBIE_STEP, ZOMBIE_STEP_HASHES)
 	if is_instance_valid(zombie_listener):
 		_queue_series(root, &"zombie_idle", ZOMBIE_IDLE, ZOMBIE_IDLE_HASHES)
-		_queue_series(root, &"baby_hurt", BABY_CUE.replace("%s", "Hurt"), BABY_HURT_HASHES)
-		_queue_series(root, &"baby_death", BABY_CUE.replace("%s", "Death"), BABY_DEATH_HASHES)
-		_queue_series(root, &"baby_swing", BABY_CUE.replace("%s", "Whoosh"), BABY_SWING_HASHES)
+		# Retain the existing Baby Zombie contact layer beside its release cue.
+		_queue_series(root, &"baby_hit", ZOMBIE_VOCAL.replace("%s", "Attack"), BABY_HIT_HASHES)
 
 func _queue_series(root: String, group: StringName, pattern: String, hashes: Array) -> void:
 	for index in hashes.size():
@@ -854,6 +851,7 @@ func _load_audio() -> void:
 		return
 	_started_frames.resize(_next_voice.size() * VOICES_PER_POOL)
 	_started_frames.fill(-1)
+	_voice_groups.resize(_started_frames.size())
 	_weapon_onsets.resize(VOICES_PER_POOL)
 	# DefaultPlayer routes SW.Audio.Generic.Hurt to SW.Audio.Category.Player.Local.
 	_player_hurt_voice = AudioStreamPlayer.new()
@@ -868,6 +866,11 @@ func _load_audio() -> void:
 	_queue_base_samples()
 	while not _base_sample_jobs.is_empty():
 		_base_sample_jobs.pop_front().call()
+	if is_instance_valid(zombie_listener):
+		for baby_group: StringName in SHARED_BABY_VOCALS:
+			var source_group: StringName = SHARED_BABY_VOCALS[baby_group]
+			if _groups.has(source_group):
+				_groups[baby_group] = _groups[source_group]
 	if _groups.has(&"slam_grass"):
 		for i in SURFACE_LANDING_VOICE_COUNT:
 			var voice := _new_spatial_voice(SPATIAL_VOICE_DISTANCE)
@@ -934,7 +937,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 	match group:
 		&"hurt", &"death", &"baby_hurt", &"baby_death":
 			pool = REACTION_POOL
-		&"zombie_windup", &"zombie_hit", &"baby_swing":
+		&"zombie_windup", &"zombie_hit", &"baby_windup", &"baby_hit", &"baby_swing":
 			pool = ATTACK_POOL
 		&"zombie_step":
 			pool = STEP_POOL
@@ -968,17 +971,24 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 	_next_voice[pool] = (slot + 1) % VOICES_PER_POOL
 	if voice_index < _started_frames.size():
 		_started_frames[voice_index] = frame
+		_voice_groups[voice_index] = group
 	if pool == WEAPON_POOL and not _weapon_onsets.is_empty():
 		_weapon_onsets[slot] = weapon_onset
-	_start_spatial_voice(voice, stream, point, gain)
+	var pitch := 1.0
+	if group in PITCHED_ZOMBIE_VOCALS:
+		var cents := _zombie_vocal_pitch.randf_range(ZOMBIE_PITCH_MIN_CENTS, ZOMBIE_PITCH_MAX_CENTS)
+		pitch = pow(2.0, cents / 1200.0)
+	_start_spatial_voice(voice, stream, point, gain, pitch)
 	return voice
 
-func _start_spatial_voice(voice: AudioStreamPlayer3D, stream: AudioStream, point: Vector3, gain: float) -> void:
+func _start_spatial_voice(voice: AudioStreamPlayer3D, stream: AudioStream, point: Vector3,
+		gain: float, pitch := 1.0) -> void:
 	voice.stop()
 	voice.stream = stream
 	voice.global_position = point
 	voice.volume_db = gain
 	voice.max_db = gain
+	voice.pitch_scale = pitch
 	voice.play()
 
 func _replace_weapon_slot(start: int, onset: bool, frame: int) -> int:
@@ -1002,19 +1012,17 @@ func _replace_attack_slot(first: int, start: int, group: StringName, frame: int,
 	# A swing fills spare voices. Telegraphs and confirmed hits take precedence.
 	if group == &"baby_swing":
 		return -1
-	var swing_streams: Array = _groups.get(&"baby_swing", [])
 	for offset in VOICES_PER_POOL:
 		var slot := (start + offset) % VOICES_PER_POOL
-		if _voices[first + slot].stream in swing_streams:
+		if _voice_groups[first + slot] == &"baby_swing":
 			return slot
-	return _replace_priority_slot(first, start, &"zombie_hit", group, frame, point)
+	return _replace_priority_slot(first, start, &"zombie_hit", group, frame, point, &"baby_hit")
 
 func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName,
 		frame: int, point: Vector3, secondary_priority := &"") -> int:
 	# Each render flush submits the nearest cues first. Protect a nearby
 	# voice from later frames while the mixer starts its sample.
-	var priority_streams: Array = _groups.get(priority_group, [])
-	var secondary_streams: Array = _groups.get(secondary_priority, [])
+	# Playback cues can share decoded waveforms and still have different priorities.
 	var priority := group == priority_group or group == secondary_priority
 	var compare_onsets := is_instance_valid(zombie_listener)
 	var listener := zombie_listener.global_position if compare_onsets else Vector3.ZERO
@@ -1026,7 +1034,8 @@ func _replace_priority_slot(first: int, start: int, priority_group: StringName, 
 		var slot := (start + offset) % VOICES_PER_POOL
 		var voice_index := first + slot
 		var voice := _voices[voice_index]
-		var playing_priority := voice.stream in priority_streams or voice.stream in secondary_streams
+		var playing_group := _voice_groups[voice_index]
+		var playing_priority := playing_group == priority_group or playing_group == secondary_priority
 		if priority and not playing_priority:
 			return slot
 		var age := frame - _started_frames[voice_index]
@@ -1034,7 +1043,8 @@ func _replace_priority_slot(first: int, start: int, priority_group: StringName, 
 			continue
 		# Physics can catch up several ticks while the audio mixer is still
 		# at the start of a voice. Check the stream's playhead as well.
-		if compare_onsets and (age <= onset_ticks or voice.get_playback_position() < ZOMBIE_ONSET_SECONDS):
+		if compare_onsets and (age <= onset_ticks
+				or voice.get_playback_position() < ZOMBIE_ONSET_SECONDS * voice.pitch_scale):
 			var distance := voice.global_position.distance_squared_to(listener)
 			if distance > farthest:
 				farthest = distance
