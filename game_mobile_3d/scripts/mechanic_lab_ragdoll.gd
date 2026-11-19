@@ -12,6 +12,7 @@ const LOCAL_FLOOR_LIFT_FULL := 0.066
 const LOCAL_FLOOR_SHARED_LIFT := 0.033
 const FLOOR_CONTACT_GAP_DEPTH := 0.10
 const EARLY_FLOOR_WALL_LOOKAHEAD := 5.0 / 60.0
+const HANDOFF_TERRAIN_MASK := 1
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
@@ -28,6 +29,7 @@ const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
 
+var _handoff_query_snapshot: Dictionary[PhysicalBone3D, PhysicsShapeQueryParameters3D]
 var _sample_names: Array[String]
 var _sample_bone_ids: Array[int]
 var _sample_body_offsets: Array[Transform3D]
@@ -42,11 +44,17 @@ var wall_handoff_idle_pose: Array[Transform3D]
 
 static var _handoff_bounds_shape: BoxShape3D
 static var _handoff_bounds_query: PhysicsShapeQueryParameters3D
+static var _handoff_box_queries: Dictionary[BoxShape3D, PhysicsShapeQueryParameters3D]
 static var _body_shapes: Dictionary[Vector3, BoxShape3D]
 
 func _make_body_shape(size: Vector3) -> BoxShape3D:
 	if not _body_shapes.has(size):
-		_body_shapes[size] = super._make_body_shape(size)
+		var box := super._make_body_shape(size)
+		_body_shapes[size] = box
+		var query := PhysicsShapeQueryParameters3D.new()
+		query.shape = box
+		query.collision_mask = HANDOFF_TERRAIN_MASK
+		_handoff_box_queries[box] = query
 	return _body_shapes[size]
 
 func begin(profile: Resource, direction: Vector3, location: String, distance: float, gravity: float,
@@ -139,7 +147,19 @@ func _handoff_wall_clearance() -> Vector3:
 	if wall_handoff_animation != null and _handoff_straddles_wall(
 			space, collision_mask, Vector3.ZERO, SOURCE_ANCHOR_TOLERANCE, {}):
 		_wall_handoff_frame = Engine.get_physics_frames()
-		return _blend_wall_handoff(space, collision_mask, overlaps, bounds)
+		# All candidate poses share the rig's collision configuration.
+		if collision_mask == HANDOFF_TERRAIN_MASK:
+			for body: PhysicalBone3D in bodies.values():
+				if body.collision_mask != HANDOFF_TERRAIN_MASK:
+					continue
+				var collider := body.get_child(0) as CollisionShape3D
+				if collider.transform == Transform3D.IDENTITY:
+					var query: PhysicsShapeQueryParameters3D = _handoff_box_queries.get(collider.shape)
+					if query != null:
+						_handoff_query_snapshot[body] = query
+		var shift := _blend_wall_handoff(space, collision_mask, overlaps, bounds)
+		_handoff_query_snapshot.clear()
+		return shift
 	return super._handoff_wall_clearance()
 
 func _is_floor_top_overlap(hit: RID, bounds: AABB) -> bool:
@@ -386,6 +406,15 @@ func _handoff_straddles_wall(space: PhysicsDirectSpaceState3D, collision_mask: i
 		if crosses:
 			return true
 	return false
+
+func _terrain_contacts_at(body: PhysicalBone3D, space: PhysicsDirectSpaceState3D, pose: Transform3D) -> Array[Vector3]:
+	var query: PhysicsShapeQueryParameters3D = _handoff_query_snapshot.get(body)
+	if query != null:
+		# Set the pose just before the synchronous physics query.
+		query.transform = pose
+		return space.collide_shape(query, 16)
+	return super._terrain_contacts_at(body, space, pose)
+
 
 func is_near_flat_floor(tolerance: float) -> bool:
 	var floor_box := _flat_floor.shape as BoxShape3D
