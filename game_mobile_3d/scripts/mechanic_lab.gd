@@ -64,15 +64,16 @@ const SABRE_LANDING_BURST_DELAY := 0.056890413
 enum PlayerSkin { MD2, KAI }
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD, CROSS_POLLINATOR, GAUNTLETS,
-	CLEAVER, BOW, BASIC_GAUNTLETS, PICKAXE, SHOVEL }
+	CLEAVER, BOW, BASIC_GAUNTLETS, PICKAXE, SHOVEL, AXE }
 const TOOL_TYPES := {
 	Weapon.CLEAVER: MeleeTools.Tool.CLEAVER,
 	Weapon.PICKAXE: MeleeTools.Tool.PICKAXE,
 	Weapon.SHOVEL: MeleeTools.Tool.SHOVEL,
+	Weapon.AXE: MeleeTools.Tool.AXE,
 }
 const MELEE_AUDIO_NAMES := {
 	Weapon.CLEAVER: &"cleaver", Weapon.BASIC_GAUNTLETS: &"gauntlet",
-	Weapon.PICKAXE: &"pickaxe", Weapon.SHOVEL: &"shovel",
+	Weapon.PICKAXE: &"pickaxe", Weapon.SHOVEL: &"shovel", Weapon.AXE: &"axe",
 }
 
 const MELEE_EQUIPMENT_NAMES := {
@@ -84,6 +85,7 @@ const MELEE_EQUIPMENT_NAMES := {
 	Weapon.BASIC_GAUNTLETS: &"gauntlet",
 	Weapon.PICKAXE: &"pickaxe",
 	Weapon.SHOVEL: &"shovel",
+	Weapon.AXE: &"axe",
 }
 
 var presentation: Node
@@ -367,6 +369,7 @@ func _setup_weapon_selector() -> void:
 	_add_weapon_option("Gauntlets", Gauntlets.icon(true))
 	_add_weapon_option("Pickaxe", MeleeTools.icon(MeleeTools.Tool.PICKAXE))
 	_add_weapon_option("Shovel", MeleeTools.icon(MeleeTools.Tool.SHOVEL))
+	_add_weapon_option("Axe", MeleeTools.icon(MeleeTools.Tool.AXE))
 	_weapon_mesh = player.model.find_child("SabrePrototypeSabre", true, false) as MeshInstance3D
 	if _weapon_mesh == null or not player.combo.native_enabled:
 		return
@@ -1050,7 +1053,8 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 			player.effects.contact(point, direction)
 	var tool_hit: StringName = MELEE_AUDIO_NAMES.get(_equipped_weapon, &"") if clip != Bow.ACTION and clip != CrossPollinator.SHOT else &""
 	_combat_audio.contact(point, serial, lethal, clip, tool_hit)
-	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3", "NativeCleaverAttack3"]
+	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3",
+		"NativeCleaverAttack3", "NativeAxeAttack3"]
 	if clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
 		_start_contact_light(point, serial, 2.3 if finisher else 1.8)
 	# These finishers share the source radii and non-oriented shake.

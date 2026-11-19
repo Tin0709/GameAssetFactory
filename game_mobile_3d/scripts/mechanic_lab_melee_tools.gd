@@ -1,7 +1,7 @@
 extends RefCounted
-## MD2 Meat Cleaver, Pickaxe and Shovel for MechanicLab.
+## MD2 Meat Cleaver, Pickaxe, Shovel and Axe for MechanicLab.
 
-enum Tool { CLEAVER, PICKAXE, SHOVEL }
+enum Tool { CLEAVER, PICKAXE, SHOVEL, AXE }
 
 const Source := preload("res://scripts/mechanic_lab_weapon_source.gd")
 const SourceGait := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
@@ -12,21 +12,24 @@ const SPECIAL := Source.ANIMATIONS + "Weapons_Melee/Special/"
 const SHOVEL_COMBAT := SPECIAL + "Combat/"
 const LOCOMOTION_LIBRARY := &"private_shovel_locomotion"
 
-const NAMES := ["Cleaver", "Pickaxe", "Shovel"]
+const NAMES := ["Cleaver", "Pickaxe", "Shovel", "Axe"]
 const MESH_HASHES := [
 	"ba6b162413123870b1b3312c4556d7e255e26f7ad93c685ae372c49842e88443",
 	"5ba4315be354b8a29a9491c2bdc5f9c0e8e4301ee24e244f8b5a398e29c206e7",
 	"e8ab77c67aa8f7f5df9e7bc9406916d95d8d7a36056e49164a561ed4e969f621",
+	"6e457e1a95cefa24a4d19f093de9532faaa95e0bdd04ab7b555e72119d965086",
 ]
 const TEXTURE_HASHES := [
 	"dc98f8ec5e5196fa4ecd15188c8f9f517f65fc2d1995f9a93b4860ad4be533b6",
 	"244f2def2add25e65807827c88fde8207ec08052bae7476db036cf8634d0d094",
 	"c2648b4753113f1d6629e23dc21ecfa13b63e6952aa75ac071243f8cd7ed03f6",
+	"f9078bcca003ecb3fbb36490787e068e886d5d8b8c1a57c46cea071c5a4cf383",
 ]
 const ICON_HASHES := [
 	"b33d18469f72d9762253f3558c32c76ac5ef38ad53d1cab7740e0b5dfe7af8fb",
 	"8c6fc4108dd4decabb2719d0537d34cda086e4a7151418eb3bd036104ea0577d",
 	"c234df5f78a8b8347bfb9703d7842207842be721a6ff492d90de2e6a55f2a502",
+	"8c439330b9d7d5c571cea53cfe1445a6d66ef328c1422b3022a4890df4b40906",
 ]
 
 const SWORD_ATTACK_1 := [MEDIUM, "Player_SwordCombo_Attack1", 13,
@@ -37,9 +40,13 @@ const SWORD_ATTACK_2 := [MEDIUM, "Player_SwordCombo_Attack2", 12,
 	"1965f796a758f59ccaca2a527aaa81cee70c55f4a3c810eb712b3022b8bced7c"]
 const SWORD_RECOVERY_2 := [MEDIUM, "Player_SwordCombo_Attack2Recovery", 10,
 	"e3f648faf99577412fb23aa8804443c420ee4cad67727104a73433ab22c01c47"]
+const AXE_ATTACK_1 := [HEAVY, "Player_AxeCombo_Attack1", 14,
+	"f579befb029ed60443c77d727048db8b9162548190228ccd920f43a7cb705133"]
+const HEAVY_AIR := [HEAVY, "Player_1H_Heavy_JumpAttack_v2", 44,
+	"e580452a52db4337aadafd2a14c3fce7b5ff016fb9fb5692b77ab526e419f86b"]
 const ATTACKS := [
 	[
-		[HEAVY, "Player_AxeCombo_Attack1", 14, "f579befb029ed60443c77d727048db8b9162548190228ccd920f43a7cb705133"],
+		AXE_ATTACK_1,
 		SWORD_ATTACK_2,
 		[SPEEDY, "Player_CleaverCombo_Attack3", 25, "83811a24e23f6cf7b2dd70eff1c321ca18494e87aee34dac19ca3a61b0755b57"],
 	],
@@ -52,6 +59,11 @@ const ATTACKS := [
 		[SHOVEL_COMBAT, "Player_Shovel_Attack1", 23, "659aa2714c0d4d83d188d656c4d72f838ab2f9fee42eb92722dd6c4903a4f1db"],
 		[SHOVEL_COMBAT, "Player_Shovel_Attack2", 57, "6fab07b118855acd2687a80c958501f2be61d5eb2562788f5621a09ce5126908"],
 		[SHOVEL_COMBAT, "Player_Shovel_Attack3", 20, "2a6d12c92dfac0236fcea2ddf0970a02d4f6beb733b2c3671875ef65404d52eb"],
+	],
+	[
+		AXE_ATTACK_1,
+		SWORD_ATTACK_2,
+		[HEAVY, "Player_AxeCombo_Attack3", 25, "6b2c0a67941ad79913c0c3e951e291efd124e15cefad3227fc545364dbb355fd"],
 	],
 ]
 const RECOVERIES := [
@@ -70,11 +82,17 @@ const RECOVERIES := [
 		[SHOVEL_COMBAT, "Player_Shovel_Attack2Recovery", 18, "d665bebabc381cc2f510354f71451d91a25ecb875dd9080526c5a5da559f6462"],
 		[SHOVEL_COMBAT, "Player_Shovel_Attack3Recovery", 15, "61f7d15466380cc5d069fb65864cb945a49445b73515a4757a2ae72ca3f3089d"],
 	],
+	[
+		SWORD_RECOVERY_1,
+		SWORD_RECOVERY_2,
+		[HEAVY, "Player_AxeCombo_Attack3Recovery", 10, "87737bb27841c711b7639f78127d409ada475aa6ab62dfccc4d8f64d250c6ac2"],
+	],
 ]
 const AIR_CLIPS := [
 	[MEDIUM, "Player_1H_Medium_JumpAttack", 26, "7f3e6e95fc8e5a2bcedbef3a1980b34c334eb1ff8f4ad0f65c608abd48b22fbb"],
-	[HEAVY, "Player_1H_Heavy_JumpAttack_v2", 44, "e580452a52db4337aadafd2a14c3fce7b5ff016fb9fb5692b77ab526e419f86b"],
+	HEAVY_AIR,
 	[SHOVEL_COMBAT, "Player_Shovel_JumpAttack", 54, "d6578ab9cac7b9761ef388e744e497a34b2dd3f9896c702d13dcc0f38124834b"],
+	HEAVY_AIR,
 ]
 
 # AN_MeleeAttack, AN_ResumeMovement, AN_RecoveryStart and montage segment
@@ -87,13 +105,16 @@ const WINDOWS := [
 		Vector4(0.224718, 0.418574, 0.829549, 1.333333)],
 	[Vector4(0.118083, 0.597601, 0.699838, 1.166650), Vector4(0.383572, 1.780749, 1.858310, 2.500000),
 		Vector4(0.203482, 0.669863, 0.898273, 1.066667)],
+	# Axe uses the observed timing on these shared clips as a Lab fit.
+	[Vector4(0.101934, 0.108253, 0.381204, 0.833333), Vector4(0.163472, 0.213492, 0.423431, 0.716533),
+		Vector4(0.164172, 0.180649, 0.825099, 1.166666)],
 ]
-const RATES := [Vector3(1.43, 1.43, 1.43), Vector3(0.9, 0.9, 1.0), Vector3(1.4, 1.4, 1.2)]
-const AIR_LOOP := [0.139664, 0.033285, 0.428704]
-const AIR_RATES := [1.2, 1.0, 1.0]
-const AIR_LANDING := [0.214319, 0.607441, 0.431681]
-const AIR_CONTACT := [0.279693, 0.628606, 0.444457]
-const AIR_END := [0.866667, 1.302315, 1.290120]
+const RATES := [Vector3(1.43, 1.43, 1.43), Vector3(0.9, 0.9, 1.0), Vector3(1.4, 1.4, 1.2), Vector3.ONE]
+const AIR_LOOP := [0.139664, 0.033285, 0.428704, 0.033285]
+const AIR_RATES := [1.2, 1.0, 1.0, 1.0]
+const AIR_LANDING := [0.214319, 0.607441, 0.431681, 0.607441]
+const AIR_CONTACT := [0.279693, 0.628606, 0.444457, 0.628606]
+const AIR_END := [0.866667, 1.302315, 1.290120, 1.302315]
 const STRIKES := [
 	[
 		{"damage": 13, "stagger": 15.0, "range_m": 2.5, "cone_degrees": 100.0, "cone_cutoff": 1.2, "cone_offset": -1.2, "strength": 500.0, "angle": 15.0},
@@ -110,15 +131,21 @@ const STRIKES := [
 		{"damage": 15, "stagger": 30.0, "range_m": 2.5, "cone_degrees": 180.0, "cone_cutoff": 0.0, "cone_offset": 0.0, "strength": 750.0, "angle": 35.0},
 		{"damage": 60, "stagger": 80.0, "range_m": 4.0, "cone_degrees": 60.0, "cone_cutoff": 4.0, "cone_offset": -4.0, "strength": 850.0, "angle": 55.0, "radial": true, "splash_stagger": 1.0},
 	],
+	[
+		{"damage": 14, "stagger": 27.5, "range_m": 2.5, "cone_degrees": 70.0, "cone_cutoff": 1.2, "cone_offset": -1.2, "strength": 500.0, "angle": 15.0},
+		{"damage": 16, "stagger": 27.5, "range_m": 2.5, "cone_degrees": 70.0, "cone_cutoff": 1.2, "cone_offset": -1.2, "strength": 500.0, "angle": 15.0},
+		{"damage": 22, "stagger": 45.0, "range_m": 3.5, "cone_degrees": 180.0, "cone_cutoff": 0.0, "cone_offset": 0.0, "strength": 700.0, "angle": 25.0, "radial": true},
+	],
 ]
 const AIR_STRIKES := [
 	{"damage": 20, "stagger": 37.0, "primary_range": 1.25, "range_m": 2.5, "strength": 1150.0, "angle": 25.0, "radial": true},
 	{"damage": 28, "stagger": 45.0, "primary_range": 1.5, "range_m": 2.5, "strength": 1250.0, "angle": 25.0, "radial": true},
 	{"damage": 30, "stagger": 75.0, "primary_range": 1.85, "range_m": 2.5, "strength": 850.0, "angle": 25.0, "radial": false, "splash_stagger": 0.5},
+	{"damage": 21, "stagger": 42.5, "primary_range": 1.5, "range_m": 2.5, "strength": 1250.0, "angle": 25.0, "radial": true},
 ]
-const AIR_OFFSETS := [0.0, 1.5, 0.25]
-const BLADE_BASES := [Vector3(0, -0.31, 0), Vector3(0, -0.49, 0), Vector3(0, -0.44, 0)]
-const BLADE_TIPS := [Vector3(0, -0.928, -0.133), Vector3(0, -0.821, 0), Vector3(0, -0.750, 0)]
+const AIR_OFFSETS := [0.0, 1.5, 0.25, 1.6]
+const BLADE_BASES := [Vector3(0, -0.31, 0), Vector3(0, -0.49, 0), Vector3(0, -0.44, 0), Vector3(0, -0.39, -0.05)]
+const BLADE_TIPS := [Vector3(0, -0.928, -0.133), Vector3(0, -0.821, 0), Vector3(0, -0.750, 0), Vector3(0, -0.70, -0.28)]
 
 const LOCOMOTION := {
 	"Idle": [SPECIAL, "Player_Shovel_Idle", 80, "ade1ae2d2411370497cd2f346c21b2132608560ddfb8a77b1bf02dae765f6273"],
