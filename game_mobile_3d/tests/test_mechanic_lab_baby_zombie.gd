@@ -85,7 +85,10 @@ func run() -> void:
 		"The baby lands with the full rig connected and releases the simulation at rest")
 	lab.free()
 	await check_prewarmed_spawn()
-	await check_tuned_floor_contact()
+	await check_tuned_contact(26)
+	await check_tuned_contact(13, 0.0, 0.90)
+	await check_tuned_contact(25, 27.0, 1.00)
+	await check_tuned_contact(50, 27.0, 1.00)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -137,33 +140,42 @@ func check_walk_contacts(baby: Zombie) -> void:
 			and points[contact].distance_to(authored_contacts[contact % 2]) < 0.005,
 			"The Baby Zombie step matches the source sole and phase at frame 2 or 8")
 
-func check_tuned_floor_contact() -> void:
+func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
 	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = 1000.0
 	lab.get_node("HUD/RagdollTuning/Gravity/Slider").value = 1000.0
+	var corner: Node3D
+	if wall_yaw != INF:
+		corner = add_contact_corner(lab, wall_yaw)
 	var group: Node = lab.get_node("Zombies")
-	group._spawn_serial = 26
+	group._spawn_serial = seed
 	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
 	var baby := group.get_child(0) as Zombie
 	baby.set_physics_process(false)
 	baby.position = Vector3(3.0, 0.02, 2.0)
-	baby.rotation.y = 26 * 0.47
-	baby.animation.play(Zombie.ATTACK)
+	baby.rotation.y = seed * 0.47
+	if corner != null:
+		baby.position = corner.to_global(baby.position)
+		baby.rotation.y += corner.rotation.y
+	var clip: StringName = Zombie.WALK_CLIPS[0] if seed % 3 == 1 else Zombie.ATTACK
+	baby.animation.play(clip)
 	baby.animation.advance(0.0)
-	baby.animation.seek(baby.animation.get_animation(Zombie.ATTACK).length * 0.6, true)
+	baby.animation.seek(baby.animation.get_animation(clip).length * (seed % 10) * 0.1, true)
 	await physics_frame
 	for sample in 2:
 		baby.ragdoll.sample(1.0 / 60.0)
 	var direction := Vector3(0.91, 0.0, -0.22).normalized()
-	group._apply_contact(baby, baby.combat_center(), "Attack", 0, 1,
-		group.SABRE_STRIKES[0], direction, false, baby.global_position)
+	var origin := baby.global_position if corner == null else baby.global_position - direction
+	group._apply_contact(baby, baby.combat_center(), "Attack", 0, seed,
+		group.SABRE_STRIKES[0], direction, false, origin)
 	baby.set_physics_process(true)
 	var gap := 0.0
 	var impulse := 0.0
 	var gravity := 0.0
+	var crossed := false
 	for tick in 120:
 		await physics_frame
 		if baby._corpse_parked:
@@ -171,16 +183,37 @@ func check_tuned_floor_contact() -> void:
 		if not baby.ragdoll.running:
 			continue
 		gap = maxf(gap, baby.ragdoll.max_anchor_error())
+		if corner != null:
+			for part: PhysicalBone3D in baby.ragdoll.bodies.values():
+				var local := corner.to_local(part.global_position)
+				crossed = crossed or (local.y > 0.0 and local.y < 7.9 and (local.x > 6.13 or local.z < 0.07))
 		if impulse == 0.0:
 			impulse = baby.ragdoll.total_applied_impulse.length()
 			var chest: PhysicalBone3D = baby.ragdoll.bodies.Chest
 			gravity = PhysicsServer3D.body_get_direct_state(chest.get_rid()).total_gravity.y
 	check(baby.health == 0 and is_equal_approx(impulse, 987.36) and is_equal_approx(gravity, -500.0),
 		"The Baby Zombie receives both 1000% settings from the Sabre contact")
-	check(gap < 0.20 and baby._corpse_landed and baby._corpse_parked,
-		"At 1000% launch and gravity the braced Baby Zombie lands with its legs connected")
-	print("LAB_BABY_TUNED_CONTACT gap=", gap, " impulse=", impulse, " gravity=", gravity)
+	check(gap < gap_limit and baby._corpse_landed and baby._corpse_parked and not crossed,
+		"At 1000% launch and gravity the Baby Zombie settles with limited joint stretch and no wall crossings")
+	print("LAB_BABY_TUNED_CONTACT seed=", seed, " yaw=", wall_yaw, " gap=", gap, " crossed=", crossed,
+		" parked=", baby._corpse_parked, " impulse=", impulse, " gravity=", gravity)
 	lab.free()
+
+func add_contact_corner(lab: Node3D, yaw: float) -> Node3D:
+	var corner := Node3D.new()
+	corner.rotation.y = deg_to_rad(yaw)
+	lab.add_child(corner)
+	for face: Array in [[Vector3(6.0, 4.0, 0.0), Vector3(0.25, 8.0, 30.0)],
+			[Vector3(0.0, 4.0, 0.20), Vector3(30.0, 8.0, 0.25)]]:
+		var wall := StaticBody3D.new()
+		wall.position = face[0]
+		var collider := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = face[1]
+		collider.shape = box
+		wall.add_child(collider)
+		corner.add_child(wall)
+	return corner
 
 func attack_key(pressed: bool) -> void:
 	var event := InputEventKey.new()
