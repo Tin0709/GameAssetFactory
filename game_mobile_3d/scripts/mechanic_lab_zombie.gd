@@ -776,14 +776,15 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 				or obstacle == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
 			continue
 		var space := get_world_3d().direct_space_state
-		_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance)
+		var packed_blocker := living_blocker and get_parent().get_child_count() >= CROWD_RETRY_MIN_ZOMBIES
+		_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, packed_blocker)
 		if not _chase_detour.is_finite() and not _target_visible and not living_blocker:
 			# The remembered route can reach farther with a faster chaser.
 			# Bound the second search by the time left on the sighting.
 			var available := minf(LAB_DETOUR_TIMEOUT, LAB_SIGHT_LOSS_DELAY - _sight_state_seconds)
 			var reach := _chase_speed * available
 			if reach > LAB_DETOUR_LENGTH:
-				_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, reach)
+				_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, false, reach)
 		if _chase_detour.is_finite():
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
 			# Returning directly through the blocker would undo this side step.
@@ -793,7 +794,7 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 	return Vector3.ZERO
 
 func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3,
-		target_offset: Vector3, stop_distance: float, search_distance := LAB_DETOUR_LENGTH) -> Vector3:
+		target_offset: Vector3, stop_distance: float, packed_blocker: bool, search_distance := LAB_DETOUR_LENGTH) -> Vector3:
 	_prepare_lab_path_sweep(true)
 	# Open a small gap beside the wall before testing the two legs.
 	# A shape cast can omit contacts already touching its start.
@@ -821,6 +822,12 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 		# A sweep can only shorten this leg. Keep the earlier connected leg on a tie.
 		if max_distance <= min_distance or (best_connects and max_distance <= best_distance):
 			continue
+		if packed_blocker:
+			# Reject only a confirmed hit well inside the minimum usable leg.
+			_lab_path_sweep.motion = travel.limit_length(LAB_DETOUR_MIN_LENGTH * 0.5)
+			var prefix := space.cast_motion(_lab_path_sweep)
+			if prefix.size() == 2 and prefix[1] < 0.75:
+				continue
 		travel *= _lab_path_fraction(space, travel)
 		var distance := travel.length_squared()
 		if distance <= min_distance or (best_connects and distance <= best_distance) \
