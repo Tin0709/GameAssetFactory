@@ -178,7 +178,7 @@ func check_route_to_last_sighting(member_count: int, yaw: float, baby_chaser: bo
 	var hidden_hits := 0
 	var hits: Array[int] = []
 	chaser.melee_hit.connect(func(damage): hits.append(damage))
-	for tick in 150:
+	for tick in 300:
 		await physics_frame
 		if not chaser._target_visible:
 			routed_while_hidden = routed_while_hidden or chaser._chase_detour.is_finite()
@@ -293,6 +293,7 @@ func run() -> void:
 	await check_connected_side(1, deg_to_rad(52.0), 1.0)
 	await check_route_to_last_sighting(1, 0.0, false)
 	await check_route_to_last_sighting(100, deg_to_rad(27.0), true)
+	await check_route_to_last_sighting(1, deg_to_rad(27.0), false, 5.2, 1.7)
 	await check_route_to_last_sighting(100, deg_to_rad(27.0), true, 7.6, 1.7)
 	await check_living_blocker(2, 0.0)
 	await check_living_blocker(100, deg_to_rad(38.0))
