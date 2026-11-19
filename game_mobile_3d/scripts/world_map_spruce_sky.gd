@@ -21,6 +21,7 @@ var _texture: ImageTexture3D
 var _origin: Vector3
 var _dimensions: Vector3i
 var _casters: Array[Dictionary] = []
+var _east_casters: Array[MeshInstance3D] = []
 var _published_camera := Vector3.INF
 
 func setup(level: Node3D) -> void:
@@ -227,6 +228,7 @@ func apply_canopy_extension(relative: String, digest: String, parent_path: Strin
 		var placed := placements[i]
 		for caster: MeshInstance3D in grove.place_additional_spruce(placed.source, placed.position, "EastSpruce%02d" % (i + 1)):
 			_casters.append({"node": caster, "transform": caster.global_transform, "mesh": caster.mesh})
+			_east_casters.append(caster)
 	_texture = field
 	_dimensions = Vector3i(extent)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_extent", extent)
@@ -306,6 +308,10 @@ func mist_sky_field() -> MistSkyField:
 
 func mist_sky_current() -> bool:
 	return proof_ready and _level.grove.visible and _level.grove.spruce_visible() and _geometry_current()
+
+func east_casters_current() -> bool:
+	return not _east_casters.is_empty() and _geometry_current() and _east_casters.all(
+		func(caster: MeshInstance3D) -> bool: return caster.is_visible_in_tree())
 
 func _process(_delta: float) -> void:
 	refresh()

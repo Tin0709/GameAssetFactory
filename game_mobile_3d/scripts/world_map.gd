@@ -102,6 +102,8 @@ var biome_controller: BiomeGraphics
 @export var forest_preferred_layout_sha256 := ""
 @export var forest_canopy_extension_profile := ""
 @export var forest_canopy_extension_sha256 := ""
+@export var east_air_profile := ""
+@export var east_air_profile_sha256 := ""
 @export var forest_road_layout_profile := ""
 @export var forest_road_layout_sha256 := ""
 @export var forest_basin_layout_profile := ""
@@ -266,8 +268,11 @@ func _ready() -> void:
 	var preferred_layout := spruce_sky.proof_ready \
 		and spruce_sky.apply_layout(forest_preferred_layout_profile, forest_preferred_layout_sha256)
 	if preferred_layout:
-		spruce_sky.apply_canopy_extension(forest_canopy_extension_profile, forest_canopy_extension_sha256,
+		var extension := spruce_sky.apply_canopy_extension(forest_canopy_extension_profile, forest_canopy_extension_sha256,
 			forest_preferred_layout_profile, forest_preferred_layout_sha256)
+		if extension and showcase.mist != null and showcase.directional_air.load_east(
+				east_air_profile, east_air_profile_sha256, forest_canopy_extension_sha256, spruce_sky):
+			showcase.mist.effect.east_directional_grid = showcase.directional_air.east_texture
 	elif spruce_sky.proof_ready \
 			and not spruce_sky.apply_layout(forest_road_layout_profile, forest_road_layout_sha256) \
 			and not spruce_sky.apply_layout(forest_basin_layout_profile, forest_basin_layout_sha256):

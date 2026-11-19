@@ -215,6 +215,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_near_scatter": ["Forest mist depth light", 1.],
 	&"sunlit_mist": ["Canopy sunlight in mist", DirectionalAir.MAX_GAIN],
 	&"basin_sunlit_mist": ["Nắng trong sương bậc đá", 1.],
+	&"east_sunlit_mist": ["Nắng trong sương phía đông", 1.],
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
 	&"night_depth_scatter": ["Ánh xanh trong sương xa", 1.],
@@ -312,7 +313,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 206
+const LIGHTING_MIX_VERSION := 207
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2883,6 +2884,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 206 and effect == &"ambient_tint_by_hour":
 			missing_value = 0.
+		if version < 207 and effect == &"east_sunlit_mist":
+			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -2942,6 +2945,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and not _flat_lab and level.additional_local_diffuse_region != null
 		if effect == &"basin_sunlit_mist":
 			slider.editable = slider.editable and directional_air.region_available()
+		if effect == &"east_sunlit_mist":
+			slider.editable = slider.editable and directional_air.east_available()
 		if effect in [&"dawn_sky_transition", &"night_sky_fill"]:
 			slider.editable = slider.editable and sky_response.available()
 		if effect in [&"dawn_mist_source", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze"]:
@@ -3131,7 +3136,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"forest_path_beam", &"lantern_grass_tone"]:
 		_publish_point_cutoff()
 		return
-	if changed_effect in [&"forest_path_air", &"forest_path_air_beam", &"sunlit_mist", &"basin_sunlit_mist"]:
+	if changed_effect in [&"forest_path_air", &"forest_path_air_beam", &"sunlit_mist", &"basin_sunlit_mist", &"east_sunlit_mist"]:
 		return # The volume reads the live fixture and mix immediately before dispatch.
 	if changed_effect in [&"", &"foot_contact"] and player_contact != null:
 		player_contact.refresh()
@@ -4023,6 +4028,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"basin_sunlit_mist":
 			slider.editable = directional_air.region_available()
+		if effect == &"east_sunlit_mist":
+			slider.editable = directional_air.east_available()
 		if effect == &"sunlit_mist":
 			slider.editable = directional_air.available()
 			slider.tooltip_text = "Compare the 33% default against 24% at 07:00 or 16:30. Adds scattered sunlight behind canopy gaps; fades to zero at noon and night." if slider.editable else "Requires the verified private canopy field and the Mobile renderer."
