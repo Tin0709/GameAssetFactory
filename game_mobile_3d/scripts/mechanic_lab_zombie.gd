@@ -15,6 +15,8 @@ const Ragdoll := preload("res://scripts/mechanic_lab_ragdoll.gd")
 const DeathProfile := preload("res://scenes/dev/zombie_death_physics/death_profile.gd")
 const CORPSE_SHADER := preload("res://materials/mechanic_lab_zombie_corpse.gdshader")
 const LAB_SKIN_SHADER := preload("res://materials/mechanic_lab_zombie_skin.gdshader")
+const LAB_SKIN_FLASH_SHADER := preload("res://materials/mechanic_lab_zombie_skin_flash.gdshader")
+const LAB_FLASH_SKIN_META := &"lab_flash_skin"
 const HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_zombie_hit_flash.gdshader")
 const IDLE := &"Zombie_Idle"
 const IDLE_AUDIO_NOTIFY_TIME := 0.066887535
@@ -234,6 +236,8 @@ var _blocked_walk_destination := Vector3.ZERO
 var _skipped_blocked_step := false
 var _flash_left := 0.0
 var _flash_pending := false
+var _lab_skin: ShaderMaterial
+var _lab_flash_skin: ShaderMaterial
 var _corpse_age := 0.0
 var _corpse_landed := false
 var _limb_support_age := 0.0
@@ -276,6 +280,12 @@ static func prepare_lab_skin(model: Node, mesh_name := "SK_Zombie") -> void:
 	material.shader = LAB_SKIN_SHADER
 	material.set_shader_parameter("living_skin", skin.albedo_texture)
 	material.set_shader_parameter("corpse_skin", skin.albedo_texture)
+	if RenderingServer.get_current_rendering_method() == &"mobile":
+		var flash := ShaderMaterial.new()
+		flash.shader = LAB_SKIN_FLASH_SHADER
+		flash.set_shader_parameter("living_skin", skin.albedo_texture)
+		flash.set_shader_parameter("corpse_skin", skin.albedo_texture)
+		material.set_meta(LAB_FLASH_SKIN_META, flash)
 	mesh.material_override = material
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D],
@@ -308,6 +318,9 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 	animation = model.get_node("AnimationPlayer")
 	animation.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	_mesh = model.find_child("SK_BabyZombie" if is_baby else "SK_Zombie", true, false)
+	if _mesh.material_override != null and _mesh.material_override.has_meta(LAB_FLASH_SKIN_META):
+		_lab_skin = _mesh.material_override as ShaderMaterial
+		_lab_flash_skin = _lab_skin.get_meta(LAB_FLASH_SKIN_META) as ShaderMaterial
 	_feedback = Feedback.new()
 	_feedback.digits = digits
 	_feedback.effects = effects
@@ -431,7 +444,10 @@ func _process(delta: float) -> void:
 	var flash := smoothstep(0.0, HIT_FLASH_DURATION * 0.65, _flash_left)
 	_mesh.set_instance_shader_parameter("hit_flash", flash)
 	if _flash_left <= 0.0:
-		_mesh.material_overlay = null
+		if _lab_flash_skin != null:
+			_mesh.material_override = _lab_skin
+		else:
+			_mesh.material_overlay = null
 		set_process(false)
 
 func _physics_process(delta: float) -> void:
@@ -994,7 +1010,11 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 	direction.y = 0.0
 	direction = direction.normalized()
 	_feedback.show_hit(amount, health, max_health)
-	_mesh.material_overlay = _flash_material
+	if _flash_left <= 0.0:
+		if _lab_flash_skin != null:
+			_mesh.material_override = _lab_flash_skin
+		else:
+			_mesh.material_overlay = _flash_material
 	_mesh.set_instance_shader_parameter("hit_flash", 1.0)
 	_flash_left = HIT_FLASH_DURATION
 	_flash_pending = true
