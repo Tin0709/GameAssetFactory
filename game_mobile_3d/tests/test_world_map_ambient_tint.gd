@@ -42,7 +42,7 @@ func run() -> void:
 	current_scene = world
 	await process_frame
 	var showcase = world.showcase
-	if showcase.private_primary and showcase.atmosphere_review == "combined":
+	if showcase.forest_active() and showcase.atmosphere_review == "combined":
 		var env: Environment = world.get_node("WorldEnvironment").environment
 		var sun: DirectionalLight3D = world.get_node("Sun")
 		var slider := showcase._lighting_sliders.get(CONTROL) as HSlider
@@ -85,6 +85,7 @@ func run() -> void:
 	await process_frame
 	if FOREST.has_method("tint_ambient"):
 		var env: Environment = meadow.get_node("WorldEnvironment").environment
+		meadow.biome_controller.set_profile(MEADOW)
 		meadow.showcase.set_hour(7.)
 		var original := env.ambient_light_color
 		var profile := MEADOW.duplicate()
