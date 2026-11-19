@@ -845,6 +845,71 @@ func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
 	check(reactions.all(func(voice): return not voice.playing), "Muting stops both zombie reaction banks")
 	lab.free()
 
+func check_baby_zombie_swing(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group := lab.get_node("Zombies")
+	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
+	var baby := group.get_child(0) as ZOMBIE if group.get_child_count() == 1 else null
+	check(baby != null and baby.is_baby, "The swing fixture loads the source Baby Zombie")
+	if baby == null:
+		lab.free()
+		return
+	lab.player.set_physics_process(false)
+	baby.set_physics_process(false)
+	baby.global_position = lab.player.global_position + Vector3.FORWARD * 2.5
+	baby.rotation.y = 0.0
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	var audio := lab.get_node("CombatAudio")
+	var bank: Array = audio._groups.get(&"baby_swing", [])
+	check(bank.size() == 4, "All four verified Baby Zombie swing samples load")
+	var start: int = COMBAT_AUDIO.ATTACK_POOL * COMBAT_AUDIO.VOICES_PER_POOL
+	var attacks: Array[AudioStreamPlayer3D] = audio._voices.slice(start, start + COMBAT_AUDIO.VOICES_PER_POOL)
+	for voice in attacks:
+		voice.bus = AudioServer.get_bus_name(bus)
+	audio.reset()
+	await create_timer(0.08).timeout
+	capture.clear_buffer()
+	baby.animation.stop()
+	baby.animation.play(ZOMBIE.ATTACK, 0.0)
+	baby.animation.advance(0.0)
+	baby.animation.seek(17.0 / 30.0, true)
+	baby._advance_animation(1.0 / 60.0, Vector3.ZERO)
+	audio.flush_zombie_combat_cues()
+	check(not attacks.any(func(voice): return voice.playing), "No swing voice before the release pose")
+	var initial_hp: int = lab.player_health
+	baby._advance_animation(1.0 / 60.0, Vector3.ZERO)
+	audio.flush_zombie_combat_cues()
+	check(bank.size() == 4 and attacks[0].playing and attacks[0].stream == bank[0]
+		and attacks[0].global_position == baby.combat_center(),
+		"Crossing release plays one swing at the Baby Zombie before the damage frame")
+	baby._advance_animation(0.2, Vector3.ZERO)
+	audio.flush_zombie_combat_cues()
+	check(lab.player_health == initial_hp and audio._next_choice.get(&"baby_swing", 0) == 1
+		and audio._next_choice.get(&"zombie_hit", 0) == 0,
+		"A real missed swing plays once and never starts the melee contact sample")
+	await create_timer(0.22).timeout
+	var peak := 0.0
+	for sample in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+	check(peak > 0.001 and peak < 0.9, "The source swing reaches the silent mixer with headroom")
+	print("MECHANIC_LAB_BABY_SWING peak=", peak)
+	audio.reset()
+	var point := baby.combat_center()
+	for i in COMBAT_AUDIO.VOICES_PER_POOL:
+		audio._play(&"baby_swing", point + Vector3.RIGHT * i, -20.0)
+	var windup := audio._play(&"zombie_windup", point, COMBAT_AUDIO.ZOMBIE_WINDUP_GAIN_DB)
+	var hit := audio._play(&"zombie_hit", point, COMBAT_AUDIO.ZOMBIE_HIT_GAIN_DB)
+	check(windup != null and hit != null and windup != hit and windup.stream in audio._groups[&"zombie_windup"],
+		"Windup and confirmed contact can each replace a swing when the attack pool is full")
+	check(audio._play(&"baby_swing", point, -20.0) == null,
+		"A swing never steals an occupied attack voice")
+	toggle.button_pressed = false
+	check(attacks.all(func(voice): return not voice.playing), "Muting stops Baby Zombie swings")
+	lab.free()
+
 func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -1531,6 +1596,7 @@ func run() -> void:
 	await check_zombie_attack_overflow(bus, capture)
 	await check_zombie_idle_audio(bus, capture)
 	await check_baby_zombie_reactions(bus, capture)
+	await check_baby_zombie_swing(bus, capture)
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
