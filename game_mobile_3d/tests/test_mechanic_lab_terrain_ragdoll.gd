@@ -381,7 +381,7 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 
 func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true, landing_gravity := -1.0,
 		max_anchor_gap := INF, strike: Zombie.DeathStrike = Zombie.DeathStrike.SABRE_FINISHER,
-		strength := 1150.0, shared_wall := false) -> void:
+		strength := 1150.0, shared_wall := false, bevel := false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -391,6 +391,8 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		second_wall.get_child(0).reparent(first_wall)
 		second_wall.free()
 		second_wall = first_wall
+	if bevel:
+		terrain(lab, Vector3(4.35, 0.73, 4.35), Vector3(0.10, 1.46, 0.26), -PI / 4.0)
 	var group := lab.get_node("Zombies")
 	group._spawn_serial = 1800 + seed
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
@@ -426,6 +428,8 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 	var peak_gap := 0.0
 	var farthest := 0.0
 	var walls_hit := {}
+	var corner_samples := 0
+	var missed_corner_samples := 0
 	for i in roundi(settle_seconds * 60.0):
 		await physics_frame
 		if zombie._corpse_parked:
@@ -433,19 +437,32 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		if not zombie.ragdoll.running:
 			continue
 		peak_gap = maxf(peak_gap, zombie.ragdoll.max_anchor_error())
+		var upper_wall_faces := 0
 		for part: PhysicalBone3D in zombie.ragdoll.bodies.values():
 			farthest = maxf(farthest, maxf(part.global_position.x, part.global_position.z))
 			var state := PhysicsServer3D.body_get_direct_state(part.get_rid())
 			for index in state.get_contact_count():
 				var collider := state.get_contact_collider_object(index)
 				if collider == first_wall:
-					walls_hit[state.get_contact_collider_shape(index) if shared_wall else 0] = true
+					var face := state.get_contact_collider_shape(index) if shared_wall else 0
+					walls_hit[face] = true
+					if bevel and part in [zombie.ragdoll.bodies.Head, zombie.ragdoll.bodies.Chest]:
+						var normal := state.get_contact_local_normal(index)
+						if (face == 0 and absf(normal.x) > 0.99) or (face == 1 and absf(normal.z) > 0.99):
+							upper_wall_faces |= 1 << face
 				elif collider == second_wall:
 					walls_hit[1] = true
+		if bevel and upper_wall_faces == 3 and zombie.ragdoll.contact_motion().leg_supported:
+			corner_samples += 1
+			missed_corner_samples += int(not zombie.ragdoll.has_flat_corner_brace())
 	check(walls_hit.size() == 2 and farthest < 4.65,
 		"The ragdoll meets both faces of the closed corner and stays on the near side")
 	check(zombie._corpse_parked == should_settle and (not should_settle or zombie.ragdoll.bodies.is_empty()),
 		"The corner ragdoll %d has the expected rest state" % seed)
+	if bevel:
+		check(corner_samples > 0 and missed_corner_samples == 0,
+			"The bevel leaves both supporting wall faces visible to the corner check")
+		print("LAB_BEVELED_CORNER samples=", corner_samples, " missed=", missed_corner_samples)
 	if should_settle and zombie._corpse_parked:
 		var pose_matches := last_simulated.size() == skeleton.get_bone_count()
 		for bone in last_simulated.size():
@@ -492,6 +509,7 @@ func run() -> void:
 	await check_corner_ragdoll(113, 4.60, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
 	await check_corner_ragdoll(108, 4.90, false, 1.0, 0.09, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
 	await check_corner_ragdoll(238, 4.80, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
+	await check_corner_ragdoll(87, 4.90, true, -1.0, 0.09, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true, true)
 	await check_wall_rebound(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,
