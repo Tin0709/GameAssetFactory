@@ -87,6 +87,7 @@ func run() -> void:
 	await physics_frame
 	check(visible_particles(dust) == 0 and visible_particles(wind) == 0, "Reset clears both movement effects")
 	await check_heavy_dust_timing(lab, dust)
+	await check_overlapping_landing_dust(lab, dust)
 	await check_gauntlet_debris(lab, dust)
 	await check_running_wake_support(lab, wind)
 	await check_running_wake_render_clock(lab, wind, dust)
@@ -271,6 +272,61 @@ func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 		await physics_frame
 	check(visible_particles(dust) == 0 and not dust.is_physics_processing(),
 		"Reset cancels heavy dust that has not appeared yet")
+
+func check_overlapping_landing_dust(lab, dust: Node3D) -> void:
+	lab.reset_player()
+	dust._random.seed = 27385
+	var landing_ticks: Array[int] = []
+	var record := func(_point: Vector3, landed: bool):
+		if landed:
+			landing_ticks.append(Engine.get_physics_frames())
+	lab.player.surface_contact.connect(record)
+	var ordinary_puffs: Dictionary = {}
+	var lost := 0
+	var heavy_peak := 0
+	var jumps := 0
+	var second_air_ticks := 0
+	var rate := Engine.physics_ticks_per_second
+	Input.action_press("move_forward")
+	for tick in 177:
+		await physics_frame
+		var now := Engine.get_physics_frames()
+		var heavy_puffs := 0
+		for particle in dust._particles:
+			if ordinary_puffs.has(particle):
+				var original: Vector2 = ordinary_puffs[particle]
+				var age := float(now - 1 - int(original.x)) / rate
+				if particle.contact_tick != int(original.x) or not particle.sprite.visible:
+					lost += int(age + 0.0001 < original.y)
+					ordinary_puffs.erase(particle)
+			elif landing_ticks.size() == 1 and particle.sprite.visible and particle.landing_tick >= 0:
+				ordinary_puffs[particle] = Vector2(particle.contact_tick, particle.duration)
+			if landing_ticks.size() == 2 and particle.sprite.visible and particle.contact_tick > landing_ticks[1] \
+					and particle.landing_tick < 0 and particle.run_drag == 0.0:
+				heavy_puffs += 1
+		heavy_peak = maxi(heavy_peak, heavy_puffs)
+		if tick == 38 or (jumps == 1 and landing_ticks.size() == 1 and now - landing_ticks[0] >= 2):
+			Input.action_press("jump")
+			jumps += 1
+		if lab.player._grounded or jumps == 0:
+			continue
+		Input.action_release("jump")
+		if jumps == 2:
+			second_air_ticks += 1
+			if second_air_ticks in [10, 12]:
+				var attack := InputEventKey.new()
+				attack.physical_keycode = KEY_E
+				attack.pressed = second_air_ticks == 10
+				root.push_input(attack, true)
+	Input.action_release("move_forward")
+	Input.action_release("jump")
+	lab.player.surface_contact.disconnect(record)
+	check(landing_ticks.size() == 2 and heavy_peak == 10,
+		"The running jump and follow-up Sabre dive both complete their landings")
+	check(lost == 0, "The Sabre landing and later footsteps preserve visible dust from the ordinary landing")
+	print("MECHANIC_LAB_OVERLAPPING_DUST lost=", lost, " heavy=", heavy_peak)
+	lab.reset_player()
+	await physics_frame
 
 func check_gauntlet_debris(lab, dust: Node3D) -> void:
 	for weapon in [lab.Weapon.GAUNTLETS, lab.Weapon.BASIC_GAUNTLETS]:
