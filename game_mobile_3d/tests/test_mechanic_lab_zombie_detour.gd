@@ -191,6 +191,46 @@ func check_floor_edge_pursuit(member_count: int, yaw: float, corner: bool) -> vo
 	lab.free()
 	await physics_frame
 
+func check_active_crowd_at_floor_edge() -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	lab.player_health = 10000
+	var zombies := lab.get_node("Zombies")
+	lab.get_node("HUD/SpawnCrowd").pressed.emit()
+	for i in 120:
+		await process_frame
+		if zombies.get_child_count() == 100:
+			break
+	if zombies.get_child_count() != 100:
+		failures.append("The edge fixture must have 100 living zombies")
+		lab.free()
+		return
+	for i in 100:
+		var member := zombies.get_child(i) as ZOMBIE
+		member.position = Vector3(48.0 - floorf(i / 10.0) * 1.15, 0.02, (i % 10 - 4.5) * 1.05)
+		member._roam_origin = member.position
+		member._reset_roam()
+		member.animation.play(ZOMBIE.IDLE)
+		member.animation.advance(0.0)
+	lab.player.position = Vector3(53.2, 0.02, 0.0)
+	for i in 240:
+		await physics_frame
+	var supported := zombies.get_child_count() == 100 and zombies.get_children().all(
+		func(member: ZOMBIE) -> bool: return member.is_on_floor() and member.position.x < 50.0)
+	if not supported or lab.player_health != 10000:
+		failures.append("The active crowd should stay supported at the edge without hitting a distant target")
+	lab.player.position = Vector3(45.9, 0.02, 0.0)
+	for i in 240:
+		await physics_frame
+	var damage := 10000 - lab.player_health
+	if zombies.get_child_count() != 100 or damage <= 0 or damage % ZOMBIE.MELEE_DAMAGE != 0:
+		failures.append("All 100 zombies should remain and resume normal attacks after the player returns")
+	print("LAB_EDGE_CROWD supported=", supported, " alive=", zombies.get_child_count(), " damage=", damage)
+	lab.free()
+	await physics_frame
+
 func run() -> void:
 	await check_detour(1, 0.0, false)
 	await check_detour(100, deg_to_rad(27.0), true)
@@ -204,6 +244,7 @@ func run() -> void:
 	await check_living_blocker(100, deg_to_rad(-27.0), true)
 	await check_floor_edge_pursuit(1, 0.0, false)
 	await check_floor_edge_pursuit(100, deg_to_rad(27.0), true)
+	await check_active_crowd_at_floor_edge()
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 

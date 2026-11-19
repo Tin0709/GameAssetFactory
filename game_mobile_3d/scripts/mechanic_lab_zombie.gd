@@ -841,13 +841,13 @@ func _limit_lab_pursuit_to_floor(travel: Vector3, delta: float) -> Vector3:
 	var end := _corpse_floor.to_local(global_position + travel * delta)
 	if absf(end.x) <= extent.x and absf(end.z) <= extent.z:
 		return travel
-	# Use the reachable part of the approach. A knockback can leave the
-	# capsule outside this inset, so allow it to walk back under its own power.
-	var start := _corpse_floor.to_local(global_position)
-	end.x = clampf(end.x, minf(-extent.x, start.x), maxf(extent.x, start.x))
-	end.z = clampf(end.z, minf(-extent.z, start.z), maxf(extent.z, start.z))
+	# Steer back toward supported ground when a capsule slides beyond the inset.
+	end.x = clampf(end.x, -extent.x, extent.x)
+	end.z = clampf(end.z, -extent.z, extent.z)
 	var endpoint := _corpse_floor.to_global(end)
-	return Vector3.ZERO if endpoint.is_equal_approx(global_position) else (endpoint - global_position) / delta
+	if endpoint.is_equal_approx(global_position):
+		return Vector3.ZERO
+	return ((endpoint - global_position) / delta).limit_length(travel.length())
 
 func _confirm_windup_target(point: Vector3) -> bool:
 	# Crowd sight runs on a staggered clock. The current target must still
