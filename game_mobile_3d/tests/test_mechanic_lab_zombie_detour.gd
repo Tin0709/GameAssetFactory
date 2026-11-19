@@ -153,5 +153,44 @@ func run() -> void:
 	await check_connected_side(1, 0.0, 1.0)
 	await check_connected_side(100, deg_to_rad(27.0), -1.0)
 	await check_connected_side(1, deg_to_rad(52.0), 1.0)
+	await check_living_blocker(2, 0.0)
+	await check_living_blocker(100, deg_to_rad(38.0))
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_living_blocker(member_count: int, yaw: float) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var zombies := spawn_detour_group(lab, member_count)
+	if zombies == null:
+		lab.free()
+		return
+	var heading := Basis(Vector3.UP, yaw)
+	var blocker := zombies.get_child(1) as ZOMBIE
+	blocker.position = heading * Vector3(0.0, 0.02, -2.5)
+	var chaser := zombies.get_child(0) as ZOMBIE
+	chaser.position = heading * Vector3(0.0, 0.02, -4.2)
+	chaser.animation.play(ZOMBIE.IDLE)
+	chaser.animation.advance(0.0)
+	var first_waypoint := INF
+	var crossing_x := INF
+	var hits: Array[int] = []
+	chaser.melee_hit.connect(func(damage): hits.append(damage))
+	for tick in 210:
+		await physics_frame
+		if not is_finite(first_waypoint) and chaser._chase_detour.is_finite():
+			first_waypoint = (heading.inverse() * chaser._chase_detour).x
+		var local := heading.inverse() * chaser.global_position
+		if not is_finite(crossing_x) and local.z > -2.5:
+			crossing_x = local.x
+		if not hits.is_empty():
+			break
+	if not is_finite(first_waypoint) or not is_finite(crossing_x) or absf(crossing_x) < 0.7 \
+			or hits != [ZOMBIE.MELEE_DAMAGE]:
+		failures.append("A visible chaser should circle a stationary zombie and land one normal hit")
+	print("LAB_LIVING_DETOUR members=", member_count, " yaw=", rad_to_deg(yaw), " waypoint_x=", first_waypoint,
+		" crossing_x=", crossing_x, " hits=", hits, " final=", heading.inverse() * chaser.global_position)
+	lab.free()
+	await physics_frame
