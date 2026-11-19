@@ -196,6 +196,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"day_grass_shadow_compactness": ["Day grass shadow compactness", 2.],
 	&"day_grass_shadow_footprint": ["Bề ngang bóng cỏ sáng và chiều", 1.],
 	&"day_grass_shadow_wind": ["Độ ổn định bóng cỏ", 1.],
+	&"day_grass_sunlight_stability": ["Ổn định vệt nắng trên cỏ", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
 	&"cool_shadow_detail": ["Cool shadow detail", 1.],
@@ -329,7 +330,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 211
+const LIGHTING_MIX_VERSION := 212
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2418,6 +2419,12 @@ func grass_shadow_wind_scale() -> float:
 	return 1. - _biome_profile.day_grass_shadow_wind_reduction * _day_grass_shadow_weight() \
 		* _lighting_scale(&"day_grass_shadow_wind")
 
+func grass_sunlight_stability() -> float:
+	if _biome_profile == null or atmosphere_review != "combined" or _balanced_preview or not level.look.direct_clouds_active():
+		return 0.
+	return clampf(_biome_profile.day_grass_sunlight_stability * _day_grass_shadow_weight() \
+		* _lighting_scale(&"day_grass_sunlight_stability"), 0., 1.)
+
 func _day_grass_shadow_weight() -> float:
 	var morning := smoothstep(5.5, 7.0, hour) * (1.0 - smoothstep(7.0, 12.0, hour))
 	var afternoon := smoothstep(12.0, 16.5, hour) * (1.0 - smoothstep(16.5, 19.0, hour))
@@ -2852,6 +2859,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 211 and effect == &"source_path_edge_filter":
 			missing_value = 0.
+		if version < 212 and effect == &"day_grass_sunlight_stability":
+			missing_value = 0.
 		if version < 191 and effect == &"night_leaf_lamp_shoulder":
 			missing_value = 0.
 		if version < 190 and effect == &"day_path_chroma":
@@ -3122,6 +3131,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if effect == &"day_grass_shadow_wind":
 			slider.editable = slider.editable and plants != null and plants.grass_light.active \
 				and _biome_profile != null and _biome_profile.day_grass_shadow_wind_reduction > 0.
+		if effect == &"day_grass_sunlight_stability":
+			slider.editable = slider.editable and plants != null and plants.grass_light.active \
+				and _biome_profile != null and _biome_profile.day_grass_sunlight_stability > 0.
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
 		if effect == &"lantern_exposure":
@@ -3365,7 +3377,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"pre_twilight_receiver":
 		return
-	if changed_effect in [&"grass_step_coverage", &"day_grass_shadow_footprint", &"day_grass_shadow_wind"]:
+	if changed_effect in [&"grass_step_coverage", &"day_grass_shadow_footprint", &"day_grass_shadow_wind", &"day_grass_sunlight_stability"]:
 		if plants != null:
 			plants.grass_light.sync()
 		return

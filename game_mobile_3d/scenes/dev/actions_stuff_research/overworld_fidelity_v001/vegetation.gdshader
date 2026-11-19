@@ -31,6 +31,8 @@ uniform float study_grass_night_albedo = 0.0;
 uniform float study_grass_shadow_height = 1.0;
 uniform float study_grass_shadow_footprint = 1.0;
 uniform float study_grass_shadow_wind = 1.0;
+uniform float study_grass_sunlight_stability = 0.0;
+varying vec3 study_cloud_position;
 varying flat vec4 study_ground_sky_at_root;
 varying flat float study_canopy_sky_at_root;
 varying flat float study_raw_canopy_sky;
@@ -166,6 +168,10 @@ void vertex(){
 	}
 #endif
 	foliage_world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+	// Retain part of the rest position for the patterned sun on moving blades.
+	study_cloud_position = foliage_world - world_offset * study_grass_sunlight_stability;
+#endif
 #ifndef GAF_REFERENCE_GRASS_LIGHTING
 	if(tinted_grass)NORMAL=normalize(NORMAL*0.35+vec3(0.0,0.65,0.0));
 #endif
@@ -297,7 +303,7 @@ void fragment(){
 		grass_opening_incident = study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix * study_canopy_sky_at_root * sole;
 	}
 	study_tip_weight=smoothstep(0.26,0.85,height_fraction);
-	study_cloud=world_cloud_shade(foliage_world);
+	study_cloud=world_cloud_shade(study_cloud_position);
 #endif
 #ifdef GAF_SHARED_MIST
 	FOG=gaf_surface_mist(SCREEN_UV,-VERTEX.z,INV_VIEW_MATRIX[3].xyz,-INV_VIEW_MATRIX[2].xyz,vec2(PROJECTION_MATRIX[0][0],PROJECTION_MATRIX[1][1]));
