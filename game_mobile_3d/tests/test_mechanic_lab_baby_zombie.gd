@@ -34,7 +34,7 @@ func run() -> void:
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var adult := group.get_child(1) as Zombie if group.get_child_count() == 2 else null
 	check(adult != null and not adult.is_baby and adult.max_health == Zombie.TRAINING_HEALTH
-		and adult._live_capsule.height == Zombie.HEIGHT, "Adult and baby variants coexist with their own capsules")
+		and is_equal_approx(adult._live_capsule.height, Zombie.HEIGHT), "Adult and baby variants coexist with their own capsules")
 	if adult != null:
 		adult.set_physics_process(false)
 		adult.position = Vector3(14.0, 0.02, 0.0)
