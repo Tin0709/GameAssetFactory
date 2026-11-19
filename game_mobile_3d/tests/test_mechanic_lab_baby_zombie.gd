@@ -102,6 +102,7 @@ func run() -> void:
 	await check_first_wall_neck_contact()
 	await check_first_wall_neck_contact(true)
 	await check_floor_then_wall()
+	await check_tuned_contact(9, 13.0, 0.80, Strike.AIR, -44.0, Vector2(1000.0, 100.0))
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
