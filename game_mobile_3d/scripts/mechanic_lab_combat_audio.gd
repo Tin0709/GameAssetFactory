@@ -457,17 +457,16 @@ func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"", preview
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
 		AudioServer.set_bus_mute(0, false)
-	if not preview_group.is_empty():
-		# Preview the next sample without spending a combat variant or priority slot.
-		_play(preview_group, preview_point, HIT_GAIN_DB, -1, false, true)
-		return
-	var preview := _weapon_hit_group()
-	if not melee_tool.is_empty():
-		preview = _tool_group(melee_tool, 5)
-		if not _groups.has(preview):
-			# Some tools only have a verified swing in the local export.
-			preview = _tool_group(melee_tool, 0)
-	_play(preview, preview_point, HIT_GAIN_DB)
+	var preview := preview_group
+	if preview.is_empty():
+		preview = _weapon_hit_group()
+		if not melee_tool.is_empty():
+			preview = _tool_group(melee_tool, 5)
+			if not _groups.has(preview):
+				# Some tools only have a verified swing in the local export.
+				preview = _tool_group(melee_tool, 0)
+	# Preview the next sample without spending a combat variant or priority slot.
+	_play(preview, preview_point, HIT_GAIN_DB, -1, false, true)
 
 func set_surface_landing_enabled(value: bool) -> void:
 	if enabled == value:
