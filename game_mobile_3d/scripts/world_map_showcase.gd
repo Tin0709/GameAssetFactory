@@ -2878,6 +2878,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
+		if version < 205 and effect == &"lantern_exposure":
+			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:

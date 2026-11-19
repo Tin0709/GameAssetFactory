@@ -75,7 +75,7 @@ func _storage_uniform(rd: RenderingDevice, binding: int, bytes: PackedByteArray)
  return uniform
 
 func _render_pass(rd:RenderingDevice,framebuffer:RID,pipeline:RID,uniform_set:RID,control:PackedByteArray=PackedByteArray())->void:
- if pipeline in [_final_pipeline, _lantern_pipeline] and control.size()==16:
+ if (pipeline == _final_pipeline or pipeline == _lantern_pipeline) and control.size() == 16:
   _mutex.lock()
   var scale := _guide_scale
   var neighborhood := _neighborhood

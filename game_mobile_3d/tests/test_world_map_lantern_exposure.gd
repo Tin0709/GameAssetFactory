@@ -44,6 +44,17 @@ func run() -> void:
 			slider.value = .5
 			await settle()
 			check(is_equal_approx(finish._native.lantern_exposure_status().amount, before * .5), "Half-strength uploads half the trim")
+			var preset_path := "user://test-lantern-exposure-%d.cfg" % OS.get_process_id()
+			check(showcase.save_lighting_mix(preset_path) == OK, "The new control is saved with the lighting preset")
+			slider.value = 1.
+			check(showcase.load_lighting_mix(preset_path) == OK and is_equal_approx(slider.value, .5),
+				"Loading restores the saved strength")
+			var cfg := ConfigFile.new()
+			cfg.set_value("recipe", "version", 204)
+			cfg.set_value("strengths", "lantern", 1.)
+			check(cfg.save(preset_path) == OK and showcase.load_lighting_mix(preset_path) == OK and slider.value == 0.,
+				"Presets from before the change retain their previous look")
+			DirAccess.remove_absolute(preset_path)
 			slider.value = 0.
 			await settle()
 			check(finish.active and not active(finish), "Zero leaves the stock exposure pass in use")
