@@ -1680,22 +1680,26 @@ func check_equipped_weapon_previews(bus: int, capture: AudioEffectCapture) -> vo
 	for voice: AudioStreamPlayer3D in audio._voices:
 		voice.bus = AudioServer.get_bus_name(bus)
 	toggle.button_pressed = false
-	for fixture: Array in [[3, &"crossbow_fire"], [4, &"gauntlet_hit"], [6, &"bow_fire"]]:
+	for fixture: Array in [
+		[0, &"hit"], [1, &"sword_hit"], [2, &"curved_hit"], [3, &"crossbow_fire"], [4, &"gauntlet_hit"],
+		[5, &"tool_cleaver_0"], [6, &"bow_fire"], [7, &"tool_gauntlet_5"], [8, &"tool_pickaxe_5"],
+		[9, &"tool_shovel_5"], [10, &"tool_axe_0"],
+	]:
 		var index: int = fixture[0]
 		var group: StringName = fixture[1]
 		menu.select(index)
 		menu.item_selected.emit(index)
-		check(menu.selected == index and not audio._groups.get(group, []).is_empty(),
-			"%s equips with its verified preview family" % menu.get_item_text(index))
+		check(menu.selected == index, "%s equips before enabling audio" % menu.get_item_text(index))
 		await create_timer(0.10).timeout
 		capture.clear_buffer()
+		var choices: Dictionary = audio._next_choice.duplicate()
 		var next_variant: int = audio._next_choice.get(group, 0)
 		toggle.button_pressed = true
 		var samples: Array = audio._groups.get(group, [])
 		var preview: Array = audio._voices.filter(func(voice): return voice.playing)
-		check(menu.selected == index and preview.size() == 1 and preview[0].stream in samples,
-			"Enabling audio with %s plays one preview from its own source family" % menu.get_item_text(index))
-		check(audio._next_choice.get(group, 0) == next_variant,
+		check(preview.size() == 1 and next_variant < samples.size() and preview[0].stream == samples[next_variant],
+			"Enabling audio with %s previews its next verified sample" % menu.get_item_text(index))
+		check(audio._next_choice == choices,
 			"%s preview preserves the next sample for combat" % menu.get_item_text(index))
 		await create_timer(0.16).timeout
 		var peak := 0.0
