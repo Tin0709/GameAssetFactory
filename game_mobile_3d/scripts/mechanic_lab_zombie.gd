@@ -91,7 +91,7 @@ const SABRE_LATE_ROLL_ANGULAR_DAMP := 6.0
 const SABRE_GROUNDED_SLIDE_DRAG := 4.0
 const SABRE_ROLL_BLEND_END := 0.35
 const SABRE_BRACE_MIN_AGE := 0.82
-const SABRE_CORNER_LANDING_MIN_AGE := 1.5
+const WALL_BRACE_MIN_AGE := 1.5
 const SABRE_CORNER_LANDING_MAX_SPEED := 0.60
 const SABRE_BRACE_GRAVITY_SHARE := 0.65
 const SABRE_BRACE_LIMB_SPEED_SHARE := 0.60
@@ -1128,9 +1128,11 @@ func _update_death(delta: float) -> void:
 		# A corner can carry the upper body and one planted foot while a free
 		# limb still swings. Measure the brace before blending landing gravity.
 		if not limbs_supporting and sabre_finisher and source_rig and is_instance_valid(_corpse_floor) \
-				and not _corpse_floor.disabled and _corpse_age >= SABRE_CORNER_LANDING_MIN_AGE \
+				and not _corpse_floor.disabled and _corpse_age >= WALL_BRACE_MIN_AGE \
 				and contact.supports == 1 and contact.leg_supported:
 			limbs_supporting = ragdoll.has_flat_corner_brace(SABRE_CORNER_LANDING_MAX_SPEED, CORPSE_SETTLE_SPIN)
+		if not limbs_supporting and contact.linear < DEATH_LIMB_SUPPORT_MAX_SPEED:
+			limbs_supporting = _has_tuned_wall_brace(contact)
 		_limb_support_age = _limb_support_age + delta if limbs_supporting else 0.0
 	if not _corpse_landed and (contact.core_supports > 0 or _limb_support_age >= DEATH_LIMB_SUPPORT_DURATION - 0.00001):
 		_corpse_landed = true
@@ -1172,6 +1174,11 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var roll_weight := 1.0 if damp_supported_roll else 0.0
 	if flat_sabre_finisher and not ragdoll.source_joints.is_empty():
 		roll_weight = _sabre_roll_weight(delta, contact_age, motion, damp_supported_roll) if supported else 0.0
+	# A late wall brace can keep one leg oscillating even after gravity
+	# has blended. Ease into the existing supported-roll damping.
+	if contact_age >= gravity_blend_end - 0.00001 and motion.linear < DEATH_LIMB_SUPPORT_MAX_SPEED \
+			and _has_tuned_wall_brace(motion):
+		roll_weight = maxf(roll_weight, move_toward(_roll_damping_weight, 1.0, delta / DEATH_LANDING_BLEND_TIME))
 	if flat_sabre_finisher and damp_supported_roll and roll_weight > 0.9 and not _had_upper_body_brace:
 		# Keep the existing fall from an upper-body brace through its roll.
 		var drag := smoothstep(0.78, 1.00, _corpse_age) * (1.0 - smoothstep(0.9, 2.0, motion.linear))
@@ -1311,6 +1318,16 @@ func _has_rest_support(motion: Dictionary) -> bool:
 	var support_up := Vector3.UP.slide(span.normalized()).normalized()
 	return horizontal_span >= head_to_feet.length() * 0.5 and absf(axis.dot(support_up)) <= CORPSE_SETTLE_MAX_AXIS_Y
 
+func _has_tuned_wall_brace(motion: Dictionary) -> bool:
+	if not ragdoll.use_tuned_wall_sweep or ragdoll.use_tuned_floor_support or ragdoll.source_joints.is_empty() \
+			or _corpse_age < WALL_BRACE_MIN_AGE or motion.core_supports > 0 \
+			or not motion.leg_supported or not is_instance_valid(_corpse_floor) or _corpse_floor.disabled:
+		return false
+	var floor_body := _corpse_floor.get_parent()
+	return (Ragdoll._body_supported_by(ragdoll.bodies["Leg.L"], floor_body) \
+		or Ragdoll._body_supported_by(ragdoll.bodies["Leg.R"], floor_body)) \
+		and ragdoll.has_flat_wall_rest_support(true)
+
 func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: bool) -> bool:
 	var two_parts: bool = motion.supports == 2
 	var flat_floor := is_instance_valid(_corpse_floor)
@@ -1333,7 +1350,10 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 		and (motion.supports >= 2 or intermittent_foot) \
 		and (slow_motion or measure_supported_pose)
 	var corner_support := false
-	if slow_support:
+	# A second foot can lose contact for a tick while the pose stays braced.
+	if slow_motion and ragdoll.floor_landing_blended and _has_tuned_wall_brace(motion):
+		slow_support = ragdoll.max_anchor_error() <= Ragdoll.SOURCE_ANCHOR_TOLERANCE
+	elif slow_support:
 		if flat_floor:
 			# A wall can carry the upper body while the floor carries the
 			# chest and legs, or both feet. Verify the pose stays put.
@@ -1343,7 +1363,7 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 				# Two wall faces can carry the torso even with the second leg
 				# off the floor. Require the tighter terrain pose envelope.
 				corner_support = not slow_support and not _corpse_floor.disabled \
-					and _corpse_age >= SABRE_CORNER_LANDING_MIN_AGE \
+					and _corpse_age >= WALL_BRACE_MIN_AGE \
 					and ragdoll.floor_landing_blended and ragdoll.has_flat_corner_brace()
 				slow_support = slow_support or corner_support
 			elif slow_support:
