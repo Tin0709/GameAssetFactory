@@ -92,7 +92,10 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 
 func _correct_physical_pose() -> void:
 	var frame := Engine.get_physics_frames()
-	if not use_tuned_wall_sweep or not running or _pose_correction_frame == frame:
+	# Every physical bone calls this, but pose correction already processes the whole rig.
+	if not running or _pose_correction_frame == frame:
+		return
+	if not use_tuned_wall_sweep:
 		super._correct_physical_pose()
 		return
 	_sweep_tuned_lab_walls()
