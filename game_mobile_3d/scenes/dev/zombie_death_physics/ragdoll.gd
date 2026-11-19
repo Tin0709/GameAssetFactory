@@ -964,14 +964,8 @@ func _project_floor_contact() -> void:
 				var target_lift := FLOOR_SINGLE_PART_SHARED_LIFT if depths.size() == 1 else FLOOR_ROLL_SHARED_LIFT
 				shared_lift = lerpf(shared_lift, target_lift, roll_blend)
 		var anchor_lifts: Dictionary[PhysicalBone3D, float] = {}
-		if _limit_first_contact_stretch and (landing_blended or floor_impact_blend < EARLY_ROLL_ANCHOR_BLEND_END) \
-				and not depths.is_empty():
-			# Give the early roll extra room until per-limb floor recovery takes over.
-			var early_roll := not landing_blended and floor_impact_blend > 0.0
-			var anchor_limit := EARLY_ROLL_ANCHOR_LIMIT if early_roll else FIRST_CONTACT_ANCHOR_LIMIT
-			_limit_floor_anchor_stretch(anchor_lifts, depths, shared_lift, slop, anchor_limit)
-			if not landing_blended and floor_impact_blend <= 0.0:
-				_limit_shared_first_contact_lift(anchor_lifts, depths, shared_lift, slop)
+		if _limit_first_contact_stretch and not depths.is_empty():
+			_resolve_floor_anchor_lifts(anchor_lifts, depths, shared_lift, slop, landing_blended)
 		for part in _physical_parts:
 			var body := part.body
 			var correction: float = anchor_lifts.get(body, maxf(shared_lift, depths.get(body, 0.0) - slop))
@@ -982,6 +976,18 @@ func _project_floor_contact() -> void:
 				state.transform = state.transform.translated(Vector3.UP * correction)
 	if _flat_floor_has_contact and not landing_blended and floor_impact_blend > 0.0:
 		_preempt_floor_penetration(floor_half, floor_inverse, floor_pose.origin.y + floor_half.y)
+
+func _resolve_floor_anchor_lifts(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
+		shared_lift: float, slop: float, landing_blended: bool) -> void:
+	if not landing_blended and floor_impact_blend >= EARLY_ROLL_ANCHOR_BLEND_END:
+		return
+	# Give the early roll extra room until per-limb floor recovery takes over.
+	var early_roll := not landing_blended and floor_impact_blend > 0.0
+	var anchor_limit := EARLY_ROLL_ANCHOR_LIMIT if early_roll else FIRST_CONTACT_ANCHOR_LIMIT
+	_limit_floor_anchor_stretch(lifts, depths, shared_lift, slop, anchor_limit)
+	if not landing_blended and floor_impact_blend <= 0.0:
+		_limit_shared_first_contact_lift(lifts, depths, shared_lift, slop)
+
 
 func _limit_shared_first_contact_lift(_lifts: Dictionary[PhysicalBone3D, float],
 		_depths: Dictionary[PhysicalBone3D, float], _shared_lift: float, _slop: float) -> void:

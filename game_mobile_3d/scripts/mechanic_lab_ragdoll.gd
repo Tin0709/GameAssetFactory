@@ -7,6 +7,8 @@ const EARLY_FLOOR_LIFT_START := 0.065
 const EARLY_FLOOR_LIFT_FULL := 0.095
 const EARLY_FLOOR_SHARED_LIFT := 0.045
 const EARLY_FLOOR_LIFT_BLEND_END := 0.16
+const HEAD_ROLL_LIFT_BLEND_START := 0.28
+const HEAD_ROLL_LIFT_BLEND_END := 0.65
 const LOCAL_FLOOR_LIFT_START := 0.057
 const LOCAL_FLOOR_LIFT_FULL := 0.066
 const LOCAL_FLOOR_SHARED_LIFT := 0.033
@@ -569,6 +571,30 @@ func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depth
 		reduced_lift = local_lift
 	if reduced_lift < shared_lift:
 		_distribute_floor_lift(lifts, depths, shared_lift, slop, reduced_lift, anchor_limit)
+
+func _resolve_floor_anchor_lifts(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
+		shared_lift: float, slop: float, landing_blended: bool) -> void:
+	super._resolve_floor_anchor_lifts(lifts, depths, shared_lift, slop, landing_blended)
+	if (landing_blended or not _flat_floor_has_contact or floor_impact_blend <= HEAD_ROLL_LIFT_BLEND_START
+			or floor_impact_blend >= HEAD_ROLL_LIFT_BLEND_END or shared_lift <= FLOOR_SINGLE_PART_SHARED_LIFT or depths.size() < 2):
+		return
+	var head: PhysicalBone3D = bodies.Head
+	var head_overlap: float = depths.get(head, 0.0) - slop
+	if head_overlap <= 0.045:
+		return
+	# A second box just over the contact tolerance carries little of this correction.
+	var other_overlap := 0.0
+	for body: PhysicalBone3D in depths:
+		if body != head:
+			other_overlap = maxf(other_overlap, depths[body] - slop)
+	var weight := smoothstep(0.045, 0.060, head_overlap) * (1.0 - smoothstep(0.001, 0.004, other_overlap))
+	weight *= smoothstep(HEAD_ROLL_LIFT_BLEND_START, 0.36, floor_impact_blend) \
+		* (1.0 - smoothstep(0.43, HEAD_ROLL_LIFT_BLEND_END, floor_impact_blend))
+	if weight <= 0.0 or _floor_roll_nears_obstacle(_flat_floor.get_parent().get_rid()):
+		return
+	var local_lift := lerpf(shared_lift, FLOOR_SINGLE_PART_SHARED_LIFT, weight)
+	_distribute_floor_lift(lifts, depths, shared_lift, slop, local_lift, EARLY_ROLL_ANCHOR_LIMIT)
+
 
 func _floor_roll_nears_obstacle(floor: RID) -> bool:
 	# Preserve the incoming pose of a roll that is about to contact a wall.
