@@ -24,7 +24,7 @@ const ITEMS := {
 	"cliff_vista_feather": ["Dịu mép địa hình khi zoom xa", "Soften the distant terrain border",
 		"Hòa bớt mép địa hình trang trí vào màu không khí ở góc rộng, giữ chiều sâu của lớp nền.",
 		"Ở gần bậc đá, lăn chuột ra xa rồi so 0% và 100%. Cần bật sương và Địa hình xa sau bậc đá."],
-	"zoom_exposure_blur": ["Giữ ánh sáng ổn định khi cuộn zoom", "Steadier local exposure during zoom", "Giữ bán kính làm mượt của local exposure gần với cùng khoảng cách trên map khi zoom xa vào sáng và chiều.", "So 0% và 100% lúc 07:00 hoặc 16:30, rồi cuộn zoom ở lối rừng."],
+	"zoom_exposure_blur": ["Giữ ánh sáng ổn định khi cuộn zoom", "Steadier local exposure during zoom", "Ổn định vùng làm mượt của local exposure khi zoom xa. Từ chạng vạng, hiệu chỉnh nhẹ quanh vùng đèn và giảm dần ở góc nhìn rất rộng.", "So 0% và 100% lúc 07:00, 16:30 hoặc 22:00 rồi cuộn zoom ở lối rừng."],
 	"lantern_exposure": ["Dịu rìa sáng đèn hông", "Soften the hip lantern's spill",
 		"Giảm phần bù sáng ở rìa vùng đèn trên cỏ và địa hình thấp. Hiệu ứng dựa vào độ sâu, nên nhân vật và tán cây cao giữ phần sáng của chúng.",
 		"Ở 22:00, so 0% và 100% trên lối rừng. Dùng với đèn chiếu từ trên và MSAA có depth hỗ trợ."],

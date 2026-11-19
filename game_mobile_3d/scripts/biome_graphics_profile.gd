@@ -152,6 +152,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., 1., .01) var daylight_green_grade_scale := 0.
 ## Keep the reference local-exposure blur footprint steadier when zooming out.
 @export_range(0., 1., .01) var zoom_exposure_blur_strength := 0.
+## Optional exposure blur correction by normalized hour for lantern-lit gameplay.
+@export var night_zoom_exposure_blur_by_hour: Curve
 
 @export_group("Bloom")
 @export_range(0., 2.) var glow_intensity := .42

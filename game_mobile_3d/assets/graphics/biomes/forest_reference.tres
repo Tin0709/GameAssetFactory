@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=27 format=3]
+[gd_resource type="Resource" load_steps=28 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -22,6 +22,10 @@ evening_hours = Vector4(19, 19.5, 20, 21)
 
 [sub_resource type="Curve" id="PathLampPhase"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.145833333, 1), 0.0, 0.0, 0, 0, Vector2(0.208333333, 0), 0.0, 0.0, 0, 0, Vector2(0.783333333, 0), 0.0, 0.0, 0, 0, Vector2(0.8125, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 6
+
+[sub_resource type="Curve" id="NightExposureZoom"]
+_data = [Vector2(0, 0.5), 0.0, 0.0, 0, 0, Vector2(0.145833333, 0.5), 0.0, 0.0, 0, 0, Vector2(0.1875, 0), 0.0, 0.0, 0, 0, Vector2(0.791666667, 0), 0.0, 0.0, 0, 0, Vector2(0.8125, 0.5), 0.0, 0.0, 0, 0, Vector2(1, 0.5), 0.0, 0.0, 0, 0]
 point_count = 6
 
 [sub_resource type="Curve" id="GroveMistPhase"]
@@ -141,6 +145,7 @@ grass_sky_height = 0.36
 grass_ground_tone = Vector2(0.46, 0.19)
 daylight_green_grade_scale = 1.0
 zoom_exposure_blur_strength = 1.0
+night_zoom_exposure_blur_by_hour = SubResource("NightExposureZoom")
 shadowed_wall_return_scale = 1.5
 sheltered_stone_return_scale = 1.6
 stone_wall_sky_by_hour = SubResource("ForestWallSky")

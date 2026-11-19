@@ -3639,10 +3639,18 @@ func daylight_green_grade_weight() -> float:
 		return 0.
 	return _daylight_grade_phase() * _biome_profile.daylight_green_grade_scale * _lighting_scale(&"daylight_green_grade")
 
-func zoom_exposure_blur_weight() -> float:
+func zoom_exposure_blur_weight(zoom: float) -> float:
 	if _biome_profile == null:
 		return 0.
-	return _daylight_grade_phase() * _biome_profile.zoom_exposure_blur_strength * _lighting_scale(&"zoom_exposure_blur")
+	var daylight := _daylight_grade_phase() * _biome_profile.zoom_exposure_blur_strength
+	var night := 0.
+	if not _flat_lab and not _balanced_preview and atmosphere_review == "combined" \
+			and level.view_mode == "gameplay":
+		# At very wide zoom, the finer kernel reacts too strongly to the canopy.
+		var falloff := 1. - smoothstep(26., 29., zoom)
+		var phase := DayNight.sample_curve(_biome_profile.night_zoom_exposure_blur_by_hour, hour / 24., 0.)
+		night = clampf(phase, 0., 1.) * falloff
+	return maxf(daylight, night) * _lighting_scale(&"zoom_exposure_blur")
 
 func _publish_stone_twilight_color() -> void:
 	if level != null and level.look != null:

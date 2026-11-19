@@ -146,7 +146,7 @@ func refresh()->void:
  _native.set_guide_scale(lerpf(1., .30, zoom_weight * showcase._lighting_scale(&"zoom_exposure_guide")))
  var blur_scale := 1.
  if camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
-  blur_scale = lerpf(1., 18. / clampf(camera.size, 18., 26.), showcase.zoom_exposure_blur_weight())
+  blur_scale = lerpf(1., 18. / clampf(camera.size, 18., 26.), showcase.zoom_exposure_blur_weight(camera.size))
  _native.set_blur_scale(blur_scale)
  _native.set_neighborhood_limit(_exposure_neighborhood(camera))
  # The optional raw-bloom comparison needs the same exposure math on both inputs.
