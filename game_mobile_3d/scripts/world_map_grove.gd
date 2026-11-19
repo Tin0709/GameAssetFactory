@@ -117,6 +117,7 @@ var _spruce_atlas: ImageTexture
 var _spruce_leaf_mips: ImageTexture
 var _spruce_leaf_filter := 0.0
 var _spruce_leaf_gap_mask: ImageTexture
+var _spruce_gap_coverage_weight := 1.0
 var spruce_gap_coverage_enabled := true
 var _spruce_appearance := ShaderMaterial.new()
 var _bark_irradiance := Vector4.ZERO
@@ -311,6 +312,7 @@ func _bind_spruce_atlas(material: ShaderMaterial) -> void:
 		if _spruce_leaf_gap_mask != null:
 			material.set_shader_parameter("spruce_leaf_gap_mask", _spruce_leaf_gap_mask)
 			material.set_shader_parameter("spruce_gap_coverage", spruce_gap_coverage_enabled)
+			material.set_shader_parameter("spruce_gap_coverage_weight", _spruce_gap_coverage_weight)
 	if _source_crown_pattern != null:
 		material.set_shader_parameter("source_crown_pattern", _source_crown_pattern)
 	if _source_crown_weights != null:
@@ -327,9 +329,15 @@ func set_spruce_gap_coverage(enabled: bool) -> void:
 	if spruce_gap_coverage_available():
 		_spruce_appearance.set_shader_parameter("spruce_gap_coverage", enabled)
 
+func set_spruce_gap_coverage_weight(weight: float) -> void:
+	if spruce_gap_coverage_available() and weight != _spruce_gap_coverage_weight:
+		_spruce_gap_coverage_weight = weight
+		_spruce_appearance.set_shader_parameter("spruce_gap_coverage_weight", weight)
+
 static func small_leaf_gap_mask(leaves: Image) -> Image:
 	var region := Rect2i(Vector2i.ZERO, leaves.get_size())
 	var visited: Dictionary[Vector2i, bool] = {}
+	var gaps: Array[Vector2i] = []
 	var mask := Image.create_empty(region.size.x, region.size.y, false, Image.FORMAT_L8)
 	mask.fill(Color.BLACK)
 	for y in region.size.y:
@@ -353,8 +361,13 @@ static func small_leaf_gap_mask(leaves: Image) -> Image:
 						points.append(neighbor)
 			# Preserve both large gaps and the outline of the leaf islands.
 			if enclosed and points.size() <= 4:
-				for point: Vector2i in points:
-					mask.set_pixelv(point, Color.WHITE)
+				gaps.append_array(points)
+	# Give each eligible texel its own activation point so a phase change
+	# spreads across the atlas instead of switching the entire crown at once.
+	gaps.sort_custom(func(left: Vector2i, right: Vector2i) -> bool: return hash(left) < hash(right))
+	for index in gaps.size():
+		var rank := float(index + 1) / float(gaps.size())
+		mask.set_pixelv(gaps[index], Color(rank, rank, rank))
 	return mask
 
 func set_spruce_leaf_filter(strength: float) -> void:

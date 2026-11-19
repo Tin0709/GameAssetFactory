@@ -3684,6 +3684,11 @@ func apply_time()->void:
 		_publish_path_chroma()
 		_publish_stone_twilight_color()
 		_sync_twilight_crown()
+		if level.grove != null and level.grove.spruce_gap_coverage_available():
+			var amount := 1.0
+			if _biome_profile != null:
+				amount = DayNight.sample_curve(_biome_profile.spruce_gap_coverage_by_hour, hour / 24., 1.)
+			level.grove.set_spruce_gap_coverage_weight(clampf(amount, 0., 1.))
 		_sync_forest_night_lights()
 		_publish_dawn_turf_color()
 	var env:Environment=level.get_node("WorldEnvironment").environment

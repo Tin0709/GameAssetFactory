@@ -106,6 +106,10 @@ point_count = 8
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.7458333333, 0), 0.0, 0.0, 0, 0, Vector2(0.75625, 0.35), 0.0, 0.0, 0, 0, Vector2(0.7666666667, 0.35), 0.0, 0.0, 0, 0, Vector2(0.7854166667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 6
 
+[sub_resource type="Curve" id="SpruceGapCoveragePhase"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.791666667, 1), 0.0, 0.0, 0, 0, Vector2(0.807291667, 0), 0.0, 0.0, 0, 0, Vector2(0.822916667, 0), 0.0, 0.0, 0, 0, Vector2(0.854166667, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 6
+
 [resource]
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
@@ -143,6 +147,7 @@ stone_wall_sky_by_hour = SubResource("ForestWallSky")
 shadow_diffuse_by_hour = SubResource("ForestShadowDiffuse")
 bark_irradiance_by_hour = SubResource("ForestBarkIrradiance")
 spruce_leaf_filter = 1.0
+spruce_gap_coverage_by_hour = SubResource("SpruceGapCoveragePhase")
 bark_irradiance_tint = Vector3(0.50, 1.16, 1.79)
 bark_diffuse_return_by_hour = SubResource("ForestBarkDiffuseReturn")
 bark_diffuse_return_tint = Vector3(0.57, 1, 1.39)

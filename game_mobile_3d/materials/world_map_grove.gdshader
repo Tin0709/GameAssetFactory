@@ -2,6 +2,7 @@ shader_type spatial;
 #ifdef GAF_GROVE_REVEAL_COVERAGE
 render_mode alpha_to_coverage_and_one;
 uniform bool spruce_gap_coverage = false;
+uniform float spruce_gap_coverage_weight = 1.0;
 uniform sampler2D spruce_leaf_gap_mask : filter_nearest, repeat_disable;
 #endif
 #ifdef GAF_GROVE_PLAYER_CUE
@@ -172,9 +173,13 @@ void fragment() {
 		if (texel.a < 0.3333) {
 #ifdef GAF_GROVE_REVEAL_COVERAGE
 			// Never fill gaps inside the existing player opening.
+			if (!spruce_gap_coverage || spruce_gap_coverage_weight <= 0.0
+					|| atlas_leaf < 0.5 || distance_to_player < 0.80) {
+				discard;
+			}
 			vec2 leaf_uv = vec2(atlas_uv.x * 2.0, atlas_uv.y);
-			if (!spruce_gap_coverage || atlas_leaf < 0.5 || distance_to_player < 0.80
-					|| texture(spruce_leaf_gap_mask, leaf_uv).r < 0.5) {
+			float rank = texture(spruce_leaf_gap_mask, leaf_uv).r;
+			if (rank <= 0.0 || rank > spruce_gap_coverage_weight) {
 				discard;
 			}
 			coverage = 0.5;
