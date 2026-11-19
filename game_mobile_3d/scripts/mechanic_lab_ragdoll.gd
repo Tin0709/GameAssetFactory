@@ -1352,6 +1352,8 @@ func _project_source_anchors() -> void:
 		_slide_wall_shoulder_anchors()
 	elif lab_floor and floor_impact_blend <= 0.0:
 		_slide_rebounding_legs()
+		if use_tuned_wall_sweep and not use_tuned_floor_support:
+			_recover_rebounding_wall_legs()
 	_recover_early_floor_arm_gap()
 	_recover_floor_blocked_hip()
 	var recent_handoff := _wall_handoff_frame >= 0 and Engine.get_physics_frames() - _wall_handoff_frame \
@@ -1572,6 +1574,35 @@ func _slide_wall_shoulder_anchors() -> void:
 			# the contact face does not deepen the starting overlap.
 			_slide_along_wall(limb, state, gap, normal, wall_rid)
 			break
+
+func _recover_rebounding_wall_legs() -> void:
+	# At extreme launch, a wall can hold a leg down while the torso rebounds.
+	# Sweep the leg back toward its joint without changing the rebound velocity.
+	var floor_body := _flat_floor.get_parent() as StaticBody3D
+	var floor_box := _flat_floor.shape as BoxShape3D
+	if floor_body == null or floor_box == null or not _flat_floor.global_basis.y.is_equal_approx(Vector3.UP):
+		return
+	var floor := floor_body.get_rid()
+	var floor_y := _flat_floor.global_position.y + floor_box.size.y * 0.5
+	var core := PhysicsServer3D.body_get_direct_state(bodies.Chest.get_rid())
+	if core == null:
+		return
+	for joint in _source_anchor_projections:
+		if joint.name != "Leg.L" and joint.name != "Leg.R":
+			continue
+		var state := PhysicsServer3D.body_get_direct_state(joint.rid)
+		if state == null or not _leg_has_side_contact(state):
+			continue
+		var gap := (core.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
+		var distance := gap.length()
+		if distance <= TUNED_LIMB_RECOVERY_GAP or gap.y <= SOURCE_ANCHOR_TOLERANCE:
+			continue
+		var advance := (core.linear_velocity - state.linear_velocity).dot(gap / distance) * state.step
+		if advance <= SOURCE_ANCHOR_TOLERANCE:
+			continue
+		var motion := gap * (minf(advance, distance - SOURCE_ANCHOR_TOLERANCE) / distance)
+		_slide_floor_wall_part(joint.body, state, joint.half_size, motion, floor_y, floor)
+
 
 func _slide_rebounding_legs() -> void:
 	var torso: PhysicalBone3D = bodies.Chest

@@ -15,7 +15,8 @@ func check(condition: bool, message: String) -> void:
 		printerr("FAIL ", message)
 
 func run() -> void:
-	await check_tuned_contact(9, 13.0, 0.80, Strike.AIR, -44.0, Vector2(1000.0, 100.0))
+	# Start this corner replay with a prewarmed rig, as in the live Lab.
+	await check_tuned_contact(9, 13.0, 0.80, Strike.AIR, -44.0, Vector2(1000.0, 100.0), true)
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -155,13 +156,16 @@ func check_walk_contacts(baby: Zombie) -> void:
 			"The Baby Zombie step matches the source sole and phase at frame 2 or 8")
 
 func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, strike_kind := Strike.SABRE,
-		strike_yaw := INF, tuning := Vector2(1000.0, 1000.0)) -> void:
+		strike_yaw := INF, tuning := Vector2(1000.0, 1000.0), prewarm := false) -> void:
 	var launch_percent := tuning.x
 	var gravity_percent := tuning.y
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
+	if prewarm:
+		for frame in 10:
+			await process_frame
 	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = launch_percent
 	lab.get_node("HUD/RagdollTuning/Gravity/Slider").value = gravity_percent
 	var corner: Node3D
