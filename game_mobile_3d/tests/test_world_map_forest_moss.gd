@@ -17,7 +17,7 @@ func run() -> void:
 	root.add_child(world)
 	current_scene = world
 	await process_frame
-	var moss := world.get_node_or_null("ForestLedgeMoss")
+	var moss := world.get_node_or_null("ForestLedgeMoss") as Node3D
 	var toggle := world.find_child("ForestLedgeMossToggle", true, false) as CheckButton
 	if fallback:
 		check(moss == null and toggle == null, "An unconfigured map adds no moss or settings row")
