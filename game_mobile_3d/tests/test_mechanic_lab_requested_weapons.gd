@@ -586,7 +586,7 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 			check(highest_pitch - lowest_pitch > deg_to_rad(23.0),
 				"The crossbow follows the Actions & Stuff run sway")
 			check(lowest_muzzle > 0.28 and highest_muzzle < 0.90,
-				"The running grip stays in a low carry while swaying (%.3fâ€“%.3f m)" % [lowest_muzzle, highest_muzzle])
+				"The running grip stays in a low carry while swaying (%.3f–%.3f m)" % [lowest_muzzle, highest_muzzle])
 			check(support_drift < 0.015,
 				"The support hand stays seated on the crossbow throughout the running sway")
 			var motion = player.hybrid_motion
