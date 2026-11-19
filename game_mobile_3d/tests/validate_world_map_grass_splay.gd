@@ -60,7 +60,7 @@ func run()->void:
 	var restored:=vertices(p)
 	check(restored==upright,"OFF restores exact previous upright patches")
 	p.set_grass_splay(true)
-	check(p.instance_count==8418 and p.flower_colors.is_empty(),"Density and grass-only selection preserved")
+	check(p.instance_count+p.fern_reserved_cells.size()==8418 and p.flower_colors.is_empty(),"Density and grass-only selection preserved")
 	check(AudioServer.is_bus_mute(0) and w.player.active_clip=="Idle","Muted grounded startup preserved")
 	print("GRASS_SPLAY_RESULT ",JSON.stringify({"failures":failures,"max_edge_error_m":max_length_error,"max_angle_error_rad":max_angle_error,"min_ground_m":min_ground,"min_bent_ground_m":min_bent_ground,"shape":p.grass_splay.snapshot()}))
 	w.free();await process_frame;await create_timer(.2).timeout;quit(0 if failures.is_empty() else 1)

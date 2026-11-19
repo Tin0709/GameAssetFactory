@@ -55,10 +55,8 @@ func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atla
 				return false
 			origin += outward * .29
 			origin.y -= .05
-			basis = basis.scaled(Vector3.ONE * .72)
 		elif variant < 2:
-			origin.y -= .028 if variant == 1 else .008
-			basis = basis.scaled(Vector3.ONE * .76)
+			origin.y -= .035 if variant == 1 else .008
 		occupied[cell] = true
 		if not batches.has(variant):
 			batches[variant] = []
@@ -110,8 +108,8 @@ func configure_wall_vines(world: Node3D, placements: PackedVector3Array) -> bool
 			continue
 		# The source strip starts at (0,0,0) and extends along +Z. Hang it down
 		# the face and keep it within one stone column and clear of the lower floor.
-		var length_scale := minf(.58, (drop - .16) / 3.)
-		var basis := yaw * Basis(Vector3.RIGHT, PI * .5) * Basis.from_scale(Vector3(.82, 1., length_scale))
+		var fit := minf(1., (drop - .16) / 3.)
+		var basis := yaw * Basis(Vector3.RIGHT, PI * .5) * Basis.from_scale(Vector3.ONE * fit)
 		var origin := anchor + outward * .53 - basis.x * .5 - Vector3.UP * .03
 		poses.append(Transform3D(basis, origin))
 		occupied[cell] = true

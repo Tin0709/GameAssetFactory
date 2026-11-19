@@ -24,7 +24,7 @@ func run()->void:
 	p.set_dense_review(false)
 	for m:ShaderMaterial in p.materials:check(m.get_shader_parameter("review_source_wind")==false,"Prior flower study preserves motion")
 	p.set_dense_review(true)
-	check(p.instance_count==8418 and p.grass_splay_active(),"Approved density and spread preserved")
+	check(p.instance_count+p.fern_reserved_cells.size()==8418 and p.grass_splay_active(),"Dense grass and fern clearings preserve the approved coverage")
 	check(AudioServer.is_bus_mute(0) and w.player.active_clip=="Idle","Quiet grounded startup preserved")
 	check_shadow_wind(w, p)
 	print("GRASS_WIND_RESULT ",JSON.stringify({"failures":failures,"wind":p.grass_wind.snapshot()}))

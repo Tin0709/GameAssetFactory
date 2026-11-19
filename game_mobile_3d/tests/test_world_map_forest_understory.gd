@@ -42,6 +42,7 @@ func run() -> void:
 					mushrooms[batch.name] = {}
 				for index in batch.multimesh.instance_count:
 					var pose := batch.multimesh.get_instance_transform(index)
+					check(pose.basis.get_scale().is_equal_approx(Vector3.ONE), "Forest understory uses the original mesh scale")
 					var center := (pose * batch.multimesh.mesh.get_aabb()).get_center()
 					sectors[Vector2i(signf(center.x), signf(center.z))] = true
 					var slot := Vector2i(floori(center.x), floori(center.z))

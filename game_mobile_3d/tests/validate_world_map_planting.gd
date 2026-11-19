@@ -15,7 +15,8 @@ func run()->void:
 	check(plants.get("dense_grass_review")==true,"Dense grass-only review is the current default")
 	if plants.get("dense_grass_review")==true:
 		check(plants.flower_colors.is_empty(),"No flowers in dense review")
-		check(plants.placements.size()==plants.eligible_grass_cells,"Every supported grass block covered; dirt excluded")
+		check(plants.placements.size()+plants.fern_reserved_cells.size()==plants.eligible_grass_cells,
+			"Every grass block either has a plant or supports a wide fern; dirt excluded")
 		var roots:Dictionary={};var full_scale:=true;var supported:=true
 		for row:Dictionary in plants.placements:
 			check(not roots.has(row.cell),"One dense patch root per block")

@@ -133,6 +133,8 @@ func test_wall(world: Node3D, wall: Node3D, toggle: CheckButton) -> void:
 		var ahead := behind + outward
 		var drop: float = world.surface_height(behind.x, behind.z) - world.surface_height(ahead.x, ahead.z)
 		check(drop >= 1. and pose.basis.z.length() * 3. < drop, "Every vine fits its stone drop above the lower floor")
+		var scale := pose.basis.get_scale()
+		check(scale.is_equal_approx(Vector3.ONE * minf(1., (drop - .16) / 3.)), "Vines preserve the source width-to-length ratio")
 		sectors[Vector2i(signf(behind.x), signf(behind.z))] = true
 	check(batch.multimesh.instance_count == world.forest_wall_vine_placements.size() and sectors.size() == 4,
 		"Wall vines cover all four map sectors at every authored anchor")
