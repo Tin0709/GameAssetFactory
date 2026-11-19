@@ -37,7 +37,7 @@ static func load_into(bundle: RefCounted) -> Array[String]:
 		var mesh := load_mesh(path, material)
 		if mesh == null:
 			return []
-		var key := "MD2 | " + path.get_file().get_basename()
+		var key := "ForestA1 | " + path.get_file().get_basename()
 		if loaded.has(key):
 			return []
 		names.append(key)
