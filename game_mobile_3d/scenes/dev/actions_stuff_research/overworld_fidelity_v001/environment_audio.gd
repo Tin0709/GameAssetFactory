@@ -193,7 +193,7 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		var db := float(config.get("landing_db", -9.0)) if landed else float(config.get("footsteps_db", -14.0))
 		var cue := "land_" + key if landed and not groups.get("land_" + key, []).is_empty() else key
 		var slot := _choose_step_slot(landed)
-		if slot >= 0:
+		if slot >= 0 and (not protect_landing_voice or not groups.get(cue, []).is_empty()):
 			_play(cue, step_voices[slot], point, db, 1.0)
 			_step_landing[slot] = landed
 			_step_index = (slot + 1) % step_voices.size()

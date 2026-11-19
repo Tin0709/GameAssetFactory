@@ -8,6 +8,16 @@ const WorldShowcase := preload("res://scripts/world_map_showcase.gd")
 const WorldAmbient := preload("res://scripts/world_map_ambient.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const MovementAudio := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/environment_audio.gd")
+const GRASS_STEP_DIRECTORY := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events/Spicewood/Mobs/Mob_Companion/Blub"
+# The same decoded grass steps used by the optional ambience manifest.
+const GRASS_STEP_SAMPLES := [
+	["563c4a955a79801b18792cdf18540f7174d26422112d031c4c6f234a3b946fc8", 0.4109583333333333],
+	["489163367e0aa59ca62831612dc4d569ba09a81d667d30acf67459410fce708f", 0.5076875],
+	["b620f2dce941577f0187926514650fa0c473002a61d0c0e6d4b04c01e914cb80", 0.42802083333333335],
+	["d69e3759473ca778bbf93e7e8699d3b0b27694947356c5455c08fa126f5adde2", 0.45277083333333334],
+	["4c0e995a7f8493e99a81ac56d9157c7c0d1297e97cdb3949f4ff171d1e918072", 0.5732708333333333],
+	["9ee5b276ce70dac9fd60349f3caf1bfef533d2f87ed4cebacbcdbf978380e05f", 0.5477291666666667],
+]
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
 const ZombieStepDust := preload("res://scripts/mechanic_lab_zombie_step_dust.gd")
 const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
@@ -927,7 +937,7 @@ func _setup_movement_audio() -> void:
 		manifest = research.path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")
 	var bundle := PrivateOverworldBundle.new()
 	bundle.rebase_extracted_audio = true
-	if not bundle.read_audio(manifest, "grass"):
+	if not bundle.read_audio(manifest, "grass") and not _use_local_movement_bank(bundle):
 		return
 	_movement_audio = MovementAudio.new()
 	_movement_audio.name = "MovementAudio"
@@ -935,6 +945,27 @@ func _setup_movement_audio() -> void:
 	_movement_audio.setup(player, null, bundle, _player_foot_contact_at)
 	_movement_audio.landing_contact = _grass_landing_contact_at
 	_movement_audio.protect_landing_voice = true
+
+func _use_local_movement_bank(bundle: PrivateOverworldBundle) -> bool:
+	bundle.root = WeaponSource.research_root().simplify_path().replace("\\", "/").trim_suffix("/")
+	var directory := bundle.root.path_join(GRASS_STEP_DIRECTORY)
+	if not bundle.permitted(directory):
+		return false
+	var grass: Array[Dictionary] = []
+	for i in GRASS_STEP_SAMPLES.size():
+		var name := "sfx_player_stepGrass-%03d_soundWave" % (i + 1)
+		var sample: Array = GRASS_STEP_SAMPLES[i]
+		grass.append({
+			"name": name, "path": directory.path_join(name + ".ogg"),
+			"sha256": sample[0], "seconds": sample[1],
+		})
+	bundle.data = {
+		"audio": {"grass": grass},
+		"audio_config": {"footstep_radius_m": 70.0, "footsteps_db": -8.0, "landing_db": -5.0},
+		"audio_scope": "Checksum-pinned MechanicLab grass media. Native Wwise routing and mix unverified.",
+	}
+	bundle.error = ""
+	return true
 
 func _player_foot_contact_at(sole: Vector3) -> Dictionary:
 	# Audio, dust and wind receive the same planted-foot event in the same tick.
