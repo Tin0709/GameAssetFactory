@@ -821,7 +821,7 @@ func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
 				print("MECHANIC_LAB_BABY_REACTION ", case[2], " peak=", peak)
 	audio.reset()
 	var near_points := [ear + Vector3.FORWARD, ear + Vector3.FORWARD * 2.0, ear + Vector3.FORWARD * 3.0]
-	for strike_index in [4, 3, 2, 1, 0]:
+	for strike_index: int in [4, 3, 2, 1, 0]:
 		var zombie := group.get_child(strike_index % 2) as ZOMBIE
 		zombie.health = 1
 		var point := ear + Vector3.FORWARD * (strike_index + 1.0)
