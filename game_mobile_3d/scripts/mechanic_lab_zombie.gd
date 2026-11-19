@@ -44,7 +44,7 @@ const BABY_DEATH_LAUNCH_SCALE := 0.85
 # Local contact and focus markers derived from the leading hand's swing.
 const BABY_ATTACK_CONTACT := 20.0 / 30.0
 const BABY_ATTACK_FOCUS_END := 18.0 / 30.0
-# First supported source frames and the low-edge centres of the skinned soles.
+# First source frames within 5 mm of the floor and the centres of those sole edges.
 const BABY_STEP_CONTACTS := [Vector3(2.0 / 30.0, -0.117, 0.116), Vector3(8.0 / 30.0, 0.102, 0.083)]
 const MAX_POISE := 28.0
 const POISE_RECOVERY_DELAY := 2.0
