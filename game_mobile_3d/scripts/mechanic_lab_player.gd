@@ -45,7 +45,19 @@ var _bow_aim_tick := -1
 var _bow_aim: Variant
 
 func source_step_dust_size() -> float:
-	var source: String = clips.get(active_clip, {}).get("source_name", "")
+	# Shot and recovery replace the upper body clip while crossbow steps
+	# still use the audio-only locomotion effects.
+	if crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY]:
+		return 0.0
+	var step_clip := active_clip
+	# During a moving attack, the leg pose can advance a separate gait.
+	if step_clip not in GAITS and _gait_cycles_this_tick > 0.0 and source_gait != null:
+		if bow_equipped and step_clip == Bow.ACTION and hybrid_motion != null:
+			step_clip = "Run" if hybrid_motion.run_weight > 0.5 else "Walk"
+		else:
+			var gait: Dictionary = source_gait.state(_animation_motion_speed)
+			step_clip = gait.right if float(gait.weight) > 0.5 else gait.left
+	var source: String = clips.get(step_clip, {}).get("source_name", "")
 	# Use the verified Master effects as the Curved Greatsword fallback.
 	match source:
 		"Player_Master_Run", "Player_2H_Medium_Run":
