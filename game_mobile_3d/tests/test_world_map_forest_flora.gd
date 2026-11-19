@@ -35,6 +35,7 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 	var plants: Node3D = world.showcase.plants
 	var sectors := {}
 	var rooted := {}
+	var reserved: Dictionary = plants.fern_reserved_cells.duplicate()
 	var count := 0
 	var assets := {}
 	for row: Dictionary in plants.placements:
@@ -45,9 +46,19 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 		if not assets.has(row.asset):
 			assets[row.asset] = {}
 		assets[row.asset][Vector2i(signi(row.cell.x), signi(row.cell.y))] = true
-		if not String(row.asset).ends_with("SM_SF_Fern_Small"):
-			check(row.bounds.size.x <= 1. and row.bounds.size.z <= 1.,
-				"New fern fronds fit within the cell occupied by their root")
+		check(is_equal_approx(row.scale, 1.), "Ferns use the source instance scale")
+		var name := String(row.asset)
+		var height := 1.15550654 if name.ends_with("SM_Fern_02_Small") else (1.81440655 if name.ends_with("SM_Fern_01_Large") else 1.)
+		check(absf(row.bounds.size.y - height) < .001, "Fern height matches the source mesh")
+		if height > 1.:
+			var width := 2.1735535 if height < 1.2 else 3.46213865
+			check(absf(maxf(row.bounds.size.x, row.bounds.size.z) - width) < .001,
+				"Wide fronds retain the source width and proportions")
+			var footprint: AABB = row.bounds.grow(.08)
+			for x in range(floori(footprint.position.x), floori(footprint.end.x) + 1):
+				for z in range(floori(footprint.position.z), floori(footprint.end.z) + 1):
+					check(Vector2i(x, z) == row.cell or reserved.has(Vector2i(x, z)),
+						"Full-sized ferns have clearance for their fronds")
 		count += 1
 		sectors[Vector2i(signi(row.cell.x), signi(row.cell.y))] = true
 		var pixel := Vector2i(Vector2(row.cell) - world.look.path_map_origin)
@@ -58,6 +69,8 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 			"Fern roots rest on the terrain")
 	check(count == 88 and assets.size() == 3 and sectors.size() == 4,
 		"Three fern shapes occupy 88 authored cells across all four sectors")
+	check(reserved.size() > 300 and rooted.size() + reserved.size() == plants.eligible_grass_cells,
+		"Only the clearings under source-sized fronds are removed from the carpet")
 	for asset: String in assets:
 		check(assets[asset].size() == 4, "Each fern shape grows in all four sectors")
 		var material: ShaderMaterial = plants.bundle.meshes[asset].surface_get_material(0)
@@ -75,10 +88,10 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 	var revision: int = spring.revision
 	check(not spring.active.is_empty(), "The test generates live plant contact")
 	toggle.button_pressed = false
-	check(plants.placements.size() == rooted.size(), "Toggling ferns keeps the dense carpet")
+	check(plants.placements.size() == rooted.size() + reserved.size(), "Disabling ferns restores the carpet under their fronds")
 	for row: Dictionary in plants.placements:
 		var before: Dictionary = rooted.get(row.cell, {})
-		check(not before.is_empty() and not row.get("forest_fern", false), "The former fern cells return to grass")
+		check((not before.is_empty() or reserved.has(row.cell)) and not row.get("forest_fern", false), "The former fern cells return to grass")
 		if not before.is_empty() and not before.get("forest_fern", false):
 			check(row.asset == before.asset and row.bounds == before.bounds, "Toggling ferns preserves other plants")
 	toggle.button_pressed = true

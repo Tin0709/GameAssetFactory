@@ -36,9 +36,11 @@ func run() -> void:
 			var map_pixel := Vector2i(Vector2(row.cell) - world.look.path_map_origin)
 			var path_mask := int(roundf(world.look.path_map_image.get_pixelv(map_pixel).r)) & 255
 			check(path_mask == 0 and absf(surface - row.bounds.position.y) < .002, "Every added asset sits on its grass block off the path")
-			check(row.bounds.size.y > .7 and row.bounds.size.y < 1.8, "Cover grass is proportional to the player")
+			var source_height := 2. if String(row.asset).ends_with("SM_FA1_TallGrass_Cover") else 1.
+			check(absf(row.bounds.size.y - source_height) < .002, "Cover grass uses its source height in metres")
 		check(by_asset.size() == 3 and quadrants.size() >= 4, "Medium and tall ForestA1 species appear across the map")
-		check(occupied.size() == plants.eligible_grass_cells, "Dense coverage stays consistent")
+		check(occupied.size() + plants.fern_reserved_cells.size() == plants.eligible_grass_cells,
+			"Dense coverage accounts for the clearings under wide ferns")
 		for asset: String in by_asset:
 			var material: ShaderMaterial = plants.bundle.meshes[asset].surface_get_material(0)
 			check(material.get_shader_parameter("native_grass_albedo") == true, "The plant uses verified Forest atlas color")

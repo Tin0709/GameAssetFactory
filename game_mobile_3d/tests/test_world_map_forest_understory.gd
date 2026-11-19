@@ -49,6 +49,9 @@ func run() -> void:
 					cells[slot] = batch.name
 					if mushroom:
 						mushrooms[batch.name][Vector2i(signf(center.x), signf(center.z))] = true
+						check(pose.basis.get_scale().is_equal_approx(Vector3.ONE)
+							and absf(batch.multimesh.mesh.get_aabb().size.y - .4375) < .001,
+							"Mushrooms retain the original MD2 mesh scale")
 						var ground: float = world.surface_height(pose.origin.x, pose.origin.z)
 						check(is_equal_approx(pose.origin.y, ground), "Mushrooms are seated on the rock cap")
 						check(batch.multimesh.get_instance_custom_data(index) == Color(0., 0., 0., 0.),
