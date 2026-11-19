@@ -824,8 +824,9 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 		var obstacle := collision.get_collider() as CollisionObject3D
 		var living_blocker := obstacle is CharacterBody3D and obstacle.get_parent() == get_parent() \
 			and (obstacle.collision_layer & LIVING_ZOMBIE_LAYER) != 0
+		var fixed_blocker := obstacle is StaticBody3D or (obstacle is RigidBody3D and obstacle.freeze)
 		var normal := collision.get_normal().slide(Vector3.UP)
-		if (not obstacle is StaticBody3D and not living_blocker) \
+		if (not fixed_blocker and not living_blocker) \
 				or obstacle == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
 			continue
 		var space := get_world_3d().direct_space_state
