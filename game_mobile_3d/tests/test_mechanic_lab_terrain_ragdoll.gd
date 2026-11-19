@@ -383,7 +383,7 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 
 func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true, landing_gravity := -1.0,
 		max_anchor_gap := INF, strike: Zombie.DeathStrike = Zombie.DeathStrike.SABRE_FINISHER,
-		strength := 1150.0, shared_wall := false, bevel := CornerBevel.NONE) -> void:
+		strength := 1150.0, shared_wall := false, bevel := CornerBevel.NONE, tuning := Vector2.ONE) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -419,6 +419,8 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 	for i in 2:
 		zombie.ragdoll.sample(1.0 / 60.0)
 	var direction := Vector3(1, 0, 1).normalized().rotated(Vector3.UP, rng.randf_range(-0.18, 0.18))
+	zombie.ragdoll_launch_multiplier = tuning.x
+	zombie.ragdoll_gravity_multiplier = tuning.y
 	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, strength, strike)
 	zombie.set_physics_process(true)
 	var last_simulated: Array[Transform3D] = []
@@ -461,7 +463,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 			corner_samples += 1
 			missed_corner_samples += int(not zombie.ragdoll.has_flat_corner_brace())
 	check(walls_hit.size() == 2 and farthest < 4.65,
-		"The ragdoll meets both faces of the closed corner and stays on the near side")
+		"The corner ragdoll %d meets both faces and stays on the near side" % seed)
 	check(zombie._corpse_parked == should_settle and (not should_settle or zombie.ragdoll.bodies.is_empty()),
 		"The corner ragdoll %d has the expected rest state" % seed)
 	if bevel == CornerBevel.SUPPORT:
@@ -520,6 +522,9 @@ func run() -> void:
 		1150.0, true, CornerBevel.SUPPORT)
 	await check_corner_ragdoll(141, 2.0, true, -1.0, 0.18, Zombie.DeathStrike.SABRE_FINISHER,
 		1150.0, true, CornerBevel.PINCHED_ARM)
+	for seed: int in [5, 13, 36, 43]:
+		await check_corner_ragdoll(seed, 0.40, false, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
+			1150.0, true, CornerBevel.NONE, Vector2(10.0, 10.0))
 	await check_wall_rebound(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,
