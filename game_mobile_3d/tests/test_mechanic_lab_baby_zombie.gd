@@ -287,6 +287,14 @@ func check_lower_wall_edge(lab: Node3D, group: Node) -> void:
 	var moved: Vector3 = baby.ragdoll._slide_baby_corner_part(leg, state, box.size * 0.5,
 		correction, 0.0, floor.get_rid())
 	check(moved.x < -0.18 and moved.y >= 0.0, "The leg can withdraw from the lower wall edge above the floor")
+	# This pose hits the underside with a purely vertical contact normal.
+	var underside_basis := Basis(Vector3(0.136516, 0.244008, -0.960117),
+		Vector3(0.976023, 0.132734, 0.172511), Vector3(0.169534, -0.960647, -0.220037)).orthonormalized()
+	state.transform = Transform3D(underside_basis, Vector3(4.364025, 0.088364, 44.055260))
+	var underside: Vector3 = baby.ragdoll._slide_baby_corner_part(leg, state, box.size * 0.5,
+		Vector3(-0.291128, 0.186346, 0.054950), 0.0, floor.get_rid())
+	check(underside.x < -0.20 and underside.y >= 0.0,
+		"The leg can withdraw from the wall's underside without a horizontal contact normal")
 	var obstruction := StaticBody3D.new()
 	var collider := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
@@ -301,7 +309,7 @@ func check_lower_wall_edge(lab: Node3D, group: Node) -> void:
 	var blocked: Vector3 = baby.ragdoll._slide_baby_corner_part(leg, state, box.size * 0.5,
 		correction, 0.0, floor.get_rid())
 	check(blocked.is_zero_approx(), "A second obstacle prevents the outward leg correction")
-	print("LAB_BABY_LOWER_WALL_EDGE moved=", moved, " blocked=", blocked)
+	print("LAB_BABY_LOWER_WALL_EDGE moved=", moved, " underside=", underside, " blocked=", blocked)
 
 
 func add_contact_corner(lab: Node3D, yaw: float) -> Node3D:
