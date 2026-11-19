@@ -14,6 +14,6 @@ void fragment() {
 	float opacity = hit_flash * 0.88;
 	AO = 1.0 - opacity;
 	AO_LIGHT_AFFECT = 1.0;
-	EMISSION = vec3(3.2, 1.93, 0.70) * opacity;
+	EMISSION = vec3(flash_red, 1.93, 0.70) * opacity;
 #endif
 }

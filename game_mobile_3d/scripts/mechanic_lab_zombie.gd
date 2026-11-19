@@ -1014,6 +1014,8 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 	if _flash_left <= 0.0:
 		if _lab_flash_skin != null:
 			_mesh.material_override = _lab_flash_skin
+			# The normalized Mobile buffer clips the old overlay before blending.
+			_mesh.set_instance_shader_parameter(&"flash_red", 3.2 if get_viewport().use_hdr_2d else 2.0)
 		else:
 			_mesh.material_overlay = _flash_material
 	_mesh.set_instance_shader_parameter("hit_flash", 1.0)
