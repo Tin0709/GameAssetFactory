@@ -274,6 +274,7 @@ const ZOMBIE_ONSET_SECONDS := 0.05
 const ZOMBIE_WINDUP_GAIN_DB := -16.0
 const ZOMBIE_HIT_GAIN_DB := -14.0
 const PLAYER_HURT_GAIN_DB := -14.0
+const PLAYER_HURT_ONSET_SECONDS := 0.05
 const PLAYER_DEFEAT_GAIN_DB := -16.0
 const ZOMBIE_STEP_GAIN_DB := -21.0
 const ZOMBIE_STEP_DISTANCE := 12.0
@@ -608,7 +609,9 @@ func player_hurt() -> void:
 	if not enabled or _player_hurt_voice == null:
 		return
 	var frame := Engine.get_physics_frames()
-	if _player_hurt_frame == frame:
+	# Several hits can arrive before the local voice has mixed its onset.
+	if (_player_hurt_frame == frame or (_player_hurt_voice.playing
+			and _player_hurt_voice.get_playback_position() < PLAYER_HURT_ONSET_SECONDS)):
 		return
 	var stream := _next_stream(&"player_hurt")
 	if stream != null:
