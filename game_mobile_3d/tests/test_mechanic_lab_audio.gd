@@ -455,9 +455,14 @@ func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffec
 	var grass_samples: Array = audio._groups[&"slam_grass"]
 	var first_choice: int = audio._next_choice.get(&"slam_grass", 0)
 	var weapon_voices: Array[AudioStreamPlayer3D] = []
+	var weapon_buses: Array[StringName] = []
 	for i in COMBAT_AUDIO.VOICES_PER_POOL:
-		weapon_voices.append(audio._play(&"hit", point, -9.0, -1, true))
-	check(weapon_voices.all(func(voice): return voice != null and voice.playing),
+		var voice: AudioStreamPlayer3D = audio._play(&"hit", point, -9.0, -1, true)
+		if voice != null:
+			weapon_voices.append(voice)
+			weapon_buses.append(voice.bus)
+			voice.bus = &"Master"
+	check(weapon_voices.size() == COMBAT_AUDIO.VOICES_PER_POOL and weapon_voices.all(func(voice): return voice.playing),
 		"The weapon pool is filled with three pending hit onsets")
 	var second_point := point + Vector3.RIGHT
 	audio.slam_landed(point)
@@ -480,7 +485,7 @@ func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffec
 		await physics_frame
 		for sample in capture.get_buffer(capture.get_frames_available()):
 			peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
-		if peak > 0.001:
+		if peak > 0.001 and layers.all(func(voice): return voice.get_playback_position() > 0.0):
 			break
 	check(not layers.is_empty() and layers.all(func(voice): return voice.get_playback_position() > 0.0)
 		and peak > 0.001 and peak < 0.9, "Heavy landing debris alone reaches the silent mixer")
@@ -489,6 +494,8 @@ func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffec
 		"Mute clears every active heavy ground contact")
 	for voice: AudioStreamPlayer3D in layers:
 		voice.bus = &"Master"
+	for i in weapon_voices.size():
+		weapon_voices[i].bus = weapon_buses[i]
 	print("MECHANIC_LAB_HEAVY_SURFACE layers=", layers.size(), " peak=", peak)
 
 func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
@@ -566,7 +573,7 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 			check(swing_frame == landings[attempt] + swing_ticks and swing.played_count == before_swing + 1,
 				"Sabre plays one swing at the first authored post-audio key after landing")
 			var touchdown := touchdown_points[attempt]
-			var grass_voices := audio.get_children().filter(func(voice):
+			var grass_voices: Array = audio.get_children().filter(func(voice):
 				return voice is AudioStreamPlayer3D and voice.stream in audio._groups[&"slam_grass"])
 			check(grass_voices.size() == 1 and grass_voices[0].global_position.is_equal_approx(
 				Vector3(touchdown.x, 0.0, touchdown.z)),
