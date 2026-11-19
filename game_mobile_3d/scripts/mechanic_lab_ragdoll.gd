@@ -236,11 +236,14 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		wall_handoff_animation.pause()
 	# Collision depends only on the sampled bones and their ancestors.
 	var collision_bones := PackedInt32Array()
+	var parent_bones := PackedInt32Array()
 	for sampled_bone in _sample_bone_ids:
 		var bone := sampled_bone
 		while bone >= 0 and not collision_bones.has(bone):
 			collision_bones.append(bone)
 			bone = skeleton.get_bone_parent(bone)
+			if bone >= 0 and not parent_bones.has(bone):
+				parent_bones.append(bone)
 	collision_bones.sort()
 
 	# Search from the least visible correction. Interpolate the remaining
@@ -248,6 +251,7 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 	var selected_weight := 1.0
 	var shift := Vector3.ZERO
 	var shift_known := true
+	var rays_clear := false
 	for idle_weight: float in [0.25, 0.50, 0.75, 1.0]:
 		selected_weight = idle_weight
 		for bone in collision_bones:
@@ -263,11 +267,12 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		shift = _solve_handoff_clearance(_find_clear_handoff_parts(region, floor_bounds, wall_bounds))
 		shift_known = true
 		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift, "", {}):
+			rays_clear = true
 			break
 	for bone in source.size():
 		if not collision_bones.has(bone):
 			skeleton.set_bone_pose(bone, source[bone].interpolate_with(idle[bone], selected_weight))
-	return _preserve_wall_handoff_branches(space, collision_mask, source, shift)
+	return _preserve_wall_handoff_branches(space, collision_mask, source, shift, parent_bones, rays_clear)
 
 func _handoff_floor_bounds() -> AABB:
 	var floor := _flat_floor.get_parent() as StaticBody3D
@@ -350,23 +355,51 @@ func _wall_blocks_every_handoff_shift(space: PhysicsDirectSpaceState3D, collisio
 	return false
 
 func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision_mask: int,
-		source: Array[Transform3D], shift: Vector3) -> Vector3:
+		source: Array[Transform3D], shift: Vector3, parent_bones: PackedInt32Array, rays_clear: bool) -> Vector3:
 	# Keep source rotation on branches that can move without reopening the overlap.
 	# The ray origin, shift, mask and terrain stay fixed throughout this search.
+	var skeleton_transform := skeleton.global_transform
+	var origin := skeleton_transform.origin + shift
+	_handoff_ray.collision_mask = collision_mask
 	var wall_crossings: Dictionary[Vector3, bool] = {}
 	for name in ["Head", "Arm.L", "Arm.R", "Leg.L", "Leg.R"]:
-		var bone: int = bodies[name].get_bone_id()
+		var body: PhysicalBone3D = bodies[name]
+		var bone := body.get_bone_id()
 		var safe_pose := skeleton.get_bone_pose(bone)
+		# From a verified pose, a terminal branch can only change its own ray.
+		var sample_index := _sample_names.find(name)
+		var independent_part := sample_index >= 0 and not parent_bones.has(bone) \
+			and _sample_bone_ids.count(bone) == 1
+		var check_single_part := rays_clear and independent_part
+		var start_rotation := safe_pose.basis.get_rotation_quaternion()
+		var target_rotation := source[bone].basis.get_rotation_quaternion()
+		var scale := Basis.from_scale(safe_pose.basis.get_scale())
 		for weight: float in [1.0, 0.5, 0.25]:
-			var rotation := safe_pose.basis.get_rotation_quaternion().slerp(
-				source[bone].basis.get_rotation_quaternion(), weight)
-			var basis := Basis(rotation) * Basis.from_scale(safe_pose.basis.get_scale())
+			var basis := Basis(start_rotation.slerp(target_rotation, weight)) * scale
 			skeleton.set_bone_pose(bone, Transform3D(basis, safe_pose.origin))
-			sample(sample_delta)
-			if _wall_handoff_is_clear(space, collision_mask, shift, name, wall_crossings):
+			var clear := false
+			if check_single_part:
+				var pose := skeleton_transform * skeleton.get_bone_global_pose(bone) \
+					* _sample_body_offsets[sample_index]
+				clear = not _wall_ray_crosses(space, origin, pose.origin, shift, 0.0, wall_crossings) \
+					and _wall_handoff_part_is_clear(space, body, pose.translated(shift))
+			else:
+				sample(sample_delta)
+				clear = _wall_handoff_is_clear(space, collision_mask, shift, name, wall_crossings)
+			if clear:
 				safe_pose = skeleton.get_bone_pose(bone)
+				rays_clear = true
 				break
 		skeleton.set_bone_pose(bone, safe_pose)
+		# Writing the pose can round its basis. Refresh the affected ray
+		# before using the restored branch as evidence for the next one.
+		if rays_clear:
+			if independent_part:
+				var pose := skeleton_transform * skeleton.get_bone_global_pose(bone) \
+					* _sample_body_offsets[sample_index]
+				rays_clear = not _wall_ray_crosses(space, origin, pose.origin, shift, 0.0, wall_crossings)
+			else:
+				rays_clear = skeleton.get_bone_pose(bone) == safe_pose
 	# Both snapshots must agree so the correction itself doesn't become a launch impulse.
 	sample(sample_delta)
 	sample(sample_delta)
@@ -376,42 +409,52 @@ func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: in
 		shift: Vector3, changed_part: String, wall_crossings: Dictionary[Vector3, bool]) -> bool:
 	if _handoff_straddles_wall(space, collision_mask, shift, 0.0, wall_crossings):
 		return false
+	if not changed_part.is_empty():
+		var pose: Transform3D = current[changed_part]
+		return _wall_handoff_part_is_clear(space, bodies[changed_part], pose.translated(shift))
 	for name: String in current:
-		if not changed_part.is_empty() and name != changed_part:
-			continue
 		var pose: Transform3D = current[name]
-		var points := _terrain_contacts_at(bodies[name], space, pose.translated(shift))
-		for i in range(0, points.size(), 2):
-			var separation := points[i + 1] - points[i]
-			var depth := separation.length()
-			if depth > HANDOFF_WALL_REST_OVERLAP and absf(separation.y) < depth * 0.7:
-				return false
+		if not _wall_handoff_part_is_clear(space, bodies[name], pose.translated(shift)):
+			return false
+	return true
+
+func _wall_handoff_part_is_clear(space: PhysicsDirectSpaceState3D, body: PhysicalBone3D, pose: Transform3D) -> bool:
+	var points := _terrain_contacts_at(body, space, pose)
+	for i in range(0, points.size(), 2):
+		var separation := points[i + 1] - points[i]
+		var depth := separation.length()
+		if depth > HANDOFF_WALL_REST_OVERLAP and absf(separation.y) < depth * 0.7:
+			return false
 	return true
 
 func _handoff_straddles_wall(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		shift: Vector3, tolerance: float, wall_crossings: Dictionary[Vector3, bool]) -> bool:
-	# This query is synchronous; the next ragdoll can reuse the parameters.
-	var ray := _handoff_ray
-	ray.collision_mask = collision_mask
+	# The synchronous query can reuse its parameters for the next body.
+	_handoff_ray.collision_mask = collision_mask
 	var origin := skeleton.global_position + shift
 	for pose: Transform3D in current.values():
-		var crosses: Variant = wall_crossings.get(pose.origin)
-		if crosses == null:
-			var start := Vector3(origin.x, pose.origin.y, origin.z)
-			var finish := pose.origin + shift
-			crosses = false
-			if start.distance_squared_to(finish) > SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
-				ray.from = start
-				ray.to = finish
-				var hit := space.intersect_ray(ray)
-				if not hit.is_empty() and hit.collider is StaticBody3D:
-					var normal: Vector3 = hit.normal
-					var point: Vector3 = hit.position
-					crosses = absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - finish) > tolerance
-			wall_crossings[pose.origin] = crosses
-		if crosses:
+		if _wall_ray_crosses(space, origin, pose.origin, shift, tolerance, wall_crossings):
 			return true
 	return false
+
+func _wall_ray_crosses(space: PhysicsDirectSpaceState3D, origin: Vector3, endpoint: Vector3,
+		shift: Vector3, tolerance: float, wall_crossings: Dictionary[Vector3, bool]) -> bool:
+	var cached: Variant = wall_crossings.get(endpoint)
+	if cached != null:
+		return cached
+	var start := Vector3(origin.x, endpoint.y, origin.z)
+	var finish := endpoint + shift
+	var crosses := false
+	if start.distance_squared_to(finish) > SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
+		_handoff_ray.from = start
+		_handoff_ray.to = finish
+		var hit := space.intersect_ray(_handoff_ray)
+		if not hit.is_empty() and hit.collider is StaticBody3D:
+			var normal: Vector3 = hit.normal
+			var point: Vector3 = hit.position
+			crosses = absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - finish) > tolerance
+	wall_crossings[endpoint] = crosses
+	return crosses
 
 func _terrain_contacts_at(body: PhysicalBone3D, space: PhysicsDirectSpaceState3D, pose: Transform3D) -> Array[Vector3]:
 	var query: PhysicsShapeQueryParameters3D = _handoff_query_snapshot.get(body)
