@@ -26,5 +26,44 @@ func run()->void:
 	p.set_dense_review(true)
 	check(p.instance_count==8418 and p.grass_splay_active(),"Approved density and spread preserved")
 	check(AudioServer.is_bus_mute(0) and w.player.active_clip=="Idle","Quiet grounded startup preserved")
+	check_shadow_wind(w, p)
 	print("GRASS_WIND_RESULT ",JSON.stringify({"failures":failures,"wind":p.grass_wind.snapshot()}))
 	w.free();await process_frame;await create_timer(.2).timeout;quit(0 if failures.is_empty() else 1)
+
+func check_shadow_wind(world: Node, plants: Node3D) -> void:
+	if not plants.grass_light.active:
+		return
+	var showcase: Node = world.showcase
+	var id := &"day_grass_shadow_wind"
+	var control: HSlider = showcase._settings._sliders.get(String(id))
+	check(control != null and control.editable and is_equal_approx(control.value, 1.),
+		"Forest exposes the default grass shadow motion control")
+	for hour: float in [7., 12., 16.5, 19.5, 22.]:
+		showcase.set_hour(hour)
+		plants.grass_light.sync()
+		var expected := .5 if hour in [7., 16.5] else 1.
+		check(shadow_wind_matches(plants, expected), "Grass shadow wind at %s" % hour)
+	showcase.set_hour(16.5)
+	showcase.set_lighting_scale(id, .4)
+	check(shadow_wind_matches(plants, .8), "The existing live controls refresh the shadow motion")
+	var path := "user://grass_shadow_wind_%s.cfg" % OS.get_process_id()
+	var config := ConfigFile.new()
+	check(showcase.save_lighting_mix(path) == OK and config.load(path) == OK, "The control can be saved")
+	check(config.get_value("recipe", "version", 0) == 210
+		and is_equal_approx(float(config.get_value("strengths", id, 0.)), .4), "Recipe stores the amount")
+	showcase.set_lighting_scale(id, 0.)
+	check(shadow_wind_matches(plants, 1.), "Zero restores full shadow motion")
+	check(showcase.load_lighting_mix(path) == OK and shadow_wind_matches(plants, .8), "New recipe restores its adjustment")
+	config.set_value("recipe", "version", 209)
+	if config.has_section_key("strengths", id):
+		config.erase_section_key("strengths", id)
+	check(config.save(path) == OK and showcase.load_lighting_mix(path) == OK
+		and shadow_wind_matches(plants, 1.), "Legacy recipe keeps full shadow motion")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+func shadow_wind_matches(plants: Node3D, expected: float) -> bool:
+	for record: Dictionary in plants.grass_light._records:
+		var value: Variant = record.material.get_shader_parameter("study_grass_shadow_wind")
+		if value == null or not is_equal_approx(float(value), expected):
+			return false
+	return true
