@@ -18,6 +18,8 @@ func run() -> void:
 	check(plants != null and plants.has_method("set_forest_cover"), "F5 Forest can toggle the extra source plants")
 	if plants != null and plants.has_method("set_forest_cover"):
 		var batches: int = plants.batch_count
+		var toggle := world.find_child("ForestCoverGrass", true, false) as CheckButton
+		check(toggle != null and toggle.button_pressed, "The real settings menu exposes the enabled default")
 		var by_asset := {}
 		var occupied := {}
 		var quadrants := {}
@@ -43,14 +45,20 @@ func run() -> void:
 			if plants.grass_light.supported():
 				check(plants.grass_light._records.any(func(row: Dictionary) -> bool: return row.material == material),
 					"Every ForestA1 species uses the shared grass lighting pipeline")
-		plants.set_forest_cover(false)
+		if toggle != null:
+			toggle.button_pressed = false
+		else:
+			plants.set_forest_cover(false)
 		check(plants.placements.size() == occupied.size(), "Disabling replaces the variants with regular dense grass")
 		check(batches <= plants.batch_count + by_asset.size(), "Sparse additions use one batch per species")
 		for row: Dictionary in plants.placements:
 			if saved.has(row.cell):
 				var before: Dictionary = saved[row.cell]
 				check(row.asset == before.asset and row.root == before.root and row.bounds == before.bounds, "A/B keeps other plant transforms")
-		plants.set_forest_cover(true)
+		if toggle != null:
+			toggle.button_pressed = true
+		else:
+			plants.set_forest_cover(true)
 		check(plants.snapshot().get("forest_cover_species", {}) == by_asset, "Restoring cover is deterministic")
 	world.free()
 	await process_frame

@@ -20,7 +20,10 @@ func run()->void:
 	var upright:=vertices(p)
 	p.set_grass_splay(true)
 	var fan:=vertices(p)
-	for material:ShaderMaterial in p.materials:check(material.get_shader_parameter("splayed_rest_motion")==true,"Wind/contact accounts for pitched rest geometry")
+	for material: ShaderMaterial in p.materials:
+		var native_cover: bool = material.get_shader_parameter("native_grass_albedo") == true
+		check(material.get_shader_parameter("splayed_rest_motion") == not native_cover,
+			"Wind/contact follows pitched fans and the original Forest cover geometry")
 	var max_length_error:=0.;var max_angle_error:=0.;var min_ground:=INF;var min_bent_ground:=INF
 	for variant in 6:
 		var a:PackedVector3Array=upright[variant];var b:PackedVector3Array=fan[variant]

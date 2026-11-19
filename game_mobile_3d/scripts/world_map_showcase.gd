@@ -4469,6 +4469,7 @@ func _build_ui()->void:
 		density.focus_mode=Control.FOCUS_NONE;box.add_child(density);density.toggled.connect(plants.set_dense_review)
 		if not plants.forest_cover_species.is_empty():
 			var cover := CheckButton.new()
+			cover.name = "ForestCoverGrass"
 			cover.text = "Cỏ phủ đất Forest"
 			cover.button_pressed = plants.forest_cover_enabled
 			cover.focus_mode = Control.FOCUS_NONE

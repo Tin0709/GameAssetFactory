@@ -16,6 +16,7 @@ const NAMED := {
 	"SettingsPlayerNote": "player-note",
 	"SettingsTerrainNote": "terrain-note",
 	"GrassEdgeSampling": "grass-edge-sampling",
+	"ForestCoverGrass": "forest-cover-grass",
 	"ForestWeather": "biome-weather",
 	"BiomePreset": "biome-preset",
 	"BiomeQuality": "biome-quality",
