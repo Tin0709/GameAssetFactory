@@ -276,6 +276,7 @@ const PLAYER_HURT := "Player/Hurt/sfx_multi_hit-%03d_soundWave.ogg"
 const PLAYER_DEFEAT := "Player/Death/sfx_playerDeath.ogg"
 const PLAYER_DEFEAT_HASH := "3c15d66e2b2ce0bc571a8bfa3cadc7d532d2f559ecd45e894a0e44d7c2e0882c"
 const VOICES_PER_POOL := 3
+const CROWD_SAMPLE_BUDGET_USEC := 500
 const WEAPON_POOL := 0
 const REACTION_POOL := 1
 const ATTACK_POOL := 2
@@ -393,6 +394,8 @@ var curved_equipped := false
 var gauntlets_equipped := false
 var zombie_listener: AudioListener3D
 var _groups: Dictionary[StringName, Array] = {}
+var _base_sample_jobs: Array[Callable] = []
+var _base_samples_queued := false
 var _voices: Array[AudioStreamPlayer3D] = []
 var _surface_landing_voices: Array[AudioStreamPlayer3D] = []
 var _next_surface_landing_voice := 0
@@ -768,13 +771,49 @@ static func _research_root() -> String:
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	return OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research") if root.is_empty() else root
 
+func queue_crowd_samples() -> void:
+	if OS.has_feature("editor"):
+		_queue_base_samples()
+
+func prepare_queued_samples() -> void:
+	if _base_sample_jobs.is_empty():
+		return
+	var deadline := Time.get_ticks_usec() + CROWD_SAMPLE_BUDGET_USEC
+	for sample in mini(_base_sample_jobs.size(), 2):
+		_base_sample_jobs.pop_front().call()
+		if Time.get_ticks_usec() >= deadline:
+			break
+
+func _queue_base_samples() -> void:
+	if _base_samples_queued:
+		return
+	_base_samples_queued = true
+	var root := _research_root()
+	_queue_series(root, &"hit", SABRE, HIT_HASHES)
+	_queue_series(root, &"sword_hit", SWORD, SWORD_HIT_HASHES)
+	_queue_series(root, &"curved_hit", CURVED, CURVED_HIT_HASHES)
+	_queue_series(root, &"hurt", ZOMBIE.replace("%s", "Hurt"), HURT_HASHES)
+	_queue_series(root, &"death", ZOMBIE.replace("%s", "Death"), DEATH_HASHES)
+	_queue_series(root, &"slam", HEAVY_LANDING, LANDING_HASHES)
+	_queue_series(root, &"slam_grass", SURFACE_LANDING.replace("%s", "Grass"), GRASS_LANDING_HASHES)
+	_queue_series(root, &"player_hurt", PLAYER_HURT, PLAYER_HURT_HASHES)
+	_base_sample_jobs.append(_load_sample.bind(root, &"player_defeat", PLAYER_DEFEAT, PLAYER_DEFEAT_HASH))
+	_queue_series(root, &"zombie_windup", ZOMBIE_ATTACK.replace("%s", "Pre"), ZOMBIE_WINDUP_HASHES)
+	_queue_series(root, &"zombie_hit", ZOMBIE_ATTACK.replace("%s", ""), ZOMBIE_HIT_HASHES)
+	_queue_series(root, &"zombie_step", ZOMBIE_STEP, ZOMBIE_STEP_HASHES)
+	if is_instance_valid(zombie_listener):
+		_queue_series(root, &"zombie_idle", ZOMBIE_IDLE, ZOMBIE_IDLE_HASHES)
+
+func _queue_series(root: String, group: StringName, pattern: String, hashes: Array) -> void:
+	for index in hashes.size():
+		_base_sample_jobs.append(_load_sample.bind(root, group, pattern % (index + 1), hashes[index]))
+
 func _load_audio() -> void:
 	if not OS.has_feature("editor"):
 		return
 	_started_frames.resize(_next_voice.size() * VOICES_PER_POOL)
 	_started_frames.fill(-1)
 	_weapon_onsets.resize(VOICES_PER_POOL)
-	var root := _research_root()
 	# DefaultPlayer routes SW.Audio.Generic.Hurt to SW.Audio.Category.Player.Local.
 	_player_hurt_voice = AudioStreamPlayer.new()
 	_player_hurt_voice.name = "PlayerHurt"
@@ -785,41 +824,19 @@ func _load_audio() -> void:
 	_player_defeat_voice.volume_db = PLAYER_DEFEAT_GAIN_DB
 	add_child(_player_defeat_voice)
 	_create_voices(FLIGHT_POOL * VOICES_PER_POOL)
-	for i in HIT_HASHES.size():
-		_load_sample(root, &"hit", SABRE % (i + 1), HIT_HASHES[i])
-	for i in SWORD_HIT_HASHES.size():
-		_load_sample(root, &"sword_hit", SWORD % (i + 1), SWORD_HIT_HASHES[i])
-	for i in CURVED_HIT_HASHES.size():
-		_load_sample(root, &"curved_hit", CURVED % (i + 1), CURVED_HIT_HASHES[i])
-	for i in HURT_HASHES.size():
-		_load_sample(root, &"hurt", ZOMBIE % ["Hurt", i + 1], HURT_HASHES[i])
-	for i in DEATH_HASHES.size():
-		_load_sample(root, &"death", ZOMBIE % ["Death", i + 1], DEATH_HASHES[i])
-	for i in LANDING_HASHES.size():
-		_load_sample(root, &"slam", HEAVY_LANDING % (i + 1), LANDING_HASHES[i])
-	_load_surface_landing(root, "Grass", &"slam_grass", GRASS_LANDING_HASHES)
+	_queue_base_samples()
+	while not _base_sample_jobs.is_empty():
+		_base_sample_jobs.pop_front().call()
 	if _groups.has(&"slam_grass"):
 		for i in SURFACE_LANDING_VOICE_COUNT:
 			var voice := _new_spatial_voice(SPATIAL_VOICE_DISTANCE)
 			voice.name = "HeavyLandingSurface%d" % (i + 1)
 			_surface_landing_voices.append(voice)
-	for i in PLAYER_HURT_HASHES.size():
-		_load_sample(root, &"player_hurt", PLAYER_HURT % (i + 1), PLAYER_HURT_HASHES[i])
-	_load_sample(root, &"player_defeat", PLAYER_DEFEAT, PLAYER_DEFEAT_HASH)
-	for i in ZOMBIE_WINDUP_HASHES.size():
-		_load_sample(root, &"zombie_windup", ZOMBIE_ATTACK % ["Pre", i + 1], ZOMBIE_WINDUP_HASHES[i])
-	for i in ZOMBIE_HIT_HASHES.size():
-		_load_sample(root, &"zombie_hit", ZOMBIE_ATTACK % ["", i + 1], ZOMBIE_HIT_HASHES[i])
-	for i in ZOMBIE_STEP_HASHES.size():
-		_load_sample(root, &"zombie_step", ZOMBIE_STEP % (i + 1), ZOMBIE_STEP_HASHES[i])
-	if is_instance_valid(zombie_listener):
-		for i in ZOMBIE_IDLE_HASHES.size():
-			_load_sample(root, &"zombie_idle", ZOMBIE_IDLE % (i + 1), ZOMBIE_IDLE_HASHES[i])
-		if _groups.has(&"zombie_idle"):
-			_zombie_idle_voice = _new_spatial_voice(ZOMBIE_IDLE_DISTANCE)
-			_zombie_idle_voice.name = "ZombieIdle"
-			_zombie_idle_voice.volume_db = ZOMBIE_IDLE_GAIN_DB
-			_zombie_idle_voice.max_db = ZOMBIE_IDLE_GAIN_DB
+	if is_instance_valid(zombie_listener) and _groups.has(&"zombie_idle"):
+		_zombie_idle_voice = _new_spatial_voice(ZOMBIE_IDLE_DISTANCE)
+		_zombie_idle_voice.name = "ZombieIdle"
+		_zombie_idle_voice.volume_db = ZOMBIE_IDLE_GAIN_DB
+		_zombie_idle_voice.max_db = ZOMBIE_IDLE_GAIN_DB
 
 func _create_voices(count: int) -> void:
 	for i in count:

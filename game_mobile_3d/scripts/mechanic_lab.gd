@@ -883,6 +883,8 @@ func _process(delta: float) -> void:
 		_combat_audio.flush_zombie_idle()
 	if _crowd_spawns_left > 0:
 		_spawn_crowd_frame()
+	elif _combat_audio != null:
+		_combat_audio.prepare_queued_samples()
 	var focus: Vector3 = presentation.player_position()
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
 	if not _player_overlays.is_empty():
@@ -1259,6 +1261,8 @@ func _spawn_crowd_frame() -> void:
 	if _crowd_spawns_left == 0:
 		_stop_crowd_spawn()
 		$HUD/SpawnStatus.text = "Đã tạo %d zombie." % CROWD_SPAWN_COUNT
+		# Prepare the base audio after the spawn batches have finished.
+		_combat_audio.queue_crowd_samples()
 	else:
 		$HUD/SpawnStatus.text = "Đang tạo zombie… %d/%d" % [CROWD_SPAWN_COUNT - _crowd_spawns_left, CROWD_SPAWN_COUNT]
 
