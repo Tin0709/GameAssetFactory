@@ -448,6 +448,49 @@ func check_weapon_onsets_under_mixed_impacts(audio: Node, bus: int, capture: Aud
 	audio.sword_equipped = false
 	audio.set_enabled(false, point)
 
+func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffectCapture) -> void:
+	audio.set_enabled(true, Vector3.ZERO)
+	audio.reset()
+	var point := Vector3.FORWARD * 2.0
+	var grass_samples: Array = audio._groups[&"slam_grass"]
+	var first_choice: int = audio._next_choice.get(&"slam_grass", 0)
+	var weapon_voices: Array[AudioStreamPlayer3D] = []
+	for i in COMBAT_AUDIO.VOICES_PER_POOL:
+		weapon_voices.append(audio._play(&"hit", point, -9.0, -1, true))
+	check(weapon_voices.all(func(voice): return voice != null and voice.playing),
+		"The weapon pool is filled with three pending hit onsets")
+	var second_point := point + Vector3.RIGHT
+	audio.slam_landed(point)
+	audio.slam_landed(second_point)
+	var layers := audio.get_children().filter(func(child):
+		return child is AudioStreamPlayer3D and child.playing and child.stream in grass_samples)
+	check(layers.size() == 2
+		and layers.any(func(voice): return voice.global_position == point
+			and voice.stream == grass_samples[first_choice])
+		and layers.any(func(voice): return voice.global_position == second_point
+			and voice.stream == grass_samples[(first_choice + 1) % grass_samples.size()]),
+		"Two recent ground contacts reach separate voices with their original positions")
+	check(weapon_voices.all(func(voice): return voice != null and voice.playing and voice.stream in audio._groups[&"hit"]),
+		"The two ground contacts preserve the three pending weapon onsets")
+	capture.clear_buffer()
+	for voice: AudioStreamPlayer3D in layers:
+		voice.bus = AudioServer.get_bus_name(bus)
+	var peak := 0.0
+	for tick in 24:
+		await physics_frame
+		for sample in capture.get_buffer(capture.get_frames_available()):
+			peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+		if peak > 0.001:
+			break
+	check(not layers.is_empty() and layers.all(func(voice): return voice.get_playback_position() > 0.0)
+		and peak > 0.001 and peak < 0.9, "Heavy landing debris alone reaches the silent mixer")
+	audio.set_enabled(false, point)
+	check(layers.all(func(voice): return not voice.playing and voice.stream == null),
+		"Mute clears every active heavy ground contact")
+	for voice: AudioStreamPlayer3D in layers:
+		voice.bus = &"Master"
+	print("MECHANIC_LAB_HEAVY_SURFACE layers=", layers.size(), " peak=", peak)
+
 func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -506,8 +549,12 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 		var playback_frame := -1
 		var dust_frame := -1
 		var swing_frame := -1
+		var debris_frame := landings[attempt] + ceili(0.045126423 * Engine.physics_ticks_per_second)
 		for i in 18:
 			await physics_frame
+			if attempt == 0 and Engine.get_physics_frames() == debris_frame:
+				for cue in COMBAT_AUDIO.VOICES_PER_POOL:
+					audio._play(&"hit", touchdown_points[attempt], -9.0, -1, true)
 			if swing_frame < 0 and swing.played_count > before_swing:
 				swing_frame = Engine.get_physics_frames() - 1
 			if playback_frame < 0 and audio._next_choice.get(&"slam_grass", 0) != before:
@@ -519,7 +566,8 @@ func check_sabre_debris_audio(bus: int, capture: AudioEffectCapture) -> void:
 			check(swing_frame == landings[attempt] + swing_ticks and swing.played_count == before_swing + 1,
 				"Sabre plays one swing at the first authored post-audio key after landing")
 			var touchdown := touchdown_points[attempt]
-			var grass_voices: Array = audio._voices.filter(func(voice): return voice.stream in audio._groups[&"slam_grass"])
+			var grass_voices := audio.get_children().filter(func(voice):
+				return voice is AudioStreamPlayer3D and voice.stream in audio._groups[&"slam_grass"])
 			check(grass_voices.size() == 1 and grass_voices[0].global_position.is_equal_approx(
 				Vector3(touchdown.x, 0.0, touchdown.z)),
 				"The Sabre debris sample is positioned at the physical touchdown")
@@ -1253,6 +1301,7 @@ func run() -> void:
 	check(peak > 0.01 and peak < 0.9, "Simultaneous MD2 impact, slam and reactions have mix headroom")
 	await check_crossbow_fire_under_impact_burst(audio, bus, capture)
 	await check_weapon_onsets_under_mixed_impacts(audio, bus, capture)
+	await check_overlapping_heavy_landings(audio, bus, capture)
 	await check_melee_tool_variants(audio, bus, capture)
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
