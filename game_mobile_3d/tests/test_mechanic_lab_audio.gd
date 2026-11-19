@@ -1667,6 +1667,38 @@ func check_zombie_idle_audio(bus: int, capture: AudioEffectCapture) -> void:
 	await create_timer(0.10).timeout
 	lab.free()
 
+func check_equipped_weapon_previews(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var menu := lab.get_node("HUD/Weapon") as OptionButton
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var audio = lab.get_node("CombatAudio")
+	toggle.button_pressed = true
+	for voice: AudioStreamPlayer3D in audio._voices:
+		voice.bus = AudioServer.get_bus_name(bus)
+	toggle.button_pressed = false
+	for fixture: Array in [[3, &"crossbow_fire"], [4, &"gauntlet_hit"], [6, &"bow_fire"]]:
+		var index: int = fixture[0]
+		var group: StringName = fixture[1]
+		menu.select(index)
+		menu.item_selected.emit(index)
+		await create_timer(0.10).timeout
+		capture.clear_buffer()
+		toggle.button_pressed = true
+		var samples: Array = audio._groups.get(group, [])
+		var preview: Array = audio._voices.filter(func(voice): return voice.playing)
+		check(menu.selected == index and preview.size() == 1 and preview[0].stream in samples,
+			"Enabling audio with %s plays one preview from its own source family" % menu.get_item_text(index))
+		await create_timer(0.16).timeout
+		var peak := 0.0
+		for frame in capture.get_buffer(capture.get_frames_available()):
+			peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
+		check(peak > 0.001 and peak < 0.9, "%s preview reaches the mixer with headroom" % menu.get_item_text(index))
+		toggle.button_pressed = false
+	await create_timer(0.12).timeout
+	lab.free()
+
 func run() -> void:
 	var camera := Camera3D.new()
 	root.add_child(camera)
@@ -1755,6 +1787,7 @@ func run() -> void:
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
 	await check_bow_fire_during_crossbow_impacts(bus, capture)
+	await check_equipped_weapon_previews(bus, capture)
 	await check_local_hurt(bus, capture)
 	await check_movement_audio(bus, capture)
 	await check_movement_audio_manifest_fallback()
