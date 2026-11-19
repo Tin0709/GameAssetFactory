@@ -4,6 +4,7 @@ global uniform float gaf_sun_opening_gain;
 global uniform vec4 gaf_diffuse_opening;
 global uniform vec4 gaf_shadow_diffuse_sun;
 global uniform vec3 gaf_shadow_diffuse_tint;
+global uniform vec2 gaf_ground_shadow_fill_reduction;
 global uniform vec4 gaf_turf_sun_chroma;
 
 float gaf_turf_sun_weight(bool directional, vec3 view_light, mat4 inverse_view, float visibility) {
@@ -46,4 +47,9 @@ vec3 gaf_shadow_diffuse(bool directional, vec3 view_light, mat4 inverse_view,
 	float direct = attenuation * cloud * facing;
 	float shade = 1.0 - smoothstep(.055, .48, direct);
 	return gaf_shadow_diffuse_tint * (gaf_shadow_diffuse_sun.w * contact * shade);
+}
+
+float gaf_ground_shadow_fill_multiplier(float reduction, float attenuation) {
+	// Leave the penumbra and the direct beam under the existing shadow map.
+	return 1.0 - reduction * (1.0 - smoothstep(.02, .40, attenuation));
 }

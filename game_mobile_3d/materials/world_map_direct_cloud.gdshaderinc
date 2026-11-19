@@ -51,8 +51,18 @@ void light() {
 #endif
 	float nl = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
+	float ground_fill = 1.0;
+	if (LIGHT_IS_DIRECTIONAL && surface_top > .998
+			&& max(gaf_ground_shadow_fill_reduction.x, gaf_ground_shadow_fill_reduction.y) > 0.0) {
+		if (ground_grade == 3) {
+			ground_fill = gaf_ground_shadow_fill_multiplier(gaf_ground_shadow_fill_reduction.y, shadow_attenuation);
+		} else if ((ground_grade == 1 || ground_grade == 2)
+				&& ALBEDO.g > ALBEDO.r * 1.22 && ALBEDO.g > ALBEDO.b * 1.35) {
+			ground_fill = gaf_ground_shadow_fill_multiplier(gaf_ground_shadow_fill_reduction.x, shadow_attenuation);
+		}
+	}
 	DIFFUSE_LIGHT += gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
-		shadow_attenuation, cloud_transmission, nl, terrain_direct_contact);
+		shadow_attenuation, cloud_transmission, nl, terrain_direct_contact) * ground_fill;
 	// The same directional light and shadow term shape both the original key and the warmth.
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sun_warmth.w > 0.0
 			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sun_warmth.xyz) > 0.9999
@@ -91,7 +101,7 @@ void light() {
 			}
 			vec3 sky = terrain_opening_incident;
 			vec3 fill = mix(sky, vec3(dot(sky, vec3(.2126, .7152, .0722))), .40);
-			DIFFUSE_LIGHT += fill * (facing * shade * gaf_stone_shade_fill.w);
+			DIFFUSE_LIGHT += fill * (facing * shade * gaf_stone_shade_fill.w * ground_fill);
 		}
 #ifdef GAF_TERRAIN_NIGHT_SKY
 		if (max(gaf_stone_wall_return, gaf_sheltered_stone_return) > 0.0 && shade > 0.0) {

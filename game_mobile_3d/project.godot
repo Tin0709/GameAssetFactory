@@ -111,6 +111,10 @@ gaf_shadow_diffuse_tint={
 "type": "vec3",
 "value": Vector3(1, 1, 1)
 }
+gaf_ground_shadow_fill_reduction={
+"type": "vec2",
+"value": Vector2(0, 0)
+}
 gaf_stone_shade_reach={
 "type": "float",
 "value": 0.0

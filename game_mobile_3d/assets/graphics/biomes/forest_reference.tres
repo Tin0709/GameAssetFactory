@@ -145,6 +145,7 @@ shadowed_wall_return_scale = 1.5
 sheltered_stone_return_scale = 1.6
 stone_wall_sky_by_hour = SubResource("ForestWallSky")
 shadow_diffuse_by_hour = SubResource("ForestShadowDiffuse")
+ground_shadow_fill_reduction = Vector2(0.25, 0.45)
 bark_irradiance_by_hour = SubResource("ForestBarkIrradiance")
 spruce_leaf_filter = 1.0
 spruce_gap_coverage_by_hour = SubResource("SpruceGapCoveragePhase")

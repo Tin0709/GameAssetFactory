@@ -116,6 +116,7 @@ var _stone_sunset_region := Vector4.ZERO
 var _local_diffuse_source := Vector4.ZERO
 var _additional_diffuse_source := Vector4.ZERO
 var _shadow_diffuse_state := Vector4.ZERO
+var _ground_shadow_fill_reduction := Vector2.ZERO
 var _shadow_diffuse_tint := Vector3.ONE
 const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
@@ -162,6 +163,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_diffuse_contrast": ["Stone face lighting transition (preview)", 1.],
 	&"stone_day_face_fill": ["Ánh hắt mặt đá ban ngày", 1.],
 	&"shadow_diffuse_return": ["Ánh dịu trong bóng trên đất và cỏ", 1.],
+	&"ground_shadow_fill_reduction": ["Chiều sâu bóng trên cỏ và mặt đá", 1.],
 	&"stone_shade_fill": ["Ánh hắt trong bóng đá", .55],
 	&"stone_shade_reach": ["Ánh hắt tới mặt đá khuất nắng", 1.],
 	&"stone_wall_return": ["Ánh phản xạ trên vách đá trong bóng", 1.],
@@ -325,7 +327,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 208
+const LIGHTING_MIX_VERSION := 209
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -487,6 +489,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_fill", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
+	RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1026,6 +1029,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_fill", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
+			RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1583,6 +1587,15 @@ func _sync_shadow_diffuse() -> void:
 	if state != _shadow_diffuse_state:
 		_shadow_diffuse_state = state
 		RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", state)
+	var reduction := Vector2.ZERO
+	if _ground_shadow_fill_available() and (state.w > 0. or _stone_shade_fill.w > 0.):
+		reduction = _biome_profile.ground_shadow_fill_reduction.clamp(Vector2.ZERO, Vector2.ONE) +			* _lighting_scale(&"ground_shadow_fill_reduction")
+	if reduction != _ground_shadow_fill_reduction:
+		_ground_shadow_fill_reduction = reduction
+		RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", reduction)
+
+func _ground_shadow_fill_available() -> bool:
+	return _shadow_diffuse_available() and not _balanced_preview and atmosphere_review == "combined" +		and forest_active() and _biome_profile.ground_shadow_fill_reduction.is_finite() +		and _biome_profile.ground_shadow_fill_reduction != Vector2.ZERO
 
 func _sync_stone_shade_fill() -> void:
 	var state := Vector4.ZERO
@@ -2795,6 +2808,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 208 and effect == &"overcast_shadow_softness":
 			missing_value = 0.
+		if version < 209 and effect == &"ground_shadow_fill_reduction":
+			missing_value = 0.
 		if version < 202 and effect == &"dusk_key_fade":
 			missing_value = 0.
 		if version < 201 and effect == &"mist_rear_chroma":
@@ -3188,7 +3203,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"overcast_shadow":
 		_refresh_direct_shadow_opacity()
 		return
-	if changed_effect == &"shadow_diffuse_return":
+	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction"]:
 		_sync_shadow_diffuse()
 		return
 	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach", &"stone_wall_return", &"sheltered_stone_return", &"local_diffuse_return", &"basin_diffuse_return"]:
@@ -3885,6 +3900,9 @@ func _process(delta:float)->void:
 	var shade_diffuse: HSlider = _lighting_sliders.get(&"shadow_diffuse_return")
 	if shade_diffuse != null:
 		shade_diffuse.editable = _shadow_diffuse_available()
+	var ground_shadow_fill: HSlider = _lighting_sliders.get(&"ground_shadow_fill_reduction")
+	if ground_shadow_fill != null:
+		ground_shadow_fill.editable = _ground_shadow_fill_available()
 	var night_editable := _night_sky_editable()
 	for effect in [&"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
 		var slider: HSlider = _lighting_sliders.get(effect)

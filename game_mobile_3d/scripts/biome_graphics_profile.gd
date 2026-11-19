@@ -48,6 +48,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export var stone_wall_sky_by_hour: Curve
 ## Diffuse return on receivers in weak directional light. X is normalized hour.
 @export var shadow_diffuse_by_hour: Curve
+## Reduction of supplemental fill in deep shadows, on grass and on stone tops respectively.
+@export var ground_shadow_fill_reduction := Vector2.ZERO
 ## Blend of the owned sky irradiance on bark, keyed by normalized hour.
 @export var bark_irradiance_by_hour: Curve
 @export_range(0.0, 1.0) var spruce_leaf_filter := 0.0
