@@ -1689,11 +1689,14 @@ func check_equipped_weapon_previews(bus: int, capture: AudioEffectCapture) -> vo
 			"%s equips with its verified preview family" % menu.get_item_text(index))
 		await create_timer(0.10).timeout
 		capture.clear_buffer()
+		var next_variant: int = audio._next_choice.get(group, 0)
 		toggle.button_pressed = true
 		var samples: Array = audio._groups.get(group, [])
 		var preview: Array = audio._voices.filter(func(voice): return voice.playing)
 		check(menu.selected == index and preview.size() == 1 and preview[0].stream in samples,
 			"Enabling audio with %s plays one preview from its own source family" % menu.get_item_text(index))
+		check(audio._next_choice.get(group, 0) == next_variant,
+			"%s preview preserves the next sample for combat" % menu.get_item_text(index))
 		await create_timer(0.16).timeout
 		var peak := 0.0
 		for frame in capture.get_buffer(capture.get_frames_available()):
