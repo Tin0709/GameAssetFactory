@@ -775,6 +775,74 @@ func check_sabre_crowd_audio(bus: int, capture: AudioEffectCapture) -> void:
 	check(reactions.all(func(voice): return voice.stream == null), "Muting discards queued zombie reactions")
 	lab.free()
 
+func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group := lab.get_node("Zombies")
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
+	check(group.get_child_count() == 2, "The reaction fixture loads both source zombie models")
+	if group.get_child_count() != 2:
+		lab.free()
+		return
+	for zombie in group.get_children():
+		zombie.set_physics_process(false)
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	var audio := lab.get_node("CombatAudio")
+	var reactions: Array[AudioStreamPlayer3D] = audio._voices.slice(
+		COMBAT_AUDIO.VOICES_PER_POOL, COMBAT_AUDIO.VOICES_PER_POOL * 2)
+	for voice in reactions:
+		voice.bus = AudioServer.get_bus_name(bus)
+	var ear: Vector3 = audio.zombie_listener.global_position
+	var strike := {"damage": 1, "stagger": 0.0, "strength": 500.0, "angle": 15.0}
+	for case: Array in [[0, false, &"hurt", 3], [1, false, &"baby_hurt", 2],
+			[0, true, &"death", 3], [1, true, &"baby_death", 3]]:
+		var zombie := group.get_child(case[0]) as ZOMBIE
+		var bank: Array = audio._groups.get(case[2], [])
+		check(bank.size() == case[3], "%s loads all verified variants" % case[2])
+		for variant in case[3]:
+			audio.reset()
+			capture.clear_buffer()
+			zombie.health = 1 if case[1] else 8
+			var point := ear + Vector3.FORWARD * 2.0
+			group.strike_bolt({"collider": zombie, "position": point}, Vector3.FORWARD, 500 + variant, strike)
+			audio.flush_zombie_combat_cues()
+			check(reactions[0].playing and reactions[0].global_position == point
+				and variant < bank.size() and reactions[0].stream == bank[variant],
+				"A real %s strike plays variant %d from the correct reaction bank" % [case[2], variant + 1])
+			if variant == 0 and case[0] == 1:
+				await create_timer(0.19).timeout
+				var peak := 0.0
+				for sample in capture.get_buffer(capture.get_frames_available()):
+					peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+				check(peak > 0.001 and peak < 0.9, "%s reaches the silent mixer with headroom" % case[2])
+				print("MECHANIC_LAB_BABY_REACTION ", case[2], " peak=", peak)
+	audio.reset()
+	var near_points := [ear + Vector3.FORWARD, ear + Vector3.FORWARD * 2.0, ear + Vector3.FORWARD * 3.0]
+	for strike_index in [4, 3, 2, 1, 0]:
+		var zombie := group.get_child(strike_index % 2) as ZOMBIE
+		zombie.health = 1
+		var point := ear + Vector3.FORWARD * (strike_index + 1.0)
+		group.strike_bolt({"collider": zombie, "position": point}, Vector3.FORWARD, 509, strike)
+	audio.flush_zombie_combat_cues()
+	var baby_deaths: Array = audio._groups.get(&"baby_death", [])
+	var adult_deaths: Array = audio._groups.get(&"death", [])
+	check(reactions.all(func(voice):
+		return voice.playing and (voice.stream in baby_deaths if voice.global_position == near_points[1]
+			else voice.global_position in [near_points[0], near_points[2]] and voice.stream in adult_deaths)),
+		"Adult and Baby Zombie deaths share the three nearest reaction voices")
+	var adult := group.get_child(0) as ZOMBIE
+	adult.health = 8
+	group.strike_bolt({"collider": adult, "position": ear}, Vector3.FORWARD, 510, strike)
+	audio.flush_zombie_combat_cues()
+	check(reactions.all(func(voice): return voice.global_position in near_points),
+		"An adult hurt cannot interrupt a Baby Zombie death")
+	toggle.button_pressed = false
+	check(reactions.all(func(voice): return not voice.playing), "Muting stops both zombie reaction banks")
+	lab.free()
+
 func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -1460,6 +1528,7 @@ func run() -> void:
 	await check_zombie_steps(bus, capture)
 	await check_zombie_attack_overflow(bus, capture)
 	await check_zombie_idle_audio(bus, capture)
+	await check_baby_zombie_reactions(bus, capture)
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
