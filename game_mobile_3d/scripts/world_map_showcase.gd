@@ -11,6 +11,7 @@ const DistantTerrain = preload("res://scripts/world_map_distant_terrain.gd")
 const PlayableTerrace = preload("res://scripts/world_map_playable_terrace.gd")
 const PlayableBoulder = preload("res://scripts/world_map_boulder.gd")
 const ForestMoss = preload("res://scripts/world_map_forest_moss.gd")
+const ForestUnderstory = preload("res://scripts/world_map_forest_understory.gd")
 const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
 const BiomeProfile = preload("res://scripts/biome_graphics_profile.gd")
 const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
@@ -80,6 +81,7 @@ var playable_terrace: PlayableTerrace
 var playable_boulder: PlayableBoulder
 var basin_boulders: Array[PlayableBoulder] = []
 var forest_moss: ForestMoss
+var forest_understory: ForestUnderstory
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_replay := preload("res://scripts/world_map_forest_replay.gd").new()
@@ -542,6 +544,14 @@ func setup(world:Node3D)->void:
 			level.add_child(moss)
 		else:
 			moss.free()
+	if not level.forest_understory_placements.is_empty():
+		var understory := ForestUnderstory.new()
+		if understory.configure(level, level.forest_understory_placements):
+			forest_understory = understory
+			understory.name = "ForestUnderstory"
+			level.add_child(understory)
+		else:
+			understory.free()
 	sync_spruce_leaf_filter()
 	_build_ui()
 	set_source_terrain(true)
@@ -1736,6 +1746,8 @@ func _scene_light_materials() -> Array:
 			result.append(rock.material)
 	if is_instance_valid(forest_moss) and forest_moss.visible:
 		result.append(forest_moss.material)
+	if is_instance_valid(forest_understory) and forest_understory.visible:
+		result.append_array(forest_understory.materials)
 	return result
 
 func far_terrain_shading_materials() -> Array:
@@ -4432,6 +4444,13 @@ func _build_ui()->void:
 		moss.focus_mode = Control.FOCUS_NONE
 		box.add_child(moss)
 		moss.toggled.connect(forest_moss.set_visible)
+	if is_instance_valid(forest_understory):
+		var understory := CheckButton.new()
+		understory.name = "ForestUnderstoryToggle"
+		understory.button_pressed = forest_understory.visible
+		understory.focus_mode = Control.FOCUS_NONE
+		box.add_child(understory)
+		understory.toggled.connect(forest_understory.set_visible)
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)
