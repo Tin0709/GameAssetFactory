@@ -644,21 +644,55 @@ func is_near_flat_floor(tolerance: float) -> bool:
 		return false
 	var floor_half := floor_box.size * 0.5
 	var floor_inverse := floor_pose.affine_inverse()
-	var minimum_y := INF
 	var inner_minimum_y := INF
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var size: Vector3 = part[2]
-		var bounds := (floor_inverse * body.global_transform) * AABB(-size * 0.5, size)
+		var pose := floor_inverse * body.global_transform
+		var bounds := pose * AABB(-size * 0.5, size)
 		if bounds.position.x > floor_half.x or bounds.end.x < -floor_half.x \
 				or bounds.position.z > floor_half.z or bounds.end.z < -floor_half.z:
 			continue
-		minimum_y = minf(minimum_y, bounds.position.y)
 		if bounds.position.x >= -floor_half.x and bounds.end.x <= floor_half.x \
 				and bounds.position.z >= -floor_half.z and bounds.end.z <= floor_half.z:
 			inner_minimum_y = minf(inner_minimum_y, bounds.position.y)
-	# A corner below the lip can hide another part resting wholly on the floor.
-	return absf(minimum_y - floor_half.y) <= tolerance or absf(inner_minimum_y - floor_half.y) <= tolerance
+		elif bounds.position.y <= floor_half.y + tolerance and bounds.end.y >= floor_half.y - tolerance:
+			# The lowest corner can hang beyond the lip while the rest of the part rolls on it.
+			var edge_minimum_y := _floor_edge_minimum_y(pose, size * 0.5, bounds, floor_half)
+			if absf(edge_minimum_y - floor_half.y) <= tolerance:
+				return true
+	return absf(inner_minimum_y - floor_half.y) <= tolerance
+
+static func _floor_edge_minimum_y(pose: Transform3D, half: Vector3, bounds: AABB, floor_half: Vector3) -> float:
+	var edges: Array[Plane] = []
+	if bounds.position.x < -floor_half.x:
+		edges.append(Plane(Vector3.LEFT, floor_half.x))
+	if bounds.end.x > floor_half.x:
+		edges.append(Plane(Vector3.RIGHT, floor_half.x))
+	if bounds.position.z < -floor_half.z:
+		edges.append(Plane(Vector3.FORWARD, floor_half.z))
+	if bounds.end.z > floor_half.z:
+		edges.append(Plane(Vector3.BACK, floor_half.z))
+	var minimum_y := INF
+	for axis in 3:
+		var normal := pose.basis[axis]
+		var side := 1.0 if normal.y < 0.0 else -1.0
+		var center := pose.origin + normal * (half[axis] * side)
+		var u := (axis + 1) % 3
+		var v := (axis + 2) % 3
+		var width := pose.basis[u] * half[u]
+		var length := pose.basis[v] * half[v]
+		var face := PackedVector3Array([
+			center - width - length, center + width - length,
+			center + width + length, center - width + length,
+		])
+		for edge in edges:
+			face = Geometry3D.clip_polygon(face, edge)
+			if face.is_empty():
+				break
+		for point in face:
+			minimum_y = minf(minimum_y, point.y)
+	return minimum_y
 
 func has_flat_wall_rest_support(core_grounded: bool) -> bool:
 	if not core_grounded:
