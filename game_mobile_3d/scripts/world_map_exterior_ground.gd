@@ -23,6 +23,10 @@ func build(world: Node3D, reach: int) -> bool:
 		return false
 	material = ShaderMaterial.new()
 	material.shader = SHADER
+	material.set_shader_parameter("cloud_field", world.look.cloud_texture)
+	material.set_shader_parameter("cloud_shape", world.look._cloud_shape)
+	material.set_shader_parameter("clouds_enabled", true)
+	world.look.materials["exterior-ground:stone"] = material
 	var noise := FastNoiseLite.new()
 	noise.seed = 622
 	noise.frequency = .035

@@ -1762,8 +1762,6 @@ func _scene_light_materials() -> Array:
 		result.append(forest_moss.material)
 	if is_instance_valid(forest_understory) and forest_understory.visible:
 		result.append_array(forest_understory.materials)
-	if is_instance_valid(exterior_ground) and exterior_ground.visible:
-		result.append(exterior_ground.material)
 	return result
 
 func far_terrain_shading_materials() -> Array:
