@@ -1,6 +1,7 @@
 extends SceneTree
 
 const ContactSparks := preload("res://scripts/mechanic_lab_contact_sparks.gd")
+const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 
 class FlashMonitor extends Node:
 	var zombie: CharacterBody3D
@@ -80,8 +81,59 @@ func run() -> void:
 	await check_crowd_sparks()
 	await check_flash_during_render_hitch()
 	await check_damage_numbers_during_render_hitch()
+	if DisplayServer.get_name() != "headless":
+		await check_health_bar_visibility()
 	print("MECHANIC_LAB_HIT_FLASH failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_health_bar_visibility() -> void:
+	var viewport := SubViewport.new()
+	viewport.own_world_3d = true
+	viewport.size = Vector2i(320, 320)
+	viewport.transparent_bg = true
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	root.add_child(viewport)
+	var camera := Camera3D.new()
+	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+	camera.size = 4.0
+	viewport.add_child(camera)
+	camera.make_current()
+	var centre := Vector3.UP * HealthBars.BAR_HEIGHT
+	camera.position = centre + Vector3.BACK * 6.0
+	camera.look_at(centre)
+	var near_owner := Node3D.new()
+	var far_owner := Node3D.new()
+	viewport.add_child(near_owner)
+	viewport.add_child(far_owner)
+	near_owner.position.z = 2.0
+	var bars := HealthBars.new()
+	viewport.add_child(bars)
+	var foreground := bars.add_bar(near_owner)
+	var near_colour := (await read_health_viewport(viewport)).get_pixel(160, 160) as Color
+	var background := bars.add_bar(far_owner)
+	bars.set_bar_health(background, 0.0, 0.0)
+	var overlap := (await read_health_viewport(viewport)).get_pixel(160, 160) as Color
+	check(near_colour.r > 0.5 and near_colour.is_equal_approx(overlap),
+		"A full near health bar stays visible when the farther depleted bar is added after it")
+	bars.remove_bar(foreground)
+	bars.remove_bar(0)
+	near_owner.position.z = 3.82
+	bars.add_bar(near_owner)
+	var focus := centre + Vector3.BACK * 6.0
+	camera.position = focus + Vector3.RIGHT * 6.0
+	camera.look_at(focus)
+	var edge := await read_health_viewport(viewport)
+	bars.extra_cull_margin = 1.0
+	var reference := await read_health_viewport(viewport)
+	# The centre is outside the frame, but part of the rotated quad projects inside.
+	check(reference.get_pixel(8, 160).a > 0.5 and edge.get_data() == reference.get_data(),
+		"A partly visible health bar is rendered when its centre is outside the viewport")
+	viewport.free()
+
+func read_health_viewport(viewport: SubViewport) -> Image:
+	await RenderingServer.frame_post_draw
+	await RenderingServer.frame_post_draw
+	return viewport.get_texture().get_image()
 
 func check_damage_numbers_during_render_hitch() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
