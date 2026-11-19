@@ -4,6 +4,14 @@ const MANIFEST := "godot_lab/world_map_unified_showcase_v001/forest_cover_grass_
 const PlantShader := preload("vegetation.gdshader")
 const ResearchRoot := preload("res://scripts/world_map_forest_path_light.gd")
 const ENVIRONMENT := "extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Environment"
+const FOREST_ATLAS := "ForestA1/Props/Boulder"
+const FOREST_ATLAS_ENTRY := {"file": "T_TreesBoulders.png",
+	"sha256": "9b596a2149fcaf999178d6a5557cda9677c204f21848c84c9a30425ad1d850f6"}
+const FERN_DIRECTORY := "Generic/Nature/Foliage/Ferns"
+const FERN_VARIANTS := [
+	{"file": "SM_Fern_02_Small.glb", "sha256": "9a913d07388d03126054307edbb32aca8a07ab0e42a8e9c737954c7147df9bed", "height": .72},
+	{"file": "SM_Fern_01_Large.glb", "sha256": "2d8a465d2cc3956e691e46e7c3ea542af5d66933823925311aa00607a745f8c5", "height": .89},
+]
 
 static func load_into(bundle: RefCounted) -> Array[String]:
 	var manifest_path: String = bundle.root.path_join(MANIFEST)
@@ -43,10 +51,8 @@ static func load_forest_fern(bundle: RefCounted) -> String:
 	if ResearchRoot.research_root().is_empty() or RenderingServer.get_rendering_device() == null:
 		return ""
 	var directory: String = bundle.root.path_join(ENVIRONMENT)
-	var atlas_path := checked_file(bundle, directory.path_join("ForestA1/Props/Boulder"), {
-		"file": "T_TreesBoulders.png",
-		"sha256": "9b596a2149fcaf999178d6a5557cda9677c204f21848c84c9a30425ad1d850f6"}, "png")
-	var mesh_path := checked_file(bundle, directory.path_join("Generic/Nature/Foliage/Ferns"), {
+	var atlas_path := checked_file(bundle, directory.path_join(FOREST_ATLAS), FOREST_ATLAS_ENTRY, "png")
+	var mesh_path := checked_file(bundle, directory.path_join(FERN_DIRECTORY), {
 		"file": "SM_SF_Fern_Small.glb",
 		"sha256": "46ebb26dff1711472085ed6dea1a2c52e56aa04d9087ebfba4312a6d6fa5876f"}, "glb")
 	if atlas_path.is_empty() or mesh_path.is_empty():
@@ -62,6 +68,32 @@ static func load_forest_fern(bundle: RefCounted) -> String:
 	bundle.meshes[key] = mesh
 	bundle.materials.append(material)
 	return key
+
+static func load_fern_variants(bundle: RefCounted) -> Dictionary[int, String]:
+	var result: Dictionary[int, String] = {}
+	if ResearchRoot.research_root().is_empty() or RenderingServer.get_rendering_device() == null:
+		return result
+	var directory: String = bundle.root.path_join(ENVIRONMENT).path_join(FERN_DIRECTORY)
+	var atlas_path := checked_file(bundle, directory, {"file": "T_Ferns_01.png",
+		"sha256": "ffe2b5d7d75975a00b4cf7bdad2201c377f2f4492f260369f46698df203aaee8"}, "png")
+	if atlas_path.is_empty():
+		return result
+	var image := Image.load_from_file(atlas_path)
+	if image == null or image.get_size() != Vector2i(64, 64):
+		return result
+	var material := plant_material(bundle, image)
+	material.set_meta("limit_motion_to_cell", true)
+	for index: int in FERN_VARIANTS.size():
+		var entry: Dictionary = FERN_VARIANTS[index]
+		var path := checked_file(bundle, directory, entry, "glb")
+		var mesh := load_mesh(path, material, entry.height)
+		if mesh != null:
+			var key := "MD2 | " + path.get_file().get_basename()
+			bundle.meshes[key] = mesh
+			result[index] = key
+	if not result.is_empty():
+		bundle.materials.append(material)
+	return result
 
 static func plant_material(bundle: RefCounted, image: Image) -> ShaderMaterial:
 	var material := ShaderMaterial.new()
@@ -87,7 +119,7 @@ static func checked_file(bundle: RefCounted, directory: String, entry: Variant, 
 		return path
 	return ""
 
-static func load_mesh(path: String, material: ShaderMaterial) -> ArrayMesh:
+static func load_mesh(path: String, material: ShaderMaterial, fitted_height := 0.) -> ArrayMesh:
 	if path.is_empty():
 		return null
 	var document := GLTFDocument.new()
@@ -106,9 +138,27 @@ static func load_mesh(path: String, material: ShaderMaterial) -> ArrayMesh:
 		return null
 	var arrays := source.surface_get_arrays(0)
 	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
-	var size := source.get_aabb().size
+	var bounds := source.get_aabb()
+	var size := bounds.size
 	if vertices.size() < 3 or size.y < .9 or size.y > 2.1:
 		return null
+	if fitted_height > 0.:
+		var radius := 0.
+		for vertex in vertices:
+			radius = maxf(radius, Vector2(vertex.x, vertex.z).length())
+		if radius <= 0.:
+			return null
+		# Keep the entire rest pose and a small wind margin within one block.
+		var horizontal := .42 / radius
+		var fit := Vector3(horizontal, fitted_height / size.y, horizontal)
+		var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+		for index in vertices.size():
+			vertices[index] = (vertices[index] - Vector3.UP * bounds.position.y) * fit
+			normals[index] = (normals[index] / fit).normalized()
+		arrays[Mesh.ARRAY_VERTEX] = vertices
+		arrays[Mesh.ARRAY_NORMAL] = normals
+		arrays[Mesh.ARRAY_TANGENT] = null
+		size.y = fitted_height
 	var roots := PackedVector2Array()
 	roots.resize(vertices.size())
 	var motion := PackedFloat32Array()

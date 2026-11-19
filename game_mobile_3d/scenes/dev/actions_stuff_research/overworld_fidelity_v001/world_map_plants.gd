@@ -22,7 +22,7 @@ var forest_cover_species: Array[String] = []
 var forest_cover_counts: Dictionary = {}
 var forest_fern_enabled := true
 var forest_fern_asset := ""
-var _fern_cells: Dictionary[Vector2i, bool] = {}
+var _fern_cells: Dictionary[Vector2i, String] = {}
 var eligible_grass_cells:=0
 var world:Node3D
 var error:=""
@@ -46,7 +46,15 @@ func setup_world(level:Node3D)->void:
 		if not forest_fern_asset.is_empty():
 			for cell: Vector2 in world.forest_fern_cells:
 				if cell.is_finite() and cell == cell.floor():
-					_fern_cells[Vector2i(cell)] = true
+					_fern_cells[Vector2i(cell)] = forest_fern_asset
+	if not world.forest_fern_variants.is_empty():
+		var variants := ForestCover.load_fern_variants(bundle)
+		for slot: Vector3 in world.forest_fern_variants:
+			if not slot.is_finite() or slot != slot.floor():
+				continue
+			var cell := Vector2i(int(slot.x), int(slot.y))
+			if not _fern_cells.has(cell) and variants.has(int(slot.z)):
+				_fern_cells[cell] = variants[int(slot.z)]
 	for material:ShaderMaterial in bundle.materials:
 		_native_wind_intensities[material.get_instance_id()]=float(material.get_shader_parameter("wind_intensity"))
 	grass_light=GRASS_LIGHT.new();grass_light.setup(world,bundle)
@@ -76,8 +84,17 @@ func set_forest_fern(value: bool) -> void:
 	if forest_fern_enabled == value:
 		return
 	forest_fern_enabled = value
-	if dense_grass_review and not forest_fern_asset.is_empty():
+	if dense_grass_review and has_forest_ferns():
 		_rebuild_planting(false)
+
+func has_forest_ferns() -> bool:
+	return not _fern_cells.is_empty()
+
+func forest_fern_atlas() -> Texture2D:
+	if forest_fern_asset.is_empty():
+		return null
+	var material: ShaderMaterial = bundle.meshes[forest_fern_asset].surface_get_material(0)
+	return material.get_shader_parameter("atlas")
 
 func _rebuild_planting(reset_interaction := true)->void:
 	for child:Node in get_children():
@@ -193,10 +210,11 @@ func _build_dense_planting()->void:
 		var transform:=Transform3D(Basis(Vector3.UP,_rng.randf()*TAU),position)
 		var phase := _rng.randf() * TAU
 		var cover := _cover_index(cell)
-		var fern := forest_fern_enabled and _fern_cells.has(cell) and _off_path(cell)
+		var fern_asset := _fern_cells.get(cell, "") if forest_fern_enabled else ""
+		var fern := not fern_asset.is_empty() and _off_path(cell)
 		var scale_factor := 1.
 		if fern:
-			asset = forest_fern_asset
+			asset = fern_asset
 			scale_factor = .94 + float(posmod(hash(cell + Vector2i(397, 619)), 13)) * .01
 			transform.origin = Vector3(cell.x + .5, position.y, cell.y + .5)
 			transform.basis = transform.basis.scaled(Vector3.ONE * scale_factor)
@@ -323,7 +341,8 @@ func _prepare_materials()->void:
 		material.set_shader_parameter("interaction_previous",interaction.previous_texture)
 		material.set_shader_parameter("field_extent",interaction.extent)
 		material.set_shader_parameter("ground_atlas",bundle.textures[ground.texture]);material.set_shader_parameter("ground_uv",uv)
-		material.set_shader_parameter("cell_limited_motion",not dense_grass_review)
+		material.set_shader_parameter("cell_limited_motion",
+			not dense_grass_review or material.has_meta("limit_motion_to_cell"))
 		material.set_shader_parameter("splayed_rest_motion",grass_splay_active() and not source_cover)
 		material.set_shader_parameter("ground_mask_enabled",dense_grass_review)
 		material.set_shader_parameter("ground_coverage_map",world.look.path_map)
