@@ -44,7 +44,7 @@ func test_source_mask(script: Script) -> void:
 	check(mask.get_format() == Image.FORMAT_L8 and mask.get_size() == image.get_size(), "Gap mask uses one byte per source texel")
 	for y in image.get_height():
 		for x in image.get_width():
-			check((mask.get_pixel(x, y).r > .5) == small.has(Vector2i(x, y)),
+			check((mask.get_pixel(x, y).r > 0.) == small.has(Vector2i(x, y)),
 				"Only four-connected enclosed gaps of at most four texels qualify")
 
 func test_gameplay(world: Node, toggle: CheckButton) -> void:
@@ -60,8 +60,13 @@ func test_gameplay(world: Node, toggle: CheckButton) -> void:
 		var pixels := mask.get_image()
 		var count := 0
 		for alpha: int in pixels.get_data():
-			count += int(alpha > 127)
+			count += int(alpha > 0)
 		check(pixels.get_size() == Vector2i(16, 32) and count == 42, "The verified spruce source gives 42 enclosed gap texels")
+		var values: Dictionary[int, bool] = {}
+		for rank: int in pixels.get_data():
+			if rank > 0:
+				values[rank] = true
+		check(values.size() == count and values.has(255), "Coverage can fade across individual source texels")
 	check(not shadow.code.contains("#define GAF_GROVE_REVEAL_COVERAGE"), "Shadows retain the original alpha test")
 	toggle.button_pressed = false
 	check(material.get_shader_parameter("spruce_gap_coverage") == false, "The checkbox restores the original spruce coverage")
@@ -72,3 +77,11 @@ func test_gameplay(world: Node, toggle: CheckButton) -> void:
 	check(material.shader.code.contains("#define GAF_GROVE_REVEAL_COVERAGE")
 		and material.get_shader_parameter("spruce_gap_coverage") == true, "Rebuilding the material restores the chosen coverage")
 	check(grove._spruce_shadow.shader == shadow, "Comparison leaves the caster shader intact")
+	for hours: Vector2 in [Vector2(12., 1.), Vector2(19.5, 0.), Vector2(22., 1.)]:
+		world.showcase.set_hour(hours.x)
+		check(material.get_shader_parameter("spruce_gap_coverage_weight") == hours.y,
+			"Forest applies the validated coverage amount at %s" % hours.x)
+	for hour: float in [19.125, 20.125]:
+		world.showcase.set_hour(hour)
+		var weight: Variant = material.get_shader_parameter("spruce_gap_coverage_weight")
+		check(weight is float and weight > 0. and weight < 1., "Coverage transitions gradually around dusk")
