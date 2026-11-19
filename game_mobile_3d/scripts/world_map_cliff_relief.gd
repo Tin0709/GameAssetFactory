@@ -45,7 +45,10 @@ func build_relief(world: Node3D, reach: int, tree_sites: PackedVector2Array) -> 
 			# The overlap under the existing crest is below the source map's bottom surfaces.
 			if outside <= 8.:
 				elevation = mini(elevation, lower_y)
-			heights[Vector2i(x,z)] = clampi(elevation, lower_y - 1, lower_y + 23)
+				if point.x >= high.x - 5.:
+					# Pass below the east foothills where the two background layers meet.
+					elevation = mini(elevation, lower_y - 4)
+			heights[Vector2i(x,z)] = clampi(elevation, lower_y - 4, lower_y + 23)
 	var grove := _make_grove(trees.mesh, tree_sites, heights)
 	if grove == null or heights.is_empty():
 		return false
