@@ -246,8 +246,13 @@ func check_first_wall_impact(frozen := false, serial := 4) -> void:
 		baby.ragdoll.sample(1.0 / 60.0)
 
 	var direction := Vector3.RIGHT.rotated(Vector3.UP, deg_to_rad(-25.0))
-	group._apply_contact(baby, baby.combat_center(), "Attack", 2, serial, group.SABRE_STRIKES[2],
-		direction, false, baby.global_position)
+	if serial == 4:
+		group._apply_contact(baby, baby.combat_center(), "Attack", 2, serial, group.SABRE_STRIKES[2],
+			direction, false, baby.global_position - direction)
+	else:
+		baby.ragdoll_launch_multiplier = group.ragdoll_launch_multiplier
+		baby.ragdoll_gravity_multiplier = group.ragdoll_gravity_multiplier
+		baby.take_hit(100, direction, Vector2.ZERO, 0.0, group.SABRE_STRIKES[2].strength, Zombie.DeathStrike.SABRE_FINISHER)
 	baby.set_physics_process(true)
 	var peak := 0.0
 	var crossed := false
