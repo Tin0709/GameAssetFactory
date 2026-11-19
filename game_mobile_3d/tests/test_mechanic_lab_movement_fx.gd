@@ -94,6 +94,7 @@ func run() -> void:
 	await check_floor_edge_landing(lab, dust)
 	await check_non_grass_landing(lab, dust)
 	await check_non_grass_steps(lab, dust, wind)
+	await check_downhill_steps(lab, dust, wind)
 	await check_wall_slide_steps(lab, dust, wind)
 	await check_curved_step_effects(lab, dust, wind)
 	await check_steps_during_attacks(lab, dust)
@@ -535,6 +536,51 @@ func check_non_grass_steps(lab, dust, wind) -> void:
 	slab.free()
 	lab.reset_player()
 	await create_timer(0.10, true, false, true).timeout
+
+func check_downhill_steps(lab, dust, wind) -> void:
+	var player = lab.player
+	var movement = lab.get_node("MovementAudio")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var ramp := StaticBody3D.new()
+	ramp.position.y = 0.21
+	ramp.rotation.x = 0.045
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(1.0, 0.12, 15.0)
+	shape.shape = box
+	ramp.add_child(shape)
+	lab.add_child(ramp)
+	toggle.button_pressed = true
+	lab.reset_player()
+	player.scripted_input = true
+	player.global_position = Vector3(0.43, 0.65, 0.0)
+	for i in 34:
+		await physics_frame
+	var snapped_steps := [0]
+	var on_contact := func(point: Vector3, landed: bool):
+		if not landed and point.x > 0.5 and player.is_on_floor() +				and player.get_slide_collision_count() == 0 and player.global_position.y > 0.05:
+			snapped_steps[0] += 1
+	player.surface_contact.connect(on_contact)
+	var before_audio: int = movement.event_count.grass
+	var before_dust: int = dust._next
+	var before_wind: int = wind._next
+	player.requested_run = true
+	player.requested_direction = Vector2(0, 1)
+	for i in 45:
+		await physics_frame
+	player.surface_contact.disconnect(on_contact)
+	var grass_cues: int = movement.event_count.grass - before_audio
+	check(snapped_steps[0] > 0 and player.is_on_floor() and player.global_position.y > 0.05,
+		"The actor takes a downhill step over the ramp edge with floor snap holding support")
+	check(grass_cues == 0 and dust._next == before_dust and wind._next == before_wind,
+		"A snapped step on the ramp does not emit the grass below it")
+	print("MECHANIC_LAB_DOWNHILL_STEPS snapped=", snapped_steps[0], " grass_audio=", grass_cues,
+		" dust=", dust._next != before_dust, " wind=", wind._next != before_wind)
+	ramp.free()
+	player.scripted_input = false
+	toggle.button_pressed = false
+	lab.reset_player()
+	await physics_frame
 
 func check_wall_slide_steps(lab, dust, wind) -> void:
 	var player = lab.player
