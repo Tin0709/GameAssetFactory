@@ -7,6 +7,8 @@ uniform float alpha_curve[54];
 uniform float alpha_duration;
 uniform float camera_range_squared;
 uniform float source_step_seconds;
+uniform bool crop_smoke_atlas = false;
+uniform vec4 cell_bounds[32];
 // Integer physics tick modulo 2048, interpolation offset in ticks, seconds per tick.
 uniform vec3 contact_clock;
 varying flat vec3 sprite_data;
@@ -30,8 +32,15 @@ void vertex() {
 		// Cull the rendered puff without discarding its remaining lifetime.
 		POSITION = vec4(2.0, 2.0, 0.0, 1.0);
 	} else {
+		vec3 sprite_vertex = VERTEX;
+		if (crop_smoke_atlas) {
+			vec4 bounds = cell_bounds[int(cell)];
+			vec2 center = (bounds.xy + bounds.zw) * 0.5 - vec2(0.5);
+			sprite_vertex.xy = VERTEX.xy * (bounds.zw - bounds.xy) + vec2(center.x, -center.y);
+			UV = mix(bounds.xy, bounds.zw, UV);
+		}
 		POSITION = PROJECTION_MATRIX * VIEW_MATRIX * mat4(
-			INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], origin) * vec4(VERTEX, 1.0);
+			INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], origin) * vec4(sprite_vertex, 1.0);
 	}
 	float cursor = clamp(age / (lifetime * alpha_duration), 0.0, 1.0) * 53.0;
 	int sample = int(cursor);

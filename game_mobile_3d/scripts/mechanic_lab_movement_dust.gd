@@ -123,7 +123,7 @@ func use_source_landing() -> void:
 	_grow_particle_pool(SOURCE_LANDING_CAPACITY)
 
 func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:
-	return batch.setup(_smoke_texture, _run_alpha, _run_alpha_duration)
+	return batch.setup(_smoke_texture, _run_alpha, _run_alpha_duration, true)
 
 func use_gauntlet_debris(equipped: Callable) -> void:
 	var image := EffectSource.load_image(GAUNTLET_DEBRIS_SOURCE, GAUNTLET_DEBRIS_HASH, Vector2i(16, 16))
