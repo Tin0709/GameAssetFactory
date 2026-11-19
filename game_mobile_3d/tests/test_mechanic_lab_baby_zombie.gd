@@ -263,7 +263,45 @@ func check_first_wall_neck_contact(frozen := false) -> void:
 		"At 1000%% launch and gravity the Baby Zombie keeps its neck connected against a %s wall" %
 		("frozen" if frozen else "static"))
 	print("LAB_BABY_FIRST_WALL frozen=", frozen, " gap=", peak, " crossed=", crossed, " parked=", baby._corpse_parked)
+	if frozen:
+		await check_lower_wall_edge(lab, group)
 	lab.free()
+
+func check_lower_wall_edge(lab: Node3D, group: Node) -> void:
+	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
+	var baby := group.get_child(-1) as Zombie
+	baby.set_physics_process(false)
+	await physics_frame
+	baby.take_hit(100, Vector3.RIGHT)
+	baby._update_death(1.0 / 60.0)
+	var leg: PhysicalBone3D = baby.ragdoll.bodies["Leg.L"]
+	var state := PhysicsServer3D.body_get_direct_state(leg.get_rid())
+	var box := (leg.get_child(0) as CollisionShape3D).shape as BoxShape3D
+	var floor := lab.get_node("Ground") as StaticBody3D
+	# Captured leg transform at the lower edge during the 1000% launch.
+	var basis := Basis(Vector3(0.077177, 0.234985, -0.968930),
+		Vector3(0.946671, -0.322191, -0.002734), Vector3(-0.312823, -0.917047, -0.247320)).orthonormalized()
+	var pose := Transform3D(basis, Vector3(4.348000, 0.118846, 19.796310))
+	var correction := Vector3(-0.259280, 0.230669, 0.045452)
+	state.transform = pose
+	var moved: Vector3 = baby.ragdoll._slide_baby_corner_part(leg, state, box.size * 0.5,
+		correction, 0.0, floor.get_rid())
+	check(moved.x < -0.18 and moved.y >= 0.0, "The leg can withdraw from the lower wall edge above the floor")
+	var obstruction := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(0.08, 0.4, 0.3)
+	collider.shape = shape
+	obstruction.add_child(collider)
+	obstruction.position = Vector3(4.02, 0.2, 19.80)
+	lab.add_child(obstruction)
+	await physics_frame
+	state = PhysicsServer3D.body_get_direct_state(leg.get_rid())
+	state.transform = pose
+	var blocked: Vector3 = baby.ragdoll._slide_baby_corner_part(leg, state, box.size * 0.5,
+		correction, 0.0, floor.get_rid())
+	check(blocked.is_zero_approx(), "A second obstacle prevents the outward leg correction")
+	print("LAB_BABY_LOWER_WALL_EDGE moved=", moved, " blocked=", blocked)
 
 
 func add_contact_corner(lab: Node3D, yaw: float) -> Node3D:
