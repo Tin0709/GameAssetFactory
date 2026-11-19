@@ -9,6 +9,7 @@ var textures:Dictionary={}
 var materials:Array[ShaderMaterial]=[]
 var _material_map:Dictionary={}
 var root:=""
+var rebase_extracted_audio := false
 
 static func default_path()->String:
 	var custom:=OS.get_environment("MD2_OVERWORLD_BUNDLE")
@@ -91,6 +92,15 @@ func read_audio(path: String, group := "") -> bool:
 
 func audio_stream(row:Dictionary)->AudioStreamOggVorbis:
 	var path:String=row.get("path","")
+	if rebase_extracted_audio and not root.is_empty() and not permitted(path):
+		# Manifests can retain absolute media paths from the source machine.
+		# Look for the same extraction-relative file under the manifest root.
+		var normalized := path.replace("\\", "/")
+		var extraction := normalized.rfind("/extracted/")
+		if extraction >= 0:
+			var relative := normalized.substr(extraction + 1).simplify_path()
+			if relative.begins_with("extracted/"):
+				path = root.path_join(relative)
 	if not permitted(path) or not FileAccess.file_exists(path) or FileAccess.get_sha256(path)!=String(row.get("sha256","")):return null
 	return AudioStreamOggVorbis.load_from_file(path)
 

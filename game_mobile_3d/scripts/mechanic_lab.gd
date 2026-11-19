@@ -914,9 +914,10 @@ func _process(delta: float) -> void:
 func _setup_movement_audio() -> void:
 	var manifest := PrivateOverworldBundle.default_path()
 	var research := OS.get_environment("MD2_RESEARCH_ROOT")
-	if not research.is_empty():
+	if not research.is_empty() and OS.get_environment("MD2_OVERWORLD_BUNDLE").is_empty():
 		manifest = research.path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")
 	var bundle := PrivateOverworldBundle.new()
+	bundle.rebase_extracted_audio = true
 	if not bundle.read_audio(manifest, "grass"):
 		return
 	_movement_audio = MovementAudio.new()
