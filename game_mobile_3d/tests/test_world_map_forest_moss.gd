@@ -12,6 +12,7 @@ func check(condition: bool, message: String) -> void:
 func run() -> void:
 	var world = load("res://scenes/WorldMap.tscn").instantiate()
 	var fallback := "fallback" in OS.get_cmdline_user_args()
+	var unsupported := "unsupported" in OS.get_cmdline_user_args()
 	if fallback:
 		world.set("forest_moss_placements", PackedVector4Array())
 	root.add_child(world)
@@ -19,8 +20,8 @@ func run() -> void:
 	await process_frame
 	var moss := world.get_node_or_null("ForestLedgeMoss") as Node3D
 	var toggle := world.find_child("ForestLedgeMossToggle", true, false) as CheckButton
-	if fallback:
-		check(moss == null and toggle == null, "An unconfigured map adds no moss or settings row")
+	if fallback or unsupported:
+		check(moss == null and toggle == null, "An unconfigured map or unsupported renderer adds no moss or settings row")
 	else:
 		check(moss != null and toggle != null and toggle.button_pressed, "F5 places verified moss and enables its settings row")
 		if moss != null and toggle != null:
@@ -43,11 +44,13 @@ func run() -> void:
 			check(total == 14 and quadrants.size() == 4 and moss.get_child_count() == 2, "Two source meshes form 14 grounded patches in four sectors")
 			check(materials.size() == 1, "Both batches share one lit material and atlas")
 			if materials.size() == 1:
-				check(world.showcase._mist_materials().has(materials.keys()[0]), "The default foliage receives the shared mist")
-			toggle.button_pressed = false
-			check(not moss.visible and not world.showcase._mist_materials().has(materials.keys()[0]), "Comparison disables the moss and removes its receiver")
-			toggle.button_pressed = true
-			check(moss.visible, "The settings row restores both batches")
+				var shared: ShaderMaterial = materials.keys()[0]
+				check(shared.shader.code.contains("gaf_ground_canopy_sky"), "Moss shares the ground canopy response")
+				check(world.showcase._mist_materials().has(shared), "The default foliage receives the shared mist")
+				toggle.button_pressed = false
+				check(not moss.visible and not world.showcase._mist_materials().has(shared), "Comparison disables the moss and removes its receiver")
+				toggle.button_pressed = true
+				check(moss.visible, "The settings row restores both batches")
 	world.free()
 	await process_frame
 	print("FOREST_LEDGE_MOSS failures=", JSON.stringify(failures), " count=", failures.size())
