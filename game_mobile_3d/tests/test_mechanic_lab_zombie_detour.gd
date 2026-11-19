@@ -357,6 +357,7 @@ func run() -> void:
 	await check_floor_edge_pursuit(1, 0.0, false)
 	await check_floor_edge_pursuit(100, deg_to_rad(27.0), true)
 	await check_active_crowd_at_floor_edge()
+	await check_paired_blocker_release()
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 
@@ -405,5 +406,59 @@ func check_living_blocker(member_count: int, yaw: float, opens := false) -> void
 	print("LAB_LIVING_DETOUR members=", member_count, " yaw=", rad_to_deg(yaw), " waypoint_x=", first_waypoint,
 		" crossing_x=", crossing_x, " rejoin_ticks=", rejoin_ticks, " hits=", hits,
 		" final=", heading.inverse() * chaser.global_position)
+	lab.free()
+	await physics_frame
+
+func check_paired_blocker_release() -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var zombies := spawn_detour_group(lab, 100)
+	if zombies == null:
+		lab.free()
+		return
+	for x in [-1.06, 1.06]:
+		add_wall(lab, Vector3(x, 0.35, -2.8), Vector3(0.2, 0.7, 5.2), 0.0)
+	var follower := zombies.get_child(0) as ZOMBIE
+	var left := zombies.get_child(1) as ZOMBIE
+	var right := zombies.get_child(2) as ZOMBIE
+	left.position = Vector3(-0.34, 0.02, -2.0)
+	right.position = Vector3(0.34, 0.02, -2.0)
+	follower.position = Vector3(0.0, 0.02, -3.8)
+	follower.animation.play(ZOMBIE.IDLE, 0.0)
+	follower.animation.advance(0.0)
+	var hits: Array[int] = []
+	follower.melee_hit.connect(func(damage): hits.append(damage))
+	for tick in 90:
+		await physics_frame
+	var skipped := 0
+	var samples := follower.ragdoll.sample_count
+	for tick in 48:
+		await physics_frame
+		skipped += int(follower._skipped_blocked_step)
+	var pose_steps := follower.ragdoll.sample_count - samples
+	if skipped != 42 or pose_steps != 48:
+		failures.append("A persistent two-zombie jam should make six retries and keep all 48 pose samples")
+	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / ZOMBIE.PACKED_WALK_RETRY_HZ))
+	if Engine.get_physics_frames() % stride == follower._crowd_slot % stride:
+		await physics_frame
+	var release := left if follower._blocking_zombie_id == right.get_instance_id() else right
+	var origin := follower.global_position
+	release.global_position.x += signf(release.global_position.x) * 3.0
+	PhysicsServer3D.body_set_state(release.get_rid(), PhysicsServer3D.BODY_STATE_TRANSFORM, release.global_transform)
+	await physics_frame
+	var woke := not follower._skipped_blocked_step
+	if not woke:
+		failures.append("Moving the second zombie should resume collision checks off schedule")
+	for tick in 125:
+		await physics_frame
+		if not hits.is_empty():
+			break
+	var progress := follower.global_position.z - origin.z
+	if progress <= 0.4 or hits != [ZOMBIE.MELEE_DAMAGE]:
+		failures.append("After release the chaser should advance and land a normal hit")
+	print("LAB_PAIRED_BLOCKER skipped=", skipped, " pose_steps=", pose_steps, " woke=", woke,
+		" progress_m=", progress, " hits=", hits)
 	lab.free()
 	await physics_frame

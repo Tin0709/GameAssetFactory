@@ -227,6 +227,9 @@ var _crowd_slot := 0
 var _blocked_walk := false
 var _blocking_zombie_id := 0
 var _blocking_position := Vector3.ZERO
+var _blocking_peer_id := 0
+var _blocking_peer_position := Vector3.ZERO
+var _repeated_blocking_pair := false
 var _blocked_walk_destination := Vector3.ZERO
 var _skipped_blocked_step := false
 var _flash_left := 0.0
@@ -482,18 +485,32 @@ func _physics_process(delta: float) -> void:
 
 func _wait_for_walk_retry(destination: Vector3) -> bool:
 	var retry_hz := BLOCKED_CHASE_RETRY_HZ
+	var retry_interval := 1
 	if _blocking_zombie_id != 0:
-		var blocker := instance_from_id(_blocking_zombie_id) as CharacterBody3D
-		if (blocker == null or blocker.is_queued_for_deletion() or blocker.collision_layer == 0
-				or blocker.global_position.distance_squared_to(_blocking_position) > BLOCKER_MOVE_DISTANCE_SQUARED
-				or destination.distance_squared_to(_blocked_walk_destination) > WALK_DESTINATION_MOVE_DISTANCE_SQUARED):
+		if _walk_blocker_moved(_blocking_zombie_id, _blocking_position) \
+				or destination.distance_squared_to(_blocked_walk_destination) > WALK_DESTINATION_MOVE_DISTANCE_SQUARED:
 			return false
 		retry_hz = PACKED_WALK_RETRY_HZ
-	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / retry_hz))
+		if _blocking_peer_id != 0:
+			if _walk_blocker_moved(_blocking_peer_id, _blocking_peer_position):
+				return false
+			if _repeated_blocking_pair:
+				retry_interval = 2
+	var stride := maxi(1, roundi(Engine.physics_ticks_per_second / retry_hz)) * retry_interval
 	return Engine.get_physics_frames() % stride != _crowd_slot % stride
 
+func _walk_blocker_moved(id: int, position_at_contact: Vector3) -> bool:
+	var blocker := instance_from_id(id) as CharacterBody3D
+	return blocker == null or blocker.is_queued_for_deletion() or blocker.collision_layer == 0 \
+		or blocker.global_position.distance_squared_to(position_at_contact) > BLOCKER_MOVE_DISTANCE_SQUARED
+
 func _update_walk_blocker(destination: Vector3) -> void:
-	if not _blocked_walk or get_slide_collision_count() == 0:
+	var previous_blocker := _blocking_zombie_id
+	var previous_peer := _blocking_peer_id
+	_blocking_peer_id = 0
+	_repeated_blocking_pair = false
+	var contacts := get_slide_collision_count() if _blocked_walk else 0
+	if contacts == 0:
 		_blocking_zombie_id = 0
 		return
 	var blocker := get_last_slide_collision().get_collider() as CharacterBody3D
@@ -507,6 +524,25 @@ func _update_walk_blocker(destination: Vector3) -> void:
 	_blocking_position = collider_transform.origin
 	# Retry when the destination changes, including on a new sighting.
 	_blocked_walk_destination = destination
+	if contacts < 2:
+		return
+	var peer: CharacterBody3D
+	for i in contacts - 1:
+		var other := get_slide_collision(i).get_collider() as CharacterBody3D
+		if other == null or other == blocker or other.get_parent() != get_parent():
+			continue
+		if peer != null and peer != other:
+			return
+		peer = other
+	if peer == null:
+		return
+	_blocking_peer_id = peer.get_instance_id()
+	var peer_transform: Transform3D = PhysicsServer3D.body_get_state(
+		peer.get_rid(), PhysicsServer3D.BODY_STATE_TRANSFORM)
+	_blocking_peer_position = peer_transform.origin
+	# Only slow a repeat jam. Either peer can wake the existing collision test.
+	_repeated_blocking_pair = (previous_blocker == _blocking_zombie_id and previous_peer == _blocking_peer_id) \
+		or (previous_blocker == _blocking_peer_id and previous_peer == _blocking_zombie_id)
 
 func _integrate_knockback(delta: float) -> Vector3:
 	var speed := _knockback.length()
