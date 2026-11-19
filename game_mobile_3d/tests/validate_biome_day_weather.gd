@@ -149,6 +149,15 @@ func verify() -> void:
 		"Directional shadow softness and opacity come from the selected biome")
 	check(is_equal_approx(env.fog_depth_curve, 2.2) and is_equal_approx(env.fog_light_energy, .81),
 		"Depth fog shape and lighting come from the selected biome")
+	var original_weather = profile.overcast
+	profile.overcast = FOREST.overcast
+	graphics.set_weather(1., 0.)
+	world.showcase.set_hour(16.5)
+	check(is_equal_approx(light.shadow_blur, 2.1 * 1.6) and is_equal_approx(light.shadow_opacity, .66),
+		"The imported map can opt into the shared cloudy blur independently of opacity")
+	profile.overcast = original_weather
+	graphics.set_weather(0., 0.)
+	world.showcase.set_hour(12.)
 	var key_track: Curve = profile.key_energy_by_hour
 	var fog_track: Curve = profile.fog_density_by_hour
 	profile.key_energy_by_hour = null
