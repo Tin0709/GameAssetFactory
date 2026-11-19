@@ -308,8 +308,8 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 	var wall := RID()
 	var wall_bounds := AABB()
 	for overlap in overlaps:
-		var candidate := overlap.collider as StaticBody3D
-		if candidate == null or candidate == _flat_floor.get_parent() or not _is_single_box(candidate.get_rid()):
+		var candidate := overlap.collider as PhysicsBody3D
+		if not _is_fixed_wall(candidate) or candidate == _flat_floor.get_parent() or not _is_single_box(candidate.get_rid()):
 			continue
 		var rid := candidate.get_rid()
 		var pose: Transform3D = PhysicsServer3D.body_get_state(rid, PhysicsServer3D.BODY_STATE_TRANSFORM)
@@ -1266,9 +1266,9 @@ func _slide_wall_shoulder_anchors() -> void:
 				or _projection_hit.get_collision_count() == 0):
 			continue
 		for i in maxi(contacts, 1):
-			var wall := (_projection_hit.get_collider() if swept else state.get_contact_collider_object(i)) as StaticBody3D
+			var wall := (_projection_hit.get_collider() if swept else state.get_contact_collider_object(i)) as PhysicsBody3D
 			var normal := _projection_hit.get_collision_normal() if swept else state.get_contact_local_normal(i)
-			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y:
+			if not _is_fixed_wall(wall) or absf(normal.y) >= MAX_WALL_NORMAL_Y:
 				continue
 			var normal_gap := gap.dot(normal)
 			# An arm rebounding from the wall can also close a tangential
@@ -1304,9 +1304,9 @@ func _slide_rebounding_legs() -> void:
 		if distance <= WALL_SLIDE_MIN_GAP:
 			continue
 		for i in state.get_contact_count():
-			var wall := state.get_contact_collider_object(i) as StaticBody3D
+			var wall := state.get_contact_collider_object(i) as PhysicsBody3D
 			var normal := state.get_contact_local_normal(i)
-			if wall == null or absf(normal.y) >= MAX_WALL_NORMAL_Y or state.linear_velocity.dot(normal) <= 0.0:
+			if not _is_fixed_wall(wall) or absf(normal.y) >= MAX_WALL_NORMAL_Y or state.linear_velocity.dot(normal) <= 0.0:
 				continue
 			var normal_gap := gap.dot(normal)
 			if normal_gap >= 0.0 or -normal_gap > distance * REBOUND_SLIDE_MAX_NORMAL_FRACTION:
@@ -1332,9 +1332,9 @@ func _slide_at_wall_intersection(limb: PhysicalBone3D, state: PhysicsDirectBodyS
 	var walls: Array[RID] = []
 	var first_normal := Vector3.ZERO
 	for i in state.get_contact_count():
-		var wall := state.get_contact_collider_object(i) as StaticBody3D
+		var wall := state.get_contact_collider_object(i) as PhysicsBody3D
 		var normal := state.get_contact_local_normal(i)
-		if wall == null or absf(normal.y) > 0.001:
+		if not _is_fixed_wall(wall) or absf(normal.y) > 0.001:
 			return false
 		var rid := wall.get_rid()
 		if rid in walls:
@@ -1418,7 +1418,7 @@ func _wall_anchor_motion(state: PhysicsDirectBodyState3D, gap: Vector3, require_
 		allow_extra_arm_shift := false) -> Vector3:
 	for index in state.get_contact_count():
 		var normal := state.get_contact_local_normal(index)
-		if absf(normal.y) >= MAX_WALL_NORMAL_Y or not state.get_contact_collider_object(index) is StaticBody3D:
+		if absf(normal.y) >= MAX_WALL_NORMAL_Y or not _is_fixed_wall(state.get_contact_collider_object(index)):
 			continue
 		var rebounding := state.linear_velocity.dot(normal) > 0.0
 		if require_rebound and not rebounding:
