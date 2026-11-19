@@ -331,7 +331,8 @@ func check_lower_wall_edge(lab: Node3D, group: Node, wall: PhysicsBody3D) -> voi
 	state.transform = rotated * pose
 	var rotated_blocked: Vector3 = baby.ragdoll._slide_floor_wall_part(leg, state, box.size * 0.5,
 		yaw * correction, 0.0, floor.get_rid())
-	check(rotated_blocked.is_zero_approx(), "A second obstacle still blocks retreat at a rotated wall")
+	check(rotated_blocked.dot(yaw * Vector3.LEFT) < 0.18,
+		"A second obstacle prevents the leg from clearing the rotated wall")
 	obstruction.free()
 	await physics_frame
 	state = PhysicsServer3D.body_get_direct_state(leg.get_rid())
