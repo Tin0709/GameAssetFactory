@@ -264,9 +264,10 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 				and _wall_blocks_every_handoff_shift(space, collision_mask, wall, wall_bounds, region, floor_bounds):
 			shift_known = false
 			continue
-		shift = _solve_handoff_clearance(_find_clear_handoff_parts(region, floor_bounds, wall_bounds))
+		var clear_parts := _find_clear_handoff_parts(region, floor_bounds, wall_bounds)
+		shift = _solve_handoff_clearance(clear_parts)
 		shift_known = true
-		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift, "", {}):
+		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift, "", {}, clear_parts):
 			rays_clear = true
 			break
 	for bone in source.size():
@@ -406,13 +407,17 @@ func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision
 	return shift
 
 func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: int,
-		shift: Vector3, changed_part: String, wall_crossings: Dictionary[Vector3, bool]) -> bool:
+		shift: Vector3, changed_part: String, wall_crossings: Dictionary[Vector3, bool],
+		clear_parts: Dictionary[String, bool] = {}) -> bool:
 	if _handoff_straddles_wall(space, collision_mask, shift, 0.0, wall_crossings):
 		return false
 	if not changed_part.is_empty():
 		var pose: Transform3D = current[changed_part]
 		return _wall_handoff_part_is_clear(space, bodies[changed_part], pose.translated(shift))
 	for name: String in current:
+		# These parts clear terrain throughout the allowed horizontal shift.
+		if clear_parts.has(name):
+			continue
 		var pose: Transform3D = current[name]
 		if not _wall_handoff_part_is_clear(space, bodies[name], pose.translated(shift)):
 			return false
