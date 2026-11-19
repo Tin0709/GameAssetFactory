@@ -87,11 +87,15 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	return true
 
 func _correct_physical_pose() -> void:
-	if not use_tuned_wall_sweep or not running or _pose_correction_frame == Engine.get_physics_frames():
+	var frame := Engine.get_physics_frames()
+	if not use_tuned_wall_sweep or not running or _pose_correction_frame == frame:
 		super._correct_physical_pose()
 		return
 	_sweep_tuned_lab_walls()
 	super._correct_physical_pose()
+	if use_tuned_floor_support and _limit_first_contact_stretch and frame <= _launch_frame + 1 \
+			and not use_baby_floor_anchors and not _baby_wall_anchors:
+		_recover_tuned_wall_shoulders()
 	if _baby_wall_anchors:
 		# A floor hit can hide a wall from the first ray. Check the
 		# corrected pose before saving the start of the next sweep.
@@ -971,6 +975,69 @@ func _baby_neck_needs_wall_recovery() -> bool:
 		var gap: Vector3 = (parent.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
 		return gap.length_squared() > WALL_SLIDE_MIN_GAP ** 2
 	return false
+
+func _recover_tuned_wall_shoulders() -> void:
+	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return
+	var chest: PhysicalBone3D = bodies.Chest
+	var core := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if core == null or core.get_contact_count() != 0:
+		return
+	for joint in _source_anchor_projections:
+		if joint.name != "Arm.L" and joint.name != "Arm.R":
+			continue
+		var state := PhysicsServer3D.body_get_direct_state(joint.rid)
+		if state == null or state.get_contact_count() == 0:
+			continue
+		var gap := (core.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
+		var distance := gap.length()
+		if distance <= WALL_SLIDE_MIN_GAP:
+			continue
+		for i in state.get_contact_count():
+			var normal := state.get_contact_local_normal(i)
+			var wall := state.get_contact_collider_object(i) as PhysicsBody3D
+			if absf(normal.y) >= MAX_WALL_NORMAL_Y or gap.dot(normal) <= PROJECTION_COLLISION_MARGIN \
+					or not _is_fixed_wall(wall):
+				continue
+			# Bound the correction by how far the two parts can separate in one step.
+			var relative_speed := float(joint.body.get("maximum_linear_speed")) + float(chest.get("maximum_linear_speed"))
+			var limit := relative_speed * state.step
+			if _recover_first_wall_shoulder(joint, state, wall.get_rid(), normal, gap, limit):
+				break
+
+
+func _recover_first_wall_shoulder(joint: PhysicalPart, state: PhysicsDirectBodyState3D,
+		wall: RID, normal: Vector3, gap: Vector3, limit: float) -> bool:
+	if not _is_single_box(wall) or normal.y != 0.0 or (absf(normal.x) != 1.0 and absf(normal.z) != 1.0):
+		return false
+	var wall_pose: Transform3D = PhysicsServer3D.body_get_state(wall, PhysicsServer3D.BODY_STATE_TRANSFORM)
+	wall_pose *= PhysicsServer3D.body_get_shape_transform(wall, 0)
+	if wall_pose.basis != Basis.IDENTITY:
+		return false
+	var wall_half: Vector3 = PhysicsServer3D.shape_get_data(PhysicsServer3D.body_get_shape(wall, 0))
+	var pose := state.transform
+	var side := (pose.origin - wall_pose.origin).dot(normal)
+	if side <= 0.0:
+		return false
+	var extent := (pose.basis.transposed() * normal).abs().dot(joint.half_size)
+	var retreat_distance := maxf(wall_half.dot(normal.abs()) + extent - side + 2.0 * PROJECTION_COLLISION_MARGIN, 0.0)
+	if retreat_distance > limit:
+		return false
+	# Clear the contacted face first. The retreat only moves out of this
+	# box, and both it and the following tangent sweep test all other bodies.
+	var retreat := normal * retreat_distance
+	if retreat_distance > 0.0 and _test_projection_motion(joint.body, pose, retreat, wall):
+		return false
+	var tangent := gap.slide(normal).limit_length(maxf(limit - retreat_distance, 0.0))
+	var separated := pose.translated(retreat)
+	if _test_projection_motion(joint.body, separated, tangent):
+		tangent *= _projection_hit.get_collision_safe_fraction()
+	var motion := retreat + tangent
+	if (gap - motion).length_squared() >= gap.length_squared():
+		return false
+	state.transform = pose.translated(motion)
+	return true
+
 
 func _recover_baby_wall_anchors() -> void:
 	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
