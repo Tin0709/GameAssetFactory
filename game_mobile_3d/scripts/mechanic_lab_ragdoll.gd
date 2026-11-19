@@ -482,6 +482,10 @@ func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision
 	var origin := skeleton_transform.origin + shift
 	_handoff_ray.collision_mask = collision_mask
 	var wall_crossings: Dictionary[Vector3, bool] = {}
+	# The last blend can be selected without a branch clearance check.
+	# Verify its rays once so each independent limb can test just its own pose.
+	if not rays_clear:
+		rays_clear = not _handoff_straddles_wall(space, collision_mask, shift, 0.0, wall_crossings)
 	for name in ["Head", "Arm.L", "Arm.R", "Leg.L", "Leg.R"]:
 		var body: PhysicalBone3D = bodies[name]
 		var bone := body.get_bone_id()
