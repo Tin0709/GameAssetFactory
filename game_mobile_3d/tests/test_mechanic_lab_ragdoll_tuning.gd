@@ -59,6 +59,7 @@ func run() -> void:
 			" ground_scales=", [lighter.ground_scale, heavier.ground_scale])
 		await check_tuned_wall_contact(lab, 88, Zombie.WALK_CLIPS[0], 2, 11, 0.35)
 		await check_tuned_wall_contact(lab, 92, Zombie.STAGGER, 11, 7, 0.42)
+		await check_tuned_wall_contact(lab, 87, Zombie.ATTACK, 3, 17, 0.38)
 	lab.free()
 	print("MECHANIC_LAB_RAGDOLL_TUNING failures=", failures)
 	quit(0 if failures.is_empty() else 1)
