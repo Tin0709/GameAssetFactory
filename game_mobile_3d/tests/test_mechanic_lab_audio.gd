@@ -833,6 +833,7 @@ func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
 		return voice.playing and (voice.stream in baby_deaths if voice.global_position == near_points[1]
 			else voice.global_position in [near_points[0], near_points[2]] and voice.stream in adult_deaths)),
 		"Adult and Baby Zombie deaths share the three nearest reaction voices")
+	await physics_frame
 	var adult := group.get_child(0) as ZOMBIE
 	adult.health = 8
 	group.strike_bolt({"collider": adult, "position": ear}, Vector3.FORWARD, 510, strike)
