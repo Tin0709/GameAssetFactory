@@ -42,6 +42,7 @@ var _wall_handoff_frame := -1
 var _launch_frame := -1
 var _tuned_wall_poses: Dictionary[String, Vector3]
 var use_tuned_wall_sweep := false
+var use_tuned_floor_support := false
 var wall_handoff_animation: AnimationPlayer
 var wall_handoff_idle: StringName
 var wall_handoff_idle_pose: Array[Transform3D]
@@ -708,6 +709,25 @@ func _limit_floor_anchor_stretch(lifts: Dictionary[PhysicalBone3D, float], depth
 		reduced_lift = local_lift
 	if reduced_lift < shared_lift:
 		_distribute_floor_lift(lifts, depths, shared_lift, slop, reduced_lift, anchor_limit)
+
+func _project_floor_contact() -> void:
+	super._project_floor_contact()
+	if not use_tuned_floor_support or not floor_landing_blended:
+		return
+	var floor_body := _flat_floor.get_parent() as StaticBody3D
+	if floor_body == null or not _flat_floor.global_basis.y.is_equal_approx(Vector3.UP):
+		return
+	var default_gravity := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+	# Once the landing blend has finished, carry the added gravity through
+	# the supported parts. This keeps the normal solver from repeatedly
+	# lifting those parts out of the floor under the higher load.
+	for part in _physical_parts:
+		var state := PhysicsServer3D.body_get_direct_state(part.rid)
+		if state == null or state.sleeping or not _body_supported_by(part.body, floor_body):
+			continue
+		var added_acceleration := -state.total_gravity.y - default_gravity
+		if added_acceleration > 0.0:
+			PhysicsServer3D.body_apply_central_force(part.rid, Vector3.UP * added_acceleration * part.body.mass)
 
 func _resolve_floor_anchor_lifts(lifts: Dictionary[PhysicalBone3D, float], depths: Dictionary[PhysicalBone3D, float],
 		shared_lift: float, slop: float, landing_blended: bool) -> void:

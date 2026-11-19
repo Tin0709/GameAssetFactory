@@ -50,6 +50,8 @@ func run() -> void:
 			"Only the gravity slider changes the flight acceleration")
 		check(is_equal_approx(lighter.ground_scale, 0.25) and is_equal_approx(heavier.ground_scale, 10.0),
 			"The grounded ragdoll finishes its gravity blend at either setting")
+		check(heavier.rested and combined.rested,
+			"At 1000% gravity the real Sabre combo settles and releases the grounded rig")
 		print("RAGDOLL_TUNING flight=", [baseline.flight, stronger.flight, lighter.flight, heavier.flight],
 			" impulse=", [baseline.impulse.length(), stronger.impulse.length()],
 			" ground_scales=", [lighter.ground_scale, heavier.ground_scale])
@@ -74,7 +76,7 @@ func replay_combo(lab) -> Dictionary:
 	var group = lab.get_node("Zombies")
 	group._spawn_serial = 1
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
-	var result := {"health": [], "impulse": Vector3.ZERO, "flight": 0.0, "ground_scale": 0.0}
+	var result := {"health": [], "impulse": Vector3.ZERO, "flight": 0.0, "ground_scale": 0.0, "rested": false}
 	var zombie = group.get_child(0)
 	if zombie == null:
 		return result
@@ -106,9 +108,9 @@ func replay_combo(lab) -> Dictionary:
 		var state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
 		if result.flight == 0.0 and state and not zombie._corpse_landed:
 			result.flight = state.total_gravity.y
-		if zombie.ragdoll.floor_landing_blended:
+		if result.ground_scale == 0.0 and zombie.ragdoll.floor_landing_blended:
 			result.ground_scale = chest.gravity_scale
-			break
+	result.rested = zombie._corpse_parked and zombie.ragdoll.bodies.is_empty()
 	zombie.free()
 	await physics_frame
 	return result
