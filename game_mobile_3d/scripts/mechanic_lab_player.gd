@@ -46,10 +46,11 @@ var _bow_aim: Variant
 
 func source_step_dust_size() -> float:
 	var source: String = clips.get(active_clip, {}).get("source_name", "")
+	# Use the verified Master effects as the Curved Greatsword fallback.
 	match source:
-		"Player_Master_Run":
+		"Player_Master_Run", "Player_2H_Medium_Run":
 			return 1.0
-		"Player_Master_Walk", "Player_Crossbow_Walk", "Player_Crossbow_Run":
+		"Player_Master_Walk", "Player_2H_Medium_Walk", "Player_Crossbow_Walk", "Player_Crossbow_Run":
 			return 0.0
 	return -1.0
 
