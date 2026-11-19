@@ -251,6 +251,7 @@ var _ragdoll_layout: Dictionary
 var _corpse_floor: CollisionShape3D
 static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
+static var _baby_death_profile: DeathProfile
 static var _corpse_base_material: ShaderMaterial
 var _live_capsule: CapsuleShape3D
 static var _adult_capsule: CapsuleShape3D
@@ -1016,7 +1017,15 @@ func _update_death(delta: float) -> void:
 		elif _death_strike == DeathStrike.SABRE_GROUND:
 			floor_impact_limb_share = SABRE_GROUND_FLOOR_LIMB_SHARE
 		var flight_gravity := ZOMBIE_GRAVITY * ragdoll_gravity_multiplier
-		if ragdoll.begin(_death_profile, direction, "Chest", 0.0, flight_gravity,
+		var profile := _death_profile
+		if is_baby:
+			if _baby_death_profile == null:
+				_baby_death_profile = _death_profile.duplicate() as DeathProfile
+				# Match the smaller rig's inertia and share more of the hit across its body.
+				_baby_death_profile.angular_impulse *= mass / SOURCE_RIG_LAB_MASS * (BABY_HEIGHT / HEIGHT) ** 2
+				_baby_death_profile.transport_fraction = 0.98
+			profile = _baby_death_profile
+		if ragdoll.begin(profile, direction, "Chest", 0.0, flight_gravity,
 				_corpse_floor, floor_impact_limb_share, sabre_finisher, cos(angle) * launch_impulse, sin(angle) * launch_impulse):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
