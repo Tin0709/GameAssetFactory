@@ -897,9 +897,20 @@ func check_baby_zombie_swing(bus: int, capture: AudioEffectCapture) -> void:
 	check(peak > 0.001 and peak < 0.9, "The source swing reaches the silent mixer with headroom")
 	print("MECHANIC_LAB_BABY_SWING peak=", peak)
 	audio.reset()
+	baby.global_position = lab.player.global_position + Vector3.FORWARD * 1.15
+	baby.animation.seek(17.0 / 30.0, true)
+	baby._advance_animation(0.15, Vector3.ZERO)
+	audio.flush_zombie_combat_cues()
+	check(lab.player_health == initial_hp - ZOMBIE.BABY_MELEE_DAMAGE
+		and attacks.any(func(voice): return voice.playing and voice.stream in bank)
+		and attacks.any(func(voice): return voice.playing and voice.stream in audio._groups[&"zombie_hit"]),
+		"Crossing both markers in one update retains the swing, confirmed cue, and source damage")
+	audio.reset()
 	var point := baby.combat_center()
 	for i in COMBAT_AUDIO.VOICES_PER_POOL:
 		audio._play(&"baby_swing", point + Vector3.RIGHT * i, -20.0)
+	check(attacks.all(func(voice): return voice.playing and voice.stream in bank),
+		"The overflow fixture fills all three attack voices with swings")
 	var windup: AudioStreamPlayer3D = audio._play(&"zombie_windup", point, COMBAT_AUDIO.ZOMBIE_WINDUP_GAIN_DB)
 	var hit: AudioStreamPlayer3D = audio._play(&"zombie_hit", point, COMBAT_AUDIO.ZOMBIE_HIT_GAIN_DB)
 	check(windup != null and hit != null and windup != hit and windup.stream in audio._groups[&"zombie_windup"],
