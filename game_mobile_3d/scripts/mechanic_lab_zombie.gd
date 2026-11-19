@@ -32,6 +32,18 @@ const ATTACK := &"Zombie_BasicAttack"
 const STAGGER := &"Zombie_Staggered"
 const BASE_HEALTH := 8
 const TRAINING_HEALTH := 48
+const BABY_HEIGHT := 1.125
+const BABY_SPEED := 8.5
+const BABY_SIGHT_RADIUS_SQUARED := 15.0 * 15.0
+const BABY_MELEE_DAMAGE := 5
+const BABY_MELEE_REACH := 1.5
+const BABY_MELEE_APPROACH := 1.02
+const BABY_MAX_POISE := 50.0
+const BABY_ATTACK_RATE := 1.1
+# Local contact and focus markers derived from the leading hand's swing.
+const BABY_ATTACK_CONTACT := 20.0 / 30.0
+const BABY_ATTACK_FOCUS_END := 18.0 / 30.0
+const BABY_STEP_CONTACTS := [Vector2(0.2, 0.0625), Vector2(0.4, -0.0625)]
 const MAX_POISE := 28.0
 const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
@@ -164,6 +176,20 @@ var animation: AnimationPlayer
 var ragdoll: Ragdoll
 var max_health := TRAINING_HEALTH
 var health := TRAINING_HEALTH
+var is_baby := false
+var _body_height := HEIGHT
+var _chase_speed := CHASE_SPEED
+var _roam_speed := LAB_ROAM_SPEED
+var _sight_radius_squared := LAB_SIGHT_RADIUS_SQUARED
+var _sight_delay := LAB_SIGHT_DELAY
+var _melee_approach := MELEE_RANGE
+var _melee_reach := MELEE_REACH
+var _melee_damage := MELEE_DAMAGE
+var _max_poise := MAX_POISE
+var _knockback_resistance := 1.0
+var _attack_contact := MELEE_CONTACT_TIME
+var _attack_focus_end := LAB_ATTACK_HIT_SECTION
+var _telegraph_rate := TELEGRAPH_RATE
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
 var _feedback: Feedback
@@ -226,13 +252,15 @@ var _corpse_floor: CollisionShape3D
 static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
 static var _corpse_base_material: ShaderMaterial
-static var _live_capsule: CapsuleShape3D
+var _live_capsule: CapsuleShape3D
+static var _adult_capsule: CapsuleShape3D
+static var _baby_capsule: CapsuleShape3D
 # These main-thread queries run synchronously and store no results.
 static var _sight_ray: PhysicsRayQueryParameters3D
 static var _lab_path_sweep: PhysicsShapeQueryParameters3D
 
-static func prepare_lab_skin(model: Node) -> void:
-	var mesh := model.find_child("SK_Zombie", true, false) as MeshInstance3D
+static func prepare_lab_skin(model: Node, mesh_name := "SK_Zombie") -> void:
+	var mesh := model.find_child(mesh_name, true, false) as MeshInstance3D
 	var skin := mesh.get_active_material(0) as StandardMaterial3D if mesh != null else null
 	if skin == null or skin.albedo_texture == null:
 		return
@@ -245,37 +273,62 @@ static func prepare_lab_skin(model: Node) -> void:
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D],
 		serial: int, ragdoll_layout: Dictionary = {}, corpse_floor: CollisionShape3D = null,
-		health_bars: HealthBars = null, damage_numbers: DamageNumbers = null) -> void:
+		health_bars: HealthBars = null, damage_numbers: DamageNumbers = null, baby := false) -> void:
+	is_baby = baby
+	if is_baby:
+		_body_height = BABY_HEIGHT
+		_chase_speed = BABY_SPEED
+		_roam_speed = BABY_SPEED
+		_sight_radius_squared = BABY_SIGHT_RADIUS_SQUARED
+		_sight_delay = 0.0 # DefaultHostile acquisition delay.
+		_melee_approach = BABY_MELEE_APPROACH
+		_melee_reach = BABY_MELEE_REACH
+		_melee_damage = BABY_MELEE_DAMAGE
+		_max_poise = BABY_MAX_POISE
+		_poise = _max_poise
+		_knockback_resistance = 2.0
+		_attack_contact = BABY_ATTACK_CONTACT
+		_attack_focus_end = BABY_ATTACK_FOCUS_END
+		_telegraph_rate = BABY_ATTACK_RATE
 	target = player
 	_ragdoll_layout = ragdoll_layout
 	_corpse_floor = corpse_floor
 	_crowd_slot = serial
 	_death_rng.seed = hash(Vector2i(serial, 1709))
 	_roam_rng.seed = hash(Vector2i(serial, 4021))
-	_walk_clip = WALK_CLIPS[serial % WALK_CLIPS.size()]
+	_walk_clip = WALK_CLIPS[0 if is_baby else serial % WALK_CLIPS.size()]
 	add_child(model)
 	animation = model.get_node("AnimationPlayer")
 	animation.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
-	_mesh = model.find_child("SK_Zombie", true, false)
+	_mesh = model.find_child("SK_BabyZombie" if is_baby else "SK_Zombie", true, false)
 	_feedback = Feedback.new()
 	_feedback.digits = digits
 	_feedback.effects = effects
 	_feedback.health_bars = health_bars
 	_feedback.damage_numbers = damage_numbers
+	_feedback.position.y = _body_height - HEIGHT
 	add_child(_feedback)
-	if _live_capsule == null:
-		_live_capsule = CapsuleShape3D.new()
-		_live_capsule.radius = 0.43
-		_live_capsule.height = HEIGHT
+	if is_baby and _baby_capsule == null:
+		_baby_capsule = CapsuleShape3D.new()
+		_baby_capsule.radius = 0.24
+		_baby_capsule.height = BABY_HEIGHT
+	elif not is_baby and _adult_capsule == null:
+		_adult_capsule = CapsuleShape3D.new()
+		_adult_capsule.radius = 0.43
+		_adult_capsule.height = HEIGHT
+	_live_capsule = _baby_capsule if is_baby else _adult_capsule
+	if _lab_path_sweep == null:
 		_lab_path_sweep = PhysicsShapeQueryParameters3D.new()
-		_lab_path_sweep.shape = _live_capsule
 		_lab_path_sweep.collision_mask = LEVEL_COLLISION_MASK
 	var collision := CollisionShape3D.new()
-	collision.position.y = HEIGHT * 0.5
+	collision.position.y = _body_height * 0.5
 	collision.shape = _live_capsule
 	add_child(collision)
 	collision_layer = LIVING_ZOMBIE_LAYER
 	collision_mask = LEVEL_COLLISION_MASK | 2 | LIVING_ZOMBIE_LAYER
+
+func combat_center() -> Vector3:
+	return global_position + Vector3.UP * (_body_height * 0.5)
 
 func _ready() -> void:
 	set_process(false)
@@ -383,7 +436,7 @@ func _physics_process(delta: float) -> void:
 		return
 	var recovery_time := maxf(0.0, delta - _poise_recovery_wait)
 	_poise_recovery_wait = maxf(0.0, _poise_recovery_wait - delta)
-	_poise = minf(MAX_POISE, _poise + POISE_RECOVERY_PER_SECOND * recovery_time)
+	_poise = minf(_max_poise, _poise + POISE_RECOVERY_PER_SECOND * recovery_time)
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 	var in_lab := is_instance_valid(_corpse_floor)
 	var crowd := in_lab and get_parent().get_child_count() >= CROWD_RETRY_MIN_ZOMBIES
@@ -483,16 +536,16 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 		return
 	var before := animation.current_animation_position
 	var lab := is_instance_valid(_corpse_floor)
-	var montage_rate := LAB_MELEE_MONTAGE_RATE if lab else 1.0
-	var hit_section := LAB_ATTACK_HIT_SECTION if lab else TELEGRAPH_END
-	var windup_rate := TELEGRAPH_RATE * montage_rate
+	var montage_rate := LAB_MELEE_MONTAGE_RATE if lab and not is_baby else 1.0
+	var hit_section := _attack_focus_end if lab else TELEGRAPH_END
+	var windup_rate := _telegraph_rate * montage_rate
 	var telegraph_seconds := clampf((hit_section - before) / windup_rate, 0.0, delta)
 	# AN_FocusOnTarget disables tracking at the start of Attack_Hit.
 	if lab and telegraph_seconds > 0.0 and _target_visible and _windup_target_has_moved(_last_seen_position):
 		_face_target(_last_seen_position - global_position, telegraph_seconds)
 	var advance_seconds := telegraph_seconds * windup_rate + (delta - telegraph_seconds) * montage_rate
 	animation.advance(advance_seconds)
-	if before < MELEE_CONTACT_TIME and before + advance_seconds >= MELEE_CONTACT_TIME:
+	if before < _attack_contact and before + advance_seconds >= _attack_contact:
 		_check_melee_contact()
 
 func _emit_idle_audio(previous_phase: float) -> void:
@@ -505,12 +558,13 @@ func _emit_idle_audio(previous_phase: float) -> void:
 		# Keep idle chance independent of the zombie's patrol and ragdoll draws.
 		var roll := float(hash(Vector2i(_crowd_slot, _idle_audio_index))) / 4294967296.0
 		if roll < IDLE_AUDIO_CHANCE:
-			idle_audio.emit(global_position + Vector3.UP * (HEIGHT * 0.5))
+			idle_audio.emit(combat_center())
 
 func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
 	var phase := animation.current_animation_position
 	var wrapped := phase < previous_phase
-	for contact: Vector2 in WALK_STEP_NOTIFIES[clip]:
+	var contacts: Array = BABY_STEP_CONTACTS if is_baby else WALK_STEP_NOTIFIES[clip]
+	for contact: Vector2 in contacts:
 		var at := contact.x
 		var crossed := (at > previous_phase or at <= phase) if wrapped else (at > previous_phase and at <= phase)
 		if crossed:
@@ -520,15 +574,14 @@ func _check_melee_contact() -> void:
 	if target.get("is_dead") == true:
 		return
 	var offset := target.global_position - global_position
-	if absf(offset.y) > MELEE_HEIGHT_LIMIT:
+	if absf(offset.y) > _melee_reach:
 		return
 	offset.y = 0.0
-	if offset.length_squared() > MELEE_REACH * MELEE_REACH or not _is_in_melee_cone(offset):
+	if offset.length_squared() > _melee_reach * _melee_reach or not _is_in_melee_cone(offset):
 		return
-	var height := Vector3.UP * (HEIGHT * 0.5)
 	if _clear_sight_to(target.global_position):
-		melee_audio.emit(global_position + height, true)
-		melee_hit.emit(MELEE_DAMAGE)
+		melee_audio.emit(combat_center(), true)
+		melee_hit.emit(_melee_damage)
 
 func _clear_sight_to(point: Vector3) -> bool:
 	var height := Vector3.UP * (HEIGHT * 0.5)
@@ -536,7 +589,7 @@ func _clear_sight_to(point: Vector3) -> bool:
 		_sight_ray = PhysicsRayQueryParameters3D.new()
 		_sight_ray.collision_mask = LEVEL_COLLISION_MASK
 		_sight_ray.hit_from_inside = true
-	_sight_ray.from = global_position + height
+	_sight_ray.from = combat_center()
 	_sight_ray.to = point + height
 	return get_world_3d().direct_space_state.intersect_ray(_sight_ray).is_empty()
 
@@ -549,8 +602,8 @@ func _update_target_sight(delta: float, sample_ai: bool) -> void:
 		_sight_state_seconds = 0.0
 		return
 	var point := target.global_position
-	var delay := LAB_SIGHT_LOSS_DELAY if _target_aggressive else LAB_SIGHT_DELAY
-	if global_position.distance_squared_to(point) > LAB_SIGHT_RADIUS_SQUARED:
+	var delay := LAB_SIGHT_LOSS_DELAY if _target_aggressive else _sight_delay
+	if global_position.distance_squared_to(point) > _sight_radius_squared:
 		_target_visible = false
 	elif sample_ai or _needs_windup_sight(point) or (_target_visible != _target_aggressive
 			and _sight_state_seconds + delta >= delay - 0.000001):
@@ -568,7 +621,7 @@ func _update_target_sight(delta: float, sample_ai: bool) -> void:
 			_reset_roam()
 
 func _needs_windup_sight(point: Vector3) -> bool:
-	if animation.current_animation != ATTACK or animation.current_animation_position >= LAB_ATTACK_HIT_SECTION:
+	if animation.current_animation != ATTACK or animation.current_animation_position >= _attack_focus_end:
 		return false
 	# A moving target can sidestep or enter cover before the next crowd ray.
 	# Check both positions so a return to the start also stops the old turn.
@@ -608,7 +661,7 @@ func _roam_velocity(delta: float, sample_ai: bool) -> Vector3:
 		return Vector3.ZERO
 	_face_target(offset, delta)
 	_play_loop(_walk_clip)
-	return offset * (minf(LAB_ROAM_SPEED, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
+	return offset * (minf(_roam_speed, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
 
 func _pick_roam_destination() -> Vector3:
 	# Keep the capsule inside the flat Lab floor and test the body along
@@ -635,7 +688,9 @@ func _pick_roam_destination() -> Vector3:
 	return Vector3.INF
 
 func _prepare_lab_path_sweep(include_zombies := false) -> void:
-	_lab_path_sweep.transform = Transform3D(Basis.IDENTITY, global_position + Vector3.UP * (HEIGHT * 0.5))
+	if _lab_path_sweep.shape != _live_capsule:
+		_lab_path_sweep.shape = _live_capsule
+	_lab_path_sweep.transform = Transform3D(Basis.IDENTITY, combat_center())
 	# Keep terrain in the query and exclude the flat floor supporting the capsule.
 	var floor_body := _corpse_floor.get_parent() as StaticBody3D
 	var exclude: Array[RID] = []
@@ -684,7 +739,7 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool, targ
 				else:
 					direct_clear = _lab_path_fraction(space, offset) >= 1.0 and _lab_path_end_clear(space, offset)
 			if not direct_clear:
-				return travel * (minf(CHASE_SPEED, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
+				return travel * (minf(_chase_speed, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
 		_clear_chase_detour()
 
 	# During sight loss, a committed leg still leads toward the last seen
@@ -716,7 +771,7 @@ func _chase_detour_velocity(offset: Vector3, delta: float, sample_ai: bool, targ
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
 			# Returning directly through the blocker would undo this side step.
 			_chase_detour_around_zombie = living_blocker
-			return (_chase_detour - global_position).slide(Vector3.UP).normalized() * CHASE_SPEED
+			return (_chase_detour - global_position).slide(Vector3.UP).normalized() * _chase_speed
 		break
 	return Vector3.ZERO
 
@@ -766,9 +821,9 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 func _detour_reaches_approach(space: PhysicsDirectSpaceState3D, detour: Vector3, target_offset: Vector3) -> bool:
 	var approach := target_offset - detour
 	var distance := approach.length()
-	if distance <= MELEE_RANGE:
+	if distance <= _melee_approach:
 		return true
-	approach *= (distance - MELEE_RANGE) / distance
+	approach *= (distance - _melee_approach) / distance
 	var start := _lab_path_sweep.transform
 	var mask := _lab_path_sweep.collision_mask
 	# Test the remainder against terrain. Other zombies can move by the
@@ -801,7 +856,7 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	var height_delta := absf(offset.y)
 	offset.y = 0.0
 	var distance := offset.length()
-	var stop_distance := MELEE_RANGE if target_visible else LAB_LAST_SEEN_STOP_DISTANCE
+	var stop_distance := _melee_approach if target_visible else LAB_LAST_SEEN_STOP_DISTANCE
 	if (in_lab and (target_visible or _chase_detour.is_finite()) and distance > stop_distance + MELEE_RANGE_TOLERANCE
 			and is_on_floor() and not _corpse_floor.disabled):
 		var detour := _chase_detour_velocity(offset, delta, sample_ai, target_visible)
@@ -813,14 +868,14 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 		_clear_chase_detour()
 	_face_target(offset, delta)
 	if distance > stop_distance + MELEE_RANGE_TOLERANCE:
-		var travel := offset.normalized() * minf(CHASE_SPEED, (distance - stop_distance) / delta)
+		var travel := offset.normalized() * minf(_chase_speed, (distance - stop_distance) / delta)
 		if in_lab and is_on_floor() and not _corpse_floor.disabled:
 			travel = _limit_lab_pursuit_to_floor(travel, delta)
 		_play_loop(IDLE if travel.is_zero_approx() else _walk_clip)
 		return travel
 	# Complete the approach turn before locking the swing's heading.
 	var facing_target := _is_in_melee_cone(offset)
-	if target_visible and height_delta <= MELEE_HEIGHT_LIMIT and facing_target and _attack_cooldown <= 0.0:
+	if target_visible and height_delta <= _melee_reach and facing_target and _attack_cooldown <= 0.0:
 		var target_position := target.global_position
 		if in_lab and not sample_ai and not _confirm_windup_target(target_position):
 			_play_loop(IDLE)
@@ -828,7 +883,7 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 		_windup_target_start = target_position
 		animation.play(ATTACK, 0.1)
 		_attack_cooldown = MELEE_COOLDOWN
-		melee_audio.emit(global_position + Vector3.UP * (HEIGHT * 0.5), false)
+		melee_audio.emit(combat_center(), false)
 	else:
 		_play_loop(IDLE)
 	return Vector3.ZERO
@@ -853,10 +908,10 @@ func _confirm_windup_target(point: Vector3) -> bool:
 	# Crowd sight runs on a staggered clock. The current target must still
 	# be in reach and in front before this tick can commit the windup.
 	var offset := point - global_position
-	if absf(offset.y) > MELEE_HEIGHT_LIMIT:
+	if absf(offset.y) > _melee_reach:
 		return false
 	offset.y = 0.0
-	if offset.length_squared() > (MELEE_RANGE + MELEE_RANGE_TOLERANCE) ** 2 or not _is_in_melee_cone(offset):
+	if offset.length_squared() > (_melee_approach + MELEE_RANGE_TOLERANCE) ** 2 or not _is_in_melee_cone(offset):
 		return false
 	_target_visible = _clear_sight_to(point)
 	if _target_visible:
@@ -896,7 +951,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		set_deferred("collision_layer", 0)
 		set_deferred("collision_mask", 0)
 	elif stagger > 0.0:
-		_knockback = direction * launch_impulse.x / 80.0
+		_knockback = direction * launch_impulse.x / (80.0 * _knockback_resistance)
 		_knockback_deceleration = KNOCKBACK_DECELERATION
 		if not _knockback.is_zero_approx():
 			if push_duration > 0.0:
@@ -909,7 +964,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		_poise -= stagger
 		_poise_recovery_wait = POISE_RECOVERY_DELAY
 		if _poise <= 0.0:
-			_poise = MAX_POISE
+			_poise = _max_poise
 			if animation.current_animation != STAGGER:
 				animation.stop(true)
 				var clip_duration := animation.get_animation(STAGGER).length
