@@ -283,7 +283,63 @@ func check_active_crowd_at_floor_edge() -> void:
 	lab.free()
 	await physics_frame
 
+func check_direct_approach_after_cover_opens(member_count: int, yaw: float) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var zombies := spawn_detour_group(lab, member_count)
+	if zombies == null:
+		lab.free()
+		return
+	var heading := Basis(Vector3.UP, yaw)
+	lab.player.global_position = Vector3(0.0, 0.02, 0.0)
+	# The 36 cm gap fits the player's 30 cm radius but not the zombie's 43 cm radius.
+	add_wall(lab, heading * Vector3(0.0, 1.5, 0.45), Vector3(5.0, 3.0, 0.18), yaw)
+	var cover := add_wall(lab, heading * Vector3(0.0, 0.35, -2.25), Vector3(2.5, 0.7, 0.30), yaw)
+	var chaser := zombies.get_child(0) as ZOMBIE
+	chaser.position = heading * Vector3(0.0, 0.02, -4.2)
+	chaser.animation.play(ZOMBIE.IDLE, 0.0)
+	chaser.animation.advance(0.0)
+	var damage: Array[int] = []
+	chaser.melee_hit.connect(func(amount: int): damage.append(amount))
+	for tick in 150:
+		await physics_frame
+		if chaser._chase_detour.is_finite():
+			break
+	if not chaser._chase_detour.is_finite():
+		failures.append("The fixture must start a detour around the front cover")
+		lab.free()
+		return
+	cover.free()
+	await physics_frame
+	chaser._prepare_lab_path_sweep()
+	var space := chaser.get_world_3d().direct_space_state
+	var ray: Vector3 = (lab.player.global_position - chaser.global_position).slide(Vector3.UP)
+	var approach := ray.move_toward(Vector3.ZERO, chaser._melee_approach)
+	var blocked_center := not chaser._lab_path_end_clear(space, ray)
+	var clear_approach := chaser._lab_path_end_clear(space, approach) and chaser._lab_path_fraction(space, approach) >= 1.0
+	for tick in 5:
+		await physics_frame
+	var resumed := not chaser._chase_detour.is_finite() and chaser._target_visible
+	if not blocked_center or not clear_approach:
+		failures.append("The central point must be obstructed while the melee approach clears the wall")
+	if not resumed:
+		failures.append("The zombie should drop its detour when the route to melee reach opens")
+	for tick in 180:
+		await physics_frame
+		if not damage.is_empty():
+			break
+	if damage != [ZOMBIE.MELEE_DAMAGE]:
+		failures.append("The restored direct route must still produce the normal melee hit")
+	print("LAB_DIRECT_APPROACH members=", member_count, " yaw=", rad_to_deg(yaw),
+		" blocked_center=", blocked_center, " clear_approach=", clear_approach, " resumed=", resumed, " hits=", damage)
+	lab.free()
+	await physics_frame
+
 func run() -> void:
+	await check_direct_approach_after_cover_opens(1, 0.0)
+	await check_direct_approach_after_cover_opens(100, deg_to_rad(27.0))
 	await check_detour(1, 0.0, false)
 	await check_detour(100, deg_to_rad(27.0), true)
 	await check_detour(100, 0.0, true, true)
