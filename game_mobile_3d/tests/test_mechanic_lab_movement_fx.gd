@@ -96,6 +96,7 @@ func run() -> void:
 	await check_non_grass_steps(lab, dust, wind)
 	await check_wall_slide_steps(lab, dust, wind)
 	await check_curved_step_effects(lab, dust, wind)
+	await check_steps_during_attacks(lab, dust)
 	await check_dust_contact_clock(lab, dust)
 	await check_zombie_steps_on_slab(lab)
 	await check_zombie_dust_contact_clock(lab)
@@ -669,6 +670,78 @@ func check_curved_step_effects(lab, dust: Node3D, wind: Node3D) -> void:
 	sound.button_pressed = sound_was_enabled
 	lab.reset_player()
 	await physics_frame
+
+func check_steps_during_attacks(lab, dust: Node3D) -> void:
+	var player = lab.player
+	var picker := lab.get_node("HUD/Weapon") as OptionButton
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var movement = lab.get_node("MovementAudio")
+	var selected := picker.selected
+	var sound_was_enabled := toggle.button_pressed
+	toggle.button_pressed = true
+	for slot: int in [0, 2, 3, 6]:
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		picker.select(slot)
+		picker.item_selected.emit(slot)
+		check(lab._equipped_weapon == slot, "The movement fixture equips %s" % picker.get_item_text(slot))
+		for walking: bool in [false, true]:
+			var expected_puffs := 0 if walking or slot == 3 else 1
+			var counts := [0, 0]
+			var last_audio := [int(movement.event_count.grass)]
+			var observed := func(sole: Vector3, landed: bool):
+				if landed:
+					return
+				var audio_before: int = last_audio[0]
+				last_audio[0] = int(movement.event_count.grass)
+				if player.active_clip in player.GAITS or not player._move_requested:
+					return
+				if slot != 3 and not (player._combat_was_moving or (slot == 6 and player.hybrid_motion.phase_advanced > 0.0)):
+					return
+				var ground: Dictionary = lab._player_foot_contact_at(sole)
+				if ground.is_empty():
+					return
+				var contact_tick := Engine.get_physics_frames()
+				var puffs: Array = dust._particles.filter(func(p): return p.sprite.visible and p.contact_tick == contact_tick)
+				var correct_dust := puffs.size() == expected_puffs
+				if expected_puffs == 1 and correct_dust:
+					correct_dust = puffs[0].run_drag > 0.0 and puffs[0].velocity == Vector3.ZERO \
+						and puffs[0].origin.is_equal_approx(ground.position + Vector3.UP * 0.20) \
+						and is_equal_approx(puffs[0].sprite.pixel_size * 16.0, 1.0)
+				var correct_audio: bool = last_audio[0] == audio_before + 1 \
+					and movement.events[-1].at == [ground.position.x, ground.position.y, ground.position.z]
+				counts[0] += 1
+				counts[1] += int(correct_dust and correct_audio)
+			player.surface_contact.connect(observed)
+			for attack_at: int in [24, 33, 41]:
+				lab.reset_player()
+				for i in 9:
+					await physics_frame
+				Input.action_press("move_forward")
+				if walking:
+					Input.action_press("sprint")
+				for i in 125:
+					if i == attack_at or i == attack_at + 48:
+						var attack := InputEventKey.new()
+						attack.physical_keycode = KEY_E
+						attack.pressed = i == attack_at
+						root.push_input(attack, true)
+					await physics_frame
+				Input.action_release("move_forward")
+				Input.action_release("sprint")
+			player.surface_contact.disconnect(observed)
+			var label := picker.get_item_text(slot)
+			check(counts[0] > 0 and counts[0] == counts[1],
+				"%s planted steps during %s attacks share the gait's dust and grass audio %s" %
+				[label, "walking" if walking else "running", counts])
+			print("MECHANIC_LAB_COMBAT_STEPS weapon=", label, " walk=", walking, " matched/total=", counts[1], "/", counts[0])
+	lab.reset_player()
+	for i in 12:
+		await physics_frame
+	picker.select(selected)
+	picker.item_selected.emit(selected)
+	toggle.button_pressed = sound_was_enabled
 
 func check_dust_contact_clock(lab, dust) -> void:
 	lab.reset_player()
