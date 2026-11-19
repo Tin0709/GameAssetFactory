@@ -417,7 +417,8 @@ func check_floor_edge_landing(lab, dust: Node3D) -> void:
 		if heavy:
 			check(audio._next_choice.get(&"slam_grass", 0) == (heavy_before + 1) % 6
 				and movement.event_count.landing == ordinary_before, "The edge dive plays one heavy grass cue")
-			var grass_voices: Array = audio._voices.filter(func(voice): return voice.stream in audio._groups[&"slam_grass"])
+			var grass_voices: Array = audio.get_children().filter(func(voice):
+				return voice is AudioStreamPlayer3D and voice.stream in audio._groups[&"slam_grass"])
 			check(grass_voices.size() == 1 and absf(grass_voices[0].global_position.x - 50.0) < 0.03,
 				"The heavy debris cue plays at the grass edge")
 		else:
