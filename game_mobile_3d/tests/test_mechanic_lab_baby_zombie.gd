@@ -90,6 +90,8 @@ func run() -> void:
 	await check_tuned_contact(25, 27.0, 1.00)
 	await check_tuned_contact(50, 27.0, 1.00)
 	await check_tuned_contact(58, 27.0, 0.35, true)
+	await check_tuned_contact(73, 27.0, 0.18, false, -58.0)
+	await check_tuned_contact(81, 27.0, 0.35, true, -58.0)
 	await check_first_wall_neck_contact()
 	await check_first_wall_neck_contact(true)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
@@ -143,7 +145,8 @@ func check_walk_contacts(baby: Zombie) -> void:
 			and points[contact].distance_to(authored_contacts[contact % 2]) < 0.005,
 			"The Baby Zombie step matches the source sole and phase at frame 2 or 8")
 
-func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_attack := false) -> void:
+func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_attack := false,
+		strike_yaw := INF) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -163,7 +166,8 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_atta
 	if corner != null:
 		baby.position = corner.to_global(baby.position)
 		baby.rotation.y += corner.rotation.y
-	var clip: StringName = Zombie.WALK_CLIPS[0] if seed % 3 == 1 else Zombie.ATTACK
+	var clips := [Zombie.IDLE, Zombie.WALK_CLIPS[0], Zombie.ATTACK]
+	var clip: StringName = clips[seed % clips.size()]
 	baby.animation.play(clip)
 	baby.animation.advance(0.0)
 	baby.animation.seek(baby.animation.get_animation(clip).length * (seed % 10) * 0.1, true)
@@ -171,6 +175,9 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_atta
 	for sample in 2:
 		baby.ragdoll.sample(1.0 / 60.0)
 	var direction := Vector3(0.91, 0.0, -0.22).normalized()
+	if strike_yaw != INF:
+		var angle := deg_to_rad(strike_yaw)
+		direction = Vector3(cos(angle), 0.0, sin(angle))
 	var origin := baby.global_position if corner == null else baby.global_position - direction
 	var attack := "AirAttack" if air_attack else "Attack"
 	var strike: Dictionary = group.AIR_STRIKE if air_attack else group.SABRE_STRIKES[0]
@@ -200,7 +207,7 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_atta
 		"The Baby Zombie receives both 1000% settings from the lethal contact")
 	check(gap < gap_limit and baby._corpse_landed and baby._corpse_parked and not crossed,
 		"At 1000% launch and gravity the Baby Zombie settles with limited joint stretch and no wall crossings")
-	print("LAB_BABY_TUNED_CONTACT seed=", seed, " yaw=", wall_yaw, " gap=", gap, " crossed=", crossed,
+	print("LAB_BABY_TUNED_CONTACT seed=", seed, " yaw=", wall_yaw, " strike_yaw=", strike_yaw, " gap=", gap, " crossed=", crossed,
 		" parked=", baby._corpse_parked, " impulse=", impulse, " gravity=", gravity)
 	lab.free()
 
