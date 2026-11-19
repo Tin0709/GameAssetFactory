@@ -122,8 +122,24 @@ func run():
   w.showcase.set_lighting_scale(&"zoom_exposure_blur",1.)
   w.showcase.set_hour(22.)
   await settle()
+  check(f.active and is_equal_approx(float(f._native.rendered_source().blur_scale),lerpf(1.,18. / 26.,.5)),
+   "Night stabilizes the lamp's exposure image using a gentler footprint")
+  w.showcase.set_hour(19.5)
+  await settle()
+  check(f.active and is_equal_approx(float(f._native.rendered_source().blur_scale),lerpf(1.,18. / 26.,.5)),
+   "Twilight reaches the night zoom response without changing the lamp")
+  w._camera_size_target = 29.
+  w.set_review_view("gameplay")
+  await settle()
   check(f.active and is_equal_approx(float(f._native.rendered_source().blur_scale),1.),
-   "Night keeps the authored blur at the wider zoom")
+   "The night correction fades out before the wide canopy overview")
+  w._camera_size_target = 26.
+  w.set_review_view("gameplay")
+  w.showcase.set_lighting_scale(&"zoom_exposure_blur",0.)
+  await settle()
+  check(f.active and is_equal_approx(float(f._native.rendered_source().blur_scale),1.),
+   "The existing comparison setting also disables the night zoom correction")
+  w.showcase.set_lighting_scale(&"zoom_exposure_blur",1.)
   w._camera_size_target = saved_size
   w.set_review_view("gameplay")
   w.showcase.set_hour(7.)
