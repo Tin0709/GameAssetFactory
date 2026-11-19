@@ -92,6 +92,7 @@ func run() -> void:
 	await check_tuned_contact(58, 27.0, 0.35, true)
 	await check_first_wall_neck_contact()
 	await check_first_wall_neck_contact(true)
+	await check_first_wall_neck_contact(true, 70)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -204,7 +205,7 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_atta
 		" parked=", baby._corpse_parked, " impulse=", impulse, " gravity=", gravity)
 	lab.free()
 
-func check_first_wall_neck_contact(frozen := false) -> void:
+func check_first_wall_neck_contact(frozen := false, serial := 4) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -228,13 +229,13 @@ func check_first_wall_neck_contact(frozen := false) -> void:
 	lab.add_child(wall)
 
 	var group: Node = lab.get_node("Zombies")
-	group._spawn_serial = 4
+	group._spawn_serial = serial
 	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
 	var baby := group.get_child(0) as Zombie
 	baby.set_physics_process(false)
 	await physics_frame
 	await physics_frame
-	baby.global_position = Vector3(4.09, 0.02, -40.95)
+	baby.global_position = Vector3(4.09, 0.02, (serial - 49.5) * 0.9)
 	baby.rotation.y = TAU * 11.0 / 16.0
 	baby.animation.stop()
 	baby.ragdoll.skeleton.reset_bone_poses()
@@ -245,7 +246,7 @@ func check_first_wall_neck_contact(frozen := false) -> void:
 		baby.ragdoll.sample(1.0 / 60.0)
 
 	var direction := Vector3.RIGHT.rotated(Vector3.UP, deg_to_rad(-25.0))
-	group._apply_contact(baby, baby.combat_center(), "Attack", 2, 4, group.SABRE_STRIKES[2],
+	group._apply_contact(baby, baby.combat_center(), "Attack", 2, serial, group.SABRE_STRIKES[2],
 		direction, false, baby.global_position - direction)
 	baby.set_physics_process(true)
 	var peak := 0.0
@@ -260,9 +261,10 @@ func check_first_wall_neck_contact(frozen := false) -> void:
 		for part: PhysicalBone3D in baby.ragdoll.bodies.values():
 			crossed = crossed or part.global_position.x > 4.655
 	check(peak > 0.0 and peak < 0.20 and baby._corpse_parked and not crossed,
-		"At 1000%% launch and gravity the Baby Zombie keeps its neck connected against a %s wall" %
-		("frozen" if frozen else "static"))
-	print("LAB_BABY_FIRST_WALL frozen=", frozen, " gap=", peak, " crossed=", crossed, " parked=", baby._corpse_parked)
+		"At 1000%% launch and gravity Baby Zombie %d keeps its joints connected against a %s wall" %
+		[serial, "frozen" if frozen else "static"])
+	print("LAB_BABY_FIRST_WALL serial=", serial, " frozen=", frozen, " gap=", peak,
+		" crossed=", crossed, " parked=", baby._corpse_parked)
 	lab.free()
 
 
