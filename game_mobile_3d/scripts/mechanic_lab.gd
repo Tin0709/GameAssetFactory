@@ -216,6 +216,7 @@ func _ready() -> void:
 		$HUD/Controls.text = "WASD di chuyển · Shift chạy · Space nhảy · R về giữa"
 	$HUD/Controls.text += " · Cuộn chuột để zoom"
 	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
+	$HUD/SpawnBabyZombie.disabled = $HUD/SpawnZombie.disabled
 	$HUD/SpawnCrowd.disabled = $HUD/SpawnZombie.disabled
 	$HUD/CombatAudioToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
@@ -1207,6 +1208,16 @@ func _spawn_zombie() -> void:
 			$HUD/SpawnStatus.text = ""
 	else:
 		$HUD/SpawnStatus.text = "Không thể tạo zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
+
+func _spawn_baby_zombie() -> void:
+	if $HUD/SpawnBabyZombie.disabled or player_health == 0:
+		return
+	var facing := Basis(Vector3.UP, player.visual.rotation.y)
+	if $Zombies.spawn(player, facing, $CombatEffects, true, true):
+		if _crowd_spawns_left == 0:
+			$HUD/SpawnStatus.text = ""
+	else:
+		$HUD/SpawnStatus.text = "Không thể tạo Baby Zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
 
 func _start_crowd_spawn() -> void:
 	if $HUD/SpawnCrowd.disabled or player_health == 0:
