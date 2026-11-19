@@ -3016,6 +3016,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
+		if effect == &"ground_shadow_fill_reduction":
+			slider.editable = _ground_shadow_fill_available()
 		if effect == &"alternate_local_mist":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.alternate_mist_by_hour != null \
 				and level.alternate_mist_region != null
@@ -4053,6 +4055,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		var slider := HSlider.new()
 		slider.accessibility_name = label.text
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
+		if effect == &"ground_shadow_fill_reduction":
+			slider.editable = _ground_shadow_fill_available()
 		if effect == &"overcast_mist_phase_color":
 			slider.editable = not _balanced_preview and _overcast_mist_phase_color_editable()
 		if effect == &"kai_shade_sky":

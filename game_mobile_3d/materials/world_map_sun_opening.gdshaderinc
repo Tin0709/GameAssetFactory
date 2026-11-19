@@ -50,6 +50,6 @@ vec3 gaf_shadow_diffuse(bool directional, vec3 view_light, mat4 inverse_view,
 }
 
 float gaf_ground_shadow_fill_multiplier(float reduction, float attenuation) {
-	// Leave the penumbra and the direct beam under the existing shadow map.
+	// Fade out the fill correction toward the bright side of the penumbra.
 	return 1.0 - reduction * (1.0 - smoothstep(.02, .40, attenuation));
 }

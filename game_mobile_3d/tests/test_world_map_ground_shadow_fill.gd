@@ -15,6 +15,7 @@ func run() -> void:
 	root.add_child(world)
 	current_scene = world
 	await process_frame
+	await process_frame
 	var review: Node = world.showcase
 	var slider := review._lighting_sliders.get(EFFECT) as HSlider
 	if "absent" in OS.get_cmdline_user_args():
