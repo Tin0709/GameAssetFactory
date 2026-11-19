@@ -543,6 +543,18 @@ func check_blocked_chase(group: Node) -> void:
 		await physics_frame
 	if zombie.global_position.z <= last_position.z + 0.4:
 		failures.append("A blocked zombie did not resume when the wall was removed")
+	# Keep the packed retry and hidden-target checks in a lane with no side route.
+	var lane := Node3D.new()
+	lab.add_child(lane)
+	var side_shape := BoxShape3D.new()
+	side_shape.size = Vector3(0.20, 0.7, 4.0)
+	for side in [-1.0, 1.0]:
+		var panel := StaticBody3D.new()
+		var side_collider := CollisionShape3D.new()
+		side_collider.shape = side_shape
+		panel.add_child(side_collider)
+		lane.add_child(panel)
+		panel.position = Vector3(0.59 * side, 0.35, -2.4)
 	var blocker := group.get_child(1) as ZOMBIE
 	blocker.global_position = Vector3(0, 0.02, -2.0)
 	zombie.global_position = Vector3(0, 0.02, -3.5)
@@ -595,6 +607,7 @@ func check_blocked_chase(group: Node) -> void:
 	await physics_frame
 	if zombie.global_position.z <= last_position.z + 0.01:
 		failures.append("The chaser resumes as soon as the physics space clears the blocker")
+	lane.free()
 	for member in group.get_children():
 		member.set_physics_process(true)
 	print("CROWD_BLOCKED wall_skips=", skipped_ticks, " samples=", pose_steps, " packed_skips=", packed_skips)

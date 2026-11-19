@@ -155,10 +155,11 @@ func run() -> void:
 	await check_connected_side(1, deg_to_rad(52.0), 1.0)
 	await check_living_blocker(2, 0.0)
 	await check_living_blocker(100, deg_to_rad(38.0))
+	await check_living_blocker(100, deg_to_rad(-27.0), true)
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 
-func check_living_blocker(member_count: int, yaw: float) -> void:
+func check_living_blocker(member_count: int, yaw: float, opens := false) -> void:
 	var lab := LAB.instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -176,21 +177,32 @@ func check_living_blocker(member_count: int, yaw: float) -> void:
 	chaser.animation.advance(0.0)
 	var first_waypoint := INF
 	var crossing_x := INF
+	var moved_tick := -1
+	var rejoin_ticks := -1
 	var hits: Array[int] = []
 	chaser.melee_hit.connect(func(damage): hits.append(damage))
 	for tick in 210:
 		await physics_frame
 		if not is_finite(first_waypoint) and chaser._chase_detour.is_finite():
 			first_waypoint = (heading.inverse() * chaser._chase_detour).x
+			if opens:
+				blocker.global_position += heading.x * 3.0
+				moved_tick = tick
+		if moved_tick >= 0 and rejoin_ticks < 0 and not chaser._chase_detour.is_finite():
+			rejoin_ticks = tick - moved_tick
 		var local := heading.inverse() * chaser.global_position
 		if not is_finite(crossing_x) and local.z > -2.5:
 			crossing_x = local.x
 		if not hits.is_empty():
 			break
-	if not is_finite(first_waypoint) or not is_finite(crossing_x) or absf(crossing_x) < 0.7 \
-			or hits != [ZOMBIE.MELEE_DAMAGE]:
-		failures.append("A visible chaser should circle a stationary zombie and land one normal hit")
+	if not is_finite(first_waypoint) or not is_finite(crossing_x) or hits != [ZOMBIE.MELEE_DAMAGE]:
+		failures.append("A chaser should reach melee after finding an open route past a living blocker")
+	if opens and (rejoin_ticks < 1 or rejoin_ticks > 8 or absf(crossing_x) > 0.45):
+		failures.append("A chaser should return promptly to the direct path when the blocker moves")
+	if not opens and absf(crossing_x) < 0.7:
+		failures.append("A chaser must go around a stationary capsule with clearance")
 	print("LAB_LIVING_DETOUR members=", member_count, " yaw=", rad_to_deg(yaw), " waypoint_x=", first_waypoint,
-		" crossing_x=", crossing_x, " hits=", hits, " final=", heading.inverse() * chaser.global_position)
+		" crossing_x=", crossing_x, " rejoin_ticks=", rejoin_ticks, " hits=", hits,
+		" final=", heading.inverse() * chaser.global_position)
 	lab.free()
 	await physics_frame
