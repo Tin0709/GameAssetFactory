@@ -610,8 +610,8 @@ func player_hurt() -> void:
 		return
 	var frame := Engine.get_physics_frames()
 	# Several hits can arrive before the local voice has mixed its onset.
-	if (_player_hurt_frame == frame or (_player_hurt_voice.playing
-			and _player_hurt_voice.get_playback_position() < PLAYER_HURT_ONSET_SECONDS)):
+	if (_player_hurt_frame == frame or (_player_hurt_voice.get_playback_position() < PLAYER_HURT_ONSET_SECONDS
+			and _player_hurt_voice.playing)):
 		return
 	var stream := _next_stream(&"player_hurt")
 	if stream != null:
