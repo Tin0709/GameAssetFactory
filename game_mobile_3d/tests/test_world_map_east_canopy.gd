@@ -31,7 +31,7 @@ func run() -> void:
 		check(sky._dimensions.x == 104 and sky._dimensions.z == 99, "F5 publishes the expanded field")
 		check(sky._geometry_current() and world.showcase.directional_air._geometry_current(), "Both light proofs match their geometry")
 		for i in ROOTS.size():
-			var tree := grove.get_node_or_null("ForestSpruce/EastSpruce%02d" % (i + 1)) as Node3D
+			var tree := world.get_node_or_null("ForestSpruce/EastSpruce%02d" % (i + 1)) as Node3D
 			check(tree != null and tree.global_position == ROOTS[i], "F5 places the validated tree %d" % (i + 1))
 			if tree != null:
 				var trunk := tree.get_node("Trunk") as StaticBody3D
@@ -41,7 +41,7 @@ func run() -> void:
 					"East spruce reuses the live Forest shadow caster")
 		check(world.showcase.mist.effect.sky_grid == sky._texture, "Fog samples the same field as vegetation")
 	elif grove != null and grove.spruce_available():
-		check(grove.get_node_or_null("ForestSpruce/EastSpruce01") == null, "Unsupported renderer retains its existing grove")
+		check(world.get_node_or_null("ForestSpruce/EastSpruce01") == null, "Unsupported renderer retains its existing grove")
 	world.free()
 	await process_frame
 	if native:
@@ -49,7 +49,7 @@ func run() -> void:
 		await process_frame
 		var fallback_sky := fallback.get_node("SpruceSkyVisibility")
 		if fallback_sky.proof_ready:
-			check(fallback_sky._dimensions.x == 53 and fallback.grove.get_node_or_null("ForestSpruce/EastSpruce01") == null,
+			check(fallback_sky._dimensions.x == 53 and fallback.get_node_or_null("ForestSpruce/EastSpruce01") == null,
 				"Corrupt profile falls back to the complete original grove")
 		fallback.free()
 		await process_frame
