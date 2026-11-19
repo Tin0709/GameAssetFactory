@@ -101,6 +101,7 @@ func run() -> void:
 	await check_tuned_contact(88, 27.0, 0.94, Strike.SABRE_FINISHER, -58.0, Vector2(1000.0, 100.0))
 	await check_first_wall_neck_contact()
 	await check_first_wall_neck_contact(true)
+	await check_floor_then_wall()
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -365,6 +366,54 @@ func check_lower_wall_edge(lab: Node3D, group: Node, wall: PhysicsBody3D) -> voi
 		"The leg clears the underside of a rotated wall with a vertical contact normal")
 	print("LAB_BABY_ROTATED_WALL_EDGE moved=", rotated_edge, " underside=", rotated_underside,
 		" blocked=", rotated_blocked)
+
+
+func check_floor_then_wall() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = 1000.0
+	var corner := add_contact_corner(lab, 45.0)
+	var group: Node = lab.get_node("Zombies")
+	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
+	var baby := group.get_child(0) as Zombie
+	baby.set_physics_process(false)
+	await physics_frame
+	baby.take_hit(100, Vector3.RIGHT)
+	baby._update_death(1.0 / 60.0)
+	var leg: PhysicalBone3D = baby.ragdoll.bodies["Leg.L"]
+	# Consecutive leg centres from the Sabre finisher at 1000% launch.
+	var start := Vector3(4.429976, 0.077577, -3.713356)
+	var finish := Vector3(4.632934, -0.086941, -3.824733)
+	var local_velocity := Vector3(12.0, -9.0, 3.0)
+	var velocity := corner.basis * local_velocity
+	baby.ragdoll._tuned_wall_poses.clear()
+	baby.ragdoll._tuned_wall_poses["Leg.L"] = start
+	var state := PhysicsServer3D.body_get_direct_state(leg.get_rid())
+	state.transform = Transform3D(state.transform.basis, finish)
+	state.linear_velocity = velocity
+	baby.ragdoll._sweep_tuned_lab_walls()
+	var stopped := corner.to_local(state.transform.origin)
+	var slide := corner.basis.inverse() * state.linear_velocity
+	check(stopped.x < 5.875 and absf(stopped.z - corner.to_local(finish).z) < 0.001,
+		"The leg stays on the near side of the wall when its sweep hits the floor first")
+	check(slide.is_equal_approx(Vector3(0.0, local_velocity.y, local_velocity.z)),
+		"The floor-to-wall contact cancels only the velocity into the wall")
+
+	# The same path passes beneath a raised obstacle.
+	var wall := corner.get_child(0) as StaticBody3D
+	wall.position.y += 0.2
+	await physics_frame
+	await physics_frame
+	state = PhysicsServer3D.body_get_direct_state(leg.get_rid())
+	state.transform = Transform3D(state.transform.basis, finish)
+	state.linear_velocity = velocity
+	baby.ragdoll._sweep_tuned_lab_walls()
+	check(state.transform.origin.is_equal_approx(finish) and state.linear_velocity.is_equal_approx(velocity),
+		"The floor continuation leaves a path under a raised wall unobstructed")
+	print("LAB_BABY_FLOOR_WALL near_side=", stopped.x, " slide=", slide)
+	lab.free()
 
 
 func add_contact_corner(lab: Node3D, yaw: float) -> Node3D:
