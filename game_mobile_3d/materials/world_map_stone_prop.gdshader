@@ -2,7 +2,6 @@ shader_type spatial;
 render_mode diffuse_burley, specular_disabled;
 
 uniform sampler2D source_atlas : source_color, filter_linear_mipmap, repeat_disable;
-uniform bool source_cutout = false;
 
 #ifdef GAF_SHARED_MIST
 #include "res://materials/world_map_mist.gdshaderinc"
@@ -10,9 +9,11 @@ uniform bool source_cutout = false;
 
 void fragment() {
 	vec4 source = texture(source_atlas, UV);
-	if (source_cutout && source.a < 0.5) {
+#ifdef GAF_PROP_CUTOUT
+	if (source.a < 0.5) {
 		discard;
 	}
+#endif
 	ALBEDO = source.rgb;
 	ROUGHNESS = 1.0;
 	AO = 0.88;

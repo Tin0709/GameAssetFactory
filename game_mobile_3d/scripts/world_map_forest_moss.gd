@@ -54,9 +54,10 @@ func configure(world: Node3D, placements: PackedVector4Array) -> bool:
 		poses[variant].append(pose)
 
 	material = ShaderMaterial.new()
-	material.shader = SurfaceShader
+	var cutout := Shader.new()
+	cutout.code = SurfaceShader.code.replace("shader_type spatial;", "shader_type spatial;\n#define GAF_PROP_CUTOUT")
+	material.shader = cutout
 	material.set_shader_parameter("source_atlas", ImageTexture.create_from_image(image))
-	material.set_shader_parameter("source_cutout", true)
 	for variant: int in poses:
 		var instances := MultiMesh.new()
 		instances.transform_format = MultiMesh.TRANSFORM_3D
