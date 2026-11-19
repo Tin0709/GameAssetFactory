@@ -26,12 +26,13 @@ const BABY_CLIPS := {
 	Zombie.ATTACK: [&"BabyZombie_BasicAttack", "7102bdedb8f5050d2e35fcc5b07cba1f1a7c890263950d8664a1792d6cb10574"],
 	Zombie.STAGGER: [&"BabyZombie_Staggered", "9eb4846636634d9b63ddc050c98cccadfcdfbafeb16ea34d983bb4ceda741f8f"],
 }
-# Box centres and extents fitted to the weighted bind mesh.
+# Box centres and extents fitted to the weighted bind mesh. Neck and shoulder
+# cones allow the animated attack pose to hand off without an abrupt snap.
 const BABY_PARTS := [
 	["Chest", Vector3(0, 0.563, 0), Vector3(0.235, 0.354, 0.116), 3.0, 0.0, 0.0],
-	["Head", Vector3(0, 0.9375, 0), Vector3(0.358, 0.358, 0.358), 5.0, 22.0, 15.0],
-	["Arm.L", Vector3(0.1875, 0.563, 0), Vector3(0.116, 0.354, 0.116), 0.9, 48.0, 18.0],
-	["Arm.R", Vector3(-0.1875, 0.563, 0), Vector3(0.116, 0.354, 0.116), 0.9, 48.0, 18.0],
+	["Head", Vector3(0, 0.9375, 0), Vector3(0.358, 0.358, 0.358), 5.0, 34.0, 22.0],
+	["Arm.L", Vector3(0.1875, 0.563, 0), Vector3(0.116, 0.354, 0.116), 0.9, 75.0, 24.0],
+	["Arm.R", Vector3(-0.1875, 0.563, 0), Vector3(0.116, 0.354, 0.116), 0.9, 75.0, 24.0],
 	["Leg.L", Vector3(0.0625, 0.1875, 0), Vector3(0.116, 0.354, 0.116), 1.1, 33.0, 14.0],
 	["Leg.R", Vector3(-0.0625, 0.1875, 0), Vector3(0.116, 0.354, 0.116), 1.1, 33.0, 14.0],
 ]
