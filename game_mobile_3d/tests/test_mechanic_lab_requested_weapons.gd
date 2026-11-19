@@ -586,7 +586,7 @@ func check_weapon_movement(lab: Node3D, menu: OptionButton) -> void:
 			check(highest_pitch - lowest_pitch > deg_to_rad(23.0),
 				"The crossbow follows the Actions & Stuff run sway")
 			check(lowest_muzzle > 0.28 and highest_muzzle < 0.90,
-				"The running grip stays in a low carry while swaying (%.3f–%.3f m)" % [lowest_muzzle, highest_muzzle])
+				"The running grip stays in a low carry while swaying (%.3fâ€“%.3f m)" % [lowest_muzzle, highest_muzzle])
 			check(support_drift < 0.015,
 				"The support hand stays seated on the crossbow throughout the running sway")
 			var motion = player.hybrid_motion
@@ -1015,11 +1015,17 @@ func check_melee_equip_audio(lab: Node3D, menu: OptionButton) -> void:
 		"Changing melee tools while muted does not decode or play switch audio")
 	for preview: Array in [[8, &"tool_pickaxe_5", 3], [10, &"tool_axe_0", 1]]:
 		equip(menu, preview[0])
+		check(not audio._groups.has(preview[1]), "%s leaves its combat bank unloaded while muted" % menu.get_item_text(preview[0]))
 		var sabre_choice: int = audio._next_choice.get(&"hit", -1)
 		sound.button_pressed = true
 		check(menu.selected == preview[0] and switch_cue_is_playing(audio, preview[1], preview[2])
 			and audio._next_choice.get(&"hit", -1) == sabre_choice,
 			"%s previews its own verified sample when combat audio is enabled" % menu.get_item_text(preview[0]))
+		var samples: Array = audio._groups.get(preview[1], []).duplicate()
+		sound.button_pressed = false
+		sound.button_pressed = true
+		check(audio._groups.get(preview[1], []) == samples,
+			"%s reuses the verified bank on the next audio toggle" % menu.get_item_text(preview[0]))
 		sound.button_pressed = false
 	equip(menu, 0)
 	sound.button_pressed = true
@@ -1029,6 +1035,10 @@ func check_melee_equip_audio(lab: Node3D, menu: OptionButton) -> void:
 	for spec: Array in fixtures:
 		var tool: StringName = spec[1]
 		equip(menu, spec[0])
+		var first_swing := StringName("tool_%s_0" % tool)
+		if spec[0] in [5, 7, 8, 9, 10]:
+			check(audio._groups.has(first_swing),
+				"%s has its verified swing ready on the first audible equip" % tool)
 		check(menu.selected == spec[0] and switch_cue_is_playing(audio, &"sabre_unequip", 1)
 			and switch_cue_is_playing(audio, StringName(tool + "_equip"), spec[2]),
 			"%s commits its verified equip family beside the outgoing Sabre cue" % tool)
