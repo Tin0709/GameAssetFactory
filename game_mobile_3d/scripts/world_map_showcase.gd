@@ -236,6 +236,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"cliff_vista_feather": ["Dịu mép địa hình khi zoom xa", 1.],
 	&"zoom_exposure_guide": ["Ổn định sáng tối khi zoom xa", 1.],
 	&"exposure_neighborhood_limit": ["Giữ chiều sâu dưới tán", 1.],
+	&"lantern_exposure": ["Dịu rìa sáng đèn hông", 1.],
 	&"zoom_exposure_blur": ["Giữ ánh sáng ổn định khi cuộn zoom", 1.],
 	&"noon_depth_haze": ["Chiều sâu sương buổi trưa", 1.],
 	&"morning_depth_optical": ["Mật độ sương trung cảnh buổi sáng", .85],
@@ -310,7 +311,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 204
+const LIGHTING_MIX_VERSION := 205
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2990,6 +2991,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 				and _biome_profile != null and _biome_profile.day_grass_shadow_footprint_reduction > 0.
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient", &"twilight_ground_transition", &"turf_ambient_color"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
+		if effect == &"lantern_exposure":
+			slider.editable = slider.editable and _lantern_exposure_editable()
 		if effect == &"exposure_neighborhood_limit":
 			slider.editable = slider.editable and _exposure_neighborhood_editable()
 		if effect == &"green_shadow_exposure_trim":
@@ -3148,7 +3151,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"cliff_vista", &"cliff_vista_feather"]:
 		_update_mist()
 		return
-	if changed_effect in [&"zoom_exposure_guide", &"zoom_exposure_blur", &"green_shadow_exposure_trim", &"exposure_neighborhood_limit"]:
+	if changed_effect in [&"zoom_exposure_guide", &"zoom_exposure_blur", &"green_shadow_exposure_trim", &"exposure_neighborhood_limit", &"lantern_exposure"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -3470,6 +3473,19 @@ func daylight_exposure_neighborhood() -> float:
 	return _biome_profile.exposure_neighborhood_limit * _lighting_scale(&"exposure_neighborhood_limit") \
 		* daylight * away_from_noon
 
+func lantern_exposure_amount() -> float:
+	if _biome_profile == null or _balanced_preview or _flat_lab or not lantern_overhead:
+		return 0.
+	if level.view_mode != "gameplay" or not is_instance_valid(_player_light) or not _player_light.visible:
+		return 0.
+	return _biome_profile.lantern_exposure * _lighting_scale(&"lantern_exposure") \
+		* smoothstep(.25, .65, _player_light.light_energy)
+
+func _lantern_exposure_editable() -> bool:
+	return _biome_profile != null and _biome_profile.lantern_exposure > 0. \
+		and not _flat_lab and DepthDiffusion.supported(level.get_viewport()) \
+		and phase_finish != null and phase_finish.available()
+
 func _exposure_neighborhood_editable() -> bool:
 	return _biome_profile != null and _biome_profile.exposure_neighborhood_limit > 0. \
 		and phase_finish != null and phase_finish.available()
@@ -3651,6 +3667,9 @@ func _update_shape_control()->void:
 	var stone_warmth: HSlider = _lighting_sliders.get(&"stone_sun_warmth")
 	if stone_warmth != null:
 		stone_warmth.editable = not _balanced_preview and _stone_sun_warmth_available()
+	var lantern_exposure_slider: HSlider = _lighting_sliders.get(&"lantern_exposure")
+	if lantern_exposure_slider != null:
+		lantern_exposure_slider.editable = not _balanced_preview and _lantern_exposure_editable()
 	var neighborhood: HSlider = _lighting_sliders.get(&"exposure_neighborhood_limit")
 	if neighborhood != null:
 		neighborhood.editable = not _balanced_preview and _exposure_neighborhood_editable()

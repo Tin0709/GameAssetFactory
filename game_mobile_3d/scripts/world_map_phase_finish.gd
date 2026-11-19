@@ -149,6 +149,10 @@ func refresh()->void:
   blur_scale = lerpf(1., 18. / clampf(camera.size, 18., 26.), showcase.zoom_exposure_blur_weight())
  _native.set_blur_scale(blur_scale)
  _native.set_neighborhood_limit(_exposure_neighborhood(camera))
+ # The optional raw-bloom comparison needs the same exposure math on both inputs.
+ var lantern_amount: float = 0. if source_order else showcase.lantern_exposure_amount()
+ var feet: Vector3 = level.presentation.player_position() if lantern_amount > 0. else Vector3.ZERO
+ _native.set_lantern_exposure(camera, feet, showcase._player_light, lantern_amount)
  effect.set_review_strength(_saved_strength*(1.-weight)*gain_scale)
  effect.set_finish_weight(weight*finish_scale);effect.set_reference_grade(true)
  var shadow_color: float = showcase.shadow_color_detail_weight() if finish_scale > 0. else 0.

@@ -18,6 +18,7 @@ var _first_pipeline:=RID()
 var _first_set:=RID()
 var _final_pipeline:=RID()
 var _final_set:=RID()
+var _final_sampler:=RID()
 var _rebuilds:=0
 var _published:Dictionary={"frames":0,"error":"","size":[0,0],"gain":1.,"neutral":false,"owned_RIDs":0,"graph_owned_RIDs":0,"graph_error":"","graph_source_hashes":{},"parameters_sha256":"","buffer_rebuilds":0}
 func _digest(bytes:PackedByteArray)->String:
@@ -100,14 +101,21 @@ void main(){vec2 uv=clamp(gl_FragCoord.xy*p[0].xy,p[0].zw,p[1].xy);output_color=
  _first_pipeline=_raster_pipeline(rd,first_shader,_half_fb)
  var first_params:=PackedFloat32Array([1./1024.,1./576.,.5/_size.x,.5/_size.y,1.-.5/_size.x,1.-.5/_size.y,0.,0.]).to_byte_array()
  _first_set=rd.uniform_set_create([_sampler_uniform(0,_copy,sampler),_storage_uniform(rd,1,first_params)],first_shader,0);_owned.append(_first_set)
- var fragment:="""#version 450
+ _final_sampler=sampler
+ var final_shader:=_compile_raster(rd,_final_fragment())
+ if not final_shader.is_valid():return false
+ _final_pipeline=_raster_pipeline(rd,final_shader,_scene_fb)
+ _final_set=rd.uniform_set_create([_sampler_uniform(0,_copy,sampler),_sampler_uniform(1,_graph.outputs.grid,sampler),_sampler_uniform(2,_graph.outputs.blur,sampler),_storage_uniform(rd,3,_parameters.final)],final_shader,0);_owned.append(_final_set)
+ return _error.is_empty()
+func _final_fragment(shader: String = "", gain: String = "") -> String:
+ return """#version 450
 layout(set=0,binding=0)uniform sampler2D source_color;
 layout(set=0,binding=1)uniform sampler3D exposure_grid;
 layout(set=0,binding=2)uniform sampler2D blurred_log;
 layout(std430,set=0,binding=3)readonly buffer Parameters{vec4 p[];};
 layout(push_constant,std430)uniform Control{vec4 value;}control;
 layout(location=0)out vec4 output_color;
-""" + GREEN_SHADOW_TRIM_SHADER + _neighborhood_shader() + """
+""" + GREEN_SHADOW_TRIM_SHADER + _neighborhood_shader() + shader + """
 void main(){
  ivec2 pixel=ivec2(gl_FragCoord.xy);vec2 uv=gl_FragCoord.xy/vec2(textureSize(source_color,0));
  vec4 color=texelFetch(source_color,pixel,0);
@@ -121,19 +129,16 @@ void main(){
  if (delta < 0.0) strength *= gaf_green_shadow_lift(color.rgb,p[3].xyz,control.value.w);
  float contrast=delta>0.?p[0].z:p[0].w;if(strength<1.)contrast=mix(1.,contrast,strength);if(control.value.x==0.)contrast=1.;
  float gain_ev=(contrast-1.)*delta;
-""" + _neighborhood_gain() + """
+""" + _neighborhood_gain() + gain + """
  float gain=exp2(gain_ev);output_color=vec4(color.rgb*gain,color.a);
 }
 """
- var final_shader:=_compile_raster(rd,fragment)
- if not final_shader.is_valid():return false
- _final_pipeline=_raster_pipeline(rd,final_shader,_scene_fb)
- _final_set=rd.uniform_set_create([_sampler_uniform(0,_copy,sampler),_sampler_uniform(1,_graph.outputs.grid,sampler),_sampler_uniform(2,_graph.outputs.blur,sampler),_storage_uniform(rd,3,_parameters.final)],final_shader,0);_owned.append(_final_set)
- return _error.is_empty()
 func _render_pass(rd:RenderingDevice,framebuffer:RID,pipeline:RID,uniform_set:RID,control:PackedByteArray=PackedByteArray())->void:
  var list:=rd.draw_list_begin(framebuffer);rd.draw_list_bind_render_pipeline(list,pipeline);rd.draw_list_bind_uniform_set(list,uniform_set,0)
  if not control.is_empty():rd.draw_list_set_push_constant(list,control,control.size())
  rd.draw_list_draw(list,false,1,3);rd.draw_list_end()
+func _render_final(rd: RenderingDevice, _buffers: RenderSceneBuffersRD, control: PackedByteArray) -> void:
+ _render_pass(rd,_scene_fb,_final_pipeline,_final_set,control)
 func _render_callback(kind:int,data:RenderData)->void:
  _render_frame(kind,data);_publish_snapshot()
 func _statistics_blur_scale() -> float:
@@ -160,7 +165,7 @@ func _render_frame(kind:int,data:RenderData)->void:
  var shadow_lift := _shadow_lift
  var green_shadow_trim := _green_shadow_trim
  _mutex.unlock()
- _render_pass(rd,_scene_fb,_final_pipeline,_final_set,PackedFloat32Array([0. if neutral else 1.,strength,shadow_lift,green_shadow_trim]).to_byte_array())
+ _render_final(rd,buffers,PackedFloat32Array([0. if neutral else 1.,strength,shadow_lift,green_shadow_trim]).to_byte_array())
  _mutex.lock();_frames+=1;_mutex.unlock()
 func release_on_render_thread()->void:
  _release_resources();_publish_snapshot()

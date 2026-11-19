@@ -132,6 +132,7 @@ const GroundHazeProfile = preload("res://scripts/ground_haze_profile.gd")
 @export_range(0., .64, .01) var daylight_air_chroma := 0.
 @export_range(0., .4, .01) var green_shadow_exposure_trim := 0.
 @export_range(0., .32, .01) var exposure_neighborhood_limit := 0.
+@export_range(0., .32, .01) var lantern_exposure := 0.
 @export_range(0., .65, .01) var stone_sun_warmth := 0.
 ## Remove a fraction of the luminance added by the stone warmth tint.
 @export_range(0., 1., .01) var stone_warmth_luma_trim := 0.

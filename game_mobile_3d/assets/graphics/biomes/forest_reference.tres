@@ -122,6 +122,7 @@ daylight_shade_retention = 0.55
 daylight_air_chroma = 0.36
 green_shadow_exposure_trim = 0.16
 exposure_neighborhood_limit = 0.2
+lantern_exposure = 0.32
 stone_sun_warmth = 0.38
 stone_warmth_luma_trim = 0.60
 turf_sun_chroma = 0.60
