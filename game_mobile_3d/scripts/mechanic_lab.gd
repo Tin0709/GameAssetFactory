@@ -935,20 +935,40 @@ func _process(delta: float) -> void:
 		_impact_light.visible = _light_remaining > 0.0
 
 func _setup_movement_audio() -> void:
-	var manifest := PrivateOverworldBundle.default_path()
-	var research := OS.get_environment("MD2_RESEARCH_ROOT")
-	if not research.is_empty() and OS.get_environment("MD2_OVERWORLD_BUNDLE").is_empty():
-		manifest = research.path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")
+	var configured_manifest := OS.get_environment("MD2_OVERWORLD_BUNDLE")
 	var bundle := PrivateOverworldBundle.new()
 	bundle.rebase_extracted_audio = true
-	if not bundle.read_audio(manifest, "grass") and not _use_local_movement_bank(bundle):
+	# The pinned Lab bank has the same default samples and mix. Read the
+	# larger ambience manifest first only when it was explicitly configured.
+	var uses_manifest := not configured_manifest.is_empty() and bundle.read_audio(configured_manifest, "grass")
+	if not uses_manifest and not _use_local_movement_bank(bundle):
 		return
-	_movement_audio = MovementAudio.new()
+	_movement_audio = _prepare_movement_audio(bundle)
+	if _movement_audio.groups.grass.is_empty():
+		var fallback := PrivateOverworldBundle.new()
+		fallback.rebase_extracted_audio = true
+		var has_fallback := false
+		if uses_manifest:
+			has_fallback = _use_local_movement_bank(fallback)
+		elif configured_manifest.is_empty():
+			var manifest := WeaponSource.research_root().path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")
+			has_fallback = fallback.read_audio(manifest, "grass")
+		if has_fallback:
+			var alternative := _prepare_movement_audio(fallback)
+			if alternative.groups.grass.is_empty():
+				alternative.free()
+			else:
+				_movement_audio.free()
+				_movement_audio = alternative
 	_movement_audio.name = "MovementAudio"
 	add_child(_movement_audio)
-	_movement_audio.setup(player, null, bundle, _player_foot_contact_at)
-	_movement_audio.landing_contact = _grass_landing_contact_at
-	_movement_audio.protect_landing_voice = true
+
+func _prepare_movement_audio(bundle: PrivateOverworldBundle) -> MovementAudio:
+	var movement := MovementAudio.new()
+	movement.setup(player, null, bundle, _player_foot_contact_at)
+	movement.landing_contact = _grass_landing_contact_at
+	movement.protect_landing_voice = true
+	return movement
 
 func _use_local_movement_bank(bundle: PrivateOverworldBundle) -> bool:
 	bundle.root = WeaponSource.research_root().simplify_path().replace("\\", "/").trim_suffix("/")
