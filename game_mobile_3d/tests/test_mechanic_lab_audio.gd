@@ -72,6 +72,18 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 	check(not toggle.button_pressed and not movement.footsteps_enabled
 		and movement.groups.get("grass", []).size() == 6 and movement.rejected_count == 0,
 		"All six private grass samples load while lab audio starts muted")
+	var grass_rows: Array = movement.reader.data.audio.grass
+	var moved_row: Dictionary = grass_rows[0].duplicate()
+	var normalized := String(moved_row.path).replace("\\", "/")
+	var extraction := normalized.rfind("/extracted/")
+	check(extraction >= 0, "The verified grass sample belongs to the Research extraction")
+	if extraction >= 0:
+		moved_row.path = "Z:\\Old MD2 Research\\" + normalized.substr(extraction + 1).replace("/", "\\")
+		var moved := movement.reader.audio_stream(moved_row) as AudioStreamOggVorbis
+		check(moved != null and is_equal_approx(moved.get_length(), movement.groups.grass[0].stream.get_length()),
+			"MechanicLab resolves an old absolute path to the same verified grass sample")
+		moved_row.sha256 = "0".repeat(64)
+		check(movement.reader.audio_stream(moved_row) == null, "A relocated grass sample still requires its original checksum")
 	for voice: AudioStreamPlayer3D in movement.step_voices:
 		voice.bus = AudioServer.get_bus_name(bus)
 	Input.action_press("move_forward")
