@@ -83,10 +83,31 @@ func run() -> void:
 			peak_gap = maxf(peak_gap, baby.ragdoll.max_anchor_error())
 	check(landed and baby._corpse_parked and baby.ragdoll.bodies.is_empty() and peak_gap < 0.18,
 		"The baby lands with the full rig connected and releases the simulation at rest")
+	lab.free()
+	await check_prewarmed_spawn()
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
-	lab.free()
 	quit(0 if failures.is_empty() else 1)
+
+func check_prewarmed_spawn() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group: Node = lab.get_node("Zombies")
+	check(group.get("_baby_visual") == null, "Opening the Lab does not import the baby rig synchronously")
+	for frame in 9:
+		await process_frame
+	check(group.get_child_count() == 0 and group.get("_baby_visual") is PackedScene,
+		"The idle Lab prepares the Baby Zombie without spawning one")
+	var button := lab.get_node("HUD/SpawnBabyZombie") as Button
+	button.pressed.emit()
+	button.pressed.emit()
+	check(group.get_child_count() == 2, "Two presses after preparation spawn exactly two Baby Zombies")
+	for zombie: Zombie in group.get_children():
+		var material := zombie._mesh.material_override as ShaderMaterial
+		var skin: Variant = material.get_shader_parameter("living_skin") if material != null else null
+		check(zombie.is_baby and skin is Texture2D, "The prepared Baby Zombie keeps its verified skin")
+	lab.free()
 
 func attack_key(pressed: bool) -> void:
 	var event := InputEventKey.new()
