@@ -896,18 +896,20 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 
 func check_crowd_corpse_fade(group: Node) -> void:
 	checked_corpse_fade = true
-	var shared: Material
+	var shared: Dictionary[bool, ShaderMaterial] = {}
 	var fading := 0
 	for zombie: ZOMBIE in group.get_children():
 		var mesh: MeshInstance3D = zombie._mesh
-		var material := mesh.material_override
-		if shared == null:
-			shared = material
+		var material := mesh.material_override as ShaderMaterial
+		if material == null:
+			continue
+		if not shared.has(zombie.is_baby):
+			shared[zombie.is_baby] = material
 		var fade: Variant = mesh.get_instance_shader_parameter("desaturation")
-		if material is ShaderMaterial and material == shared and fade is float and fade > 0.0:
+		if material == shared[zombie.is_baby] and fade is float and fade > 0.0:
 			fading += 1
 	if fading != COUNT:
-		failures.append("All 100 corpses fade with one shared material before their first second")
+		failures.append("All 100 corpses fade with a material shared per zombie rig before their first second")
 	print("CROWD_CORPSE_FADE shared_material_instances=", fading)
 
 func stats(samples: Array[float]) -> Dictionary:
