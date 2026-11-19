@@ -948,13 +948,15 @@ func check_baby_zombie_swing(bus: int, capture: AudioEffectCapture) -> void:
 	print("MECHANIC_LAB_BABY_SWING peak=", peak)
 	audio.reset()
 	baby.global_position = lab.player.global_position + Vector3.FORWARD * 1.15
+	var swing_choice: int = audio._next_choice.get(&"baby_swing", 0)
 	baby.animation.seek(17.0 / 30.0, true)
 	baby._advance_animation(0.15, Vector3.ZERO)
 	audio.flush_zombie_combat_cues()
 	check(lab.player_health == initial_hp - ZOMBIE.BABY_MELEE_DAMAGE
 		and attacks.any(func(voice): return voice.playing and voice.stream in bank)
 		and attacks.any(func(voice): return voice.playing and voice.stream in audio._groups.get(&"baby_hit", []))
-		and audio._next_choice.get(&"baby_swing", 0) == 1 and audio._next_choice.get(&"baby_hit", 0) == 1,
+		and audio._next_choice.get(&"baby_swing", 0) == (swing_choice + 1) % 4
+		and audio._next_choice.get(&"baby_hit", 0) == 1,
 		"Crossing both markers in one update retains the swing, confirmed cue, and source damage")
 	audio.reset()
 	var point := baby.combat_center()
