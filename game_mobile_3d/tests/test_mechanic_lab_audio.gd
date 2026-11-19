@@ -900,8 +900,8 @@ func check_baby_zombie_swing(bus: int, capture: AudioEffectCapture) -> void:
 	var point := baby.combat_center()
 	for i in COMBAT_AUDIO.VOICES_PER_POOL:
 		audio._play(&"baby_swing", point + Vector3.RIGHT * i, -20.0)
-	var windup := audio._play(&"zombie_windup", point, COMBAT_AUDIO.ZOMBIE_WINDUP_GAIN_DB)
-	var hit := audio._play(&"zombie_hit", point, COMBAT_AUDIO.ZOMBIE_HIT_GAIN_DB)
+	var windup: AudioStreamPlayer3D = audio._play(&"zombie_windup", point, COMBAT_AUDIO.ZOMBIE_WINDUP_GAIN_DB)
+	var hit: AudioStreamPlayer3D = audio._play(&"zombie_hit", point, COMBAT_AUDIO.ZOMBIE_HIT_GAIN_DB)
 	check(windup != null and hit != null and windup != hit and windup.stream in audio._groups[&"zombie_windup"],
 		"Windup and confirmed contact can each replace a swing when the attack pool is full")
 	check(audio._play(&"baby_swing", point, -20.0) == null,
