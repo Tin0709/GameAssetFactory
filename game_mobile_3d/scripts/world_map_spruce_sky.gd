@@ -184,6 +184,90 @@ func apply_layout(relative: String, digest: String) -> bool:
 			_level.showcase._lighting_scale(&"player_bounce") > 0.)
 	return true
 
+func apply_canopy_extension(relative: String, digest: String, parent_path: String, parent_digest: String) -> bool:
+	var air = _level.showcase.directional_air
+	if not proof_ready or not air.region_available() or not _geometry_current() or not air._geometry_current():
+		return false
+	var root: String = air.research_root
+	var profile := _layout_profile(root, relative, digest)
+	if profile.get("schema") != "private_forest_sky_extension/1" or profile.get("parent") != parent_path \
+			or profile.get("parent_sha256") != parent_digest:
+		return false
+	var parent := _layout_profile(root, parent_path, parent_digest)
+	if parent.is_empty() or profile.get("parent_sky_sha256") != parent.get("sky_sha256") \
+			or profile.get("base_air_sha256") != parent.get("air_sha256"):
+		return false
+	var coordinates := _checked_vector(profile.get("origin"))
+	var extent := _checked_vector(profile.get("dimensions"))
+	if not coordinates.is_equal_approx(_origin) or not extent.is_finite() or extent != extent.floor() \
+			or extent.x <= _dimensions.x or extent.y != _dimensions.y or extent.z < _dimensions.z \
+			or extent.x > 128. or extent.z > 128.:
+		return false
+	var rows: Variant = profile.get("placements")
+	if not rows is Array or rows.is_empty() or rows.size() > 8:
+		return false
+	var placements: Array[Dictionary] = []
+	for row: Variant in rows:
+		var placed := _check_extension_tree(row, extent)
+		if placed.is_empty():
+			return false
+		for previous: Dictionary in placements:
+			if placed.position.distance_to(previous.position) < 4.:
+				return false
+		placements.append(placed)
+	var directory := root.path_join(relative).get_base_dir()
+	var field := _layout_texture(directory.path_join("sky.private.r8"), profile.get("sky_sha256", ""), Vector3i(extent))
+	if field == null:
+		return false
+	var grove = _level.grove
+	for i in placements.size():
+		var placed := placements[i]
+		for caster: MeshInstance3D in grove.place_additional_spruce(placed.source, placed.position, "EastSpruce%02d" % (i + 1)):
+			_casters.append({"node": caster, "transform": caster.global_transform, "mesh": caster.mesh})
+	_texture = field
+	_dimensions = Vector3i(extent)
+	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_extent", extent)
+	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", field)
+	return true
+
+func _check_extension_tree(row: Variant, extent: Vector3) -> Dictionary:
+	if not row is Dictionary or not row.get("source") is String or not row.source.begins_with("MD2Spruce") \
+			or not row.source.get_file() == row.source:
+		return {}
+	var position := _checked_vector(row.get("root"))
+	if not position.is_finite() or position.x <= _origin.x + _dimensions.x + 4. \
+			or position.x >= _origin.x + extent.x - 1. \
+			or position.z <= _origin.z or position.z >= _origin.z + extent.z - 1. \
+			or not is_equal_approx(_level.surface_height(position.x, position.z), position.y):
+		return {}
+	var source := _level.grove._spruce_root.get_node_or_null(NodePath(row.source)) as Node3D
+	if source == null or source.get_meta("source_glb", "") != row.get("glb"):
+		return {}
+	var pose: Variant = row.get("pose")
+	if not pose is Array or pose.size() != 4:
+		return {}
+	var basis := Basis(_checked_vector(pose[0]), _checked_vector(pose[1]), _checked_vector(pose[2]))
+	var expected := Transform3D(basis, _checked_vector(pose[3]))
+	for record: Dictionary in _casters:
+		var caster: MeshInstance3D = record.node
+		if not source.is_ancestor_of(caster):
+			continue
+		var current := caster.global_transform
+		current.origin += position - source.global_position
+		if not expected.is_finite() or not current.is_equal_approx(expected) \
+				or caster.mesh.surface_get_array_index_len(0) != 3. * float(row.get("triangles", -1)):
+			return {}
+		return {"source":source, "position":position}
+	return {}
+
+func _checked_vector(value: Variant) -> Vector3:
+	if not value is Array or value.size() != 3:
+		return Vector3.INF
+	for component: Variant in value:
+		if not (component is float or component is int) or not is_finite(component):
+			return Vector3.INF
+	return _vector(value)
+
 func _layout_profile(root: String, relative: String, digest: String) -> Dictionary:
 	if relative.is_empty() or relative.is_absolute_path():
 		return {}
