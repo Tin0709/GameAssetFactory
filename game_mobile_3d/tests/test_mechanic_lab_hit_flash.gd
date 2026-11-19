@@ -161,11 +161,17 @@ func check_flash_during_render_hitch() -> void:
 	var zombie = group.get_child(0)
 	var mesh := zombie._mesh as MeshInstance3D
 	var original_skin := mesh.material_override
-	zombie.take_hit(1, Vector3.RIGHT)
 	var mobile := RenderingServer.get_current_rendering_method() == &"mobile"
+	var original_hdr := root.use_hdr_2d
+	if mobile:
+		root.use_hdr_2d = false
+	zombie.take_hit(1, Vector3.RIGHT)
 	check((mesh.material_override != original_skin and mesh.material_overlay == null) if mobile
 		else mesh.material_override == original_skin and mesh.material_overlay != null,
 		"Mobile flashes with a single skin surface; other renderers retain the overlay")
+	if mobile:
+		check(mesh.get_instance_shader_parameter(&"flash_red") == 2.0,
+			"Mobile clamps the red of the old overlay before blending into a normalized target")
 	zombie._process(0.10)
 	zombie._process(1.0 / 60.0)
 	check(float(mesh.get_instance_shader_parameter(&"hit_flash")) > 0.9,
@@ -173,4 +179,10 @@ func check_flash_during_render_hitch() -> void:
 	zombie._process(0.10)
 	check(mesh.material_override == original_skin and mesh.material_overlay == null and not zombie.is_processing(),
 		"A render hitch after the first displayed frame restores the ordinary zombie skin")
+	if mobile:
+		root.use_hdr_2d = true
+		zombie.take_hit(1, Vector3.RIGHT)
+		check(mesh.get_instance_shader_parameter(&"flash_red") == 3.2,
+			"An HDR target retains the full red of the old flash")
+		root.use_hdr_2d = original_hdr
 	lab.free()
