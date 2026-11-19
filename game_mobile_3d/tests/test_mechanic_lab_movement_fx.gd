@@ -95,6 +95,7 @@ func run() -> void:
 	await check_non_grass_landing(lab, dust)
 	await check_non_grass_steps(lab, dust, wind)
 	await check_wall_slide_steps(lab, dust, wind)
+	await check_curved_step_effects(lab, dust, wind)
 	await check_dust_contact_clock(lab, dust)
 	await check_zombie_steps_on_slab(lab)
 	await check_zombie_dust_contact_clock(lab)
@@ -604,6 +605,70 @@ func check_wall_slide_steps(lab, dust, wind) -> void:
 	wall.free()
 	lab.reset_player()
 	await create_timer(0.10, true, false, true).timeout
+
+func check_curved_step_effects(lab, dust: Node3D, wind: Node3D) -> void:
+	var weapon := lab.get_node("HUD/Weapon") as OptionButton
+	var sound := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var movement = lab.get_node("MovementAudio")
+	var selected := weapon.selected
+	var sound_was_enabled := sound.button_pressed
+	weapon.select(2)
+	weapon.item_selected.emit(2)
+	sound.button_pressed = true
+	lab.reset_player()
+	var run_steps: Array[Dictionary] = []
+	var walk_steps: Array[Dictionary] = []
+	var last_audio := [int(movement.event_count.grass)]
+	var observe := func(sole: Vector3, landed: bool):
+		if landed:
+			return
+		var frame := Engine.get_physics_frames()
+		var ground: Dictionary = lab._player_foot_contact_at(sole)
+		var previous: int = last_audio[0]
+		last_audio[0] = int(movement.event_count.grass)
+		if ground.is_empty():
+			return
+		var source: String = lab.player.clips.get(lab.player.active_clip, {}).get("source_name", "")
+		if source not in ["Player_2H_Medium_Run", "Player_2H_Medium_Walk"]:
+			return
+		var puffs: Array = dust._particles.filter(func(p): return p.sprite.visible and p.contact_tick == frame)
+		var wakes: Array = wind._wakes.filter(func(w): return w.mesh.visible and w.contact_tick == frame)
+		var record := {"puffs": puffs.size(), "wakes": wakes.size(),
+			"sound": last_audio[0] == previous + 1 and movement.events[-1].at == [ground.position.x, ground.position.y, ground.position.z],
+			"source_puff": puffs.size() == 1 and puffs[0].run_drag > 0.0
+				and puffs[0].velocity == Vector3.ZERO
+				and puffs[0].origin.is_equal_approx(ground.position + Vector3.UP * 0.20)
+				and is_equal_approx(puffs[0].sprite.pixel_size * 16.0, 1.0)}
+		if source == "Player_2H_Medium_Run":
+			run_steps.append(record)
+		else:
+			walk_steps.append(record)
+	lab.player.surface_contact.connect(observe)
+	Input.action_press("move_forward")
+	for i in 49:
+		await physics_frame
+	Input.action_release("move_forward")
+	Input.action_press("move_right")
+	for i in 47:
+		await physics_frame
+	Input.action_press("sprint")
+	for i in 65:
+		await physics_frame
+	Input.action_release("move_right")
+	Input.action_release("sprint")
+	lab.player.surface_contact.disconnect(observe)
+	check(run_steps.size() >= 3 and run_steps.all(func(step): return step.sound and step.source_puff)
+		and run_steps.any(func(step): return step.wakes == 1),
+		"Curved Greatsword run and turn use source dust at the same supported foot as the sound")
+	check(walk_steps.size() >= 2 and walk_steps.all(func(step): return step.sound
+		and step.puffs == 0 and step.wakes == 0),
+		"Curved Greatsword walking keeps the supported footstep sound without run effects")
+	print("MECHANIC_LAB_CURVED_STEP_FX run=", run_steps, " walk=", walk_steps)
+	weapon.select(selected)
+	weapon.item_selected.emit(selected)
+	sound.button_pressed = sound_was_enabled
+	lab.reset_player()
+	await physics_frame
 
 func check_dust_contact_clock(lab, dust) -> void:
 	lab.reset_player()
