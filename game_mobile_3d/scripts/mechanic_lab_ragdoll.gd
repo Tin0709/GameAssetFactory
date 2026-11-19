@@ -33,7 +33,8 @@ const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
 const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
 const BABY_FLOOR_ANCHOR_GAP := 0.08
-const BABY_SUPPORTED_LEG_SLIDE_GAP := 3.0 * EARLY_ROLL_ANCHOR_LIMIT
+const BABY_SUPPORTED_LEG_SLIDE_GAP := 2.0 * EARLY_ROLL_ANCHOR_LIMIT
+const BABY_LARGE_LEG_SLIDE_GAP := 3.0 * EARLY_ROLL_ANCHOR_LIMIT
 const BABY_FLOOR_ANCHOR_CLEARANCE := 0.02
 const BABY_WALL_LIMB_SHIFT := 0.35
 const BABY_WALL_CHEST_SHIFT := 0.10
@@ -950,6 +951,15 @@ func _recover_baby_floor_anchors() -> void:
 		var distance := gap.length()
 		if distance <= gap_limit or (not tuned and not _body_supported_by(joint.body, floor_body)):
 			continue
+		var tolerance := SOURCE_ANCHOR_TOLERANCE
+		if not tuned and distance <= BABY_LARGE_LEG_SLIDE_GAP:
+			# A smaller gap can be part of the planted leg's roll. Help only
+			# when it opens quickly and leave more room for the support solver.
+			var relative_velocity := parent.linear_velocity - state.linear_velocity
+			var separation_step := relative_velocity.dot(gap / distance) * state.step
+			if separation_step <= EARLY_ROLL_ANCHOR_LIMIT:
+				continue
+			tolerance = EARLY_ROLL_ANCHOR_LIMIT
 		var local := floor_inverse * state.transform
 		var extent := Basis(local.basis.x.abs(), local.basis.y.abs(), local.basis.z.abs()) * joint.half_size
 		var clearance := local.origin.y - extent.y - floor_half.y
@@ -960,7 +970,7 @@ func _recover_baby_floor_anchors() -> void:
 		if local.origin.y + extent.y < floor_half.y:
 			continue
 		# Bound the anchor correction by the travel the two pieces can cover in one step.
-		var motion := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
+		var motion := gap * (1.0 - tolerance / distance)
 		motion.y = maxf(motion.y, -maxf(clearance + FLOOR_REST_SLOP, 0.0))
 		var speed_sum := float(chest.get("maximum_linear_speed")) + float(joint.body.get("maximum_linear_speed"))
 		motion = motion.limit_length(speed_sum * state.step)
