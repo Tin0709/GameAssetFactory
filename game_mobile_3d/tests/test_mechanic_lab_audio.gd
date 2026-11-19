@@ -1083,14 +1083,15 @@ func check_zombie_cue_catchup(lab: Node, audio: COMBAT_AUDIO, group: Node) -> vo
 		emit_cues.call(far, confirmed)
 		await physics_frame
 		emit_cues.call(near, confirmed)
-		check(audio._next_choice.get(attack, 0) == attack_before
+		check((attacks + reactions).all(func(voice): return voice.stream == null)
+			and audio._next_choice.get(attack, 0) == attack_before
 			and audio._next_choice.get(reaction, 0) == reaction_before,
 			"Older physics ticks reserve no attack or reaction voice before the render flush")
 		audio.flush_zombie_combat_cues()
-		check(audio._next_choice.get(attack, 0) == attack_before + 3
+		check(audio._next_choice.get(attack, 0) == (attack_before + 3) % audio._groups[attack].size()
 			and attacks.all(func(voice): return voice.global_position in near and voice.stream in audio._groups[attack]),
 			"The render flush selects the three nearest %s cues across ticks" % attack)
-		check(audio._next_choice.get(reaction, 0) == reaction_before + 3
+		check(audio._next_choice.get(reaction, 0) == (reaction_before + 3) % audio._groups[reaction].size()
 			and reactions.all(func(voice): return voice.global_position in near and voice.stream in audio._groups[reaction]),
 			"The render flush selects the three nearest %s cues across ticks" % reaction)
 
