@@ -89,6 +89,7 @@ func run() -> void:
 	await check_tuned_contact(13, 0.0, 0.90)
 	await check_tuned_contact(25, 27.0, 1.00)
 	await check_tuned_contact(50, 27.0, 1.00)
+	await check_tuned_contact(58, 27.0, 0.35, true)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -140,7 +141,7 @@ func check_walk_contacts(baby: Zombie) -> void:
 			and points[contact].distance_to(authored_contacts[contact % 2]) < 0.005,
 			"The Baby Zombie step matches the source sole and phase at frame 2 or 8")
 
-func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20) -> void:
+func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_attack := false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -169,8 +170,9 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20) -> void:
 		baby.ragdoll.sample(1.0 / 60.0)
 	var direction := Vector3(0.91, 0.0, -0.22).normalized()
 	var origin := baby.global_position if corner == null else baby.global_position - direction
-	group._apply_contact(baby, baby.combat_center(), "Attack", 0, seed,
-		group.SABRE_STRIKES[0], direction, false, origin)
+	var attack := "AirAttack" if air_attack else "Attack"
+	var strike: Dictionary = group.AIR_STRIKE if air_attack else group.SABRE_STRIKES[0]
+	group._apply_contact(baby, baby.combat_center(), attack, 0, seed, strike, direction, false, origin)
 	baby.set_physics_process(true)
 	var gap := 0.0
 	var impulse := 0.0
@@ -191,8 +193,9 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20) -> void:
 			impulse = baby.ragdoll.total_applied_impulse.length()
 			var chest: PhysicalBone3D = baby.ragdoll.bodies.Chest
 			gravity = PhysicsServer3D.body_get_direct_state(chest.get_rid()).total_gravity.y
-	check(baby.health == 0 and is_equal_approx(impulse, 987.36) and is_equal_approx(gravity, -500.0),
-		"The Baby Zombie receives both 1000% settings from the Sabre contact")
+	var expected_impulse := 1256.64 if air_attack else 987.36
+	check(baby.health == 0 and is_equal_approx(impulse, expected_impulse) and is_equal_approx(gravity, -500.0),
+		"The Baby Zombie receives both 1000% settings from the lethal contact")
 	check(gap < gap_limit and baby._corpse_landed and baby._corpse_parked and not crossed,
 		"At 1000% launch and gravity the Baby Zombie settles with limited joint stretch and no wall crossings")
 	print("LAB_BABY_TUNED_CONTACT seed=", seed, " yaw=", wall_yaw, " gap=", gap, " crossed=", crossed,
