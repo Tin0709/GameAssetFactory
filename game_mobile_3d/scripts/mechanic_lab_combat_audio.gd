@@ -396,6 +396,14 @@ const ZOMBIE_STEP_HASHES := [
 	"d447953adb0b0f692f241d42aee6662653843365e5306d6cfd159c8d0e4f9555",
 ]
 
+class ZombieCueBatch:
+	var points := PackedVector3Array()
+	var groups: Array[StringName] = []
+
+	func clear() -> void:
+		points.clear()
+		groups.clear()
+
 var enabled := false
 var sword_equipped := false
 var curved_equipped := false
@@ -421,11 +429,11 @@ var _started_frames: PackedInt64Array
 var _voice_groups: Array[StringName] = []
 var _weapon_onsets: Array[bool] = []
 var _player_hurt_frame := -1
-var _attack_contacts: Array[Dictionary] = []
-var _attack_windups: Array[Dictionary] = []
-var _attack_swings: Array[Dictionary] = []
-var _reaction_deaths: Array[Dictionary] = []
-var _reaction_hurts: Array[Dictionary] = []
+var _attack_contacts := ZombieCueBatch.new()
+var _attack_windups := ZombieCueBatch.new()
+var _attack_swings := ZombieCueBatch.new()
+var _reaction_deaths := ZombieCueBatch.new()
+var _reaction_hurts := ZombieCueBatch.new()
 var _step_points: Array[Vector3] = []
 var _step_distances: Array[float] = []
 var _last_weapon_serial := -1
@@ -690,32 +698,47 @@ func baby_swing(point: Vector3) -> void:
 	if enabled:
 		_queue_zombie_cue(&"baby_swing", point, _attack_swings)
 
-func _queue_zombie_cue(group: StringName, point: Vector3, pending: Array[Dictionary]) -> void:
+func _queue_zombie_cue(group: StringName, point: Vector3, pending: ZombieCueBatch) -> void:
 	if not _groups.has(group) or not is_instance_valid(zombie_listener):
 		return
-	var distance := point.distance_squared_to(zombie_listener.global_position)
-	if distance > SPATIAL_VOICE_DISTANCE * SPATIAL_VOICE_DISTANCE:
-		return
-	# Rank across physics ticks until the Lab flushes on the rendered frame.
-	# Equal distances keep event order and only played cues advance rotation.
-	var index := pending.size()
-	while index > 0 and distance < float(pending[index - 1].distance):
-		index -= 1
-	if index < VOICES_PER_POOL:
-		pending.insert(index, {"point": point, "distance": distance, "group": group})
-		if pending.size() > VOICES_PER_POOL:
-			pending.pop_back()
+	pending.points.append(point)
+	pending.groups.append(group)
 
 func flush_zombie_combat_cues() -> void:
-	_play_zombie_cues(_attack_contacts, ZOMBIE_HIT_GAIN_DB)
-	_play_zombie_cues(_attack_windups, ZOMBIE_WINDUP_GAIN_DB)
-	_play_zombie_cues(_attack_swings, BABY_SWING_GAIN_DB)
-	_play_zombie_cues(_reaction_deaths, DEATH_GAIN_DB)
-	_play_zombie_cues(_reaction_hurts, HURT_GAIN_DB)
+	if not enabled:
+		return
+	var ear := zombie_listener.global_position if is_instance_valid(zombie_listener) else Vector3.INF
+	_play_zombie_cues(_attack_contacts, ear, ZOMBIE_HIT_GAIN_DB)
+	_play_zombie_cues(_attack_windups, ear, ZOMBIE_WINDUP_GAIN_DB)
+	_play_zombie_cues(_attack_swings, ear, BABY_SWING_GAIN_DB)
+	_play_zombie_cues(_reaction_deaths, ear, DEATH_GAIN_DB)
+	_play_zombie_cues(_reaction_hurts, ear, HURT_GAIN_DB)
 
-func _play_zombie_cues(pending: Array[Dictionary], gain: float) -> void:
-	for cue: Dictionary in pending:
-		_play(cue.group, cue.point, gain)
+func _play_zombie_cues(pending: ZombieCueBatch, ear: Vector3, gain: float) -> void:
+	if pending.points.is_empty():
+		return
+	if not ear.is_finite():
+		pending.clear()
+		return
+	# Physics catch-up can move the listener between requests. Rank every
+	# cue against the same ear position, keeping event order on a tie.
+	var closest: Array[int] = []
+	var distances: Array[float] = []
+	for i in pending.points.size():
+		var distance := pending.points[i].distance_squared_to(ear)
+		if distance > SPATIAL_VOICE_DISTANCE * SPATIAL_VOICE_DISTANCE:
+			continue
+		var rank := distances.size()
+		while rank > 0 and distance < distances[rank - 1]:
+			rank -= 1
+		if rank < VOICES_PER_POOL:
+			distances.insert(rank, distance)
+			closest.insert(rank, i)
+			if closest.size() > VOICES_PER_POOL:
+				distances.pop_back()
+				closest.pop_back()
+	for i in closest:
+		_play(pending.groups[i], pending.points[i], gain)
 	pending.clear()
 
 func queue_zombie_idle(point: Vector3) -> void:
