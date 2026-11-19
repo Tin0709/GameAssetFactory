@@ -189,7 +189,9 @@ func check_tuned_wall_contact(lab, seed: int, clip: StringName, heading: int, so
 		for part: PhysicalBone3D in zombie.ragdoll.bodies.values():
 			crossed = crossed or part.global_position.x > 4.655
 	check(active and zombie.ragdoll._wall_handoff_frame >= 0 and peak < gap_limit,
-		"The %s pose keeps its joint gap below %.2f m at both 1000%% settings" % [clip, gap_limit])
+		"The %s pose keeps its joint gap below %.2f m at %d%% launch and %d%% gravity" % [
+			clip, gap_limit, roundi(zombie.ragdoll_launch_multiplier * 100.0),
+			roundi(zombie.ragdoll_gravity_multiplier * 100.0)])
 	check(zombie._corpse_parked and not crossed, "The tuned adult wall ragdoll settles without crossing the wall")
 	print("RAGDOLL_TUNED_WALL pose=", clip, " gap_m=", peak, " parked=", zombie._corpse_parked)
 	zombie.free()

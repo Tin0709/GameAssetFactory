@@ -26,6 +26,7 @@ const WALL_SHOULDER_SLIDE_WINDOW := 5.0 / 60.0
 const WALL_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
 const FIRST_WALL_SHOULDER_SLIDE_MIN_GAP := 0.17
 const TUNED_LIMB_RECOVERY_GAP := 8.0 * SOURCE_ANCHOR_TOLERANCE
+const TUNED_WALL_SLIDE_MAX_VERTICAL_RATIO := 0.6
 const WALL_SLIDE_MAX := 0.08
 const REBOUND_SLIDE_MAX_NORMAL_FRACTION := 0.65
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
@@ -988,8 +989,9 @@ func _recover_tuned_supported_legs() -> void:
 		return
 	var chest: PhysicalBone3D = bodies.Chest
 	var core := PhysicsServer3D.body_get_direct_state(chest.get_rid())
-	if core == null or core.get_contact_count() != 0 or core.linear_velocity.y >= 0.0:
+	if core == null or core.linear_velocity.y >= 0.0:
 		return
+	var core_contacts := core.get_contact_count()
 	var floor := floor_body.get_rid()
 	var floor_y := _flat_floor.global_position.y + floor_box.size.y * 0.5
 	for joint in _source_anchor_projections:
@@ -1020,9 +1022,9 @@ func _recover_tuned_supported_legs() -> void:
 		var tangent := gap.slide(Vector3.UP)
 		var limit := (core.linear_velocity.length() + state.linear_velocity.length()) * state.step
 		var motion := tangent.limit_length(limit)
-		if wall_support and gap.y < 0.0:
+		if core_contacts == 0 and wall_support and gap.y < 0.0:
 			_slide_floor_wall_part(joint.body, state, joint.half_size, motion, floor_y, floor)
-		elif floor_only and absf(gap.y) <= SOURCE_ANCHOR_TOLERANCE \
+		elif core_contacts == 0 and floor_only and absf(gap.y) <= SOURCE_ANCHOR_TOLERANCE \
 				and tangent.length_squared() > TUNED_LIMB_RECOVERY_GAP ** 2:
 			# With a supported foot and the separation parallel to the ground,
 			# keep floor height and let the swept slide follow the torso.
@@ -1030,6 +1032,21 @@ func _recover_tuned_supported_legs() -> void:
 				motion *= _projection_hit.get_collision_safe_fraction()
 			if not motion.is_zero_approx():
 				state.transform = state.transform.translated(motion)
+		elif floor_only and gap.y < -SOURCE_ANCHOR_TOLERANCE \
+				and -gap.y <= TUNED_WALL_SLIDE_MAX_VERTICAL_RATIO * tangent.length() \
+				and tangent.length_squared() > TUNED_LIMB_RECOVERY_GAP ** 2:
+			# A vertical wall can block the inward component while the planted leg
+			# still has room to follow along the wall. Keep true upper-body support.
+			var side_contact := true
+			for contact in core_contacts:
+				side_contact = side_contact and absf(core.get_contact_local_normal(contact).y) < MAX_WALL_NORMAL_Y \
+					and _is_fixed_wall(core.get_contact_collider_object(contact))
+			if core_contacts == 0:
+				side_contact = _test_projection_motion(joint.body, state.transform, motion, floor) \
+					and absf(_projection_hit.get_collision_normal().y) < MAX_WALL_NORMAL_Y \
+					and _is_fixed_wall(_projection_hit.get_collider())
+			if side_contact:
+				_slide_floor_wall_part(joint.body, state, joint.half_size, motion, floor_y, floor)
 
 
 func _recover_tuned_wall_shoulders() -> void:
