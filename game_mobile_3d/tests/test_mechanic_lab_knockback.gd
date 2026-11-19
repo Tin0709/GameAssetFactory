@@ -85,6 +85,7 @@ func run() -> void:
 		await physics_frame
 	check(lab.player_health == player_hp - 6, "The active attack can still connect if the player stays in reach")
 	zombie.free()
+	await check_sabre_windup_retarget(lab, group)
 	await check_sword_finisher_push(lab, group)
 	await check_sabre_landing_damage(lab, group)
 	await check_coincident_sabre_landing(lab, group)
@@ -95,6 +96,58 @@ func run() -> void:
 	print("MECHANIC_LAB_KNOCKBACK first_chase_step=", first_chase_step,
 		" travel=", furthest - at_contact, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_sabre_windup_retarget(lab, group) -> void:
+	for scenario in ["valid", "outside reach", "behind wall"]:
+		lab.reset_player()
+		await ticks(3)
+		for i in 2:
+			lab.get_node("HUD/SpawnZombie").pressed.emit()
+		var first := group.get_child(0) as ZOMBIE
+		var alternate := group.get_child(1) as ZOMBIE
+		var origin: Vector3 = lab.player.global_position
+		for zombie in [first, alternate]:
+			zombie.set_physics_process(false)
+		first.global_position = origin + Vector3.BACK * 1.45
+		alternate.global_position = origin + Vector3.RIGHT * 2.10
+		var wall := StaticBody3D.new()
+		var collision := CollisionShape3D.new()
+		var shape := BoxShape3D.new()
+		shape.size = Vector3(0.80, 2.5, 0.10)
+		collision.shape = shape
+		wall.add_child(collision)
+		wall.position = origin + Vector3(0.0, 1.25, 1.95)
+		lab.add_child(wall)
+		await ticks(2)
+		attack(true)
+		for i in 12:
+			await physics_frame
+			if group._aim_target == first:
+				break
+		attack(false)
+		check(group._aim_target == first and lab.player.combo.ground_windup_active(),
+			"Actual Sabre input locks the closer target before contact (%s)" % scenario)
+		var hit_tick: Array[int] = []
+		var record := func(_point, _direction, _clip, _index, _serial, _lethal):
+			hit_tick.append(Engine.get_physics_frames())
+		group.sabre_contact.connect(record)
+		match scenario:
+			"valid":
+				alternate.global_position = origin + Vector3.RIGHT * 1.25
+			"outside reach":
+				first.global_position = origin + Vector3.BACK * 3.00
+			"behind wall":
+				first.global_position = origin + Vector3.BACK * 2.30
+		await ticks(14)
+		var target := first if scenario == "valid" else alternate
+		var other := alternate if scenario == "valid" else first
+		check(group._aim_target == target and target.health == 36 and other.health == 48
+			and hit_tick.size() == 1, "Sabre preserves a valid lock or hits one replacement (%s)" % scenario)
+		print("MECHANIC_LAB_SABRE_AIM ", scenario, " hp=", [first.health, alternate.health], " contacts=", hit_tick.size())
+		group.sabre_contact.disconnect(record)
+		wall.free()
+		first.free()
+		alternate.free()
 
 func check_sword_finisher_push(lab, group) -> void:
 	lab.reset_player()
