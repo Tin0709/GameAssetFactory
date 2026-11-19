@@ -17,10 +17,16 @@ varying float hanging;
 void vertex() {
 	vec3 root = MODEL_MATRIX[3].xyz;
 	hanging = INSTANCE_CUSTOM.g;
+	float wall_vine = INSTANCE_CUSTOM.b;
+	float hanging_depth = mix(-VERTEX.y, VERTEX.z, wall_vine);
 	float sway = INSTANCE_CUSTOM.r * smoothstep(0.04, 0.5, VERTEX.y)
-		+ hanging * smoothstep(0.07, 0.85, -VERTEX.y) * 0.7;
+		+ hanging * smoothstep(0.07, 0.85, hanging_depth) * 0.7;
 	if (sway > 0.0) {
 		vec2 drift = clamp(world_breeze(root) * sway * 0.025, vec2(-0.06), vec2(0.06));
+		if (wall_vine > 0.5) {
+			vec2 along_wall = normalize(MODEL_MATRIX[0].xz);
+			drift = along_wall * dot(drift, along_wall);
+		}
 		VERTEX += inverse(mat3(MODEL_MATRIX)) * vec3(drift.x, 0.0, drift.y);
 	}
 	world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;

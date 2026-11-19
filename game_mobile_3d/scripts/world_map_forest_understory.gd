@@ -15,6 +15,8 @@ const MODELS := [
 	["Nature/Meshes/Moss/SM_SC_HangingMoss_03.glb", "b8f7e391837901f1be358b4c105e8325d48eee61810d383728da9a251ad2a104"],
 ]
 const BATCH_NAMES := ["FungusStems", "FungusPads", "CornerMoss", "LedgeMoss"]
+const VINE_ATLAS := ["Props/CaveEntrance/T_SringyMoss_D.png", "20069a786b0b6cc019d1ad642a6a12d605673c40a2f7d58f6cecf5fafb35c526", 64]
+const VINE_MESH := ["Props/CaveEntrance/SM_SCE_VineMoss_02.glb", "48692a77a8b2a6fd3973732d4cc8c99955488b3d66c860f9f156e33f92bd7ab3"]
 
 var materials: Array[ShaderMaterial] = []
 
@@ -65,31 +67,74 @@ func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atla
 				atlas = _load_atlas(directory, ATLASES[atlas_index])
 			if atlas == null:
 				return false
-			var material := ShaderMaterial.new()
-			material.shader = LeafShader
-			material.set_shader_parameter("source_atlas", atlas)
-			shared_materials[atlas_index] = material
+			shared_materials[atlas_index] = _leaf_material(atlas)
 		var mesh := _load_mesh(directory, MODELS[variant])
 		if mesh == null:
 			return false
-		var instances := MultiMesh.new()
-		instances.transform_format = MultiMesh.TRANSFORM_3D
-		instances.use_custom_data = true
-		instances.mesh = mesh
-		instances.instance_count = batches[variant].size()
-		for i in instances.instance_count:
-			instances.set_instance_transform(i, batches[variant][i])
-			# Red weights upward stems and green weights descending moss. Pads stay rigid.
-			instances.set_instance_custom_data(i, Color(float(variant == 0), float(variant >= 2), 0., 1.))
-		var batch := MultiMeshInstance3D.new()
-		batch.name = BATCH_NAMES[variant]
-		batch.multimesh = instances
-		batch.material_override = shared_materials[atlas_index]
-		batch.extra_cull_margin = .08
-		add_child(batch)
+		# Red weights upward stems and green weights descending moss. Pads stay rigid.
+		_add_batch(BATCH_NAMES[variant], mesh, shared_materials[atlas_index], batches[variant],
+			Color(float(variant == 0), float(variant >= 2), 0., 1.))
 	for material: ShaderMaterial in shared_materials.values():
 		materials.append(material)
 	return true
+
+func configure_wall_vines(world: Node3D, placements: PackedVector3Array) -> bool:
+	var root := ResearchRoot.research_root()
+	if root.is_empty() or placements.is_empty() or RenderingServer.get_rendering_device() == null:
+		return false
+	var poses: Array[Transform3D] = []
+	var occupied := {}
+	for slot: Vector3 in placements:
+		if not slot.is_finite() or not is_equal_approx(slot.z, snappedf(slot.z, 90.)):
+			continue
+		var cell := Vector2i(floori(slot.x), floori(slot.y))
+		var anchor := Vector3(cell.x + .5, world.surface_height(cell.x + .5, cell.y + .5), cell.y + .5)
+		var yaw := Basis(Vector3.UP, deg_to_rad(slot.z))
+		var outward := yaw.z
+		var lower: float = world.surface_height(anchor.x + outward.x, anchor.z + outward.z)
+		if occupied.has(cell) or not anchor.is_finite() or not is_finite(lower) or anchor.y - lower < 2.:
+			continue
+		if not _stone_cap(world, cell, anchor.y) or not _stone_cap(world, cell, anchor.y - 1.):
+			continue
+		# The source strip starts at (0,0,0) and extends along +Z. Hang it down
+		# the face and keep it within one stone column and clear of the lower floor.
+		var basis := yaw * Basis(Vector3.RIGHT, PI * .5) * Basis.from_scale(Vector3(.82, 1., .58))
+		var origin := anchor + outward * .53 - basis.x * .5 - Vector3.UP * .03
+		poses.append(Transform3D(basis, origin))
+		occupied[cell] = true
+	if poses.is_empty():
+		return false
+	var directory := root.path_join(SOURCE)
+	var atlas := _load_atlas(directory, VINE_ATLAS)
+	var mesh := _load_mesh(directory, VINE_MESH)
+	if atlas == null or mesh == null:
+		return false
+	var material := _leaf_material(atlas)
+	_add_batch("WallVineMoss", mesh, material, poses, Color(0., 1., 1., 1.))
+	materials.append(material)
+	return true
+
+func _leaf_material(atlas: Texture2D) -> ShaderMaterial:
+	var material := ShaderMaterial.new()
+	material.shader = LeafShader
+	material.set_shader_parameter("source_atlas", atlas)
+	return material
+
+func _add_batch(batch_name: String, mesh: Mesh, material: ShaderMaterial, poses: Array, wind: Color) -> void:
+	var instances := MultiMesh.new()
+	instances.transform_format = MultiMesh.TRANSFORM_3D
+	instances.use_custom_data = true
+	instances.mesh = mesh
+	instances.instance_count = poses.size()
+	for i in instances.instance_count:
+		instances.set_instance_transform(i, poses[i])
+		instances.set_instance_custom_data(i, wind)
+	var batch := MultiMeshInstance3D.new()
+	batch.name = batch_name
+	batch.multimesh = instances
+	batch.material_override = material
+	batch.extra_cull_margin = .08
+	add_child(batch)
 
 func _stone_cap(world: Node3D, cell: Vector2i, height: float) -> bool:
 	var offset: Array = world.runtime.offset

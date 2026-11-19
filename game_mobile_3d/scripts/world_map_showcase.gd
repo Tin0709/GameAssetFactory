@@ -86,6 +86,7 @@ var playable_boulder: PlayableBoulder
 var basin_boulders: Array[PlayableBoulder] = []
 var forest_moss: ForestMoss
 var forest_understory: ForestUnderstory
+var forest_wall_vines: ForestUnderstory
 var exterior_ground: ExteriorGround
 var exterior_ground_enabled := true
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
@@ -577,6 +578,14 @@ func setup(world:Node3D)->void:
 			level.add_child(understory)
 		else:
 			understory.free()
+	if not level.forest_wall_vine_placements.is_empty():
+		var wall_vines := ForestUnderstory.new()
+		if wall_vines.configure_wall_vines(level, level.forest_wall_vine_placements):
+			forest_wall_vines = wall_vines
+			forest_wall_vines.name = "ForestWallVines"
+			level.add_child(forest_wall_vines)
+		else:
+			wall_vines.free()
 	sync_spruce_leaf_filter()
 	_build_ui()
 	set_source_terrain(true)
@@ -1780,6 +1789,8 @@ func _scene_light_materials() -> Array:
 		result.append(forest_moss.material)
 	if is_instance_valid(forest_understory) and forest_understory.visible:
 		result.append_array(forest_understory.materials)
+	if is_instance_valid(forest_wall_vines) and forest_wall_vines.visible:
+		result.append_array(forest_wall_vines.materials)
 	return result
 
 func far_terrain_shading_materials() -> Array:
@@ -4492,6 +4503,13 @@ func _build_ui()->void:
 		understory.focus_mode = Control.FOCUS_NONE
 		box.add_child(understory)
 		understory.toggled.connect(forest_understory.set_visible)
+	if is_instance_valid(forest_wall_vines):
+		var vines := CheckButton.new()
+		vines.name = "ForestWallVinesToggle"
+		vines.button_pressed = forest_wall_vines.visible
+		vines.focus_mode = Control.FOCUS_NONE
+		box.add_child(vines)
+		vines.toggled.connect(forest_wall_vines.set_visible)
 	if is_instance_valid(exterior_ground):
 		var foothills := CheckButton.new()
 		foothills.name = "ExteriorGroundToggle"
@@ -4583,6 +4601,13 @@ func _build_ui()->void:
 			cover.focus_mode = Control.FOCUS_NONE
 			box.add_child(cover)
 			cover.toggled.connect(plants.set_forest_cover)
+		if not plants.forest_fern_asset.is_empty():
+			var fern := CheckButton.new()
+			fern.name = "ForestFernToggle"
+			fern.button_pressed = plants.forest_fern_enabled
+			fern.focus_mode = Control.FOCUS_NONE
+			box.add_child(fern)
+			fern.toggled.connect(plants.set_forest_fern)
 		for option:String in ["wind_enabled","interactions_enabled"]:
 			var toggle:=CheckButton.new();toggle.text="Grass wind" if option=="wind_enabled" else "Player grass / flower interaction"
 			toggle.name = "GrassWind" if option == "wind_enabled" else "GrassContact"
