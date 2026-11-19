@@ -330,6 +330,10 @@ func set_spruce_gap_coverage(enabled: bool) -> void:
 		_spruce_appearance.set_shader_parameter("spruce_gap_coverage", enabled)
 
 func set_spruce_gap_coverage_weight(weight: float) -> void:
+	# Curve interpolation can land just below 1 on a constant segment.
+	# Preserve the fully enabled endpoint, including the texel ranked 255.
+	if is_equal_approx(weight, 1.0):
+		weight = 1.0
 	if spruce_gap_coverage_available() and weight != _spruce_gap_coverage_weight:
 		_spruce_gap_coverage_weight = weight
 		_spruce_appearance.set_shader_parameter("spruce_gap_coverage_weight", weight)
