@@ -161,9 +161,11 @@ func _sync_landing_batch() -> void:
 			break
 	var count := 0
 	var bounds := AABB()
+	var largest_size := 0.0
 	for particle in _particles:
 		var sprite := particle.sprite
-		if not sprite.visible or particle.landing_tick < 0 or particle.debris_drag > 0.0:
+		if not sprite.visible or particle.debris_drag > 0.0 \
+				or (particle.landing_tick < 0 and particle.run_drag <= 0.0):
 			continue
 		var layers := 0 if can_batch else 1
 		if sprite.layers != layers:
@@ -171,14 +173,16 @@ func _sync_landing_batch() -> void:
 		if not can_batch:
 			continue
 		var point := to_local(sprite.global_position)
+		var size := sprite.pixel_size * 16.0
 		instances.set_instance_transform(count, Transform3D(Basis.IDENTITY, point))
-		instances.set_instance_custom_data(count, Color(float(sprite.frame), sprite.modulate.a, 0.0, 0.0))
+		instances.set_instance_custom_data(count, Color(float(sprite.frame), sprite.modulate.a, size, 0.0))
 		bounds = AABB(point, Vector3.ZERO) if count == 0 else bounds.expand(point)
+		largest_size = maxf(largest_size, size)
 		count += 1
 	instances.visible_instance_count = count
 	if count > 0:
-		# Include the half diagonal of the one-metre camera-facing quad.
-		instances.custom_aabb = bounds.grow(0.71)
+		# Include the half diagonal of the largest camera-facing quad.
+		instances.custom_aabb = bounds.grow(largest_size * 0.71)
 	_landing_batch.visible = count > 0
 
 func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:

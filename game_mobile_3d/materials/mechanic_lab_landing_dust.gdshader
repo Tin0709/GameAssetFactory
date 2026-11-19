@@ -7,6 +7,7 @@ uniform float camera_range_squared;
 varying flat vec3 sprite_data;
 
 void vertex() {
+	VERTEX.xy *= INSTANCE_CUSTOM.z;
 	vec3 to_camera = MODEL_MATRIX[3].xyz - CAMERA_POSITION_WORLD;
 	if (dot(to_camera, to_camera) > camera_range_squared) {
 		VERTEX = vec3(0.0);
