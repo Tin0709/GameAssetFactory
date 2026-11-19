@@ -136,6 +136,16 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 	check(not movement.footsteps_enabled and not movement.step_voices.any(func(voice): return voice.playing),
 		"Turning off lab audio stops movement voices immediately")
 	await check_movement_support(lab, movement, toggle)
+	toggle.button_pressed = true
+	movement.groups.grass.clear()
+	movement.groups.land_grass.clear()
+	var previous_slot: int = movement._step_index
+	var previous_landing: int = movement.event_count.landing
+	var previous_roles: Array = movement._step_landing.duplicate()
+	lab.player.surface_contact.emit(lab.player.global_position, true)
+	check(movement._step_index == previous_slot and movement.event_count.landing == previous_landing
+		and movement._step_landing == previous_roles, "A landing with no verified media leaves the voice pool untouched")
+	toggle.button_pressed = false
 	print("MECHANIC_LAB_MOVEMENT_AUDIO steps=", steps, " landing=", movement.event_count.landing,
 		" step_peak=", peak, " landing_peak=", landing_peak)
 	lab.free()
@@ -171,6 +181,37 @@ func check_movement_support(lab, movement, toggle: CheckButton) -> void:
 		"Feet in the air or past the grass edge start neither steps nor grass dust")
 	toggle.button_pressed = false
 	await create_timer(0.08).timeout
+
+func check_movement_audio_without_manifest() -> void:
+	var setting := "MD2_OVERWORLD_BUNDLE"
+	var old_path := OS.get_environment(setting)
+	var had_path := OS.has_environment(setting)
+	var missing := ProjectSettings.globalize_path("user://absent_mechanic_lab_audio_fixture.json")
+	check(not FileAccess.file_exists(missing), "The fallback test starts without an audio manifest")
+	OS.set_environment(setting, missing)
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	if had_path:
+		OS.set_environment(setting, old_path)
+	else:
+		OS.unset_environment(setting)
+	var movement = lab.get_node_or_null("MovementAudio")
+	check(movement != null, "MechanicLab loads its verified movement bank without an ambience manifest")
+	if movement != null:
+		check(movement.groups.get("grass", []).size() == 6 and movement.groups.get("land_grass", []).size() == 4
+			and movement.rejected_count == 0 and not movement.footsteps_enabled,
+			"The standalone bank loads all ten verified streams and starts muted")
+		lab.get_node("HUD/CombatAudioToggle").button_pressed = true
+		for i in 12:
+			await physics_frame
+		var player: CharacterBody3D = lab.player
+		player.surface_contact.emit(player.global_position, false)
+		player.surface_contact.emit(player.global_position, true)
+		check(movement.event_count.grass == 1 and movement.event_count.landing == 1
+			and movement.last_sources.get("land_grass", "").begins_with("sfx_player_land_grassPath_"),
+			"Lab ground contacts still dispatch the grass step and landing banks after fallback")
+	lab.free()
 
 func check_landing_voice_under_step_burst(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
@@ -1599,6 +1640,7 @@ func run() -> void:
 	await check_bow_fire_during_crossbow_impacts(bus, capture)
 	await check_local_hurt(bus, capture)
 	await check_movement_audio(bus, capture)
+	await check_movement_audio_without_manifest()
 	await check_landing_voice_under_step_burst(bus, capture)
 	await check_run_step_after_landing(bus, capture)
 	await check_sabre_debris_audio(bus, capture)
