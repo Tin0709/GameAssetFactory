@@ -93,6 +93,7 @@ func run() -> void:
 	await check_tuned_contact(73, 27.0, 0.18, false, -58.0)
 	await check_tuned_contact(81, 27.0, 0.35, true, -58.0)
 	await check_tuned_contact(19, 27.0, 0.35, false, -58.0, true)
+	await check_tuned_contact(60, 27.0, 0.20, false, -58.0, false, 100.0)
 	await check_first_wall_neck_contact()
 	await check_first_wall_neck_contact(true)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
@@ -147,13 +148,13 @@ func check_walk_contacts(baby: Zombie) -> void:
 			"The Baby Zombie step matches the source sole and phase at frame 2 or 8")
 
 func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_attack := false,
-		strike_yaw := INF, sword_attack := false) -> void:
+		strike_yaw := INF, sword_attack := false, percent := 1000.0) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
-	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = 1000.0
-	lab.get_node("HUD/RagdollTuning/Gravity/Slider").value = 1000.0
+	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = percent
+	lab.get_node("HUD/RagdollTuning/Gravity/Slider").value = percent
 	var corner: Node3D
 	if wall_yaw != INF:
 		corner = add_contact_corner(lab, wall_yaw)
@@ -206,12 +207,13 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_atta
 			impulse = baby.ragdoll.total_applied_impulse.length()
 			var chest: PhysicalBone3D = baby.ragdoll.bodies.Chest
 			gravity = PhysicsServer3D.body_get_direct_state(chest.get_rid()).total_gravity.y
-	var expected_impulse := 1256.64 if air_attack else 987.36
-	check(baby.health == 0 and is_equal_approx(impulse, expected_impulse) and is_equal_approx(gravity, -500.0),
-		"The Baby Zombie receives both 1000% settings from the lethal contact")
+	var multiplier := percent / 100.0
+	var expected_impulse := (125.664 if air_attack else 98.736) * multiplier
+	check(baby.health == 0 and is_equal_approx(impulse, expected_impulse) and is_equal_approx(gravity, -50.0 * multiplier),
+		"The Baby Zombie receives the selected launch and gravity settings from the lethal contact")
 	check(gap < gap_limit and baby._corpse_landed and baby._corpse_parked and not crossed,
-		"At 1000% launch and gravity the Baby Zombie settles with limited joint stretch and no wall crossings")
-	print("LAB_BABY_TUNED_CONTACT seed=", seed, " yaw=", wall_yaw, " strike_yaw=", strike_yaw, " gap=", gap, " crossed=", crossed,
+		"At %d%% launch and gravity the Baby Zombie settles with limited joint stretch and no wall crossings" % percent)
+	print("LAB_BABY_TUNED_CONTACT percent=", percent, " seed=", seed, " yaw=", wall_yaw, " strike_yaw=", strike_yaw, " gap=", gap, " crossed=", crossed,
 		" parked=", baby._corpse_parked, " impulse=", impulse, " gravity=", gravity)
 	lab.free()
 
