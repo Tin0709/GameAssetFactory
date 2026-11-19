@@ -21,6 +21,7 @@ var _night_albedo := -1.
 var _twilight_ambient := -1.
 var _shadow_height_scale := -1.
 var _shadow_footprint_scale := -1.
+var _shadow_wind_scale := -1.
 var _step_coverage := -1.
 
 func setup(level:Node3D,reader:RefCounted)->void:
@@ -61,6 +62,7 @@ func restore()->void:
 	_twilight_ambient = -1.
 	_shadow_height_scale = -1.
 	_shadow_footprint_scale = -1.
+	_shadow_wind_scale = -1.
 	_step_coverage = -1.
 
 func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->void:
@@ -131,6 +133,11 @@ func sync()->void:
 		_shadow_footprint_scale = footprint_scale
 		for row: Dictionary in _records:
 			row.material.set_shader_parameter("study_grass_shadow_footprint",footprint_scale)
+	var wind_scale: float = world.showcase.grass_shadow_wind_scale()
+	if wind_scale != _shadow_wind_scale:
+		_shadow_wind_scale = wind_scale
+		for row: Dictionary in _records:
+			row.material.set_shader_parameter("study_grass_shadow_wind", wind_scale)
 
 func _sync_ground_sky()->void:
 	var terrain=world.terrain_light

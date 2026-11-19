@@ -27,6 +27,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Daylight caster adjustment for maps with the grass lighting adapter.
 @export_range(0., 2., .01) var day_grass_shadow_compactness := 1.
 @export_range(0., .5, .01) var day_grass_shadow_footprint_reduction := 0.
+## Limit wind displacement in the directional shadow pass while retaining plant contact.
+@export_range(0., .75, .01) var day_grass_shadow_wind_reduction := 0.
 ## Relative opacity of the daytime canopy silhouette at close camera zoom.
 @export_range(0., 1., .01) var daylight_canopy_cue_opacity := 1.
 ## Orthographic camera sizes that blend the silhouette back to full opacity.

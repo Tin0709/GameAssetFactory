@@ -30,6 +30,7 @@ uniform float study_grass_sky_height = 0.0;
 uniform float study_grass_night_albedo = 0.0;
 uniform float study_grass_shadow_height = 1.0;
 uniform float study_grass_shadow_footprint = 1.0;
+uniform float study_grass_shadow_wind = 1.0;
 varying flat vec4 study_ground_sky_at_root;
 varying flat float study_canopy_sky_at_root;
 varying flat float study_raw_canopy_sky;
@@ -121,10 +122,16 @@ void vertex(){
 	float spatial=dot(root.xz,direction);
 	float phase=CUSTOM0.z+spatial*0.6283185+INSTANCE_CUSTOM.r;
 	vec2 bend=vec2(0.0);
+	float cast_wind = 1.0;
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+	if (IN_SHADOW_PASS && PROJECTION_MATRIX[3][3] > .5) {
+		cast_wind = study_grass_shadow_wind;
+	}
+#endif
 	if(!review_source_wind){
 		bend=direction*(0.28*sin(wind_time*frequency*6.2831853+phase)+0.055*sin(wind_time*6.2831853*0.625+spatial*0.34));
 		bend+=vec2(-direction.y,direction.x)*0.025*sin(wind_time*6.2831853*0.25+phase);
-		bend*=wind_intensity*CUSTOM0.w;
+		bend*=wind_intensity*CUSTOM0.w*cast_wind;
 	}
 	vec2 field_uv=(root.xz+vec2(field_extent*0.5))/field_extent;
 	float inside=step(0.0,field_uv.x)*step(field_uv.x,1.0)*step(0.0,field_uv.y)*step(field_uv.y,1.0);
@@ -140,7 +147,7 @@ void vertex(){
 		world_offset=gaf_grass_rest_arc(normalize(MODEL_NORMAL_MATRIX*NORMAL),heading,planar,vertical);
 	}
 	if(review_source_wind && wind_intensity>0.0){
-		world_offset+=gaf_source_grass_wind((MODEL_MATRIX*vec4(VERTEX,1.0)).xyz,root,wind_time);
+		world_offset+=cast_wind*gaf_source_grass_wind((MODEL_MATRIX*vec4(VERTEX,1.0)).xyz,root,wind_time);
 	}
 	if(cell_limited_motion){
 		world_offset*=INSTANCE_CUSTOM.a;
