@@ -318,9 +318,10 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 	animation = model.get_node("AnimationPlayer")
 	animation.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	_mesh = model.find_child("SK_BabyZombie" if is_baby else "SK_Zombie", true, false)
-	if _mesh.material_override != null and _mesh.material_override.has_meta(LAB_FLASH_SKIN_META):
-		_lab_skin = _mesh.material_override as ShaderMaterial
-		_lab_flash_skin = _lab_skin.get_meta(LAB_FLASH_SKIN_META) as ShaderMaterial
+	var skin := _mesh.material_override as ShaderMaterial if _mesh != null else null
+	if skin != null and skin.has_meta(LAB_FLASH_SKIN_META):
+		_lab_skin = skin
+		_lab_flash_skin = skin.get_meta(LAB_FLASH_SKIN_META) as ShaderMaterial
 	_feedback = Feedback.new()
 	_feedback.digits = digits
 	_feedback.effects = effects
