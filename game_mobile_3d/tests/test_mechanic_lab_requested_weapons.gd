@@ -1006,6 +1006,13 @@ func check_melee_equip_audio(lab: Node3D, menu: OptionButton) -> void:
 	check(menu.selected == 8 and not audio._groups.has(&"pickaxe_equip")
 		and not audio._voices.any(func(voice): return voice.playing),
 		"Changing melee tools while muted does not decode or play switch audio")
+	for preview: Array in [[8, &"tool_pickaxe_5", 3], [10, &"tool_axe_0", 1]]:
+		equip(menu, preview[0])
+		sound.button_pressed = true
+		check(menu.selected == preview[0] and switch_cue_is_playing(audio, preview[1], preview[2])
+			and not audio._next_choice.has(&"hit"),
+			"%s previews its own verified sample when combat audio is enabled" % menu.get_item_text(preview[0]))
+		sound.button_pressed = false
 	equip(menu, 0)
 	sound.button_pressed = true
 	var fixtures := [[1, &"sword", 1, 1], [2, &"curved_greatsword", 1, 1],

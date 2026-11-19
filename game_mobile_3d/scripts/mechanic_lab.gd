@@ -1043,7 +1043,8 @@ func _set_combat_audio(enabled: bool) -> void:
 		_movement_audio.footsteps_enabled = enabled
 		if not enabled:
 			_movement_audio.reset_contacts()
-	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP)
+	var melee_tool: StringName = MELEE_AUDIO_NAMES.get(_equipped_weapon, &"")
+	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP, melee_tool)
 
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, lethal: bool) -> void:
 	var has_arrow_sparks := clip == CrossPollinator.SHOT and _crossbow != null and _crossbow.impact_sparks != null
