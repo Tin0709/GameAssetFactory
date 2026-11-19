@@ -584,6 +584,9 @@ func setup(world:Node3D)->void:
 			forest_wall_vines = wall_vines
 			forest_wall_vines.name = "ForestWallVines"
 			level.add_child(forest_wall_vines)
+			for material: ShaderMaterial in forest_wall_vines.materials:
+				material.set_shader_parameter("travelling_breeze", level.look.travelling_breeze)
+				level.look.wind_materials.append(material)
 		else:
 			wall_vines.free()
 	sync_spruce_leaf_filter()

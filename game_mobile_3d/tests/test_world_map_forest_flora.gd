@@ -20,7 +20,7 @@ func run() -> void:
 	if "absent" in OS.get_cmdline_user_args():
 		check(fern == null and vine == null and wall == null, "Private flora is absent without supported local source")
 	else:
-		check(fern != null and fern.button_pressed, "F5 enables verified Forest dương xỉ by default")
+		check(fern != null and fern.button_pressed, "F5 enables verified Forest ferns by default")
 		check(vine != null and vine.button_pressed and wall != null, "F5 enables verified Forest wall vines by default")
 		if fern != null:
 			test_carpet(world, fern)
@@ -87,6 +87,9 @@ func test_wall(world: Node3D, wall: Node3D, toggle: CheckButton) -> void:
 	check(batch.multimesh.instance_count >= 12 and sectors.size() == 4, "Wall vines cover all four map sectors")
 	check(batch.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_ON, "Vines cast cutout shadows")
 	check(world.showcase._mist_materials().has(batch.material_override), "Wall vines participate in shared mist")
+	world.look.publish_render_wind(1.)
+	check(is_equal_approx(batch.material_override.get_shader_parameter("wind_phase"), PI * .5),
+		"Wall vines receive the map's animated wind")
 	toggle.button_pressed = false
 	check(not wall.visible and not world.showcase._mist_materials().has(batch.material_override), "Hiding wall vines removes them from rendering")
 	toggle.button_pressed = true
