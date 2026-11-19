@@ -324,9 +324,10 @@ func spruce_available() -> bool:
 func spruce_visible() -> bool:
 	return spruce_available() and _spruce_root.visible
 
-func place_additional_spruce(source: Node3D, position_world: Vector3) -> Array[MeshInstance3D]:
+func place_additional_spruce(source: Node3D, position_world: Vector3,
+		tree_name: String = "BasinDaySpruce") -> Array[MeshInstance3D]:
 	var tree := source.duplicate() as Node3D
-	tree.name = "BasinDaySpruce"
+	tree.name = tree_name
 	_spruce_root.add_child(tree)
 	tree.global_position = position_world
 	var casters: Array[MeshInstance3D] = []
