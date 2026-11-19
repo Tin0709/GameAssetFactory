@@ -660,8 +660,8 @@ func check_curved_step_effects(lab, dust: Node3D, wind: Node3D) -> void:
 	check(run_steps.size() >= 3 and run_steps.all(func(step): return step.sound and step.source_puff)
 		and run_steps.any(func(step): return step.wakes == 1),
 		"Curved Greatsword run and turn use source dust at the same supported foot as the sound")
-	check(walk_steps.size() >= 2 and walk_steps.all(func(step): return step.sound
-		and step.puffs == 0 and step.wakes == 0),
+	var walk_quiet := walk_steps.all(func(step): return step.sound and step.puffs == 0 and step.wakes == 0)
+	check(walk_steps.size() >= 2 and walk_quiet,
 		"Curved Greatsword walking keeps the supported footstep sound without run effects")
 	print("MECHANIC_LAB_CURVED_STEP_FX run=", run_steps, " walk=", walk_steps)
 	weapon.select(selected)
