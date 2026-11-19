@@ -25,7 +25,7 @@ const WALL_NECK_LANDING_BLEND_END := 0.5
 const WALL_SHOULDER_SLIDE_WINDOW := 5.0 / 60.0
 const WALL_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
 const FIRST_WALL_SHOULDER_SLIDE_MIN_GAP := 0.17
-const TUNED_WALL_LIMB_RECOVERY_GAP := 8.0 * SOURCE_ANCHOR_TOLERANCE
+const TUNED_LIMB_RECOVERY_GAP := 8.0 * SOURCE_ANCHOR_TOLERANCE
 const WALL_SLIDE_MAX := 0.08
 const REBOUND_SLIDE_MAX_NORMAL_FRACTION := 0.65
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
@@ -98,7 +98,7 @@ func _correct_physical_pose() -> void:
 		if frame <= _launch_frame + 1:
 			_recover_tuned_wall_shoulders()
 		elif floor_impact_blend <= 0.0:
-			_recover_tuned_wall_legs()
+			_recover_tuned_supported_legs()
 	if _baby_wall_anchors:
 		# A floor hit can hide a wall from the first ray. Check the
 		# corrected pose before saving the start of the next sweep.
@@ -979,7 +979,7 @@ func _baby_neck_needs_wall_recovery() -> bool:
 		return gap.length_squared() > WALL_SLIDE_MIN_GAP ** 2
 	return false
 
-func _recover_tuned_wall_legs() -> void:
+func _recover_tuned_supported_legs() -> void:
 	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
 		return
 	var floor_body := _flat_floor.get_parent() as StaticBody3D
@@ -999,26 +999,37 @@ func _recover_tuned_wall_legs() -> void:
 		if state == null:
 			continue
 		var contacts := state.get_contact_count()
-		if contacts < 2:
+		if contacts == 0:
 			continue
 		var gap := (core.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
-		if gap.y >= 0.0 or gap.length_squared() <= TUNED_WALL_LIMB_RECOVERY_GAP ** 2:
+		if gap.length_squared() <= TUNED_LIMB_RECOVERY_GAP ** 2:
 			continue
 		var wall_support := false
 		var floor_support := false
+		var floor_only := true
 		for i in contacts:
 			var normal := state.get_contact_local_normal(i)
 			var obstacle := state.get_contact_collider_object(i) as PhysicsBody3D
-			floor_support = floor_support or (obstacle == floor_body and normal.y >= MIN_SUPPORT_NORMAL_Y)
+			var on_floor := obstacle == floor_body and normal.y >= MIN_SUPPORT_NORMAL_Y
+			floor_support = floor_support or on_floor
+			floor_only = floor_only and on_floor
 			if absf(normal.y) < MAX_WALL_NORMAL_Y and gap.dot(normal) > 0.0 and _is_fixed_wall(obstacle):
 				wall_support = wall_support or _is_single_box(obstacle.get_rid())
-		if not (floor_support and wall_support):
+		if not floor_support:
 			continue
-		# The floor is carrying the leg and the torso is still falling.
-		# Let the leg follow along the floor within one step of combined travel.
+		var tangent := gap.slide(Vector3.UP)
 		var limit := (core.linear_velocity.length() + state.linear_velocity.length()) * state.step
-		var motion := gap.slide(Vector3.UP).limit_length(limit)
-		_slide_floor_wall_part(joint.body, state, joint.half_size, motion, floor_y, floor)
+		var motion := tangent.limit_length(limit)
+		if wall_support and gap.y < 0.0:
+			_slide_floor_wall_part(joint.body, state, joint.half_size, motion, floor_y, floor)
+		elif floor_only and absf(gap.y) <= SOURCE_ANCHOR_TOLERANCE \
+				and tangent.length_squared() > TUNED_LIMB_RECOVERY_GAP ** 2:
+			# With a supported foot and the separation parallel to the ground,
+			# keep floor height and let the swept slide follow the torso.
+			if _test_projection_motion(joint.body, state.transform, motion, floor):
+				motion *= _projection_hit.get_collision_safe_fraction()
+			if not motion.is_zero_approx():
+				state.transform = state.transform.translated(motion)
 
 
 func _recover_tuned_wall_shoulders() -> void:
@@ -1036,7 +1047,7 @@ func _recover_tuned_wall_shoulders() -> void:
 			continue
 		var gap := (core.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
 		var distance := gap.length()
-		if distance <= TUNED_WALL_LIMB_RECOVERY_GAP:
+		if distance <= TUNED_LIMB_RECOVERY_GAP:
 			continue
 		for i in state.get_contact_count():
 			var normal := state.get_contact_local_normal(i)
