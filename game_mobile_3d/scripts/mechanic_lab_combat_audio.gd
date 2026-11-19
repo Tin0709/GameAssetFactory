@@ -441,7 +441,7 @@ var _master_was_muted := false
 func _ready() -> void:
 	set_process(false)
 
-func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"") -> void:
+func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"", preview_group := &"") -> void:
 	if enabled == value:
 		return
 	enabled = value
@@ -457,7 +457,7 @@ func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"") -> void
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
 		AudioServer.set_bus_mute(0, false)
-	var preview := _weapon_hit_group()
+	var preview := _weapon_hit_group() if preview_group.is_empty() else preview_group
 	if not melee_tool.is_empty():
 		preview = _tool_group(melee_tool, 5)
 		if not _groups.has(preview):

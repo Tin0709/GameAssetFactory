@@ -1805,7 +1805,8 @@ func run() -> void:
 	AudioServer.remove_bus_effect(bus, 0)
 	audio.queue_free()
 	camera.queue_free()
-	await process_frame
+	# Let the mixer release stopped streams before dropping the temporary bus.
+	await create_timer(0.12).timeout
 	AudioServer.remove_bus(bus)
 	quit(0 if failures.is_empty() else 1)
 
