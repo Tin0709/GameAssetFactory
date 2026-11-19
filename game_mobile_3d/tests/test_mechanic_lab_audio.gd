@@ -953,7 +953,8 @@ func check_baby_zombie_swing(bus: int, capture: AudioEffectCapture) -> void:
 	audio.flush_zombie_combat_cues()
 	check(lab.player_health == initial_hp - ZOMBIE.BABY_MELEE_DAMAGE
 		and attacks.any(func(voice): return voice.playing and voice.stream in bank)
-		and attacks.any(func(voice): return voice.playing and voice.stream in audio._groups[&"zombie_hit"]),
+		and attacks.any(func(voice): return voice.playing and voice.stream in audio._groups.get(&"baby_hit", []))
+		and audio._next_choice.get(&"baby_swing", 0) == 1 and audio._next_choice.get(&"baby_hit", 0) == 1,
 		"Crossing both markers in one update retains the swing, confirmed cue, and source damage")
 	audio.reset()
 	var point := baby.combat_center()
@@ -1266,6 +1267,10 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 	check(audio._next_choice.get(&"zombie_windup", 0) == 3
 		and voices.all(func(voice): return voice.global_position in nearest_points),
 		"A same-tick attack burst plays the three nearest telegraphs")
+	check(voices.all(func(voice):
+		var cents := 1200.0 * log(voice.pitch_scale) / log(2.0)
+		return cents >= -200.01 and cents <= 300.01 and not is_zero_approx(cents)),
+		"Adult windups use the pitch range inferred from the cooked event")
 	# Let the real-time mixer start the telegraphs before the contact burst.
 	await create_timer(0.10).timeout
 	capture.clear_buffer()
@@ -1279,7 +1284,7 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 		"Confirmed contacts replace windups with the three nearest contact cues")
 	check(audio._groups.get(&"zombie_hit") == audio._groups.get(&"baby_swing")
 		and hit_voices.all(func(voice): return is_equal_approx(voice.pitch_scale, 1.0)),
-		"Confirmed contacts reuse the source media at neutral pitch without taking swing priority")
+		"Confirmed contacts share the neutral-pitch waveforms used by swings")
 	var hit_streams := voices.map(func(voice): return voice.stream)
 	for point in points:
 		group.zombie_attack_audio.emit(point, false)
