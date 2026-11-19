@@ -129,7 +129,7 @@ func check_first_wall_shoulder(lab) -> void:
 	collider.shape = box
 	wall.add_child(collider)
 	lab.add_child(wall)
-	var group := lab.get_node("Zombies")
+	var group: Node = lab.get_node("Zombies")
 	# Replay the recorded adult walk pose and oblique Sabre finisher by this face.
 	group._spawn_serial = 88
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
