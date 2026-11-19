@@ -65,6 +65,7 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 		check(world.showcase._mist_materials().has(material), "Fern participates in shared mist")
 		check(plants.grass_light._records.any(func(record: Dictionary) -> bool: return record.material == material),
 			"Fern participates in shared grass lighting")
+	test_fern_night_response(world, plants, assets)
 	var spring = plants.interaction
 	var point: Vector3 = world.player.global_position
 	for step in 8:
@@ -85,6 +86,25 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 		"Restoring the ferns gives the same placement count")
 	check(spring.revision == revision and spring.pixels == motion and spring.previous_pixels == previous,
 		"Changing the fern comparison preserves the live grass bend")
+
+func test_fern_night_response(world: Node3D, plants: Node3D, assets: Dictionary) -> void:
+	var previous_hour: float = world.showcase.hour
+	for hour: float in [12., 16.5, 19.5, 22.]:
+		world.showcase.set_hour(hour)
+		plants.grass_light.sync()
+		var turf: float = world.showcase.grass_night_albedo_mix()
+		check((turf == 0.) == (hour <= 16.5), "The turf tint runs only during twilight and night")
+		for asset: String in assets:
+			var material: ShaderMaterial = plants.bundle.meshes[asset].surface_get_material(0)
+			var expected := turf if asset.ends_with("SM_SF_Fern_Small") else turf * .5
+			check(is_equal_approx(material.get_shader_parameter("study_grass_night_albedo"), expected),
+				"The two generic fern shapes retain more source pigment at %s" % hour)
+		for asset: String in plants.forest_cover_species:
+			var material: ShaderMaterial = plants.bundle.meshes[asset].surface_get_material(0)
+			check(is_equal_approx(material.get_shader_parameter("study_grass_night_albedo"), turf),
+				"The cover grass keeps its biome night tint")
+	world.showcase.set_hour(previous_hour)
+	plants.grass_light.sync()
 
 func test_wall(world: Node3D, wall: Node3D, toggle: CheckButton) -> void:
 	check(wall.find_children("*", "CollisionObject3D", true, false).is_empty(), "Wall vines are visual")
