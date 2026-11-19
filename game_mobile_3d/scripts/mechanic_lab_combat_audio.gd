@@ -142,6 +142,22 @@ const TOOL_SAMPLES := {
 			"9cc6d9d3cef4f4672ef1f647cdb2789d3138853d41cfc3b647ea23096b1e0d38",
 		]],
 	],
+	&"axe": [
+		["sfx_axe_attack_combo_01", ["bee4c3e4572bcc33a91d448c52aebbe3de7f814502ba02bde31b5831b6a195ef"]],
+		["sfx_axe_attack_combo_02", ["baf9210e80e2a6e736cbd7fe16fa656951fdd8fc7e983fe867f3e8c28490c8c7"]],
+		["sfx_axe_attack_combo_03", ["0e5f24a0ead9ad8eddaa685c169a43273868bd81bc87f1458573a0bba129cdc9"]],
+		["sfx_axe_HJA_start_%02d", [
+			"80b72d591c9aca57bb4414f07b3afd22fb958d58e423ab6450d3d9827db09744",
+			"18df36965bc6b92ac93a60caa3081578b4365bc52f19414edba76b9e7b379960",
+			"999a78ecb9889b552586eb70a826df49ec5057e9449fe984686afdc426704539",
+		]],
+		["sfx_axe_HJA_hit_%02d", [
+			"b7536f0aa90c601dd40b22c85e4451204a2a8e4d99d147dd517a364495207956",
+			"37493bf31fe6bf265240d94f4ed4d46fa33f733d47481ab03a5c0928e1ced648",
+			"295793b2336f7bbde0379566dd1496cda03f5309d692ef6e623695e6216d8ff9",
+		]],
+		[], # The base Axe hitmarker has no matching local export.
+	],
 }
 # DT_MeleePropertyDefinition uses shared events with a switch for each weapon.
 # The exported samples below match the weapon name and event folder.
@@ -199,6 +215,12 @@ const MELEE_SWITCH_SAMPLES := {
 	},
 	&"shovel_unequip": {
 		"sfx_shovel_unequip": "4ab811f6ef1737cb7702e50f8308c2aaa8186fe3763332d0f43993da44d34c20",
+	},
+	&"axe_equip": {
+		"sfx_axe_equip": "258fdf6d1eeef5cb17da337c9f89254b89c8cf17cdfc5ce26e56bade96fb5663",
+	},
+	&"axe_unequip": {
+		"sfx_axe_unequip": "17ff9a8c75a602c67c79db675a90eec3714705d29815d5330cc81ea9c86b7291",
 	},
 }
 const GAUNTLET_SWING_HASHES := {
