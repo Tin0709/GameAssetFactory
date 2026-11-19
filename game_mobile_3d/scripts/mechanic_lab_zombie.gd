@@ -40,6 +40,7 @@ const BABY_MELEE_REACH := 1.5
 const BABY_MELEE_APPROACH := 1.02
 const BABY_MAX_POISE := 50.0
 const BABY_ATTACK_RATE := 1.1
+const BABY_DEATH_LAUNCH_SCALE := 0.85
 # Local contact and focus markers derived from the leading hand's swing.
 const BABY_ATTACK_CONTACT := 20.0 / 30.0
 const BABY_ATTACK_FOCUS_END := 18.0 / 30.0
@@ -1010,6 +1011,8 @@ func _update_death(delta: float) -> void:
 			head.bounce = DEATH_SOURCE_RESTITUTION
 		var angle := deg_to_rad(DEATH_LAUNCH_ANGLE)
 		var launch_impulse := _death_launch_speed(_death_strength) * mass * ragdoll_launch_multiplier
+		if is_baby:
+			launch_impulse *= BABY_DEATH_LAUNCH_SCALE
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
 		var floor_impact_limb_share := 0.0
 		if sabre_finisher:
