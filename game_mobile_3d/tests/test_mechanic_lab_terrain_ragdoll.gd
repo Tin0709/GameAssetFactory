@@ -392,7 +392,8 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		second_wall.free()
 		second_wall = first_wall
 	if bevel:
-		terrain(lab, Vector3(4.35, 0.73, 4.35), Vector3(0.10, 1.46, 0.26), -PI / 4.0)
+		var bevel_face := terrain(lab, Vector3(4.35, 0.73, 4.35), Vector3(0.10, 1.46, 0.26), 0.0)
+		bevel_face.rotation.y = -PI / 4.0
 	var group := lab.get_node("Zombies")
 	group._spawn_serial = 1800 + seed
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
