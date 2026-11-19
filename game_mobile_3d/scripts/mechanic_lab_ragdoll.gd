@@ -548,9 +548,9 @@ func has_flat_corner_brace(max_linear := INF, max_angular := INF) -> bool:
 	if not foot_supported or not _body_below_speed(bodies.Head, max_linear, max_angular) \
 			or not _body_below_speed(bodies.Chest, max_linear, max_angular):
 		return false
-	var normal := Vector3.ZERO
-	var wall := RID()
-	var wall_shape := -1
+	var normals: Array[Vector3] = []
+	var walls: Array[RID] = []
+	var shapes := PackedInt32Array()
 	for name in ["Head", "Chest"]:
 		var body: PhysicalBone3D = bodies[name]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
@@ -562,13 +562,15 @@ func has_flat_corner_brace(max_linear := INF, max_angular := INF) -> bool:
 				continue
 			var collider := state.get_contact_collider(i)
 			var shape := state.get_contact_collider_shape(i)
-			if not wall.is_valid():
-				wall = collider
-				wall_shape = shape
-				normal = next
-			# A single static body can contain box colliders for both walls.
-			elif (collider != wall or shape != wall_shape) and absf(normal.dot(next)) < 0.25:
-				return true
+			# Contact order can put a bevel before both supporting walls.
+			# The two faces can belong to different shapes on one body.
+			for previous in normals.size():
+				if (collider != walls[previous] or shape != shapes[previous]) \
+						and absf(normals[previous].dot(next)) < 0.25:
+					return true
+			normals.append(next)
+			walls.append(collider)
+			shapes.append(shape)
 	return false
 
 static func _body_below_speed(body: PhysicalBone3D, max_linear: float, max_angular: float) -> bool:
