@@ -46,6 +46,7 @@ var wall_handoff_idle_pose: Array[Transform3D]
 
 static var _handoff_bounds_shape: BoxShape3D
 static var _handoff_bounds_query: PhysicsShapeQueryParameters3D
+static var _handoff_ray := PhysicsRayQueryParameters3D.new()
 static var _handoff_box_queries: Dictionary[BoxShape3D, PhysicsShapeQueryParameters3D]
 static var _body_shapes: Dictionary[Vector3, BoxShape3D]
 
@@ -389,21 +390,24 @@ func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: in
 
 func _handoff_straddles_wall(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		shift: Vector3, tolerance: float, wall_crossings: Dictionary[Vector3, bool]) -> bool:
-	var ray := PhysicsRayQueryParameters3D.new()
+	# This query is synchronous; the next ragdoll can reuse the parameters.
+	var ray := _handoff_ray
 	ray.collision_mask = collision_mask
 	var origin := skeleton.global_position + shift
 	for pose: Transform3D in current.values():
 		var crosses: Variant = wall_crossings.get(pose.origin)
 		if crosses == null:
-			ray.from = Vector3(origin.x, pose.origin.y, origin.z)
-			ray.to = pose.origin + shift
+			var start := Vector3(origin.x, pose.origin.y, origin.z)
+			var finish := pose.origin + shift
 			crosses = false
-			if ray.from.distance_squared_to(ray.to) > SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
+			if start.distance_squared_to(finish) > SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
+				ray.from = start
+				ray.to = finish
 				var hit := space.intersect_ray(ray)
 				if not hit.is_empty() and hit.collider is StaticBody3D:
 					var normal: Vector3 = hit.normal
 					var point: Vector3 = hit.position
-					crosses = absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - ray.to) > tolerance
+					crosses = absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - finish) > tolerance
 			wall_crossings[pose.origin] = crosses
 		if crosses:
 			return true
