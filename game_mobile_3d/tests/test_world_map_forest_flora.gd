@@ -1,0 +1,93 @@
+extends SceneTree
+
+var failures: Array[String] = []
+
+func _initialize() -> void:
+	run.call_deferred()
+
+func check(condition: bool, message: String) -> void:
+	if not condition and not failures.has(message):
+		failures.append(message)
+
+func run() -> void:
+	var world = load("res://scenes/WorldMap.tscn").instantiate()
+	root.add_child(world)
+	current_scene = world
+	await process_frame
+	var fern := world.find_child("ForestFernToggle", true, false) as CheckButton
+	var vine := world.find_child("ForestWallVinesToggle", true, false) as CheckButton
+	var wall := world.get_node_or_null("ForestWallVines") as Node3D
+	if "absent" in OS.get_cmdline_user_args():
+		check(fern == null and vine == null and wall == null, "Private flora is absent without supported local source")
+	else:
+		check(fern != null and fern.button_pressed, "F5 enables verified Forest dương xỉ by default")
+		check(vine != null and vine.button_pressed and wall != null, "F5 enables verified Forest wall vines by default")
+		if fern != null:
+			test_carpet(world, fern)
+		if wall != null and vine != null:
+			test_wall(world, wall, vine)
+	world.free()
+	await process_frame
+	print("FOREST_FLORA failures=", JSON.stringify(failures))
+	quit(0 if failures.is_empty() else 1)
+
+func test_carpet(world: Node3D, toggle: CheckButton) -> void:
+	var plants: Node3D = world.showcase.plants
+	var sectors := {}
+	var rooted := {}
+	var count := 0
+	var asset := ""
+	for row: Dictionary in plants.placements:
+		check(not rooted.has(row.cell), "Only one plant grows in each grass cell")
+		rooted[row.cell] = row
+		if not row.get("forest_fern", false):
+			continue
+		asset = row.asset
+		count += 1
+		sectors[Vector2i(signi(row.cell.x), signi(row.cell.y))] = true
+		var pixel := Vector2i(Vector2(row.cell) - world.look.path_map_origin)
+		for offset: Vector2i in [Vector2i.ZERO, Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+			var flags := roundi(world.look.path_map_image.get_pixelv(pixel + offset).r) & 255
+			check(flags == 0, "Ferns keep the path and its immediate margin clear")
+		check(absf(world.surface_height(row.root.x, row.root.z) - row.bounds.position.y) < .002,
+			"Fern roots rest on the terrain")
+	check(count >= 50 and sectors.size() == 4, "Small fern groups appear across all four map sectors")
+	if not asset.is_empty():
+		var material: ShaderMaterial = plants.bundle.meshes[asset].surface_get_material(0)
+		check(material.get_shader_parameter("native_grass_albedo") == true, "Fern keeps its verified source color")
+		check(world.showcase._mist_materials().has(material), "Fern participates in shared mist")
+		check(plants.grass_light._records.any(func(record: Dictionary) -> bool: return record.material == material),
+			"Fern participates in shared grass lighting")
+	toggle.button_pressed = false
+	check(plants.placements.size() == rooted.size(), "Toggling ferns keeps the dense carpet")
+	for row: Dictionary in plants.placements:
+		var before: Dictionary = rooted.get(row.cell, {})
+		check(not before.is_empty() and not row.get("forest_fern", false), "The former fern cells return to grass")
+		if not before.is_empty() and not before.get("forest_fern", false):
+			check(row.asset == before.asset and row.bounds == before.bounds, "Toggling ferns preserves other plants")
+	toggle.button_pressed = true
+	check(plants.placements.filter(func(row: Dictionary) -> bool: return row.get("forest_fern", false)).size() == count,
+		"Restoring the ferns gives the same placement count")
+
+func test_wall(world: Node3D, wall: Node3D, toggle: CheckButton) -> void:
+	check(wall.find_children("*", "CollisionObject3D", true, false).is_empty(), "Wall vines are visual")
+	var batch := wall.get_child(0) as MultiMeshInstance3D
+	check(wall.get_child_count() == 1 and batch != null, "The vine placements use one instanced batch")
+	if batch == null:
+		return
+	var sectors := {}
+	for index in batch.multimesh.instance_count:
+		var pose := batch.multimesh.get_instance_transform(index)
+		var outward := pose.basis.y.normalized()
+		var behind := pose.origin - outward * .12 + pose.basis.x * .5
+		var ahead := behind + outward
+		var drop: float = world.surface_height(behind.x, behind.z) - world.surface_height(ahead.x, ahead.z)
+		check(drop >= 2., "Every vine hangs on a real stone drop")
+		sectors[Vector2i(signf(behind.x), signf(behind.z))] = true
+	check(batch.multimesh.instance_count >= 12 and sectors.size() == 4, "Wall vines cover all four map sectors")
+	check(batch.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_ON, "Vines cast cutout shadows")
+	check(world.showcase._mist_materials().has(batch.material_override), "Wall vines participate in shared mist")
+	toggle.button_pressed = false
+	check(not wall.visible and not world.showcase._mist_materials().has(batch.material_override), "Hiding wall vines removes them from rendering")
+	toggle.button_pressed = true
+	check(wall.visible, "Wall vines can be restored from settings")
