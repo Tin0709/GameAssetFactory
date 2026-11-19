@@ -31,8 +31,27 @@ func verify_weather_shadow() -> void:
 	check(blend.shadow_opacity(MEADOW.overcast, base, 12.) == base, "A weather profile without a shadow curve stays neutral")
 	check(blend.shadow_opacity(null, base, 12.) == base, "A map without weather stays neutral")
 
+func verify_weather_shadow_blur() -> void:
+	var blend = WEATHER.new()
+	check(blend.has_method("shadow_blur"), "Weather resolves penumbra width independently of opacity")
+	if not blend.has_method("shadow_blur"):
+		return
+	var base := 1.242
+	check(blend.shadow_blur(FOREST.overcast, base, 7.) == base, "Clear weather keeps the shadow filter")
+	blend.set_target(.5, 0.)
+	check(is_equal_approx(blend.shadow_blur(FOREST.overcast, base, 7.), base * 1.3), "Half cloud applies half the blur increase")
+	blend.set_target(1., 0.)
+	for hour: float in [7., 16.5]:
+		check(is_equal_approx(blend.shadow_blur(FOREST.overcast, base, hour), base * 1.6), "Soft cloud penumbra at %s" % hour)
+	for hour: float in [0., 12., 19.5, 22.]:
+		check(blend.shadow_blur(FOREST.overcast, base, hour) == base, "No blur change at protected hour %s" % hour)
+	check(blend.shadow_blur(FOREST.overcast, base, 7., 0.) == base, "Weather blur can be disabled")
+	check(blend.shadow_blur(MEADOW.overcast, base, 7.) == base, "An unconfigured biome retains its blur")
+	check(blend.shadow_blur(null, base, 7.) == base, "Missing weather retains its blur")
+
 func verify() -> void:
 	verify_weather_shadow()
+	verify_weather_shadow_blur()
 	check("day_night" in PROFILE.new(), "Biome must accept a day/night resource")
 	check("start_overcast" in PROFILE.new(), "Starting weather must be a biome setting")
 	if not failures.is_empty():
