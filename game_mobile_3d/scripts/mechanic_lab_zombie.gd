@@ -3,6 +3,7 @@ extends CharacterBody3D
 signal melee_hit(amount: int)
 signal step_audio(point: Vector3)
 signal idle_audio(point: Vector3)
+signal swing_audio(point: Vector3)
 
 enum DeathStrike { GROUND, AIR, SABRE_FINISHER, SABRE_GROUND }
 signal melee_audio(point: Vector3, contact: bool)
@@ -548,7 +549,11 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 		_face_target(_last_seen_position - global_position, telegraph_seconds)
 	var advance_seconds := telegraph_seconds * windup_rate + (delta - telegraph_seconds) * montage_rate
 	animation.advance(advance_seconds)
-	if before < _attack_contact and before + advance_seconds >= _attack_contact:
+	var after := before + advance_seconds
+	# In the source Baby Zombie clip, the leading hand accelerates at release.
+	if is_baby and before < BABY_ATTACK_FOCUS_END and after >= BABY_ATTACK_FOCUS_END:
+		swing_audio.emit(combat_center())
+	if before < _attack_contact and after >= _attack_contact:
 		_check_melee_contact()
 
 func _emit_idle_audio(previous_phase: float) -> void:

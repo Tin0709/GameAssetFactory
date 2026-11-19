@@ -314,6 +314,7 @@ func _ready() -> void:
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
 		$Zombies.zombie_attack_audio.connect(_combat_audio.zombie_attack)
+		$Zombies.zombie_swing_audio.connect(_combat_audio.baby_swing)
 		$Zombies.zombie_reaction_audio.connect(_combat_audio.zombie_reaction)
 		$Zombies.zombie_step_audio.connect(_on_zombie_step)
 		$Zombies.zombie_idle_audio.connect(_combat_audio.queue_zombie_idle)

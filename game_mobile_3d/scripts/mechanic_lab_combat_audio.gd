@@ -261,7 +261,7 @@ const MAULER_DIVE_HASHES := [
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
 const SURFACE_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttackDebris/sfx_HJA_impact debris_%s_%02d.ogg"
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
-const BABY_REACTION := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%s-%03d_soundWave.ogg"
+const BABY_CUE := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%s-%03d_soundWave.ogg"
 # The exported waveforms matching the Zombie event names sit under BabyZombie.
 const ZOMBIE_ATTACK := "Mobs/Mob_Hostile/MobType1/BabyZombie/sfx_mob_zombie%sAttack-%03d_soundWave.ogg"
 # Zombie.Step names the adult event. The exported generic candidate is under BabyZombie.
@@ -297,6 +297,7 @@ const WEAPON_ONSET_SECONDS := 0.05
 const ZOMBIE_ONSET_SECONDS := 0.05
 const ZOMBIE_WINDUP_GAIN_DB := -16.0
 const ZOMBIE_HIT_GAIN_DB := -14.0
+const BABY_SWING_GAIN_DB := -20.0
 const PLAYER_HURT_GAIN_DB := -14.0
 const PLAYER_HURT_ONSET_SECONDS := 0.05
 const PLAYER_DEFEAT_GAIN_DB := -16.0
@@ -343,6 +344,12 @@ const BABY_DEATH_HASHES := [
 	"4f37c8fbfa63b116cc7afe6930ba1d403a54cf32bb19e04db4a4815ae2628deb",
 	"0396d7f66dd11827ac94b1384b9a8ecf55127d9072363ec259ad01f8bb32e1e4",
 	"578017fb1cc8213e1b15f39f8208a6c947fa705bb8e603c242c5091e6377ee72",
+]
+const BABY_SWING_HASHES := [
+	"5dbc65f67fcd3336628c7a35a4576b237735cb17d209205a8d94e642708be59c",
+	"ae4008449f238d65576d53c99f9dff67fb51151e48df94669a8dedf55bb6e32e",
+	"5a610689ac0dc8ea0100e183e1814c0ed4378bb8bf8a68d4e7a5eeea40b1d3f8",
+	"d38a3dfb4a38b5a71eb8cd52dfeff5ff04ca97f9bdee0625c295d92cdac47366",
 ]
 const LANDING_HASHES := [
 	"ef64187aa4ff1b50d32fcfe617d04b3bde4ac7f8e045bbb687895ea60e3b81ab",
@@ -423,6 +430,7 @@ var _weapon_onsets: Array[bool] = []
 var _player_hurt_frame := -1
 var _attack_contacts: Array[Dictionary] = []
 var _attack_windups: Array[Dictionary] = []
+var _attack_swings: Array[Dictionary] = []
 var _reaction_deaths: Array[Dictionary] = []
 var _reaction_hurts: Array[Dictionary] = []
 var _step_points: Array[Vector3] = []
@@ -683,6 +691,10 @@ func zombie_attack(point: Vector3, contact: bool) -> void:
 	if enabled:
 		_queue_zombie_cue(group, point, _attack_contacts if contact else _attack_windups)
 
+func baby_swing(point: Vector3) -> void:
+	if enabled:
+		_queue_zombie_cue(&"baby_swing", point, _attack_swings)
+
 func _queue_zombie_cue(group: StringName, point: Vector3, pending: Array[Dictionary]) -> void:
 	if not _groups.has(group) or not is_instance_valid(zombie_listener):
 		return
@@ -702,6 +714,7 @@ func _queue_zombie_cue(group: StringName, point: Vector3, pending: Array[Diction
 func flush_zombie_combat_cues() -> void:
 	_play_zombie_cues(_attack_contacts, ZOMBIE_HIT_GAIN_DB)
 	_play_zombie_cues(_attack_windups, ZOMBIE_WINDUP_GAIN_DB)
+	_play_zombie_cues(_attack_swings, BABY_SWING_GAIN_DB)
 	_play_zombie_cues(_reaction_deaths, DEATH_GAIN_DB)
 	_play_zombie_cues(_reaction_hurts, HURT_GAIN_DB)
 
@@ -768,6 +781,7 @@ func reset() -> void:
 	set_process(false)
 	_attack_contacts.clear()
 	_attack_windups.clear()
+	_attack_swings.clear()
 	_reaction_deaths.clear()
 	_reaction_hurts.clear()
 	_zombie_idle_point = Vector3.INF
@@ -829,8 +843,9 @@ func _queue_base_samples() -> void:
 	_queue_series(root, &"zombie_step", ZOMBIE_STEP, ZOMBIE_STEP_HASHES)
 	if is_instance_valid(zombie_listener):
 		_queue_series(root, &"zombie_idle", ZOMBIE_IDLE, ZOMBIE_IDLE_HASHES)
-		_queue_series(root, &"baby_hurt", BABY_REACTION.replace("%s", "Hurt"), BABY_HURT_HASHES)
-		_queue_series(root, &"baby_death", BABY_REACTION.replace("%s", "Death"), BABY_DEATH_HASHES)
+		_queue_series(root, &"baby_hurt", BABY_CUE.replace("%s", "Hurt"), BABY_HURT_HASHES)
+		_queue_series(root, &"baby_death", BABY_CUE.replace("%s", "Death"), BABY_DEATH_HASHES)
+		_queue_series(root, &"baby_swing", BABY_CUE.replace("%s", "Whoosh"), BABY_SWING_HASHES)
 
 func _queue_series(root: String, group: StringName, pattern: String, hashes: Array) -> void:
 	for index in hashes.size():
@@ -921,7 +936,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 	match group:
 		&"hurt", &"death", &"baby_hurt", &"baby_death":
 			pool = REACTION_POOL
-		&"zombie_windup", &"zombie_hit":
+		&"zombie_windup", &"zombie_hit", &"baby_swing":
 			pool = ATTACK_POOL
 		&"zombie_step":
 			pool = STEP_POOL
@@ -944,7 +959,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 			REACTION_POOL:
 				slot = _replace_priority_slot(first, start, &"death", group, frame, point, &"baby_death")
 			ATTACK_POOL:
-				slot = _replace_priority_slot(first, start, &"zombie_hit", group, frame, point)
+				slot = _replace_attack_slot(first, start, group, frame, point)
 			WEAPON_POOL:
 				slot = _replace_weapon_slot(start, weapon_onset, frame)
 		if slot == -1:
@@ -984,6 +999,17 @@ func _replace_weapon_slot(start: int, onset: bool, frame: int) -> int:
 			continue
 		older_slot = slot
 	return older_slot
+
+func _replace_attack_slot(first: int, start: int, group: StringName, frame: int, point: Vector3) -> int:
+	# A swing fills spare voices. Telegraphs and confirmed hits take precedence.
+	if group == &"baby_swing":
+		return -1
+	var swing_streams: Array = _groups.get(&"baby_swing", [])
+	for offset in VOICES_PER_POOL:
+		var slot := (start + offset) % VOICES_PER_POOL
+		if _voices[first + slot].stream in swing_streams:
+			return slot
+	return _replace_priority_slot(first, start, &"zombie_hit", group, frame, point)
 
 func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName,
 		frame: int, point: Vector3, secondary_priority := &"") -> int:
