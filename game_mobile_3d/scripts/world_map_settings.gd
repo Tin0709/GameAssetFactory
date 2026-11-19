@@ -19,6 +19,7 @@ const NAMED := {
 	"ForestCoverGrass": "forest-cover-grass",
 	"ForestLedgeMossToggle": "forest-ledge-moss",
 	"ForestUnderstoryToggle": "forest-understory",
+	"ExteriorGroundToggle": "exterior-ground",
 	"GrassWind": "grass-wind",
 	"GrassContact": "player-grass-flower-interaction",
 	"ForestWeather": "biome-weather",

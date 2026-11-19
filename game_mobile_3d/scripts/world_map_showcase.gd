@@ -12,6 +12,7 @@ const PlayableTerrace = preload("res://scripts/world_map_playable_terrace.gd")
 const PlayableBoulder = preload("res://scripts/world_map_boulder.gd")
 const ForestMoss = preload("res://scripts/world_map_forest_moss.gd")
 const ForestUnderstory = preload("res://scripts/world_map_forest_understory.gd")
+const ExteriorGround = preload("res://scripts/world_map_exterior_ground.gd")
 const WeatherProfile = preload("res://scripts/biome_weather_profile.gd")
 const BiomeProfile = preload("res://scripts/biome_graphics_profile.gd")
 const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
@@ -82,6 +83,8 @@ var playable_boulder: PlayableBoulder
 var basin_boulders: Array[PlayableBoulder] = []
 var forest_moss: ForestMoss
 var forest_understory: ForestUnderstory
+var exterior_ground: ExteriorGround
+var exterior_ground_enabled := true
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_replay := preload("res://scripts/world_map_forest_replay.gd").new()
@@ -518,6 +521,15 @@ func setup(world:Node3D)->void:
 	var terrace_profile := PlayableTerrace.read_profile(level, level.playable_terrace_profile, level.playable_terrace_sha256)
 	distant_terrain.prepare(level, level.distant_terrain_origin, level.distant_terrain_layout_sha,
 		StringName(terrace_profile.get("section", "")))
+	if level.exterior_ground_reach > 0 and is_instance_valid(distant_terrain.vista):
+		var foothills := ExteriorGround.new()
+		if foothills.build(level, level.exterior_ground_reach):
+			exterior_ground = foothills
+			foothills.name = "ExteriorGround"
+			foothills.hide()
+			level.add_child(foothills)
+		else:
+			foothills.free()
 	if not terrace_profile.is_empty() and distant_terrain.linked_section != null and distant_terrain.material != null:
 		var insert := PlayableTerrace.new()
 		var atlas: Texture2D = distant_terrain.material.get_shader_parameter("terrain_atlas")
@@ -1037,6 +1049,7 @@ func refresh_cliff_vista() -> void:
 		env, camera, hour, _lighting_scale(&"cliff_vista_feather") if private_primary else 1.)
 
 func _sync_distant_terrain() -> void:
+	refresh_exterior_ground()
 	if private_primary:
 		sync_cliff_vista(forest_active() and atmosphere_review == "combined" and not _balanced_preview
 			and _source_terrain_toggle != null and _source_terrain_toggle.button_pressed and _lighting_scale(&"cliff_vista") > 0.)
@@ -1787,6 +1800,11 @@ func set_forest_spruce_visible(enabled: bool) -> void:
 	if _spruce_toggle != null:
 		_spruce_toggle.set_pressed_no_signal(grove.spruce_visible())
 	_sync_forest_night_lights()
+
+func refresh_exterior_ground() -> void:
+	if is_instance_valid(exterior_ground):
+		exterior_ground.visible = exterior_ground_enabled and source_terrain_active and forest_active() \
+			and atmosphere_review == "combined" and not _balanced_preview
 
 func set_source_terrain(enabled: bool) -> bool:
 	if not private_primary:
@@ -4452,6 +4470,15 @@ func _build_ui()->void:
 		understory.focus_mode = Control.FOCUS_NONE
 		box.add_child(understory)
 		understory.toggled.connect(forest_understory.set_visible)
+	if is_instance_valid(exterior_ground):
+		var foothills := CheckButton.new()
+		foothills.name = "ExteriorGroundToggle"
+		foothills.button_pressed = exterior_ground_enabled
+		foothills.focus_mode = Control.FOCUS_NONE
+		box.add_child(foothills)
+		foothills.toggled.connect(func(enabled: bool):
+			exterior_ground_enabled = enabled
+			refresh_exterior_ground())
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)
