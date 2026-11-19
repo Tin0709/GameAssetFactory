@@ -464,20 +464,20 @@ func check_overlapping_heavy_landings(audio: Node, bus: int, capture: AudioEffec
 		audio._play(&"hit", point, -9.0, -1, true)
 	check(weapon_voices.size() == COMBAT_AUDIO.VOICES_PER_POOL and weapon_voices.all(func(voice): return voice.playing),
 		"The weapon pool is filled with three pending hit onsets")
-	var second_point := point + Vector3.RIGHT
-	audio.slam_landed(point)
-	audio.slam_landed(second_point)
+	var contacts := [point, point + Vector3.RIGHT, point + Vector3.LEFT]
+	for contact in contacts:
+		audio.slam_landed(contact)
 	var layers := audio.get_children().filter(func(child):
 		return child is AudioStreamPlayer3D and child.playing and child.stream in grass_samples)
 	var samples_at: Dictionary[Vector3, AudioStream] = {}
 	for voice: AudioStreamPlayer3D in layers:
 		samples_at[voice.global_position] = voice.stream
-	check(layers.size() == 2
-		and samples_at.get(point) == grass_samples[first_choice]
-		and samples_at.get(second_point) == grass_samples[(first_choice + 1) % grass_samples.size()],
-		"Two recent ground contacts reach separate voices with their original positions")
+	var positions_preserved := layers.size() == contacts.size()
+	for i in contacts.size():
+		positions_preserved = positions_preserved and samples_at.get(contacts[i]) == grass_samples[(first_choice + i) % grass_samples.size()]
+	check(positions_preserved, "Three recent ground contacts reach separate voices with their original positions")
 	check(weapon_voices.all(func(voice): return voice != null and voice.playing and voice.stream in audio._groups[&"hit"]),
-		"The two ground contacts preserve the three pending weapon onsets")
+		"The ground contacts preserve the three pending weapon onsets")
 	capture.clear_buffer()
 	for voice: AudioStreamPlayer3D in layers:
 		voice.bus = AudioServer.get_bus_name(bus)

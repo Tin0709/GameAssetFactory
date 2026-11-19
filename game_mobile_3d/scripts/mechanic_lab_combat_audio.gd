@@ -259,7 +259,8 @@ const REACTION_POOL := 1
 const ATTACK_POOL := 2
 const STEP_POOL := 3
 const FLIGHT_POOL := 4
-const SURFACE_LANDING_VOICE_COUNT := 2
+# Fast successive dives can land 16 ticks apart at 60 Hz, within the 0.57 s samples.
+const SURFACE_LANDING_VOICE_COUNT := 3
 const SPATIAL_VOICE_DISTANCE := 35.0
 const FLIGHT_GAIN_DB := -17.0
 const HIT_GAIN_DB := -9.0
