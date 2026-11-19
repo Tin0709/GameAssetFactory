@@ -45,7 +45,39 @@ func run() -> void:
 			verify(not extension.visible, "Original atlas comparison hides the extension")
 			world.showcase.set_source_terrain(true)
 			verify(extension.visible, "Returning to the source atlas restores the extension")
+			test_source_path_filter(world)
 	world.free()
 	await process_frame
 	print("WORLD_EXTERIOR_GROUND failures=", JSON.stringify(failures))
 	quit(0 if failures.is_empty() else 1)
+
+func test_source_path_filter(world: Node) -> void:
+	var showcase: Node = world.showcase
+	var id := &"source_path_edge_filter"
+	var slider: HSlider = showcase._settings._sliders.get(String(id))
+	verify(slider != null and slider.editable and is_equal_approx(slider.value, 1.),
+		"The source atlas enables the Forest path edge control")
+	var material: ShaderMaterial = world.look.terrain_materials[0][3]
+	var initial: Variant = material.get_shader_parameter(id)
+	verify(initial != null and is_equal_approx(float(initial), 1.),
+		"The terrain receives the authored path filter")
+	showcase.set_lighting_scale(id, 0.)
+	var off: Variant = material.get_shader_parameter(id)
+	verify(off != null and is_zero_approx(float(off)), "Zero restores point-sampled path noise")
+	showcase.set_lighting_scale(id, 1.)
+	showcase.set_source_terrain(false)
+	verify(slider != null and not slider.editable, "The control is disabled with the source atlas off")
+	showcase.set_source_terrain(true)
+	verify(slider != null and slider.editable and material.get_shader_parameter(id) == 1.,
+		"Restoring the source atlas restores the path filter")
+	var path := "user://source_path_filter_%d.cfg" % OS.get_process_id()
+	var config := ConfigFile.new()
+	verify(showcase.save_lighting_mix(path) == OK and config.load(path) == OK
+		and config.get_value("recipe", "version", 0) == 211
+		and config.get_value("strengths", String(id), -1.) == 1., "Recipe saves the profile control")
+	config.set_value("recipe", "version", 210)
+	if config.has_section_key("strengths", String(id)):
+		config.erase_section_key("strengths", String(id))
+	verify(config.save(path) == OK and showcase.load_lighting_mix(path) == OK
+		and material.get_shader_parameter(id) == 0., "An older recipe retains the original path sampling")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
