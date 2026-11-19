@@ -25,7 +25,7 @@ const WALL_NECK_LANDING_BLEND_END := 0.5
 const WALL_SHOULDER_SLIDE_WINDOW := 5.0 / 60.0
 const WALL_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
 const FIRST_WALL_SHOULDER_SLIDE_MIN_GAP := 0.17
-const TUNED_WALL_SHOULDER_RECOVERY_GAP := 8.0 * SOURCE_ANCHOR_TOLERANCE
+const TUNED_WALL_LIMB_RECOVERY_GAP := 8.0 * SOURCE_ANCHOR_TOLERANCE
 const WALL_SLIDE_MAX := 0.08
 const REBOUND_SLIDE_MAX_NORMAL_FRACTION := 0.65
 const FIRST_FLOOR_CHEST_MAX_SHIFT := 0.03
@@ -35,7 +35,7 @@ const BABY_FLOOR_ANCHOR_GAP := 0.08
 const BABY_FLOOR_ANCHOR_CLEARANCE := 0.02
 const BABY_WALL_LIMB_SHIFT := 0.35
 const BABY_WALL_CHEST_SHIFT := 0.10
-const BABY_WALL_MAX_RECOVERY_TRAVEL := 0.20
+const FLOOR_WALL_MAX_RECOVERY_TRAVEL := 0.20
 
 var _handoff_query_snapshot: Dictionary[PhysicalBone3D, PhysicsShapeQueryParameters3D]
 var _handoff_ray_region: AABB
@@ -94,9 +94,11 @@ func _correct_physical_pose() -> void:
 		return
 	_sweep_tuned_lab_walls()
 	super._correct_physical_pose()
-	if use_tuned_floor_support and _limit_first_contact_stretch and frame <= _launch_frame + 1 \
-			and not use_baby_floor_anchors and not _baby_wall_anchors:
-		_recover_tuned_wall_shoulders()
+	if use_tuned_floor_support and _limit_first_contact_stretch and not use_baby_floor_anchors and not _baby_wall_anchors:
+		if frame <= _launch_frame + 1:
+			_recover_tuned_wall_shoulders()
+		elif floor_impact_blend <= 0.0:
+			_recover_tuned_wall_legs()
 	if _baby_wall_anchors:
 		# A floor hit can hide a wall from the first ray. Check the
 		# corrected pose before saving the start of the next sweep.
@@ -977,6 +979,48 @@ func _baby_neck_needs_wall_recovery() -> bool:
 		return gap.length_squared() > WALL_SLIDE_MIN_GAP ** 2
 	return false
 
+func _recover_tuned_wall_legs() -> void:
+	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return
+	var floor_body := _flat_floor.get_parent() as StaticBody3D
+	var floor_box := _flat_floor.shape as BoxShape3D
+	if floor_body == null or floor_box == null or not _flat_floor.global_basis.y.is_equal_approx(Vector3.UP):
+		return
+	var chest: PhysicalBone3D = bodies.Chest
+	var core := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if core == null or core.get_contact_count() != 0 or core.linear_velocity.y >= 0.0:
+		return
+	var floor := floor_body.get_rid()
+	var floor_y := _flat_floor.global_position.y + floor_box.size.y * 0.5
+	for joint in _source_anchor_projections:
+		if joint.name != "Leg.L" and joint.name != "Leg.R":
+			continue
+		var state := PhysicsServer3D.body_get_direct_state(joint.rid)
+		if state == null:
+			continue
+		var contacts := state.get_contact_count()
+		if contacts < 2:
+			continue
+		var gap := (core.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
+		if gap.y >= 0.0 or gap.length_squared() <= TUNED_WALL_LIMB_RECOVERY_GAP ** 2:
+			continue
+		var wall_support := false
+		var floor_support := false
+		for i in contacts:
+			var normal := state.get_contact_local_normal(i)
+			var obstacle := state.get_contact_collider_object(i) as PhysicsBody3D
+			floor_support = floor_support or (obstacle == floor_body and normal.y >= MIN_SUPPORT_NORMAL_Y)
+			if absf(normal.y) < MAX_WALL_NORMAL_Y and gap.dot(normal) > 0.0 and _is_fixed_wall(obstacle):
+				wall_support = wall_support or _is_single_box(obstacle.get_rid())
+		if not (floor_support and wall_support):
+			continue
+		# The floor is carrying the leg and the torso is still falling.
+		# Let the leg follow along the floor within one step of combined travel.
+		var limit := (core.linear_velocity.length() + state.linear_velocity.length()) * state.step
+		var motion := gap.slide(Vector3.UP).limit_length(limit)
+		_slide_floor_wall_part(joint.body, state, joint.half_size, motion, floor_y, floor)
+
+
 func _recover_tuned_wall_shoulders() -> void:
 	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
 		return
@@ -992,7 +1036,7 @@ func _recover_tuned_wall_shoulders() -> void:
 			continue
 		var gap := (core.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
 		var distance := gap.length()
-		if distance <= TUNED_WALL_SHOULDER_RECOVERY_GAP:
+		if distance <= TUNED_WALL_LIMB_RECOVERY_GAP:
 			continue
 		for i in state.get_contact_count():
 			var normal := state.get_contact_local_normal(i)
@@ -1067,12 +1111,12 @@ func _recover_baby_wall_anchors() -> void:
 			if distance <= BABY_FLOOR_ANCHOR_GAP:
 				continue
 			var motion := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
-			var moved := _slide_baby_corner_part(joint.body, child, joint.half_size,
+			var moved := _slide_floor_wall_part(joint.body, child, joint.half_size,
 				motion.limit_length(BABY_WALL_LIMB_SHIFT), floor_y, floor)
-			_slide_baby_corner_part(chest, parent, chest_half,
+			_slide_floor_wall_part(chest, parent, chest_half,
 				(moved - motion).limit_length(BABY_WALL_CHEST_SHIFT), floor_y, floor)
 
-func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, half_size: Vector3,
+func _slide_floor_wall_part(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, half_size: Vector3,
 		motion: Vector3, floor_y: float, floor: RID) -> Vector3:
 	var start := state.transform.origin
 	var basis := state.transform.basis
@@ -1091,7 +1135,7 @@ func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState
 		var normal := _projection_hit.get_collision_normal()
 		var fraction := _projection_hit.get_collision_safe_fraction()
 		if fraction == 0.0 and normal.y <= -MAX_WALL_NORMAL_Y and _is_fixed_wall(_projection_hit.get_collider()):
-			var retreat := _baby_lower_wall_retreat(body, state.transform, half_size, motion, normal, floor)
+			var retreat := _lower_wall_retreat(body, state.transform, half_size, motion, normal, floor)
 			if not retreat.is_zero_approx():
 				state.transform = state.transform.translated(retreat)
 				motion -= retreat
@@ -1104,7 +1148,7 @@ func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState
 			var collided := _test_projection_motion(body, state.transform, motion, floor)
 			_projection_query.recovery_as_collision = true
 			var travel := _projection_hit.get_travel()
-			if travel.length() <= motion.length() + BABY_WALL_MAX_RECOVERY_TRAVEL and travel.y >= lowest_travel:
+			if travel.length() <= motion.length() + FLOOR_WALL_MAX_RECOVERY_TRAVEL and travel.y >= lowest_travel:
 				state.transform = state.transform.translated(travel)
 				if not collided:
 					break
@@ -1116,7 +1160,7 @@ func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState
 		motion = (motion * (1.0 - fraction)).slide(normal)
 	return state.transform.origin - start
 
-func _baby_lower_wall_retreat(body: PhysicalBone3D, pose: Transform3D, half_size: Vector3,
+func _lower_wall_retreat(body: PhysicalBone3D, pose: Transform3D, half_size: Vector3,
 		motion: Vector3, normal: Vector3, floor: RID) -> Vector3:
 	# A lower edge can separate the box downward into the floor. For an
 	# aligned box wall, clear the current side along the requested horizontal motion.
