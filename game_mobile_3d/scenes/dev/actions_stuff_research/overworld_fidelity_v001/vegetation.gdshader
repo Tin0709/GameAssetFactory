@@ -76,6 +76,7 @@ uniform sampler2D ground_atlas : source_color, filter_nearest, repeat_disable;
 uniform vec4 ground_uv=vec4(0.0);
 uniform bool has_mre=false;
 uniform bool tinted_grass=false;
+uniform bool native_grass_albedo=false;
 uniform vec3 base_tint=vec3(0.0);
 uniform vec3 tip_tint=vec3(0.0);
 uniform float cutoff=0.3333;
@@ -176,7 +177,9 @@ void fragment(){
 		world_normal=gaf_foliage_world_normal(world_normal,study_grass_up_weight);
 #endif
 		NORMAL=normalize(mat3(VIEW_MATRIX)*world_normal);
-		color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);
+		if (!native_grass_albedo) {
+			color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);
+		}
 		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 		if (max(study_grass_ground_tone.x, study_grass_ground_tone.y) > 0.0 &&
