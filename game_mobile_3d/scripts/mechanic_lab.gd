@@ -501,7 +501,7 @@ func _select_weapon(index: int) -> void:
 	var crossbow_equipped := index == Weapon.CROSS_POLLINATOR
 	var switch_point := player.global_position + Vector3.UP
 	if _combat_audio.enabled and MELEE_AUDIO_NAMES.has(index):
-		_combat_audio.load_melee_tool(_private_research_root(), MELEE_AUDIO_NAMES[index])
+		_combat_audio.load_melee_tool(WeaponSource.research_root(), MELEE_AUDIO_NAMES[index])
 	_combat_audio.melee_switched(MELEE_EQUIPMENT_NAMES.get(previous, &""), false, switch_point)
 	if crossbow_equipped != was_crossbow:
 		_combat_audio.crossbow_switched(crossbow_equipped, switch_point)
