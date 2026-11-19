@@ -813,8 +813,11 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 		_clear_chase_detour()
 	_face_target(offset, delta)
 	if distance > stop_distance + MELEE_RANGE_TOLERANCE:
-		_play_loop(_walk_clip)
-		return offset.normalized() * minf(CHASE_SPEED, (distance - stop_distance) / delta)
+		var travel := offset.normalized() * minf(CHASE_SPEED, (distance - stop_distance) / delta)
+		if in_lab and is_on_floor() and not _corpse_floor.disabled:
+			travel = _limit_lab_pursuit_to_floor(travel, delta)
+		_play_loop(IDLE if travel.is_zero_approx() else _walk_clip)
+		return travel
 	# Complete the approach turn before locking the swing's heading.
 	var facing_target := _is_in_melee_cone(offset)
 	if target_visible and height_delta <= MELEE_HEIGHT_LIMIT and facing_target and _attack_cooldown <= 0.0:
@@ -829,6 +832,22 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	else:
 		_play_loop(IDLE)
 	return Vector3.ZERO
+
+func _limit_lab_pursuit_to_floor(travel: Vector3, delta: float) -> Vector3:
+	var floor_box := _corpse_floor.shape as BoxShape3D
+	if floor_box == null or not _corpse_floor.global_basis.y.is_equal_approx(Vector3.UP):
+		return travel
+	var extent := floor_box.size * 0.5 - Vector3.ONE * _live_capsule.radius
+	var end := _corpse_floor.to_local(global_position + travel * delta)
+	if absf(end.x) <= extent.x and absf(end.z) <= extent.z:
+		return travel
+	# Use the reachable part of the approach. A knockback can leave the
+	# capsule outside this inset, so allow it to walk back under its own power.
+	var start := _corpse_floor.to_local(global_position)
+	end.x = clampf(end.x, minf(-extent.x, start.x), maxf(extent.x, start.x))
+	end.z = clampf(end.z, minf(-extent.z, start.z), maxf(extent.z, start.z))
+	var endpoint := _corpse_floor.to_global(end)
+	return Vector3.ZERO if endpoint.is_equal_approx(global_position) else (endpoint - global_position) / delta
 
 func _confirm_windup_target(point: Vector3) -> bool:
 	# Crowd sight runs on a staggered clock. The current target must still
