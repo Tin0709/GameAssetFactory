@@ -32,6 +32,8 @@ const EARLY_ARM_SLIDE_RESIDUAL := 0.125
 const EARLY_ARM_SLIDE_EXTRA := 0.02
 const BABY_FLOOR_ANCHOR_GAP := 0.08
 const BABY_FLOOR_ANCHOR_CLEARANCE := 0.02
+const BABY_WALL_LIMB_SHIFT := 0.35
+const BABY_WALL_CHEST_SHIFT := 0.10
 
 var _handoff_query_snapshot: Dictionary[PhysicalBone3D, PhysicsShapeQueryParameters3D]
 var _sample_names: Array[String]
@@ -46,6 +48,7 @@ var _tuned_wall_poses: Dictionary[String, Vector3]
 var use_tuned_wall_sweep := false
 var use_tuned_floor_support := false
 var use_baby_floor_anchors := false
+var _baby_wall_anchors := false
 var wall_handoff_animation: AnimationPlayer
 var wall_handoff_idle: StringName
 var wall_handoff_idle_pose: Array[Transform3D]
@@ -85,6 +88,10 @@ func _correct_physical_pose() -> void:
 		return
 	_sweep_tuned_lab_walls()
 	super._correct_physical_pose()
+	if _baby_wall_anchors:
+		# A floor hit can hide a wall from the first ray. Check the
+		# corrected pose before saving the start of the next sweep.
+		_sweep_tuned_lab_walls()
 	for name: String in bodies:
 		var body: PhysicalBone3D = bodies[name]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
@@ -116,6 +123,9 @@ func _sweep_tuned_lab_walls() -> void:
 			if hit.is_empty() or not hit.collider is StaticBody3D or absf(hit.normal.y) >= MAX_WALL_NORMAL_Y:
 				start = finish
 				break
+			if use_baby_floor_anchors and use_tuned_floor_support:
+				use_baby_floor_anchors = false
+				_baby_wall_anchors = true
 			var point: Vector3 = hit.position
 			var normal: Vector3 = hit.normal
 			start = point + normal * (2.0 * PROJECTION_COLLISION_MARGIN)
@@ -915,12 +925,68 @@ func _recover_baby_floor_anchors() -> void:
 		if not checked_obstacles:
 			if _floor_roll_nears_obstacle(floor_rid, true):
 				use_baby_floor_anchors = false
+				_baby_wall_anchors = use_tuned_floor_support
 				return
 			checked_obstacles = true
 		if _test_projection_motion(joint.body, state.transform, motion, floor_rid):
 			motion *= _projection_hit.get_collision_safe_fraction()
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
+
+func _recover_baby_wall_anchors() -> void:
+	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return
+	var floor_body := _flat_floor.get_parent() as StaticBody3D
+	var floor_box := _flat_floor.shape as BoxShape3D
+	if floor_body == null or floor_box == null or not _flat_floor.global_basis.y.is_equal_approx(Vector3.UP):
+		return
+	var floor_y := _flat_floor.global_position.y + floor_box.size.y * 0.5
+	var floor := floor_body.get_rid()
+	var chest: PhysicalBone3D = bodies.Chest
+	var parent := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if parent == null:
+		return
+	var chest_box := (chest.get_child(0) as CollisionShape3D).shape as BoxShape3D
+	var chest_half := chest_box.size * 0.5
+	# When the floor and a wall block a limb, move the chest toward
+	# the residual instead of trying to push the limb through the corner.
+	for pass_index in 2:
+		for joint in _source_anchor_projections:
+			var child := PhysicsServer3D.body_get_direct_state(joint.rid)
+			if child == null:
+				continue
+			var gap := (parent.transform * joint.parent_frame).origin - (child.transform * joint.child_frame).origin
+			var distance := gap.length()
+			if distance <= BABY_FLOOR_ANCHOR_GAP:
+				continue
+			var motion := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
+			var moved := _slide_baby_corner_part(joint.body, child, joint.half_size,
+				motion.limit_length(BABY_WALL_LIMB_SHIFT), floor_y, floor)
+			_slide_baby_corner_part(chest, parent, chest_half,
+				(moved - motion).limit_length(BABY_WALL_CHEST_SHIFT), floor_y, floor)
+
+func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, half_size: Vector3,
+		motion: Vector3, floor_y: float, floor: RID) -> Vector3:
+	var start := state.transform.origin
+	var basis := state.transform.basis
+	var floor_clearance := start.y - Vector3(absf(basis.x.y), absf(basis.y.y), absf(basis.z.y)).dot(half_size) - floor_y
+	# Clamp against the floor plane before each wall sweep so its
+	# solver overlap does not block tangential motion at the corner.
+	for sweep in 3:
+		var moved_y := state.transform.origin.y - start.y
+		motion.y = maxf(motion.y, -maxf(floor_clearance + moved_y + FLOOR_REST_SLOP, 0.0))
+		if motion.length_squared() <= PROJECTION_COLLISION_MARGIN ** 2:
+			break
+		if not _test_projection_motion(body, state.transform, motion, floor):
+			state.transform = state.transform.translated(motion)
+			break
+		var normal := _projection_hit.get_collision_normal()
+		var fraction := _projection_hit.get_collision_safe_fraction()
+		state.transform = state.transform.translated(motion * fraction)
+		if motion.dot(normal) >= 0.0:
+			break
+		motion = (motion * (1.0 - fraction)).slide(normal)
+	return state.transform.origin - start
 
 func _project_source_anchors() -> void:
 	var lab_floor := not floor_landing_blended and is_instance_valid(_flat_floor) and not _flat_floor.disabled
@@ -935,6 +1001,8 @@ func _project_source_anchors() -> void:
 	super._project_source_anchors()
 	if use_baby_floor_anchors:
 		_recover_baby_floor_anchors()
+	if _baby_wall_anchors:
+		_recover_baby_wall_anchors()
 	if first_wall_window:
 		_slide_wall_shoulder_anchors()
 	elif lab_floor and floor_impact_blend <= 0.0:
