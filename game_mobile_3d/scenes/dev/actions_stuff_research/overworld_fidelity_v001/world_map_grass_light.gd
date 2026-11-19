@@ -78,7 +78,8 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 			variant.code=source.code.replace("shader_type spatial;",header)
 			variants[edge_sampling]=variant
 		var shader:Shader=variants[edge_sampling]
-		_records.append({"material":material,"original":source,"variant":shader})
+		_records.append({"material":material,"original":source,"variant":shader,
+			"night_turf_weight":material.get_meta("night_turf_weight",1.)})
 		material.shader=shader
 		if edge_sampling:material.set_shader_parameter("edge_atlas",material.get_shader_parameter("atlas"))
 		material.set_shader_parameter("study_grass_up_weight",weight)
@@ -118,7 +119,7 @@ func sync()->void:
 	if night_albedo != _night_albedo:
 		_night_albedo = night_albedo
 		for row: Dictionary in _records:
-			row.material.set_shader_parameter("study_grass_night_albedo", night_albedo)
+			row.material.set_shader_parameter("study_grass_night_albedo", night_albedo * float(row.night_turf_weight))
 	var shadow_scale: float = world.showcase.grass_shadow_height_scale()
 	if shadow_scale != _shadow_height_scale:
 		_shadow_height_scale = shadow_scale

@@ -83,6 +83,9 @@ static func load_fern_variants(bundle: RefCounted) -> Dictionary[int, String]:
 		return result
 	var material := plant_material(bundle, image)
 	material.set_meta("limit_motion_to_cell", true)
+	# The fern atlas already has dark leaf pigments. Retain some of the
+	# biome's turf tint without applying the full grass dimming to those leaves.
+	material.set_meta("night_turf_weight", .5)
 	for index: int in FERN_VARIANTS.size():
 		var entry: Dictionary = FERN_VARIANTS[index]
 		var path := checked_file(bundle, directory, entry, "glb")
