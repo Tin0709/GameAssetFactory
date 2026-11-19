@@ -553,7 +553,8 @@ func check_wall_slide_steps(lab, dust, wind) -> void:
 	for case: Dictionary in [
 		{"yaw": 0.31, "camera_yaw": 0.0, "live": false, "progress": false},
 		{"yaw": 0.31, "camera_yaw": 0.7, "live": true, "progress": false},
-		{"yaw": 1.20, "camera_yaw": 0.7, "live": true, "progress": true},
+		{"yaw": 0.65, "camera_yaw": 0.7, "live": true, "progress": true, "fast": false},
+		{"yaw": 1.20, "camera_yaw": 0.7, "live": true, "progress": true, "fast": true},
 	]:
 		var camera_basis := Basis(Vector3.UP, case.camera_yaw)
 		var forward := camera_basis.z
@@ -579,6 +580,7 @@ func check_wall_slide_steps(lab, dust, wind) -> void:
 		var wall_frames := 0
 		var forward_speed := 0.0
 		var lateral_speed := 0.0
+		var planar_speed := 0.0
 		for i in 82:
 			await physics_frame
 			dust_emitted = dust_emitted or dust._next != before_dust
@@ -588,18 +590,21 @@ func check_wall_slide_steps(lab, dust, wind) -> void:
 				var motion: Vector3 = player.get_real_velocity()
 				forward_speed = maxf(forward_speed, motion.dot(forward))
 				lateral_speed = maxf(lateral_speed, absf(motion.dot(camera_basis.x)))
+				planar_speed = maxf(planar_speed, motion.slide(Vector3.UP).length())
 		Input.action_release("move_backward")
 		var steps: int = movement.event_count.grass - before_audio
 		check(wall_frames >= 75 and lateral_speed > 0.8,
 			"The player stays grounded and slides sideways along the angled wall")
 		if case.progress:
-			check(forward_speed > 5.0 and steps > 0 and dust_emitted and wind_emitted,
-				"Running along the wall still produces grass footsteps, dust and wind")
+			check(forward_speed > 2.0 and steps > 0 and dust_emitted,
+				"An advancing wall slide still produces supported footsteps and dust")
+			check((planar_speed >= player.run_speed * wind.RUN_SPEED_FRACTION) == case.fast
+				and wind_emitted == case.fast, "The running wake follows the speed of the advancing wall slide")
 		else:
 			check(forward_speed < 0.7 and steps == 0 and not dust_emitted and not wind_emitted,
 				"Sliding mainly sideways into a wall does not produce running cues (live=%s)" % case.live)
 		print("MECHANIC_LAB_WALL_STEPS live=", case.live, " progress=", case.progress, " wall_ticks=", wall_frames,
-			" forward=", forward_speed, " lateral=", lateral_speed, " grass_steps=", steps,
+			" forward=", forward_speed, " lateral=", lateral_speed, " planar=", planar_speed, " grass_steps=", steps,
 			" dust=", dust_emitted, " wind=", wind_emitted)
 	player.scripted_input = false
 	camera.global_basis = original_camera_basis
