@@ -33,6 +33,12 @@ func shadow_opacity(profile: Profile, base: float, hour: float, scale: float = 1
 	var reduction := DayNight.sample_curve(profile.shadow_reduction_by_hour, fposmod(hour, 24.) / 24., 0.)
 	return base * (1. - weight * clampf(reduction * scale, 0., 1.))
 
+func shadow_blur(profile: Profile, base: float, hour: float, scale: float = 1.) -> float:
+	if profile == null or profile.shadow_blur_gain_by_hour == null or weight <= 0. or scale <= 0.:
+		return base
+	var gain := DayNight.sample_curve(profile.shadow_blur_gain_by_hour, fposmod(hour, 24.) / 24., 0.)
+	return base * (1. + weight * clampf(gain * scale, 0., 1.))
+
 func apply_lighting(profile: Profile, sun: DirectionalLight3D, env: Environment,
 		hour: float = 12., phase_color_scale: float = 1.) -> void:
 	if profile == null or weight <= 0.:

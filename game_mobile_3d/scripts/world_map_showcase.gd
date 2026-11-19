@@ -113,6 +113,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sun": ["Direct sunlight", 2.],
 	&"overcast_phase_color": ["Giữ sắc nắng theo giờ khi nhiều mây", 1.],
 	&"overcast_shadow": ["Dịu bóng trưa nhiều mây", 1.],
+	&"overcast_shadow_softness": ["Mép bóng sáng chiều nhiều mây", 1.],
 	&"overcast_mist_phase_color": ["Giữ sắc sương theo giờ khi nhiều mây", 1.],
 	&"sun_pockets": ["Sunlight pockets", 1.5],
 	&"sun_opening": ["Sunlit openings", 1.],
@@ -315,7 +316,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 207
+const LIGHTING_MIX_VERSION := 208
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1980,7 +1981,8 @@ func shadow_softness_mix_scale() -> float:
 	if _balanced_preview or not forest_active() or atmosphere_review not in ["lighting", "combined"]:
 		return 1.
 	var weight := PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
-	return lerpf(1., _lighting_scale(&"shadow_softness"), weight)
+	var clear_scale := lerpf(1., _lighting_scale(&"shadow_softness"), weight)
+	return _weather.shadow_blur(_weather_profile, clear_scale, hour, _lighting_scale(&"overcast_shadow_softness"))
 
 func sunlight_pockets_weight() -> float:
 	if not forest_active() or atmosphere_review not in ["lighting", "combined"]:
@@ -2724,6 +2726,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 204 and effect == &"overcast_shadow":
 			missing_value = 0.
+		if version < 208 and effect == &"overcast_shadow_softness":
+			missing_value = 0.
 		if version < 202 and effect == &"dusk_key_fade":
 			missing_value = 0.
 		if version < 201 and effect == &"mist_rear_chroma":
@@ -3231,7 +3235,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			return
 	if not forest_active():
 		return
-	if changed_effect == &"shadow_softness":
+	if changed_effect in [&"shadow_softness", &"overcast_shadow_softness"]:
 		level.look.refresh_directional_shadow_blur(level.get_node("Sun"))
 		return
 	if changed_effect == &"sun_pockets":

@@ -11,6 +11,8 @@ extends Resource
 @export_range(0., 1.) var saturation_scale := .90
 ## Fraction of directional shadow opacity removed at full cloud cover, by normalized hour.
 @export var shadow_reduction_by_hour: Curve
+## Fraction added to the shadow filter radius at full cloud cover, by normalized hour.
+@export var shadow_blur_gain_by_hour: Curve
 
 @export_group("Phase color")
 ## Restores some of the resolved time-of-day key hue at the cloudy key's luminance.
