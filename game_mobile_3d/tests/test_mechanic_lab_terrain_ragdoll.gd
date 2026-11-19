@@ -1,6 +1,6 @@
 extends SceneTree
 
-enum CornerBevel { NONE, SUPPORT, PINCHED_ARM, PINCHED_ARM_FROZEN_WALLS }
+enum CornerFixture { NONE, SUPPORT_BEVEL, PINCHED_ARM, PINCHED_ARM_FROZEN_WALLS, FROZEN_WALLS }
 
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const MeleeTools := preload("res://scripts/mechanic_lab_melee_tools.gd")
@@ -389,18 +389,18 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 
 func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true, landing_gravity := -1.0,
 		max_anchor_gap := INF, strike: Zombie.DeathStrike = Zombie.DeathStrike.SABRE_FINISHER,
-		strength := 1150.0, shared_wall := false, bevel := CornerBevel.NONE, tuning := Vector2.ONE) -> void:
+		strength := 1150.0, shared_wall := false, fixture := CornerFixture.NONE, tuning := Vector2.ONE) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
-	var frozen := bevel == CornerBevel.PINCHED_ARM_FROZEN_WALLS
+	var frozen := fixture in [CornerFixture.PINCHED_ARM_FROZEN_WALLS, CornerFixture.FROZEN_WALLS]
 	var first_wall := terrain(lab, Vector3(4.5, 1.5, -1.85), Vector3(0.30, 3.0, 12.4), 0.0, frozen)
 	var second_wall := terrain(lab, Vector3(-1.70, 1.5, 4.5), Vector3(12.7, 3.0, 0.30), 0.0, frozen)
 	if shared_wall:
 		second_wall.get_child(0).reparent(first_wall)
 		second_wall.free()
 		second_wall = first_wall
-	if bevel != CornerBevel.NONE:
+	if fixture in [CornerFixture.SUPPORT_BEVEL, CornerFixture.PINCHED_ARM, CornerFixture.PINCHED_ARM_FROZEN_WALLS]:
 		var bevel_face := terrain(lab, Vector3(4.35, 0.73, 4.35), Vector3(0.10, 1.46, 0.26), 0.0)
 		bevel_face.rotation.y = -PI / 4.0
 	var group := lab.get_node("Zombies")
@@ -460,24 +460,24 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 				if collider == first_wall:
 					var face := state.get_contact_collider_shape(index) if shared_wall else 0
 					walls_hit[face] = true
-					if bevel == CornerBevel.SUPPORT and part in [zombie.ragdoll.bodies.Head, zombie.ragdoll.bodies.Chest]:
+				if fixture == CornerFixture.SUPPORT_BEVEL and part in [zombie.ragdoll.bodies.Head, zombie.ragdoll.bodies.Chest]:
 						var normal := state.get_contact_local_normal(index)
 						if (face == 0 and absf(normal.x) > 0.99) or (face == 1 and absf(normal.z) > 0.99):
 							upper_wall_faces |= 1 << face
 				elif collider == second_wall:
 					walls_hit[1] = true
-		if bevel == CornerBevel.SUPPORT and upper_wall_faces == 3 and zombie.ragdoll.contact_motion().leg_supported:
+		if fixture == CornerFixture.SUPPORT_BEVEL and upper_wall_faces == 3 and zombie.ragdoll.contact_motion().leg_supported:
 			corner_samples += 1
 			missed_corner_samples += int(not zombie.ragdoll.has_flat_corner_brace())
 	check(walls_hit.size() == 2 and farthest < 4.65,
 		"The corner ragdoll %d meets both faces and stays on the near side" % seed)
 	check(zombie._corpse_parked == should_settle and (not should_settle or zombie.ragdoll.bodies.is_empty()),
 		"The corner ragdoll %d has the expected rest state" % seed)
-	if bevel == CornerBevel.SUPPORT:
+	if fixture == CornerFixture.SUPPORT_BEVEL:
 		check(corner_samples > 0 and missed_corner_samples == 0,
 			"The bevel leaves both supporting wall faces visible to the corner check")
 		print("LAB_BEVELED_CORNER samples=", corner_samples, " missed=", missed_corner_samples)
-	elif bevel in [CornerBevel.PINCHED_ARM, CornerBevel.PINCHED_ARM_FROZEN_WALLS]:
+	elif fixture in [CornerFixture.PINCHED_ARM, CornerFixture.PINCHED_ARM_FROZEN_WALLS]:
 		check(used_handoff, "The pinched right arm is corrected before the first ragdoll step")
 	if should_settle and zombie._corpse_parked:
 		var pose_matches := last_simulated.size() == skeleton.get_bone_count()
@@ -520,23 +520,25 @@ func run() -> void:
 	await check_corner_ragdoll(65, 4.25)
 	await check_corner_ragdoll(29, 4.25, false, 50.0 / float(ProjectSettings.get_setting("physics/3d/default_gravity")))
 	await check_corner_ragdoll(101, 4.05)
+	await check_corner_ragdoll(101, 4.95, true, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
+		1150.0, false, CornerFixture.FROZEN_WALLS)
 	await check_corner_ragdoll(113, 4.95)
 	await check_corner_ragdoll(238, 4.90, false, 1.0)
 	await check_corner_ragdoll(113, 4.60, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
 	await check_corner_ragdoll(108, 4.90, false, 1.0, 0.09, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
 	await check_corner_ragdoll(238, 4.80, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
 	await check_corner_ragdoll(87, 4.90, true, -1.0, 0.09, Zombie.DeathStrike.SABRE_FINISHER,
-		1150.0, true, CornerBevel.SUPPORT)
+		1150.0, true, CornerFixture.SUPPORT_BEVEL)
 	await check_corner_ragdoll(141, 2.0, true, -1.0, 0.18, Zombie.DeathStrike.SABRE_FINISHER,
-		1150.0, true, CornerBevel.PINCHED_ARM)
+		1150.0, true, CornerFixture.PINCHED_ARM)
 	await check_corner_ragdoll(141, 2.0, true, -1.0, 0.18, Zombie.DeathStrike.SABRE_FINISHER,
-		1150.0, false, CornerBevel.PINCHED_ARM_FROZEN_WALLS)
+		1150.0, false, CornerFixture.PINCHED_ARM_FROZEN_WALLS)
 	for seed: int in [5, 13, 36, 43]:
 		await check_corner_ragdoll(seed, 0.40, false, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
-			1150.0, true, CornerBevel.NONE, Vector2(10.0, 10.0))
+			1150.0, true, CornerFixture.NONE, Vector2(10.0, 10.0))
 	# The feet and torso stay supported while the head rests against both faces.
 	await check_corner_ragdoll(90, 4.90, true, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
-		1150.0, true, CornerBevel.NONE, Vector2(10.0, 10.0))
+		1150.0, true, CornerFixture.NONE, Vector2(10.0, 10.0))
 	await check_wall_rebound(77, Vector3(2.25, 0.02, 2.25), -0.57424086332321,
 		&"Zombie_Walk_Variant2", 0.13333353201548)
 	await check_wall_rebound(96, Vector3(1.35, 0.02, 4.05), 2.56416249275208,
