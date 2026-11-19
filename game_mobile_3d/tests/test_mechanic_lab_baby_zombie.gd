@@ -412,6 +412,19 @@ func check_floor_then_wall() -> void:
 	baby.ragdoll._sweep_tuned_lab_walls()
 	check(state.transform.origin.is_equal_approx(finish) and state.linear_velocity.is_equal_approx(velocity),
 		"The floor continuation leaves a path under a raised wall unobstructed")
+
+	# The floor is finite. It cannot redirect a limb that travels off the edge.
+	var edge_offset := Vector3(50.01 - finish.x, 0.0, 0.0)
+	wall.position.y -= 0.2
+	corner.position += edge_offset
+	await physics_frame
+	await physics_frame
+	state = PhysicsServer3D.body_get_direct_state(leg.get_rid())
+	baby.ragdoll._tuned_wall_poses["Leg.L"] = start + edge_offset
+	state.transform = Transform3D(state.transform.basis, finish + edge_offset)
+	baby.ragdoll._sweep_tuned_lab_walls()
+	check(state.transform.origin.is_equal_approx(finish + edge_offset),
+		"The floor continuation does not extend the platform past its edge")
 	print("LAB_BABY_FLOOR_WALL near_side=", stopped.x, " slide=", slide)
 	lab.free()
 
