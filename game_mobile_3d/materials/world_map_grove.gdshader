@@ -139,7 +139,7 @@ void fragment() {
 	// WorldMap uses an orthographic camera. Centre the opening on the actor
 	// even while the camera holds its elevation during a jump.
 	float distance_to_player = 0.80;
-	if (reveal_player && VERTEX.z > player_view.z + 0.01) {
+	if (reveal_player && VERTEX.z - player_view.z > 0.01) {
 		vec2 extent = abs(VERTEX.xy - player_view.xy) / vec2(0.70, 1.16);
 		distance_to_player = length(max(extent - 0.48, vec2(0.0)));
 	}
