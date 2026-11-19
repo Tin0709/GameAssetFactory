@@ -147,8 +147,9 @@ func _handoff_wall_clearance() -> Vector3:
 		return Vector3.ZERO
 	if overlaps.size() == 1 and _is_floor_top_overlap(overlaps[0].rid, bounds):
 		return Vector3.ZERO
-	if wall_handoff_animation != null and _handoff_straddles_wall(
-			space, collision_mask, Vector3.ZERO, SOURCE_ANCHOR_TOLERANCE, {}):
+	if wall_handoff_animation != null and (_handoff_straddles_wall(
+			space, collision_mask, Vector3.ZERO, SOURCE_ANCHOR_TOLERANCE, {})
+			or _handoff_arm_is_pinched(space, overlaps)):
 		_wall_handoff_frame = Engine.get_physics_frames()
 		# All candidate poses share the rig's collision configuration.
 		if collision_mask == HANDOFF_TERRAIN_MASK:
@@ -164,6 +165,29 @@ func _handoff_wall_clearance() -> Vector3:
 		_handoff_query_snapshot.clear()
 		return shift
 	return super._handoff_wall_clearance()
+
+func _handoff_arm_is_pinched(space: PhysicsDirectSpaceState3D, overlaps: Array[Dictionary]) -> bool:
+	var wall_shapes := 0
+	for hit in overlaps:
+		if hit.collider is StaticBody3D and hit.collider != _flat_floor.get_parent():
+			wall_shapes += PhysicsServer3D.body_get_shape_count(hit.rid)
+	if wall_shapes < 2:
+		return false
+	# The arm box can overlap both sides of a seam while its centre still clears the walls.
+	for name in ["Arm.L", "Arm.R"]:
+		var points := _terrain_contacts_at(bodies[name], space, current[name])
+		var normals: Array[Vector3] = []
+		for i in range(0, points.size(), 2):
+			var separation := points[i + 1] - points[i]
+			var depth := separation.length()
+			if depth <= HANDOFF_MIN_WALL_OVERLAP or absf(separation.y) >= depth * MAX_WALL_NORMAL_Y:
+				continue
+			var normal := separation / depth
+			for other in normals:
+				if normal.dot(other) < -0.90:
+					return true
+			normals.append(normal)
+	return false
 
 func _is_floor_top_overlap(hit: RID, bounds: AABB) -> bool:
 	var floor_body := _flat_floor.get_parent() as StaticBody3D
