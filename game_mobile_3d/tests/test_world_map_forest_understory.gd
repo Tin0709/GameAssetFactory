@@ -22,6 +22,7 @@ func run() -> void:
 	else:
 		check(plants != null and toggle != null and toggle.button_pressed, "WorldMap enables the Forest understory by default")
 		if plants != null and toggle != null:
+			check(plants.find_children("*", "CollisionObject3D", true, false).is_empty(), "Private vegetation leaves collision unchanged")
 			var sectors := {}
 			var materials := {}
 			var cells := {}
@@ -43,8 +44,13 @@ func run() -> void:
 					total += 1
 			check(total >= 20 and sectors.size() == 4 and plants.get_child_count() == 4, "Four variants are scattered across all four sectors")
 			check(materials.size() == 2, "Variants share two material/atlas sets")
+			var moss_atlas: Texture2D = world.showcase.forest_moss.material.get_shader_parameter("source_atlas")
+			var shared_atlas_count := 0
 			for material in materials:
 				check(world.showcase._mist_materials().has(material), "The material receives the shared fog")
+				if material.get_shader_parameter("source_atlas") == moss_atlas:
+					shared_atlas_count += 1
+			check(shared_atlas_count == 1, "The hanging moss reuses the verified ledge moss texture")
 			toggle.button_pressed = false
 			check(not plants.visible, "Settings can isolate the understory")
 			for material in materials:
