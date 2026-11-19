@@ -838,7 +838,7 @@ func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
 		voice.bus = AudioServer.get_bus_name(bus)
 	var ear: Vector3 = audio.zombie_listener.global_position
 	var strike := {"damage": 1, "stagger": 0.0, "strength": 500.0, "angle": 15.0}
-	for case: Array in [[0, false, &"hurt", 3], [1, false, &"baby_hurt", 2],
+	for case: Array in [[0, false, &"hurt", 2], [1, false, &"baby_hurt", 2],
 			[0, true, &"death", 3], [1, true, &"baby_death", 3]]:
 		var zombie := group.get_child(case[0]) as ZOMBIE
 		var bank: Array = audio._groups.get(case[2], [])
@@ -854,13 +854,22 @@ func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
 			check(reactions[0].playing and reactions[0].global_position == point
 				and variant < bank.size() and reactions[0].stream == bank[variant],
 				"A real %s strike plays variant %d from the correct reaction bank" % [case[2], variant + 1])
-			if variant == 0 and case[0] == 1:
+			if case[0] == 1:
+				check(is_equal_approx(reactions[0].pitch_scale, 1.0), "Baby reactions reuse the voice at neutral pitch")
+			else:
+				var cents := 1200.0 * log(reactions[0].pitch_scale) / log(2.0)
+				check(cents >= -200.01 and cents <= 300.01 and not is_zero_approx(cents),
+					"The adult reaction varies pitch inside the range inferred from the cooked event")
+			if variant == 0:
 				await create_timer(0.25).timeout
 				var peak := 0.0
 				for sample in capture.get_buffer(capture.get_frames_available()):
 					peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
 				check(peak > 0.001 and peak < 0.9, "%s reaches the silent mixer with headroom" % case[2])
-				print("MECHANIC_LAB_BABY_REACTION ", case[2], " peak=", peak)
+				print("MECHANIC_LAB_ZOMBIE_REACTION ", case[2], " peak=", peak)
+	check(audio._groups.get(&"hurt") == audio._groups.get(&"baby_hurt")
+		and audio._groups.get(&"death") == audio._groups.get(&"baby_death"),
+		"Adult and baby cues reuse the decoded media for the corroborated waveforms")
 	audio.reset()
 	var near_points := [ear + Vector3.FORWARD, ear + Vector3.FORWARD * 2.0, ear + Vector3.FORWARD * 3.0]
 	for strike_index: int in [4, 3, 2, 1, 0]:
@@ -1268,6 +1277,9 @@ func check_zombie_attack_overflow(bus: int, capture: AudioEffectCapture) -> void
 	check(audio._next_choice.get(&"zombie_hit", 0) == 3 and hit_voices.size() == voices.size()
 		and hit_voices.all(func(voice): return voice.global_position in nearest_points),
 		"Confirmed contacts replace windups with the three nearest contact cues")
+	check(audio._groups.get(&"zombie_hit") == audio._groups.get(&"baby_swing")
+		and hit_voices.all(func(voice): return is_equal_approx(voice.pitch_scale, 1.0)),
+		"Confirmed contacts reuse the source media at neutral pitch without taking swing priority")
 	var hit_streams := voices.map(func(voice): return voice.stream)
 	for point in points:
 		group.zombie_attack_audio.emit(point, false)
@@ -1421,7 +1433,7 @@ func wait_for_zombie_onset(voices: Array[AudioStreamPlayer3D]) -> bool:
 	var deadline := Time.get_ticks_msec() + 500
 	while Time.get_ticks_msec() < deadline:
 		for voice in voices:
-			if not voice.playing or voice.get_playback_position() >= COMBAT_AUDIO.ZOMBIE_ONSET_SECONDS:
+			if not voice.playing or voice.get_playback_position() / voice.pitch_scale >= COMBAT_AUDIO.ZOMBIE_ONSET_SECONDS:
 				return true
 		await process_frame
 	return false
@@ -1565,11 +1577,17 @@ func run() -> void:
 	AudioServer.set_bus_mute(0, true)
 	audio.set_enabled(true, Vector3.ZERO)
 	check(not AudioServer.is_bus_mute(0), "Audio toggle enables playback")
-	var expected := {&"hit": 5, &"hurt": 3, &"death": 3, &"slam": 3, &"slam_grass": 6,
+	var expected := {&"hit": 5, &"hurt": 2, &"death": 3, &"slam": 3, &"slam_grass": 6,
 		&"zombie_windup": 4, &"zombie_hit": 4}
 	for group in expected:
 		check(audio._groups.get(group, []).size() == expected[group],
 			"All pinned MD2 variants decode for " + str(group))
+	var original_frame_counts := {&"hurt": [36190, 35207], &"death": [76726, 73653, 58933],
+		&"zombie_hit": [13399, 17213, 16869, 31411]}
+	for group in original_frame_counts:
+		var decoded: Array = audio._groups.get(group, [])
+		check(decoded.map(func(sample): return roundi(sample.get_length() * 48000.0)) == original_frame_counts[group],
+			"Ordinary zombie %s loads the takes that match the original event durations" % group)
 	audio.reset()
 	audio.contact(Vector3.FORWARD * 2.0, 7, false)
 	var hit_voice: AudioStreamPlayer3D
