@@ -145,7 +145,8 @@ func check_connected_side(member_count: int, yaw: float, side: float) -> void:
 	lab.free()
 	await physics_frame
 
-func check_route_to_last_sighting(member_count: int, yaw: float, baby_chaser: bool) -> void:
+func check_route_to_last_sighting(member_count: int, yaw: float, baby_chaser: bool,
+		wall_width := 1.4, target_distance := 0.0) -> void:
 	var lab := LAB.instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -155,6 +156,7 @@ func check_route_to_last_sighting(member_count: int, yaw: float, baby_chaser: bo
 		lab.free()
 		return
 	var heading := Basis(Vector3.UP, yaw)
+	lab.player.position += heading.z * target_distance
 	var chaser := zombies.get_child(0) as ZOMBIE
 	chaser.position = heading * Vector3(0.0, 0.02, -3.3)
 	chaser.animation.play(ZOMBIE.IDLE)
@@ -164,7 +166,7 @@ func check_route_to_last_sighting(member_count: int, yaw: float, baby_chaser: bo
 		if chaser._target_aggressive:
 			break
 	var last_seen := chaser._last_seen_position
-	add_wall(lab, heading * Vector3(0.0, 1.25, -1.8), Vector3(1.4, 2.5, 0.30), yaw)
+	add_wall(lab, heading * Vector3(0.0, 1.25, -1.8), Vector3(wall_width, 2.5, 0.30), yaw)
 	for tick in 6:
 		await physics_frame
 		if not chaser._target_visible:
@@ -187,7 +189,7 @@ func check_route_to_last_sighting(member_count: int, yaw: float, baby_chaser: bo
 	var expected := ZOMBIE.BABY_MELEE_DAMAGE if baby_chaser else ZOMBIE.MELEE_DAMAGE
 	if not lost_sight or not routed_while_hidden or not used_last_sighting or hidden_hits > 0 or hits != [expected]:
 		failures.append("A recent sighting should permit a detour and a hit only after the zombie sees the player again")
-	print("LAB_LAST_SIGHT_ROUTE members=", member_count, " baby=", baby_chaser, " lost=", lost_sight,
+	print("LAB_LAST_SIGHT_ROUTE members=", member_count, " baby=", baby_chaser, " wall_width=", wall_width, " lost=", lost_sight,
 		" routed=", routed_while_hidden, " remembered=", used_last_sighting, " hidden_hits=", hidden_hits,
 		" hits=", hits)
 	lab.free()
@@ -291,6 +293,7 @@ func run() -> void:
 	await check_connected_side(1, deg_to_rad(52.0), 1.0)
 	await check_route_to_last_sighting(1, 0.0, false)
 	await check_route_to_last_sighting(100, deg_to_rad(27.0), true)
+	await check_route_to_last_sighting(100, deg_to_rad(27.0), true, 7.6, 1.7)
 	await check_living_blocker(2, 0.0)
 	await check_living_blocker(100, deg_to_rad(38.0))
 	await check_living_blocker(100, deg_to_rad(-27.0), true)
