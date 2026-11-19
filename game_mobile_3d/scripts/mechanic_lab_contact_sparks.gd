@@ -86,6 +86,10 @@ func _spawn_burst(point: Vector3, attack_direction: Vector3) -> void:
 		spark.width = _random.randf_range(0.045, 0.075)
 
 func _process(delta: float) -> void:
+	# The elapsed frame only advances streaks that were already displayed.
+	for spark in _particles:
+		if spark.age < spark.lifetime:
+			spark.age += delta
 	for contact: Dictionary in _pending:
 		_spawn_burst(contact.point, contact.direction)
 	_pending.clear()
@@ -108,7 +112,6 @@ func _process(delta: float) -> void:
 		var color := HOT.lerp(COOL, smoothstep(0.22, 1.0, progress))
 		color.a = 1.0 - smoothstep(0.18, 1.0, progress)
 		_streaks.set_instance_color(count, color)
-		spark.age += delta
 		count += 1
 	_streaks.visible_instance_count = count
 	set_process(count > 0)

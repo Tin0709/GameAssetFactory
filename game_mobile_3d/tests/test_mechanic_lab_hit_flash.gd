@@ -189,15 +189,15 @@ func check_crowd_sparks() -> void:
 			"A hitch before the first presentation still shows all selected contacts")
 		sparks._process(1.0 / 30.0)
 		var counts := [0, 0, 0, 0, 0]
+		var ages_match := true
 		for particle in sparks._particles:
 			if particle.age >= particle.lifetime:
 				continue
-			check(is_equal_approx(particle.age, 1.0 / 30.0),
-				"New streaks advance by the time since their first displayed frame")
+			ages_match = ages_match and is_equal_approx(particle.age, 1.0 / 30.0)
 			for i in nearest.size():
 				if particle.origin.distance_squared_to(nearest[i]) < 0.22 ** 2:
 					counts[i] += 1
-		check(counts == [9, 9, 9, 9, 9] and renderer.multimesh.visible_instance_count == 45,
+		check(ages_match and counts == [9, 9, 9, 9, 9] and renderer.multimesh.visible_instance_count == 45,
 			"A 100-contact burst is still visible one frame after the hitch (far first: %s)" % reversed)
 	lab.reset_player()
 	group.sabre_contact.emit(origin, Vector3.RIGHT, "Attack3", 2, 1701, false)
@@ -208,7 +208,7 @@ func check_crowd_sparks() -> void:
 	sparks._process(0.25)
 	check(renderer.multimesh.visible_instance_count == 9,
 		"A hitch expires the previous burst while showing the new contact")
-	group.sabre_contact.emit(origin, Vector3.RIGHT, "Attack3", 2, 1702, false)
+	group.sabre_contact.emit(origin, Vector3.RIGHT, "Attack3", 2, 1703, false)
 	lab.reset_player()
 	await process_frame
 	await process_frame
