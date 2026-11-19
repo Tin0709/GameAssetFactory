@@ -9,8 +9,8 @@ const FOREST_ATLAS_ENTRY := {"file": "T_TreesBoulders.png",
 	"sha256": "9b596a2149fcaf999178d6a5557cda9677c204f21848c84c9a30425ad1d850f6"}
 const FERN_DIRECTORY := "Generic/Nature/Foliage/Ferns"
 const FERN_VARIANTS := [
-	{"file": "SM_Fern_02_Small.glb", "sha256": "9a913d07388d03126054307edbb32aca8a07ab0e42a8e9c737954c7147df9bed", "height": .72},
-	{"file": "SM_Fern_01_Large.glb", "sha256": "2d8a465d2cc3956e691e46e7c3ea542af5d66933823925311aa00607a745f8c5", "height": .89},
+	{"file": "SM_Fern_02_Small.glb", "sha256": "9a913d07388d03126054307edbb32aca8a07ab0e42a8e9c737954c7147df9bed"},
+	{"file": "SM_Fern_01_Large.glb", "sha256": "2d8a465d2cc3956e691e46e7c3ea542af5d66933823925311aa00607a745f8c5"},
 ]
 
 static func load_into(bundle: RefCounted) -> Array[String]:
@@ -82,14 +82,13 @@ static func load_fern_variants(bundle: RefCounted) -> Dictionary[int, String]:
 	if image == null or image.get_size() != Vector2i(64, 64):
 		return result
 	var material := plant_material(bundle, image)
-	material.set_meta("limit_motion_to_cell", true)
 	# The fern atlas already has dark leaf pigments. Retain some of the
 	# biome's turf tint without applying the full grass dimming to those leaves.
 	material.set_meta("night_turf_weight", .5)
 	for index: int in FERN_VARIANTS.size():
 		var entry: Dictionary = FERN_VARIANTS[index]
 		var path := checked_file(bundle, directory, entry, "glb")
-		var mesh := load_mesh(path, material, entry.height)
+		var mesh := load_mesh(path, material, true)
 		if mesh != null:
 			var key := "MD2 | " + path.get_file().get_basename()
 			bundle.meshes[key] = mesh
@@ -122,7 +121,7 @@ static func checked_file(bundle: RefCounted, directory: String, entry: Variant, 
 		return path
 	return ""
 
-static func load_mesh(path: String, material: ShaderMaterial, fitted_height := 0.) -> ArrayMesh:
+static func load_mesh(path: String, material: ShaderMaterial, seat_at_ground := false) -> ArrayMesh:
 	if path.is_empty():
 		return null
 	var document := GLTFDocument.new()
@@ -145,23 +144,11 @@ static func load_mesh(path: String, material: ShaderMaterial, fitted_height := 0
 	var size := bounds.size
 	if vertices.size() < 3 or size.y < .9 or size.y > 2.1:
 		return null
-	if fitted_height > 0.:
-		var radius := 0.
-		for vertex in vertices:
-			radius = maxf(radius, Vector2(vertex.x, vertex.z).length())
-		if radius <= 0.:
-			return null
-		# Keep the entire rest pose and a small wind margin within one block.
-		var horizontal := .42 / radius
-		var fit := Vector3(horizontal, fitted_height / size.y, horizontal)
-		var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+	if seat_at_ground:
+		# Translate from the exported pivot to ground level without resizing the mesh.
 		for index in vertices.size():
-			vertices[index] = (vertices[index] - Vector3.UP * bounds.position.y) * fit
-			normals[index] = (normals[index] / fit).normalized()
+			vertices[index].y -= bounds.position.y
 		arrays[Mesh.ARRAY_VERTEX] = vertices
-		arrays[Mesh.ARRAY_NORMAL] = normals
-		arrays[Mesh.ARRAY_TANGENT] = null
-		size.y = fitted_height
 	var roots := PackedVector2Array()
 	roots.resize(vertices.size())
 	var motion := PackedFloat32Array()

@@ -23,6 +23,8 @@ var forest_cover_counts: Dictionary = {}
 var forest_fern_enabled := true
 var forest_fern_asset := ""
 var _fern_cells: Dictionary[Vector2i, String] = {}
+var fern_reserved_cells: Dictionary[Vector2i, bool] = {}
+var _wide_fern_roots: Dictionary[Vector2i, Basis] = {}
 var eligible_grass_cells:=0
 var world:Node3D
 var error:=""
@@ -100,6 +102,7 @@ func _rebuild_planting(reset_interaction := true)->void:
 	for child:Node in get_children():
 		remove_child(child);child.queue_free()
 	placements.clear();_groups.clear();_plant_cells.clear();species_counts.clear();flower_colors.clear()
+	fern_reserved_cells.clear();_wide_fern_roots.clear()
 	materials.clear();_wind_intensities.clear();_flower_centers.clear()
 	forest_cover_counts.clear()
 	instance_count=0;batch_count=0;eligible_grass_cells=0;_rng.seed=110826
@@ -192,6 +195,7 @@ func _build_native_patches()->void:
 		bundle.meshes[name]=mesh
 
 func _build_dense_planting()->void:
+	_reserve_wide_ferns()
 	var keys:Array=world.columns.keys();keys.sort()
 	for column:Vector2i in keys:
 		var height:float=world.columns[column]
@@ -209,20 +213,23 @@ func _build_dense_planting()->void:
 		position+=Vector3(_rng.randf_range(-.09,.09),0.,_rng.randf_range(-.09,.09))
 		var transform:=Transform3D(Basis(Vector3.UP,_rng.randf()*TAU),position)
 		var phase := _rng.randf() * TAU
+		# Consume the same placement RNG before skipping the fern's support cells.
+		if fern_reserved_cells.has(cell):
+			continue
 		var cover := _cover_index(cell)
 		var fern_asset: String = _fern_cells.get(cell, "") if forest_fern_enabled else ""
-		var fern := not fern_asset.is_empty() and _off_path(cell)
+		var fern := not fern_asset.is_empty() and (_wide_fern_roots.has(cell)
+			or (fern_asset == forest_fern_asset and _off_path(cell)))
 		var scale_factor := 1.
 		if fern:
 			asset = fern_asset
-			scale_factor = .94 + float(posmod(hash(cell + Vector2i(397, 619)), 13)) * .01
 			transform.origin = Vector3(cell.x + .5, position.y, cell.y + .5)
-			transform.basis = transform.basis.scaled(Vector3.ONE * scale_factor)
+			if _wide_fern_roots.has(cell):
+				transform.basis = _wide_fern_roots[cell]
 		elif cover >= 0:
 			asset = forest_cover_species[cover]
-			scale_factor = .82 if cover == 2 else 1.
 			var yaw := float(posmod(hash(cell + Vector2i(593, 827)), 4)) * PI * .5
-			transform.basis = Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale_factor)
+			transform.basis = Basis(Vector3.UP, yaw)
 			forest_cover_counts[asset] = int(forest_cover_counts.get(asset, 0)) + 1
 		var bounds:AABB=transform*bundle.meshes[asset].get_aabb()
 		# Sparse plants use one batch per species. The dense carpet stays tiled.
@@ -234,6 +241,38 @@ func _build_dense_planting()->void:
 			"forest_cover":not fern and cover >= 0,"forest_fern":fern})
 		_add_plant_root(Vector2(transform.origin.x,transform.origin.z))
 		instance_count+=1;species_counts[asset]=int(species_counts.get(asset,0))+1
+
+func _reserve_wide_ferns() -> void:
+	if not forest_fern_enabled:
+		return
+	var origin: Array = world.runtime.offset
+	for root_cell: Vector2i in _fern_cells:
+		var asset: String = _fern_cells[root_cell]
+		if asset == forest_fern_asset:
+			continue
+		var basis := Basis(Vector3.UP, posmod(root_cell.x + 3 * root_cell.y, 4) * PI * .5)
+		var center := Vector3(root_cell.x + .5, 0., root_cell.y + .5)
+		var footprint: AABB = (Transform3D(basis, center) * bundle.meshes[asset].get_aabb()).grow(.08)
+		var ground: float = world.surface_height(center.x, center.z)
+		var support: Array[Vector2i] = []
+		var valid := is_finite(ground)
+		for x in range(floori(footprint.position.x), floori(footprint.end.x) + 1):
+			for z in range(floori(footprint.position.z), floori(footprint.end.z) + 1):
+				var cell := Vector2i(x, z)
+				var column := cell - Vector2i(int(origin[0]), int(origin[2]))
+				var height: float = world.columns.get(column, -INF)
+				var index: int = world.geometry.cells.get(Vector3i(column.x, floori(height - .01), column.y), -1) if is_finite(height) else -1
+				if index < 0 or not String(world.runtime.palette[index].kind).begins_with("grass_") \
+						or not is_equal_approx(height + float(origin[1]), ground) or not _off_path(cell) \
+						or not world.clear_standing_space(column, height) or fern_reserved_cells.has(cell) \
+						or (cell != root_cell and _fern_cells.has(cell)):
+					valid = false
+				elif cell != root_cell:
+					support.append(cell)
+		if valid:
+			_wide_fern_roots[root_cell] = basis
+			for cell: Vector2i in support:
+				fern_reserved_cells[cell] = true
 
 func _cover_index(cell: Vector2i) -> int:
 	if not forest_cover_enabled or forest_cover_species.is_empty():
@@ -341,8 +380,7 @@ func _prepare_materials()->void:
 		material.set_shader_parameter("interaction_previous",interaction.previous_texture)
 		material.set_shader_parameter("field_extent",interaction.extent)
 		material.set_shader_parameter("ground_atlas",bundle.textures[ground.texture]);material.set_shader_parameter("ground_uv",uv)
-		material.set_shader_parameter("cell_limited_motion",
-			not dense_grass_review or material.has_meta("limit_motion_to_cell"))
+		material.set_shader_parameter("cell_limited_motion",not dense_grass_review)
 		material.set_shader_parameter("splayed_rest_motion",grass_splay_active() and not source_cover)
 		material.set_shader_parameter("ground_mask_enabled",dense_grass_review)
 		material.set_shader_parameter("ground_coverage_map",world.look.path_map)
@@ -391,6 +429,7 @@ func snapshot()->Dictionary:
 	data["one_asset_per_block"]=true;data["trees"]=0
 	data["dense_grass_review"]=dense_grass_review;data["eligible_grass_cells"]=eligible_grass_cells
 	data["forest_cover_species"] = forest_cover_counts.duplicate()
+	data["fern_support_cells"] = fern_reserved_cells.size()
 	data["grass_splay_active"]=grass_splay_active()
 	data["recovered_wind_active"]=grass_wind!=null and grass_wind.configured and recovered_wind_enabled and dense_grass_review
 	if dense_grass_review:

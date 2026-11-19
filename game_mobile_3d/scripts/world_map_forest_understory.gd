@@ -44,10 +44,7 @@ func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atla
 			return false
 		var basis := Basis(Vector3.UP, deg_to_rad(slot.z))
 		var origin := Vector3(anchor.x, ground, anchor.y)
-		if variant >= FIRST_MUSHROOM:
-			# These meshes have a rigid cap and their source pivot is at ground level.
-			basis = basis.scaled(Vector3.ONE * .93)
-		elif variant >= 2:
+		if variant >= 2 and variant < FIRST_MUSHROOM:
 			# The source stems hang toward local -X. Seat them on the top lip of a real step.
 			var outward := -basis.x
 			var direction := Vector2i(roundi(outward.x), roundi(outward.z))
@@ -59,7 +56,7 @@ func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atla
 			origin += outward * .29
 			origin.y -= .05
 			basis = basis.scaled(Vector3.ONE * .72)
-		else:
+		elif variant < 2:
 			origin.y -= .028 if variant == 1 else .008
 			basis = basis.scaled(Vector3.ONE * .76)
 		occupied[cell] = true
