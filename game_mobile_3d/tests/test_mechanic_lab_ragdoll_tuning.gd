@@ -130,19 +130,33 @@ func check_tuned_wall_contact(lab, seed: int, clip: StringName, heading: int, so
 	box.size = Vector3(0.30, 3.0, 96.0)
 	collider.shape = box
 	wall.add_child(collider)
-	lab.add_child(wall)
 	var group: Node = lab.get_node("Zombies")
 	# Replay the recorded adult source pose and oblique Sabre finisher by this face.
 	group._spawn_serial = seed
+	lab.player_health = 10000
+	for i in 90:
+		await physics_frame
+	lab.player.set_physics_process(false)
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	await physics_frame
+	lab.player.set_physics_process(true)
 	if group.get_child_count() != 1:
 		check(false, "The tuned wall test loads a verified adult zombie")
 		wall.free()
 		return
 	var zombie := group.get_child(0) as Zombie
-	for i in 65:
+	for i in 75:
 		await physics_frame
-	zombie.global_position = Vector3(3.9, 0.02, (seed - 49.5) * 0.9)
+	Input.action_press("move_backward")
+	for i in 120:
+		await physics_frame
+	Input.action_release("move_backward")
+	for i in 300:
+		await physics_frame
+	lab.add_child(wall)
+	await physics_frame
+	await physics_frame
+	zombie.global_position = Vector3(4.35 - zombie._live_capsule.radius - 0.02, 0.02, (seed - 49.5) * 0.9)
 	zombie.rotation.y = TAU * float(heading) / 16.0
 	zombie.velocity = Vector3.ZERO
 	zombie.reset_physics_interpolation()
@@ -157,6 +171,7 @@ func check_tuned_wall_contact(lab, seed: int, clip: StringName, heading: int, so
 	zombie.ragdoll_gravity_multiplier = group.ragdoll_gravity_multiplier
 	var direction := Vector3.RIGHT.rotated(Vector3.UP, deg_to_rad(25.0))
 	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 800.0, Zombie.DeathStrike.SABRE_FINISHER)
+	await process_frame
 	var peak := 0.0
 	var active := false
 	var crossed := false
