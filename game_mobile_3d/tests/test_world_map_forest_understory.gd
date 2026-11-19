@@ -45,8 +45,8 @@ func run() -> void:
 					var center := (pose * batch.multimesh.mesh.get_aabb()).get_center()
 					sectors[Vector2i(signf(center.x), signf(center.z))] = true
 					var slot := Vector2i(floori(center.x), floori(center.z))
-					check(not cells.has(slot), "Each placement has its own cell")
-					cells[slot] = true
+					check(not cells.has(slot), "Plants %s and %s share cell %s" % [cells.get(slot), batch.name, slot])
+					cells[slot] = batch.name
 					if mushroom:
 						mushrooms[batch.name][Vector2i(signf(center.x), signf(center.z))] = true
 						var ground: float = world.surface_height(pose.origin.x, pose.origin.z)
