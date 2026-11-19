@@ -13,7 +13,7 @@ func check(condition: bool, message: String) -> void:
 func visible_particles(dust: Node3D) -> int:
 	var count := 0
 	for particle: Node3D in dust.get_children():
-		if particle.visible:
+		if particle.visible and not particle is MultiMeshInstance3D:
 			count += 1
 	return count
 

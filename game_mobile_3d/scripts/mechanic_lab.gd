@@ -257,7 +257,7 @@ func _ready() -> void:
 		dust.name = "MovementDust"
 		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _grass_landing_contact_at,
 				player.source_step_dust_size, true):
-			dust.use_source_landing()
+			dust.use_source_landing(true)
 			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped)
 			add_child(dust)
 			var zombie_dust := ZombieStepDust.new()

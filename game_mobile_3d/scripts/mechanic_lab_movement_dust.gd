@@ -10,6 +10,7 @@ const GAUNTLET_DEBRIS_GRAVITY := 14.7
 const FRAMES := [0, 9, 10, 16, 24, 25]
 const CAPACITY := 16
 const SOURCE_LANDING_CAPACITY := 24
+const LANDING_SHADER := preload("res://materials/mechanic_lab_landing_dust.gdshader")
 # Camera distance in NS_Step_Dust, NS_PlayerLanding_Medium_Dust and NS_Debris_Generic_Small.
 const SOURCE_CAMERA_RANGE := 100.0
 const HEAVY_PARTICLE_COUNT := 10
@@ -55,6 +56,7 @@ var _burst_point: Vector3
 var _burst_surface: String
 var _random := RandomNumberGenerator.new()
 var _landing_random: RandomNumberGenerator
+var _landing_batch: MultiMeshInstance3D
 var _run_profile: Callable
 var _run_alpha := PackedFloat32Array()
 var _run_alpha_duration := 1.0
@@ -109,7 +111,7 @@ func _grow_particle_pool(capacity: int) -> void:
 		add_child(particle.sprite)
 		_particles.append(particle)
 
-func use_source_landing() -> void:
+func use_source_landing(batch_render := false) -> void:
 	var path := WeaponSource.verified_path(WeaponSource.research_root(), LANDING_CURVES_PATH, LANDING_CURVES_HASH)
 	if path.is_empty():
 		return
@@ -121,6 +123,63 @@ func use_source_landing() -> void:
 	_landing_random = RandomNumberGenerator.new()
 	_landing_random.seed = PARTICLE_SEED
 	_grow_particle_pool(SOURCE_LANDING_CAPACITY)
+	if batch_render and RenderingServer.get_current_rendering_method() == "mobile":
+		_create_landing_batch()
+
+func _create_landing_batch() -> void:
+	var material := ShaderMaterial.new()
+	material.shader = LANDING_SHADER
+	material.set_shader_parameter("smoke_mask", _smoke_texture)
+	material.set_shader_parameter("dust_tint", SURFACE_DUST.grass)
+	material.set_shader_parameter("camera_range_squared", SOURCE_CAMERA_RANGE ** 2)
+	var quad := QuadMesh.new()
+	quad.material = material
+	var instances := MultiMesh.new()
+	instances.transform_format = MultiMesh.TRANSFORM_3D
+	instances.use_custom_data = true
+	instances.mesh = quad
+	instances.instance_count = SOURCE_LANDING_CAPACITY
+	instances.visible_instance_count = 0
+	_landing_batch = MultiMeshInstance3D.new()
+	_landing_batch.name = "LandingDustBatch"
+	_landing_batch.multimesh = instances
+	_landing_batch.sorting_use_aabb_center = true
+	_landing_batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_landing_batch.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	_landing_batch.hide()
+	add_child(_landing_batch)
+
+func _sync_landing_batch() -> void:
+	var instances := _landing_batch.multimesh
+	var can_batch := true
+	# Grass smoke has one color. Differently colored debris keeps the
+	# original per-sprite transparency order when it overlaps the plume.
+	for particle in _particles:
+		if particle.sprite.visible and (particle.debris_drag > 0.0 \
+				or Color(particle.sprite.modulate, 1.0) != SURFACE_DUST.grass):
+			can_batch = false
+			break
+	var count := 0
+	var bounds := AABB()
+	for particle in _particles:
+		var sprite := particle.sprite
+		if not sprite.visible or particle.landing_tick < 0 or particle.debris_drag > 0.0:
+			continue
+		var layers := 0 if can_batch else 1
+		if sprite.layers != layers:
+			sprite.layers = layers
+		if not can_batch:
+			continue
+		var point := to_local(sprite.global_position)
+		instances.set_instance_transform(count, Transform3D(Basis.IDENTITY, point))
+		instances.set_instance_custom_data(count, Color(float(sprite.frame), sprite.modulate.a, 0.0, 0.0))
+		bounds = AABB(point, Vector3.ZERO) if count == 0 else bounds.expand(point)
+		count += 1
+	instances.visible_instance_count = count
+	if count > 0:
+		# Include the half diagonal of the one-metre camera-facing quad.
+		instances.custom_aabb = bounds.grow(0.71)
+	_landing_batch.visible = count > 0
 
 func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:
 	return batch.setup(_smoke_texture, _run_alpha, _run_alpha_duration, true)
@@ -210,6 +269,8 @@ func _next_particle(texture: Texture2D, camera_range := 0.0) -> Particle:
 		particle.sprite.hframes = 8 if texture == _smoke_texture else 1
 		particle.sprite.vframes = 4 if texture == _smoke_texture else 1
 		particle.sprite.texture = texture
+	if particle.sprite.layers == 0:
+		particle.sprite.layers = 1
 	particle.debris_drag = 0.0
 	particle.sprite.visibility_range_end = camera_range
 	return particle
@@ -413,6 +474,8 @@ func _process(delta: float) -> void:
 		particle.sprite.scale = Vector3.ONE * (1.0 + 0.35 * progress)
 		particle.sprite.modulate.a = particle.opacity * (1.0 - smoothstep(0.12, 1.0, progress))
 		active = true
+	if _landing_batch != null:
+		_sync_landing_batch()
 	set_process(active)
 
 func clear() -> void:
@@ -421,4 +484,7 @@ func clear() -> void:
 	set_physics_process(false)
 	for particle in _particles:
 		particle.sprite.hide()
+	if _landing_batch != null:
+		_landing_batch.multimesh.visible_instance_count = 0
+		_landing_batch.hide()
 	set_process(false)
