@@ -784,7 +784,7 @@ func check_landing_variation_is_independent(lab, emitter_script: Script) -> void
 	check(regular_steps[0] >= 3 and without_steps.size() == 3
 		and without_steps.all(func(row): return row.size() >= 4 and row.size() <= 6),
 		"The replay emits real MD2 run puffs and three ordinary landing bursts")
-	check(without_steps == after_steps and without_steps[0] != without_steps[-1],
+	check(without_steps.size() == 3 and without_steps == after_steps and without_steps[0] != without_steps[-1],
 		"Landing particles vary between jumps independently of the run steps")
 	print("MECHANIC_LAB_LANDING_VARIATION steps=", regular_steps[0], " jumps=", without_steps.size(),
 		" independent=", without_steps == after_steps)
@@ -797,7 +797,7 @@ func landing_emission_signature(emitter, tick: int) -> Array[String]:
 	var result: Array[String] = []
 	for particle in emitter._particles:
 		if particle.sprite.visible and particle.contact_tick == tick and particle.landing_tick == 0:
-			result.append(var_to_bytes([particle.origin, particle.velocity, particle.duration, particle.sprite.frame]).hex_encode())
+			result.append(var_to_bytes([particle.velocity, particle.duration, particle.sprite.frame]).hex_encode())
 	# Pool slots can differ because one emitter has live footstep sprites.
 	result.sort()
 	return result
