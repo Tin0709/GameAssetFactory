@@ -838,14 +838,14 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 			continue
 		var space := get_world_3d().direct_space_state
 		var packed_blocker: bool = living_blocker and get_parent().has_living_crowd
-		_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, packed_blocker)
+		_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, packed_blocker, fixed_blocker)
 		if not _chase_detour.is_finite() and not _target_visible and not living_blocker:
 			# The remembered route can reach farther with a faster chaser.
 			# Bound the second search by the time left on the sighting.
 			var available := minf(LAB_DETOUR_TIMEOUT, LAB_SIGHT_LOSS_DELAY - _sight_state_seconds)
 			var reach := _chase_speed * available
 			if reach > LAB_DETOUR_LENGTH:
-				_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, false, reach)
+				_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, false, true, reach)
 		if _chase_detour.is_finite():
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
 			# Returning directly through the blocker would undo this side step.
@@ -855,7 +855,8 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 	return Vector3.ZERO
 
 func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3,
-		target_offset: Vector3, stop_distance: float, packed_blocker: bool, search_distance := LAB_DETOUR_LENGTH) -> Vector3:
+		target_offset: Vector3, stop_distance: float, packed_blocker: bool, fixed_blocker: bool,
+		search_distance := LAB_DETOUR_LENGTH) -> Vector3:
 	_prepare_lab_path_sweep(true)
 	# Open a small gap beside the wall before testing the two legs.
 	# A shape cast can omit contacts already touching its start.
@@ -873,7 +874,10 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 	var best := Vector3.INF
 	var min_distance := LAB_DETOUR_MIN_LENGTH * LAB_DETOUR_MIN_LENGTH
 	var best_distance := min_distance
+	var best_remaining := INF
+	var best_route_length := INF
 	var best_connects := false
+	var approach := target_offset - clearance
 	for direction in [lateral, -lateral]:
 		var local := _corpse_floor.to_local(origin + direction * search_distance)
 		local.x = clampf(local.x, -extent.x, extent.x)
@@ -881,7 +885,7 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 		var travel := (_corpse_floor.to_global(local) - origin).slide(Vector3.UP)
 		var max_distance := travel.length_squared()
 		# A sweep can only shorten this leg. Keep the earlier connected leg on a tie.
-		if max_distance <= min_distance or (best_connects and max_distance <= best_distance):
+		if max_distance <= min_distance or (best_connects and not fixed_blocker and max_distance <= best_distance):
 			continue
 		if packed_blocker:
 			# Reject only a confirmed hit well inside the minimum usable leg.
@@ -891,16 +895,33 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 				continue
 		travel *= _lab_path_fraction(space, travel)
 		var distance := travel.length_squared()
-		if distance <= min_distance or (best_connects and distance <= best_distance) \
-				or not _lab_path_end_clear(space, travel):
+		if distance <= min_distance or (best_connects and not fixed_blocker and distance <= best_distance):
 			continue
-		var connects := _detour_reaches_approach(space, travel, target_offset - clearance, stop_distance)
+		var remaining := 0.0
+		var route_length := 0.0
+		if fixed_blocker:
+			remaining = (approach - travel).length_squared()
+			route_length = sqrt(distance) + maxf(0.0, sqrt(remaining) - stop_distance)
+			# Test a second endpoint and approach only if they can improve a connected route.
+			if best_connects and (route_length >= best_route_length or is_equal_approx(route_length, best_route_length)):
+				continue
+		if not _lab_path_end_clear(space, travel):
+			continue
+		var connects := _detour_reaches_approach(space, travel, approach, stop_distance)
+		var better_leg := distance > best_distance
+		if fixed_blocker and connects:
+			better_leg = route_length < best_route_length
+		elif fixed_blocker and is_equal_approx(distance, best_distance):
+			# Equal partial legs favor the side that leaves less distance to the target.
+			better_leg = remaining < best_remaining and not is_equal_approx(remaining, best_remaining)
 		# A remembered position needs a connected route. With fresh sight,
 		# the chaser can use a partial leg and plan again at the next corner.
 		if (connects or _target_visible) and ((connects and not best_connects)
-				or (connects == best_connects and distance > best_distance)):
+				or (connects == best_connects and better_leg)):
 			best = origin + travel
 			best_distance = distance
+			best_remaining = remaining
+			best_route_length = route_length
 			best_connects = connects
 	return best
 
