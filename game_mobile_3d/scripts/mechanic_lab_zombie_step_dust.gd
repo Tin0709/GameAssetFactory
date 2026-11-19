@@ -41,12 +41,13 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float,
 	_material = ShaderMaterial.new()
 	_material.shader = SHADER
 	_material.set_shader_parameter("smoke_mask", texture)
-	if verified_smoke_atlas:
+	if verified_smoke_atlas and RenderingServer.get_current_rendering_method() == "mobile":
 		var cell_bounds := PackedVector4Array()
 		cell_bounds.resize(32)
 		cell_bounds.fill(Vector4(0, 0, 1, 1))
 		for cell: int in SMOKE_CELL_BOUNDS:
-			cell_bounds[cell] = SMOKE_CELL_BOUNDS[cell] / 16.0
+			# Keep one transparent texel around the original alpha support.
+			cell_bounds[cell] = (SMOKE_CELL_BOUNDS[cell] + Vector4(-1, -1, 1, 1)) / 16.0
 		_material.set_shader_parameter("cell_bounds", cell_bounds)
 		_material.set_shader_parameter("crop_smoke_atlas", true)
 	_material.set_shader_parameter("dust_tint", MovementDust.SURFACE_DUST.grass)
