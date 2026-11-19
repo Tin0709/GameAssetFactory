@@ -91,6 +91,7 @@ func run() -> void:
 	await check_tuned_contact(50, 27.0, 1.00)
 	await check_tuned_contact(58, 27.0, 0.35, true)
 	await check_first_wall_neck_contact()
+	await check_first_wall_neck_contact(true)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -203,7 +204,7 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_atta
 		" parked=", baby._corpse_parked, " impulse=", impulse, " gravity=", gravity)
 	lab.free()
 
-func check_first_wall_neck_contact() -> void:
+func check_first_wall_neck_contact(frozen := false) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -211,7 +212,13 @@ func check_first_wall_neck_contact() -> void:
 	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = 1000.0
 	lab.get_node("HUD/RagdollTuning/Gravity/Slider").value = 1000.0
 
-	var wall := StaticBody3D.new()
+	var wall: PhysicsBody3D
+	if frozen:
+		var blocker := RigidBody3D.new()
+		blocker.freeze = true
+		wall = blocker
+	else:
+		wall = StaticBody3D.new()
 	var collider := CollisionShape3D.new()
 	var box := BoxShape3D.new()
 	box.size = Vector3(0.30, 3.0, 96.0)
@@ -253,8 +260,9 @@ func check_first_wall_neck_contact() -> void:
 		for part: PhysicalBone3D in baby.ragdoll.bodies.values():
 			crossed = crossed or part.global_position.x > 4.655
 	check(peak > 0.0 and peak < 0.20 and baby._corpse_parked and not crossed,
-		"At 1000% launch and gravity the Baby Zombie limits neck stretch at the first wall contact")
-	print("LAB_BABY_FIRST_WALL gap=", peak, " crossed=", crossed, " parked=", baby._corpse_parked)
+		"At 1000% launch and gravity the Baby Zombie keeps its neck connected against a %s wall" %
+		("frozen" if frozen else "static"))
+	print("LAB_BABY_FIRST_WALL frozen=", frozen, " gap=", peak, " crossed=", crossed, " parked=", baby._corpse_parked)
 	lab.free()
 
 
