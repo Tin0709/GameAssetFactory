@@ -390,6 +390,13 @@ func run() -> void:
 	equip(menu, 0)
 	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
 		"Switching back restores the original Sabre")
+	equip(menu, 10)
+	var tool_mount := lab._weapon_mesh as MeshInstance3D
+	check(menu.selected == 10 and tool_mount.material_override != null,
+		"The teardown fixture has an equipped Axe material")
+	lab.tree_exiting.connect(func():
+		check(is_instance_valid(tool_mount) and tool_mount.material_override == null,
+			"Leaving the Lab detaches the equipped tool material before the mount is freed"))
 	lab.queue_free()
 	# Let the audio server release stopped voices before a fixed-FPS test exits.
 	var audio_end := Time.get_ticks_msec() + 100
