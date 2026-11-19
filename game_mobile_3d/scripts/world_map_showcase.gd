@@ -1762,6 +1762,8 @@ func _scene_light_materials() -> Array:
 		result.append(forest_moss.material)
 	if is_instance_valid(forest_understory) and forest_understory.visible:
 		result.append_array(forest_understory.materials)
+	if is_instance_valid(exterior_ground) and exterior_ground.visible:
+		result.append(exterior_ground.material)
 	return result
 
 func far_terrain_shading_materials() -> Array:
@@ -1813,6 +1815,8 @@ func set_source_terrain(enabled: bool) -> bool:
 		_source_terrain_tiles = preload("res://scripts/world_map_source_terrain.gd").load_tiles()
 	enabled = enabled and _source_terrain_tiles != null
 	source_terrain_active = enabled
+	if is_instance_valid(exterior_ground):
+		exterior_ground.material.set_shader_parameter("source_terrain_tiles", _source_terrain_tiles if enabled else null)
 	var bound: Dictionary[ShaderMaterial, bool] = {}
 	for item: Array in level.look.terrain_materials:
 		var material: ShaderMaterial = item[3]

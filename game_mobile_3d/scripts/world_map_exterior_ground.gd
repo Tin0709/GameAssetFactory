@@ -3,6 +3,9 @@ extends Node3D
 
 const SIDES := [Vector3i.LEFT, Vector3i.RIGHT, Vector3i.FORWARD, Vector3i.BACK]
 const TOP_SPAN := 8
+const SHADER := preload("res://materials/world_map_exterior_ground.gdshader")
+
+var material: ShaderMaterial
 
 func build(world: Node3D, reach: int) -> bool:
 	var bounds: Dictionary = world.runtime.border
@@ -18,7 +21,8 @@ func build(world: Node3D, reach: int) -> bool:
 	var stone: Dictionary = source[0]
 	if not stone.faces.has_all(SIDES + [Vector3i.UP]):
 		return false
-	var material: ShaderMaterial = world.look.make_material(stone.material, "terrain")
+	material = ShaderMaterial.new()
+	material.shader = SHADER
 	var noise := FastNoiseLite.new()
 	noise.seed = 622
 	noise.frequency = .035
