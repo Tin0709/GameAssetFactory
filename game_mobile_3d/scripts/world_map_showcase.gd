@@ -575,7 +575,8 @@ func setup(world:Node3D)->void:
 	if not level.forest_understory_placements.is_empty():
 		var understory := ForestUnderstory.new()
 		var moss_atlas: Texture2D = forest_moss.material.get_shader_parameter("source_atlas") if forest_moss != null else null
-		if understory.configure(level, level.forest_understory_placements, moss_atlas):
+		var forest_atlas: Texture2D = plants.forest_fern_atlas() if plants != null else null
+		if understory.configure(level, level.forest_understory_placements, moss_atlas, forest_atlas):
 			forest_understory = understory
 			understory.name = "ForestUnderstory"
 			level.add_child(understory)
@@ -4641,7 +4642,7 @@ func _build_ui()->void:
 			cover.focus_mode = Control.FOCUS_NONE
 			box.add_child(cover)
 			cover.toggled.connect(plants.set_forest_cover)
-		if not plants.forest_fern_asset.is_empty():
+		if plants.has_forest_ferns():
 			var fern := CheckButton.new()
 			fern.name = "ForestFernToggle"
 			fern.button_pressed = plants.forest_fern_enabled

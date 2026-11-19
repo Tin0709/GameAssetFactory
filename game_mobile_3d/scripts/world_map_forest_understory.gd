@@ -4,23 +4,29 @@ extends Node3D
 const ResearchRoot := preload("res://scripts/world_map_forest_path_light.gd")
 const LeafShader := preload("res://materials/world_map_forest_understory.gdshader")
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Environment/ForestA1"
+const MUSHROOMS := "extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Environment/Generic/Nature/Foliage/Mushrooms"
 const ATLASES := [
 	["Nature/Foliage/CaveFungus/T_SC_Fungus_D.png", "f99d48a3944fe3a06ab41254c224bd5e10197fee4141ec4dee289b58d6c174fd", 64],
 	["Props/Webs/T_SpiderCavePropAtlas_D.png", "d09274d23b20d9d4b5d8ab07dd19e9dcda6699312b34260ef116ed0a62ef2207", 128],
+	["Props/Boulder/T_TreesBoulders.png", "9b596a2149fcaf999178d6a5557cda9677c204f21848c84c9a30425ad1d850f6", 128],
 ]
 const MODELS := [
 	["Nature/Foliage/CaveFungus/SM_SC_FungusGrass_S.glb", "bbc0b352489822293e7ee342b5387a4275f4f2225835c0f2b47e69122e259b0a"],
 	["Nature/Foliage/CaveFungus/SM_SC_FungusPads_01.glb", "8fc13ab607fe79629c2e0ea0a4927e84d8e8b627fb3c327ee8fe96f6bb6bcb2b"],
 	["Nature/Meshes/Moss/SM_SC_HangingMoss_01.glb", "62b74269a7f50e3330fd19f366c44e7db3476e654af1d4deaea4a15d41ab9462"],
 	["Nature/Meshes/Moss/SM_SC_HangingMoss_03.glb", "b8f7e391837901f1be358b4c105e8325d48eee61810d383728da9a251ad2a104"],
+	["SM_SF_MushroomBrown.glb", "873488cd5356a0ae170a89bd7450f7d35c4b2cd125930fc82a444cd6dda013d1"],
+	["SM_SF_MushroomRed.glb", "ee36c834c032aaeb84b3ba35727395fa929b55e8e55c088a070b86e317c7b7e2"],
 ]
-const BATCH_NAMES := ["FungusStems", "FungusPads", "CornerMoss", "LedgeMoss"]
+const BATCH_NAMES := ["FungusStems", "FungusPads", "CornerMoss", "LedgeMoss", "BrownMushrooms", "RedMushrooms"]
+const FIRST_MUSHROOM := 4
 const VINE_ATLAS := ["Props/CaveEntrance/T_SringyMoss_D.png", "20069a786b0b6cc019d1ad642a6a12d605673c40a2f7d58f6cecf5fafb35c526", 64]
 const VINE_MESH := ["Props/CaveEntrance/SM_SCE_VineMoss_02.glb", "48692a77a8b2a6fd3973732d4cc8c99955488b3d66c860f9f156e33f92bd7ab3"]
 
 var materials: Array[ShaderMaterial] = []
 
-func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atlas: Texture2D) -> bool:
+func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atlas: Texture2D,
+		verified_forest_atlas: Texture2D = null) -> bool:
 	var root := ResearchRoot.research_root()
 	if root.is_empty() or placements.is_empty() or RenderingServer.get_rendering_device() == null:
 		return false
@@ -38,7 +44,10 @@ func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atla
 			return false
 		var basis := Basis(Vector3.UP, deg_to_rad(slot.z))
 		var origin := Vector3(anchor.x, ground, anchor.y)
-		if variant >= 2:
+		if variant >= FIRST_MUSHROOM:
+			# These meshes have a rigid cap and their source pivot is at ground level.
+			basis = basis.scaled(Vector3.ONE * .93)
+		elif variant >= 2:
 			# The source stems hang toward local -X. Seat them on the top lip of a real step.
 			var outward := -basis.x
 			var direction := Vector2i(roundi(outward.x), roundi(outward.z))
@@ -60,23 +69,28 @@ func configure(world: Node3D, placements: PackedVector4Array, verified_moss_atla
 
 	var shared_materials := {}
 	for variant: int in batches:
-		var atlas_index := 0 if variant < 2 else 1
+		var mushroom := variant >= FIRST_MUSHROOM
+		var mesh := _load_mesh(root.path_join(MUSHROOMS) if mushroom else directory, MODELS[variant])
+		if mesh == null:
+			if mushroom:
+				continue
+			return false
+		var atlas_index := variant / 2
 		if not shared_materials.has(atlas_index):
-			var atlas := verified_moss_atlas if atlas_index == 1 else null
+			var atlas := verified_forest_atlas if mushroom else (verified_moss_atlas if atlas_index == 1 else null)
 			if atlas == null:
 				atlas = _load_atlas(directory, ATLASES[atlas_index])
 			if atlas == null:
+				if mushroom:
+					continue
 				return false
 			shared_materials[atlas_index] = _leaf_material(atlas)
-		var mesh := _load_mesh(directory, MODELS[variant])
-		if mesh == null:
-			return false
-		# Red weights upward stems and green weights descending moss. Pads stay rigid.
-		_add_batch(BATCH_NAMES[variant], mesh, shared_materials[atlas_index], batches[variant],
-			Color(float(variant == 0), float(variant >= 2), 0., 1.))
+		# Red weights stems and green weights hanging moss. Caps keep their source normals.
+		var motion := Color(0., 0., 0., 0.) if mushroom else Color(float(variant == 0), float(variant >= 2), 0., 1.)
+		_add_batch(BATCH_NAMES[variant], mesh, shared_materials[atlas_index], batches[variant], motion)
 	for material: ShaderMaterial in shared_materials.values():
 		materials.append(material)
-	return true
+	return not materials.is_empty()
 
 func configure_wall_vines(world: Node3D, placements: PackedVector3Array) -> bool:
 	var root := ResearchRoot.research_root()

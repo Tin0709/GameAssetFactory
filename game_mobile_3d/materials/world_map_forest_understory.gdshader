@@ -12,11 +12,12 @@ render_mode cull_disabled, diffuse_lambert, specular_disabled;
 uniform sampler2D source_atlas : source_color, filter_nearest_mipmap, repeat_disable;
 varying float sky_opening;
 varying vec3 world_position;
-varying float hanging;
+varying float normal_wrap;
 
 void vertex() {
 	vec3 root = MODEL_MATRIX[3].xyz;
-	hanging = INSTANCE_CUSTOM.g;
+	float hanging = INSTANCE_CUSTOM.g;
+	normal_wrap = INSTANCE_CUSTOM.a * mix(0.38, 0.17, hanging);
 	float wall_vine = INSTANCE_CUSTOM.b;
 	float hanging_depth = mix(-VERTEX.y, VERTEX.z, wall_vine);
 	float sway = INSTANCE_CUSTOM.r * smoothstep(0.04, 0.5, VERTEX.y)
@@ -43,7 +44,7 @@ void fragment() {
 	ALBEDO = source.rgb;
 	vec3 world_up_view = (VIEW_MATRIX * vec4(0.0, 1.0, 0.0, 0.0)).xyz;
 	vec3 face = FRONT_FACING ? NORMAL : -NORMAL;
-	NORMAL = normalize(mix(face, world_up_view, mix(0.38, 0.17, hanging)));
+	NORMAL = normalize(mix(face, world_up_view, normal_wrap));
 	float open_sky = gaf_ground_canopy_sky(sky_opening);
 	AO = 0.96 * mix(0.58, 1.0, open_sky);
 	AO_LIGHT_AFFECT = 0.0;

@@ -210,7 +210,7 @@ func _build_dense_planting()->void:
 		var transform:=Transform3D(Basis(Vector3.UP,_rng.randf()*TAU),position)
 		var phase := _rng.randf() * TAU
 		var cover := _cover_index(cell)
-		var fern_asset := _fern_cells.get(cell, "") if forest_fern_enabled else ""
+		var fern_asset: String = _fern_cells.get(cell, "") if forest_fern_enabled else ""
 		var fern := not fern_asset.is_empty() and _off_path(cell)
 		var scale_factor := 1.
 		if fern:
