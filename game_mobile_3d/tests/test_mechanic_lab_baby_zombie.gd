@@ -90,9 +90,9 @@ func run() -> void:
 	await check_tuned_contact(25, 27.0, 1.00)
 	await check_tuned_contact(50, 27.0, 1.00)
 	await check_tuned_contact(58, 27.0, 0.35, true)
-	await check_first_wall_neck_contact()
-	await check_first_wall_neck_contact(true)
-	await check_first_wall_neck_contact(true, 70)
+	await check_first_wall_impact()
+	await check_first_wall_impact(true)
+	await check_first_wall_impact(true, 70)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -205,7 +205,7 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, air_atta
 		" parked=", baby._corpse_parked, " impulse=", impulse, " gravity=", gravity)
 	lab.free()
 
-func check_first_wall_neck_contact(frozen := false, serial := 4) -> void:
+func check_first_wall_impact(frozen := false, serial := 4) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -247,7 +247,7 @@ func check_first_wall_neck_contact(frozen := false, serial := 4) -> void:
 
 	var direction := Vector3.RIGHT.rotated(Vector3.UP, deg_to_rad(-25.0))
 	group._apply_contact(baby, baby.combat_center(), "Attack", 2, serial, group.SABRE_STRIKES[2],
-		direction, false, baby.global_position - direction)
+		direction, false, baby.global_position)
 	baby.set_physics_process(true)
 	var peak := 0.0
 	var crossed := false
