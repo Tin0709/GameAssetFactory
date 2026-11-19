@@ -124,7 +124,7 @@ func _sweep_tuned_lab_walls() -> void:
 			_handoff_ray.from = start
 			_handoff_ray.to = finish
 			var hit := space.intersect_ray(_handoff_ray)
-			if hit.is_empty() or not hit.collider is StaticBody3D or absf(hit.normal.y) >= MAX_WALL_NORMAL_Y:
+			if hit.is_empty() or not _is_fixed_wall(hit.collider) or absf(hit.normal.y) >= MAX_WALL_NORMAL_Y:
 				start = finish
 				break
 			if use_baby_floor_anchors and use_tuned_floor_support:
@@ -243,13 +243,15 @@ func _handoff_wall_clearance() -> Vector3:
 		return shift
 	return super._handoff_wall_clearance()
 
+static func _is_fixed_wall(body: Object) -> bool:
+	return body is StaticBody3D or (body is RigidBody3D and body.freeze)
+
 func _handoff_arm_is_pinched(space: PhysicsDirectSpaceState3D, overlaps: Array[Dictionary]) -> bool:
 	var wall_shapes := 0
 	var floor_body := _flat_floor.get_parent()
 	for hit in overlaps:
 		var blocker: Object = hit.collider
-		# Frozen props hold their shape against an arm just like fixed terrain.
-		if blocker != floor_body and (blocker is StaticBody3D or (blocker is RigidBody3D and blocker.freeze)):
+		if blocker != floor_body and _is_fixed_wall(blocker):
 			wall_shapes += PhysicsServer3D.body_get_shape_count(hit.rid)
 	if wall_shapes < 2:
 		return false
@@ -570,7 +572,7 @@ func _wall_ray_crosses(space: PhysicsDirectSpaceState3D, origin: Vector3, endpoi
 		_handoff_ray.from = start
 		_handoff_ray.to = finish
 		var hit := space.intersect_ray(_handoff_ray)
-		if not hit.is_empty() and hit.collider is StaticBody3D:
+		if not hit.is_empty() and _is_fixed_wall(hit.collider):
 			var normal: Vector3 = hit.normal
 			var point: Vector3 = hit.position
 			crosses = absf(normal.y) < MAX_WALL_NORMAL_Y and normal.dot(point - finish) > tolerance
@@ -959,7 +961,7 @@ func _baby_neck_needs_wall_recovery() -> bool:
 		return false
 	for contact in state.get_contact_count():
 		if absf(state.get_contact_local_normal(contact).y) >= MAX_WALL_NORMAL_Y \
-				or not state.get_contact_collider_object(contact) is StaticBody3D:
+				or not _is_fixed_wall(state.get_contact_collider_object(contact)):
 			continue
 		var chest: PhysicalBone3D = bodies.Chest
 		var parent := PhysicsServer3D.body_get_direct_state(chest.get_rid())
@@ -1020,7 +1022,7 @@ func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState
 			break
 		var normal := _projection_hit.get_collision_normal()
 		var fraction := _projection_hit.get_collision_safe_fraction()
-		if fraction == 0.0 and absf(normal.y) < MAX_WALL_NORMAL_Y and _projection_hit.get_collider() is StaticBody3D:
+		if fraction == 0.0 and absf(normal.y) < MAX_WALL_NORMAL_Y and _is_fixed_wall(_projection_hit.get_collider()):
 			# The initial overlap can report a zero-distance hit even when
 			# the part has room along the wall. Let the query separate the
 			# box first, then sweep the requested correction from there.
