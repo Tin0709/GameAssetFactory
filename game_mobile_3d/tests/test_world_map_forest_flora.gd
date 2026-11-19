@@ -51,7 +51,8 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 			check(flags == 0, "Ferns keep the path and its immediate margin clear")
 		check(absf(world.surface_height(row.root.x, row.root.z) - row.bounds.position.y) < .002,
 			"Fern roots rest on the terrain")
-	check(count >= 50 and sectors.size() == 4, "Small fern groups appear across all four map sectors")
+	check(count == world.forest_fern_cells.size() and sectors.size() == 4,
+		"Small fern groups appear at every authored cell across all four map sectors")
 	if not asset.is_empty():
 		var material: ShaderMaterial = plants.bundle.meshes[asset].surface_get_material(0)
 		check(material.get_shader_parameter("native_grass_albedo") == true, "Fern keeps its verified source color")
