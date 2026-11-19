@@ -795,7 +795,6 @@ func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
 		COMBAT_AUDIO.VOICES_PER_POOL, COMBAT_AUDIO.VOICES_PER_POOL * 2)
 	for voice in reactions:
 		voice.bus = AudioServer.get_bus_name(bus)
-	await create_timer(0.08).timeout
 	var ear: Vector3 = audio.zombie_listener.global_position
 	var strike := {"damage": 1, "stagger": 0.0, "strength": 500.0, "angle": 15.0}
 	for case: Array in [[0, false, &"hurt", 3], [1, false, &"baby_hurt", 2],
@@ -805,6 +804,7 @@ func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
 		check(bank.size() == case[3], "%s loads all verified variants" % case[2])
 		for variant in case[3]:
 			audio.reset()
+			await create_timer(0.08).timeout
 			capture.clear_buffer()
 			zombie.health = 1 if case[1] else 8
 			var point := ear + Vector3.FORWARD * 2.0
@@ -814,7 +814,7 @@ func check_baby_zombie_reactions(bus: int, capture: AudioEffectCapture) -> void:
 				and variant < bank.size() and reactions[0].stream == bank[variant],
 				"A real %s strike plays variant %d from the correct reaction bank" % [case[2], variant + 1])
 			if variant == 0 and case[0] == 1:
-				await create_timer(0.19).timeout
+				await create_timer(0.25).timeout
 				var peak := 0.0
 				for sample in capture.get_buffer(capture.get_frames_available()):
 					peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
