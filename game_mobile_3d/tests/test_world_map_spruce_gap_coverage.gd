@@ -77,11 +77,11 @@ func test_gameplay(world: Node, toggle: CheckButton) -> void:
 	check(material.shader.code.contains("#define GAF_GROVE_REVEAL_COVERAGE")
 		and material.get_shader_parameter("spruce_gap_coverage") == true, "Rebuilding the material restores the chosen coverage")
 	check(grove._spruce_shadow.shader == shadow, "Comparison leaves the caster shader intact")
-	for hours: Vector2 in [Vector2(12., 1.), Vector2(19.5, 0.), Vector2(22., 1.)]:
+	for hours: Vector2 in [Vector2(12., 1.), Vector2(19.5, 0.), Vector2(20.125, 0.), Vector2(22., 1.)]:
 		world.showcase.set_hour(hours.x)
 		check(material.get_shader_parameter("spruce_gap_coverage_weight") == hours.y,
 			"Forest applies the validated coverage amount at %s" % hours.x)
-	for hour: float in [19.125, 20.125]:
+	for hour: float in [19.125, 20.5]:
 		world.showcase.set_hour(hour)
 		var weight: Variant = material.get_shader_parameter("spruce_gap_coverage_weight")
 		check(weight is float and weight > 0. and weight < 1., "Coverage transitions gradually around dusk")
