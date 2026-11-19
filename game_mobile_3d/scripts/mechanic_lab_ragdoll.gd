@@ -627,7 +627,7 @@ func has_flat_wall_rest_support(core_grounded: bool) -> bool:
 			continue
 		for contact in state.get_contact_count():
 			if absf(state.get_contact_local_normal(contact).y) < MAX_WALL_NORMAL_Y \
-					and state.get_contact_collider_object(contact) is StaticBody3D:
+					and _is_fixed_wall(state.get_contact_collider_object(contact)):
 				return true
 	return false
 
@@ -676,7 +676,7 @@ func has_flat_corner_brace(max_linear := INF, max_angular := INF) -> bool:
 			continue
 		for i in state.get_contact_count():
 			var next := state.get_contact_local_normal(i)
-			if absf(next.y) >= MAX_WALL_NORMAL_Y or not state.get_contact_collider_object(i) is StaticBody3D:
+			if absf(next.y) >= MAX_WALL_NORMAL_Y or not _is_fixed_wall(state.get_contact_collider_object(i)):
 				continue
 			var collider := state.get_contact_collider(i)
 			var shape := state.get_contact_collider_shape(i)

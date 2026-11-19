@@ -490,7 +490,8 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 	if landing_gravity >= 0.0 and not zombie._corpse_parked:
 		var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
 		check(is_equal_approx(head.gravity_scale, landing_gravity), "The corner ragdoll %d uses the expected gravity" % seed)
-	print("LAB_CORNER seed=", seed, " shared_wall=", shared_wall, " gap=", peak_gap, " farthest=", farthest, " walls=", walls_hit.size(),
+	print("LAB_CORNER seed=", seed, " shared_wall=", shared_wall, " frozen=", frozen,
+		" gap=", peak_gap, " farthest=", farthest, " walls=", walls_hit.size(),
 		" parked=", zombie._corpse_parked, " seconds=", zombie._corpse_age)
 	lab.free()
 
@@ -520,8 +521,6 @@ func run() -> void:
 	await check_corner_ragdoll(65, 4.25)
 	await check_corner_ragdoll(29, 4.25, false, 50.0 / float(ProjectSettings.get_setting("physics/3d/default_gravity")))
 	await check_corner_ragdoll(101, 4.05)
-	await check_corner_ragdoll(101, 4.95, true, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
-		1150.0, false, CornerFixture.FROZEN_WALLS)
 	await check_corner_ragdoll(113, 4.95)
 	await check_corner_ragdoll(238, 4.90, false, 1.0)
 	await check_corner_ragdoll(113, 4.60, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER, 1150.0, true)
@@ -567,5 +566,7 @@ func run() -> void:
 		&"Zombie_Walk_Variant2", 0.13333353201548, "Arm.L", 0.145)
 	await check_wall_rebound(94, Vector3(-0.45, 0.02, 4.05), -2.41648817062378,
 		&"Zombie_Walk_Variant1", 0.10000019868214, "Head", 0.13, false, INF, true)
+	await check_corner_ragdoll(101, 4.95, true, -1.0, INF, Zombie.DeathStrike.SABRE_FINISHER,
+		1150.0, false, CornerFixture.FROZEN_WALLS)
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
