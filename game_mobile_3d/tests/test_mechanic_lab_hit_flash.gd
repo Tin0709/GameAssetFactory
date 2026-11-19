@@ -12,7 +12,7 @@ class FlashMonitor extends Node:
 	func _process(_delta: float) -> void:
 		if hit:
 			var mesh := zombie.get("_mesh") as MeshInstance3D
-			values.append(float(mesh.get_instance_shader_parameter("hit_flash")) if mesh.material_overlay != null else 0.0)
+			values.append(float(mesh.get_instance_shader_parameter("hit_flash")))
 			if sparks != null:
 				spark_counts.append(sparks.multimesh.visible_instance_count)
 
@@ -160,12 +160,17 @@ func check_flash_during_render_hitch() -> void:
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
 	var mesh := zombie._mesh as MeshInstance3D
+	var original_skin := mesh.material_override
 	zombie.take_hit(1, Vector3.RIGHT)
+	var mobile := RenderingServer.get_current_rendering_method() == &"mobile"
+	check((mesh.material_override != original_skin and mesh.material_overlay == null) if mobile
+		else mesh.material_override == original_skin and mesh.material_overlay != null,
+		"Mobile flashes with a single skin surface; other renderers retain the overlay")
 	zombie._process(0.10)
 	zombie._process(1.0 / 60.0)
-	check(mesh.material_overlay != null and float(mesh.get_instance_shader_parameter(&"hit_flash")) > 0.9,
+	check(float(mesh.get_instance_shader_parameter(&"hit_flash")) > 0.9,
 		"A render hitch before the first displayed frame does not consume the zombie flash")
 	zombie._process(0.10)
-	check(mesh.material_overlay == null and not zombie.is_processing(),
-		"A render hitch after the first displayed frame expires the zombie flash")
+	check(mesh.material_override == original_skin and mesh.material_overlay == null and not zombie.is_processing(),
+		"A render hitch after the first displayed frame restores the ordinary zombie skin")
 	lab.free()
