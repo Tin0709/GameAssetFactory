@@ -34,6 +34,7 @@ const BABY_FLOOR_ANCHOR_GAP := 0.08
 const BABY_FLOOR_ANCHOR_CLEARANCE := 0.02
 const BABY_WALL_LIMB_SHIFT := 0.35
 const BABY_WALL_CHEST_SHIFT := 0.10
+const BABY_WALL_MAX_RECOVERY_TRAVEL := 0.20
 
 var _handoff_query_snapshot: Dictionary[PhysicalBone3D, PhysicsShapeQueryParameters3D]
 var _sample_names: Array[String]
@@ -974,7 +975,8 @@ func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState
 	# solver overlap does not block tangential motion at the corner.
 	for sweep in 3:
 		var moved_y := state.transform.origin.y - start.y
-		motion.y = maxf(motion.y, -maxf(floor_clearance + moved_y + FLOOR_REST_SLOP, 0.0))
+		var lowest_travel := -maxf(floor_clearance + moved_y + FLOOR_REST_SLOP, 0.0)
+		motion.y = maxf(motion.y, lowest_travel)
 		if motion.length_squared() <= PROJECTION_COLLISION_MARGIN ** 2:
 			break
 		if not _test_projection_motion(body, state.transform, motion, floor):
@@ -982,6 +984,20 @@ func _slide_baby_corner_part(body: PhysicalBone3D, state: PhysicsDirectBodyState
 			break
 		var normal := _projection_hit.get_collision_normal()
 		var fraction := _projection_hit.get_collision_safe_fraction()
+		if fraction == 0.0 and absf(normal.y) < MAX_WALL_NORMAL_Y and _projection_hit.get_collider() is StaticBody3D:
+			# The initial overlap can report a zero-distance hit even when
+			# the part has room along the wall. Let the query separate the
+			# box first, then sweep the requested correction from there.
+			_projection_query.recovery_as_collision = false
+			var collided := _test_projection_motion(body, state.transform, motion, floor)
+			_projection_query.recovery_as_collision = true
+			var travel := _projection_hit.get_travel()
+			if travel.length() <= motion.length() + BABY_WALL_MAX_RECOVERY_TRAVEL and travel.y >= lowest_travel:
+				state.transform = state.transform.translated(travel)
+				if not collided:
+					break
+				motion = _projection_hit.get_remainder().slide(_projection_hit.get_collision_normal())
+				continue
 		state.transform = state.transform.translated(motion * fraction)
 		if motion.dot(normal) >= 0.0:
 			break
