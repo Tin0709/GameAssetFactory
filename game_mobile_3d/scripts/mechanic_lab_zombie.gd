@@ -1257,9 +1257,14 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 		and motion.supports >= 3 and motion.core_supports > 0
 	var slow_motion: bool = motion.linear <= CORPSE_SETTLE_SPEED * speed_scale \
 		and motion.angular <= CORPSE_SETTLE_SPIN * speed_scale
-	var slow_support: bool = not normally_supported and not ragdoll.source_joints.is_empty() \
-		and (motion.supports >= 2 or intermittent_foot) \
-		and (slow_motion or measure_supported_pose)
+	# Keep tracking a fully supported pose across transient solver speed spikes.
+	var grounded_baby: bool = is_baby and measure_supported_pose and motion.supports >= 4 \
+		and absf(_corpse_axis().normalized().y) <= CORPSE_SETTLE_MAX_AXIS_Y \
+		and ragdoll.has_flat_limb_support() \
+		and Ragdoll._body_supported_by(ragdoll.bodies.Chest, _corpse_floor.get_parent())
+	var slow_support: bool = not ragdoll.source_joints.is_empty() \
+		and (grounded_baby or (not normally_supported and (motion.supports >= 2 or intermittent_foot) \
+		and (slow_motion or measure_supported_pose)))
 	var corner_support := false
 	if slow_support:
 		if flat_floor:
@@ -1275,7 +1280,7 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 					and ragdoll.floor_landing_blended and ragdoll.has_flat_corner_brace()
 				slow_support = slow_support or corner_support
 			elif slow_support:
-				slow_support = ragdoll.has_flat_wall_rest_support(motion.core_supports > 0)
+				slow_support = grounded_baby or ragdoll.has_flat_wall_rest_support(motion.core_supports > 0)
 			slow_support = slow_support and ragdoll.max_anchor_error() <= Ragdoll.SOURCE_ANCHOR_TOLERANCE
 		else:
 			slow_support = motion.core_supports > 0 and (not two_parts or motion.leg_supported) \
