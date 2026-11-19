@@ -58,6 +58,14 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 		check(world.showcase._mist_materials().has(material), "Fern participates in shared mist")
 		check(plants.grass_light._records.any(func(record: Dictionary) -> bool: return record.material == material),
 			"Fern participates in shared grass lighting")
+	var spring = plants.interaction
+	var point: Vector3 = world.player.global_position
+	for step in 8:
+		spring.advance(1. / 60., point + Vector3.RIGHT * float(step) * .1, Vector3.RIGHT * 6.)
+	var motion: PackedByteArray = spring.pixels
+	var previous: PackedByteArray = spring.previous_pixels
+	var revision: int = spring.revision
+	check(not spring.active.is_empty(), "The test generates live plant contact")
 	toggle.button_pressed = false
 	check(plants.placements.size() == rooted.size(), "Toggling ferns keeps the dense carpet")
 	for row: Dictionary in plants.placements:
@@ -68,6 +76,8 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 	toggle.button_pressed = true
 	check(plants.placements.filter(func(row: Dictionary) -> bool: return row.get("forest_fern", false)).size() == count,
 		"Restoring the ferns gives the same placement count")
+	check(spring.revision == revision and spring.pixels == motion and spring.previous_pixels == previous,
+		"Changing the fern comparison preserves the live grass bend")
 
 func test_wall(world: Node3D, wall: Node3D, toggle: CheckButton) -> void:
 	check(wall.find_children("*", "CollisionObject3D", true, false).is_empty(), "Wall vines are visual")
