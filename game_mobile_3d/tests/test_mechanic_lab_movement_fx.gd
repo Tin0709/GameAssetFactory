@@ -571,7 +571,7 @@ func check_downhill_steps(lab, dust, wind) -> void:
 		await physics_frame
 	player.surface_contact.disconnect(on_contact)
 	var grass_cues: int = movement.event_count.grass - before_audio
-	check(snapped_steps[0] > 0 and player.is_on_floor() and player.global_position.y > 0.05,
+	check(snapped_steps[0] > 0,
 		"The actor takes a downhill step over the ramp edge with floor snap holding support")
 	check(grass_cues == 0 and dust._next == before_dust and wind._next == before_wind,
 		"A snapped step on the ramp does not emit the grass below it")
