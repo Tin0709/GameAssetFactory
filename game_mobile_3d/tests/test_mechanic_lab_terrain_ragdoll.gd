@@ -460,7 +460,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 				if collider == first_wall:
 					var face := state.get_contact_collider_shape(index) if shared_wall else 0
 					walls_hit[face] = true
-				if fixture == CornerFixture.SUPPORT_BEVEL and part in [zombie.ragdoll.bodies.Head, zombie.ragdoll.bodies.Chest]:
+					if fixture == CornerFixture.SUPPORT_BEVEL and part in [zombie.ragdoll.bodies.Head, zombie.ragdoll.bodies.Chest]:
 						var normal := state.get_contact_local_normal(index)
 						if (face == 0 and absf(normal.x) > 0.99) or (face == 1 and absf(normal.z) > 0.99):
 							upper_wall_faces |= 1 << face
