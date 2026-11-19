@@ -876,6 +876,8 @@ func set_night_reference_atmosphere(value: bool) -> void:
 	_forest_hour = INF
 	apply_time()
 	level.look._refresh_ground_bounce()
+	if changed_effect.is_empty() and plants != null and plants.grass_light != null:
+		plants.grass_light.sync()
 	_update_mist()
 
 func _apply_key_mix(sun:DirectionalLight3D)->void:
