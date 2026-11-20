@@ -1262,6 +1262,8 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		# Fade in more resistance during the slow final roll on the lab floor.
 		var slow_roll := (1.0 - smoothstep(0.4, 1.5, motion.linear)) * smoothstep(0.60, 0.90, _corpse_age)
 		var target := SABRE_LATE_ROLL_ANGULAR_DAMP * roll_weight * slow_roll
+		if _had_upper_body_brace and damp_supported_roll and motion.supports >= 4 and motion.core_supports == 1:
+			target *= _suspended_chest_damping_scale()
 		var roll_gain := DEATH_SUPPORTED_ANGULAR_DAMP - DEATH_LANDING_ANGULAR_DAMP
 		var damping_step := roll_gain * delta / SABRE_ROLL_RESPONSE_TIME
 		# Share the existing ramp with the ordinary supported-roll damping.
@@ -1301,6 +1303,22 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		body.angular_damp = angular_damp
 	_landing_gravity_sent = final_gravity
 	_landing_linear_damp_sent = linear_damp
+
+func _suspended_chest_damping_scale() -> float:
+	var floor_box := _corpse_floor.shape as BoxShape3D
+	if floor_box == null or not _corpse_floor.global_basis.y.is_equal_approx(Vector3.UP):
+		return 1.0
+	var floor_body := _corpse_floor.get_parent()
+	if not Ragdoll._body_supported_by(ragdoll.bodies["Leg.L"], floor_body) \
+			or not Ragdoll._body_supported_by(ragdoll.bodies["Leg.R"], floor_body):
+		return 1.0
+	# Both feet are down after the brace, but the chest can still be suspended.
+	# Restore the extra roll resistance as the chest approaches the floor.
+	var collider := ragdoll.bodies.Chest.get_child(0) as CollisionShape3D
+	var half_size := (collider.shape as BoxShape3D).size * 0.5
+	var chest_bottom := collider.global_position.y - collider.global_basis.transposed().y.abs().dot(half_size)
+	var floor_top := _corpse_floor.global_position.y + floor_box.size.y * 0.5
+	return 1.0 - smoothstep(DEATH_FLOOR_CONTACT_MARGIN, 0.10, chest_bottom - floor_top)
 
 func _resist_grounded_slide(drag: float) -> void:
 	# A uniform horizontal acceleration opposes whole-body drift. Leave
