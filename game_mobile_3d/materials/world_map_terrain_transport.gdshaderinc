@@ -1,7 +1,20 @@
 // Original baked GAF irradiance, terrain-only. No native source coefficients.
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
+global uniform float gaf_stone_foot_fill;
+varying float terrain_stone_foot;
 varying vec3 terrain_sky_light;
+
+float gaf_stone_foot_mask(vec3 position, vec3 normal) {
+	if (gaf_stone_foot_fill <= 0.0 || ground_grade != 3 || abs(normal.y) >= .1 ||
+			!path_blending || !use_source_terrain) return 0.0;
+	// Only the exposed floor at the riser's foot contributes. A freestanding
+	// facade or a higher block behind this face cannot make a dark stripe.
+	float floor_height = surface_height_at(position.xz + normal.xz * .028);
+	float height = position.y - floor_height;
+	return smoothstep(-.025, .015, height) * (1.0 - smoothstep(.03, .34, height));
+}
+
 varying float terrain_canopy_sky;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 varying vec3 terrain_night_sky_light;

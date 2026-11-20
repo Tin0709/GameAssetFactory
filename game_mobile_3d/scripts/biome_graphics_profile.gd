@@ -58,6 +58,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export var shadow_diffuse_by_hour: Curve
 ## Reduction of supplemental fill in deep shadows, on grass and on stone tops respectively.
 @export var ground_shadow_fill_reduction := Vector2.ZERO
+## Reduction of supplemental shadow fill at the foot of supported stone risers.
+@export_range(0.0, 0.66) var stone_foot_fill := 0.0
 ## Reduction of the path's supplemental shadow fill and gain for moderately lit dirt.
 @export var path_sun_response := Vector2.ZERO
 ## Diffuse gain and warmth in the illuminated core of a dirt path.

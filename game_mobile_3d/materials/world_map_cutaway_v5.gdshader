@@ -121,6 +121,7 @@ void fragment() {
 	float receiver_contact=terrain_contact_shade(cutaway_world,surface_normal);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	terrain_direct_contact=terrain_colored_visibility ? 1.0 : receiver_contact;
+	terrain_stone_foot = gaf_stone_foot_mask(cutaway_world, surface_normal);
 #else
 	ALBEDO*=receiver_contact;
 #endif

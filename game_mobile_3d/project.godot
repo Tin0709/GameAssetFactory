@@ -115,6 +115,10 @@ gaf_path_sun_response={
 "type": "vec2",
 "value": Vector2(0, 0)
 }
+gaf_stone_foot_fill={
+"type": "float",
+"value": 0.0
+}
 gaf_path_sun_core={
 "type": "vec2",
 "value": Vector2(0, 0)

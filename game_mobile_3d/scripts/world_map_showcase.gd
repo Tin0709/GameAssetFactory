@@ -117,6 +117,7 @@ var _local_diffuse_source := Vector4.ZERO
 var _additional_diffuse_source := Vector4.ZERO
 var _shadow_diffuse_state := Vector4.ZERO
 var _ground_shadow_fill_reduction := Vector2.ZERO
+var _stone_foot_fill := 0.0
 var _path_sun_response := Vector2.ZERO
 var _path_sun_core := Vector2.ZERO
 var _path_sun_core_direction := Vector3.ZERO
@@ -168,6 +169,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_day_face_fill": ["Ánh hắt mặt đá ban ngày", 1.],
 	&"shadow_diffuse_return": ["Ánh dịu trong bóng trên đất và cỏ", 1.],
 	&"ground_shadow_fill_reduction": ["Chiều sâu bóng trên cỏ và mặt đá", 1.],
+	&"stone_foot_fill": ["Chiều sâu chân bậc đá", 1.],
 	&"path_sun_response": ["Tương phản nắng trên lối đất", 1.],
 	&"path_sun_core": ["Sắc nắng trên lối đất", 1.],
 	&"stone_shade_fill": ["Ánh hắt trong bóng đá", .55],
@@ -337,7 +339,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 216
+const LIGHTING_MIX_VERSION := 217
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -500,6 +502,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
 	RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", Vector3.ZERO)
@@ -1044,6 +1047,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
 			RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", Vector3.ZERO)
@@ -1620,6 +1624,12 @@ func _sync_shadow_diffuse() -> void:
 	if reduction != _ground_shadow_fill_reduction:
 		_ground_shadow_fill_reduction = reduction
 		RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", reduction)
+	var foot := 0.
+	if state.w > 0. and _stone_foot_fill_available():
+		foot = clampf(_biome_profile.stone_foot_fill, 0., .66) * _day_grass_shadow_weight() * _lighting_scale(&"stone_foot_fill")
+	if foot != _stone_foot_fill:
+		_stone_foot_fill = foot
+		RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", foot)
 	var path := Vector2.ZERO
 	if state.w > 0. and _path_sun_response_available():
 		# Cap the midrange curve so brighter incoming sunlight stays brighter.
@@ -1647,6 +1657,9 @@ func _path_sun_response_available() -> bool:
 func _path_sun_core_available() -> bool:
 	return _path_sun_available() and _biome_profile.path_sun_core.is_finite() \
 		and _biome_profile.path_sun_core != Vector2.ZERO
+
+func _stone_foot_fill_available() -> bool:
+	return _path_sun_available() and is_finite(_biome_profile.stone_foot_fill) and _biome_profile.stone_foot_fill > 0.
 
 func _ground_shadow_fill_available() -> bool:
 	return (_shadow_diffuse_available() and not _balanced_preview and atmosphere_review == "combined"
@@ -1951,6 +1964,9 @@ func set_source_terrain(enabled: bool) -> bool:
 	var path_core: HSlider = _lighting_sliders.get(&"path_sun_core")
 	if path_core != null:
 		path_core.editable = _path_sun_core_available()
+	var stone_foot: HSlider = _lighting_sliders.get(&"stone_foot_fill")
+	if stone_foot != null:
+		stone_foot.editable = _stone_foot_fill_available()
 	_sync_shadow_diffuse()
 	return enabled
 
@@ -2957,6 +2973,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 216 and effect == &"path_sun_core":
 			missing_value = 0.
+		if version < 217 and effect == &"stone_foot_fill":
+			missing_value = 0.
 		if version < 191 and effect == &"night_leaf_lamp_shoulder":
 			missing_value = 0.
 		if version < 190 and effect == &"day_path_chroma":
@@ -3144,6 +3162,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _path_sun_response_available()
 		if effect == &"path_sun_core":
 			slider.editable = _path_sun_core_available()
+		if effect == &"stone_foot_fill":
+			slider.editable = _stone_foot_fill_available()
 		if effect == &"alternate_local_mist":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.alternate_mist_by_hour != null \
 				and level.alternate_mist_region != null
@@ -3350,7 +3370,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"overcast_shadow":
 		_refresh_direct_shadow_opacity()
 		return
-	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response", &"path_sun_core"]:
+	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response", &"path_sun_core", &"stone_foot_fill"]:
 		_sync_shadow_diffuse()
 		return
 	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach", &"stone_wall_return", &"sheltered_stone_return", &"local_diffuse_return", &"basin_diffuse_return"]:
@@ -4228,6 +4248,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = _path_sun_response_available()
 		if effect == &"path_sun_core":
 			slider.editable = _path_sun_core_available()
+		if effect == &"stone_foot_fill":
+			slider.editable = _stone_foot_fill_available()
 		if effect == &"overcast_mist_phase_color":
 			slider.editable = not _balanced_preview and _overcast_mist_phase_color_editable()
 		if effect == &"kai_shade_sky":

@@ -80,8 +80,13 @@ void light() {
 			path_core_weight = dirt;
 		}
 	}
-	DIFFUSE_LIGHT += gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
-		shadow_attenuation, cloud_transmission, nl, terrain_direct_contact) * ground_fill;
+	vec3 shadow_diffuse = gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
+		shadow_attenuation, cloud_transmission, nl, terrain_direct_contact);
+	if (terrain_stone_foot > 0.0 && shadow_diffuse.g > 0.0) {
+		float shade = 1.0 - smoothstep(.03, .30, shadow_attenuation * nl);
+		shadow_diffuse *= 1.0 - gaf_stone_foot_fill * terrain_stone_foot * shade;
+	}
+	DIFFUSE_LIGHT += shadow_diffuse * ground_fill;
 	// The same directional light and shadow term shape both the original key and the warmth.
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sun_warmth.w > 0.0
 			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sun_warmth.xyz) > 0.9999

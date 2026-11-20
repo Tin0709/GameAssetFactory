@@ -134,6 +134,7 @@ void fragment() {
 #endif
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	terrain_direct_contact=terrain_colored_visibility ? 1.0 : receiver_contact;
+	terrain_stone_foot = gaf_stone_foot_mask(surface_world, surface_normal);
 	float sole = surface_top > 0.9 ? gaf_player_contact(surface_world, CAMERA_POSITION_WORLD) : 1.0;
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	stone_sunset_position = surface_world.xz;
