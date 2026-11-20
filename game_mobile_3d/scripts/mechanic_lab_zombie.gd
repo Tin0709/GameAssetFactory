@@ -24,15 +24,19 @@ const IDLE := &"Zombie_Idle"
 const IDLE_AUDIO_NOTIFY_TIME := 0.066887535
 const IDLE_AUDIO_CHANCE := 0.5
 const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Variant2"]
+const CHASE_SPEED := 3.1
+const LAB_ROAM_SPEED := 3.0
+const EXPRESSIVE_WALK_REACH := 0.5 * LAB_ROAM_SPEED * Gait.WALK_DURATION * Gait.WALK_SUPPORT
+const EXPRESSIVE_RUN_REACH := 0.5 * CHASE_SPEED * Gait.RUN_DURATION * Gait.RUN_SUPPORT
 # PlayDebrisEffect notifies store phase in seconds and lateral/forward offsets in metres.
 const WALK_STEP_NOTIFIES := {
 	&"Zombie_Walk": [Vector3(0.427282363, 0.20, 0.0), Vector3(1.281282187, -0.20, 0.0)],
 	&"Zombie_Walk_Variant1": [Vector3(0.427282006, 0.20, 0.0), Vector3(1.281281948, -0.20, 0.0)],
 	&"Zombie_Walk_Variant2": [Vector3(0.427282006, 0.20, 0.0), Vector3(1.281281948, -0.20, 0.0)],
-	Gait.WALK: [Vector3(Gait.PLANT * Gait.WALK_DURATION, 0.125, 0.615),
-		Vector3((Gait.PLANT + 0.5) * Gait.WALK_DURATION, -0.125, 0.615)],
-	Gait.RUN: [Vector3(Gait.PLANT * Gait.RUN_DURATION, 0.125, 0.397),
-		Vector3((Gait.PLANT + 0.5) * Gait.RUN_DURATION, -0.125, 0.397)],
+	Gait.WALK: [Vector3(Gait.PLANT * Gait.WALK_DURATION, 0.125, EXPRESSIVE_WALK_REACH),
+		Vector3((Gait.PLANT + 0.5) * Gait.WALK_DURATION, -0.125, EXPRESSIVE_WALK_REACH)],
+	Gait.RUN: [Vector3(Gait.PLANT * Gait.RUN_DURATION, 0.125, EXPRESSIVE_RUN_REACH),
+		Vector3((Gait.PLANT + 0.5) * Gait.RUN_DURATION, -0.125, EXPRESSIVE_RUN_REACH)],
 }
 const STEP_MIN_SPEED_SQUARED := 0.15 * 0.15
 const SPAWN := &"Zombie_Spawn"
@@ -106,7 +110,6 @@ const SABRE_BRACE_BLEND_TIME := 0.10
 const SABRE_ROLL_RESPONSE_TIME := 0.10
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
 const HEIGHT := 1.95
-const CHASE_SPEED := 3.1
 # SW.Mob.Zombie specializes the hostile mob's AI attributes, with a 360°
 # cone. The controller's generic engine sight defaults are broader.
 const LAB_SIGHT_RADIUS_SQUARED := 10.0 * 10.0
@@ -116,7 +119,6 @@ const LAB_CROWD_SIGHT_HZ := 15.0
 const LAB_LAST_SEEN_STOP_DISTANCE := 0.10
 const LAB_ROAM_RADIUS := 10.0
 const LAB_ROAM_DELAY := 1.0
-const LAB_ROAM_SPEED := 3.0
 const LAB_WAYPOINT_ARRIVAL := 0.10
 const LAB_WALL_STALL_TIME := 0.25
 const MIN_WALL_PROGRESS_SPEED := LAB_ROAM_SPEED * 0.10
@@ -602,7 +604,7 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 			if expressive:
 				# Keep the animated stance proportional to distance moved, including
 				# a short final step and the lower speed along oblique walls.
-				var speed := _chase_speed if clip == Gait.RUN else _roam_speed
+				var speed := CHASE_SPEED if clip == Gait.RUN else LAB_ROAM_SPEED
 				var forward_speed := motion.dot(global_basis.z) if not _skipped_blocked_step else 0.0
 				delta *= clampf(forward_speed / speed, 0.0, 1.0)
 		var play_idle := clip == IDLE and idle_audio.has_connections()

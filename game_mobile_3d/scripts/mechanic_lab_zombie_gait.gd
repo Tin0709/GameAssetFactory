@@ -4,7 +4,7 @@ extends RefCounted
 
 const WALK := &"Zombie_ExpressiveWalk"
 const RUN := &"Zombie_ExpressiveRun"
-const WALK_DURATION := 0.82
+const WALK_DURATION := 0.78
 const RUN_DURATION := 0.64
 const WALK_SUPPORT := 0.50
 const RUN_SUPPORT := 0.40
@@ -61,8 +61,7 @@ static func _bake(source: Animation, skeleton: Skeleton3D, duration: float,
 		# during the short interval between push-off and the next contact.
 		var height := -minf(_sole_y(left), _sole_y(right)) + air
 		var weight_shift := sin(TAU * (left_phase + 0.14))
-		clip.position_track_insert_key(hip_track, time,
-			Vector3(hip_rest.x + weight_shift * (0.018 if running else 0.030), hip_rest.y, -height))
+		clip.position_track_insert_key(hip_track, time, Vector3(hip_rest.x, hip_rest.y, -height))
 		var compression := smoothstep(0.0, 0.065, step) * (1.0 - smoothstep(0.065, 0.23, step))
 		var push := smoothstep(0.18, 0.34, step) * (1.0 - smoothstep(0.34, 0.50, step))
 		var chest_dip := push * 0.022 - compression * (0.061 if running else 0.046)
@@ -73,6 +72,7 @@ static func _bake(source: Animation, skeleton: Skeleton3D, duration: float,
 			if source.track_get_type(track) == Animation.TYPE_POSITION_3D:
 				var position := rest.origin
 				if bone == &"J_Spine":
+					position.x += weight_shift * (0.018 if running else 0.028)
 					position.z -= chest_dip
 				clip.position_track_insert_key(track, time, position)
 			else:
@@ -85,13 +85,13 @@ static func _bake(source: Animation, skeleton: Skeleton3D, duration: float,
 					&"J_L_Foot", &"J_R_Foot", &"J_L_Hand", &"J_R_Hand":
 						rotation = rest.basis.get_rotation_quaternion()
 					&"J_Spine":
-						var lean := (0.27 if running else 0.10) + compression * 0.09 - push * 0.05
+						var lean := (0.31 if running else 0.10) + compression * 0.09 - push * 0.05
 						rotation = Quaternion(Vector3.RIGHT, lean) * Quaternion(Vector3.UP, weight_shift * 0.074)
 					&"J_Neck":
 						rotation = Quaternion(Vector3.RIGHT, -0.12 if running else -0.05) * rotation
 					&"J_L_Arm", &"J_R_Arm":
 						var side := 1.0 if bone == &"J_L_Arm" else -1.0
-						var reach := weight_shift * side * (0.30 if running else 0.14)
+						var reach := weight_shift * side * (0.36 if running else 0.14)
 						rotation = Quaternion(Vector3.RIGHT, reach) * rotation
 				clip.rotation_track_insert_key(track, time, rotation.normalized())
 	return clip
