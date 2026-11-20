@@ -1607,7 +1607,7 @@ func _sync_shadow_diffuse() -> void:
 		RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", reduction)
 	var path := Vector2.ZERO
 	if state.w > 0. and _path_sun_response_available():
-		path = _biome_profile.path_sun_response.clamp(Vector2.ZERO, Vector2(.65,.30))
+		path = _biome_profile.path_sun_response.clamp(Vector2.ZERO, Vector2(.65, .25))
 		path *= _day_grass_shadow_weight() * _lighting_scale(&"path_sun_response")
 	if path != _path_sun_response:
 		_path_sun_response = path
