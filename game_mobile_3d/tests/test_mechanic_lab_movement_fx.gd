@@ -200,6 +200,8 @@ func check_running_wake_render_clock(lab, wind, dust) -> void:
 	var samples := 0
 	var max_position_error := 0.0
 	var max_alpha_error := 0.0
+	var pending_samples := 0
+	var draw_mismatches := 0
 	Input.action_press("move_forward")
 	for i in 115:
 		await process_frame
@@ -210,6 +212,18 @@ func check_running_wake_render_clock(lab, wind, dust) -> void:
 		# The render delta may include time before the planted foot event.
 		dust._process(0.15)
 		wind._process(0.15)
+		var render_tick := Engine.get_physics_frames() + Engine.get_physics_interpolation_fraction() - 1.0
+		var pending: bool = wake.contact_tick > render_tick
+		pending_samples += int(pending)
+		draw_mismatches += int((wake.mesh.layers != 0) == pending)
+		if dust._landing_batch == null:
+			draw_mismatches += int((puff.sprite.layers != 0) == pending)
+		else:
+			var drawn := 0
+			for particle in dust._particles:
+				if particle.sprite.visible and particle.run_drag > 0.0 and particle.contact_tick <= render_tick:
+					drawn += 1
+			draw_mismatches += int(dust._landing_batch.multimesh.visible_instance_count != drawn)
 		var progress: float = puff.age / wind.LIFETIME
 		if progress >= 1.0:
 			continue
@@ -224,8 +238,9 @@ func check_running_wake_render_clock(lab, wind, dust) -> void:
 	Input.action_release("move_forward")
 	check(samples >= 8 and max_position_error < 0.0001 and max_alpha_error < 0.0001,
 		"Varying render intervals keep the running wake aligned with dust from the same contact")
+	check(draw_mismatches == 0, "Dust and wake draw only once presentation reaches their planted-foot contact")
 	print("MECHANIC_LAB_WAKE_RENDER_CLOCK samples=", samples, " position_error_m=", max_position_error,
-		" alpha_error=", max_alpha_error)
+		" alpha_error=", max_alpha_error, " pending=", pending_samples, " draw_mismatches=", draw_mismatches)
 	lab.reset_player()
 
 func check_source_run_dust(lab, dust) -> void:
