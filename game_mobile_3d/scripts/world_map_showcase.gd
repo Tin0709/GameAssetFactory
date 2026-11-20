@@ -2483,7 +2483,7 @@ func _dawn_canopy_available() -> bool:
 	return not _flat_lab and _biome_profile != null and _biome_profile.dawn_canopy_by_hour != null \
 		and _biome_profile.dawn_canopy_response != Vector2.ZERO and level != null \
 		and is_instance_valid(level.grove) and level.grove.source_oaks \
-		and RenderingServer.get_current_rendering_method() == &"mobile"
+		and RenderingServer.get_current_rendering_method() == &"mobile" and RenderingServer.get_rendering_device() != null
 
 func _dawn_canopy_gain() -> Vector2:
 	if _balanced_preview or atmosphere_review != "combined" or not _dawn_canopy_available() \
