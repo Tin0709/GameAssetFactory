@@ -49,17 +49,25 @@ func run() -> void:
 		"The baby has its own spawn, stagger and attack clips")
 	baby.position = Vector3(0.0, 0.02, 6.0)
 	var hits: Array[int] = []
-	var steps: Array[Vector3] = []
+	var step_phases: Array[float] = []
 	baby.melee_hit.connect(func(amount: int): hits.append(amount))
-	baby.step_audio.connect(func(point: Vector3): steps.append(point))
+	baby.step_audio.connect(func(_point: Vector3):
+		step_phases.append(baby.animation.current_animation_position))
 	var peak_speed := 0.0
 	for i in 180:
 		await physics_frame
 		peak_speed = maxf(peak_speed, baby.get_real_velocity().slide(Vector3.UP).length())
 		if not hits.is_empty():
 			break
-	check(peak_speed > 8.45 and peak_speed < 8.55 and not steps.is_empty()
+	check(peak_speed > 8.45 and peak_speed < 8.55 and not step_phases.is_empty()
 		and hits == [5] and lab.player_health == 95, "The baby chases at 8.5 m/s and applies its own five-HP hit")
+	var peak_step_error := 0.0
+	for i in step_phases.size():
+		var authored: Vector3 = Zombie.BABY_STEP_CONTACTS[i % Zombie.BABY_STEP_CONTACTS.size()]
+		peak_step_error = maxf(peak_step_error, absf(step_phases[i] - authored.x))
+	check(step_phases.size() >= 2 and peak_step_error <= 0.000001,
+		"The Baby Zombie emits once per authored planted-foot phase without an extra tick")
+	print("LAB_BABY_STEP_PHASES phases=", step_phases, " max_error_s=", peak_step_error)
 	var skeleton := baby.ragdoll.skeleton
 	var hip := skeleton.get_bone_global_pose(skeleton.find_bone(&"J_Hip"))
 	check(hip.basis.get_scale().is_equal_approx(Vector3.ONE), "The Baby Zombie restores full size after its spawn clip")
@@ -104,7 +112,7 @@ func run() -> void:
 	await check_first_wall_neck_contact()
 	await check_first_wall_neck_contact(true)
 	await check_floor_then_wall()
-	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", steps.size(),
+	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", step_phases.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 
