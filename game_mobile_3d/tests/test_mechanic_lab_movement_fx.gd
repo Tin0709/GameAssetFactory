@@ -120,6 +120,8 @@ func check_source_dust_batch(lab, dust) -> void:
 	dust._emit_run_dust(Vector3.LEFT, "grass", 1.0)
 	dust._emit_source_landing(Vector3.ZERO, "grass")
 	dust._emit_source_landing(Vector3.FORWARD * 0.5, "grass")
+	await physics_frame
+	await physics_frame
 	await process_frame
 	await process_frame
 	var smoke: Array = dust._particles.filter(func(p): return p.sprite.visible)
@@ -127,6 +129,8 @@ func check_source_dust_batch(lab, dust) -> void:
 		and smoke.all(func(p): return p.sprite.layers == 0),
 		"Running dust and overlapping ordinary landings share one draw while retaining all particles")
 	dust._emit_gauntlet_debris(Vector3.ZERO, "grass")
+	await physics_frame
+	await physics_frame
 	await process_frame
 	await process_frame
 	check(batch.multimesh.visible_instance_count == 0 and smoke.all(func(p): return p.sprite.layers == 1),
