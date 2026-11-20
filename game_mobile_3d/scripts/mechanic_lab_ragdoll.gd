@@ -861,7 +861,9 @@ func _resolve_floor_anchor_lifts(lifts: Dictionary[PhysicalBone3D, float], depth
 			other_overlap = maxf(other_overlap, depths[body] - slop)
 	# Keep more of a deep head correction local when every other part still
 	# fits within the shared lift allowed for a single penetrating part.
-	var shallow_secondary := 1.0 - smoothstep(0.001, 0.004, other_overlap)
+	# A second part barely past the floor tolerance should not spread
+	# a deep head correction across the rest of the rig.
+	var shallow_secondary := 1.0 - smoothstep(FLOOR_CONTACT_SLOP * 0.5, FLOOR_CONTACT_SLOP, other_overlap)
 	var deep_head := smoothstep(0.030, 0.036, head_overlap - shared_lift)
 	var spare_lift := 1.0 - smoothstep(
 		FLOOR_SINGLE_PART_SHARED_LIFT - FLOOR_CONTACT_SLOP, FLOOR_SINGLE_PART_SHARED_LIFT, other_overlap)
