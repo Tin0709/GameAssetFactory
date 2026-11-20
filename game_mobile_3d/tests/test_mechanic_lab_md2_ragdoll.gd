@@ -131,7 +131,7 @@ func run() -> void:
 			break
 		var active_material: Material = zombie._mesh.get_active_material(0)
 		# A low render rate can carry the preloaded hit flash over several physics ticks.
-		var flashing := active_material == zombie._lab_flash_skin and zombie._flash_left > 0.0
+		var flashing: bool = active_material == zombie._lab_flash_skin and zombie._flash_left > 0.0
 		kept_skin_material = kept_skin_material and (active_material == skin_material or flashing)
 		var parameter: Variant = zombie._mesh.get_instance_shader_parameter("desaturation")
 		var actual := float(parameter) if parameter is float else 0.0
