@@ -217,6 +217,7 @@ func run() -> void:
 	await check_sabre_floor_lift(lab, group, 510, 0.041)
 	await check_sabre_floor_lift(lab, group, 514, 0.036)
 	await check_sabre_floor_lift(lab, group, 2438, 0.043)
+	await check_sabre_floor_lift(lab, group, 3239, 0.041)
 	await check_sabre_floor_lift(lab, group, 3260, 0.035)
 	await check_sabre_first_support_lift(lab, group)
 	await check_sabre_head_and_arm_brace(lab, group)
