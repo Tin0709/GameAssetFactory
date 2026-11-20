@@ -50,6 +50,7 @@ const BABY_ATTACK_CONTACT := 20.0 / 30.0
 const BABY_ATTACK_FOCUS_END := 18.0 / 30.0
 # First source frames within 5 mm of the floor and the centres of those sole edges.
 const BABY_STEP_CONTACTS := [Vector3(2.0 / 30.0, -0.117, 0.116), Vector3(8.0 / 30.0, 0.102, 0.083)]
+const BABY_STEP_PHASE_TOLERANCE := 0.000001
 const MAX_POISE := 28.0
 const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
@@ -631,9 +632,13 @@ func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
 	var phase := animation.current_animation_position
 	var wrapped := phase < previous_phase
 	var contacts: Array = BABY_STEP_CONTACTS if is_baby else WALK_STEP_NOTIFIES[clip]
+	# The Baby contacts are exact 30 FPS keys stored in float32 vectors.
+	# Apply the rounding tolerance to both bounds to avoid a late or repeated cue.
+	var tolerance := BABY_STEP_PHASE_TOLERANCE if is_baby and is_instance_valid(_corpse_floor) else 0.0
 	for contact: Vector3 in contacts:
-		var at := contact.x
-		var crossed := (at > previous_phase or at <= phase) if wrapped else (at > previous_phase and at <= phase)
+		var after_previous := contact.x > previous_phase + tolerance
+		var reached := contact.x <= phase + tolerance
+		var crossed := (after_previous or reached) if wrapped else (after_previous and reached)
 		if crossed:
 			step_audio.emit(to_global(Vector3(contact.y, 0.0, contact.z)))
 
