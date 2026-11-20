@@ -1607,6 +1607,7 @@ func _sync_shadow_diffuse() -> void:
 		RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", reduction)
 	var path := Vector2.ZERO
 	if state.w > 0. and _path_sun_response_available():
+		# Cap the midrange curve so brighter incoming sunlight stays brighter.
 		path = _biome_profile.path_sun_response.clamp(Vector2.ZERO, Vector2(.65, .25))
 		path *= _day_grass_shadow_weight() * _lighting_scale(&"path_sun_response")
 	if path != _path_sun_response:
@@ -1927,6 +1928,7 @@ func forest_active()->bool:
 func set_atmosphere_review(mode:String)->void:
 	if not mode in ["previous","haze","lighting","combined"]:return
 	_restore_day();atmosphere_review=mode;_forest_expected.clear();apply_time()
+	_sync_shadow_diffuse()
 	if mode!="previous" and level!=null and level.terrain_sky.enabled:level.terrain_sky.set_enabled(false)
 	if level!=null:level.look._refresh_ground_bounce()
 
