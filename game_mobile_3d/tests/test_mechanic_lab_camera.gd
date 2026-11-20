@@ -168,6 +168,8 @@ func check_sabre_dive_presentation(lab) -> void:
 			return
 		var render_tick := Engine.get_physics_frames() + Engine.get_physics_interpolation_fraction() - 1.0
 		var elapsed := render_tick - landing[0]
+		if not first_draw.has("camera") and not is_zero_approx(lab.camera.h_offset):
+			first_draw.camera = elapsed
 		var light: OmniLight3D = lab._impact_light
 		if not first_draw.has("light") and light.is_visible_in_tree() and light.light_energy > 0.0:
 			first_draw.light = elapsed
@@ -184,11 +186,14 @@ func check_sabre_dive_presentation(lab) -> void:
 	await start_sabre_dive(lab)
 	for i in Engine.physics_ticks_per_second:
 		await physics_frame
-		if first_draw.size() == 2:
+		if first_draw.size() == 3:
 			break
 	RenderingServer.frame_pre_draw.disconnect(sample)
 	var cue := ceili(0.056890413 * Engine.physics_ticks_per_second)
 	check(first_draw.get("light", -1.0) >= cue - 0.000001
 		and is_equal_approx(first_draw.get("light", -1.0), first_draw.get("sparks", -2.0)),
 		"The rendered floor flash and sparks start together on or after the authored pose")
+	var shake_cue := ceili(0.052268848 * Engine.physics_ticks_per_second)
+	check(first_draw.get("camera", -1.0) >= shake_cue - 0.000001,
+		"The displayed camera waits for its own authored pose")
 	print("SABRE_DIVE_FIRST_DRAW cue=", cue, " draw=", first_draw)
