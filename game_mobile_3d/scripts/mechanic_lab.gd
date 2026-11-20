@@ -930,10 +930,14 @@ func _process(delta: float) -> void:
 				for mesh: MeshInstance3D in _player_overlays:
 					mesh.set_instance_shader_parameter(&"player_hit_flash", weight)
 	if _shake_duration > 0.0:
-		# Begin at age zero and charge only intervals after the first frame.
+		# Start the pulse at its full kick on the first eligible display frame.
 		if _shake_sample_time >= 0.0:
-			var elapsed: float = player.render_presenter.display_clock - _shake_sample_time
-			_shake_age = minf(elapsed, _shake_duration)
+			var display_time: float = player.render_presenter.display_clock
+			_shake_age = minf(display_time - _shake_sample_time, _shake_duration)
+			if _shake_pending and _shake_age >= 0.0 and _shake_age < _shake_duration:
+				_shake_sample_time = display_time
+				_shake_age = 0.0
+				_shake_pending = false
 		elif _shake_pending:
 			_shake_pending = false
 		else:
@@ -1163,7 +1167,7 @@ func _start_camera_shake(strength: float, sample_time := -1.0) -> void:
 	_shake_strength = strength
 	_shake_age = 0.0
 	_shake_duration = HEAVY_SHAKE_DURATION
-	_shake_pending = sample_time < 0.0
+	_shake_pending = true
 	_shake_sample_time = sample_time
 
 func _clear_camera_shake() -> void:
