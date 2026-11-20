@@ -129,7 +129,10 @@ func run() -> void:
 		await physics_frame
 		if not zombie.ragdoll.running:
 			break
-		kept_skin_material = kept_skin_material and zombie._mesh.get_active_material(0) == skin_material
+		var active_material: Material = zombie._mesh.get_active_material(0)
+		# A low render rate can carry the preloaded hit flash over several physics ticks.
+		var flashing := active_material == zombie._lab_flash_skin and zombie._flash_left > 0.0
+		kept_skin_material = kept_skin_material and (active_material == skin_material or flashing)
 		var parameter: Variant = zombie._mesh.get_instance_shader_parameter("desaturation")
 		var actual := float(parameter) if parameter is float else 0.0
 		var expected := smoothstep(0.1, ZOMBIE.CORPSE_DESATURATION_END, zombie._corpse_age) * 0.80
@@ -152,7 +155,8 @@ func run() -> void:
 		fastest_descent = maxf(fastest_descent, -velocity.y)
 	check(fastest_descent > 5.0, "The corpse falls faster than 5 m/s before head or chest contact")
 	check(maximum_fade_error < 0.00001, "MechanicLab follows the color fade curve from the source 100 ms delay")
-	check(kept_skin_material, "The zombie prepares its fade material while alive and keeps it through ragdoll")
+	check(kept_skin_material and zombie._mesh.get_active_material(0) == skin_material,
+		"The ragdoll uses the preloaded fade and hit flash materials and returns to the original skin")
 	# A tilted pose can find support before it rolls into the visible low pose.
 	check(landing_time >= 0.33 and landing_time <= low_pose_time and low_pose_time < 0.55,
 		"A grounded Sabre strike reaches support and then a low pose within 550 ms")
