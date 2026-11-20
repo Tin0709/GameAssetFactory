@@ -171,6 +171,7 @@ var _light_serial := -1
 var _light_remaining := 0.0
 var _light_peak := 0.0
 var _light_pending := false
+var _light_sample_time := -1.0
 var _player_flash_remaining := 0.0
 var _player_flash_pending := false
 var _player_flash_material: ShaderMaterial
@@ -327,6 +328,7 @@ func _ready() -> void:
 		player.bow_released.connect(_on_bow_released)
 		player.connect("grounded_sabre_impact", _on_grounded_attack)
 		player.connect("heavy_jump_landed", _on_heavy_jump_landed)
+		player.physics_pose_ready.connect(_sample_sabre_landing_burst)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
 		player.presentation_reset.connect(_clear_camera_shake)
@@ -937,7 +939,16 @@ func _process(delta: float) -> void:
 		camera.h_offset = camera.size * _shake_strength * pulse
 		if _shake_age >= _shake_duration:
 			_shake_duration = 0.0
-	if _impact_light.visible:
+	if _light_sample_time >= 0.0:
+		# The spark buffer uses the same interpolated actor sample clock.
+		var age: float = player.render_presenter.display_clock - _light_sample_time
+		_light_remaining = clampf(CONTACT_LIGHT_DURATION - age, 0.0, CONTACT_LIGHT_DURATION)
+		_impact_light.visible = age >= 0.0 and _light_remaining > 0.0
+		var decay := _light_remaining / CONTACT_LIGHT_DURATION
+		_impact_light.light_energy = _light_peak * decay * decay
+		if _light_remaining <= 0.0:
+			_light_sample_time = -1.0
+	elif _impact_light.visible:
 		if _light_pending:
 			_light_pending = false
 		else:
@@ -1224,22 +1235,33 @@ func _show_landing_burst(point: Vector3, serial: int) -> void:
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
 
-func _start_contact_light(point: Vector3, serial: int, energy: float) -> void:
+func _sample_sabre_landing_burst() -> void:
+	if _slam_burst_frame < 0 or Engine.get_physics_frames() < _slam_burst_frame:
+		return
+	_slam_burst_frame = -1
+	# Record the authored event after the actor has advanced this physics pose.
+	var point := _slam_burst_point
+	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP, true)
+	_start_contact_light(point + Vector3.UP * 0.60, _slam_burst_serial, 2.3, player.effects.clock)
+
+func _start_contact_light(point: Vector3, serial: int, energy: float, sample_time := -1.0) -> void:
 	if _light_serial == serial:
 		return
 	_light_serial = serial
 	_light_peak = energy
 	_light_remaining = CONTACT_LIGHT_DURATION
-	_light_pending = true
+	_light_pending = sample_time < 0.0
+	_light_sample_time = sample_time
 	_impact_light.global_position = point
 	_impact_light.light_energy = _light_peak
-	_impact_light.show()
+	_impact_light.visible = _light_pending
 
 func _clear_contact_light() -> void:
 	_slam_burst_frame = -1
 	_light_serial = -1
 	_light_remaining = 0.0
 	_light_pending = false
+	_light_sample_time = -1.0
 	_impact_light.light_energy = 0.0
 	_impact_light.hide()
 
@@ -1250,9 +1272,6 @@ func _physics_process(_delta: float) -> void:
 	if _slam_shake_frame >= 0 and frame >= _slam_shake_frame:
 		_slam_shake_frame = -1
 		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION)
-	if _slam_burst_frame >= 0 and frame >= _slam_burst_frame:
-		_slam_burst_frame = -1
-		_show_landing_burst(_slam_burst_point, _slam_burst_serial)
 	if _slam_swing_frame >= 0 and frame >= _slam_swing_frame:
 		_slam_swing_frame = -1
 		if player.combo.serial == _slam_swing_serial and player.combo.active():

@@ -68,17 +68,19 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int)-
 			while history.size()>2 and clock-float(history[1].time)>display_lag+1./120.:history.pop_front()
 			while history.size()>MAX_PARTICLE_HISTORY:history.pop_front()
 	_was_active=active;_previous_tip=tip
-func _burst(point:Vector3,direction:Vector3)->void:
+func _burst(point:Vector3,direction:Vector3,publish_sample:=false)->void:
 	bursts+=1;var added:=0
 	for particle:Dictionary in particles:
 		if particle.life>0. or clock<float(particle.born)+float(particle.duration)+1./maxf(1.,Engine.physics_ticks_per_second):continue
 		var duration:=_rng.randf_range(.13,.3)
 		particle.position=point;particle.velocity=direction.normalized()*_rng.randf_range(.2,.8)+Vector3(_rng.randf_range(-.7,.7),_rng.randf_range(.1,.7),_rng.randf_range(-.7,.7))
 		particle.duration=duration;particle.life=duration;particle.born=clock;particle.history.clear();added+=1
+		if publish_sample:
+			particle.history.append({"time":clock,"position":point,"life":duration})
 		if added>=8:break
-func contact(point: Vector3, direction: Vector3) -> void:
+func contact(point: Vector3, direction: Vector3, publish_sample := false) -> void:
 	if enabled:
-		_burst(point, direction)
+		_burst(point, direction, publish_sample)
 func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=null)->Array:
 	var result:Array=[]
 	for point:Dictionary in samples:
