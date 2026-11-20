@@ -14,6 +14,7 @@ global uniform vec4 gaf_stone_sunset_region;
 global uniform vec4 gaf_stone_sunset_beam;
 global uniform vec4 gaf_stone_sun_warmth;
 global uniform float gaf_stone_warmth_luma_trim;
+global uniform vec2 gaf_path_sun_response;
 varying vec2 stone_sunset_position;
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
@@ -59,6 +60,17 @@ void light() {
 		} else if ((ground_grade == 1 || ground_grade == 2)
 				&& ALBEDO.g > ALBEDO.r * 1.22 && ALBEDO.g > ALBEDO.b * 1.35) {
 			ground_fill = gaf_ground_shadow_fill_multiplier(gaf_ground_shadow_fill_reduction.x, shadow_attenuation);
+		}
+	}
+	float path_weight = 0.0;
+	if (LIGHT_IS_DIRECTIONAL && ground_grade == 2 && surface_top > .998 && use_source_terrain
+			&& dot(gaf_path_sun_response, vec2(1.0)) > 0.0
+			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_shadow_diffuse_sun.xyz) > .9999
+			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= .005) {
+		// Match the dirt part of the blended shoulder and keep the neighboring grass.
+		path_weight = smoothstep(1.02, 1.22, ALBEDO.r / max(ALBEDO.g, .0001));
+		if (path_weight > 0.0) {
+			ground_fill *= gaf_ground_shadow_fill_multiplier(path_weight * gaf_path_sun_response.x, shadow_attenuation);
 		}
 	}
 	DIFFUSE_LIGHT += gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
@@ -155,6 +167,14 @@ void light() {
 		}
 #endif
 		vec3 diffuse_incident = incident;
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+		if (path_weight > 0.0) {
+			// Redistribute the existing Sun response in the midrange, preserving its brightest patches.
+			float beam = shadow_attenuation * cloud_transmission;
+			float edge = smoothstep(.12, .47, beam) * (1.0 - smoothstep(.62, .93, beam));
+			diffuse_incident *= 1.0 + gaf_path_sun_response.y * (path_weight * edge);
+		}
+#endif
 #if defined(GAF_WORLD_SPATIAL_TERRAIN) || defined(GAF_WORLD_FLAT_TURF)
 		if (gaf_turf_sun_chroma.w > 0.0 && use_source_terrain && surface_top > 0.998 &&
 				(ground_grade == 1 || ground_grade == 2) &&
