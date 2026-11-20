@@ -118,6 +118,7 @@ var _additional_diffuse_source := Vector4.ZERO
 var _shadow_diffuse_state := Vector4.ZERO
 var _ground_shadow_fill_reduction := Vector2.ZERO
 var _path_sun_response := Vector2.ZERO
+var _path_sun_core := Vector2.ZERO
 var _shadow_diffuse_tint := Vector3.ONE
 const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
@@ -167,6 +168,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"shadow_diffuse_return": ["Ánh dịu trong bóng trên đất và cỏ", 1.],
 	&"ground_shadow_fill_reduction": ["Chiều sâu bóng trên cỏ và mặt đá", 1.],
 	&"path_sun_response": ["Tương phản nắng trên lối đất", 1.],
+	&"path_sun_core": ["Sắc nắng trên lối đất", 1.],
 	&"stone_shade_fill": ["Ánh hắt trong bóng đá", .55],
 	&"stone_shade_reach": ["Ánh hắt tới mặt đá khuất nắng", 1.],
 	&"stone_wall_return": ["Ánh phản xạ trên vách đá trong bóng", 1.],
@@ -334,7 +336,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 214
+const LIGHTING_MIX_VERSION := 216
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -498,6 +500,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
 	RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1040,7 +1043,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
 			RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
-			RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1580,21 +1583,28 @@ func _sync_shadow_diffuse() -> void:
 	if _point_kernel_owner == null or _point_kernel_owner.get_ref() != self:
 		return
 	var state := Vector4.ZERO
+	var core := Vector2.ZERO
 	if (not _balanced_preview and _shadow_diffuse_available() and atmosphere_review == "combined"
 			and forest_active() and level.terrain_light.is_active()):
 		var sun: DirectionalLight3D = level.get_node("Sun")
 		var gain := clampf(DayNight.sample_curve(_biome_profile.shadow_diffuse_by_hour, hour / 24., 0.), 0., .10)
 		gain *= _lighting_scale(&"shadow_diffuse_return") * smoothstep(0., .2, sun.shadow_opacity)
-		if gain > 0. and sun.shadow_enabled and sun.light_energy > 0. and sun.is_visible_in_tree():
-			var direction := sun.global_basis.z.normalized()
-			state = Vector4(direction.x, direction.y, direction.z, gain)
-			var env: Environment = level.get_node("WorldEnvironment").environment
-			var c := env.ambient_light_color.srgb_to_linear()
-			var rgb := Vector3(c.r, c.g, c.b)
-			var tint := Vector3.ONE.lerp(rgb / maxf(rgb.dot(KEY_LUMA), .0001), .44)
-			if tint != _shadow_diffuse_tint:
-				_shadow_diffuse_tint = tint
-				RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", tint)
+		if sun.shadow_enabled and sun.light_energy > 0. and sun.is_visible_in_tree():
+			if _path_sun_core_available():
+				var weather_scale := Vector2.ONE.lerp(Vector2(.72, .45), _weather.weight)
+				core = _biome_profile.path_sun_core.clamp(Vector2.ZERO, Vector2(.36, 1.))
+				core *= _day_grass_shadow_weight() * _lighting_scale(&"path_sun_core") * weather_scale
+			if gain > 0. or core != Vector2.ZERO:
+				var direction := sun.global_basis.z.normalized()
+				state = Vector4(direction.x, direction.y, direction.z, gain)
+			if gain > 0.:
+				var env: Environment = level.get_node("WorldEnvironment").environment
+				var c := env.ambient_light_color.srgb_to_linear()
+				var rgb := Vector3(c.r, c.g, c.b)
+				var tint := Vector3.ONE.lerp(rgb / maxf(rgb.dot(KEY_LUMA), .0001), .44)
+				if tint != _shadow_diffuse_tint:
+					_shadow_diffuse_tint = tint
+					RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", tint)
 	if state != _shadow_diffuse_state:
 		_shadow_diffuse_state = state
 		RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_sun", state)
@@ -1614,10 +1624,21 @@ func _sync_shadow_diffuse() -> void:
 		_path_sun_response = path
 		RenderingServer.global_shader_parameter_set("gaf_path_sun_response", path)
 
-func _path_sun_response_available() -> bool:
+	if core != _path_sun_core:
+		_path_sun_core = core
+		RenderingServer.global_shader_parameter_set("gaf_path_sun_core", core)
+
+func _path_sun_available() -> bool:
 	return source_terrain_active and _shadow_diffuse_available() and not _balanced_preview \
-		and atmosphere_review == "combined" and forest_active() \
-		and _biome_profile.path_sun_response.is_finite() and _biome_profile.path_sun_response != Vector2.ZERO
+		and atmosphere_review == "combined" and forest_active()
+
+func _path_sun_response_available() -> bool:
+	return _path_sun_available() and _biome_profile.path_sun_response.is_finite() \
+		and _biome_profile.path_sun_response != Vector2.ZERO
+
+func _path_sun_core_available() -> bool:
+	return _path_sun_available() and _biome_profile.path_sun_core.is_finite() \
+		and _biome_profile.path_sun_core != Vector2.ZERO
 
 func _ground_shadow_fill_available() -> bool:
 	return (_shadow_diffuse_available() and not _balanced_preview and atmosphere_review == "combined"
@@ -1919,6 +1940,9 @@ func set_source_terrain(enabled: bool) -> bool:
 	var path_sun: HSlider = _lighting_sliders.get(&"path_sun_response")
 	if path_sun != null:
 		path_sun.editable = _path_sun_response_available()
+	var path_core: HSlider = _lighting_sliders.get(&"path_sun_core")
+	if path_core != null:
+		path_core.editable = _path_sun_core_available()
 	_sync_shadow_diffuse()
 	return enabled
 
@@ -2923,6 +2947,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 215 and effect == &"path_sun_response":
 			missing_value = 0.
+		if version < 216 and effect == &"path_sun_core":
+			missing_value = 0.
 		if version < 191 and effect == &"night_leaf_lamp_shoulder":
 			missing_value = 0.
 		if version < 190 and effect == &"day_path_chroma":
@@ -3108,6 +3134,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _ground_shadow_fill_available()
 		if effect == &"path_sun_response":
 			slider.editable = _path_sun_response_available()
+		if effect == &"path_sun_core":
+			slider.editable = _path_sun_core_available()
 		if effect == &"alternate_local_mist":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.alternate_mist_by_hour != null \
 				and level.alternate_mist_region != null
@@ -3314,7 +3342,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"overcast_shadow":
 		_refresh_direct_shadow_opacity()
 		return
-	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response"]:
+	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response", &"path_sun_core"]:
 		_sync_shadow_diffuse()
 		return
 	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach", &"stone_wall_return", &"sheltered_stone_return", &"local_diffuse_return", &"basin_diffuse_return"]:
@@ -4190,6 +4218,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = _ground_shadow_fill_available()
 		if effect == &"path_sun_response":
 			slider.editable = _path_sun_response_available()
+		if effect == &"path_sun_core":
+			slider.editable = _path_sun_core_available()
 		if effect == &"overcast_mist_phase_color":
 			slider.editable = not _balanced_preview and _overcast_mist_phase_color_editable()
 		if effect == &"kai_shade_sky":
