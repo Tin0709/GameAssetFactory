@@ -855,12 +855,17 @@ func _resolve_floor_anchor_lifts(lifts: Dictionary[PhysicalBone3D, float], depth
 	var head_overlap: float = depths.get(head, 0.0) - slop
 	if head_overlap <= 0.045:
 		return
-	# A second box just over the contact tolerance carries little of this correction.
 	var other_overlap := 0.0
 	for body: PhysicalBone3D in depths:
 		if body != head:
 			other_overlap = maxf(other_overlap, depths[body] - slop)
-	var weight := smoothstep(0.045, 0.060, head_overlap) * (1.0 - smoothstep(0.001, 0.004, other_overlap))
+	# Keep more of a deep head correction local when every other part still
+	# fits within the shared lift allowed for a single penetrating part.
+	var shallow_secondary := 1.0 - smoothstep(0.001, 0.004, other_overlap)
+	var deep_head := smoothstep(0.030, 0.036, head_overlap - shared_lift)
+	var spare_lift := 1.0 - smoothstep(
+		FLOOR_SINGLE_PART_SHARED_LIFT - FLOOR_CONTACT_SLOP, FLOOR_SINGLE_PART_SHARED_LIFT, other_overlap)
+	var weight := smoothstep(0.045, 0.060, head_overlap) * maxf(shallow_secondary, deep_head * spare_lift)
 	weight *= smoothstep(HEAD_ROLL_LIFT_BLEND_START, 0.36, floor_impact_blend) \
 		* (1.0 - smoothstep(0.43, HEAD_ROLL_LIFT_BLEND_END, floor_impact_blend))
 	if weight <= 0.0 or _floor_roll_nears_obstacle(_flat_floor.get_parent().get_rid()):
