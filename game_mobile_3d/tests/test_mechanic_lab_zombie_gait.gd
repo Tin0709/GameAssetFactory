@@ -61,14 +61,17 @@ func run() -> void:
 		"The Baby Zombie keeps its own locomotion")
 	lab.player.position = adult.position + Vector3(7.0, 0.0, 0.0)
 	var steps: Array[Vector3] = []
-	adult.step_audio.connect(func(point: Vector3): steps.append(point))
+	adult.step_audio.connect(func(point: Vector3):
+		if adult.animation.current_animation == STYLED_RUN:
+			steps.append(adult.to_local(point)))
 	check(await await_clip(adult, [STYLED_RUN]), "An adult switches to the expressive run in pursuit")
 	check(absf(adult.get_real_velocity().slide(Vector3.UP).length() - Zombie.CHASE_SPEED) < 0.05,
 		"The expressive run keeps the pursuit speed")
 	for tick in 43:
 		await physics_frame
-	check(steps.size() >= 2 and steps[steps.size() - 1].distance_to(steps[steps.size() - 2]) > 0.2,
-		"Expressive pursuit still emits alternating foot contacts")
+	check(steps.size() >= 2, "Expressive pursuit emits foot contacts")
+	for i in range(1, steps.size()):
+		check(steps[i - 1].x * steps[i].x < 0.0, "Run contacts alternate between left and right feet")
 	select(mode, 0)
 	check(await await_clip(adult, Zombie.WALK_CLIPS, 5), "An adult in pursuit switches back to the previous clip")
 
@@ -87,5 +90,15 @@ func run() -> void:
 		var next_adult := group.get_child(2) as Zombie
 		next_adult.position = Vector3(32.0, 0.0, 0.0)
 		check(await await_clip(next_adult, [STYLED_WALK]), "New adults inherit the selection")
+		next_adult.take_hit(next_adult.health, Vector3.BACK)
+		for tick in 3:
+			await physics_frame
+		check(next_adult.health == 0 and next_adult.ragdoll.running,
+			"The expressive walking pose hands off to the same death rig")
+		select(mode, 0)
+		for tick in 3:
+			await physics_frame
+		check(next_adult.health == 0 and next_adult.ragdoll.running,
+			"Changing the review style leaves an existing ragdoll in simulation")
 	print("MECHANIC_LAB_ZOMBIE_GAIT failures=", failures, " footsteps=", steps.size())
 	quit(0 if failures == 0 else 1)
