@@ -138,6 +138,7 @@ var equipped_air_offset := 0.0
 var equipped_air_delay := 0.0
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
+var _expressive_gait := false
 var _ragdoll_layout: Dictionary
 var _baby_visual: PackedScene
 var _baby_ragdoll_layout: Dictionary
@@ -177,6 +178,12 @@ func _update_living_count(alive: bool) -> void:
 
 func damage_digits() -> Array[Texture2D]:
 	return _digits
+
+func set_expressive_gait(enabled: bool) -> void:
+	_expressive_gait = enabled
+	for child in get_children():
+		if child is Zombie and not child.is_baby and child.health > 0:
+			child.expressive_gait = enabled
 
 func setup_combat(attacker: CharacterBody3D) -> void:
 	_attacker = attacker
@@ -236,6 +243,7 @@ func _spawn_at(point: Vector3, floor_position: Vector3, player: CharacterBody3D,
 	var layout := _baby_ragdoll_layout if baby else _ragdoll_layout
 	zombie.configure(scene.instantiate(), player, effects, _digits, _spawn_serial, layout,
 		corpse_floor, health_bars, damage_numbers, baby)
+	zombie.expressive_gait = _expressive_gait and not baby
 	zombie.melee_hit.connect(player_hit.emit)
 	zombie.melee_audio.connect(baby_attack_audio.emit if baby else zombie_attack_audio.emit)
 	if baby and zombie_swing_audio.has_connections():
@@ -579,6 +587,9 @@ func _load_assets() -> void:
 		var in_lab := get_node_or_null("../Ground/Collision") is CollisionShape3D
 		if in_lab:
 			Zombie.prepare_lab_skin(model)
+			var skeleton := model.find_child("Skeleton3D", true, false) as Skeleton3D
+			Zombie.Gait.build(player.get_animation_library(&""), skeleton, player.get_animation(Zombie.WALK_CLIPS[0]),
+				Zombie.LAB_ROAM_SPEED, Zombie.CHASE_SPEED)
 			# Keep the first authored pose in the in-memory scene template.
 			player.play(Zombie.SPAWN)
 			player.advance(0.0)

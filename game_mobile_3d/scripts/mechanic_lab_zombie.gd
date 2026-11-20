@@ -13,6 +13,7 @@ const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
 const Ragdoll := preload("res://scripts/mechanic_lab_ragdoll.gd")
+const Gait := preload("res://scripts/mechanic_lab_zombie_gait.gd")
 const DeathProfile := preload("res://scenes/dev/zombie_death_physics/death_profile.gd")
 const CORPSE_SHADER := preload("res://materials/mechanic_lab_zombie_corpse.gdshader")
 const LAB_SKIN_SHADER := preload("res://materials/mechanic_lab_zombie_skin.gdshader")
@@ -28,6 +29,10 @@ const WALK_STEP_NOTIFIES := {
 	&"Zombie_Walk": [Vector3(0.427282363, 0.20, 0.0), Vector3(1.281282187, -0.20, 0.0)],
 	&"Zombie_Walk_Variant1": [Vector3(0.427282006, 0.20, 0.0), Vector3(1.281281948, -0.20, 0.0)],
 	&"Zombie_Walk_Variant2": [Vector3(0.427282006, 0.20, 0.0), Vector3(1.281281948, -0.20, 0.0)],
+	Gait.WALK: [Vector3(Gait.PLANT * Gait.WALK_DURATION, 0.125, 0.615),
+		Vector3((Gait.PLANT + 0.5) * Gait.WALK_DURATION, -0.125, 0.615)],
+	Gait.RUN: [Vector3(Gait.PLANT * Gait.RUN_DURATION, 0.125, 0.397),
+		Vector3((Gait.PLANT + 0.5) * Gait.RUN_DURATION, -0.125, 0.397)],
 }
 const STEP_MIN_SPEED_SQUARED := 0.15 * 0.15
 const SPAWN := &"Zombie_Spawn"
@@ -190,6 +195,7 @@ var health := TRAINING_HEALTH:
 		if alive != was_alive:
 			living_changed.emit(alive)
 var is_baby := false
+var expressive_gait := false
 var _body_height := HEIGHT
 var _chase_speed := CHASE_SPEED
 var _roam_speed := LAB_ROAM_SPEED
@@ -493,7 +499,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity += get_gravity() * _gravity_scale(ZOMBIE_GRAVITY) * delta
 	var crowd_walking := crowd and not pushed and controlled_time == delta and not travel.is_zero_approx() \
-		and animation.current_animation in WALK_CLIPS
+		and animation.current_animation in WALK_STEP_NOTIFIES
 	var destination := _roam_destination
 	if _target_aggressive:
 		destination = _chase_detour if _chase_detour.is_finite() else _last_seen_position
@@ -585,13 +591,20 @@ func _integrate_knockback(delta: float) -> Vector3:
 func _advance_animation(delta: float, travel: Vector3) -> void:
 	var clip := animation.current_animation
 	if clip != ATTACK:
+		var expressive := Gait.is_gait(clip)
 		var play_steps := (step_audio.has_connections() and clip in WALK_STEP_NOTIFIES and is_on_floor()
 			and not _skipped_blocked_step)
-		if play_steps:
+		if play_steps or expressive:
 			var motion := get_real_velocity().slide(Vector3.UP)
 			play_steps = motion.length_squared() >= STEP_MIN_SPEED_SQUARED \
 				and (not is_on_wall() or motion.dot(travel) >= MIN_WALL_PROGRESS_SPEED * travel.length()) \
-				and not travel.is_zero_approx()
+				and not travel.is_zero_approx() and play_steps
+			if expressive:
+				# Keep the animated stance proportional to distance moved, including
+				# a short final step and the lower speed along oblique walls.
+				var speed := _chase_speed if clip == Gait.RUN else _roam_speed
+				var forward_speed := motion.dot(global_basis.z) if not _skipped_blocked_step else 0.0
+				delta *= clampf(forward_speed / speed, 0.0, 1.0)
 		var play_idle := clip == IDLE and idle_audio.has_connections()
 		var previous_phase := animation.current_animation_position if play_steps or play_idle else 0.0
 		animation.advance(delta)
@@ -735,7 +748,7 @@ func _roam_velocity(delta: float, sample_ai: bool) -> Vector3:
 		_play_loop(IDLE)
 		return Vector3.ZERO
 	_face_target(offset, delta)
-	_play_loop(_walk_clip)
+	_play_gait()
 	return offset * (minf(_roam_speed, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
 
 func _pick_roam_destination() -> Vector3:
@@ -996,7 +1009,7 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 		var detour := _chase_detour_velocity(offset, stop_distance, delta, sample_ai)
 		if not detour.is_zero_approx():
 			_face_target(detour, delta)
-			_play_loop(_walk_clip)
+			_play_gait()
 			return detour
 	elif in_lab:
 		_clear_chase_detour()
@@ -1005,7 +1018,10 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 		var travel := offset.normalized() * minf(_chase_speed, (distance - stop_distance) / delta)
 		if in_lab and is_on_floor() and not _corpse_floor.disabled:
 			travel = _limit_lab_pursuit_to_floor(travel, delta)
-		_play_loop(IDLE if travel.is_zero_approx() else _walk_clip)
+		if travel.is_zero_approx():
+			_play_loop(IDLE)
+		else:
+			_play_gait()
 		return travel
 	# Complete the approach turn before locking the swing's heading.
 	var facing_target := _is_in_melee_cone(offset)
@@ -1055,6 +1071,22 @@ func _confirm_windup_target(point: Vector3) -> bool:
 func _play_loop(clip: StringName) -> void:
 	if animation.current_animation != clip:
 		animation.play(clip, 0.13)
+
+func _play_gait() -> void:
+	var clip := _walk_clip
+	if expressive_gait:
+		clip = Gait.RUN if _target_aggressive else Gait.WALK
+	var previous := animation.current_animation
+	if clip == previous:
+		return
+	if previous not in WALK_STEP_NOTIFIES or not (expressive_gait or Gait.is_gait(previous)):
+		_play_loop(clip)
+		return
+	# Match the leading foot on live switches and on patrol/pursuit transitions.
+	var progress := animation.current_animation_position / animation.current_animation_length
+	var phase := fposmod(progress - Gait.plant_phase(previous) + Gait.plant_phase(clip), 1.0)
+	animation.play(clip, 0.13)
+	animation.seek(phase * animation.current_animation_length)
 
 func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE,
 		stagger: float = MAX_POISE, knockback_strength: float = 500.0, death_strike := DeathStrike.GROUND,
@@ -1109,7 +1141,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 				animation.stop(true)
 				var clip_duration := animation.get_animation(STAGGER).length
 				animation.play(STAGGER, 0.0, clip_duration / STAGGER_DURATION)
-		elif _knockback_control_left > 0.0 and animation.current_animation in WALK_CLIPS:
+		elif _knockback_control_left > 0.0 and animation.current_animation in WALK_STEP_NOTIFIES:
 			_play_loop(IDLE)
 
 func _update_death(delta: float) -> void:
