@@ -421,7 +421,49 @@ func check_direct_approach_after_cover_opens(member_count: int, yaw: float) -> v
 	lab.free()
 	await physics_frame
 
+func check_v_corner_escape(member_count: int) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var zombies := spawn_detour_group(lab, member_count)
+	if zombies == null:
+		lab.free()
+		return
+	var yaw := 0.15118330717087
+	var heading := Basis(Vector3.UP, yaw)
+	var chaser := zombies.get_child(0) as ZOMBIE
+	lab.player.position = heading * Vector3(-0.892124, 0.02, 0.645718)
+	chaser.position = heading * Vector3(-0.622533, 0.02, -4.5)
+	chaser.animation.play(ZOMBIE.IDLE, 0.0)
+	chaser.animation.advance(0.0)
+	var corner := Vector3(-0.093521, 0.0, -2.12)
+	for end: Vector3 in [Vector3(-2.585104, 0.0, -3.993645), Vector3(2.028336, 0.0, -3.993645)]:
+		var side := end - corner
+		var center := heading * ((corner + end) * 0.5)
+		center.y = 0.215
+		add_wall(lab, center, Vector3(side.length(), 0.43, 0.22), yaw + atan2(-side.z, side.x))
+	var damage: Array[int] = []
+	chaser.melee_hit.connect(func(amount: int): damage.append(amount))
+	var took_detour := false
+	var hit_tick := -1
+	for tick in 570:
+		await physics_frame
+		took_detour = took_detour or chaser._chase_detour.is_finite()
+		if not damage.is_empty():
+			hit_tick = tick
+			break
+	if not took_detour or damage != [ZOMBIE.MELEE_DAMAGE]:
+		failures.append("A zombie that returns to the same V corner should take a longer detour and reach melee")
+	print("LAB_V_CORNER_ESCAPE members=", member_count, " hit_tick=", hit_tick, " damage=", damage)
+	lab.free()
+	await physics_frame
+
+
+
 func run() -> void:
+	await check_v_corner_escape(1)
+	await check_v_corner_escape(100)
 	await check_short_static_detour(1, 0.0, 2.5, Vector3(-1.25, 0.02, 3.5), 232)
 	await check_short_static_detour(1, 0.0, 4.1, Vector3(-0.8, 0.02, 0.0), 225)
 	await check_direct_approach_after_cover_opens(1, 0.0)
