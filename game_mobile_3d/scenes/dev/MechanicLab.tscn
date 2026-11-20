@@ -127,8 +127,8 @@ text = "Spawn 100 zombie"
 tooltip_text = "Tạo thêm 100 zombie theo từng đợt ngắn để thử hiệu năng."
 
 [node name="SpawnStatus" type="Label" parent="HUD"]
-offset_left = 194.0
-offset_top = 145.0
+offset_left = 18.0
+offset_top = 184.0
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 2
@@ -142,6 +142,14 @@ offset_bottom = 179.0
 focus_mode = 0
 text = "Spawn Baby Zombie"
 tooltip_text = "Tạo một Baby Zombie · 8 HP"
+
+[node name="ZombieGait" type="OptionButton" parent="HUD"]
+offset_left = 194.0
+offset_top = 145.0
+offset_right = 435.0
+offset_bottom = 179.0
+focus_mode = 0
+tooltip_text = "Đổi dáng đi và chạy của zombie trưởng thành đã spawn và sẽ spawn."
 
 [node name="CombatAudioToggle" type="CheckButton" parent="HUD"]
 offset_left = 158.0
