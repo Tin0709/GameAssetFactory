@@ -111,11 +111,15 @@ func check_sabre_dive(lab) -> void:
 		var onset := -1
 		var flash_frame := -1
 		var burst_frame := -1
+		var sampled_kick := 0.0
 		for i in 16:
 			await physics_frame
 			var frame := Engine.get_physics_frames() - 1
 			if lab._shake_duration > 0.0 and onset < 0:
 				onset = frame
+				lab.player.render_presenter.prepare(1.0)
+				lab._process(0.0)
+				sampled_kick = lab.camera.h_offset / lab.camera.size
 			if lab._light_sample_time >= 0.0 and flash_frame < 0:
 				flash_frame = frame
 			if burst_frame < 0 and lab.player.effects.particles.any(func(particle): return particle.life > 0.0):
@@ -128,18 +132,14 @@ func check_sabre_dive(lab) -> void:
 		check(flash_frame == landings[attempt] + flash_delay and burst_frame == flash_frame,
 			"The aerial light and sparks are sampled at the authored one-shot VFX key")
 		var delay := ceili(0.052268848 * Engine.physics_ticks_per_second)
-		check(onset == landings[attempt] + delay, "The Sabre camera pulse starts at its montage cue")
+		check(onset == landings[attempt] + delay and is_equal_approx(sampled_kick, 0.008),
+			"The Sabre camera pulse reaches its full kick at the sampled montage cue")
 		if target != null:
 			var damage_delay := ceili(0.054369554 * Engine.physics_ticks_per_second)
 			check(target_hits == [landings[attempt] + damage_delay] and target.health == 8
 				and is_equal_approx(lab._impact_light.light_energy, 2.3),
 				"Target damage keeps its own key and cannot replace the landing flash")
 			target.free()
-		lab._process(1.0 / 60.0)
-		check(not is_zero_approx(lab.camera.h_offset), "The aerial cue moves the actual camera")
-		for i in 15:
-			lab._process(1.0 / 60.0)
-		check(is_zero_approx(lab.camera.h_offset), "The pulse settles back to the original camera offset")
 		print("SABRE_DIVE_SHAKE touchdown=", landings[attempt], " onset=", onset, " flash=", flash_frame, " burst=", burst_frame)
 
 func start_sabre_dive(lab) -> void:
@@ -196,4 +196,6 @@ func check_sabre_dive_presentation(lab) -> void:
 	var shake_cue := ceili(0.052268848 * Engine.physics_ticks_per_second)
 	check(first_draw.get("camera", -1.0) >= shake_cue - 0.000001,
 		"The displayed camera waits for its own authored pose")
+	await create_timer(0.25).timeout
+	check(is_zero_approx(lab.camera.h_offset), "The displayed pulse settles back to the original camera offset")
 	print("SABRE_DIVE_FIRST_DRAW cue=", cue, " draw=", first_draw)

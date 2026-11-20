@@ -163,6 +163,7 @@ var _shake_age := 0.0
 var _shake_duration := 0.0
 var _shake_strength := 0.0
 var _shake_pending := false
+var _shake_sample_time := -1.0
 var _slam_shake_frame := -1
 var _slam_burst_frame := -1
 var _slam_burst_point: Vector3
@@ -328,7 +329,7 @@ func _ready() -> void:
 		player.bow_released.connect(_on_bow_released)
 		player.connect("grounded_sabre_impact", _on_grounded_attack)
 		player.connect("heavy_jump_landed", _on_heavy_jump_landed)
-		player.physics_pose_ready.connect(_sample_sabre_landing_burst)
+		player.physics_pose_ready.connect(_sample_sabre_landing_fx)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
 		player.presentation_reset.connect(_clear_camera_shake)
@@ -930,12 +931,15 @@ func _process(delta: float) -> void:
 					mesh.set_instance_shader_parameter(&"player_hit_flash", weight)
 	if _shake_duration > 0.0:
 		# Begin at age zero and charge only intervals after the first frame.
-		if _shake_pending:
+		if _shake_sample_time >= 0.0:
+			var elapsed: float = player.render_presenter.display_clock - _shake_sample_time
+			_shake_age = minf(elapsed, _shake_duration)
+		elif _shake_pending:
 			_shake_pending = false
 		else:
 			_shake_age = minf(_shake_age + delta, _shake_duration)
 		var decay := 1.0 - _shake_age / _shake_duration
-		var pulse := cos(TAU * 15.0 * _shake_age) * decay * decay
+		var pulse := cos(TAU * 15.0 * _shake_age) * decay * decay if _shake_age >= 0.0 else 0.0
 		camera.h_offset = camera.size * _shake_strength * pulse
 		if _shake_age >= _shake_duration:
 			_shake_duration = 0.0
@@ -1155,17 +1159,19 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	_shake_serial = serial
 	_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION * falloff)
 
-func _start_camera_shake(strength: float) -> void:
+func _start_camera_shake(strength: float, sample_time := -1.0) -> void:
 	_shake_strength = strength
 	_shake_age = 0.0
 	_shake_duration = HEAVY_SHAKE_DURATION
-	_shake_pending = true
+	_shake_pending = sample_time < 0.0
+	_shake_sample_time = sample_time
 
 func _clear_camera_shake() -> void:
 	_slam_shake_frame = -1
 	_shake_serial = -1
 	_shake_duration = 0.0
 	_shake_pending = false
+	_shake_sample_time = -1.0
 	camera.h_offset = 0.0
 	camera.v_offset = 0.0
 
@@ -1235,14 +1241,21 @@ func _show_landing_burst(point: Vector3, serial: int) -> void:
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
 
-func _sample_sabre_landing_burst() -> void:
-	if _slam_burst_frame < 0 or Engine.get_physics_frames() < _slam_burst_frame:
+func _sample_sabre_landing_fx() -> void:
+	if _slam_shake_frame < 0 and _slam_burst_frame < 0:
+		return
+	var frame := Engine.get_physics_frames()
+	var sample_time: float = player.effects.clock
+	if _slam_shake_frame >= 0 and frame >= _slam_shake_frame:
+		_slam_shake_frame = -1
+		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION, sample_time)
+	if _slam_burst_frame < 0 or frame < _slam_burst_frame:
 		return
 	_slam_burst_frame = -1
 	# Record the authored event after the actor has advanced this physics pose.
 	var point := _slam_burst_point
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP, true)
-	_start_contact_light(point + Vector3.UP * 0.60, _slam_burst_serial, 2.3, player.effects.clock)
+	_start_contact_light(point + Vector3.UP * 0.60, _slam_burst_serial, 2.3, sample_time)
 
 func _start_contact_light(point: Vector3, serial: int, energy: float, sample_time := -1.0) -> void:
 	if _light_serial == serial:
@@ -1269,9 +1282,6 @@ func _physics_process(_delta: float) -> void:
 	if player.position.y < -5.0:
 		reset_player()
 	var frame := Engine.get_physics_frames()
-	if _slam_shake_frame >= 0 and frame >= _slam_shake_frame:
-		_slam_shake_frame = -1
-		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION)
 	if _slam_swing_frame >= 0 and frame >= _slam_swing_frame:
 		_slam_swing_frame = -1
 		if player.combo.serial == _slam_swing_serial and player.combo.active():
