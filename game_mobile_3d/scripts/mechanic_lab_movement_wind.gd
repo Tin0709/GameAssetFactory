@@ -76,6 +76,7 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	wake.contact_tick = Engine.get_physics_frames()
 	wake.mesh.global_transform = Transform3D(Basis(trailing, Vector3.UP, lateral), wake.origin)
 	wake.material.albedo_color = TINT
+	wake.mesh.layers = 0 if _physics_clock else 1
 	wake.mesh.show()
 	set_process(true)
 
@@ -93,6 +94,9 @@ func _process(delta: float) -> void:
 		if not wake.mesh.visible:
 			continue
 		if _physics_clock:
+			var layers := int(render_tick >= wake.contact_tick)
+			if wake.mesh.layers != layers:
+				wake.mesh.layers = layers
 			wake.age = maxf(render_tick - wake.contact_tick, 0.0) * step
 		else:
 			wake.age += delta

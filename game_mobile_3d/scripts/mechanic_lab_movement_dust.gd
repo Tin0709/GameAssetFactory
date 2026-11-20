@@ -34,6 +34,7 @@ class Particle:
 	var velocity: Vector3
 	var age := 0.0
 	var contact_tick := -1
+	var draw_pending := false
 	var duration := 0.0
 	var opacity := 0.0
 	var run_drag := 0.0
@@ -155,7 +156,7 @@ func _sync_landing_batch() -> void:
 	# Grass smoke has one color. Differently colored debris keeps the
 	# original per-sprite transparency order when it overlaps the plume.
 	for particle in _particles:
-		if particle.sprite.visible and (particle.debris_drag > 0.0 \
+		if particle.sprite.visible and not particle.draw_pending and (particle.debris_drag > 0.0 \
 				or Color(particle.sprite.modulate, 1.0) != SURFACE_DUST.grass):
 			can_batch = false
 			break
@@ -164,7 +165,7 @@ func _sync_landing_batch() -> void:
 	var largest_size := 0.0
 	for particle in _particles:
 		var sprite := particle.sprite
-		if not sprite.visible or particle.debris_drag > 0.0 \
+		if not sprite.visible or particle.draw_pending or particle.debris_drag > 0.0 \
 				or (particle.landing_tick < 0 and particle.run_drag <= 0.0):
 			continue
 		var layers := 0 if can_batch else 1
@@ -273,8 +274,10 @@ func _next_particle(texture: Texture2D, camera_range := 0.0) -> Particle:
 		particle.sprite.hframes = 8 if texture == _smoke_texture else 1
 		particle.sprite.vframes = 4 if texture == _smoke_texture else 1
 		particle.sprite.texture = texture
-	if particle.sprite.layers == 0:
-		particle.sprite.layers = 1
+	particle.draw_pending = _contact_clock
+	var layers := 0 if particle.draw_pending else 1
+	if particle.sprite.layers != layers:
+		particle.sprite.layers = layers
 	particle.debris_drag = 0.0
 	particle.sprite.visibility_range_end = camera_range
 	return particle
@@ -449,7 +452,12 @@ func _process(delta: float) -> void:
 		if not particle.sprite.visible:
 			continue
 		if _contact_clock:
-			# The first render delta can include time before the contact.
+			# Keep the particle off screen until the interpolated foot reaches
+			# the pose that emitted it. The sprite stays active in the pool.
+			var pending := render_tick < particle.contact_tick
+			if pending != particle.draw_pending:
+				particle.draw_pending = pending
+				particle.sprite.layers = 0 if pending else 1
 			particle.age = maxf(render_tick - particle.contact_tick, 0.0) * step
 		else:
 			particle.age += delta
