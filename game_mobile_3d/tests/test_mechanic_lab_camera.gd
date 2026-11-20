@@ -47,6 +47,8 @@ func run() -> void:
 	check(is_zero_approx(contact(lab, Vector3(1, 0, 0), 104, "Attack2", 1)), "Sword ordinary strike has zero shake")
 	check_contact_render_hitch(lab)
 	await check_sabre_dive(lab)
+	if DisplayServer.get_name() != "headless":
+		await check_sabre_dive_presentation(lab)
 	lab.free()
 	print("PAWN_SHAKE_RANGE failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -91,18 +93,7 @@ func check_sabre_dive(lab) -> void:
 			target.global_position = lab.player.global_position + lab.player.visual.global_basis.z * 1.5
 			lab.get_node("Zombies").sabre_contact.connect(func(_point, _direction, _clip, _index, _serial, _lethal):
 				target_hits.append(Engine.get_physics_frames()))
-		lab.get_node("HUD/DropMedium").pressed.emit()
-		for i in 2:
-			await physics_frame
-		var event := InputEventKey.new()
-		event.physical_keycode = KEY_E
-		event.pressed = true
-		root.push_input(event, true)
-		for i in 2:
-			await physics_frame
-		event = InputEventKey.new()
-		event.physical_keycode = KEY_E
-		root.push_input(event, true)
+		await start_sabre_dive(lab)
 		for i in Engine.physics_ticks_per_second:
 			await physics_frame
 			if landings.size() > attempt:
@@ -125,7 +116,7 @@ func check_sabre_dive(lab) -> void:
 			var frame := Engine.get_physics_frames() - 1
 			if lab._shake_duration > 0.0 and onset < 0:
 				onset = frame
-			if lab._impact_light.visible and flash_frame < 0:
+			if lab._light_sample_time >= 0.0 and flash_frame < 0:
 				flash_frame = frame
 			if burst_frame < 0 and lab.player.effects.particles.any(func(particle): return particle.life > 0.0):
 				burst_frame = frame
@@ -135,7 +126,7 @@ func check_sabre_dive(lab) -> void:
 			continue
 		var flash_delay := ceili(0.056890413 * Engine.physics_ticks_per_second)
 		check(flash_frame == landings[attempt] + flash_delay and burst_frame == flash_frame,
-			"The aerial light and sparks share the authored one-shot VFX key")
+			"The aerial light and sparks are sampled at the authored one-shot VFX key")
 		var delay := ceili(0.052268848 * Engine.physics_ticks_per_second)
 		check(onset == landings[attempt] + delay, "The Sabre camera pulse starts at its montage cue")
 		if target != null:
@@ -150,3 +141,54 @@ func check_sabre_dive(lab) -> void:
 			lab._process(1.0 / 60.0)
 		check(is_zero_approx(lab.camera.h_offset), "The pulse settles back to the original camera offset")
 		print("SABRE_DIVE_SHAKE touchdown=", landings[attempt], " onset=", onset, " flash=", flash_frame, " burst=", burst_frame)
+
+func start_sabre_dive(lab) -> void:
+	lab.get_node("HUD/DropMedium").pressed.emit()
+	for i in 2:
+		await physics_frame
+	var event := InputEventKey.new()
+	event.physical_keycode = KEY_E
+	event.pressed = true
+	root.push_input(event, true)
+	for i in 2:
+		await physics_frame
+	event = InputEventKey.new()
+	event.physical_keycode = KEY_E
+	root.push_input(event, true)
+
+func check_sabre_dive_presentation(lab) -> void:
+	lab.reset_player()
+	lab.set_process(true)
+	var landing: Array[int] = []
+	var first_draw := {}
+	lab.player.heavy_jump_landed.connect(func(_point, _forward, _serial, _height):
+		landing.append(Engine.get_physics_frames()), CONNECT_ONE_SHOT)
+	var sample := func():
+		if landing.is_empty():
+			return
+		var render_tick := Engine.get_physics_frames() + Engine.get_physics_interpolation_fraction() - 1.0
+		var elapsed := render_tick - landing[0]
+		var light: OmniLight3D = lab._impact_light
+		if not first_draw.has("light") and light.is_visible_in_tree() and light.light_energy > 0.0:
+			first_draw.light = elapsed
+		if first_draw.has("sparks"):
+			return
+		var sparks: MultiMesh = lab.player.effects.sparks.multimesh
+		for i in sparks.instance_count:
+			if sparks.get_instance_color(i).a > 0.001 and sparks.get_instance_transform(i).origin.y < 0.45:
+				first_draw.sparks = elapsed
+				break
+	RenderingServer.frame_pre_draw.connect(sample)
+	for i in 8:
+		await physics_frame
+	await start_sabre_dive(lab)
+	for i in Engine.physics_ticks_per_second:
+		await physics_frame
+		if first_draw.size() == 2:
+			break
+	RenderingServer.frame_pre_draw.disconnect(sample)
+	var cue := ceili(0.056890413 * Engine.physics_ticks_per_second)
+	check(first_draw.get("light", -1.0) >= cue - 0.000001
+		and is_equal_approx(first_draw.get("light", -1.0), first_draw.get("sparks", -2.0)),
+		"The rendered floor flash and sparks start together on or after the authored pose")
+	print("SABRE_DIVE_FIRST_DRAW cue=", cue, " draw=", first_draw)
