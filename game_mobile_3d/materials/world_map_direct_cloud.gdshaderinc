@@ -15,6 +15,7 @@ global uniform vec4 gaf_stone_sunset_beam;
 global uniform vec4 gaf_stone_sun_warmth;
 global uniform float gaf_stone_warmth_luma_trim;
 global uniform vec2 gaf_path_sun_response;
+global uniform vec2 gaf_path_sun_core;
 varying vec2 stone_sunset_position;
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
@@ -64,7 +65,7 @@ void light() {
 	}
 	float path_weight = 0.0;
 	if (LIGHT_IS_DIRECTIONAL && ground_grade == 2 && surface_top > .998 && use_source_terrain
-			&& dot(gaf_path_sun_response, vec2(1.0)) > 0.0
+			&& dot(gaf_path_sun_response + gaf_path_sun_core, vec2(1.0)) > 0.0
 			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_shadow_diffuse_sun.xyz) > .9999
 			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= .005) {
 		// Match the dirt part of the blended shoulder and keep the neighboring grass.
@@ -173,6 +174,12 @@ void light() {
 			float beam = shadow_attenuation * cloud_transmission;
 			float edge = smoothstep(.12, .47, beam) * (1.0 - smoothstep(.62, .93, beam));
 			diffuse_incident *= 1.0 + gaf_path_sun_response.y * (path_weight * edge);
+			if (dot(gaf_path_sun_core, vec2(1.0)) > 0.0) {
+				// Apply the warm key only where both the real shadow and projected mask admit it.
+				float core = path_weight * smoothstep(.46, .90, beam);
+				vec3 warmth = gaf_diffuse_chroma_scale(ALBEDO, incident, vec3(1.38, 1.04, .72), gaf_path_sun_core.y * core);
+				diffuse_incident *= warmth * (1.0 + gaf_path_sun_core.x * core);
+			}
 		}
 #endif
 #if defined(GAF_WORLD_SPATIAL_TERRAIN) || defined(GAF_WORLD_FLAT_TURF)

@@ -60,6 +60,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export var ground_shadow_fill_reduction := Vector2.ZERO
 ## Reduction of the path's supplemental shadow fill and gain for moderately lit dirt.
 @export var path_sun_response := Vector2.ZERO
+## Diffuse gain and warmth in the illuminated core of a dirt path.
+@export var path_sun_core := Vector2.ZERO
 ## Blend of the owned sky irradiance on bark, keyed by normalized hour.
 @export var bark_irradiance_by_hour: Curve
 @export_range(0.0, 1.0) var spruce_leaf_filter := 0.0
