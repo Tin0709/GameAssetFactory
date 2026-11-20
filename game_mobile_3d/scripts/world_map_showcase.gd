@@ -119,6 +119,7 @@ var _shadow_diffuse_state := Vector4.ZERO
 var _ground_shadow_fill_reduction := Vector2.ZERO
 var _path_sun_response := Vector2.ZERO
 var _path_sun_core := Vector2.ZERO
+var _path_sun_core_direction := Vector3.ZERO
 var _shadow_diffuse_tint := Vector3.ONE
 const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
@@ -501,6 +502,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", Vector3.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1044,6 +1046,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", Vector3.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1584,6 +1587,7 @@ func _sync_shadow_diffuse() -> void:
 		return
 	var state := Vector4.ZERO
 	var core := Vector2.ZERO
+	var core_direction := Vector3.ZERO
 	if (not _balanced_preview and _shadow_diffuse_available() and atmosphere_review == "combined"
 			and forest_active() and level.terrain_light.is_active()):
 		var sun: DirectionalLight3D = level.get_node("Sun")
@@ -1594,10 +1598,11 @@ func _sync_shadow_diffuse() -> void:
 				var weather_scale := Vector2.ONE.lerp(Vector2(.72, .45), _weather.weight)
 				core = _biome_profile.path_sun_core.clamp(Vector2.ZERO, Vector2(.36, 1.))
 				core *= _day_grass_shadow_weight() * _lighting_scale(&"path_sun_core") * weather_scale
-			if gain > 0. or core != Vector2.ZERO:
+				if core != Vector2.ZERO:
+					core_direction = sun.global_basis.z.normalized()
+			if gain > 0.:
 				var direction := sun.global_basis.z.normalized()
 				state = Vector4(direction.x, direction.y, direction.z, gain)
-			if gain > 0.:
 				var env: Environment = level.get_node("WorldEnvironment").environment
 				var c := env.ambient_light_color.srgb_to_linear()
 				var rgb := Vector3(c.r, c.g, c.b)
@@ -1627,6 +1632,9 @@ func _sync_shadow_diffuse() -> void:
 	if core != _path_sun_core:
 		_path_sun_core = core
 		RenderingServer.global_shader_parameter_set("gaf_path_sun_core", core)
+	if core_direction != _path_sun_core_direction:
+		_path_sun_core_direction = core_direction
+		RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", core_direction)
 
 func _path_sun_available() -> bool:
 	return source_terrain_active and _shadow_diffuse_available() and not _balanced_preview \
