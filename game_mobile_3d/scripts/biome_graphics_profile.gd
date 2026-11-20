@@ -44,6 +44,9 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., 2., .01) var actor_ground_light_cloudy_scale := 1.
 ## Optional normalized-hour blend towards stronger sunlight in openings of a map's projection.
 @export var projected_opening_recovery_by_hour: Curve
+## Local share of lost sunlight to restore within the map's authored region.
+@export var projected_path_recovery_by_hour: Curve
+@export_range(0., 1., .01) var projected_path_recovery_overcast_scale := 1.
 ## Scales the baked directional diffuse return on shadowed stone walls.
 @export_range(0., 1.5, .01) var shadowed_wall_return_scale := 0.
 ## Restores a limited share of the local sky on shaded walls with low baked return.

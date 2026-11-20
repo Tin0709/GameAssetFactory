@@ -10,6 +10,8 @@ global uniform vec4 gaf_projected_sun_local_region;
 global uniform vec2 gaf_projected_sun_local_shift;
 global uniform float gaf_projected_sun_softness;
 global uniform float gaf_projected_sun_openings;
+global uniform vec4 gaf_projected_path_recovery_region;
+global uniform float gaf_projected_path_recovery_amount;
 global uniform sampler2D gaf_projected_sun_mask : filter_linear_mipmap, repeat_enable;
 float cloud_noise(vec2 p) {
 	return texture(cloud_field,(p+0.5)/64.0).r;
@@ -40,6 +42,13 @@ float world_cloud_shade(vec3 world) {
 		float opening = smoothstep(0.46, 0.90, mask);
 		float cloud_loss = (1.0 - current_shade) * (1.0 - gaf_projected_sun_strength);
 		transmission += cloud_loss * opening * gaf_projected_sun_openings;
+	}
+	if (gaf_projected_path_recovery_amount > 0.0) {
+		vec2 offset = world.xz - gaf_projected_path_recovery_region.xy;
+		float weight = 1.0 - smoothstep(gaf_projected_path_recovery_region.z,
+			gaf_projected_path_recovery_region.w, dot(offset, offset));
+		// Ease projection losses locally. The receiver still applies geometric shadows.
+		transmission += (1.0 - transmission) * weight * gaf_projected_path_recovery_amount;
 	}
 	return transmission;
 }

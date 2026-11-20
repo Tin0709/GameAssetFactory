@@ -12,6 +12,8 @@ const LOCAL_SHIFT := &"gaf_projected_sun_local_shift"
 const SOFTNESS := &"gaf_projected_sun_softness"
 const MASK := &"gaf_projected_sun_mask"
 const OPENINGS := &"gaf_projected_sun_openings"
+const RECOVERY_REGION := &"gaf_projected_path_recovery_region"
+const RECOVERY_AMOUNT := &"gaf_projected_path_recovery_amount"
 
 var _path := ""
 var _texture: ImageTexture
@@ -23,6 +25,8 @@ var _soft_path := ""
 var _softness := 0.0
 var _softness_loaded := false
 var _opening_recovery := 0.
+var _recovery_region := Vector4.ZERO
+var _recovery_amount := 0.
 
 func setup() -> void:
 	release()
@@ -85,6 +89,7 @@ func set_weight(weight: float) -> void:
 	RenderingServer.global_shader_parameter_set(STRENGTH, weight)
 	if _weight <= 0.0:
 		set_local_alignment(Vector4.ZERO, Vector2.ZERO)
+		set_path_recovery(Vector4.ZERO, 0.)
 
 func set_opening_recovery(amount: float, phase_response: float = 0.) -> void:
 	var projection_weight := clampf(_weight / .40, 0., 1.)
@@ -104,9 +109,11 @@ func set_shift(shift: Vector2) -> void:
 	_shift = applied
 	RenderingServer.global_shader_parameter_set(SHIFT, _shift)
 
+static func valid_local_region(region: Vector4) -> bool:
+	return region.is_finite() and region.z >= 0.0 and region.w > region.z and is_finite(region.w * region.w)
+
 static func valid_local_alignment(region: Vector4, offset: Vector2) -> bool:
-	return region.is_finite() and region.z >= 0.0 and region.w > region.z \
-		and is_finite(region.w * region.w) and offset.is_finite() and offset != Vector2.ZERO
+	return valid_local_region(region) and offset.is_finite() and offset != Vector2.ZERO
 
 func set_local_alignment(region: Vector4, offset: Vector2) -> void:
 	var radii := Vector4.ZERO
@@ -121,7 +128,21 @@ func set_local_alignment(region: Vector4, offset: Vector2) -> void:
 		_local_shift = shift
 		RenderingServer.global_shader_parameter_set(LOCAL_SHIFT, shift)
 
+func set_path_recovery(region: Vector4, amount: float) -> void:
+	var radii := Vector4.ZERO
+	var applied := 0.
+	if _weight > 0. and is_finite(amount) and amount > 0. and valid_local_region(region):
+		radii = Vector4(region.x, region.y, region.z * region.z, region.w * region.w)
+		applied = clampf(amount, 0., 1.)
+	if radii != _recovery_region:
+		_recovery_region = radii
+		RenderingServer.global_shader_parameter_set(RECOVERY_REGION, radii)
+	if applied != _recovery_amount:
+		_recovery_amount = applied
+		RenderingServer.global_shader_parameter_set(RECOVERY_AMOUNT, applied)
+
 func release() -> void:
+	set_path_recovery(Vector4.ZERO, 0.)
 	RenderingServer.global_shader_parameter_set(STRENGTH, 0.)
 	RenderingServer.global_shader_parameter_set(SHIFT, Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set(LOCAL_REGION, Vector4.ZERO)

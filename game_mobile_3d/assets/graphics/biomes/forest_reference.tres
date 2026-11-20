@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=29 format=3]
+[gd_resource type="Resource" load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -118,6 +118,10 @@ point_count = 6
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 1), 0.0, 0.0, 0, 0, Vector2(0.322916667, 1), 0.0, 0.0, 0, 0, Vector2(0.489583333, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 6
 
+[sub_resource type="Curve" id="ProjectedPathRecovery"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.604166667, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.5), 0.0, 0.0, 0, 0, Vector2(0.729166667, 0.5), 0.0, 0.0, 0, 0, Vector2(0.791666667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 6
+
 [resource]
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
@@ -130,6 +134,8 @@ day_grass_shadow_wind_reduction = 0.5
 day_grass_sunlight_stability = 0.5
 daylight_canopy_cue_opacity = 0.75
 projected_opening_recovery_by_hour = SubResource("ProjectedOpeningRecovery")
+projected_path_recovery_by_hour = SubResource("ProjectedPathRecovery")
+projected_path_recovery_overcast_scale = 0.7
 afternoon_key_by_hour = SubResource("AfternoonKey")
 dusk_key_fade_hours = Vector2(18.9, 19.5)
 dusk_key_fade_strength = 0.7

@@ -131,6 +131,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"noon_projected_sun": ["Vệt nắng buổi trưa", 1.],
 	&"projected_sun_position": ["Projected sunlight placement", 1.],
 	&"projected_sun_region_alignment": ["Vị trí vệt nắng cục bộ", 1.],
+	&"projected_path_recovery": ["Vệt nắng chiều trên lối đất", 1.],
 	&"projected_sun_softness": ["Projected sunlight softness", 1.],
 	&"projected_sun_openings": ["Projected sunlight openings", 1.],
 	&"moon": ["Moonlight", 2.],
@@ -331,7 +332,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 213
+const LIGHTING_MIX_VERSION := 214
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2108,6 +2109,14 @@ func refresh_daylight_shading() -> void:
 		opening_response *= 1. - _weather.weight
 	projected_sun.set_opening_recovery(0. if _balanced_preview or _flat_lab else
 		_lighting_scale(&"projected_sun_openings") * opening_phase, opening_response)
+	var path_recovery_available := _projected_path_recovery_available()
+	if path_recovery_available and phase > 0. and atmosphere_review == "combined":
+		var amount := DayNight.sample_curve(_biome_profile.projected_path_recovery_by_hour, hour / 24., 0.)
+		var weather_scale := lerpf(1., _biome_profile.projected_path_recovery_overcast_scale, _weather.weight)
+		projected_sun.set_path_recovery(level.projected_path_recovery_region,
+			amount * weather_scale * _lighting_scale(&"projected_path_recovery"))
+	else:
+		projected_sun.set_path_recovery(Vector4.ZERO, 0.)
 	var gain := .64 * _lighting_scale(&"sun_opening") * phase if not _balanced_preview else 0.
 	if gain != _opening_gain:
 		_opening_gain = gain
@@ -2122,6 +2131,9 @@ func refresh_daylight_shading() -> void:
 	var alignment: HSlider = _lighting_sliders.get(&"projected_sun_region_alignment")
 	if alignment != null:
 		alignment.editable = region_available
+	var path_recovery: HSlider = _lighting_sliders.get(&"projected_path_recovery")
+	if path_recovery != null:
+		path_recovery.editable = path_recovery_available
 	var softness: HSlider = _lighting_sliders.get(&"projected_sun_softness")
 	if softness != null:
 		softness.editable = not _balanced_preview and projected_sun.softness_available()
@@ -2129,6 +2141,11 @@ func refresh_daylight_shading() -> void:
 func _projected_placement_available() -> bool:
 	return not _balanced_preview and projected_sun.available() and level != null \
 		and level.projected_sun_shift.is_finite() and level.projected_sun_shift != Vector2.ZERO
+
+func _projected_path_recovery_available() -> bool:
+	return not _balanced_preview and not _flat_lab and level != null and projected_sun.available() \
+		and _biome_profile != null and _biome_profile.projected_path_recovery_by_hour != null \
+		and projected_sun.valid_local_region(level.projected_path_recovery_region)
 
 func _projected_region_available() -> bool:
 	return not _balanced_preview and not _flat_lab and level != null and projected_sun.available() \
@@ -2879,6 +2896,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 213 and effect == &"dawn_canopy_response":
 			missing_value = 0.
+		if version < 214 and effect == &"projected_path_recovery":
+			missing_value = 0.
 		if version < 191 and effect == &"night_leaf_lamp_shoulder":
 			missing_value = 0.
 		if version < 190 and effect == &"day_path_chroma":
@@ -3197,6 +3216,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _projected_placement_available()
 		if effect == &"projected_sun_region_alignment":
 			slider.editable = _projected_region_available()
+		if effect == &"projected_path_recovery":
+			slider.editable = _projected_path_recovery_available()
 		if effect == &"projected_sun_softness":
 			slider.editable = slider.editable and projected_sun.softness_available()
 		if effect == &"regional_sky":
@@ -3258,7 +3279,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_sync_source_path_edge_filter()
 		if changed_effect == &"source_path_edge_filter":
 			return
-	if changed_effect in [&"projected_sun", &"noon_projected_sun", &"projected_sun_position", &"projected_sun_region_alignment", &"projected_sun_softness", &"projected_sun_openings", &"sun_opening"]:
+	if changed_effect in [&"projected_sun", &"noon_projected_sun", &"projected_sun_position", &"projected_sun_region_alignment", &"projected_path_recovery", &"projected_sun_softness", &"projected_sun_openings", &"sun_opening"]:
 		refresh_daylight_shading()
 		return
 	if changed_effect == &"day_cycle_pacing":

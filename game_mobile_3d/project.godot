@@ -183,6 +183,14 @@ gaf_projected_sun_local_shift={
 "type": "vec2",
 "value": Vector2(0, 0)
 }
+gaf_projected_path_recovery_region={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
+gaf_projected_path_recovery_amount={
+"type": "float",
+"value": 0.0
+}
 gaf_projected_sun_softness={
 "type": "float",
 "value": 0.0

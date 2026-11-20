@@ -108,6 +108,8 @@ var biome_controller: BiomeGraphics
 @export var projected_sun_local_region := Vector4.ZERO
 ## Local translation in the two axes of the projected sunlight plane.
 @export var projected_sun_local_shift := Vector2.ZERO
+## XZ center and inner/outer radii in metres for a local break in projected shade.
+@export var projected_path_recovery_region := Vector4.ZERO
 ## Optional verified, editor-only extension of the directional fog atlas.
 @export var directional_air_region_profile := ""
 @export var directional_air_region_sha256 := ""
