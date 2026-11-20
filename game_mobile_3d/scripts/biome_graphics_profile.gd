@@ -64,6 +64,10 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Fraction of ambient irradiance returned to diffuse bark above ground contact.
 @export var bark_diffuse_return_by_hour: Curve
 @export var bark_diffuse_return_tint := Vector3.ONE
+## Early daylight reduction for direct sunlight on high leaves and ambient fill in the crown.
+@export var dawn_canopy_response := Vector2.ZERO
+## X is normalized hour and Y is the blend of the crown response.
+@export var dawn_canopy_by_hour: Curve
 ## Bright-leaf response to the supported player lamp at twilight.
 @export_range(0., 1., .01) var twilight_leaf_lamp_shoulder_strength := 0.
 @export_range(0., 1., .01) var night_leaf_lamp_shoulder_strength := 0.

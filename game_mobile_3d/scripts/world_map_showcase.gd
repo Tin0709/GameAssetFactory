@@ -296,6 +296,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"twilight_leaf_lamp_shoulder": ["Dịu ánh đèn hông trên lá lúc chạng vạng", 1.],
 	&"night_leaf_lamp_shoulder": ["Dịu ánh đèn hông trên lá ban đêm", 1.],
 	&"canopy_direct_softness": ["Dịu nắng trên tán cao", 1.],
+	&"dawn_canopy_response": ["Chiều sâu tán lá buổi sáng", 1.],
 	&"late_canopy_sun": ["Dịu nắng còn lại khi lên đèn", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
 	&"forest_path_dusk": ["Đèn lối rừng lúc chạng vạng", 1.],
@@ -330,7 +331,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 212
+const LIGHTING_MIX_VERSION := 213
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2459,7 +2460,7 @@ func _sync_twilight_crown() -> void:
 			var night := moonlight_weight(hour)
 			depth = lerpf(0.32 * twilight_finish_weight(), 0.62, night) * _lighting_scale(&"crown_ambient_depth")
 	level.grove.set_crown_dusk_occlusion(amount)
-	level.grove.set_crown_ambient_depth(depth)
+	level.grove.set_crown_ambient_depth(clampf(depth + _dawn_canopy_gain().y, 0., 1.))
 	var lamp_shoulder := 0.
 	if level.look.stage == 2 and atmosphere_review == "combined" and not _balanced_preview:
 		if forest_active() and _leaf_lamp_editable(&"twilight_leaf_lamp_shoulder"):
@@ -2478,21 +2479,36 @@ func _leaf_lamp_editable(effect: StringName) -> bool:
 		return _biome_profile.night_leaf_lamp_shoulder_strength > 0.
 	return _biome_profile.twilight_leaf_lamp_shoulder_strength > 0.
 
+func _dawn_canopy_available() -> bool:
+	return not _flat_lab and _biome_profile != null and _biome_profile.dawn_canopy_by_hour != null \
+		and _biome_profile.dawn_canopy_response != Vector2.ZERO and level != null \
+		and is_instance_valid(level.grove) and level.grove.source_oaks \
+		and RenderingServer.get_current_rendering_method() == &"mobile"
+
+func _dawn_canopy_gain() -> Vector2:
+	if _balanced_preview or atmosphere_review != "combined" or not _dawn_canopy_available() \
+			or level.look.stage != 2 or level.view_mode != "gameplay":
+		return Vector2.ZERO
+	var weight := DayNight.sample_curve(_biome_profile.dawn_canopy_by_hour, fposmod(hour, 24.) / 24., 0.)
+	return _biome_profile.dawn_canopy_response.clamp(Vector2.ZERO, Vector2.ONE) \
+		* clampf(weight, 0., 1.) * _lighting_scale(&"dawn_canopy_response")
+
 func _sync_canopy_direct() -> void:
 	if level == null or not is_instance_valid(level.grove):
 		return
 	var state := Vector4.ZERO
+	var gain := _dawn_canopy_gain().x
 	if level.grove.source_oaks and forest_active() and atmosphere_review == "combined" and not _balanced_preview:
 		var time := fposmod(hour, 24.)
 		var afternoon := smoothstep(14.5, 16.5, time) * (1. - smoothstep(18.5, 19.5, time))
-		var gain := .34 * afternoon * _lighting_scale(&"canopy_direct_softness")
+		gain += .34 * afternoon * _lighting_scale(&"canopy_direct_softness")
 		# Keep the afternoon response and lower the remaining high-leaf highlights
 		# only during the handoff to the local lamps.
 		var transition := smoothstep(18.5, 19.25, time) * (1. - smoothstep(19.25, 19.5, time))
 		gain += .42 * transition * _lighting_scale(&"late_canopy_sun")
-		if gain > 0.:
-			var direction: Vector3 = level.get_node("Sun").global_basis.z.normalized()
-			state = Vector4(direction.x, direction.y, direction.z, gain)
+	if gain > 0.:
+		var direction: Vector3 = level.get_node("Sun").global_basis.z.normalized()
+		state = Vector4(direction.x, direction.y, direction.z, minf(gain, 1.))
 	level.grove.set_canopy_direct(state, Vector2(2.5, 6.0) + Vector2.ONE * level.spawn_position.y)
 
 func _spruce_leaf_filter_editable() -> bool:
@@ -2861,6 +2877,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 212 and effect == &"day_grass_sunlight_stability":
 			missing_value = 0.
+		if version < 213 and effect == &"dawn_canopy_response":
+			missing_value = 0.
 		if version < 191 and effect == &"night_leaf_lamp_shoulder":
 			missing_value = 0.
 		if version < 190 and effect == &"day_path_chroma":
@@ -3099,6 +3117,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.available() and not phase_air.evening_anchors.is_empty()
 		if effect in [&"twilight_sky_chroma", &"twilight_ambient", &"twilight_crown"]:
 			slider.editable = slider.editable and sky_response.twilight_available()
+		if effect == &"dawn_canopy_response":
+			slider.editable = not _balanced_preview and _dawn_canopy_available()
 		if effect == &"crown_ambient_depth":
 			slider.editable = slider.editable and is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
 		if effect in [&"twilight_leaf_lamp_shoulder", &"night_leaf_lamp_shoulder"]:
@@ -3334,6 +3354,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		level.terrain_light.bind()
 		if plants != null:
 			plants.grass_light.sync()
+		return
+	if changed_effect == &"dawn_canopy_response":
+		_sync_twilight_crown()
+		_sync_canopy_direct()
 		return
 	if changed_effect in [&"twilight_crown", &"crown_ambient_depth", &"twilight_leaf_lamp_shoulder", &"night_leaf_lamp_shoulder"]:
 		_sync_twilight_crown()
@@ -4124,6 +4148,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = not _balanced_preview and _kai_twilight_ground_bounce_editable()
 		if effect in [&"canopy_player_cue", &"canopy_cue_day_tone", &"canopy_cue_clarity", &"canopy_cue_softness"]:
 			slider.editable = level.canopy_player_cue.available(level)
+		if effect == &"dawn_canopy_response":
+			slider.editable = not _balanced_preview and _dawn_canopy_available()
 		if effect == &"crown_ambient_depth":
 			slider.editable = is_instance_valid(level.grove) and level.grove.source_oaks and sky_response.available()
 		if effect == &"exposure":

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=28 format=3]
+[gd_resource type="Resource" load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -114,6 +114,10 @@ point_count = 6
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.791666667, 1), 0.0, 0.0, 0, 0, Vector2(0.807291667, 0), 0.0, 0.0, 0, 0, Vector2(0.84375, 0), 0.0, 0.0, 0, 0, Vector2(0.864583333, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 6
 
+[sub_resource type="Curve" id="DawnCanopyPhase"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 1), 0.0, 0.0, 0, 0, Vector2(0.322916667, 1), 0.0, 0.0, 0, 0, Vector2(0.489583333, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 6
+
 [resource]
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
@@ -160,6 +164,8 @@ spruce_gap_coverage_by_hour = SubResource("SpruceGapCoveragePhase")
 bark_irradiance_tint = Vector3(0.50, 1.16, 1.79)
 bark_diffuse_return_by_hour = SubResource("ForestBarkDiffuseReturn")
 bark_diffuse_return_tint = Vector3(0.57, 1, 1.39)
+dawn_canopy_response = Vector2(0.18, 0.24)
+dawn_canopy_by_hour = SubResource("DawnCanopyPhase")
 twilight_leaf_lamp_shoulder_strength = 0.4
 night_leaf_lamp_shoulder_strength = 0.3
 actor_shade_sky_by_hour = SubResource("ForestActorShadeSky")
