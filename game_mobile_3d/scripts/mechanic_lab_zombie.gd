@@ -225,6 +225,8 @@ var _sight_state_seconds := 0.0
 var _last_seen_position := Vector3.ZERO
 var _chase_detour := Vector3.INF
 var _chase_detour_time := 0.0
+var _partial_detour_origin := Vector3.INF
+var _partial_detour_target := Vector3.INF
 var _chase_detour_around_zombie := false
 var _chase_stalled_seconds := 0.0
 var _roam_origin := Vector3.ZERO
@@ -707,6 +709,7 @@ func _reset_roam() -> void:
 	_roam_destination = Vector3.INF
 	_roam_wait = LAB_ROAM_DELAY
 	_roam_blocked_seconds = 0.0
+	_partial_detour_origin = Vector3.INF
 	_clear_chase_detour()
 
 func _roam_velocity(delta: float, sample_ai: bool) -> Vector3:
@@ -815,6 +818,7 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 					direct_clear = _lab_path_fraction(space, approach) >= 1.0 and _lab_path_end_clear(space, approach)
 			if not direct_clear:
 				return travel * (minf(_chase_speed, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
+			_partial_detour_origin = Vector3.INF
 		_clear_chase_detour()
 
 	# The offset uses the last confirmed sighting. Plan around a new
@@ -927,6 +931,24 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 			best_remaining = remaining
 			best_route_length = route_length
 			best_connects = connects
+	if not fixed_blocker or search_distance != LAB_DETOUR_LENGTH or not best.is_finite():
+		return best
+	if best_connects:
+		_partial_detour_origin = Vector3.INF
+		return best
+	# A partial leg can return the zombie to the same corner. Give a repeated
+	# attempt its full reachable distance while keeping the same swept checks.
+	var target_position := global_position + target_offset
+	var revisits := _partial_detour_origin.distance_squared_to(global_position) <= LAB_WAYPOINT_ARRIVAL ** 2 \
+		and _partial_detour_target.distance_squared_to(target_position) <= LAB_WAYPOINT_ARRIVAL ** 2
+	_partial_detour_origin = global_position
+	_partial_detour_target = target_position
+	var reachable_length := _chase_speed * LAB_DETOUR_TIMEOUT
+	if revisits and reachable_length > search_distance:
+		var longer := _choose_detour_waypoint(space, bounds, normal, target_offset,
+			stop_distance, packed_blocker, fixed_blocker, reachable_length)
+		if longer.is_finite() and longer.distance_squared_to(global_position) > best.distance_squared_to(global_position):
+			return longer
 	return best
 
 func _detour_reaches_approach(space: PhysicsDirectSpaceState3D, detour: Vector3,
