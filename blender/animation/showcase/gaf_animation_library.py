@@ -9,7 +9,7 @@ from gaf_animation_browser import FILTER_ITEMS,visible_entries
 
 SCENE_TAG='gaf_animation_showcase';RIG='Showcase_Player_Rig';BASELINE='GAF_Neutral_Pose.json'
 REVIEW_TAG='gaf_review_sequence_id';REVIEW_ENTRY='gaf_review_entry_json'
-KAI_PREVIEWS={'Kai - Skin Preview','Kai - Survival 3D'}
+KAI_PREVIEWS=('Kai - Survival 3D','Kai - Skin Preview')
 PREVIEW_PROPS={
     'rifle_stylized_v2':('GAF_Rifle_V2_Preview','GAF_Rifle_V2_Attachment','WeaponCarrier'),
     'sword_sand_block_v1':('GAF_Sword_Sand_Block_V1_Preview','GAF_Sword_Sand_Block_V1_Attachment','WeaponCarrier'),
@@ -475,6 +475,23 @@ class GAF_OT_return_library(bpy.types.Operator):
         try:return_library(context);return {'FINISHED'}
         except Exception as error:context.scene.gaf_error=str(error);self.report({'ERROR'},str(error));return {'CANCELLED'}
 
+class GAF_OT_open_kai_preview(bpy.types.Operator):
+    bl_idname='gaf.open_kai_preview'
+    bl_label='Open Kai Preview'
+    bl_description='Open the selected Kai skin preview scene'
+    scene_name:StringProperty()
+
+    def execute(self,context):
+        preview=bpy.data.scenes.get(self.scene_name)
+        if preview is None or preview.name not in KAI_PREVIEWS:
+            self.report({'ERROR'},'Kai preview scene is unavailable')
+            return {'CANCELLED'}
+        stop_playback(context)
+        context.window.scene=preview
+        if context.area and context.area.type=='VIEW_3D' and preview.camera:
+            context.area.spaces.active.region_3d.view_perspective='CAMERA'
+        return {'FINISHED'}
+
 class GAF_OT_browse_group(bpy.types.Operator):
     bl_idname='gaf.browse_group';bl_label='Browse Animation Group'
     group_id:StringProperty(default='AS_WALKRUN')
@@ -490,6 +507,11 @@ def draw_focus_selector(layout,scene):
     if home is None:return False
     all_entries=ordered_library_entries(data,True)
     box=layout.box()
+    for name in KAI_PREVIEWS:
+        if bpy.data.scenes.get(name) is not None:
+            row=box.row()
+            row.scale_y=1.15
+            row.operator('gaf.open_kai_preview',text=name,icon='SCENE_DATA',depress=scene.name==name).scene_name=name
     row=box.row();row.scale_y=1.15
     row.operator('gaf.browse_group',text='A&S - Walk / Run / Sneak',icon='BOOKMARKS',depress=home.gaf_library_group=='AS_WALKRUN' and not home.gaf_library_search).group_id='AS_WALKRUN'
     box.prop(home,'gaf_library_group',text='Group')
@@ -612,7 +634,7 @@ def show_library_on_open():
     # Blender creates the category list when it first draws the sidebar.
     bpy.app.timers.register(reveal,first_interval=0.1)
 
-CLASSES=[GAF_Clip,GAF_UL_animations,GAF_OT_refresh,GAF_OT_play,GAF_OT_restart,GAF_OT_view,GAF_OT_open_review_sequence,GAF_OT_select_action,GAF_OT_return_library,GAF_OT_browse_group,GAF_PT_animation_library]
+CLASSES=[GAF_Clip,GAF_UL_animations,GAF_OT_refresh,GAF_OT_play,GAF_OT_restart,GAF_OT_view,GAF_OT_open_review_sequence,GAF_OT_select_action,GAF_OT_return_library,GAF_OT_open_kai_preview,GAF_OT_browse_group,GAF_PT_animation_library]
 def register():
     for cls in CLASSES:bpy.utils.register_class(cls)
     bpy.types.Scene.gaf_clips=CollectionProperty(type=GAF_Clip)
