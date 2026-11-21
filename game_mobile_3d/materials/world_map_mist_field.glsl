@@ -53,7 +53,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 additional_radii;
  vec4 additional_scatter_multiplier;
  vec4 depth_scatter; // World metres along the ray: start, full effect, source gain, extinction gain (negative selects the bounded morning band).
- vec4 depth_scatter_color; // Linear change to ambient source RGB, enabled in w.
+ vec4 depth_scatter_color; // Linear change to ambient source RGB, entry balance in w.
  vec4 ground_haze_band; // view-depth start/end and lower/upper world Y
  vec4 ground_haze; // low ground source gain, rear chroma mix, focus depth, near-entry source gain
 #ifdef GAF_SKY_AIR
@@ -189,7 +189,7 @@ vec3 ambient_depth_source(float depth_m, float view_depth, float world_y){
  float amount=0.;
  if(p.depth_scatter.z>0.)amount=smoothstep(p.depth_scatter.x,p.depth_scatter.y,depth_m);
  vec3 source=p.scatter.rgb;
- if(p.depth_scatter_color.w>0.)source+=p.depth_scatter_color.rgb*amount;
+ source+=p.depth_scatter_color.rgb*amount;
  if (p.ground_haze.y > 0.0 && view_depth > p.ground_haze.z + 1.5) {
   float rear = smoothstep(1.5, 7.5, view_depth - p.ground_haze.z);
   const vec3 luma = vec3(.2126, .7152, .0722);
@@ -208,6 +208,13 @@ vec3 ambient_depth_source(float depth_m, float view_depth, float world_y){
   float after_entry = depth_m - p.origin.w;
   float front = smoothstep(0.0, 1.5, after_entry);
   float back = 1.0 - smoothstep(6.0, 11.0, after_entry);
+  float entry_balance = p.depth_scatter_color.w;
+  if (entry_balance > 0.0) {
+   // Bring some of the entry light farther into the medium. Extinction is evaluated separately.
+   float rear = smoothstep(5.8, 8.25, after_entry) * (1.0 - smoothstep(9.25, 13.0, after_entry));
+   front = mix(front * back, rear * 1.25, entry_balance);
+   back = 1.0;
+  }
   entry_air = p.ground_haze.w * front * back;
  }
  return source*p.scatter.w*(1.+p.depth_scatter.z*amount+low_air+entry_air);

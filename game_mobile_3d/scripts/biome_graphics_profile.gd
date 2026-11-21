@@ -116,6 +116,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Added light near the entry to the spatial mist, sampled by normalized hour.
 ## An empty track leaves the original medium lighting in place.
 @export var mist_entry_scatter_by_hour: Curve
+## Fraction of entry lighting shifted deeper into the same medium.
+@export_range(0., 1., .01) var mist_entry_depth_balance := 0.
 ## Mix of the rear ambient scattering tint during daylight.
 @export_range(0., 1., .01) var mist_rear_chroma := 0.
 ## Adds ambient sky color to the existing mist in partially occluded air.

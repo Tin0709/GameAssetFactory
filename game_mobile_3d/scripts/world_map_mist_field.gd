@@ -59,7 +59,7 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		depth_scatter: float, depth_color: Vector3 = Vector3.ZERO, depth_optical: float = 0.0,
 		depth_scatter_offset: float = DEPTH_SCATTER_START_M, morning_optical: float = 0.0,
 		depth_scatter_ramp: float = DEPTH_SCATTER_RAMP_M, ground_haze := PackedFloat32Array(),
-		entry_scatter_gain: float = 0., sky_air := PackedFloat32Array()) -> void:
+		entry_scatter_gain: float = 0., sky_air := PackedFloat32Array(), entry_depth_balance := 0.) -> void:
 	var path_bytes := path_light.to_byte_array()
 	if path_bytes.size() == LEGACY_PATH_SOURCE_BYTES:
 		path_bytes.resize(PATH_SOURCE_BYTES)
@@ -92,8 +92,9 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		optical_gain = -clampf(morning_optical, 0.0, MAX_DEPTH_OPTICAL_GAIN)
 	var offset := maxf(0.0, depth_scatter_offset) if is_finite(depth_scatter_offset) else DEPTH_SCATTER_START_M
 	var ramp := maxf(depth_scatter_ramp, 0.001) if is_finite(depth_scatter_ramp) else DEPTH_SCATTER_RAMP_M
+	var balance := clampf(entry_depth_balance, 0., 1.) if entry > 0. and is_finite(entry_depth_balance) else 0.
 	var depth_bytes := PackedFloat32Array([entry + offset, entry + offset + ramp,
-		gain, optical_gain, color.x, color.y, color.z, 1.0 if color != Vector3.ZERO else 0.0]).to_byte_array()
+		gain, optical_gain, color.x, color.y, color.z, balance]).to_byte_array()
 	var ground_haze_bytes := ground_haze.to_byte_array() if ground_haze.size() == 8 else PackedByteArray()
 	ground_haze_bytes.resize(GROUND_HAZE_BYTES)
 	ground_haze_bytes.encode_float(28, clampf(entry_scatter_gain, 0., 4.) if entry > 0. and is_finite(entry_scatter_gain) else 0.)

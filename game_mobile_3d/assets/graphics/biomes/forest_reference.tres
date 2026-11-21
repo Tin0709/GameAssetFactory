@@ -183,6 +183,7 @@ lantern_ground_return_by_hour = SubResource("ForestLanternGroundReturn")
 actor_side_sky_by_hour = SubResource("ForestActorSideSky")
 alternate_mist_by_hour = SubResource("LowForestMistPhase")
 mist_entry_scatter_by_hour = SubResource("ForestEntryScatter")
+mist_entry_depth_balance = 0.55
 mist_rear_chroma = 0.58
 mist_sky_scatter_by_hour = SubResource("ForestMistSky")
 mist_dusk_sky_scatter_by_hour = SubResource("ForestDuskMistSky")
