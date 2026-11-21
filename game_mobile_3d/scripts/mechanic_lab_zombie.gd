@@ -1219,6 +1219,7 @@ func _update_death(delta: float) -> void:
 				and not _corpse_floor.disabled and _corpse_age >= WALL_BRACE_MIN_AGE \
 				and contact.supports == 1 and contact.leg_supported:
 			limbs_supporting = ragdoll.has_flat_corner_brace(SABRE_CORNER_LANDING_MAX_SPEED, CORPSE_SETTLE_SPIN)
+			_absorb_late_foot_rebounds(contact)
 		if not limbs_supporting and contact.linear < DEATH_LIMB_SUPPORT_MAX_SPEED:
 			limbs_supporting = _has_tuned_wall_brace(contact)
 		_limb_support_age = _limb_support_age + delta if limbs_supporting else 0.0
@@ -1240,6 +1241,21 @@ func _update_death(delta: float) -> void:
 			supported = absf(_corpse_axis().normalized().y) <= CORPSE_UPRIGHT_AXIS_Y
 		_update_landing_forces(delta, sabre_finisher, supported, contact)
 		_check_corpse_settled(delta, contact)
+
+func _absorb_late_foot_rebounds(contact: Dictionary) -> void:
+	var left: PhysicalBone3D = ragdoll.bodies["Leg.L"]
+	if is_baby or ragdoll.use_tuned_wall_sweep or left.bounce <= 0.0 \
+			or contact.linear > SABRE_CORNER_LANDING_MAX_SPEED or contact.angular > CORPSE_SETTLE_SPIN \
+			or absf(_corpse_axis().normalized().y) > CORPSE_UPRIGHT_AXIS_Y \
+			or not ragdoll.has_flat_wall_rest_support(true):
+		return
+	var floor_body := _corpse_floor.get_parent()
+	var right: PhysicalBone3D = ragdoll.bodies["Leg.R"]
+	if Ragdoll._body_supported_by(left, floor_body) or Ragdoll._body_supported_by(right, floor_body):
+		# A foot can keep bouncing against the floor while the upper body
+		# slides down a wall. Absorb that rebound as the body tips over.
+		left.bounce = 0.0
+		right.bounce = 0.0
 
 func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool, motion: Dictionary) -> void:
 	var flat_floor := is_instance_valid(_corpse_floor) and not _corpse_floor.disabled
