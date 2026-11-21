@@ -500,6 +500,8 @@ class GAF_OT_browse_group(bpy.types.Operator):
     def execute(self,context):
         home=library_home(context.scene)
         if home is None:return {'CANCELLED'}
+        if context.scene!=home and json.loads(home['gaf_manifest_snapshot']).get('compact_showcase'):
+            return_library(context)
         home.gaf_library_group=self.group_id;home.gaf_library_search=''
         return {'FINISHED'}
 
@@ -515,7 +517,8 @@ def draw_focus_selector(layout,scene):
             row.scale_y=1.15
             row.operator('gaf.open_kai_preview',text=name,icon='SCENE_DATA',depress=scene.name==name).scene_name=name
     row=box.row();row.scale_y=1.15
-    row.operator('gaf.browse_group',text='A&S - Walk / Run / Sneak',icon='BOOKMARKS',depress=home.gaf_library_group=='AS_WALKRUN' and not home.gaf_library_search).group_id='AS_WALKRUN'
+    compact=data.get('compact_showcase')
+    row.operator('gaf.browse_group',text='A&S - Walk / Run / Sneak',icon='BOOKMARKS',depress=(not compact or scene==home) and home.gaf_library_group=='AS_WALKRUN' and not home.gaf_library_search).group_id='AS_WALKRUN'
     if scene.get(SCOUT_TAG):
         rig=scene.objects.get('Scout | Rig')
         if rig is not None:
@@ -524,11 +527,13 @@ def draw_focus_selector(layout,scene):
             face.prop(rig,'["Face preset"]',text='Expression')
             face.label(text=SCOUT_FACES[rig['Face preset']])
             face.prop(rig,'["Scarf down"]',text='Lower scarf')
-    if not data.get('compact_showcase'):
+    if compact and scene!=home:
+        return True
+    if not compact:
         box.prop(home,'gaf_library_group',text='Group')
         box.prop(home,'gaf_library_search',text='',icon='VIEWZOOM',placeholder='Search all animations...')
     entries=visible_entries(all_entries,home.gaf_library_group,home.gaf_library_search)
-    if not data.get('compact_showcase'):
+    if not compact:
         box.label(text=f'{len(entries)} shown / {len(all_entries)} entries',icon='FILTER')
     if not entries:box.label(text='No matching animations',icon='INFO')
     active=bpy.data.objects[RIG].animation_data.action
