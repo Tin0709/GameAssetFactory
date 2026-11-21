@@ -273,7 +273,7 @@ var _landing_gravity_sent := NAN
 var _landing_linear_damp_sent := NAN
 var _terrain_rest_age := 0.0
 var _terrain_rest_duration := 0.0
-var _terrain_rest_corner := false
+var _terrain_rest_strict := false
 var _terrain_rest_poses: Dictionary[String, Transform3D]
 var _ragdoll_layout: Dictionary
 var _corpse_floor: CollisionShape3D
@@ -1458,7 +1458,7 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 	var slow_support: bool = (not normally_supported or grounded_baby) and not ragdoll.source_joints.is_empty() \
 		and (motion.supports >= 2 or intermittent_foot) \
 		and (slow_motion or measure_supported_pose)
-	var corner_support := false
+	var strict_wall_rest := false
 	# A second foot can lose contact for a tick while the pose stays braced.
 	if slow_motion and ragdoll.floor_landing_blended and _has_tuned_wall_brace(motion):
 		slow_support = ragdoll.max_anchor_error() <= Ragdoll.SOURCE_ANCHOR_TOLERANCE
@@ -1471,12 +1471,21 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 				slow_support = ragdoll.has_wall_rest_with_near_foot()
 				# Two wall faces can carry the torso even with the second leg
 				# off the floor. Require the tighter terrain pose envelope.
-				corner_support = not slow_support and not _corpse_floor.disabled \
+				strict_wall_rest = not slow_support and not _corpse_floor.disabled \
 					and _corpse_age >= WALL_BRACE_MIN_AGE \
 					and ragdoll.floor_landing_blended and ragdoll.has_flat_corner_brace()
-				slow_support = slow_support or corner_support
+				slow_support = slow_support or strict_wall_rest
 			elif slow_support:
 				slow_support = grounded_baby or ragdoll.has_flat_wall_rest_support(motion.core_supports > 0)
+				if not slow_support and two_parts and not is_baby and not _corpse_floor.disabled \
+						and _death_strike == DeathStrike.SABRE_FINISHER and _corpse_age >= WALL_BRACE_MIN_AGE \
+						and ragdoll.floor_landing_blended and not ragdoll.use_tuned_wall_sweep:
+					# A limb can brace the wall while both feet carry the weight.
+					var floor_body := _corpse_floor.get_parent()
+					strict_wall_rest = Ragdoll._body_supported_by(ragdoll.bodies["Leg.L"], floor_body) \
+						and Ragdoll._body_supported_by(ragdoll.bodies["Leg.R"], floor_body) \
+						and ragdoll.terrain_support_margin(true) > CORPSE_TERRAIN_SUPPORT_MARGIN
+					slow_support = strict_wall_rest
 			slow_support = slow_support and ragdoll.max_anchor_error() <= Ragdoll.SOURCE_ANCHOR_TOLERANCE
 		else:
 			slow_support = motion.core_supports > 0 and (not two_parts or motion.leg_supported) \
@@ -1488,7 +1497,7 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 	# Solver velocities can oscillate on a supported edge. Check that each
 	# body stays near the same pose throughout the whole rest window.
 	var duration := CORPSE_WALL_REST_TIME if flat_floor or two_parts else CORPSE_TERRAIN_REST_TIME
-	var flat_wall_support := flat_floor and not corner_support
+	var flat_wall_support := flat_floor and not strict_wall_rest
 	var shift_limit := CORPSE_FLAT_WALL_REST_SHIFT if flat_wall_support else CORPSE_TERRAIN_REST_SHIFT
 	var turn_limit := CORPSE_FLAT_WALL_REST_TURN if flat_wall_support else CORPSE_TERRAIN_REST_TURN
 	var moved := false
@@ -1500,11 +1509,11 @@ func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: b
 				or pose.basis.get_rotation_quaternion().angle_to(start.basis.get_rotation_quaternion()) > turn_limit:
 			moved = true
 			break
-	if moved or _terrain_rest_poses.is_empty() or duration != _terrain_rest_duration or corner_support != _terrain_rest_corner:
+	if moved or _terrain_rest_poses.is_empty() or duration != _terrain_rest_duration or strict_wall_rest != _terrain_rest_strict:
 		for name: String in ragdoll.bodies:
 			_terrain_rest_poses[name] = ragdoll.bodies[name].global_transform
 		_terrain_rest_duration = duration
-		_terrain_rest_corner = corner_support
+		_terrain_rest_strict = strict_wall_rest
 		_terrain_rest_age = 0.0
 		return false
 	_terrain_rest_age += delta
