@@ -107,6 +107,10 @@ const WALL_BRACE_MIN_AGE := 1.5
 const SABRE_CORNER_LANDING_MAX_SPEED := 0.60
 const SABRE_BRACE_GRAVITY_SHARE := 0.65
 const SABRE_BRACE_LIMB_SPEED_SHARE := 0.60
+const SABRE_SUSPENDED_DESCENT_MIN_AGE := 0.88
+const SABRE_SUSPENDED_DESCENT_MAX_SPEED := 1.50
+const SABRE_SUSPENDED_DESCENT_MIN_FALL_SPEED := 0.08
+const SABRE_SUSPENDED_DESCENT_GRAVITY_SHARE := 0.33
 const SABRE_BRACE_BLEND_TIME := 0.10
 const SABRE_ROLL_RESPONSE_TIME := 0.10
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
@@ -513,11 +517,41 @@ func _physics_process(delta: float) -> void:
 		_skipped_blocked_step = _wait_for_walk_retry(destination)
 	if not _skipped_blocked_step:
 		move_and_slide()
+		if crowd and not _target_aggressive and not pushed and controlled_time == delta and not is_on_floor():
+			var clip := animation.current_animation
+			if clip == IDLE or clip in WALK_STEP_NOTIFIES:
+				_recover_patrol_floor()
 		_blocked_walk = crowd_walking and is_on_floor() and is_on_wall() \
 			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_WALK_MAX_SPEED_SQUARED
 		_update_walk_blocker(destination)
 	_advance_animation(delta, travel)
 	ragdoll.sample(delta)
+
+func _recover_patrol_floor() -> void:
+	if _corpse_floor.disabled or not is_on_wall() or get_slide_collision_count() < max_slides \
+			or (collision_mask & LEVEL_COLLISION_MASK) == 0:
+		return
+	var hit := get_last_slide_collision()
+	var peer := hit.get_collider() as CharacterBody3D
+	if peer == null or peer.get_parent() != get_parent() \
+			or (peer.collision_layer & LIVING_ZOMBIE_LAYER) == 0 or absf(hit.get_normal().y) > 0.05:
+		return
+	var box := _corpse_floor.shape as BoxShape3D
+	if box == null or not _corpse_floor.global_basis.is_equal_approx(Basis.IDENTITY):
+		return
+	var foot := _corpse_floor.to_local(global_position)
+	var half := box.size * 0.5
+	if absf(foot.y - half.y) > safe_margin or absf(foot.x) + _live_capsule.radius > half.x \
+			or absf(foot.z) + _live_capsule.radius > half.z:
+		return
+	# A packed capsule can spend every slide on a neighboring zombie while its
+	# feet stay within the flat floor's margin. Check the floor without peers.
+	var movement_mask := collision_mask
+	collision_mask = LEVEL_COLLISION_MASK
+	apply_floor_snap()
+	collision_mask = movement_mask
+	if is_on_floor():
+		velocity.y = 0.0
 
 func _wait_for_walk_retry(destination: Vector3) -> bool:
 	var retry_hz := BLOCKED_CHASE_RETRY_HZ if _blocking_zombie_id == 0 else PACKED_WALK_RETRY_HZ
@@ -1242,6 +1276,8 @@ func _update_death(delta: float) -> void:
 			supported = absf(_corpse_axis().normalized().y) <= CORPSE_UPRIGHT_AXIS_Y
 		_update_landing_forces(delta, sabre_finisher, supported, contact)
 		_check_corpse_settled(delta, contact)
+		if sabre_finisher and not _corpse_parked:
+			_assist_suspended_sabre_descent(contact)
 
 func _absorb_late_foot_rebounds(contact: Dictionary) -> void:
 	var left: PhysicalBone3D = ragdoll.bodies["Leg.L"]
@@ -1316,7 +1352,7 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		var slow_roll := (1.0 - smoothstep(0.4, 1.5, motion.linear)) * smoothstep(0.60, 0.90, _corpse_age)
 		var target := SABRE_LATE_ROLL_ANGULAR_DAMP * roll_weight * slow_roll
 		if _had_upper_body_brace and damp_supported_roll and motion.supports >= 4 and motion.core_supports == 1:
-			target *= _suspended_chest_damping_scale()
+			target *= 1.0 - _suspended_chest_weight()
 		var roll_gain := DEATH_SUPPORTED_ANGULAR_DAMP - DEATH_LANDING_ANGULAR_DAMP
 		var damping_step := roll_gain * delta / SABRE_ROLL_RESPONSE_TIME
 		# Share the existing ramp with the ordinary supported-roll damping.
@@ -1357,21 +1393,44 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	_landing_gravity_sent = final_gravity
 	_landing_linear_damp_sent = linear_damp
 
-func _suspended_chest_damping_scale() -> float:
+func _assist_suspended_sabre_descent(motion: Dictionary) -> void:
+	if _settled_seconds > 0.0 or _corpse_age < SABRE_SUSPENDED_DESCENT_MIN_AGE or not is_instance_valid(_corpse_floor) \
+			or _corpse_floor.disabled or is_baby or ragdoll.source_joints.is_empty() \
+			or not is_equal_approx(ragdoll_gravity_multiplier, 1.0) or ragdoll.use_tuned_wall_sweep \
+			or not ragdoll.floor_landing_blended or _wall_gravity \
+			or motion.supports < 4 or motion.core_supports != 1 or not motion.leg_supported \
+			or motion.linear > SABRE_SUSPENDED_DESCENT_MAX_SPEED \
+			or absf(_corpse_axis().normalized().y) > SABRE_LOW_ROLL_MAX_AXIS_Y:
+		return
+	var chest: PhysicalBone3D = ragdoll.bodies.Chest
+	var floor_body := _corpse_floor.get_parent()
+	if chest.linear_velocity.y > -SABRE_SUSPENDED_DESCENT_MIN_FALL_SPEED \
+			or not Ragdoll._body_supported_by(ragdoll.bodies.Head, floor_body):
+		return
+	var height_weight := _suspended_chest_weight()
+	if height_weight <= 0.00001:
+		return
+	# When the planted head and legs carry a descending chest, briefly restore
+	# part of the Overworld gravity. Apply it evenly so it adds no launch torque.
+	var acceleration := Vector3.DOWN * (ZOMBIE_GRAVITY - get_gravity().length()) * ragdoll_gravity_multiplier
+	acceleration *= height_weight * SABRE_SUSPENDED_DESCENT_GRAVITY_SHARE
+	for body: PhysicalBone3D in ragdoll.bodies.values():
+		PhysicsServer3D.body_apply_central_force(body.get_rid(), acceleration * body.mass)
+
+func _suspended_chest_weight() -> float:
 	var floor_box := _corpse_floor.shape as BoxShape3D
 	if floor_box == null or not _corpse_floor.global_basis.y.is_equal_approx(Vector3.UP):
-		return 1.0
+		return 0.0
 	var floor_body := _corpse_floor.get_parent()
 	if not Ragdoll._body_supported_by(ragdoll.bodies["Leg.L"], floor_body) \
 			or not Ragdoll._body_supported_by(ragdoll.bodies["Leg.R"], floor_body):
-		return 1.0
-	# Both feet are down after the brace, but the chest can still be suspended.
-	# Restore the extra roll resistance as the chest approaches the floor.
+		return 0.0
+	# Require both feet on the actual flat floor, and fade out as the chest descends.
 	var collider := ragdoll.bodies.Chest.get_child(0) as CollisionShape3D
 	var half_size := (collider.shape as BoxShape3D).size * 0.5
 	var chest_bottom := collider.global_position.y - collider.global_basis.transposed().y.abs().dot(half_size)
 	var floor_top := _corpse_floor.global_position.y + floor_box.size.y * 0.5
-	return 1.0 - smoothstep(DEATH_FLOOR_CONTACT_MARGIN, 0.10, chest_bottom - floor_top)
+	return smoothstep(DEATH_FLOOR_CONTACT_MARGIN, 0.10, chest_bottom - floor_top)
 
 func _resist_grounded_slide(drag: float) -> void:
 	# A uniform horizontal acceleration opposes whole-body drift. Leave

@@ -10,6 +10,9 @@ varying vec3 study_face;
 varying float study_tip_weight;
 varying float study_cloud;
 varying vec3 grass_opening_incident;
+varying flat float grass_terrace_fill;
+varying flat float grass_canopy_ground_ev;
+varying vec3 grass_canopy_incident;
 float grass_fresnel(float x){float q=1.0-x;float q2=q*q;return q2*q2*q;}
 void light(){
 	float shadow_attenuation = GAF_RESOLVE_TERRAIN_SHADOW;
@@ -30,8 +33,18 @@ void light(){
 	if (LIGHT_IS_DIRECTIONAL && gaf_ground_shadow_fill_reduction.x > 0.0) {
 		ground_fill = gaf_ground_shadow_fill_multiplier(gaf_ground_shadow_fill_reduction.x, shadow_attenuation);
 	}
-	DIFFUSE_LIGHT += gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
-		shadow_attenuation, cloud, sqrt(front), .82) * ground_fill;
+	vec3 shade_fill = gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
+		shadow_attenuation, cloud, sqrt(front), .82);
+	if (gaf_grass_terrace_shadow_state.z > 0.0 && shade_fill.g > 0.0) {
+		ground_fill *= mix(1.0, grass_terrace_fill, gaf_terrace_shadow_weight(shadow_attenuation));
+	}
+	vec2 canopy_delta = vec2(0.0);
+	if (gaf_canopy_ground_fill.x > 0.0 && shade_fill.g > 0.0 &&
+			grass_canopy_ground_ev != 0.0 && shadow_attenuation < .58) {
+		canopy_delta = gaf_canopy_ground_delta(grass_canopy_ground_ev, shadow_attenuation);
+	}
+	DIFFUSE_LIGHT += shade_fill * (ground_fill * (1.0 + canopy_delta.y));
+	DIFFUSE_LIGHT += grass_canopy_incident * canopy_delta.x;
 	float gain = gaf_opening_gain(LIGHT_IS_DIRECTIONAL, shadow_attenuation * cloud);
 	float opening_fill = gaf_diffuse_opening_weight(LIGHT_IS_DIRECTIONAL, LIGHT, LIGHT_COLOR, INV_VIEW_MATRIX, shadow_attenuation * cloud);
 	if (opening_fill > 0.0) {

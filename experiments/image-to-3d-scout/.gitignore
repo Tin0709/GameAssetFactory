@@ -1,0 +1,8 @@
+/private/
+/weights/
+/vendor/
+/.venv/
+/__pycache__/
+*.log
+
+/.venv313/

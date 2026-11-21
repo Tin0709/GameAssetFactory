@@ -9,6 +9,7 @@ varying float canopy_direct_coverage;
 #endif
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 global uniform float gaf_stone_shade_reach;
+global uniform vec2 gaf_stone_top_shadow_fill;
 global uniform float gaf_stone_wall_return;
 global uniform vec4 gaf_stone_sunset_region;
 global uniform vec4 gaf_stone_sunset_beam;
@@ -18,6 +19,8 @@ global uniform vec2 gaf_path_sun_response;
 global uniform vec2 gaf_path_sun_core;
 global uniform vec3 gaf_path_sun_core_direction;
 varying vec2 stone_sunset_position;
+varying float terrain_canopy_ground_ev;
+varying vec3 terrain_canopy_incident;
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
 #define GAF_WORLD_FOLIAGE_LOBE_ONLY
@@ -86,7 +89,29 @@ void light() {
 		float shade = 1.0 - smoothstep(.03, .30, shadow_attenuation * nl);
 		shadow_diffuse *= 1.0 - gaf_stone_foot_fill * terrain_stone_foot * shade;
 	}
-	DIFFUSE_LIGHT += shadow_diffuse * ground_fill;
+	if (ground_grade == 3 && use_source_terrain && surface_top > .998 && shadow_diffuse.g > 0.0 &&
+			gaf_stone_top_shadow_fill.x > 0.0) {
+		// Follow the existing sky field so sheltered shelves receive less supplemental fill.
+		float sky = dot(terrain_sky_light * terrain_ambient_tint * terrain_ambient_scale, vec3(.2126, .7152, .0722));
+		float pivot = gaf_stone_top_shadow_fill.y;
+		float openness = smoothstep(pivot * .72, pivot * 1.16, sky);
+		float shadow = 1.0 - smoothstep(.06, .45, shadow_attenuation);
+		shadow_diffuse *= 1.0 + mix(-.62, .36, openness) * gaf_stone_top_shadow_fill.x * shadow;
+	}
+	if (gaf_grass_terrace_shadow_state.z > 0.0 && shadow_diffuse.g > 0.0 &&
+			shadow_attenuation < .58 && use_source_terrain && (ground_grade == 1 || ground_grade == 2) && surface_top > .998) {
+		float green = smoothstep(1.04, 1.20, ALBEDO.g / max(ALBEDO.r, .0001)) *
+			smoothstep(1.12, 1.35, ALBEDO.g / max(ALBEDO.b, .0001));
+		float weight = gaf_terrace_shadow_weight(shadow_attenuation) * green;
+		shadow_diffuse *= mix(1.0, gaf_terrace_shadow_fill(stone_sunset_position), weight);
+	}
+	vec2 canopy_delta = vec2(0.0);
+	if (gaf_canopy_ground_fill.x > 0.0 && shadow_diffuse.g > 0.0 &&
+			terrain_canopy_ground_ev != 0.0 && shadow_attenuation < .58) {
+		canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev, shadow_attenuation);
+	}
+	DIFFUSE_LIGHT += shadow_diffuse * (ground_fill * (1.0 + canopy_delta.y));
+	DIFFUSE_LIGHT += terrain_canopy_incident * canopy_delta.x;
 	// The same directional light and shadow term shape both the original key and the warmth.
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sun_warmth.w > 0.0
 			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sun_warmth.xyz) > 0.9999

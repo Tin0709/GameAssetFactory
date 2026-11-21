@@ -1,0 +1,11 @@
+# Add on a separate local Codex profile only if headless tooling is needed.
+[mcp_servers.blender_poc]
+command = "uv"
+args = ["tool", "uvx", "--from", "git+https://projects.blender.org/lab/blender_mcp.git@v1.0.3#subdirectory=mcp", "blender-mcp", "--transport", "stdio"]
+tool_timeout_sec = 120
+
+[mcp_servers.blender_poc.env]
+BLENDER_PATH = 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe'
+
+BLENDER_MCP_HOST = "127.0.0.1"
+BLENDER_MCP_PORT = "65173"

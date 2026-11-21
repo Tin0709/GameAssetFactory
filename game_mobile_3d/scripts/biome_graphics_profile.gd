@@ -60,6 +60,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export var ground_shadow_fill_reduction := Vector2.ZERO
 ## Reduction of supplemental shadow fill at the foot of supported stone risers.
 @export_range(0.0, 0.66) var stone_foot_fill := 0.0
+## Linear sky luminance at the center of the stone shelf fill response, morning and afternoon.
+@export var stone_top_shadow_fill_pivot := Vector2.ZERO
 ## Reduction of the path's supplemental shadow fill and gain for moderately lit dirt.
 @export var path_sun_response := Vector2.ZERO
 ## Diffuse gain and warmth in the illuminated core of a dirt path.
@@ -168,6 +170,11 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., .6, .01) var grass_sky_height := 0.
 ## Blend toward the turf atlas chroma (X) and reduce base luminance in EV (Y).
 @export var grass_ground_tone := Vector2.ZERO
+## Strength of the terrain relief adjustment to supplemental grass shade, clear and overcast.
+@export var grass_terrace_shadow_fill := Vector2.ZERO
+## Strength of the sky and fill response for ground below the proven canopy field.
+@export var canopy_ground_fill := Vector2.ZERO
+@export_range(0.0, 1.0) var canopy_ground_fill_overcast := 1.0
 ## Shadow recovery for dark greens in the optional reference finish.
 @export_range(0., 1., .01) var daylight_green_grade_scale := 0.
 ## Keep the reference local-exposure blur footprint steadier when zooming out.

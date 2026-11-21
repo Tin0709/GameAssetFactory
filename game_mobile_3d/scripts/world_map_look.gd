@@ -69,6 +69,7 @@ var saved_shadow_16bit:=true
 var saved_shadow_quality:=1
 var filtered_textures: Dictionary={}
 var path_map: ImageTexture
+var _terrace_relief: ImageTexture
 var path_map_image: Image
 var _planted_path_map_image: Image
 var _path_map_vegetation_visible:=true
@@ -267,6 +268,7 @@ func make_material(native: BaseMaterial3D,kind: String) -> ShaderMaterial:
 	return material
 
 func build_path_map() -> void:
+	_terrace_relief = null
 	var bounds: Dictionary=level.runtime.source_bounds
 	path_map_origin=Vector2(bounds.min[0]+level.runtime.offset[0],bounds.min[2]+level.runtime.offset[2])
 	path_map_size=Vector2(bounds.max[0]-bounds.min[0]+1,bounds.max[2]-bounds.min[2]+1)
@@ -304,6 +306,47 @@ func build_path_map() -> void:
 	_stamp_oak_root_sites()
 	_planted_path_map_image=path_map_image.duplicate()
 	path_map=ImageTexture.create_from_image(path_map_image)
+
+
+func get_terrace_relief() -> ImageTexture:
+	if _terrace_relief != null or path_map_image == null:
+		return _terrace_relief
+	var size := path_map_image.get_size()
+	var height := PackedVector2Array()
+	height.resize(size.x * size.y)
+	for z in size.y:
+		for x in size.x:
+			var cell := path_map_image.get_pixel(x, z)
+			if cell.a > 0.:
+				height[z * size.x + x] = Vector2(cell.g, 1.)
+	var local_mean := _blur_terrace_heights(_blur_terrace_heights(height, size, Vector2i.RIGHT), size, Vector2i.DOWN)
+	var codes := PackedByteArray()
+	codes.resize(height.size())
+	codes.fill(128)
+	for i in height.size():
+		var covered := local_mean[i].y
+		if height[i].y > 0. and covered >= .70:
+			var relief := clampf(height[i].x - local_mean[i].x / covered, -.75, .75)
+			codes[i] = 128 + roundi(relief * (127. / .75))
+	_terrace_relief = ImageTexture.create_from_image(Image.create_from_data(size.x, size.y, false, Image.FORMAT_R8, codes))
+	return _terrace_relief
+
+func _blur_terrace_heights(source: PackedVector2Array, size: Vector2i, axis: Vector2i) -> PackedVector2Array:
+	# One channel accumulates height and the other accounts for absent map cells.
+	const WEIGHTS := [.025218872585, .099418154599, .226417356486, .297891232661,
+		.226417356486, .099418154599, .025218872585]
+	var filtered := PackedVector2Array()
+	filtered.resize(source.size())
+	var bounds := Rect2i(Vector2i.ZERO, size)
+	for z in size.y:
+		for x in size.x:
+			var weighted := Vector2.ZERO
+			for sample in WEIGHTS.size():
+				var tile := Vector2i(x, z) + axis * (sample - 3)
+				if bounds.has_point(tile):
+					weighted += source[tile.y * size.x + tile.x] * WEIGHTS[sample]
+			filtered[z * size.x + x] = weighted
+	return filtered
 
 func refresh_vegetation_ground_detail() -> void:
 	var enabled:bool=level.get("vegetation_visible")!=false

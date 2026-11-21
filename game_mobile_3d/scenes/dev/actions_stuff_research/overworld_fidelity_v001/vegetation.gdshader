@@ -110,9 +110,16 @@ void vertex(){
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 	// The patch origin stays in its own cell while the blades bend.
 	grass_support_cell = vec3(floor(MODEL_MATRIX[3].xz), MODEL_MATRIX[3].y);
+	grass_terrace_fill = 1.0;
+	if (!IN_SHADOW_PASS && gaf_grass_terrace_shadow_state.z > 0.0 &&
+			distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= .005) {
+		grass_terrace_fill = gaf_terrace_shadow_fill(MODEL_MATRIX[3].xz);
+	}
 	study_ground_sky_at_root = study_ground_sky_mix > 0.0 ? grass_ground_sky(MODEL_MATRIX[3].xz) : vec4(0.0);
 	study_raw_canopy_sky = gaf_spruce_sky(MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz);
 	study_canopy_sky_at_root = gaf_ground_canopy_sky(study_raw_canopy_sky);
+	grass_canopy_ground_ev = !IN_SHADOW_PASS && tinted_grass && gaf_canopy_ground_fill.x > 0.0
+		? gaf_canopy_ground_ev(study_canopy_sky_at_root) : 0.0;
 	study_day_bounce_at_root = grass_day_bounce(MODEL_MATRIX[3].xz);
 #endif
 	// Full float custom attribute: normalized height, blade height, phase, response.
@@ -295,6 +302,10 @@ void fragment(){
 		float grass_sky = exp2(study_grass_sky_height * (height_response - .42));
 		EMISSION *= grass_sky;
 		AO = min(AO * grass_sky, 1.0);
+	}
+	grass_canopy_incident = vec3(0.0);
+	if (grass_canopy_ground_ev != 0.0) {
+		grass_canopy_incident = EMISSION / max(color, vec3(.001));
 	}
 	EMISSION += color * (1.0 - METALLIC) * study_day_bounce_at_root;
 	EMISSION *= sole;

@@ -125,6 +125,8 @@ var _slam_swing_serial := -1
 var _slam_audio_frame := -1
 var _slam_audio_point: Vector3
 var _contact_sparks: ContactSparks
+var _grounded_impact_dispatch := false
+var _grounded_contact_fx: Array[Dictionary] = []
 var _movement_audio: MovementAudio
 var _kai_skin: KaiSkin
 var _md2_skin_visibility: Dictionary[MeshInstance3D, bool] = {}
@@ -271,7 +273,7 @@ func _ready() -> void:
 		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _grass_landing_contact_at,
 				player.source_step_dust_size, true):
 			dust.use_source_landing(true)
-			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped)
+			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped, _grass_contact_at)
 			add_child(dust)
 			var zombie_dust := ZombieStepDust.new()
 			zombie_dust.name = "ZombieStepDust"
@@ -291,7 +293,7 @@ func _ready() -> void:
 			wind.free()
 		var contact_sparks := ContactSparks.new()
 		contact_sparks.name = "ContactSparks"
-		if contact_sparks.setup():
+		if contact_sparks.setup(func() -> float: return player.render_presenter.display_clock):
 			_contact_sparks = contact_sparks
 			add_child(_contact_sparks)
 			player.presentation_reset.connect(_contact_sparks.clear)
@@ -329,7 +331,7 @@ func _ready() -> void:
 		player.bow_released.connect(_on_bow_released)
 		player.connect("grounded_sabre_impact", _on_grounded_attack)
 		player.connect("heavy_jump_landed", _on_heavy_jump_landed)
-		player.physics_pose_ready.connect(_sample_sabre_landing_fx)
+		player.physics_pose_ready.connect(_sample_combat_fx)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
 		player.presentation_reset.connect(_clear_camera_shake)
@@ -829,7 +831,9 @@ func _set_bow_ammo(amount: int) -> void:
 
 func _on_grounded_attack(index: int, clip: String, serial: int) -> void:
 	if clip != CrossPollinator.SHOT:
+		_grounded_impact_dispatch = true
 		$Zombies.strike_sabre(index, clip, serial)
+		_grounded_impact_dispatch = false
 		return
 	var forward: Vector3 = player.visual.global_basis.z.normalized()
 	var muzzle := _crossbow_mount.to_global(CrossPollinator.MUZZLE)
@@ -1139,19 +1143,25 @@ func _set_combat_audio(enabled: bool) -> void:
 	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP, melee_tool, preview)
 
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, _lethal: bool) -> void:
+	var tool_hit: StringName = MELEE_AUDIO_NAMES.get(_equipped_weapon, &"") if clip != Bow.ACTION and clip != CrossPollinator.SHOT else &""
+	_combat_audio.weapon_contact(point, serial, clip, tool_hit)
+	if _grounded_impact_dispatch:
+		_grounded_contact_fx.append({"point": point, "direction": direction, "clip": clip, "serial": serial})
+	else:
+		_show_contact_fx(point, direction, clip, serial)
+
+func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: int, sample_time := -1.0) -> void:
 	var has_arrow_sparks := clip == CrossPollinator.SHOT and _crossbow != null and _crossbow.impact_sparks != null
 	has_arrow_sparks = has_arrow_sparks or (clip == Bow.ACTION and _bow != null and _bow.impact_sparks != null)
 	if not has_arrow_sparks:
 		if _contact_sparks != null:
-			_contact_sparks.queue_contact(point, direction, player.global_position + Vector3.UP)
+			_contact_sparks.queue_contact(point, direction, player.global_position + Vector3.UP, sample_time)
 		else:
-			player.effects.contact(point, direction)
-	var tool_hit: StringName = MELEE_AUDIO_NAMES.get(_equipped_weapon, &"") if clip != Bow.ACTION and clip != CrossPollinator.SHOT else &""
-	_combat_audio.weapon_contact(point, serial, clip, tool_hit)
+			player.effects.contact(point, direction, sample_time >= 0.0)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3",
 		"NativeCleaverAttack3", "NativeAxeAttack3"]
 	if clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
-		_start_contact_light(point, serial, 2.3 if finisher else 1.8)
+		_start_contact_light(point, serial, 2.3 if finisher else 1.8, sample_time)
 	# These finishers share the source radii and non-oriented shake.
 	# Approximate StartMatineeCameraShakeAtPawn using the capsule center.
 	if not finisher or _shake_serial == serial or _player_body == null:
@@ -1161,7 +1171,7 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	if falloff <= 0.0:
 		return
 	_shake_serial = serial
-	_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION * falloff)
+	_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION * falloff, sample_time)
 
 func _start_camera_shake(strength: float, sample_time := -1.0) -> void:
 	_shake_strength = strength
@@ -1245,11 +1255,15 @@ func _show_landing_burst(point: Vector3, serial: int) -> void:
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
 
-func _sample_sabre_landing_fx() -> void:
-	if _slam_shake_frame < 0 and _slam_burst_frame < 0:
+func _sample_combat_fx() -> void:
+	if _grounded_contact_fx.is_empty() and _slam_shake_frame < 0 and _slam_burst_frame < 0:
 		return
-	var frame := Engine.get_physics_frames()
 	var sample_time: float = player.effects.clock
+	# Damage has already landed. Show it when the render presenter reaches this pose.
+	for contact in _grounded_contact_fx:
+		_show_contact_fx(contact.point, contact.direction, contact.clip, contact.serial, sample_time)
+	_grounded_contact_fx.clear()
+	var frame := Engine.get_physics_frames()
 	if _slam_shake_frame >= 0 and frame >= _slam_shake_frame:
 		_slam_shake_frame = -1
 		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION, sample_time)
@@ -1274,6 +1288,7 @@ func _start_contact_light(point: Vector3, serial: int, energy: float, sample_tim
 	_impact_light.visible = _light_pending
 
 func _clear_contact_light() -> void:
+	_grounded_contact_fx.clear()
 	_slam_burst_frame = -1
 	_light_serial = -1
 	_light_remaining = 0.0

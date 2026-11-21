@@ -5,6 +5,9 @@ global uniform vec4 gaf_diffuse_opening;
 global uniform vec4 gaf_shadow_diffuse_sun;
 global uniform vec3 gaf_shadow_diffuse_tint;
 global uniform vec2 gaf_ground_shadow_fill_reduction;
+global uniform vec2 gaf_canopy_ground_fill;
+global uniform vec4 gaf_grass_terrace_shadow_state;
+global uniform sampler2D gaf_grass_terrace_shadow_field : filter_nearest, repeat_disable;
 global uniform vec4 gaf_turf_sun_chroma;
 
 float gaf_turf_sun_weight(bool directional, vec3 view_light, mat4 inverse_view, float visibility) {
@@ -47,6 +50,32 @@ vec3 gaf_shadow_diffuse(bool directional, vec3 view_light, mat4 inverse_view,
 	float direct = attenuation * cloud * facing;
 	float shade = 1.0 - smoothstep(.055, .48, direct);
 	return gaf_shadow_diffuse_tint * (gaf_shadow_diffuse_sun.w * contact * shade);
+}
+
+
+float gaf_terrace_shadow_fill(vec2 world_xz) {
+	if (gaf_grass_terrace_shadow_state.z <= 0.0) return 1.0;
+	ivec2 size = textureSize(gaf_grass_terrace_shadow_field, 0);
+	ivec2 cell = ivec2(floor(world_xz - gaf_grass_terrace_shadow_state.xy));
+	if (any(lessThan(cell, ivec2(0))) || any(greaterThanEqual(cell, size))) return 1.0;
+	// Byte 128 encodes level terrain and remains exactly neutral.
+	float relief = floor(255.0 * texelFetch(gaf_grass_terrace_shadow_field, cell, 0).r + .5) - 128.0;
+	return clamp(1.0 + (1.5 / 127.0) * gaf_grass_terrace_shadow_state.z * relief, .13, 1.90);
+}
+
+float gaf_terrace_shadow_weight(float attenuation) {
+	return 1.0 - smoothstep(.10, .58, attenuation);
+}
+
+float gaf_canopy_ground_ev(float visibility) {
+	// Keep open ground at its original level and distinguish the edge from the dense interior.
+	float core = 1.0 - smoothstep(.61, .87, visibility);
+	float border = smoothstep(.84, .94, visibility) * (1.0 - smoothstep(.947, 1.0, visibility));
+	return .60 * border - .82 * core;
+}
+
+vec2 gaf_canopy_ground_delta(float ev, float attenuation) {
+	return exp2(gaf_canopy_ground_fill * (ev * gaf_terrace_shadow_weight(attenuation))) - vec2(1.0);
 }
 
 float gaf_ground_shadow_fill_multiplier(float reduction, float attenuation) {

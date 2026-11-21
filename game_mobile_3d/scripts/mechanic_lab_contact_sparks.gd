@@ -24,11 +24,13 @@ var _particles: Array[Spark] = []
 var _pending: Array[Dictionary] = []
 var _next := 0
 var _random := RandomNumberGenerator.new()
+var _display_clock: Callable
 
-func setup() -> bool:
+func setup(display_clock := Callable()) -> bool:
 	var source := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(128, 128))
 	if source == null:
 		return false
+	_display_clock = display_clock
 	var mask := Image.create_empty(SOURCE_REGION.size.x, SOURCE_REGION.size.y, false, Image.FORMAT_RGBA8)
 	for y in mask.get_height():
 		for x in mask.get_width():
@@ -57,14 +59,15 @@ func setup() -> bool:
 	set_process(false)
 	return true
 
-func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3) -> void:
+func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, sample_time := -1.0) -> void:
 	var distance := point.distance_squared_to(viewer)
 	var index := _pending.size()
 	while index > 0 and distance < float(_pending[index - 1].distance):
 		index -= 1
 	if index == CONTACTS_PER_FRAME:
 		return
-	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance})
+	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance,
+		"sample_time": sample_time})
 	if _pending.size() > CONTACTS_PER_FRAME:
 		_pending.pop_back()
 	set_process(true)
@@ -90,9 +93,15 @@ func _process(delta: float) -> void:
 	for spark in _particles:
 		if spark.age < spark.lifetime:
 			spark.age += delta
-	for contact: Dictionary in _pending:
+	var display_time := float(_display_clock.call()) if not _pending.is_empty() and _display_clock.is_valid() else INF
+	var pending_index := 0
+	while pending_index < _pending.size():
+		var contact := _pending[pending_index]
+		if contact.sample_time > display_time:
+			pending_index += 1
+			continue
 		_spawn_burst(contact.point, contact.direction)
-	_pending.clear()
+		_pending.remove_at(pending_index)
 	var camera := get_viewport().get_camera_3d()
 	var view := camera.global_basis.orthonormalized() if camera != null else Basis.IDENTITY
 	var count := 0
@@ -114,7 +123,7 @@ func _process(delta: float) -> void:
 		_streaks.set_instance_color(count, color)
 		count += 1
 	_streaks.visible_instance_count = count
-	set_process(count > 0)
+	set_process(count > 0 or not _pending.is_empty())
 
 func clear() -> void:
 	_pending.clear()

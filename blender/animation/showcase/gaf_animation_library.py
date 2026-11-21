@@ -6,6 +6,7 @@ from pathlib import Path
 from bpy.app.handlers import persistent
 from bpy.props import StringProperty,IntProperty,BoolProperty,CollectionProperty,EnumProperty
 from gaf_animation_browser import FILTER_ITEMS,visible_entries
+import gaf_scout_reference as scout_reference
 
 SCENE_TAG='gaf_animation_showcase';RIG='Showcase_Player_Rig';BASELINE='GAF_Neutral_Pose.json'
 REVIEW_TAG='gaf_review_sequence_id';REVIEW_ENTRY='gaf_review_entry_json'
@@ -174,7 +175,7 @@ def library_home(scene):
     if scene.get(SCENE_TAG):return scene
     if scene.get(REVIEW_TAG):
         return bpy.data.scenes.get(json.loads(scene[REVIEW_ENTRY])['return_scene'])
-    if scene.name in KAI_PREVIEWS or scene.get(SCOUT_TAG):
+    if scene.name in KAI_PREVIEWS or scene.get(SCOUT_TAG) or scene.get(scout_reference.TAG):
         home=bpy.data.scenes.get('ANIMATION_SHOWCASE')
         if home is not None and home.get(SCENE_TAG):return home
     return None
@@ -416,7 +417,9 @@ def refresh(scene,import_missing=True):
     return len(new_actions)
 
 def view(scene,direction):
-    if scene.get(SCOUT_TAG):
+    if scene.get(scout_reference.TAG):
+        name=scout_reference.PREFIX+scout_reference.CAMERAS[direction]
+    elif scene.get(SCOUT_TAG):
         name='Scout | '+SCOUT_VIEWS[direction]
     elif scene.get(REVIEW_TAG):
         name=json.loads(scene[REVIEW_ENTRY])['cameras'][direction]
@@ -517,6 +520,9 @@ def draw_focus_selector(layout,scene):
     if home is None:return False
     all_entries=ordered_library_entries(data,True)
     box=layout.box()
+    scout=bpy.data.scenes.get(scout_reference.SCENE)
+    if scout is not None and scout.get(scout_reference.TAG):
+        box.operator('gaf.open_scout_reference',text='Scout',icon='OUTLINER_OB_ARMATURE')
     for name in KAI_PREVIEWS:
         if bpy.data.scenes.get(name) is not None:
             row=box.row()
@@ -562,6 +568,9 @@ class GAF_PT_animation_library(bpy.types.Panel):
     def poll(cls,context):return bool(library_home(context.scene) or context.scene.get(REVIEW_TAG))
     def draw(self,context):
         layout=self.layout;s=context.scene
+        if s.get(scout_reference.TAG):
+            scout_reference.draw_preview(layout,s)
+            return
         focused=draw_focus_selector(layout,s)
         if s.get(REVIEW_TAG):
             try:e=json.loads(s[REVIEW_ENTRY])
@@ -607,7 +616,7 @@ class GAF_PT_animation_library(bpy.types.Panel):
 
 @persistent
 def stop_one_shot(scene,*args):
-    if not (scene.get(SCENE_TAG) or scene.get(REVIEW_TAG)) or scene.gaf_loop or scene.frame_current<scene.frame_end:return
+    if not (scene.get(SCENE_TAG) or scene.get(REVIEW_TAG) or scene.get(scout_reference.TAG)) or scene.gaf_loop or scene.frame_current<scene.frame_end:return
     for window in bpy.context.window_manager.windows:
         if window.scene==scene and window.screen.is_animation_playing:
             with bpy.context.temp_override(window=window,screen=window.screen):bpy.ops.screen.animation_cancel(restore_frame=False)
@@ -663,7 +672,7 @@ def show_library_on_open():
     # Blender creates the category list when it first draws the sidebar.
     bpy.app.timers.register(reveal,first_interval=0.1)
 
-CLASSES=[GAF_Clip,GAF_UL_animations,GAF_OT_refresh,GAF_OT_play,GAF_OT_restart,GAF_OT_view,GAF_OT_open_review_sequence,GAF_OT_select_action,GAF_OT_return_library,GAF_OT_open_kai_preview,GAF_OT_browse_group,GAF_PT_animation_library]
+CLASSES=[GAF_Clip,GAF_UL_animations,GAF_OT_refresh,GAF_OT_play,GAF_OT_restart,GAF_OT_view,GAF_OT_open_review_sequence,GAF_OT_select_action,GAF_OT_return_library,GAF_OT_open_kai_preview,GAF_OT_browse_group,GAF_PT_animation_library,*scout_reference.CLASSES]
 def register():
     for cls in CLASSES:bpy.utils.register_class(cls)
     bpy.types.Scene.gaf_clips=CollectionProperty(type=GAF_Clip)
@@ -673,9 +682,11 @@ def register():
     bpy.types.Scene.gaf_error=StringProperty()
     bpy.types.Scene.gaf_library_group=EnumProperty(items=FILTER_ITEMS,default='ALL',description='Browse a compact group without removing any animation')
     bpy.types.Scene.gaf_library_search=StringProperty(default='',description='Search names across every group; clear to return to the chosen group')
+    scout_reference.register_handlers()
     bpy.app.handlers.load_post.append(loaded);bpy.app.handlers.frame_change_post.append(stop_one_shot)
 
 def unregister():
+    scout_reference.unregister_handlers()
     for handlers,fn in [(bpy.app.handlers.load_post,loaded),(bpy.app.handlers.frame_change_post,stop_one_shot)]:
         if fn in handlers:handlers.remove(fn)
     for name in ['gaf_clips','gaf_active_index','gaf_loop','gaf_show_archived','gaf_error','gaf_library_group','gaf_library_search']:delattr(bpy.types.Scene,name)

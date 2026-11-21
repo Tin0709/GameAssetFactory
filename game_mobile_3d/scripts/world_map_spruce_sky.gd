@@ -14,6 +14,7 @@ var applied_tree_strength := 0.
 var applied_edge_fill := 0.
 var applied_sky_color := 0.
 var applied_edge_return := 0.
+var applied_ground_fill := Vector2.ZERO
 var applied_pre_twilight := 0.
 var _level: Node3D
 var _camera: Camera3D
@@ -83,6 +84,7 @@ func setup(level: Node3D) -> void:
 	RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_edge_return", 0.)
+	RenderingServer.global_shader_parameter_set("gaf_canopy_ground_fill", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_extent", Vector3(_dimensions))
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", _texture)
@@ -323,6 +325,7 @@ func refresh() -> void:
 		applied_edge_fill = 0.
 		applied_sky_color = 0.
 		applied_edge_return = 0.
+		applied_ground_fill = Vector2.ZERO
 		applied_pre_twilight = 0.
 		return
 	var strength := 0.
@@ -361,6 +364,10 @@ func refresh() -> void:
 	if edge_return != applied_edge_return:
 		applied_edge_return = edge_return
 		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_return", edge_return)
+	var ground_fill: Vector2 = review.canopy_ground_fill_strength() if strength > 0. else Vector2.ZERO
+	if ground_fill != applied_ground_fill:
+		applied_ground_fill = ground_fill
+		RenderingServer.global_shader_parameter_set("gaf_canopy_ground_fill", ground_fill)
 	var receiver: float = review.pre_twilight_receiver_weight()
 	if receiver != applied_pre_twilight:
 		applied_pre_twilight = receiver
@@ -376,6 +383,7 @@ func _exit_tree() -> void:
 		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_return", 0.)
+		RenderingServer.global_shader_parameter_set("gaf_canopy_ground_fill", Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", null)
 		_owner = null

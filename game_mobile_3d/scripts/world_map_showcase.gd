@@ -117,7 +117,10 @@ var _local_diffuse_source := Vector4.ZERO
 var _additional_diffuse_source := Vector4.ZERO
 var _shadow_diffuse_state := Vector4.ZERO
 var _ground_shadow_fill_reduction := Vector2.ZERO
+var _grass_terrace_shadow_state := Vector4.ZERO
+var _grass_terrace_shadow_field: Texture2D
 var _stone_foot_fill := 0.0
+var _stone_top_shadow_fill := Vector2.ZERO
 var _path_sun_response := Vector2.ZERO
 var _path_sun_core := Vector2.ZERO
 var _path_sun_core_direction := Vector3.ZERO
@@ -170,6 +173,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"shadow_diffuse_return": ["Ánh dịu trong bóng trên đất và cỏ", 1.],
 	&"ground_shadow_fill_reduction": ["Chiều sâu bóng trên cỏ và mặt đá", 1.],
 	&"stone_foot_fill": ["Chiều sâu chân bậc đá", 1.],
+	&"stone_top_shadow_fill": ["Chiều sâu bóng trên bậc đá", 1.],
 	&"path_sun_response": ["Tương phản nắng trên lối đất", 1.],
 	&"path_sun_core": ["Sắc nắng trên lối đất", 1.],
 	&"stone_shade_fill": ["Ánh hắt trong bóng đá", .55],
@@ -195,6 +199,8 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grass_root_tone": ["Night grass root tone", 1.],
 	&"day_grass_sky_height": ["Ánh trời từ gốc đến ngọn cỏ", 1.],
 	&"day_grass_ground_tone": ["Hòa màu gốc cỏ với mặt đất", 1.],
+	&"grass_terrace_shadow_fill": ["Chiều sâu cỏ qua các bậc", 1.],
+	&"canopy_ground_fill": ["Chiều sâu bóng dưới tán", 1.],
 	&"turf_sun_chroma": ["Sắc nắng trên cỏ và mặt cỏ", 1.],
 	&"grass_step_coverage": ["Cỏ sát bậc địa hình", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
@@ -340,7 +346,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 218
+const LIGHTING_MIX_VERSION := 221
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -504,6 +510,8 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
 	RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", 0.)
+	RenderingServer.global_shader_parameter_set("gaf_stone_top_shadow_fill", Vector2.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_state", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", Vector3.ZERO)
@@ -1049,6 +1057,9 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_shadow_diffuse_tint", Vector3.ONE)
 			RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", 0.)
+			RenderingServer.global_shader_parameter_set("gaf_stone_top_shadow_fill", Vector2.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_state", Vector4.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_field", null)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", Vector3.ZERO)
@@ -1634,12 +1645,23 @@ func _sync_shadow_diffuse() -> void:
 	if reduction != _ground_shadow_fill_reduction:
 		_ground_shadow_fill_reduction = reduction
 		RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", reduction)
+	_sync_grass_terrace_shadow(state.w > 0.)
 	var foot := 0.
 	if state.w > 0. and _stone_foot_fill_available():
 		foot = clampf(_biome_profile.stone_foot_fill, 0., .66) * _day_grass_shadow_weight() * _lighting_scale(&"stone_foot_fill")
 	if foot != _stone_foot_fill:
 		_stone_foot_fill = foot
 		RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", foot)
+	var stone_top := Vector2.ZERO
+	if state.w > 0. and _stone_top_shadow_fill_available():
+		var amount := _day_grass_shadow_weight() * _lighting_scale(&"stone_top_shadow_fill")
+		if amount > 0.:
+			var phase := smoothstep(7., 16.5, hour)
+			var pivot := lerpf(_biome_profile.stone_top_shadow_fill_pivot.x, _biome_profile.stone_top_shadow_fill_pivot.y, phase)
+			stone_top = Vector2(amount, pivot)
+	if stone_top != _stone_top_shadow_fill:
+		_stone_top_shadow_fill = stone_top
+		RenderingServer.global_shader_parameter_set("gaf_stone_top_shadow_fill", stone_top)
 	var path := Vector2.ZERO
 	if state.w > 0. and _path_sun_response_available():
 		# Cap the midrange curve so brighter incoming sunlight stays brighter.
@@ -1656,6 +1678,46 @@ func _sync_shadow_diffuse() -> void:
 		_path_sun_core_direction = core_direction
 		RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", core_direction)
 
+func prepare_grass_terrace_shadow() -> void:
+	if _grass_terrace_shadow_available() and _lighting_scale(&"grass_terrace_shadow_fill") > 0.:
+		level.look.get_terrace_relief()
+
+func _sync_grass_terrace_shadow(has_shadow_fill: bool) -> void:
+	var state := Vector4.ZERO
+	if has_shadow_fill and _grass_terrace_shadow_available():
+		var profile := _biome_profile.grass_terrace_shadow_fill.clamp(Vector2.ZERO, Vector2(1.5, 1.5))
+		var gain := lerpf(profile.x, profile.y, _weather.weight) * _day_grass_shadow_weight() * _lighting_scale(&"grass_terrace_shadow_fill")
+		if gain > 0.:
+			var field: Texture2D = level.look.get_terrace_relief()
+			if field != null:
+				if field != _grass_terrace_shadow_field:
+					_grass_terrace_shadow_field = field
+					RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_field", field)
+				var origin: Vector2 = level.look.path_map_origin
+				state = Vector4(origin.x, origin.y, gain, 0.)
+	if state != _grass_terrace_shadow_state:
+		_grass_terrace_shadow_state = state
+		RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_state", state)
+
+func _grass_terrace_shadow_available() -> bool:
+	return _path_sun_available() and _biome_profile.grass_terrace_shadow_fill.is_finite() \
+		and _biome_profile.grass_terrace_shadow_fill != Vector2.ZERO and level.look.path_map_image != null \
+		and plants != null and plants.grass_light != null and plants.grass_light.active
+
+func _canopy_ground_fill_available() -> bool:
+	if (level == null or not _path_sun_available() or not _biome_profile.canopy_ground_fill.is_finite()
+			or _biome_profile.canopy_ground_fill.x <= 0.):
+		return false
+	var sky := level.get_node_or_null("SpruceSkyVisibility")
+	return sky != null and sky.proof_ready
+
+func canopy_ground_fill_strength() -> Vector2:
+	if not _canopy_ground_fill_available():
+		return Vector2.ZERO
+	var gains := _biome_profile.canopy_ground_fill.clamp(Vector2.ZERO, Vector2(.75, 1.10))
+	var cloudy := clampf(_biome_profile.canopy_ground_fill_overcast, 0., 1.)
+	return gains * lerpf(1., cloudy, _weather.weight) * (_day_grass_shadow_weight() * _lighting_scale(&"canopy_ground_fill"))
+
 func _path_sun_available() -> bool:
 	return source_terrain_active and _shadow_diffuse_available() and not _balanced_preview \
 		and atmosphere_review == "combined" and forest_active()
@@ -1667,6 +1729,10 @@ func _path_sun_response_available() -> bool:
 func _path_sun_core_available() -> bool:
 	return _path_sun_available() and _biome_profile.path_sun_core.is_finite() \
 		and _biome_profile.path_sun_core != Vector2.ZERO
+
+func _stone_top_shadow_fill_available() -> bool:
+	return _path_sun_available() and _biome_profile.stone_top_shadow_fill_pivot.is_finite() \
+		and _biome_profile.stone_top_shadow_fill_pivot.x > 0. and _biome_profile.stone_top_shadow_fill_pivot.y > 0.
 
 func _stone_foot_fill_available() -> bool:
 	return _path_sun_available() and is_finite(_biome_profile.stone_foot_fill) and _biome_profile.stone_foot_fill > 0.
@@ -1974,6 +2040,12 @@ func set_source_terrain(enabled: bool) -> bool:
 	var path_core: HSlider = _lighting_sliders.get(&"path_sun_core")
 	if path_core != null:
 		path_core.editable = _path_sun_core_available()
+	var grass_terrace: HSlider = _lighting_sliders.get(&"grass_terrace_shadow_fill")
+	if grass_terrace != null:
+		grass_terrace.editable = _grass_terrace_shadow_available()
+	var stone_top: HSlider = _lighting_sliders.get(&"stone_top_shadow_fill")
+	if stone_top != null:
+		stone_top.editable = _stone_top_shadow_fill_available()
 	var stone_foot: HSlider = _lighting_sliders.get(&"stone_foot_fill")
 	if stone_foot != null:
 		stone_foot.editable = _stone_foot_fill_available()
@@ -2985,6 +3057,12 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 218 and effect == &"mist_entry_depth_balance":
 			missing_value = 0.
+		if version < 220 and effect == &"grass_terrace_shadow_fill":
+			missing_value = 0.
+		if version < 221 and effect == &"canopy_ground_fill":
+			missing_value = 0.
+		if version < 219 and effect == &"stone_top_shadow_fill":
+			missing_value = 0.
 		if version < 217 and effect == &"stone_foot_fill":
 			missing_value = 0.
 		if version < 191 and effect == &"night_leaf_lamp_shoulder":
@@ -3174,6 +3252,12 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _path_sun_response_available()
 		if effect == &"path_sun_core":
 			slider.editable = _path_sun_core_available()
+		if effect == &"grass_terrace_shadow_fill":
+			slider.editable = _grass_terrace_shadow_available()
+		if effect == &"canopy_ground_fill":
+			slider.editable = _canopy_ground_fill_available()
+		if effect == &"stone_top_shadow_fill":
+			slider.editable = _stone_top_shadow_fill_available()
 		if effect == &"stone_foot_fill":
 			slider.editable = _stone_foot_fill_available()
 		if effect == &"alternate_local_mist":
@@ -3384,7 +3468,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"overcast_shadow":
 		_refresh_direct_shadow_opacity()
 		return
-	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response", &"path_sun_core", &"stone_foot_fill"]:
+	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response", &"path_sun_core", &"stone_foot_fill", &"stone_top_shadow_fill", &"grass_terrace_shadow_fill"]:
 		_sync_shadow_diffuse()
 		return
 	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach", &"stone_wall_return", &"sheltered_stone_return", &"local_diffuse_return", &"basin_diffuse_return"]:
@@ -3518,6 +3602,11 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_update_mist()
 		return
 	if changed_effect == &"pre_twilight_receiver":
+		return
+	if changed_effect == &"canopy_ground_fill":
+		var sky := level.get_node_or_null("SpruceSkyVisibility")
+		if sky != null:
+			sky.refresh()
 		return
 	if changed_effect in [&"grass_step_coverage", &"day_grass_shadow_footprint", &"day_grass_shadow_wind", &"day_grass_sunlight_stability"]:
 		if plants != null:
@@ -4070,6 +4159,9 @@ func _process(delta:float)->void:
 		return
 	_update_shape_control()
 	if not private_primary or level==null:return
+	var canopy_ground: HSlider = _lighting_sliders.get(&"canopy_ground_fill")
+	if canopy_ground != null:
+		canopy_ground.editable = _canopy_ground_fill_available()
 	var regional_slider: HSlider = _lighting_sliders.get(&"regional_sky")
 	if regional_slider != null:
 		regional_slider.editable = _regional_sky_editable()
@@ -4262,6 +4354,12 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = _path_sun_response_available()
 		if effect == &"path_sun_core":
 			slider.editable = _path_sun_core_available()
+		if effect == &"grass_terrace_shadow_fill":
+			slider.editable = _grass_terrace_shadow_available()
+		if effect == &"canopy_ground_fill":
+			slider.editable = _canopy_ground_fill_available()
+		if effect == &"stone_top_shadow_fill":
+			slider.editable = _stone_top_shadow_fill_available()
 		if effect == &"stone_foot_fill":
 			slider.editable = _stone_foot_fill_available()
 		if effect == &"overcast_mist_phase_color":

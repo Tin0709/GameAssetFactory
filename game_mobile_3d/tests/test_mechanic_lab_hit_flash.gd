@@ -5,17 +5,32 @@ const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 
 class FlashMonitor extends Node:
 	var zombie: CharacterBody3D
+	var actor: CharacterBody3D
 	var hit := false
+	var pose_time := -1.0
 	var values: Array[float] = []
 	var sparks: MultiMeshInstance3D
+	var light: OmniLight3D
 	var spark_counts: Array[int] = []
+	var first_flash_clock := INF
+	var first_streak_clock := INF
 
 	func _process(_delta: float) -> void:
 		if hit:
 			var mesh := zombie.get("_mesh") as MeshInstance3D
 			values.append(float(mesh.get_instance_shader_parameter("hit_flash")))
+			var clock: float = actor.render_presenter.display_clock
+			if light.visible and light.light_energy > 0.0 and is_inf(first_flash_clock):
+				first_flash_clock = clock
 			if sparks != null:
-				spark_counts.append(sparks.multimesh.visible_instance_count)
+				var count := sparks.multimesh.visible_instance_count
+				spark_counts.append(count)
+				if count > 0 and is_inf(first_streak_clock):
+					first_streak_clock = clock
+
+	func sample_pose() -> void:
+		if hit and pose_time < 0.0:
+			pose_time = actor.effects.clock
 
 var failures: Array[String] = []
 
@@ -52,11 +67,14 @@ func check_hit(fatal: bool) -> void:
 	var zombie = group.get_child(0)
 	var monitor := FlashMonitor.new()
 	monitor.zombie = zombie
+	monitor.actor = lab.player
 	monitor.sparks = lab.get_node_or_null("ContactSparks/Streaks") as MultiMeshInstance3D
+	monitor.light = lab.get_node("CombatImpactLight")
 	check(monitor.sparks != null, "Lab initializes the private source spark renderer")
 	monitor.process_priority = 100
 	lab.add_child(monitor)
 	group.sabre_contact.connect(func(_point, _direction, _clip, _index, _serial, _lethal): monitor.hit = true)
+	lab.player.physics_pose_ready.connect(monitor.sample_pose)
 	await ticks(38)
 	attack(true)
 	await ticks(2)
@@ -69,9 +87,13 @@ func check_hit(fatal: bool) -> void:
 		"The temporary overlay clears and stops updating (fatal: %s)" % fatal)
 	check(zombie.health == (0 if fatal else 36) and zombie.ragdoll.running == fatal,
 		"Flash leaves damage and ragdoll handoff intact (fatal: %s)" % fatal)
-	check(not monitor.spark_counts.is_empty() and monitor.spark_counts[0] >= 6
+	check(not monitor.spark_counts.is_empty() and monitor.spark_counts.max() >= 6
 		and monitor.spark_counts.max() <= 12 and monitor.spark_counts.back() == 0,
 		"Body contact starts a bounded spark burst that fades (fatal: %s)" % fatal)
+	check(monitor.pose_time >= 0.0 and is_finite(monitor.first_streak_clock)
+		and monitor.first_streak_clock >= monitor.pose_time
+		and is_equal_approx(monitor.first_flash_clock, monitor.first_streak_clock),
+		"Grounded contact light and sparks begin together on the displayed contact pose (fatal: %s)" % fatal)
 	print("BODY_FLASH fatal=", fatal, " samples=", monitor.values.slice(0, 11))
 	lab.free()
 
@@ -224,7 +246,11 @@ func check_crowd_sparks() -> void:
 	sparks._process(0.25)
 	check(renderer.multimesh.visible_instance_count == 9,
 		"A hitch expires the previous burst while showing the new contact")
-	group.sabre_contact.emit(origin, Vector3.RIGHT, "Attack3", 2, 1703, false)
+	lab.reset_player()
+	sparks.queue_contact(origin, Vector3.RIGHT, origin, lab.player.render_presenter.display_clock + 1.0)
+	sparks._process(0.0)
+	check(renderer.multimesh.visible_instance_count == 0 and sparks.is_processing(),
+		"A future contact stays queued while the renderer catches up")
 	lab.reset_player()
 	await process_frame
 	await process_frame

@@ -224,6 +224,8 @@ func run() -> void:
 	await check_sabre_head_and_arm_brace(lab, group, 2309, 102)
 	await check_sabre_late_roll(lab, group, 424, 1.15)
 	await check_sabre_late_roll(lab, group, 2443, 1.90)
+	await check_sabre_late_roll(lab, group, 5003, 1.40)
+	await check_sabre_late_roll(lab, group, 5073, 1.60)
 	await check_sabre_grounded_slide(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
 	await check_sabre_fixed_pose_anchor(lab, group, 415, 0.10, "arm rebound")

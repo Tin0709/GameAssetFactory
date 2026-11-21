@@ -390,9 +390,19 @@ func check_gauntlet_debris(lab, dust: Node3D) -> void:
 			await physics_frame
 			if visible_particles(dust) > 0:
 				break
-		var particles: Array = dust._particles.filter(func(p): return p.sprite.visible)
+		var particles: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag > 0.0)
+		var puffs: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag == 0.0)
 		check(lab._equipped_weapon == weapon and lab.player.is_on_floor()
 			and particles.size() in [3, 4, 5], "A Gauntlets dive emits one compact ground debris burst")
+		check(puffs.size() == 1, "The Gauntlets dive has a separate compact impact puff")
+		var impact = puffs[0] if puffs.size() == 1 else null
+		if impact != null and not particles.is_empty():
+			var offset: Vector3 = impact.origin - particles[0].origin
+			var horizontal := offset.slide(Vector3.UP)
+			check(impact.contact_tick == particles[0].contact_tick
+				and absf(horizontal.length() - 0.90) < 0.02 and offset.y < 0.20
+				and impact.duration > 0.20 and impact.duration < 0.35,
+				"The short dust layer shares the landing clock and appears ahead of the debris")
 		for particle in particles:
 			check(is_equal_approx(particle.sprite.pixel_size * 16.0, 0.15)
 				and particle.duration >= 1.0 and particle.duration <= 1.5
@@ -411,11 +421,21 @@ func check_gauntlet_debris(lab, dust: Node3D) -> void:
 				samples += 1
 		check(samples > 20 and motion_error <= 0.00005,
 			"Gauntlets debris follows the cooked solve between fixed updates")
+		if impact != null:
+			check(not impact.sprite.visible and particles.any(func(p): return p.sprite.visible),
+				"The impact puff fades while the source debris is still active")
 		print("MECHANIC_LAB_GAUNTLET_DEBRIS weapon=", weapon, " count=", particles.size(),
 			" samples=", samples, " motion_error_m=", motion_error)
 		lab.reset_player()
 		await physics_frame
 		check(visible_particles(dust) == 0 and not dust.is_processing(), "Reset clears Gauntlets debris")
+	var edge := Vector3(49.8, 0.0, 0.0)
+	dust._emit_gauntlet_impact_dust(edge, "grass", Vector3.RIGHT)
+	var edge_puff = dust._particles[posmod(dust._next - 1, dust._particles.size())]
+	var edge_position: Vector3 = edge_puff.origin
+	check(edge_position.slide(Vector3.UP).distance_to(edge) < 0.01,
+		"An impact offset beyond the floor falls back to the actual landing contact")
+	dust.clear()
 	lab._select_weapon(lab.Weapon.SABRE)
 
 func gauntlet_debris_position(origin: Vector3, velocity: Vector3, drag: float, age: float) -> Vector3:

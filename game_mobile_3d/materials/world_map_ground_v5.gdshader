@@ -145,6 +145,17 @@ void fragment() {
 	}
 	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD)*sole;
 	vec3 local_diffuse = gaf_local_diffuse(diffuse_fill, surface_world, surface_normal);
+#ifdef GAF_WORLD_DIRECT_CLOUD
+	terrain_canopy_ground_ev = 0.0;
+	terrain_canopy_incident = vec3(0.0);
+	if (gaf_canopy_ground_fill.x > 0.0 && use_source_terrain &&
+			(ground_grade == 1 || ground_grade == 2) && surface_top > .998 && terrain_canopy_sky < 1.0) {
+		float turf = smoothstep(1.04, 1.20, ALBEDO.g / max(ALBEDO.r, .0001)) *
+			smoothstep(1.12, 1.35, ALBEDO.g / max(ALBEDO.b, .0001));
+		terrain_canopy_ground_ev = turf * gaf_canopy_ground_ev(gaf_ground_canopy_sky(terrain_canopy_sky));
+		terrain_canopy_incident = local_diffuse / max(ALBEDO, vec3(.001));
+	}
+#endif
 	EMISSION += gaf_dawn_turf_chroma(local_diffuse, vec3(1.42, 1.0, .65), .55 * dawn_turf);
 	EMISSION+=ALBEDO*(1.0-METALLIC)*gaf_replay_incident(surface_world,surface_normal)*receiver_contact*sole;
 	if (terrain_rough_reflection) {

@@ -119,6 +119,10 @@ gaf_stone_foot_fill={
 "type": "float",
 "value": 0.0
 }
+gaf_stone_top_shadow_fill={
+"type": "vec2",
+"value": Vector2(0, 0)
+}
 gaf_path_sun_core={
 "type": "vec2",
 "value": Vector2(0, 0)
@@ -126,6 +130,14 @@ gaf_path_sun_core={
 gaf_path_sun_core_direction={
 "type": "vec3",
 "value": Vector3(0, 0, 0)
+}
+gaf_grass_terrace_shadow_state={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
+gaf_grass_terrace_shadow_field={
+"type": "sampler2D",
+"value": ""
 }
 gaf_ground_shadow_fill_reduction={
 "type": "vec2",
@@ -258,6 +270,10 @@ gaf_spruce_sky_region={
 gaf_spruce_sky_extent={
 "type": "vec3",
 "value": Vector3(1, 1, 1)
+}
+gaf_canopy_ground_fill={
+"type": "vec2",
+"value": Vector2(0, 0)
 }
 gaf_spruce_sky_camera={
 "type": "vec3",

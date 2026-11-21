@@ -299,6 +299,7 @@ func _ready() -> void:
 		elif spruce_sky.proof_ready:
 			showcase.mist.set_sky_field(spruce_sky.mist_sky_field(), spruce_sky.mist_sky_current)
 		showcase._refresh_lighting_mix(&"mist_sky_scatter")
+	showcase.prepare_grass_terrace_shadow()
 	_setup_far_shadow_review()
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 

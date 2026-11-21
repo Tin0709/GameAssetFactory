@@ -1,0 +1,10 @@
+# Connection template only. Obtain permission before account sign-in, file upload or billable generation.
+[mcp_servers.tripo]
+enabled = false
+command = "node"
+args = ['C:/Users/ADMIN/Desktop/Dev/GameAssetFactory/experiments/image-to-3d-scout/vendor/tripo/node_modules/tripo-cli/dist/cli.js', "mcp", "--toolset", "full"]
+
+[mcp_servers.tripo.env]
+TRIPO_ANALYTICS_ENABLED = "0"
+TRIPO_HOME = 'C:/Users/ADMIN/Desktop/Dev/GameAssetFactory/experiments/image-to-3d-scout/private/tripo'
+

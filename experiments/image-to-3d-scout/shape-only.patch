@@ -1,0 +1,12 @@
+diff --git a/hy3dgen/shapegen/__init__.py b/hy3dgen/shapegen/__init__.py
+index 1b1f9cc..0e30f22 100755
+--- a/hy3dgen/shapegen/__init__.py
++++ b/hy3dgen/shapegen/__init__.py
+@@ -13,5 +13,6 @@
+ # by Tencent in accordance with TENCENT HUNYUAN COMMUNITY LICENSE AGREEMENT.
+ 
+ from .pipelines import Hunyuan3DDiTPipeline, Hunyuan3DDiTFlowMatchingPipeline
+-from .postprocessors import FaceReducer, FloaterRemover, DegenerateFaceRemover, MeshSimplifier
++# Local shape-only PoC: optional PyMeshLab postprocessors are deferred.
+ from .preprocessors import ImageProcessorV2, IMAGE_PROCESSORS, DEFAULT_IMAGEPROCESSOR
++
