@@ -571,6 +571,58 @@ func check_wall_brace_impact(seed: int, wall_angle: float, strike_angle: float, 
 	lab.free()
 
 
+func check_balanced_arm_brace() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	lab.player.position = Vector3(-8.0, 0.0, -8.0)
+	var walls := terrain(lab, Vector3(4.5, 1.5, 0.0), Vector3(0.3, 3.0, 20.0), 0.0)
+	var side := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(12.7, 3.0, 0.30)
+	side.shape = box
+	side.position = Vector3(-6.5, 0.0, 4.5)
+	walls.add_child(side)
+	await ticks(2)
+	var group := lab.get_node("Zombies")
+	group._spawn_serial = 3702
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	if group.get_child_count() != 1:
+		check(false, "The balanced arm brace loads a source zombie")
+		lab.free()
+		return
+	var zombie := group.get_child(0) as Zombie
+	zombie.set_physics_process(false)
+	zombie.position = Vector3(3.64464592933655, 0.0, 3.61663365364075)
+	zombie.rotation.y = -0.64799427986145
+	zombie.reset_physics_interpolation()
+	await ticks(2)
+	zombie.animation.stop()
+	zombie.ragdoll.skeleton.reset_bone_poses()
+	zombie.animation.play(&"Zombie_Walk_Variant2", 0.0)
+	zombie.animation.advance(0.0)
+	zombie.animation.seek(0.268070517546244, true)
+	zombie.ragdoll.sample(1.0 / 60.0)
+	zombie.ragdoll.sample(1.0 / 60.0)
+	zombie.take_hit(100, Vector3(0.698510825634003, 0.0, 0.715599477291107),
+		Vector2.ZERO, 0.0, 800.0, Zombie.DeathStrike.SABRE_FINISHER)
+	zombie.set_physics_process(true)
+	await ticks(250)
+	var motion := zombie.ragdoll.contact_motion()
+	check(zombie.ragdoll.running and motion.supports == 2 and motion.core_supports == 0
+		and zombie.ragdoll.terrain_support_margin(true) > 0.012
+		and not zombie.ragdoll.has_flat_wall_rest_support(false),
+		"The arm-braced corpse is still balanced inside its two-foot support")
+	for i in 44:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+	check(zombie._corpse_parked and zombie.ragdoll.bodies.is_empty(),
+		"A sustained and balanced arm brace releases its motionless physics bodies")
+	print("LAB_BALANCED_ARM_REST parked=", zombie._corpse_parked, " seconds=", zombie._corpse_age)
+	lab.free()
+
 func run() -> void:
 	await run_case(true)
 	await run_case(false)
@@ -595,6 +647,7 @@ func run() -> void:
 	await check_corner_ragdoll(396, 2.0, true, -1.0, 0.19)
 	await check_corner_ragdoll(433, 2.0, true, -1.0, 0.20)
 	await check_corner_ragdoll(65, 4.25)
+	await check_balanced_arm_brace()
 	await check_corner_ragdoll(29, 4.25, false, 50.0 / float(ProjectSettings.get_setting("physics/3d/default_gravity")))
 	await check_corner_ragdoll(101, 4.05)
 	await check_corner_ragdoll(113, 4.95)
