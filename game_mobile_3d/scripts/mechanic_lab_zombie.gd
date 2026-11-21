@@ -101,6 +101,7 @@ const DEATH_SUPPORTED_ANGULAR_DAMP := 12.0
 const SABRE_LATE_ROLL_ANGULAR_DAMP := 6.0
 const SABRE_GROUNDED_SLIDE_DRAG := 4.0
 const SABRE_ROLL_BLEND_END := 0.35
+const SABRE_LOW_ROLL_MAX_AXIS_Y := 0.45
 const SABRE_BRACE_MIN_AGE := 0.82
 const WALL_BRACE_MIN_AGE := 1.5
 const SABRE_CORNER_LANDING_MAX_SPEED := 0.60
@@ -1245,8 +1246,10 @@ func _update_death(delta: float) -> void:
 func _absorb_late_foot_rebounds(contact: Dictionary) -> void:
 	var left: PhysicalBone3D = ragdoll.bodies["Leg.L"]
 	if is_baby or ragdoll.use_tuned_wall_sweep or left.bounce <= 0.0 \
-			or contact.linear > SABRE_CORNER_LANDING_MAX_SPEED or contact.angular > CORPSE_SETTLE_SPIN \
-			or absf(_corpse_axis().normalized().y) > CORPSE_UPRIGHT_AXIS_Y \
+			or contact.linear > SABRE_CORNER_LANDING_MAX_SPEED or contact.angular > CORPSE_SETTLE_SPIN:
+		return
+	var axis_y := absf(_corpse_axis().normalized().y)
+	if axis_y <= SABRE_LOW_ROLL_MAX_AXIS_Y or axis_y > CORPSE_UPRIGHT_AXIS_Y \
 			or not ragdoll.has_flat_wall_rest_support(true):
 		return
 	var floor_body := _corpse_floor.get_parent()
@@ -1393,7 +1396,7 @@ func _sabre_roll_weight(delta: float, contact_age: float, motion: Dictionary, fu
 		# A low body starts to lose spin with its first support. More parts
 		# touching the floor bring the roll gradually toward full resistance.
 		var grounded := lerpf(0.15, 1.0, clampf((motion.supports - 1.0) / 3.0, 0.0, 1.0))
-		var low := 1.0 - smoothstep(0.20, 0.45, absf(_corpse_axis().normalized().y))
+		var low := 1.0 - smoothstep(0.20, SABRE_LOW_ROLL_MAX_AXIS_Y, absf(_corpse_axis().normalized().y))
 		target = grounded * low * smoothstep(DEATH_LANDING_BLEND_TIME, SABRE_ROLL_BLEND_END, contact_age)
 	return move_toward(_roll_damping_weight, target, delta / SABRE_ROLL_RESPONSE_TIME)
 
