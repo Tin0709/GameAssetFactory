@@ -12,6 +12,7 @@ REVIEW_TAG='gaf_review_sequence_id';REVIEW_ENTRY='gaf_review_entry_json'
 KAI_PREVIEWS=('Kai - Survival 3D','Kai - Skin Preview')
 SCOUT_TAG='gaf_scout_preview'
 SCOUT_FACES=('Neutral','Focused','Blink','Surprised','Smile')
+SCOUT_VIEWS={'THREE_QUARTER':'Hero','FRONT':'Front','RIGHT':'Right','BACK':'Back','LEFT':'Left','FACE':'Face'}
 PREVIEW_PROPS={
     'rifle_stylized_v2':('GAF_Rifle_V2_Preview','GAF_Rifle_V2_Attachment','WeaponCarrier'),
     'sword_sand_block_v1':('GAF_Sword_Sand_Block_V1_Preview','GAF_Sword_Sand_Block_V1_Attachment','WeaponCarrier'),
@@ -415,7 +416,12 @@ def refresh(scene,import_missing=True):
     return len(new_actions)
 
 def view(scene,direction):
-    name=json.loads(scene[REVIEW_ENTRY])['cameras'][direction] if scene.get(REVIEW_TAG) else 'Showcase_'+direction
+    if scene.get(SCOUT_TAG):
+        name='Scout | '+SCOUT_VIEWS[direction]
+    elif scene.get(REVIEW_TAG):
+        name=json.loads(scene[REVIEW_ENTRY])['cameras'][direction]
+    else:
+        name='Showcase_'+direction
     scene.camera=bpy.data.objects[name]
     if scene.get(REVIEW_TAG):
         entry=json.loads(scene[REVIEW_ENTRY])
@@ -521,12 +527,16 @@ def draw_focus_selector(layout,scene):
     row.operator('gaf.browse_group',text='A&S - Walk / Run / Sneak',icon='BOOKMARKS',depress=(not compact or scene==home) and home.gaf_library_group=='AS_WALKRUN' and not home.gaf_library_search).group_id='AS_WALKRUN'
     if scene.get(SCOUT_TAG):
         rig=scene.objects.get('Scout | Rig')
+        preview=layout.box()
+        preview.label(text='Scout',icon='OUTLINER_OB_ARMATURE')
+        for views in (('THREE_QUARTER','FRONT','RIGHT'),('BACK','LEFT','FACE')):
+            row=preview.row(align=True)
+            for direction in views:
+                row.operator('gaf.view',text=SCOUT_VIEWS[direction]).direction=direction
         if rig is not None:
-            face=layout.box()
-            face.label(text='Scout - Expression',icon='OUTLINER_OB_ARMATURE')
-            face.prop(rig,'["Face preset"]',text='Expression')
-            face.label(text=SCOUT_FACES[rig['Face preset']])
-            face.prop(rig,'["Scarf down"]',text='Lower scarf')
+            preview.prop(rig,'["Face preset"]',text='Expression')
+            preview.label(text=SCOUT_FACES[rig['Face preset']])
+            preview.prop(rig,'["Scarf down"]',text='Lower scarf')
     if compact and scene!=home:
         return True
     if not compact:
@@ -568,7 +578,8 @@ class GAF_PT_animation_library(bpy.types.Panel):
                 for line in [s.gaf_error[i:i+42] for i in range(0,len(s.gaf_error),42)]:layout.label(text=line,icon='ERROR')
             return
         if not s.get(SCENE_TAG):
-            layout.operator('gaf.return_library',icon='BACK')
+            if not s.get(SCOUT_TAG):
+                layout.operator('gaf.return_library',icon='BACK')
             return
         if not focused:
             layout.template_list('GAF_UL_animations','',s,'gaf_clips',s,'gaf_active_index',rows=5)
