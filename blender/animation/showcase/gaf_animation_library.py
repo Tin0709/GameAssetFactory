@@ -9,6 +9,7 @@ from gaf_animation_browser import FILTER_ITEMS,visible_entries
 
 SCENE_TAG='gaf_animation_showcase';RIG='Showcase_Player_Rig';BASELINE='GAF_Neutral_Pose.json'
 REVIEW_TAG='gaf_review_sequence_id';REVIEW_ENTRY='gaf_review_entry_json'
+KAI_PREVIEWS={'Kai - Skin Preview','Kai - Survival 3D'}
 PREVIEW_PROPS={
     'rifle_stylized_v2':('GAF_Rifle_V2_Preview','GAF_Rifle_V2_Attachment','WeaponCarrier'),
     'sword_sand_block_v1':('GAF_Sword_Sand_Block_V1_Preview','GAF_Sword_Sand_Block_V1_Attachment','WeaponCarrier'),
@@ -170,6 +171,9 @@ def library_home(scene):
     if scene.get(SCENE_TAG):return scene
     if scene.get(REVIEW_TAG):
         return bpy.data.scenes.get(json.loads(scene[REVIEW_ENTRY])['return_scene'])
+    if scene.name in KAI_PREVIEWS:
+        home=bpy.data.scenes.get('ANIMATION_SHOWCASE')
+        if home is not None and home.get(SCENE_TAG):return home
     return None
 
 def ordered_library_entries(data,show_archived):
@@ -302,7 +306,7 @@ def open_review_sequence(context,sequence_id):
     return scene
 
 def return_library(context):
-    entry=json.loads(context.scene[REVIEW_ENTRY]);home=bpy.data.scenes.get(entry['return_scene'])
+    home=library_home(context.scene)
     if home is None or not home.get(SCENE_TAG):raise ValueError('Review sequence return library is missing')
     stop_playback(context);context.window.scene=home
     for area in context.window.screen.areas:area.tag_redraw()
@@ -506,7 +510,7 @@ def draw_focus_selector(layout,scene):
 class GAF_PT_animation_library(bpy.types.Panel):
     bl_label='Animation Library';bl_idname='GAF_PT_animation_library';bl_space_type='VIEW_3D';bl_region_type='UI';bl_category='Animation Library'
     @classmethod
-    def poll(cls,context):return bool(context.scene.get(SCENE_TAG) or context.scene.get(REVIEW_TAG))
+    def poll(cls,context):return bool(library_home(context.scene) or context.scene.get(REVIEW_TAG))
     def draw(self,context):
         layout=self.layout;s=context.scene
         focused=draw_focus_selector(layout,s)
@@ -523,6 +527,9 @@ class GAF_PT_animation_library(bpy.types.Panel):
             layout.operator('gaf.return_library',icon='BACK')
             if s.gaf_error:
                 for line in [s.gaf_error[i:i+42] for i in range(0,len(s.gaf_error),42)]:layout.label(text=line,icon='ERROR')
+            return
+        if not s.get(SCENE_TAG):
+            layout.operator('gaf.return_library',icon='BACK')
             return
         if not focused:
             layout.template_list('GAF_UL_animations','',s,'gaf_clips',s,'gaf_active_index',rows=5)
@@ -565,6 +572,8 @@ def loaded(_):
             snapshot=json.loads(s['gaf_manifest_snapshot'])
             saved_frame=s.frame_current;saved_subframe=s.frame_subframe
             _switching=True;s.gaf_clips.clear()
+            s.gaf_show_archived=True
+            s.gaf_library_group='ALL';s.gaf_library_search=''
             for e in snapshot['animations']:
                 c=s.gaf_clips.add();c.name=e['action'];c.action=e['action'];c.status=e['status'];c.entry_json=json.dumps(e)
             s.gaf_active_index=focused_index(s,min(s.gaf_active_index,len(s.gaf_clips)-1))
@@ -577,6 +586,31 @@ def loaded(_):
         if not s.get(REVIEW_TAG):continue
         try:validate_review_sequence(json.loads(s[REVIEW_ENTRY]));s.gaf_error=''
         except Exception as error:s.gaf_error=str(error)
+    if not bpy.app.background:
+        show_library_on_open()
+
+def show_library_on_open():
+    if not any(library_home(window.scene) for window in bpy.context.window_manager.windows):return
+    attempts=0
+    def reveal():
+        nonlocal attempts
+        attempts+=1
+        waiting=False
+        for window in bpy.context.window_manager.windows:
+            if library_home(window.scene) is None:continue
+            for area in window.screen.areas:
+                if area.type!='VIEW_3D':continue
+                area.spaces.active.show_region_ui=True
+                region=next((r for r in area.regions if r.type=='UI'),None)
+                if region is not None and region.width>1:
+                    region.active_panel_category='Animation Library'
+                    waiting=waiting or region.active_panel_category!='Animation Library'
+                else:
+                    waiting=True
+                area.tag_redraw()
+        return 0.1 if waiting and attempts<8 else None
+    # Blender creates the category list when it first draws the sidebar.
+    bpy.app.timers.register(reveal,first_interval=0.1)
 
 CLASSES=[GAF_Clip,GAF_UL_animations,GAF_OT_refresh,GAF_OT_play,GAF_OT_restart,GAF_OT_view,GAF_OT_open_review_sequence,GAF_OT_select_action,GAF_OT_return_library,GAF_OT_browse_group,GAF_PT_animation_library]
 def register():
@@ -586,7 +620,7 @@ def register():
     bpy.types.Scene.gaf_loop=BoolProperty(default=True)
     bpy.types.Scene.gaf_show_archived=BoolProperty(default=False,update=archive_visibility_changed,description='Show every registered animation without removing or changing archived data')
     bpy.types.Scene.gaf_error=StringProperty()
-    bpy.types.Scene.gaf_library_group=EnumProperty(items=FILTER_ITEMS,default='AS_WALKRUN',description='Browse a compact group without removing any animation')
+    bpy.types.Scene.gaf_library_group=EnumProperty(items=FILTER_ITEMS,default='ALL',description='Browse a compact group without removing any animation')
     bpy.types.Scene.gaf_library_search=StringProperty(default='',description='Search names across every group; clear to return to the chosen group')
     bpy.app.handlers.load_post.append(loaded);bpy.app.handlers.frame_change_post.append(stop_one_shot)
 
