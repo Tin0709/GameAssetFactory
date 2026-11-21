@@ -10,6 +10,8 @@ from gaf_animation_browser import FILTER_ITEMS,visible_entries
 SCENE_TAG='gaf_animation_showcase';RIG='Showcase_Player_Rig';BASELINE='GAF_Neutral_Pose.json'
 REVIEW_TAG='gaf_review_sequence_id';REVIEW_ENTRY='gaf_review_entry_json'
 KAI_PREVIEWS=('Kai - Survival 3D','Kai - Skin Preview')
+SCOUT_TAG='gaf_scout_preview'
+SCOUT_FACES=('Neutral','Focused','Blink','Surprised','Smile')
 PREVIEW_PROPS={
     'rifle_stylized_v2':('GAF_Rifle_V2_Preview','GAF_Rifle_V2_Attachment','WeaponCarrier'),
     'sword_sand_block_v1':('GAF_Sword_Sand_Block_V1_Preview','GAF_Sword_Sand_Block_V1_Attachment','WeaponCarrier'),
@@ -171,7 +173,7 @@ def library_home(scene):
     if scene.get(SCENE_TAG):return scene
     if scene.get(REVIEW_TAG):
         return bpy.data.scenes.get(json.loads(scene[REVIEW_ENTRY])['return_scene'])
-    if scene.name in KAI_PREVIEWS:
+    if scene.name in KAI_PREVIEWS or scene.get(SCOUT_TAG):
         home=bpy.data.scenes.get('ANIMATION_SHOWCASE')
         if home is not None and home.get(SCENE_TAG):return home
     return None
@@ -514,10 +516,20 @@ def draw_focus_selector(layout,scene):
             row.operator('gaf.open_kai_preview',text=name,icon='SCENE_DATA',depress=scene.name==name).scene_name=name
     row=box.row();row.scale_y=1.15
     row.operator('gaf.browse_group',text='A&S - Walk / Run / Sneak',icon='BOOKMARKS',depress=home.gaf_library_group=='AS_WALKRUN' and not home.gaf_library_search).group_id='AS_WALKRUN'
-    box.prop(home,'gaf_library_group',text='Group')
-    box.prop(home,'gaf_library_search',text='',icon='VIEWZOOM',placeholder='Search all animations...')
+    if scene.get(SCOUT_TAG):
+        rig=scene.objects.get('Scout | Rig')
+        if rig is not None:
+            face=layout.box()
+            face.label(text='Scout - Expression',icon='OUTLINER_OB_ARMATURE')
+            face.prop(rig,'["Face preset"]',text='Expression')
+            face.label(text=SCOUT_FACES[rig['Face preset']])
+            face.prop(rig,'["Scarf down"]',text='Lower scarf')
+    if not data.get('compact_showcase'):
+        box.prop(home,'gaf_library_group',text='Group')
+        box.prop(home,'gaf_library_search',text='',icon='VIEWZOOM',placeholder='Search all animations...')
     entries=visible_entries(all_entries,home.gaf_library_group,home.gaf_library_search)
-    box.label(text=f'{len(entries)} shown / {len(all_entries)} entries',icon='FILTER')
+    if not data.get('compact_showcase'):
+        box.label(text=f'{len(entries)} shown / {len(all_entries)} entries',icon='FILTER')
     if not entries:box.label(text='No matching animations',icon='INFO')
     active=bpy.data.objects[RIG].animation_data.action
     for e in entries:
@@ -595,7 +607,8 @@ def loaded(_):
             saved_frame=s.frame_current;saved_subframe=s.frame_subframe
             _switching=True;s.gaf_clips.clear()
             s.gaf_show_archived=True
-            s.gaf_library_group='ALL';s.gaf_library_search=''
+            s.gaf_library_group='AS_WALKRUN' if snapshot.get('compact_showcase') else 'ALL'
+            s.gaf_library_search=''
             for e in snapshot['animations']:
                 c=s.gaf_clips.add();c.name=e['action'];c.action=e['action'];c.status=e['status'];c.entry_json=json.dumps(e)
             s.gaf_active_index=focused_index(s,min(s.gaf_active_index,len(s.gaf_clips)-1))
