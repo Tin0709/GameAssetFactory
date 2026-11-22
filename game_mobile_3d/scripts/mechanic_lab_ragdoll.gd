@@ -1555,6 +1555,10 @@ func _project_source_anchors() -> void:
 			var distance := gap.length()
 			if distance <= largest_gap:
 				continue
+			if is_arm and sabre_flight and not use_tuned_wall_sweep and chest_state.get_contact_count() == 0 \
+					and distance > FIRST_WALL_SHOULDER_SLIDE_MIN_GAP \
+					and _recover_deep_shoulder_contact(limb, state, gap, distance):
+				continue
 			var shift := _wall_anchor_motion(state, gap, not is_arm or not first_contact, is_arm)
 			if early_wall_landing and not shift.is_zero_approx():
 				var toward_anchor := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
@@ -1647,6 +1651,44 @@ func _project_source_anchors() -> void:
 		if _wall_chest_shift_preserves_joints(gaps, largest_gap, fallback) \
 				and not _test_projection_motion(chest, chest_state.transform, fallback):
 			chest_state.transform = chest_state.transform.translated(fallback)
+
+func _recover_deep_shoulder_contact(limb: PhysicalBone3D, state: PhysicsDirectBodyState3D,
+		gap: Vector3, distance: float) -> bool:
+	var wall_contact := false
+	for i in state.get_contact_count():
+		var normal := state.get_contact_local_normal(i)
+		if absf(normal.y) < MAX_WALL_NORMAL_Y and gap.dot(normal) > 0.0 \
+				and _is_fixed_wall(state.get_contact_collider_object(i)):
+			wall_contact = true
+			break
+	if not wall_contact:
+		return false
+	var motion := gap * (minf(distance - SOURCE_ANCHOR_TOLERANCE, CONTACT_ANCHOR_RECOVERY_MAX_SHIFT) / distance)
+	var points := _terrain_contact_points(limb, state, Vector3.ZERO)
+	var escape_fraction := 0.0
+	var deep_wall_overlap := false
+	for i in range(0, points.size(), 2):
+		var offset := points[i + 1] - points[i]
+		var depth := offset.length()
+		if depth <= PROJECTION_COLLISION_MARGIN:
+			continue
+		var separation := motion.dot(offset / depth)
+		if separation <= depth:
+			return false
+		deep_wall_overlap = deep_wall_overlap or (depth > TERRAIN_DEEP_OVERLAP and absf(offset.y) < depth * MAX_WALL_NORMAL_Y)
+		escape_fraction = maxf(escape_fraction, depth / separation)
+	if not deep_wall_overlap or _deepest_contact(_terrain_contact_points(limb, state, motion)) > PROJECTION_COLLISION_MARGIN:
+		return false
+	# A sweep from the clear end must meet the original overlap only after
+	# crossing the predicted free section. Keep the solver's rebound velocity.
+	var destination := state.transform.translated(motion)
+	if _test_projection_motion(limb, destination, -motion):
+		var early_hit := 1.0 - _projection_hit.get_collision_unsafe_fraction() - escape_fraction
+		if early_hit * motion.length() > 2.0 * PROJECTION_COLLISION_MARGIN:
+			return false
+	state.transform = destination
+	return true
+
 
 func _recover_leading_head_wall_overlap() -> void:
 	var head: PhysicalBone3D = bodies.Head
