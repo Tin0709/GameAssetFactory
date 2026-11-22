@@ -571,7 +571,7 @@ func check_wall_brace_impact(seed: int, wall_angle: float, strike_angle: float, 
 	lab.free()
 
 
-func check_stacked_wall_handoff() -> void:
+func check_stacked_wall_handoff(seam: float, seed: int, strength: float, clips: Array[StringName]) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -580,8 +580,8 @@ func check_stacked_wall_handoff() -> void:
 	var wall := StaticBody3D.new()
 	# Two stacked boxes make one continuous face, with a seam at arm height.
 	for dimensions in [[Vector3(4.5, 1.5, 0.0), Vector3(0.30, 3.0, 20.0)],
-			[Vector3(-2.0, 0.54, 4.5), Vector3(12.7, 1.08, 0.30)],
-			[Vector3(-2.0, 2.04, 4.5), Vector3(12.7, 1.92, 0.30)]]:
+			[Vector3(-2.0, seam * 0.5, 4.5), Vector3(12.7, seam, 0.30)],
+			[Vector3(-2.0, (3.0 + seam) * 0.5, 4.5), Vector3(12.7, 3.0 - seam, 0.30)]]:
 		var box := BoxShape3D.new()
 		box.size = dimensions[1]
 		var collider := CollisionShape3D.new()
@@ -591,8 +591,8 @@ func check_stacked_wall_handoff() -> void:
 	lab.add_child(wall)
 	await ticks(2)
 	var group := lab.get_node("Zombies")
-	for clip: StringName in [&"Zombie_ExpressiveWalk", &"Zombie_ExpressiveRun"]:
-		group._spawn_serial = 3724
+	for clip in clips:
+		group._spawn_serial = 3700 + seed
 		lab.get_node("HUD/SpawnZombie").pressed.emit()
 		if group.get_child_count() != 1:
 			check(false, "The stacked-wall fixture loads a source zombie")
@@ -600,7 +600,7 @@ func check_stacked_wall_handoff() -> void:
 		var zombie = group.get_child(0)
 		zombie.set_physics_process(false)
 		var rng := RandomNumberGenerator.new()
-		rng.seed = 402934
+		rng.seed = 402910 + seed
 		var gap := rng.randf_range(0.48, 0.75)
 		zombie.position = Vector3(4.35 - gap, 0.0, 4.35 - gap + rng.randf_range(-0.45, 0.45) * 0.12)
 		zombie.rotation.y = rng.randf_range(-PI, PI)
@@ -615,18 +615,23 @@ func check_stacked_wall_handoff() -> void:
 		zombie.animation.seek(phase * zombie.animation.get_animation(clip).length, true)
 		zombie.ragdoll.sample(1.0 / 60.0)
 		zombie.ragdoll.sample(1.0 / 60.0)
-		zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 1150.0, Zombie.DeathStrike.SABRE_FINISHER)
+		zombie.take_hit(100, direction, Vector2.ZERO, 0.0, strength, Zombie.DeathStrike.SABRE_FINISHER)
 		zombie.set_physics_process(true)
 		var peak_gap := 0.0
+		var farthest := 0.0
 		for tick in 120:
 			await physics_frame
 			if zombie._corpse_parked:
 				break
 			peak_gap = maxf(peak_gap, zombie.ragdoll.max_anchor_error())
+			for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
+				farthest = maxf(farthest, maxf(body.global_position.x, body.global_position.z))
 		check(zombie.ragdoll._wall_handoff_frame >= 0 and zombie._corpse_parked,
 			"The stacked-wall ragdoll corrects its launch pose and comes to rest (%s)" % clip)
-		check(peak_gap < 0.14, "The shoulder clears the wall seam without stretching (%s, %.3f m)" % [clip, peak_gap])
-		print("LAB_STACKED_WALL clip=", clip, " gap=", peak_gap, " settled=", zombie._corpse_parked)
+		check(peak_gap < 0.14 and farthest < 4.65,
+			"The shoulder clears the wall seam without stretching or crossing the wall (%s, %.3f m)" % [clip, peak_gap])
+		print("LAB_STACKED_WALL clip=", clip, " seam=", seam, " gap=", peak_gap, " farthest=", farthest,
+			" settled=", zombie._corpse_parked)
 		zombie.free()
 	lab.free()
 
@@ -708,6 +713,8 @@ func run() -> void:
 	await check_wall_brace_impact(69, 45.0, -85.0, "AirAttack", false, Zombie.IDLE)
 	await check_wall_brace_impact(74, 45.0, -85.0, "Attack", false, Zombie.ATTACK)
 	await check_wall_brace_impact(29, 27.0, -58.0, "Attack", false, Zombie.ATTACK, 100.0, 2)
-	await check_stacked_wall_handoff()
+	await check_stacked_wall_handoff(1.08, 24, 1150.0, [&"Zombie_ExpressiveWalk", &"Zombie_ExpressiveRun"])
+	await check_stacked_wall_handoff(1.35, 24, 1150.0, [&"Zombie_Walk"])
+	await check_stacked_wall_handoff(1.35, 130, 800.0, [&"Zombie_Walk_Variant1"])
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
