@@ -1231,7 +1231,12 @@ func _baby_neck_needs_wall_recovery() -> bool:
 			return false
 		var joint: Dictionary = source_joints.Head
 		var gap: Vector3 = (parent.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
-		return gap.length_squared() > WALL_SLIDE_MIN_GAP ** 2
+		var gap_squared := gap.length_squared()
+		if use_tuned_floor_support:
+			return gap_squared > WALL_SLIDE_MIN_GAP ** 2
+		# With only launch increased, recover during the first stretch from a
+		# side contact, before the other joints open. Large gaps keep the existing path.
+		return gap_squared > BABY_FLOOR_ANCHOR_GAP ** 2 and gap_squared <= WALL_SLIDE_MIN_GAP ** 2
 	return false
 
 func _recover_tuned_supported_legs() -> void:
@@ -1504,7 +1509,7 @@ func _project_source_anchors() -> void:
 	if use_baby_floor_anchors:
 		_recover_baby_floor_anchors()
 	# The head box can touch the wall before its center reaches the wall sweep.
-	if use_baby_floor_anchors and use_tuned_floor_support and _baby_neck_needs_wall_recovery():
+	if use_baby_floor_anchors and use_tuned_wall_sweep and _baby_neck_needs_wall_recovery():
 		use_baby_floor_anchors = false
 		_baby_wall_anchors = true
 	if _baby_wall_anchors:

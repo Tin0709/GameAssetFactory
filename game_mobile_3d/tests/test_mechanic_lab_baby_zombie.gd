@@ -107,8 +107,11 @@ func run() -> void:
 	await check_tuned_contact(19, 27.0, 0.35, Strike.SWORD, -58.0)
 	await check_tuned_contact(60, 27.0, 0.20, Strike.SABRE, -58.0, Vector2(100.0, 100.0))
 	await check_tuned_contact(58, 13.0, 0.18, Strike.AIR, -44.0, Vector2(100.0, 100.0))
-	await check_tuned_contact(78, 27.0, 0.75, Strike.SWORD, -58.0, Vector2(1000.0, 100.0))
-	await check_tuned_contact(88, 27.0, 0.94, Strike.SABRE_FINISHER, -58.0, Vector2(1000.0, 100.0))
+	# The first head contact can separate several joints on the next two physics ticks.
+	await check_tuned_contact(78, 27.0, 0.25, Strike.SWORD, -58.0, Vector2(1000.0, 100.0))
+	await check_tuned_contact(88, 27.0, 0.35, Strike.SABRE_FINISHER, -58.0, Vector2(1000.0, 100.0))
+	# Preserve the launch-only response when the initial neck gap is already large.
+	await check_tuned_contact(17, 27.0, 0.32, Strike.SABRE_FINISHER, -58.0, Vector2(1000.0, 100.0))
 	await check_first_wall_neck_contact()
 	await check_first_wall_neck_contact(true)
 	await check_floor_then_wall()
