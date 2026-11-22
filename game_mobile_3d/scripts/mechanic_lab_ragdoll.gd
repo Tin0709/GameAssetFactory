@@ -587,7 +587,9 @@ func _wall_handoff_part_is_clear(space: PhysicsDirectSpaceState3D, body: Physica
 	for i in range(0, points.size(), 2):
 		var separation := points[i + 1] - points[i]
 		var depth := separation.length()
-		if depth > HANDOFF_WALL_REST_OVERLAP and absf(separation.y) < depth * 0.7:
+		# Upward separation can support the pose. A deep downward separation
+		# can pin a limb under an overhang or at the seam of two stacked boxes.
+		if depth > HANDOFF_WALL_REST_OVERLAP and separation.y < depth * 0.7:
 			return false
 	return true
 
