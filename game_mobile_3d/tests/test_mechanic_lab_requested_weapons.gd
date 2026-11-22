@@ -436,8 +436,10 @@ func check_crossbow_impact_burst(lab: Node3D, sparks: MultiMeshInstance3D) -> vo
 	var expected_age := elapsed - contact_distance / CrossPollinator.BOLT_SPEED
 	var particles: Array = sparks._particles.filter(func(spark): return spark.age < spark.lifetime)
 	check(not particles.is_empty() and expected_age > 0.0 and expected_age < delta * 0.5
-		and particles.all(func(spark): return absf(spark.age - expected_age) < 0.0003),
-		"A late wall collision uses only the remaining part of its tick for Polaris sparks")
+		and particles.all(func(spark): return absf(spark.age - expected_age) < 0.0003)
+		and crossbow._trails.size() == 25
+		and crossbow._trails.all(func(trail): return trail.stopped and absf(trail.tail_age - expected_age) < 0.0003),
+		"A late wall collision gives Polaris sparks and trails the same partial tick")
 	if not particles.is_empty():
 		var spark = particles[0]
 		var before_age: float = spark.age
