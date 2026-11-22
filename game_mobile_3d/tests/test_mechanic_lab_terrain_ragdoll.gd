@@ -666,7 +666,7 @@ func check_one_foot_stacked_wall_landing() -> void:
 	check(result.landing >= 1.5 and result.landing <= 2.15, "A supported one-foot wall brace enters the normal landing blend")
 	check(result.samples >= 30 and result.peak_step < 0.004,
 		"The late one-foot brace stays simulated with less than 4 mm of torso movement per step")
-	print("LAB_STACKED_WALL_LANDING ", result)
+	print("LAB_STACKED_WALL_LANDING landing=", result.landing, " late_step=", result.peak_step, " samples=", result.samples)
 	lab.free()
 
 
