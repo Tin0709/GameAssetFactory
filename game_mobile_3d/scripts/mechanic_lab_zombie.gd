@@ -649,7 +649,7 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 				and (not is_on_wall() or motion.dot(travel) >= MIN_WALL_PROGRESS_SPEED * travel.length()) \
 				and not travel.is_zero_approx() and play_steps
 			if source_stride:
-				var speed := ActionsStuff.SOURCE_STRIDE_SPEED * _body_height / 2.0
+				var speed := BABY_SPEED if _has_source_baby_stride() else ActionsStuff.SOURCE_STRIDE_SPEED * _body_height / 2.0
 				var forward_speed := motion.dot(global_basis.z) if not _skipped_blocked_step else 0.0
 				delta *= maxf(forward_speed / speed, 0.0)
 			elif expressive:
@@ -701,9 +701,11 @@ func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
 	var wrapped := phase < previous_phase
 	if clip == ActionsStuff.MOVE:
 		var end := phase + animation.current_animation_length if wrapped else phase
-		var size := 0.5 if is_baby else 1.0
-		for contact: Vector3 in WALK_STEP_NOTIFIES[clip]:
-			var stride := ActionsStuff.STRIDE_SECONDS
+		var baby_stride := _has_source_baby_stride()
+		var contacts: Array = ActionsStuff.BABY_CONTACTS if baby_stride else WALK_STEP_NOTIFIES[clip]
+		var stride := ActionsStuff.BABY_STRIDE_SECONDS if baby_stride else ActionsStuff.STRIDE_SECONDS
+		var size := 0.5 if is_baby and not baby_stride else 1.0
+		for contact: Vector3 in contacts:
 			var next_step := contact.x + (floorf((previous_phase - contact.x) / stride) + 1.0) * stride
 			if next_step <= end:
 				step_audio.emit(to_global(Vector3(contact.y, 0.0, contact.z) * size))
@@ -718,6 +720,9 @@ func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
 		var crossed := (after_previous or reached) if wrapped else (after_previous and reached)
 		if crossed:
 			step_audio.emit(to_global(Vector3(contact.y, 0.0, contact.z)))
+
+func _has_source_baby_stride() -> bool:
+	return is_baby and is_equal_approx(animation.current_animation_length, ActionsStuff.BABY_STRIDE_SECONDS)
 
 func _check_melee_contact() -> void:
 	if target.get("is_dead") == true:

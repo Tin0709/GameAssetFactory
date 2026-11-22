@@ -684,7 +684,7 @@ func _add_actions_stuff(player: AnimationPlayer, skeleton: Skeleton3D, baby: boo
 	var release := Zombie.BABY_ATTACK_FOCUS_END if baby else Zombie.LAB_ATTACK_HIT_SECTION
 	var contact := Zombie.BABY_ATTACK_CONTACT if baby else Zombie.MELEE_CONTACT_TIME
 	Zombie.ActionsStuff.build(player, skeleton, Vector3(release, contact, player.get_animation(Zombie.ATTACK).length),
-		player.get_animation(Zombie.SPAWN).length, Zombie.STAGGER_DURATION)
+		player.get_animation(Zombie.SPAWN).length, Zombie.STAGGER_DURATION, baby)
 
 func _add_baby_clips(directory: String, player: AnimationPlayer) -> bool:
 	if not player.has_animation(BABY_IDLE):

@@ -78,7 +78,7 @@ static func build(idle: Animation, rate: float) -> Animation:
 		clip.track_set_path(rotation_track, bone_path)
 		for sample in range(sample_count + 1):
 			var time := minf(sample / rate, clip.length)
-			# Blend a little of the existing idle sway under the baby move layer.
+			# Preserve the existing idle sway under the baby move layer.
 			# Sampling one full, symmetric segment keeps both ends continuous.
 			var idle_time := minf(time, clip.length - time)
 			var pos := idle.position_track_interpolate(bone_index, idle_time)

@@ -1,6 +1,7 @@
 extends RefCounted
 
 const SOURCE_PATH := "res://scenes/dev/actions_stuff_research/zombie_combat/source_library.res"
+const BabyStride := preload("res://scripts/mechanic_lab_zombie_baby_stride.gd")
 const IDLE := &"Zombie_AS_Idle"
 const MOVE := &"Zombie_AS_Move"
 const ATTACK := &"Zombie_AS_Attack"
@@ -8,6 +9,8 @@ const SPAWN := &"Zombie_AS_Spawn"
 const STAGGER := &"Zombie_AS_Stagger"
 
 const STRIDE_SECONDS := 0.75
+const BABY_STRIDE_SECONDS := 0.4375
+const BABY_CONTACTS := [Vector3(0.1563, 0.0625, 0.17), Vector3(0.375, -0.0625, 0.17)]
 # The support foot sweeps backwards at roughly 4 m/s on the 0.675 m source leg.
 const SOURCE_STRIDE_SPEED := 4.0
 const SOURCE_LEG_HEIGHT := 0.675
@@ -29,7 +32,7 @@ const BONE_MAP := [
 ]
 
 static func build(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: Vector3,
-		spawn_duration: float, stagger_seconds: float) -> void:
+		spawn_duration: float, stagger_seconds: float, baby: bool) -> void:
 	if not ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary"):
 		return
 	var source := ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary
@@ -40,8 +43,12 @@ static func build(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: 
 		if skeleton.find_bone(binding[0]) < 0:
 			return
 	var library := player.get_animation_library(&"")
-	var idle := _bake(skeleton, player.get_parent(), source.get_animation(&"Idle"))
-	var move := _bake(skeleton, player.get_parent(), source.get_animation(&"Walk"))
+	var idle_source := source.get_animation(&"Idle")
+	var move_source := BabyStride.build(idle_source, BAKE_RATE) if baby else null
+	if move_source == null:
+		move_source = source.get_animation(&"Walk")
+	var idle := _bake(skeleton, player.get_parent(), idle_source)
+	var move := _bake(skeleton, player.get_parent(), move_source)
 	var attack := _bake(skeleton, player.get_parent(), source.get_animation(&"Attack"),
 		attack_timing)
 	library.add_animation(IDLE, idle)
