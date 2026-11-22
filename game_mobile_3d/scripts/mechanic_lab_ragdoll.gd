@@ -15,6 +15,7 @@ const LOCAL_FLOOR_SHARED_LIFT := 0.033
 const FLOOR_CONTACT_GAP_DEPTH := 0.10
 const EARLY_FLOOR_WALL_LOOKAHEAD := 5.0 / 60.0
 const HANDOFF_TERRAIN_MASK := 1
+const HANDOFF_SUPPORT_NORMAL_Y := 0.7
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
@@ -270,7 +271,7 @@ func _handoff_wall_clearance() -> Vector3:
 	var wall_tolerance := PROJECTION_COLLISION_MARGIN if use_tuned_wall_sweep else SOURCE_ANCHOR_TOLERANCE
 	if wall_handoff_animation != null and (_handoff_straddles_wall(
 			space, collision_mask, Vector3.ZERO, wall_tolerance, {})
-			or _handoff_arm_is_pinched(space, overlaps)):
+			or _handoff_arm_needs_clearance(space, overlaps)):
 		_wall_handoff_frame = Engine.get_physics_frames()
 		# All candidate poses share the rig's collision configuration.
 		if collision_mask == HANDOFF_TERRAIN_MASK:
@@ -290,7 +291,7 @@ func _handoff_wall_clearance() -> Vector3:
 static func _is_fixed_wall(body: Object) -> bool:
 	return body is StaticBody3D or (body is RigidBody3D and body.freeze)
 
-func _handoff_arm_is_pinched(space: PhysicsDirectSpaceState3D, overlaps: Array[Dictionary]) -> bool:
+func _handoff_arm_needs_clearance(space: PhysicsDirectSpaceState3D, overlaps: Array[Dictionary]) -> bool:
 	var wall_shapes := 0
 	var floor_body := _flat_floor.get_parent()
 	for hit in overlaps:
@@ -299,14 +300,18 @@ func _handoff_arm_is_pinched(space: PhysicsDirectSpaceState3D, overlaps: Array[D
 			wall_shapes += PhysicsServer3D.body_get_shape_count(hit.rid)
 	if wall_shapes < 2:
 		return false
-	# The arm box can overlap both sides of a seam while its centre still clears the walls.
+	# The arm box can catch opposing faces or an underside while its centre clears the walls.
 	for name in ["Arm.L", "Arm.R"]:
 		var points := _terrain_contacts_at(bodies[name], space, current[name])
 		var normals: Array[Vector3] = []
 		for i in range(0, points.size(), 2):
 			var separation := points[i + 1] - points[i]
 			var depth := separation.length()
-			if depth <= HANDOFF_MIN_WALL_OVERLAP or absf(separation.y) >= depth * MAX_WALL_NORMAL_Y:
+			if depth <= HANDOFF_MIN_WALL_OVERLAP:
+				continue
+			if separation.y <= -depth * HANDOFF_SUPPORT_NORMAL_Y:
+				return true
+			if absf(separation.y) >= depth * MAX_WALL_NORMAL_Y:
 				continue
 			var normal := separation / depth
 			for other in normals:
@@ -589,7 +594,7 @@ func _wall_handoff_part_is_clear(space: PhysicsDirectSpaceState3D, body: Physica
 		var depth := separation.length()
 		# Upward separation can support the pose. A deep downward separation
 		# can pin a limb under an overhang or at the seam of two stacked boxes.
-		if depth > HANDOFF_WALL_REST_OVERLAP and separation.y < depth * 0.7:
+		if depth > HANDOFF_WALL_REST_OVERLAP and separation.y < depth * HANDOFF_SUPPORT_NORMAL_Y:
 			return false
 	return true
 
