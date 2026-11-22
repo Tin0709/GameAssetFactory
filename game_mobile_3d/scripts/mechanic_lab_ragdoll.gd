@@ -847,6 +847,49 @@ func has_flat_corner_brace(max_linear := INF, max_angular := INF) -> bool:
 			shapes.append(shape)
 	return false
 
+func has_stacked_wall_brace(max_linear: float, max_angular: float) -> bool:
+	var head: PhysicalBone3D = bodies.Head
+	if not _body_below_speed(head, max_linear, max_angular) \
+			or not _body_below_speed(bodies.Chest, max_linear, max_angular):
+		return false
+	var floor_body := _flat_floor.get_parent()
+	var foot_planted := false
+	for name in ["Leg.L", "Leg.R"]:
+		var foot: PhysicalBone3D = bodies[name]
+		# The planted foot can rock under load while the torso stays supported.
+		if _body_below_speed(foot, max_linear, INF) and _body_supported_by(foot, floor_body):
+			foot_planted = true
+			break
+	if not foot_planted:
+		return false
+	var head_state := PhysicsServer3D.body_get_direct_state(head.get_rid())
+	if head_state == null:
+		return false
+	for name in ["Arm.L", "Arm.R"]:
+		var arm: PhysicalBone3D = bodies[name]
+		if not _body_below_speed(arm, max_linear, max_angular):
+			continue
+		var arm_state := PhysicsServer3D.body_get_direct_state(arm.get_rid())
+		if arm_state == null:
+			continue
+		for i in arm_state.get_contact_count():
+			var normal := arm_state.get_contact_local_normal(i)
+			if absf(normal.y) >= MAX_WALL_NORMAL_Y or not _is_fixed_wall(arm_state.get_contact_collider_object(i)):
+				continue
+			var wall := arm_state.get_contact_collider(i)
+			var shape := arm_state.get_contact_collider_shape(i)
+			var point := arm_state.get_contact_collider_position(i)
+			for j in head_state.get_contact_count():
+				# The upper and lower shapes can both carry the pose along one wall plane.
+				if head_state.get_contact_collider(j) != wall or head_state.get_contact_collider_shape(j) == shape \
+						or normal.dot(head_state.get_contact_local_normal(j)) <= 0.999:
+					continue
+				var separation := head_state.get_contact_collider_position(j) - point
+				if absf(separation.dot(normal)) <= PROJECTION_COLLISION_MARGIN:
+					return max_anchor_error() <= SOURCE_ANCHOR_TOLERANCE
+	return false
+
+
 static func _body_below_speed(body: PhysicalBone3D, max_linear: float, max_angular: float) -> bool:
 	return body.linear_velocity.length_squared() < max_linear * max_linear \
 		and body.angular_velocity.length_squared() < max_angular * max_angular

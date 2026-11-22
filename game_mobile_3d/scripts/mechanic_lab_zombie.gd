@@ -1263,6 +1263,8 @@ func _update_death(delta: float) -> void:
 				and not _corpse_floor.disabled and _corpse_age >= WALL_BRACE_MIN_AGE \
 				and contact.supports == 1 and contact.leg_supported:
 			limbs_supporting = ragdoll.has_flat_corner_brace(SABRE_CORNER_LANDING_MAX_SPEED, CORPSE_SETTLE_SPIN)
+			if not limbs_supporting and not is_baby and not ragdoll.use_tuned_wall_sweep:
+				limbs_supporting = ragdoll.has_stacked_wall_brace(SABRE_CORNER_LANDING_MAX_SPEED, CORPSE_SETTLE_SPIN)
 			_absorb_late_foot_rebounds(contact)
 		if not limbs_supporting and contact.linear < DEATH_LIMB_SUPPORT_MAX_SPEED:
 			limbs_supporting = _has_tuned_wall_brace(contact)
