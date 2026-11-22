@@ -650,6 +650,14 @@ func check_stacked_wall_handoff(seam: float, seed: int, strength: float, clips: 
 
 func check_one_foot_stacked_wall_landing() -> void:
 	var lab := await stacked_wall_lab(1.35)
+	# Reuse the same corner for both launches to cover a second combat contact.
+	var first := await launch_at_stacked_wall(lab, 62, 800.0, &"Zombie_ExpressiveWalk")
+	if first == null:
+		lab.free()
+		return
+	await ticks(294)
+	check(first._corpse_landed, "The first launch lands after sliding down the stacked wall")
+	first.free()
 	var zombie := await launch_at_stacked_wall(lab, 95, 800.0, &"Zombie_ExpressiveWalk")
 	if zombie == null:
 		lab.free()
