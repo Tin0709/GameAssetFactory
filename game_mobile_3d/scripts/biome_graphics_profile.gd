@@ -61,6 +61,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., .82) var path_projector_lift := 0.0
 ## Correct excess sky fill on cast-shadowed warm path tops.
 @export_range(0., 1.) var path_shade_sky := 0.0
+## Relax canopy color on warm path tops where the Sun reaches the surface.
+@export_range(0., 1.) var path_sky_chroma := 0.0
 ## Recover some projected Sun on exposed upper stone faces.
 @export_range(0., .20) var stone_projector_lift := 0.0
 @export_range(0., .56) var stone_wall_shadow_fill := 0.0

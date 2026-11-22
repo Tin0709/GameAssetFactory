@@ -144,13 +144,15 @@ void fragment() {
 		terrain_opening_incident = terrain_opening_fill(receiver_visibility, sole);
 	}
 	vec3 path_sky_excess;
-	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD,path_sky_excess)*sole;
+	vec2 path_sky_chroma_delta;
+	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD,path_sky_excess,path_sky_chroma_delta)*sole;
 	vec3 local_diffuse = gaf_local_diffuse(diffuse_fill, surface_world, surface_normal);
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	terrain_canopy_ground_ev = 0.0;
 	terrain_canopy_incident = vec4(0.0);
-	if (path_sky_excess.g > 0.0) {
-		terrain_canopy_incident = vec4(path_sky_excess * sole, -1.0);
+	if (path_sky_excess.g > 0.0 || path_sky_chroma_delta.x > 0.0) {
+		terrain_canopy_incident = vec4(path_sky_excess * sole, -1.0 - max(path_sky_chroma_delta.x,0.0)*sole);
+		terrain_canopy_ground_ev = path_sky_chroma_delta.y * sole;
 	} else if (use_source_terrain && (ground_grade == 1 || ground_grade == 2) && surface_top > .998) {
 		terrain_canopy_incident.w = gaf_near_wall_turf(stone_sunset_position, ALBEDO);
 		if (gaf_canopy_ground_fill.x > 0.0 && terrain_canopy_sky < 1.0) {

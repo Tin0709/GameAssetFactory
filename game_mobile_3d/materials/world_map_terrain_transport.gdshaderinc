@@ -3,6 +3,7 @@
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
 global uniform float gaf_stone_foot_fill;
 global uniform vec4 gaf_path_shade_sky;
+global uniform vec4 gaf_path_sky_chroma;
 varying float terrain_stone_foot;
 varying vec3 terrain_sky_light;
 
@@ -70,7 +71,7 @@ vec3 terrain_contact_response(vec3 albedo,float contact){
 	vec3 reflectance=clamp(albedo,vec3(0.0),vec3(0.5));
 	return vec3(single)+returned*reflectance/max(vec3(1.0)-(1.0-return_ratio)*reflectance,vec3(0.00001));
 }
-vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec3 receiver_visibility,float face_y,vec3 camera_position,out vec3 path_sky_excess){
+vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec3 receiver_visibility,float face_y,vec3 camera_position,out vec3 path_sky_excess,out vec2 path_sky_chroma_delta){
 	vec3 sky = terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
@@ -78,6 +79,7 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec
 	if (ground_grade == 3 && stone_diffuse_strength > 0.0) sky *= exp2(stone_diffuse_log * stone_diffuse_strength);
 #endif
 	vec3 sky_fill = sky * terrain_ambient_scale * terrain_ambient_tint * visibility;
+	vec3 sky_before_canopy_color = sky_fill;
 	sky_fill = gaf_canopy_diffuse_color(sky_fill, terrain_canopy_sky, gaf_canopy_sky_color);
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (ground_grade == 3 && stone_day_sky > 0.0) {
@@ -111,6 +113,20 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec
 		diffuse_sky += mix(vec3(diffuse_y), diffuse_sky, .37) * (stone_wall_sky * side * weak_sky);
 	}
 #endif
+	path_sky_chroma_delta = vec2(0.0);
+	if (gaf_path_sky_chroma.w > 0.0 && use_source_terrain && ground_grade == 2 && face_y > .998) {
+		float soil = smoothstep(1.06, 1.15, color.r / max(color.g,.0001))
+			* smoothstep(1.02, 1.11, color.g / max(color.b,.0001));
+		if (soil > 0.0) {
+			vec3 sky_uncolored = gaf_pre_twilight_diffuse(sky_before_canopy_color,camera_position) * receiver_visibility;
+			vec3 skylight = diffuse_sky * receiver_visibility;
+			// Preserve outgoing luminance after the albedo is applied.
+			vec3 weights = color * vec3(.2126,.7152,.0722);
+			float y = dot(skylight, weights);
+			vec3 restored = sky_uncolored * (y / max(dot(sky_uncolored,weights),.00001));
+			path_sky_chroma_delta = (restored - skylight).rb * ((1.0 - metallic) * soil);
+		}
+	}
 	path_sky_excess = vec3(0.0);
 	if (gaf_path_shade_sky.w > 0.0 && use_source_terrain && face_y > .998
 			&& ground_grade == 2 && gaf_spruce_sky_region.w > .01) {

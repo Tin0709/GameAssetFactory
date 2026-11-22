@@ -23,8 +23,9 @@ global uniform vec4 gaf_path_projector_lift;
 global uniform vec4 gaf_stone_projector_lift;
 varying vec2 stone_sunset_position;
 varying float terrain_canopy_ground_ev;
-// RGB carries incident light. A negative fourth component carries the warm path sky excess.
-// Other values carry the near-wall coverage for turf.
+// Turf uses the fourth component for near-wall coverage.
+// Warm paths set it to -1 minus the red chroma delta and store blue in terrain_canopy_ground_ev.
+// Their RGB incident light remains the excess used by the cast-shadow correction.
 varying vec4 terrain_canopy_incident;
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
@@ -79,6 +80,16 @@ void light() {
 		float cast_shade = 1.0 - smoothstep(.04, .52, shadow_attenuation);
 		DIFFUSE_LIGHT -= terrain_canopy_incident.rgb * (cast_shade * gaf_path_shade_sky.w);
 	}
+	if (gaf_path_sky_chroma.w > 0.0 && terrain_canopy_incident.w < -1.0 && LIGHT_IS_DIRECTIONAL &&
+			dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_path_sky_chroma.xyz) > .9999 &&
+			distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= .005) {
+		float red = -1.0 - terrain_canopy_incident.w;
+		float blue = terrain_canopy_ground_ev;
+		vec3 weights = ALBEDO * vec3(.2126,.7152,.0722);
+		float green = -(red * weights.r + blue * weights.b) / max(weights.g,.00001);
+		float passage = smoothstep(.57, .89, shadow_attenuation * cloud_transmission);
+		DIFFUSE_LIGHT += vec3(red, green, blue) * (passage * gaf_path_sky_chroma.w);
+	}
 	float path_weight = 0.0;
 	float path_core_weight = 0.0;
 	float path_transmission_gain = 1.0;
@@ -130,7 +141,7 @@ void light() {
 		shadow_diffuse *= mix(1.0, gaf_terrace_shadow_fill(stone_sunset_position), weight);
 	}
 	vec2 canopy_delta = vec2(0.0);
-	if (gaf_canopy_ground_fill.x > 0.0 && shadow_diffuse.g > 0.0 &&
+	if (terrain_canopy_incident.w >= 0.0 && gaf_canopy_ground_fill.x > 0.0 && shadow_diffuse.g > 0.0 &&
 			terrain_canopy_ground_ev != 0.0 && shadow_attenuation < .58) {
 		canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev, shadow_attenuation);
 	}
