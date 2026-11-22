@@ -439,7 +439,9 @@ var _last_weapon_serial := -1
 var _master_was_muted := false
 
 func _ready() -> void:
-	set_process(false)
+	# Projectiles move at the default physics priority before their flight voices follow.
+	process_physics_priority = 1
+	set_physics_process(false)
 
 func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"", preview_group := &"") -> void:
 	if enabled == value:
@@ -616,7 +618,7 @@ func crossbow_flight(bolt: Node3D) -> void:
 	var voice := _play(&"crossbow_flight", bolt.global_position, FLIGHT_GAIN_DB)
 	if voice != null:
 		_flight_targets[voice] = bolt
-		set_process(true)
+		set_physics_process(true)
 
 func stop_crossbow_flight(bolt: Node3D) -> void:
 	var slot := _flight_targets.find_key(bolt) as AudioStreamPlayer3D
@@ -625,9 +627,9 @@ func stop_crossbow_flight(bolt: Node3D) -> void:
 	slot.stop()
 	_flight_targets.erase(slot)
 	if _flight_targets.is_empty():
-		set_process(false)
+		set_physics_process(false)
 
-func _process(_delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	for voice: AudioStreamPlayer3D in _flight_targets.keys():
 		var bolt: Variant = _flight_targets[voice]
 		if not is_instance_valid(bolt) or bolt.is_queued_for_deletion() or not voice.playing:
@@ -636,7 +638,7 @@ func _process(_delta: float) -> void:
 		else:
 			voice.global_position = bolt.global_position
 	if _flight_targets.is_empty():
-		set_process(false)
+		set_physics_process(false)
 
 func gauntlet_swung(point: Vector3, index: int, airborne: bool) -> void:
 	if enabled:
@@ -787,7 +789,7 @@ func flush_zombie_steps() -> void:
 
 func reset() -> void:
 	_flight_targets.clear()
-	set_process(false)
+	set_physics_process(false)
 	_attack_contacts.clear()
 	_attack_windups.clear()
 	_attack_swings.clear()
