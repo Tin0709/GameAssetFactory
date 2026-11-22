@@ -271,7 +271,37 @@ func check_crowd_sight_deadline(group: Node) -> void:
 			failures.append("Crowd sight deadline must validate current cover (was aggressive %s, now visible %s)"
 				% [was_aggressive, visible])
 	print("CROWD_SIGHT_DEADLINE states=", observed)
+	if stride >= 3:
+		await check_crowd_sight_interruption(zombie, player, start, open, hidden, stride)
 	wall.free()
+
+func check_crowd_sight_interruption(zombie: ZOMBIE, player: CharacterBody3D, start: Vector3,
+		open: Vector3, hidden: Vector3, stride: int) -> void:
+	var state_seconds: Array[float] = []
+	for was_aggressive in [false, true]:
+		zombie.global_position = start
+		zombie.velocity = Vector3.ZERO
+		zombie._target_aggressive = was_aggressive
+		zombie._target_visible = was_aggressive
+		zombie._last_seen_position = open
+		zombie._sight_state_seconds = 0.0
+		zombie._attack_cooldown = 10.0
+		player.global_position = hidden if was_aggressive else open
+		# Let a scheduled scan start the timer. Interrupt it on the next tick,
+		# with the regular scan still at least two ticks away.
+		zombie._crowd_slot = Engine.get_physics_frames() % stride
+		zombie.set_physics_process(true)
+		await physics_frame
+		if zombie._sight_state_seconds <= 0.0 or zombie._target_visible == was_aggressive:
+			failures.append("The scheduled crowd scan must start a pending sight transition")
+		player.global_position = open if was_aggressive else hidden
+		await physics_frame
+		state_seconds.append(zombie._sight_state_seconds)
+		if zombie._target_aggressive != was_aggressive or zombie._target_visible != was_aggressive \
+				or zombie._sight_state_seconds > 0.0:
+			failures.append("Brief cover changes must reset a pending crowd sight timer (was aggressive %s)" % was_aggressive)
+		zombie.set_physics_process(false)
+	print("CROWD_SIGHT_INTERRUPTION pending_seconds=", state_seconds)
 
 func check_zombie_dust() -> void:
 	var dust := lab.get_node_or_null("ZombieStepDust") as MultiMeshInstance3D
