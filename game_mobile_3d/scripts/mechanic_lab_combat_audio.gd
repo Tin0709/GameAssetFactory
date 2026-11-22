@@ -787,6 +787,18 @@ func flush_zombie_steps() -> void:
 		_play(&"zombie_step", _step_points[i], ZOMBIE_STEP_GAIN_DB)
 	_step_points.clear()
 
+func clear_weapon_cues() -> void:
+	_last_weapon_serial = -1
+	_next_voice[WEAPON_POOL] = 0
+	_weapon_onsets.fill(false)
+	for slot in mini(VOICES_PER_POOL, _voices.size()):
+		var voice := _voices[slot]
+		voice.stop()
+		voice.stream = null
+		if slot < _started_frames.size():
+			_started_frames[slot] = -1
+			_voice_groups[slot] = &""
+
 func reset() -> void:
 	_flight_targets.clear()
 	set_physics_process(false)

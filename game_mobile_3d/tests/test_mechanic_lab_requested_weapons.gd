@@ -390,6 +390,7 @@ func run() -> void:
 	equip(menu, 0)
 	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
 		"Switching back restores the original Sabre")
+	await check_crossbow_flight_on_switch(lab, menu)
 	equip(menu, 10)
 	var tool_mount := lab._weapon_mesh as MeshInstance3D
 	check(menu.selected == 10 and tool_mount.material_override != null,
@@ -1037,6 +1038,50 @@ func check_crossbow_equip_audio(lab: Node3D, menu: OptionButton) -> void:
 	equip(menu, 3)
 	equip(menu, 0)
 	check(not audio._voices.any(func(voice): return voice.playing), "Combat mute suppresses weapon switch cues")
+
+func check_crossbow_flight_on_switch(lab: Node3D, menu: OptionButton) -> void:
+	var audio = lab.get_node("CombatAudio")
+	var sound := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	lab.reset_player()
+	await ticks(12)
+	sound.button_pressed = true
+	equip(menu, 3)
+	check(menu.selected == 3, "The flight fixture equips the Cross Pollinator")
+	var crossbow = lab._crossbow
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(4.0, 2.0, 0.2)
+	collider.shape = box
+	wall.add_child(collider)
+	lab.add_child(wall)
+	var origin := Vector3(24.0, 1.0, 0.0)
+	wall.position = origin + Vector3.BACK * 8.0
+	await ticks(2)
+	check(crossbow.fire(origin, Vector3.BACK, -401, origin), "The switch fixture launches a real Cross Pollinator bolt")
+	var voices: Dictionary = audio._flight_targets
+	var voice := voices.keys().front() as AudioStreamPlayer3D if voices.size() == 1 else null
+	check(voice != null and voice.playing, "The bolt already owns an active flight voice")
+	if voice != null:
+		var stream := voice.stream
+		var bolt := voices[voice] as Node3D
+		await ticks(2)
+		equip(menu, 0)
+		check(menu.selected == 0 and is_instance_valid(bolt), "The accepted switch leaves the projectile in flight")
+		check(voice.playing and voice.stream == stream and voices.get(voice) == bolt,
+			"Equipping another weapon keeps the existing projectile's flight voice")
+		await ticks(2)
+		check(voice.playing and is_instance_valid(bolt) and voice.global_position.distance_to(bolt.global_position) < 0.01,
+			"The retained voice still tracks the projectile after the switch")
+		var impact_choice: int = audio._next_choice.get(&"crossbow_hit", 0)
+		await ticks(16)
+		check(voices.is_empty() and not voice.playing and crossbow._bolts.is_empty()
+			and audio._next_choice.get(&"crossbow_hit", 0) != impact_choice,
+			"The crossbow impact plays and stops the surviving flight voice at the wall")
+	wall.queue_free()
+	sound.button_pressed = false
+	lab.reset_player()
+	await ticks(12)
 
 func switch_cue_is_playing(audio: Node, group: StringName, count: int) -> bool:
 	var samples: Array = audio._groups.get(group, [])

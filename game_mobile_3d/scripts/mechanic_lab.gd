@@ -507,7 +507,8 @@ func _select_weapon(index: int) -> void:
 	player.reference_audio.clip_play_rates = rates
 	player.effects.reset()
 	_cancel_slam_audio()
-	_combat_audio.reset()
+	# Projectiles and enemy cues keep their own lifetimes through a weapon switch.
+	_combat_audio.clear_weapon_cues()
 	var previous := _equipped_weapon
 	var was_crossbow := previous == Weapon.CROSS_POLLINATOR
 	var was_bow := previous == Weapon.BOW
