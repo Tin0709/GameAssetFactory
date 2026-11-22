@@ -662,6 +662,28 @@ func check_one_foot_stacked_wall_landing() -> void:
 	if zombie == null:
 		lab.free()
 		return
+	var result := await measure_braced_landing(zombie)
+	check(result.landing >= 1.5 and result.landing <= 2.15, "A supported one-foot wall brace enters the normal landing blend")
+	check(result.samples >= 30 and result.peak_step < 0.004,
+		"The late one-foot brace stays simulated with less than 4 mm of torso movement per step")
+	print("LAB_STACKED_WALL_LANDING ", result)
+	lab.free()
+
+
+func check_sustained_wall_landing() -> void:
+	var lab := await stacked_wall_lab(1.08)
+	var zombie := await launch_at_stacked_wall(lab, 105, 1150.0, &"Zombie_ExpressiveRun")
+	if zombie != null:
+		var result := await measure_braced_landing(zombie)
+		check(result.landing >= 2.0 and result.landing <= 3.2,
+			"The long one-foot wall brace enters landing after the initial tumble")
+		check(result.samples >= 30 and result.peak_step < 0.0015,
+			"The planted zombie simulates with less than 1.5 mm of late torso movement per step")
+		print("LAB_SUSTAINED_WALL_LANDING ", result)
+	lab.free()
+
+
+func measure_braced_landing(zombie: Zombie) -> Dictionary:
 	var landing := INF
 	var previous_chest := Vector3.INF
 	var peak_late_step := 0.0
@@ -679,11 +701,7 @@ func check_one_foot_stacked_wall_landing() -> void:
 			peak_late_step = maxf(peak_late_step, previous_chest.distance_to(chest))
 			measured_steps += 1
 		previous_chest = chest
-	check(landing >= 1.5 and landing <= 2.15, "A supported one-foot wall brace enters the normal landing blend")
-	check(measured_steps >= 30 and peak_late_step < 0.004,
-		"The late one-foot brace stays simulated with less than 4 mm of torso movement per step")
-	print("LAB_STACKED_WALL_LANDING landing=", landing, " late_step=", peak_late_step, " samples=", measured_steps)
-	lab.free()
+	return {"landing": landing, "peak_step": peak_late_step, "samples": measured_steps}
 
 
 func check_wall_shoulder_rebound(seam: float, seed: int, clip: StringName, gap_limit: float,
@@ -796,6 +814,7 @@ func run() -> void:
 	await check_stacked_wall_handoff(1.35, 24, 1150.0, [&"Zombie_Walk"])
 	await check_stacked_wall_handoff(1.35, 130, 800.0, [&"Zombie_Walk_Variant1"])
 	await check_one_foot_stacked_wall_landing()
+	await check_sustained_wall_landing()
 	await check_wall_shoulder_rebound(1.08, 77, &"Zombie_ExpressiveRun", 0.145, 17.0 / 60.0)
 	await check_wall_shoulder_rebound(1.08, 73, &"Zombie_ExpressiveWalk", 0.145)
 	await check_wall_shoulder_rebound(1.35, 73, &"Zombie_ExpressiveWalk", 0.145)
