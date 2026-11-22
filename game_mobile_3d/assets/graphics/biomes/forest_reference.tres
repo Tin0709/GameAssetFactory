@@ -169,6 +169,7 @@ sheltered_stone_return_scale = 1.6
 stone_wall_sky_by_hour = SubResource("ForestWallSky")
 shadow_diffuse_by_hour = SubResource("ForestShadowDiffuse")
 ground_shadow_fill_reduction = Vector2(0.25, 0.45)
+stone_wall_shadow_fill = 0.42
 stone_foot_fill = 0.50
 stone_top_shadow_fill_pivot = Vector2(0.119, 0.139)
 path_sun_response = Vector2(0.30, 0.24)

@@ -10,6 +10,7 @@ varying float canopy_direct_coverage;
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 global uniform float gaf_stone_shade_reach;
 global uniform vec2 gaf_stone_top_shadow_fill;
+global uniform float gaf_stone_wall_shadow_fill;
 global uniform float gaf_stone_wall_return;
 global uniform vec4 gaf_stone_sunset_region;
 global uniform vec4 gaf_stone_sunset_beam;
@@ -98,6 +99,12 @@ void light() {
 		float openness = smoothstep(pivot * .72, pivot * 1.16, sky);
 		float shadow = 1.0 - smoothstep(.06, .45, shadow_attenuation);
 		shadow_diffuse *= 1.0 + mix(-.62, .36, openness) * gaf_stone_top_shadow_fill.x * shadow;
+	}
+	if (gaf_stone_wall_shadow_fill > 0.0 && ground_grade == 3 &&
+			abs(surface_top) < .1 && shadow_diffuse.g > 0.0) {
+		// The common Sun fill can otherwise be stronger in cast shade than on an adjacent open wall.
+		float inner_shadow = 1.0 - smoothstep(.025, .50, shadow_attenuation);
+		shadow_diffuse *= 1.0 - gaf_stone_wall_shadow_fill * inner_shadow;
 	}
 	if (gaf_grass_terrace_shadow_state.z > 0.0 && shadow_diffuse.g > 0.0 &&
 			shadow_attenuation < .58 && use_source_terrain && (ground_grade == 1 || ground_grade == 2) && surface_top > .998) {

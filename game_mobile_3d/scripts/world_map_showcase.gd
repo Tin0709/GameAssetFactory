@@ -124,6 +124,7 @@ var _near_wall_bound := false
 var _near_wall_fill_state := Vector4.ZERO
 var _stone_foot_fill := 0.0
 var _stone_top_shadow_fill := Vector2.ZERO
+var _stone_wall_shadow_fill := 0.0
 var _path_sun_response := Vector2.ZERO
 var _path_sun_core := Vector2.ZERO
 var _path_sun_core_direction := Vector3.ZERO
@@ -205,6 +206,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grass_terrace_shadow_fill": ["Chiều sâu cỏ qua các bậc", 1.],
 	&"canopy_ground_fill": ["Chiều sâu bóng dưới tán", 1.],
 	&"near_wall_fill": ["Chiều sâu chân vách", 1.],
+	&"stone_wall_shadow_fill": ["Chiều sâu bóng trên vách đá", 1.],
 	&"turf_sun_chroma": ["Sắc nắng trên cỏ và mặt cỏ", 1.],
 	&"grass_step_coverage": ["Cỏ sát bậc địa hình", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
@@ -350,7 +352,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 222
+const LIGHTING_MIX_VERSION := 223
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -515,6 +517,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_top_shadow_fill", Vector2.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_stone_wall_shadow_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_state", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_near_wall_fill", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_response", Vector2.ZERO)
@@ -1063,6 +1066,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_top_shadow_fill", Vector2.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_stone_wall_shadow_fill", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_state", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_field", null)
 			RenderingServer.global_shader_parameter_set("gaf_near_wall_fill", Vector4.ZERO)
@@ -1670,6 +1674,13 @@ func _sync_shadow_diffuse() -> void:
 	if stone_top != _stone_top_shadow_fill:
 		_stone_top_shadow_fill = stone_top
 		RenderingServer.global_shader_parameter_set("gaf_stone_top_shadow_fill", stone_top)
+	var stone_wall := 0.
+	if state.w > 0. and _stone_wall_shadow_fill_available():
+		stone_wall = clampf(_biome_profile.stone_wall_shadow_fill, 0., .56)
+		stone_wall *= _day_grass_shadow_weight() * _lighting_scale(&"stone_wall_shadow_fill")
+	if stone_wall != _stone_wall_shadow_fill:
+		_stone_wall_shadow_fill = stone_wall
+		RenderingServer.global_shader_parameter_set("gaf_stone_wall_shadow_fill", stone_wall)
 	var path := Vector2.ZERO
 	if state.w > 0. and _path_sun_response_available():
 		# Cap the midrange curve so brighter incoming sunlight stays brighter.
@@ -1718,16 +1729,19 @@ func prepare_near_wall_lighting() -> void:
 			and level.near_wall_layout_sha256.length() == 64
 			and FileAccess.get_sha256(level.map_layout_path) == level.near_wall_layout_sha256):
 		_near_wall_field = field
-	_refresh_near_wall_slider()
+	_refresh_terrain_shadow_sliders()
 
 func _near_wall_fill_available() -> bool:
 	return (_near_wall_field != null and _path_sun_available()
 		and _biome_profile.near_wall_fill.is_finite() and _biome_profile.near_wall_fill != Vector2.ZERO)
 
-func _refresh_near_wall_slider() -> void:
+func _refresh_terrain_shadow_sliders() -> void:
 	var slider: HSlider = _lighting_sliders.get(&"near_wall_fill")
 	if slider != null:
 		slider.editable = _near_wall_fill_available()
+	var stone_wall: HSlider = _lighting_sliders.get(&"stone_wall_shadow_fill")
+	if stone_wall != null:
+		stone_wall.editable = _stone_wall_shadow_fill_available()
 
 func _sync_near_wall_lighting(has_shadow_fill: bool) -> void:
 	var state := Vector4.ZERO
@@ -1778,6 +1792,9 @@ func _stone_top_shadow_fill_available() -> bool:
 
 func _stone_foot_fill_available() -> bool:
 	return _path_sun_available() and is_finite(_biome_profile.stone_foot_fill) and _biome_profile.stone_foot_fill > 0.
+
+func _stone_wall_shadow_fill_available() -> bool:
+	return _path_sun_available() and is_finite(_biome_profile.stone_wall_shadow_fill) and _biome_profile.stone_wall_shadow_fill > 0.
 
 func _ground_shadow_fill_available() -> bool:
 	return (_shadow_diffuse_available() and not _balanced_preview and atmosphere_review == "combined"
@@ -2085,7 +2102,7 @@ func set_source_terrain(enabled: bool) -> bool:
 	var grass_terrace: HSlider = _lighting_sliders.get(&"grass_terrace_shadow_fill")
 	if grass_terrace != null:
 		grass_terrace.editable = _grass_terrace_shadow_available()
-	_refresh_near_wall_slider()
+	_refresh_terrain_shadow_sliders()
 	var stone_top: HSlider = _lighting_sliders.get(&"stone_top_shadow_fill")
 	if stone_top != null:
 		stone_top.editable = _stone_top_shadow_fill_available()
@@ -2102,7 +2119,7 @@ func set_atmosphere_review(mode:String)->void:
 	if not mode in ["previous","haze","lighting","combined"]:return
 	_restore_day();atmosphere_review=mode;_forest_expected.clear();apply_time()
 	_sync_shadow_diffuse()
-	_refresh_near_wall_slider()
+	_refresh_terrain_shadow_sliders()
 	if mode!="previous" and level!=null and level.terrain_sky.enabled:level.terrain_sky.set_enabled(false)
 	if level!=null:level.look._refresh_ground_bounce()
 
@@ -3107,6 +3124,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 222 and effect == &"near_wall_fill":
 			missing_value = 0.
+		if version < 223 and effect == &"stone_wall_shadow_fill":
+			missing_value = 0.
 		if version < 219 and effect == &"stone_top_shadow_fill":
 			missing_value = 0.
 		if version < 217 and effect == &"stone_foot_fill":
@@ -3304,6 +3323,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _canopy_ground_fill_available()
 		if effect == &"near_wall_fill":
 			slider.editable = _near_wall_fill_available()
+		if effect == &"stone_wall_shadow_fill":
+			slider.editable = _stone_wall_shadow_fill_available()
 		if effect == &"stone_top_shadow_fill":
 			slider.editable = _stone_top_shadow_fill_available()
 		if effect == &"stone_foot_fill":
@@ -3516,7 +3537,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"overcast_shadow":
 		_refresh_direct_shadow_opacity()
 		return
-	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response", &"path_sun_core", &"stone_foot_fill", &"stone_top_shadow_fill", &"grass_terrace_shadow_fill", &"near_wall_fill"]:
+	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response", &"path_sun_core", &"stone_foot_fill", &"stone_top_shadow_fill", &"stone_wall_shadow_fill", &"grass_terrace_shadow_fill", &"near_wall_fill"]:
 		_sync_shadow_diffuse()
 		return
 	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach", &"stone_wall_return", &"sheltered_stone_return", &"local_diffuse_return", &"basin_diffuse_return"]:
@@ -4408,6 +4429,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = _canopy_ground_fill_available()
 		if effect == &"near_wall_fill":
 			slider.editable = _near_wall_fill_available()
+		if effect == &"stone_wall_shadow_fill":
+			slider.editable = _stone_wall_shadow_fill_available()
 		if effect == &"stone_top_shadow_fill":
 			slider.editable = _stone_top_shadow_fill_available()
 		if effect == &"stone_foot_fill":

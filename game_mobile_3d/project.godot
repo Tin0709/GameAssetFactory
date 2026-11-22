@@ -123,6 +123,10 @@ gaf_stone_top_shadow_fill={
 "type": "vec2",
 "value": Vector2(0, 0)
 }
+gaf_stone_wall_shadow_fill={
+"type": "float",
+"value": 0.0
+}
 gaf_path_sun_core={
 "type": "vec2",
 "value": Vector2(0, 0)
