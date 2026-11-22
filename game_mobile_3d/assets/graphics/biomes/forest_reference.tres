@@ -175,6 +175,7 @@ stone_top_shadow_fill_pivot = Vector2(0.119, 0.139)
 path_sun_response = Vector2(0.30, 0.24)
 path_sun_core = Vector2(0.24, 0.65)
 path_projector_lift = 0.58
+path_shade_sky = 1.0
 bark_irradiance_by_hour = SubResource("ForestBarkIrradiance")
 spruce_leaf_filter = 1.0
 spruce_gap_coverage_by_hour = SubResource("SpruceGapCoveragePhase")

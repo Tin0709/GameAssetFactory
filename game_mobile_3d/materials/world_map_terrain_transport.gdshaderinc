@@ -2,6 +2,7 @@
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
 global uniform float gaf_stone_foot_fill;
+global uniform vec4 gaf_path_shade_sky;
 varying float terrain_stone_foot;
 varying vec3 terrain_sky_light;
 
@@ -69,7 +70,7 @@ vec3 terrain_contact_response(vec3 albedo,float contact){
 	vec3 reflectance=clamp(albedo,vec3(0.0),vec3(0.5));
 	return vec3(single)+returned*reflectance/max(vec3(1.0)-(1.0-return_ratio)*reflectance,vec3(0.00001));
 }
-vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec3 receiver_visibility,float face_y,vec3 camera_position){
+vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec3 receiver_visibility,float face_y,vec3 camera_position,out vec3 path_sky_excess){
 	vec3 sky = terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
@@ -110,6 +111,17 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec
 		diffuse_sky += mix(vec3(diffuse_y), diffuse_sky, .37) * (stone_wall_sky * side * weak_sky);
 	}
 #endif
+	path_sky_excess = vec3(0.0);
+	if (gaf_path_shade_sky.w > 0.0 && use_source_terrain && face_y > .998
+			&& ground_grade == 2 && gaf_spruce_sky_region.w > .01) {
+		float dirt = smoothstep(1.08, 1.17, color.r / max(color.g, .0001))
+			* smoothstep(1.03, 1.13, color.g / max(color.b, .0001));
+		// Undo the artistic sky fill only up to the existing baked canopy coverage.
+		float baked_open = 1.0 - clamp((1.0 - terrain_canopy_sky) / gaf_spruce_sky_region.w, 0.0, .75);
+		float shaded_open = gaf_ground_canopy_sky(terrain_canopy_sky);
+		float excess = clamp(1.0 - baked_open / max(shaded_open, .01), 0.0, .32);
+		path_sky_excess = diffuse_sky * receiver_visibility * ((1.0 - metallic) * dirt * excess);
+	}
 	vec3 irradiance = diffuse_sky + terrain_sun_bounce * terrain_key_radiance * cloud;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (ground_grade == 3 && night_sky_state.y > 0.0) {

@@ -147,12 +147,15 @@ void fragment() {
 	if (gaf_diffuse_opening.w > 0.0 || (ground_grade == 3 && max(gaf_stone_shade_fill.w, gaf_sheltered_stone_return) > 0.0)) {
 		terrain_opening_incident = terrain_opening_fill(receiver_visibility, sole);
 	}
-	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD)*sole;
+	vec3 path_sky_excess;
+	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD,path_sky_excess)*sole;
 	vec3 local_diffuse = gaf_local_diffuse(diffuse_fill, cutaway_world, surface_normal);
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	terrain_canopy_ground_ev = 0.0;
 	terrain_canopy_incident = vec4(0.0);
-	if (use_source_terrain && (ground_grade == 1 || ground_grade == 2) && surface_top > .998) {
+	if (path_sky_excess.g > 0.0) {
+		terrain_canopy_incident = vec4(path_sky_excess * sole, -1.0);
+	} else if (use_source_terrain && (ground_grade == 1 || ground_grade == 2) && surface_top > .998) {
 		terrain_canopy_incident.w = gaf_near_wall_turf(stone_sunset_position, ALBEDO);
 		if (gaf_canopy_ground_fill.x > 0.0 && terrain_canopy_sky < 1.0) {
 			float turf = smoothstep(1.04, 1.20, ALBEDO.g / max(ALBEDO.r, .0001)) *

@@ -22,7 +22,8 @@ global uniform vec3 gaf_path_sun_core_direction;
 global uniform vec4 gaf_path_projector_lift;
 varying vec2 stone_sunset_position;
 varying float terrain_canopy_ground_ev;
-// RGB carries incident light. The fourth component carries near-wall coverage.
+// RGB carries incident light. A negative fourth component carries the warm path sky excess.
+// Other values carry the near-wall coverage for turf.
 varying vec4 terrain_canopy_incident;
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
@@ -69,6 +70,13 @@ void light() {
 				&& ALBEDO.g > ALBEDO.r * 1.22 && ALBEDO.g > ALBEDO.b * 1.35) {
 			ground_fill = gaf_ground_shadow_fill_multiplier(gaf_ground_shadow_fill_reduction.x, shadow_attenuation);
 		}
+	}
+	if (gaf_path_shade_sky.w > 0.0 && terrain_canopy_incident.w < 0.0
+			&& LIGHT_IS_DIRECTIONAL && shadow_attenuation < .52
+			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_path_shade_sky.xyz) > .9999
+			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= .005) {
+		float cast_shade = 1.0 - smoothstep(.04, .52, shadow_attenuation);
+		DIFFUSE_LIGHT -= terrain_canopy_incident.rgb * (cast_shade * gaf_path_shade_sky.w);
 	}
 	float path_weight = 0.0;
 	float path_core_weight = 0.0;

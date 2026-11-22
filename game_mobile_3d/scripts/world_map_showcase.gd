@@ -129,6 +129,7 @@ var _path_sun_response := Vector2.ZERO
 var _path_sun_core := Vector2.ZERO
 var _path_sun_core_direction := Vector3.ZERO
 var _path_projector_lift := Vector4.ZERO
+var _path_shade_sky := Vector4.ZERO
 var _shadow_diffuse_tint := Vector3.ONE
 const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
@@ -182,6 +183,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"path_sun_response": ["Tương phản nắng trên lối đất", 1.],
 	&"path_sun_core": ["Sắc nắng trên lối đất", 1.],
 	&"path_projector_lift": ["Vệt nắng trên đất thoáng", 1.],
+	&"path_shade_sky": ["Ánh trời trong bóng lối đất", 1.],
 	&"stone_shade_fill": ["Ánh hắt trong bóng đá", .55],
 	&"stone_shade_reach": ["Ánh hắt tới mặt đá khuất nắng", 1.],
 	&"stone_wall_return": ["Ánh phản xạ trên vách đá trong bóng", 1.],
@@ -354,7 +356,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 224
+const LIGHTING_MIX_VERSION := 225
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -526,6 +528,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", Vector3.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_projector_lift", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_path_shade_sky", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1078,6 +1081,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_core", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_sun_core_direction", Vector3.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_projector_lift", Vector4.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_path_shade_sky", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1629,6 +1633,7 @@ func _sync_shadow_diffuse() -> void:
 	var core := Vector2.ZERO
 	var core_direction := Vector3.ZERO
 	var path_projector := Vector4.ZERO
+	var path_shade_sky := Vector4.ZERO
 	if (not _balanced_preview and _shadow_diffuse_available() and atmosphere_review == "combined"
 			and forest_active() and level.terrain_light.is_active()):
 		var sun: DirectionalLight3D = level.get_node("Sun")
@@ -1641,6 +1646,13 @@ func _sync_shadow_diffuse() -> void:
 				if strength > 0.:
 					var key_direction := sun.global_basis.z.normalized()
 					path_projector = Vector4(key_direction.x, key_direction.y, key_direction.z, strength)
+			if _path_shade_sky_available():
+				var strength := clampf(_biome_profile.path_shade_sky, 0., 1.)
+				strength *= _day_grass_shadow_weight() * _lighting_scale(&"path_shade_sky")
+				strength *= smoothstep(0., .2, sun.shadow_opacity)
+				if strength > 0.:
+					var direction := sun.global_basis.z.normalized()
+					path_shade_sky = Vector4(direction.x, direction.y, direction.z, strength)
 			if _path_sun_core_available():
 				var weather_scale := Vector2.ONE.lerp(Vector2(.72, .45), _weather.weight)
 				core = _biome_profile.path_sun_core.clamp(Vector2.ZERO, Vector2(.36, 1.))
@@ -1710,6 +1722,9 @@ func _sync_shadow_diffuse() -> void:
 	if path_projector != _path_projector_lift:
 		_path_projector_lift = path_projector
 		RenderingServer.global_shader_parameter_set("gaf_path_projector_lift", path_projector)
+	if path_shade_sky != _path_shade_sky:
+		_path_shade_sky = path_shade_sky
+		RenderingServer.global_shader_parameter_set("gaf_path_shade_sky", path_shade_sky)
 
 func prepare_grass_terrace_shadow() -> void:
 	if _grass_terrace_shadow_available() and _lighting_scale(&"grass_terrace_shadow_fill") > 0.:
@@ -1759,6 +1774,9 @@ func _refresh_terrain_shadow_sliders() -> void:
 	var path_projector: HSlider = _lighting_sliders.get(&"path_projector_lift")
 	if path_projector != null:
 		path_projector.editable = _path_projector_lift_available()
+	var path_shade: HSlider = _lighting_sliders.get(&"path_shade_sky")
+	if path_shade != null:
+		path_shade.editable = _path_shade_sky_available()
 
 func _sync_near_wall_lighting(has_shadow_fill: bool) -> void:
 	var state := Vector4.ZERO
@@ -1806,6 +1824,12 @@ func _path_sun_core_available() -> bool:
 func _path_projector_lift_available() -> bool:
 	return _path_sun_available() and projected_sun.available() \
 		and is_finite(_biome_profile.path_projector_lift) and _biome_profile.path_projector_lift > 0.
+
+func _path_shade_sky_available() -> bool:
+	if not _path_sun_available() or not is_finite(_biome_profile.path_shade_sky) or _biome_profile.path_shade_sky <= 0.:
+		return false
+	var sky := level.get_node_or_null("SpruceSkyVisibility")
+	return sky != null and sky.proof_ready
 
 func _stone_top_shadow_fill_available() -> bool:
 	return _path_sun_available() and _biome_profile.stone_top_shadow_fill_pivot.is_finite() \
@@ -3149,6 +3173,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 224 and effect == &"path_projector_lift":
 			missing_value = 0.
+		if version < 225 and effect == &"path_shade_sky":
+			missing_value = 0.
 		if version < 219 and effect == &"stone_top_shadow_fill":
 			missing_value = 0.
 		if version < 217 and effect == &"stone_foot_fill":
@@ -3342,6 +3368,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _path_sun_core_available()
 		if effect == &"path_projector_lift":
 			slider.editable = _path_projector_lift_available()
+		if effect == &"path_shade_sky":
+			slider.editable = _path_shade_sky_available()
 		if effect == &"grass_terrace_shadow_fill":
 			slider.editable = _grass_terrace_shadow_available()
 		if effect == &"canopy_ground_fill":
@@ -3562,7 +3590,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"overcast_shadow":
 		_refresh_direct_shadow_opacity()
 		return
-	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response", &"path_sun_core", &"path_projector_lift", &"stone_foot_fill", &"stone_top_shadow_fill", &"stone_wall_shadow_fill", &"grass_terrace_shadow_fill", &"near_wall_fill"]:
+	if changed_effect in [&"shadow_diffuse_return", &"ground_shadow_fill_reduction", &"path_sun_response", &"path_sun_core", &"path_projector_lift", &"path_shade_sky", &"stone_foot_fill", &"stone_top_shadow_fill", &"stone_wall_shadow_fill", &"grass_terrace_shadow_fill", &"near_wall_fill"]:
 		_sync_shadow_diffuse()
 		return
 	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach", &"stone_wall_return", &"sheltered_stone_return", &"local_diffuse_return", &"basin_diffuse_return"]:
@@ -4450,6 +4478,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = _path_sun_core_available()
 		if effect == &"path_projector_lift":
 			slider.editable = _path_projector_lift_available()
+		if effect == &"path_shade_sky":
+			slider.editable = _path_shade_sky_available()
 		if effect == &"grass_terrace_shadow_fill":
 			slider.editable = _grass_terrace_shadow_available()
 		if effect == &"canopy_ground_fill":
