@@ -421,17 +421,42 @@ func check_crossbow_impact_burst(lab: Node3D, sparks: MultiMeshInstance3D) -> vo
 	for index in 25:
 		var origin := Vector3(15.0 + index * 0.25, 1.25, 0.0)
 		crossbow.fire(origin, Vector3.BACK, -300 - index, origin)
+	var elapsed := 0.0
+	var delta := 1.0 / Engine.physics_ticks_per_second
 	for i in 8:
 		await physics_frame
+		elapsed += delta
 		if crossbow._bolts.is_empty():
 			break
 	check(crossbow._bolts.is_empty() and sparks.multimesh.visible_instance_count in range(200, 251),
 		"One batch can draw both emitters for all 25 simultaneous arrow impacts")
 	check(crossbow._embedded.visible_instance_count == crossbow.EMBEDDED_CAPACITY,
 		"The first frame after mass impact draws all 24 retained wall props")
+	var contact_distance := wall.position.z - box.size.z * 0.5 - CrossPollinator.BOLT_RADIUS
+	var expected_age := elapsed - contact_distance / CrossPollinator.BOLT_SPEED
+	var particles: Array = sparks._particles.filter(func(spark): return spark.age < spark.lifetime)
+	check(not particles.is_empty() and expected_age > 0.0 and expected_age < delta * 0.5
+		and particles.all(func(spark): return absf(spark.age - expected_age) < 0.0003),
+		"A late wall collision uses only the remaining part of its tick for Polaris sparks")
+	if not particles.is_empty():
+		var spark = particles[0]
+		var before_age: float = spark.age
+		var next_velocity: Vector3 = (spark.velocity + spark.acceleration * delta) / (1.0 + spark.drag * delta)
+		var next_point: Vector3 = spark.point + next_velocity * delta
+		await ticks(1)
+		check(is_equal_approx(spark.age - before_age, delta) and spark.point.is_equal_approx(next_point),
+			"Existing Polaris sparks use a full source integration step on the next tick")
+		print("MECHANIC_LAB_POLARIS_WALL_AGE expected=", expected_age, " actual=", before_age)
 	crossbow.reset()
 	check(sparks.multimesh.visible_instance_count == 0,
 		"Reset clears the whole batch immediately")
+	crossbow.fire(Vector3(18.0, 1.25, 3.4), Vector3.BACK, -399, Vector3(18.0, 1.25, 2.6))
+	await ticks(1)
+	var muzzle_particles: Array = sparks._particles.filter(func(spark): return spark.age < spark.lifetime)
+	check(crossbow._bolts.is_empty() and not muzzle_particles.is_empty()
+		and muzzle_particles.all(func(spark): return is_zero_approx(spark.age)),
+		"An obstructed muzzle presents a new spark burst at birth age")
+	crossbow.reset()
 	wall.queue_free()
 
 func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
@@ -450,8 +475,11 @@ func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
 	bow.arrow_impact.connect(record)
 	var origin := Vector3(18.0, 1.25, 0.0)
 	var fired: bool = bow.fire_arrow(origin, Vector3.BACK, -400, origin, true)
+	var elapsed := 0.0
+	var delta := 1.0 / Engine.physics_ticks_per_second
 	for i in 10:
 		await physics_frame
+		elapsed += delta
 		if not hits.is_empty():
 			break
 	check(fired and hits.size() == 1 and hits[0].collider == wall, "A charged Bow arrow hits the wall once")
@@ -459,6 +487,15 @@ func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
 	check(props_on_contact == 1 and bow._embedded_arrows.size() == 1
 		and is_zero_approx(bow._embedded_arrows[0].age),
 		"The Bow wall prop appears on impact at the start of its wobble")
+	var contact_distance := wall.position.z - box.size.z * 0.5 - CrossPollinator.BOLT_RADIUS
+	var expected_age := elapsed - contact_distance / 90.0
+	if bow.impact_sparks != null:
+		var particles: Array = bow.impact_sparks._particles.filter(func(spark): return spark.age < spark.lifetime)
+		check(not particles.is_empty() and expected_age > 0.0 and expected_age < delta * 0.5
+			and particles.all(func(spark): return absf(spark.age - expected_age) < 0.0003),
+			"A charged Bow wall collision uses its own collision time for the sparks")
+		if not particles.is_empty():
+			print("MECHANIC_LAB_BOW_WALL_AGE expected=", expected_age, " actual=", particles[0].age)
 	await ticks(1)
 	if not bow._embedded_arrows.is_empty():
 		check(bow._embedded_arrows[0].age > 0.0, "The Bow wall prop ages from the next physics tick")
