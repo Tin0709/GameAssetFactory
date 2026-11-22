@@ -1555,10 +1555,14 @@ func _project_source_anchors() -> void:
 			var distance := gap.length()
 			if distance <= largest_gap:
 				continue
-			if is_arm and sabre_flight and not use_tuned_wall_sweep and chest_state.get_contact_count() == 0 \
-					and distance > FIRST_WALL_SHOULDER_SLIDE_MIN_GAP \
-					and _recover_deep_shoulder_contact(limb, state, gap, distance):
-				continue
+			if is_arm and sabre_flight and not use_tuned_wall_sweep and distance > FIRST_WALL_SHOULDER_SLIDE_MIN_GAP:
+				if chest_state.get_contact_count() == 0 and _recover_deep_shoulder_contact(limb, state, gap, distance):
+					continue
+				if _recover_compound_wall_shoulder(limb, state, gap, distance):
+					gap = (chest_state.transform * spec.parent_frame).origin - (state.transform * spec.child_frame).origin
+					distance = gap.length()
+					if distance <= largest_gap:
+						continue
 			var shift := _wall_anchor_motion(state, gap, not is_arm or not first_contact, is_arm)
 			if early_wall_landing and not shift.is_zero_approx():
 				var toward_anchor := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
@@ -1687,6 +1691,128 @@ func _recover_deep_shoulder_contact(limb: PhysicalBone3D, state: PhysicsDirectBo
 		if early_hit * motion.length() > 2.0 * PROJECTION_COLLISION_MARGIN:
 			return false
 	state.transform = destination
+	return true
+
+
+func _recover_compound_wall_shoulder(limb: PhysicalBone3D, state: PhysicsDirectBodyState3D,
+		gap: Vector3, distance: float) -> bool:
+	var wall := RID()
+	for i in state.get_contact_count():
+		var normal := state.get_contact_local_normal(i)
+		var candidate := state.get_contact_collider(i)
+		if absf(normal.y) < MAX_WALL_NORMAL_Y and _is_fixed_wall(state.get_contact_collider_object(i)) \
+				and PhysicsServer3D.body_get_shape_count(candidate) > 1:
+			wall = candidate
+			break
+	if not wall.is_valid():
+		return false
+	# Start at the current arm pose and remove motion into each existing contact.
+	var points := _terrain_contact_points(limb, state, Vector3.ZERO)
+	var motion := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
+	var normals: Array[Vector3] = []
+	var deepest := 0.0
+	for i in range(0, points.size(), 2):
+		var offset := points[i + 1] - points[i]
+		var depth := offset.length()
+		if depth <= PROJECTION_COLLISION_MARGIN:
+			continue
+		var normal := offset / depth
+		if absf(normal.y) < MAX_WALL_NORMAL_Y:
+			deepest = maxf(deepest, depth)
+		normals.append(normal)
+		if motion.dot(normal) < 0.0:
+			motion = motion.slide(normal)
+	motion = motion.limit_length(CONTACT_ANCHOR_RECOVERY_MAX_SHIFT)
+	if deepest <= TERRAIN_DEEP_OVERLAP or (gap - motion).length_squared() >= gap.length_squared() \
+			or motion.length_squared() <= PROJECTION_COLLISION_MARGIN * PROJECTION_COLLISION_MARGIN:
+		return false
+	# Clipping against a later face can reintroduce motion into an earlier one.
+	for normal in normals:
+		if motion.dot(normal) < -PROJECTION_COLLISION_MARGIN:
+			return false
+	var space := state.get_space_state()
+	var already_overlapping := PackedInt32Array()
+	# The contact query above also sets this shape query to the current pose.
+	for hit in space.intersect_shape(_terrain_query, 16):
+		if hit.rid == wall:
+			already_overlapping.append(int(hit.shape))
+	if already_overlapping.size() < 2:
+		return false
+	var collider := limb.get_child(0) as CollisionShape3D
+	var box := collider.shape as BoxShape3D
+	if box == null:
+		return false
+	var arm_pose := state.transform * collider.transform
+	var wall_pose: Transform3D = PhysicsServer3D.body_get_state(wall, PhysicsServer3D.BODY_STATE_TRANSFORM)
+	# The native cast excludes the whole wall body to escape the initial overlap.
+	# Check its remaining shapes independently before trusting that cast.
+	if _compound_sweep_hits_new_shape(space, limb.collision_mask, wall, wall_pose, already_overlapping, arm_pose, box, motion) \
+			or _test_projection_motion(limb, state.transform, motion, wall):
+		return false
+	var mid := _deepest_contact(_terrain_contact_points(limb, state, motion * 0.5))
+	var end := _deepest_contact(_terrain_contact_points(limb, state, motion))
+	if mid > deepest + PROJECTION_COLLISION_MARGIN or end >= deepest - PROJECTION_COLLISION_MARGIN:
+		return false
+	state.transform = state.transform.translated(motion)
+	return true
+
+
+func _compound_sweep_hits_new_shape(space: PhysicsDirectSpaceState3D, mask: int, wall: RID, wall_pose: Transform3D,
+		overlapping: PackedInt32Array, arm_pose: Transform3D, arm: BoxShape3D, motion: Vector3) -> bool:
+	var start := arm_pose * AABB(-0.5 * arm.size, arm.size)
+	var swept := start.merge(AABB(start.position + motion, start.size)).grow(PROJECTION_COLLISION_MARGIN)
+	var volume := BoxShape3D.new()
+	volume.size = swept.size
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = volume
+	query.transform = Transform3D(Basis.IDENTITY, swept.get_center())
+	query.collision_mask = mask
+	var hits := space.intersect_shape(query, 16)
+	if hits.size() >= 16:
+		return true
+	for hit in hits:
+		var shape_index := int(hit.shape)
+		if hit.rid != wall or shape_index in overlapping:
+			continue
+		var shape := PhysicsServer3D.body_get_shape(wall, shape_index)
+		if PhysicsServer3D.shape_get_type(shape) != PhysicsServer3D.SHAPE_BOX:
+			return true
+		var half: Vector3 = PhysicsServer3D.shape_get_data(shape)
+		var pose := wall_pose * PhysicsServer3D.body_get_shape_transform(wall, shape_index)
+		if _swept_arm_hits_box(arm_pose, 0.5 * arm.size, motion, pose, half):
+			return true
+	return false
+
+
+func _swept_arm_hits_box(arm: Transform3D, arm_half: Vector3, motion: Vector3,
+		box: Transform3D, box_half: Vector3) -> bool:
+	var axes: Array[Vector3] = [arm.basis.x, arm.basis.y, arm.basis.z, box.basis.x, box.basis.y, box.basis.z]
+	for arm_axis in 3:
+		for box_axis in 3:
+			axes.append(arm.basis[arm_axis].cross(box.basis[box_axis]))
+	# With fixed orientations, each separating axis gives a time interval of overlap.
+	# The two boxes can touch only if those intervals intersect during the sweep.
+	var offset := box.origin - arm.origin
+	var enter := 0.0
+	var exit := 1.0
+	for raw in axes:
+		if raw.length_squared() <= 0.000001:
+			continue
+		var axis := raw.normalized()
+		var radius := (arm.basis.transposed() * axis).abs().dot(arm_half) \
+			+ (box.basis.transposed() * axis).abs().dot(box_half) + PROJECTION_COLLISION_MARGIN
+		var distance := offset.dot(axis)
+		var velocity := motion.dot(axis)
+		if velocity == 0.0:
+			if absf(distance) > radius:
+				return false
+			continue
+		var first := (distance - radius) / velocity
+		var last := (distance + radius) / velocity
+		enter = maxf(enter, minf(first, last))
+		exit = minf(exit, maxf(first, last))
+		if enter > exit:
+			return false
 	return true
 
 
