@@ -59,10 +59,31 @@ func run() -> void:
 	var passed: bool = group.get_child_count() == COUNT and lab.player_health < 10000
 	# Allow a brief physics contact transition, but no accumulating fall on the grass.
 	passed = passed and max_streak <= 2 and max_fall_speed <= 2.6
+	var edge_fall := await check_edge_fall(lab, group)
+	passed = passed and edge_fall
 	print("CROWD_PURSUIT_FLOOR living=", group.get_child_count(), " player_hp=", lab.player_health,
-		" max_off_floor_ticks=", max_streak, " fall_mps=", max_fall_speed, " passed=", passed)
+		" max_off_floor_ticks=", max_streak, " fall_mps=", max_fall_speed, " edge_falls=", edge_fall, " passed=", passed)
 	lab.free()
 	quit(0 if passed else 1)
+
+func check_edge_fall(lab: Node3D, group: Node) -> bool:
+	for zombie: ZOMBIE in group.get_children():
+		zombie.set_physics_process(false)
+	var zombie := group.get_child(0) as ZOMBIE
+	var floor := lab.get_node("Ground/Collision") as CollisionShape3D
+	var box := floor.shape as BoxShape3D
+	var outside := floor.to_global(Vector3(box.size.x * 0.5 + 1.5, box.size.y * 0.5 + 0.02, 0.0))
+	var peer := group.get_child(1) as ZOMBIE
+	peer.global_position = outside + Vector3.BACK * 0.9
+	lab.player.global_position = outside + Vector3.BACK * 4.0
+	zombie.global_position = outside
+	zombie.velocity = Vector3.ZERO
+	zombie.animation.play(ZOMBIE.IDLE, 0.0)
+	zombie.animation.advance(0.0)
+	zombie.set_physics_process(true)
+	for tick in 12:
+		await physics_frame
+	return not zombie.is_on_floor() and zombie.global_position.y < outside.y - 0.25
 
 func add_wall(lab: Node3D, start: Vector3, end: Vector3) -> void:
 	var side := end - start
