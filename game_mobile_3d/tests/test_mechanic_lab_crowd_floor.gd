@@ -56,7 +56,7 @@ func run() -> void:
 			else:
 				streak[i] = 0
 
-	var passed := group.get_child_count() == COUNT and lab.player_health < 10000
+	var passed: bool = group.get_child_count() == COUNT and lab.player_health < 10000
 	# Allow a brief physics contact transition, but no accumulating fall on the grass.
 	passed = passed and max_streak <= 2 and max_fall_speed <= 2.6
 	print("CROWD_PURSUIT_FLOOR living=", group.get_child_count(), " player_hp=", lab.player_health,
