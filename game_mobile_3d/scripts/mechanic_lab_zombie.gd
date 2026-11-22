@@ -527,17 +527,17 @@ func _physics_process(delta: float) -> void:
 		_skipped_blocked_step = _wait_for_walk_retry(destination)
 	if not _skipped_blocked_step:
 		move_and_slide()
-		if crowd and not _target_aggressive and not pushed and controlled_time == delta and not is_on_floor():
+		if crowd and not pushed and controlled_time == delta and not is_on_floor():
 			var clip := animation.current_animation
 			if _living_state(clip) == IDLE or clip in WALK_STEP_NOTIFIES:
-				_recover_patrol_floor()
+				_recover_crowd_floor()
 		_blocked_walk = crowd_walking and is_on_floor() and is_on_wall() \
 			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_WALK_MAX_SPEED_SQUARED
 		_update_walk_blocker(destination)
 	_advance_animation(delta, travel)
 	ragdoll.sample(delta)
 
-func _recover_patrol_floor() -> void:
+func _recover_crowd_floor() -> void:
 	if _corpse_floor.disabled or not is_on_wall() or get_slide_collision_count() < max_slides \
 			or (collision_mask & LEVEL_COLLISION_MASK) == 0:
 		return
