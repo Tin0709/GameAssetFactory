@@ -999,10 +999,17 @@ func _setup_movement_audio() -> void:
 	add_child(_movement_audio)
 
 func _prepare_movement_audio(bundle: PrivateOverworldBundle) -> MovementAudio:
+	var source_root := WeaponSource.research_root().simplify_path().replace("\\", "/").trim_suffix("/")
+	var landing_fallback: PrivateOverworldBundle
+	# A relocated ambience bundle may contain steps without the Jump bank.
+	if bundle.root != source_root:
+		landing_fallback = PrivateOverworldBundle.new()
+		landing_fallback.root = source_root
 	var movement := MovementAudio.new()
-	movement.setup(player, null, bundle, _player_foot_contact_at)
+	movement.setup(player, null, bundle, _player_foot_contact_at, landing_fallback)
 	movement.landing_contact = _grass_landing_contact_at
 	movement.protect_landing_voice = true
+	movement.allow_footstep_as_landing = false
 	return movement
 
 func _use_local_movement_bank(bundle: PrivateOverworldBundle) -> bool:

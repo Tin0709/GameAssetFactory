@@ -59,9 +59,11 @@ var _nature_index:=0
 var _heavy_landing_frame := -1
 var landing_contact: Callable
 var protect_landing_voice := false
+var allow_footstep_as_landing := true
 var _step_landing: Array[bool] = []
 
-func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted, terrain_contact: Callable = Callable())->void:
+func setup(body: CharacterBody3D, field: Node3D, bundle: RefCounted, terrain_contact: Callable = Callable(),
+		landing_fallback: RefCounted = null) -> void:
 	actor=body;meadow=field;reader=bundle;config=reader.data.get("audio_config",{});_random.seed=281027
 	_terrain_contact = terrain_contact
 	for key:String in reader.data.audio:
@@ -73,7 +75,7 @@ func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted, terrain_contact:
 		groups[key]=rows
 	for surface: String in LANDING_FAMILIES:
 		if groups.has(surface):
-			_load_landing_family(surface)
+			_load_landing_family(surface, landing_fallback)
 	# The flat grass lab supplies its own listener and only needs footsteps.
 	if meadow == null:
 		ambient_enabled = false
@@ -95,14 +97,16 @@ func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted, terrain_contact:
 	actor.presentation_reset.connect(reset_contacts)
 	print("OVERWORLD_AUDIO_READY ",JSON.stringify({"loaded":loaded_count,"rejected":rejected_count,"groups":groups.keys(),"scope":reader.data.audio_scope}))
 
-func _load_landing_family(surface: String) -> void:
+func _load_landing_family(surface: String, fallback: RefCounted) -> void:
 	var family: Array = LANDING_FAMILIES[surface]
 	var hashes: Array = family[1]
-	var directory: String = reader.root.path_join(LANDING_DIRECTORY)
 	var rows: Array = []
 	for i in hashes.size():
 		var name := "sfx_player_land_%s_%02d" % [family[0], i + 1]
-		var stream: AudioStreamOggVorbis = reader.audio_stream({"path": directory.path_join(name + ".ogg"), "sha256": hashes[i]})
+		var relative_path := LANDING_DIRECTORY.path_join(name + ".ogg")
+		var stream: AudioStreamOggVorbis = reader.audio_stream({"path": reader.root.path_join(relative_path), "sha256": hashes[i]})
+		if stream == null and fallback != null:
+			stream = fallback.audio_stream({"path": fallback.root.path_join(relative_path), "sha256": hashes[i]})
 		if stream == null:
 			rejected_count += 1
 			continue
@@ -191,9 +195,12 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		key = meadow.surface_at(point)
 	if footsteps_enabled and not heavy:
 		var db := float(config.get("landing_db", -9.0)) if landed else float(config.get("footsteps_db", -14.0))
-		var cue := "land_" + key if landed and not groups.get("land_" + key, []).is_empty() else key
+		var cue := "land_" + key if landed else key
+		if landed and allow_footstep_as_landing and groups.get(cue, []).is_empty():
+			cue = key
+		var needs_media := protect_landing_voice or (landed and not allow_footstep_as_landing)
 		var slot := _choose_step_slot(landed)
-		if slot >= 0 and (not protect_landing_voice or not groups.get(cue, []).is_empty()):
+		if slot >= 0 and (not needs_media or not groups.get(cue, []).is_empty()):
 			_play(cue, step_voices[slot], point, db, 1.0)
 			_step_landing[slot] = landed
 			_step_index = (slot + 1) % step_voices.size()

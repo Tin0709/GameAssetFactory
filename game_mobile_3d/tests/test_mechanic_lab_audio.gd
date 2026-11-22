@@ -156,8 +156,9 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 	check(movement._step_index == previous_slot and movement.event_count.landing == previous_landing
 		and movement.event_count.grass == previous_steps and movement._step_landing == previous_roles,
 		"A missing landing family never spends a verified footstep or changes the voice pool")
+	var steps_after_touchdown: int = movement.event_count.grass
 	lab.player.surface_contact.emit(lab.player.global_position, false)
-	check(movement.event_count.grass == previous_steps + 1, "Footsteps still play without a landing family")
+	check(movement.event_count.grass == steps_after_touchdown + 1, "Footsteps still play without a landing family")
 	toggle.button_pressed = false
 	print("MECHANIC_LAB_MOVEMENT_AUDIO steps=", steps, " landing=", movement.event_count.landing,
 		" step_peak=", peak, " landing_peak=", landing_peak)
