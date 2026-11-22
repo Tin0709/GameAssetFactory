@@ -10,7 +10,8 @@ varying vec3 study_face;
 varying float study_tip_weight;
 varying float study_cloud;
 varying vec3 grass_opening_incident;
-varying flat float grass_terrace_fill;
+// Keep both terrain responses in one interpolator on Mobile.
+varying flat vec2 grass_terrain_responses;
 varying flat float grass_canopy_ground_ev;
 varying vec3 grass_canopy_incident;
 float grass_fresnel(float x){float q=1.0-x;float q2=q*q;return q2*q2*q;}
@@ -36,7 +37,7 @@ void light(){
 	vec3 shade_fill = gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
 		shadow_attenuation, cloud, sqrt(front), .82);
 	if (gaf_grass_terrace_shadow_state.z > 0.0 && shade_fill.g > 0.0) {
-		ground_fill *= mix(1.0, grass_terrace_fill, gaf_terrace_shadow_weight(shadow_attenuation));
+		ground_fill *= mix(1.0, grass_terrain_responses.x, gaf_terrace_shadow_weight(shadow_attenuation));
 	}
 	vec2 canopy_delta = vec2(0.0);
 	if (gaf_canopy_ground_fill.x > 0.0 && shade_fill.g > 0.0 &&
@@ -45,6 +46,11 @@ void light(){
 	}
 	DIFFUSE_LIGHT += shade_fill * (ground_fill * (1.0 + canopy_delta.y));
 	DIFFUSE_LIGHT += grass_canopy_incident * canopy_delta.x;
+	if (grass_terrain_responses.y > 0.0 && shade_fill.g > 0.0 && shadow_attenuation < .58) {
+		float coverage = grass_terrain_responses.y * gaf_terrace_shadow_weight(shadow_attenuation);
+		vec3 reduction = gaf_near_wall_fill.w * shade_fill * ground_fill + gaf_near_wall_fill.z * grass_canopy_incident;
+		DIFFUSE_LIGHT -= reduction * coverage;
+	}
 	float gain = gaf_opening_gain(LIGHT_IS_DIRECTIONAL, shadow_attenuation * cloud);
 	float opening_fill = gaf_diffuse_opening_weight(LIGHT_IS_DIRECTIONAL, LIGHT, LIGHT_COLOR, INV_VIEW_MATRIX, shadow_attenuation * cloud);
 	if (opening_fill > 0.0) {

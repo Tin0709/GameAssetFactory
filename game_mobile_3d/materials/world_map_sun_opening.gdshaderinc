@@ -8,6 +8,8 @@ global uniform vec2 gaf_ground_shadow_fill_reduction;
 global uniform vec2 gaf_canopy_ground_fill;
 global uniform vec4 gaf_grass_terrace_shadow_state;
 global uniform sampler2D gaf_grass_terrace_shadow_field : filter_nearest, repeat_disable;
+global uniform vec4 gaf_near_wall_fill;
+global uniform sampler2D gaf_near_wall_field : filter_nearest, repeat_disable;
 global uniform vec4 gaf_turf_sun_chroma;
 
 float gaf_turf_sun_weight(bool directional, vec3 view_light, mat4 inverse_view, float visibility) {
@@ -65,6 +67,22 @@ float gaf_terrace_shadow_fill(vec2 world_xz) {
 
 float gaf_terrace_shadow_weight(float attenuation) {
 	return 1.0 - smoothstep(.10, .58, attenuation);
+}
+
+float gaf_near_wall_strength(vec2 world_xz) {
+	if (max(gaf_near_wall_fill.z, gaf_near_wall_fill.w) <= 0.0) return 0.0;
+	ivec2 size = textureSize(gaf_near_wall_field, 0);
+	ivec2 cell = ivec2(floor(world_xz - gaf_near_wall_fill.xy));
+	if (any(lessThan(cell, ivec2(0))) || any(greaterThanEqual(cell, size))) return 0.0;
+	return smoothstep(.015, .29, texelFetch(gaf_near_wall_field, cell, 0).r);
+}
+
+float gaf_near_wall_turf(vec2 world_xz, vec3 albedo) {
+	float near_wall = gaf_near_wall_strength(world_xz);
+	if (near_wall <= 0.0) return 0.0;
+	float green = smoothstep(1.04, 1.20, albedo.g / max(albedo.r, .0001)) *
+		smoothstep(1.12, 1.35, albedo.g / max(albedo.b, .0001));
+	return near_wall * green;
 }
 
 float gaf_canopy_ground_ev(float visibility) {

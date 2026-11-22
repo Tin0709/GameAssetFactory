@@ -20,7 +20,8 @@ global uniform vec2 gaf_path_sun_core;
 global uniform vec3 gaf_path_sun_core_direction;
 varying vec2 stone_sunset_position;
 varying float terrain_canopy_ground_ev;
-varying vec3 terrain_canopy_incident;
+// RGB carries incident light. The fourth component carries near-wall coverage.
+varying vec4 terrain_canopy_incident;
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
 #define GAF_WORLD_FOLIAGE_LOBE_ONLY
@@ -111,7 +112,12 @@ void light() {
 		canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev, shadow_attenuation);
 	}
 	DIFFUSE_LIGHT += shadow_diffuse * (ground_fill * (1.0 + canopy_delta.y));
-	DIFFUSE_LIGHT += terrain_canopy_incident * canopy_delta.x;
+	DIFFUSE_LIGHT += terrain_canopy_incident.rgb * canopy_delta.x;
+	if (terrain_canopy_incident.w > 0.0 && shadow_diffuse.g > 0.0 && shadow_attenuation < .58) {
+		float coverage = terrain_canopy_incident.w * gaf_terrace_shadow_weight(shadow_attenuation);
+		vec3 reduction = gaf_near_wall_fill.w * shadow_diffuse * ground_fill + gaf_near_wall_fill.z * terrain_canopy_incident.rgb;
+		DIFFUSE_LIGHT -= reduction * coverage;
+	}
 	// The same directional light and shadow term shape both the original key and the warmth.
 	if (ground_grade == 3 && LIGHT_IS_DIRECTIONAL && gaf_stone_sun_warmth.w > 0.0
 			&& dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_sun_warmth.xyz) > 0.9999

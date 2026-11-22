@@ -139,6 +139,14 @@ gaf_grass_terrace_shadow_field={
 "type": "sampler2D",
 "value": ""
 }
+gaf_near_wall_fill={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
+gaf_near_wall_field={
+"type": "sampler2D",
+"value": ""
+}
 gaf_ground_shadow_fill_reduction={
 "type": "vec2",
 "value": Vector2(0, 0)
