@@ -149,7 +149,7 @@ offset_top = 145.0
 offset_right = 435.0
 offset_bottom = 179.0
 focus_mode = 0
-tooltip_text = "Đổi dáng đi và chạy của zombie trưởng thành đã spawn và sẽ spawn."
+tooltip_text = "Đổi animation khi còn sống cho Zombie và Baby Zombie. Ragdoll khi chết dùng MD2."
 
 [node name="CombatAudioToggle" type="CheckButton" parent="HUD"]
 offset_left = 158.0

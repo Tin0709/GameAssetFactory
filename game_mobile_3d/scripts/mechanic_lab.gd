@@ -241,11 +241,12 @@ func _ready() -> void:
 	$HUD/SpawnBabyZombie.disabled = $HUD/SpawnZombie.disabled
 	$HUD/SpawnCrowd.disabled = $HUD/SpawnZombie.disabled
 	var gait_picker: OptionButton = $HUD/ZombieGait
-	gait_picker.add_item("Zombie · Hiện tại")
+	gait_picker.add_item("Zombie · MD2")
 	gait_picker.add_item("Zombie · Actions & Stuff")
 	gait_picker.select(0)
 	gait_picker.disabled = $HUD/SpawnZombie.disabled
-	gait_picker.item_selected.connect(func(index: int): $Zombies.set_expressive_gait(index == 1))
+	gait_picker.set_item_disabled(1, not $Zombies.actions_stuff_available)
+	gait_picker.item_selected.connect(func(index: int): $Zombies.set_actions_stuff_animation(index == 1))
 	$HUD/CombatAudioToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/RagdollTuning.visible = not $HUD/SpawnZombie.disabled

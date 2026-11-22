@@ -138,7 +138,8 @@ var equipped_air_offset := 0.0
 var equipped_air_delay := 0.0
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
-var _expressive_gait := false
+var _actions_stuff_animation := false
+var actions_stuff_available := false
 var _ragdoll_layout: Dictionary
 var _baby_visual: PackedScene
 var _baby_ragdoll_layout: Dictionary
@@ -179,11 +180,11 @@ func _update_living_count(alive: bool) -> void:
 func damage_digits() -> Array[Texture2D]:
 	return _digits
 
-func set_expressive_gait(enabled: bool) -> void:
-	_expressive_gait = enabled
+func set_actions_stuff_animation(enabled: bool) -> void:
+	_actions_stuff_animation = enabled
 	for child in get_children():
-		if child is Zombie and not child.is_baby and child.health > 0:
-			child.expressive_gait = enabled
+		if child is Zombie and child.health > 0:
+			child.actions_stuff_animation = enabled
 
 func setup_combat(attacker: CharacterBody3D) -> void:
 	_attacker = attacker
@@ -243,7 +244,7 @@ func _spawn_at(point: Vector3, floor_position: Vector3, player: CharacterBody3D,
 	var layout := _baby_ragdoll_layout if baby else _ragdoll_layout
 	zombie.configure(scene.instantiate(), player, effects, _digits, _spawn_serial, layout,
 		corpse_floor, health_bars, damage_numbers, baby)
-	zombie.expressive_gait = _expressive_gait and not baby
+	zombie.actions_stuff_animation = _actions_stuff_animation
 	zombie.melee_hit.connect(player_hit.emit)
 	zombie.melee_audio.connect(baby_attack_audio.emit if baby else zombie_attack_audio.emit)
 	if baby and zombie_swing_audio.has_connections():
@@ -590,6 +591,8 @@ func _load_assets() -> void:
 			var skeleton := model.find_child("Skeleton3D", true, false) as Skeleton3D
 			Zombie.Gait.build(player.get_animation_library(&""), skeleton, player.get_animation(Zombie.WALK_CLIPS[0]),
 				Zombie.LAB_ROAM_SPEED, Zombie.CHASE_SPEED)
+			_add_actions_stuff(player, skeleton, false)
+			actions_stuff_available = player.has_animation(Zombie.ActionsStuff.IDLE)
 			# Keep the first authored pose in the in-memory scene template.
 			player.play(Zombie.SPAWN)
 			player.advance(0.0)
@@ -661,6 +664,8 @@ func _load_baby_assets() -> void:
 	if player != null and skeleton != null and _add_baby_clips(directory, player):
 		var layout := _fit_baby_ragdoll(skeleton)
 		Zombie.prepare_lab_skin(model, "SK_BabyZombie")
+		if actions_stuff_available:
+			_add_actions_stuff(player, skeleton, true)
 		player.play(Zombie.SPAWN)
 		player.advance(0.0)
 		player.stop(true)
@@ -674,6 +679,12 @@ func _load_baby_assets() -> void:
 			_baby_visual = packed
 	model.free()
 	_baby_prepared_clips.clear()
+
+func _add_actions_stuff(player: AnimationPlayer, skeleton: Skeleton3D, baby: bool) -> void:
+	var release := Zombie.BABY_ATTACK_FOCUS_END if baby else Zombie.LAB_ATTACK_HIT_SECTION
+	var contact := Zombie.BABY_ATTACK_CONTACT if baby else Zombie.MELEE_CONTACT_TIME
+	Zombie.ActionsStuff.build(player, skeleton, Vector3(release, contact, player.get_animation(Zombie.ATTACK).length),
+		player.get_animation(Zombie.SPAWN).length, Zombie.STAGGER_DURATION)
 
 func _add_baby_clips(directory: String, player: AnimationPlayer) -> bool:
 	if not player.has_animation(BABY_IDLE):

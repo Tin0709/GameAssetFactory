@@ -21,6 +21,7 @@ const LAB_SKIN_FLASH_SHADER := preload("res://materials/mechanic_lab_zombie_skin
 const LAB_FLASH_SKIN_META := &"lab_flash_skin"
 const HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_zombie_hit_flash.gdshader")
 const IDLE := &"Zombie_Idle"
+const ActionsStuff := preload("res://scripts/mechanic_lab_zombie_actions_stuff.gd")
 const IDLE_AUDIO_NOTIFY_TIME := 0.066887535
 const IDLE_AUDIO_CHANCE := 0.5
 const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Variant2"]
@@ -37,6 +38,8 @@ const WALK_STEP_NOTIFIES := {
 		Vector3((Gait.PLANT + 0.5) * Gait.WALK_DURATION, -0.125, EXPRESSIVE_WALK_REACH)],
 	Gait.RUN: [Vector3(Gait.PLANT * Gait.RUN_DURATION, 0.125, EXPRESSIVE_RUN_REACH),
 		Vector3((Gait.PLANT + 0.5) * Gait.RUN_DURATION, -0.125, EXPRESSIVE_RUN_REACH)],
+	# Source stride touchdown near 0.30 s left and 0.73 s right.
+	ActionsStuff.MOVE: [Vector3(0.30, 0.125, 0.24), Vector3(0.73, -0.125, 0.16)],
 }
 const STEP_MIN_SPEED_SQUARED := 0.15 * 0.15
 const SPAWN := &"Zombie_Spawn"
@@ -203,6 +206,7 @@ var health := TRAINING_HEALTH:
 			living_changed.emit(alive)
 var is_baby := false
 var expressive_gait := false
+var actions_stuff_animation := false
 var _body_height := HEIGHT
 var _chase_speed := CHASE_SPEED
 var _roam_speed := LAB_ROAM_SPEED
@@ -383,8 +387,9 @@ func _ready() -> void:
 	set_process(false)
 	_roam_origin = global_position
 	health = max_health
-	animation.play(SPAWN)
-	if not animation.get_parent().has_meta(PREPARED_SPAWN_POSE):
+	var spawn_clip := _living_clip(SPAWN)
+	animation.play(spawn_clip)
+	if spawn_clip != SPAWN or not animation.get_parent().has_meta(PREPARED_SPAWN_POSE):
 		animation.advance(0)
 	ragdoll = Ragdoll.new()
 	ragdoll.wall_handoff_animation = animation
@@ -524,7 +529,7 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		if crowd and not _target_aggressive and not pushed and controlled_time == delta and not is_on_floor():
 			var clip := animation.current_animation
-			if clip == IDLE or clip in WALK_STEP_NOTIFIES:
+			if _living_state(clip) == IDLE or clip in WALK_STEP_NOTIFIES:
 				_recover_patrol_floor()
 		_blocked_walk = crowd_walking and is_on_floor() and is_on_wall() \
 			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_WALK_MAX_SPEED_SQUARED
@@ -632,22 +637,28 @@ func _integrate_knockback(delta: float) -> Vector3:
 
 func _advance_animation(delta: float, travel: Vector3) -> void:
 	var clip := animation.current_animation
-	if clip != ATTACK:
+	var state := _living_state(clip)
+	if state != ATTACK:
 		var expressive := Gait.is_gait(clip)
+		var source_stride := clip == ActionsStuff.MOVE
 		var play_steps := (not _skipped_blocked_step and clip in WALK_STEP_NOTIFIES and is_on_floor()
 			and step_audio.has_connections())
-		if play_steps or expressive:
+		if play_steps or expressive or source_stride:
 			var motion := get_real_velocity().slide(Vector3.UP)
 			play_steps = motion.length_squared() >= STEP_MIN_SPEED_SQUARED \
 				and (not is_on_wall() or motion.dot(travel) >= MIN_WALL_PROGRESS_SPEED * travel.length()) \
 				and not travel.is_zero_approx() and play_steps
-			if expressive:
+			if source_stride:
+				var speed := ActionsStuff.SOURCE_STRIDE_SPEED * _body_height / 2.0
+				var forward_speed := motion.dot(global_basis.z) if not _skipped_blocked_step else 0.0
+				delta *= maxf(forward_speed / speed, 0.0)
+			elif expressive:
 				# Keep the animated stance proportional to distance moved, including
 				# a short final step and the lower speed along oblique walls.
 				var speed := CHASE_SPEED if clip == Gait.RUN else LAB_ROAM_SPEED
 				var forward_speed := motion.dot(global_basis.z) if not _skipped_blocked_step else 0.0
 				delta *= clampf(forward_speed / speed, 0.0, 1.0)
-		var play_idle := clip == IDLE and idle_audio.has_connections()
+		var play_idle := state == IDLE and idle_audio.has_connections()
 		var previous_phase := animation.current_animation_position if play_steps or play_idle else 0.0
 		animation.advance(delta)
 		if play_steps:
@@ -688,6 +699,15 @@ func _emit_idle_audio(previous_phase: float) -> void:
 func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
 	var phase := animation.current_animation_position
 	var wrapped := phase < previous_phase
+	if clip == ActionsStuff.MOVE:
+		var end := phase + animation.current_animation_length if wrapped else phase
+		var size := 0.5 if is_baby else 1.0
+		for contact: Vector3 in WALK_STEP_NOTIFIES[clip]:
+			var stride := ActionsStuff.STRIDE_SECONDS
+			var next_step := contact.x + (floorf((previous_phase - contact.x) / stride) + 1.0) * stride
+			if next_step <= end:
+				step_audio.emit(to_global(Vector3(contact.y, 0.0, contact.z) * size))
+		return
 	var contacts: Array = BABY_STEP_CONTACTS if is_baby else WALK_STEP_NOTIFIES[clip]
 	# The Baby contacts are exact 30 FPS keys stored in float32 vectors.
 	# Apply the rounding tolerance to both bounds to avoid a late or repeated cue.
@@ -750,7 +770,7 @@ func _update_target_sight(delta: float, sample_ai: bool) -> void:
 			_reset_roam()
 
 func _needs_windup_sight(point: Vector3) -> bool:
-	if animation.current_animation != ATTACK or animation.current_animation_position >= _attack_focus_end:
+	if _living_state(animation.current_animation) != ATTACK or animation.current_animation_position >= _attack_focus_end:
 		return false
 	# A moving target can sidestep or enter cover before the next crowd ray.
 	# Check both positions so a return to the start also stops the old turn.
@@ -1040,7 +1060,7 @@ func _face_target(offset: Vector3, delta: float) -> void:
 			rotation = next_rotation
 
 func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
-	var clip := animation.current_animation
+	var clip := _living_state(animation.current_animation)
 	if clip == SPAWN or clip == ATTACK or clip == STAGGER:
 		return Vector3.ZERO
 	if in_lab and not _target_aggressive:
@@ -1084,7 +1104,7 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 			_play_loop(IDLE)
 			return Vector3.ZERO
 		_windup_target_start = target_position
-		animation.play(ATTACK, 0.1)
+		animation.play(_living_clip(ATTACK), 0.1)
 		_attack_cooldown = MELEE_COOLDOWN
 		melee_audio.emit(combat_center(), false)
 	else:
@@ -1121,18 +1141,39 @@ func _confirm_windup_target(point: Vector3) -> bool:
 		_last_seen_position = point
 	return _target_visible
 
+func _living_state(clip: StringName) -> StringName:
+	match clip:
+		ActionsStuff.IDLE: return IDLE
+		ActionsStuff.SPAWN: return SPAWN
+		ActionsStuff.ATTACK: return ATTACK
+		ActionsStuff.STAGGER: return STAGGER
+	return clip
+
+func _living_clip(clip: StringName) -> StringName:
+	if actions_stuff_animation and animation.has_animation(ActionsStuff.IDLE):
+		match clip:
+			IDLE: return ActionsStuff.IDLE
+			SPAWN: return ActionsStuff.SPAWN
+			ATTACK: return ActionsStuff.ATTACK
+			STAGGER: return ActionsStuff.STAGGER
+	return clip
+
 func _play_loop(clip: StringName) -> void:
+	clip = _living_clip(clip)
 	if animation.current_animation != clip:
 		animation.play(clip, 0.13)
 
 func _play_gait() -> void:
 	var clip := _walk_clip
-	if expressive_gait:
+	if actions_stuff_animation and animation.has_animation(ActionsStuff.MOVE):
+		clip = ActionsStuff.MOVE
+	elif expressive_gait:
 		clip = Gait.RUN if _target_aggressive else Gait.WALK
 	var previous := animation.current_animation
 	if clip == previous:
 		return
-	if previous not in WALK_STEP_NOTIFIES or not (expressive_gait or Gait.is_gait(previous)):
+	if (clip == ActionsStuff.MOVE or previous == ActionsStuff.MOVE
+			or previous not in WALK_STEP_NOTIFIES or not (expressive_gait or Gait.is_gait(previous))):
 		_play_loop(clip)
 		return
 	# Match the leading foot on live switches and on patrol/pursuit transitions.
@@ -1190,10 +1231,12 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		_poise_recovery_wait = POISE_RECOVERY_DELAY
 		if _poise <= 0.0:
 			_poise = _max_poise
-			if animation.current_animation != STAGGER:
-				animation.stop(true)
-				var clip_duration := animation.get_animation(STAGGER).length
-				animation.play(STAGGER, 0.0, clip_duration / STAGGER_DURATION)
+			if _living_state(animation.current_animation) != STAGGER:
+				var clip := _living_clip(STAGGER)
+				if clip == STAGGER:
+					animation.stop(true)
+				var clip_duration := animation.get_animation(clip).length
+				animation.play(clip, 0.0 if clip == STAGGER else 0.12, clip_duration / STAGGER_DURATION)
 		elif _knockback_control_left > 0.0 and animation.current_animation in WALK_STEP_NOTIFIES:
 			_play_loop(IDLE)
 

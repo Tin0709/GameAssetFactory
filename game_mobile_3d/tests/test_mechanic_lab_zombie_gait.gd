@@ -2,8 +2,11 @@ extends SceneTree
 
 const Lab := preload("res://scenes/dev/MechanicLab.tscn")
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
-const STYLED_WALK := &"Zombie_ExpressiveWalk"
-const STYLED_RUN := &"Zombie_ExpressiveRun"
+const STYLED_IDLE := &"Zombie_AS_Idle"
+const STYLED_WALK := &"Zombie_AS_Move"
+const STYLED_ATTACK := &"Zombie_AS_Attack"
+const STYLED_SPAWN := &"Zombie_AS_Spawn"
+const STYLED_STAGGER := &"Zombie_AS_Stagger"
 
 var failures := 0
 
@@ -32,7 +35,7 @@ func run() -> void:
 	current_scene = lab
 	var mode := lab.get_node_or_null("HUD/ZombieGait") as OptionButton
 	check(mode != null and mode.item_count == 2 and mode.selected == 0 and not mode.disabled,
-		"The Lab offers the current and expressive zombie gaits, with the current gait selected")
+		"The Lab offers MD2 and Actions & Stuff for both zombie types")
 	if failures > 0:
 		quit(1)
 		return
@@ -52,19 +55,22 @@ func run() -> void:
 	check(await await_clip(adult, Zombie.WALK_CLIPS), "The default adult patrol uses its previous clip")
 	var before := adult.position
 	select(mode, 1)
-	check(await await_clip(adult, [STYLED_WALK], 5), "An adult already on patrol switches to the expressive walk")
+	check(await await_clip(adult, [STYLED_WALK], 5), "An adult already on patrol switches to the source move clip")
 	check(adult.position.distance_to(before) < 0.3 and group.get_child(0) == adult and adult.health == adult.max_health,
 		"Changing style keeps the same living actor, position and health")
 	check(absf(adult.get_real_velocity().slide(Vector3.UP).length() - Zombie.LAB_ROAM_SPEED) < 0.05,
 		"The expressive walk keeps the patrol speed")
-	check(not baby.animation.has_animation(STYLED_WALK) and await await_clip(baby, Zombie.WALK_CLIPS, 60),
-		"The Baby Zombie keeps its own locomotion")
+	check(await await_clip(baby, [STYLED_WALK], 90), "The Baby Zombie also switches to the source move clip")
+	check(baby.animation.get_animation(STYLED_WALK) != adult.animation.get_animation(STYLED_WALK),
+		"Both rigs use their own retargeted poses")
 	lab.player.position = adult.position + Vector3(7.0, 0.0, 0.0)
 	var steps: Array[Vector3] = []
 	adult.step_audio.connect(func(point: Vector3):
-		if adult.animation.current_animation == STYLED_RUN:
+		if adult.animation.current_animation == STYLED_WALK:
 			steps.append(adult.to_local(point)))
-	check(await await_clip(adult, [STYLED_RUN]), "An adult switches to the expressive run in pursuit")
+	for tick in 40:
+		await physics_frame
+	check(adult.animation.current_animation == STYLED_WALK, "An adult uses the source stride in pursuit")
 	check(absf(adult.get_real_velocity().slide(Vector3.UP).length() - Zombie.CHASE_SPEED) < 0.05,
 		"The expressive run keeps the pursuit speed")
 	for tick in 43:
@@ -94,11 +100,36 @@ func run() -> void:
 		for tick in 3:
 			await physics_frame
 		check(next_adult.health == 0 and next_adult.ragdoll.running,
-			"The expressive walking pose hands off to the same death rig")
+			"The A&S walking pose hands off to the same MD2 death rig")
 		select(mode, 0)
 		for tick in 3:
 			await physics_frame
 		check(next_adult.health == 0 and next_adult.ragdoll.running,
 			"Changing the review style leaves an existing ragdoll in simulation")
+	select(mode, 1)
+	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
+	check(group.get_child_count() == 4, "A new Baby Zombie spawns with A&S selected")
+	if group.get_child_count() == 4:
+		var next_baby := group.get_child(3) as Zombie
+		check(next_baby.animation.current_animation == STYLED_SPAWN, "Baby spawn uses the A&S idle pose")
+		var hits := [0]
+		next_baby.melee_hit.connect(func(_damage: int): hits[0] += 1)
+		next_baby.position = Vector3(34.0, 0.0, 0.0)
+		lab.player.position = Vector3(34.0, 0.0, 5.5)
+		check(await await_clip(next_baby, [STYLED_ATTACK]), "The Baby Zombie can attack with the A&S clip")
+		for tick in 100:
+			await physics_frame
+			if next_baby.animation.current_animation != STYLED_ATTACK:
+				break
+		check(hits[0] == 1, "One A&S Baby Zombie swing applies damage exactly once")
+		# End the encounter so the next swing cannot preempt the idle pose.
+		lab.player.position = Vector3(5.0, 0.0, 5.5)
+		check(await await_clip(next_baby, [STYLED_IDLE]), "The attack returns to the A&S idle")
+		next_baby.take_hit(1, Vector3.BACK, Zombie.DEFAULT_DEATH_IMPULSE, Zombie.BABY_MAX_POISE)
+		check(next_baby.animation.current_animation == STYLED_STAGGER, "The A&S mode does not play a native living stagger montage")
+		next_baby.take_hit(next_baby.health, Vector3.BACK)
+		for tick in 3:
+			await physics_frame
+		check(next_baby.ragdoll.running, "The Baby Zombie still uses its MD2 death ragdoll")
 	print("MECHANIC_LAB_ZOMBIE_GAIT failures=", failures, " footsteps=", steps.size())
 	quit(0 if failures == 0 else 1)

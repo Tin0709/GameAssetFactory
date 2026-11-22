@@ -351,6 +351,10 @@ gaf_mist_near_entry={
 "type": "float",
 "value": 0.0
 }
+gaf_mist_front_transfer={
+"type": "float",
+"value": 0.0
+}
 gaf_mist_volume={
 "type": "sampler3D",
 "value": ""

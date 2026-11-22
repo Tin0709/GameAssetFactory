@@ -274,6 +274,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"ground_haze": ["Ánh sương thấp sau tán", 1.],
 	&"mist_entry_scatter": ["Ánh tán xạ đầu lớp sương", 1.],
 	&"mist_entry_depth_balance": ["Chiều sâu ánh sương gần", 1.],
+	&"mist_front_transfer": ["Sương nhẹ trung cảnh", 1.],
 	&"mist_rear_chroma": ["Cân sắc lam của sương xa", 1.],
 	&"mist_sky_scatter": ["Ánh trời trong sương rìa tán", 1.],
 	&"mist_dusk_sky_scatter": ["Ánh trời trong sương chạng vạng", 1.],
@@ -360,7 +361,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 227
+const LIGHTING_MIX_VERSION := 228
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -1172,6 +1173,13 @@ func _mist_entry_depth_available() -> bool:
 		and RenderingServer.get_current_rendering_method() == &"mobile" \
 		and RenderingServer.get_rendering_device() != null
 
+func _mist_front_transfer_available() -> bool:
+	return not _flat_lab and not _balanced_preview and atmosphere_review == "combined" \
+		and forest_active() and captured_mist_source and measured_atmosphere \
+		and _biome_profile != null and _biome_profile.mist_front_transfer_by_hour != null \
+		and RenderingServer.get_current_rendering_method() == &"mobile" \
+		and RenderingServer.get_rendering_device() != null
+
 func _has_mist_sky_scatter(dusk := false) -> bool:
 	if mist == null or not mist.has_sky_field() or _biome_profile == null:
 		return false
@@ -1276,6 +1284,9 @@ func _update_mist()->void:
 			sample.depth_scatter_ramp = mist.effect.DEPTH_SCATTER_RAMP_M
 			var cooler := linear * Vector3(.76, .85, 1.44)
 			sample.depth_scatter_color = (cooler * (linear.dot(luma) / maxf(cooler.dot(luma), .000001)) - linear) * noon
+		if _mist_front_transfer_available():
+			var shift := DayNight.sample_curve(_biome_profile.mist_front_transfer_by_hour, hour / 24., 0.)
+			sample.front_transfer_m = shift * _lighting_scale(&"mist_front_transfer")
 		var depth_mix := _lighting_scale(&"near_haze_depth")
 		if depth_mix > 0.:
 			sample.near_fade_start = lerpf(.4, NEAR_HAZE_FADE_START, depth_mix)
@@ -2210,6 +2221,9 @@ func set_atmosphere_review(mode:String)->void:
 	_restore_day();atmosphere_review=mode;_forest_expected.clear();apply_time()
 	_sync_shadow_diffuse()
 	_refresh_terrain_shadow_sliders()
+	var mist_transfer: HSlider = _lighting_sliders.get(&"mist_front_transfer")
+	if mist_transfer != null:
+		mist_transfer.editable = _mist_front_transfer_available()
 	if mode!="previous" and level!=null and level.terrain_sky.enabled:level.terrain_sky.set_enabled(false)
 	if level!=null:level.look._refresh_ground_bounce()
 
@@ -3224,6 +3238,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 227 and effect == &"path_sky_chroma":
 			missing_value = 0.
+		if version < 228 and effect == &"mist_front_transfer":
+			missing_value = 0.
 		if version < 219 and effect == &"stone_top_shadow_fill":
 			missing_value = 0.
 		if version < 217 and effect == &"stone_foot_fill":
@@ -3450,6 +3466,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"mist_entry_depth_balance":
 			slider.editable = slider.editable and _mist_entry_depth_available()
+		if effect == &"mist_front_transfer":
+			slider.editable = _mist_front_transfer_available()
 		if effect == &"grove_mist_coherence":
 			slider.editable = slider.editable and _biome_profile != null and _biome_profile.grove_mist_by_hour != null \
 				and is_instance_valid(level.grove)
@@ -3685,7 +3703,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_sync_forest_night_lights()
 		set_coupled_bloom(coupled_bloom)
 		return
-	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"mist_rear_chroma", &"mist_entry_scatter", &"mist_entry_depth_balance", &"mist_sky_scatter", &"mist_dusk_sky_scatter", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
+	if changed_effect in [&"ground_haze", &"twilight_ground_haze", &"mist_rear_chroma", &"mist_entry_scatter", &"mist_entry_depth_balance", &"mist_front_transfer", &"mist_sky_scatter", &"mist_dusk_sky_scatter", &"scatter_chroma", &"morning_depth_scatter", &"morning_depth_optical", &"noon_depth_haze", &"grove_mist_coherence"]:
 		_update_mist()
 		return
 	if changed_effect in [&"night_path_chroma", &"source_path_chroma", &"day_path_chroma"]:
@@ -4635,6 +4653,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = mist != null and _biome_profile != null and _biome_profile.mist_entry_scatter_by_hour != null
 		if effect == &"mist_entry_depth_balance":
 			slider.editable = slider.editable and _mist_entry_depth_available()
+		if effect == &"mist_front_transfer":
+			slider.editable = _mist_front_transfer_available()
 		if effect == &"basin_sunlit_mist":
 			slider.editable = directional_air.region_available()
 		if effect == &"east_sunlit_mist":

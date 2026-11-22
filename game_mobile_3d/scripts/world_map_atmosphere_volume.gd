@@ -3,6 +3,8 @@ extends Node3D
 const FIELD=preload("res://scripts/world_map_mist_field.gd")
 const MistSkyField = preload("res://scripts/mist_sky_field.gd")
 const LocalMistRegion=preload("res://scripts/local_mist_region.gd")
+# The rear fade spans 5.8 m. A shift of at most 2.1 m keeps the sampled depth increasing.
+const MAX_FRONT_TRANSFER_M := 2.1
 static var _owner:WeakRef
 var effect:CompositorEffect
 var noise:ImageTexture
@@ -38,6 +40,7 @@ func setup()->void:
  effect=FIELD.new();effect.enabled=false
  _owner=weakref(self)
  RenderingServer.global_shader_parameter_set("gaf_mist_enabled",false)
+ RenderingServer.global_shader_parameter_set("gaf_mist_front_transfer",0.)
  RenderingServer.global_shader_parameter_set("gaf_local_mist_center",Vector4.ZERO)
  RenderingServer.global_shader_parameter_set("gaf_additional_mist_center",Vector4.ZERO)
  var image:=Image.create(64,64,false,Image.FORMAT_RF)
@@ -181,6 +184,9 @@ func _process(_delta:float)->void:
    RenderingServer.global_shader_parameter_set("gaf_mist_volume",effect.texture);_bound_generation=state.rebuilds
   RenderingServer.global_shader_parameter_set("gaf_mist_far",_camera.far)
   RenderingServer.global_shader_parameter_set("gaf_mist_near_entry",near_layer.x)
+  var shift: float = _profile.get("front_transfer_m", 0.)
+  shift = clampf(shift, 0., MAX_FRONT_TRANSFER_M) if near_layer.y > 0. and is_finite(shift) else 0.
+  RenderingServer.global_shader_parameter_set("gaf_mist_front_transfer",shift)
   RenderingServer.global_shader_parameter_set("gaf_mist_camera_position",_camera.global_position)
   RenderingServer.global_shader_parameter_set("gaf_mist_camera_direction",-_camera.global_basis.z)
   var projection:=_camera.get_camera_projection()
@@ -234,6 +240,8 @@ static func base_shader(shader:Shader)->Shader:
 func _set_gate(value:bool):
  if value==_gate:return
  _gate=value;RenderingServer.global_shader_parameter_set("gaf_mist_enabled",value)
+ if not value:
+  RenderingServer.global_shader_parameter_set("gaf_mist_front_transfer",0.)
 func failure()->String:return "" if effect==null else str(effect.snapshot().error)
 func _exit_tree():
  if effect==null:return
@@ -243,6 +251,7 @@ func _exit_tree():
   if _camera.compositor==_owned_compositor:_camera.compositor=_previous_compositor
  if _owner!=null and _owner.get_ref()==self:
   RenderingServer.global_shader_parameter_set("gaf_mist_enabled",false)
+  RenderingServer.global_shader_parameter_set("gaf_mist_front_transfer",0.)
   RenderingServer.global_shader_parameter_set("gaf_local_mist_center",Vector4.ZERO)
   RenderingServer.global_shader_parameter_set("gaf_additional_mist_center",Vector4.ZERO)
   RenderingServer.global_shader_parameter_set("gaf_mist_volume",null);_owner=null
