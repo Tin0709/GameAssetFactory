@@ -733,7 +733,32 @@ func check_wall_shoulder_rebound(seam: float, seed: int, clip: StringName, gap_l
 	lab.free()
 
 
+func check_wall_entry_rays() -> void:
+	var rig := preload("res://scripts/mechanic_lab_ragdoll.gd").new()
+	var fixture := Node3D.new()
+	root.add_child(fixture)
+	fixture.add_child(rig)
+	var wall := AABB(Vector3(0.0, 0.0, -1.0), Vector3(0.3, 2.0, 2.0))
+	terrain(fixture, wall.get_center(), wall.size, 0.0)
+	await ticks(2)
+	# Recreate the single-wall neighborhood established during a handoff.
+	rig._handoff_ray_region = wall.grow(1.0)
+	rig._handoff_region_wall = wall
+	rig._handoff_region_floor = AABB(Vector3(-2, -1, -2), Vector3(4, 1, 4))
+	rig._handoff_ray.collision_mask = 1
+	var space := fixture.get_world_3d().direct_space_state
+	var outside := Vector3(-0.02, 1.0, 0.0)
+	var inside := Vector3(0.02, 1.0, 0.0)
+	check(not rig._wall_ray_crosses(space, outside, inside, Vector3.ZERO, 0.0, {}),
+		"Wall handoff ignores ray travel below the existing anchor tolerance")
+	check(not rig._wall_ray_crosses(space, inside, Vector3(-0.12, 1.0, 0.0), Vector3.ZERO, 0.0, {}),
+		"A wall ray starting inside the box keeps the native ray semantics")
+	check(rig._wall_ray_crosses(space, Vector3(-0.12, 1.0, 0.0), inside, Vector3.ZERO, 0.0, {}),
+		"An exterior ray reaching the same wall interior rejects the pose")
+	fixture.free()
+
 func run() -> void:
+	await check_wall_entry_rays()
 	await run_case(true)
 	await run_case(false)
 	await check_wall_handoff()
