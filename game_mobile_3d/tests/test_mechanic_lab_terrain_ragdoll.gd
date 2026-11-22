@@ -686,9 +686,10 @@ func check_one_foot_stacked_wall_landing() -> void:
 	lab.free()
 
 
-func check_wall_shoulder_rebound() -> void:
-	var lab := await stacked_wall_lab(1.08)
-	var zombie := await launch_at_stacked_wall(lab, 77, 1150.0, &"Zombie_ExpressiveRun")
+func check_wall_shoulder_rebound(seam: float, seed: int, clip: StringName, gap_limit: float,
+		landing_time := INF) -> void:
+	var lab := await stacked_wall_lab(seam)
+	var zombie := await launch_at_stacked_wall(lab, seed, 1150.0, clip)
 	if zombie == null:
 		lab.free()
 		return
@@ -704,10 +705,13 @@ func check_wall_shoulder_rebound() -> void:
 			farthest = maxf(farthest, maxf(body.global_position.x, body.global_position.z))
 		if zombie._corpse_landed and not is_finite(landing):
 			landing = zombie._corpse_age
-	check(zombie.ragdoll._wall_handoff_frame < 0 and is_equal_approx(landing, 17.0 / 60.0),
-		"The shoulder rebounds after a clean launch and keeps its first landing time")
-	check(peak_gap < 0.145 and farthest < 4.35, "The arm clears the wall without pulling away from its shoulder")
-	print("LAB_WALL_SHOULDER_REBOUND gap=", peak_gap, " farthest=", farthest, " landing=", landing)
+	check(zombie.ragdoll._wall_handoff_frame < 0, "The shoulder hits the wall after a clean launch")
+	if is_finite(landing_time):
+		check(is_equal_approx(landing, landing_time), "The shoulder rebound keeps its first landing time")
+	check(peak_gap < gap_limit and farthest < 4.35,
+		"The shoulder stays connected during a corner rebound (%s at seam %.2f m, gap %.3f m)" % [clip, seam, peak_gap])
+	print("LAB_WALL_SHOULDER_REBOUND clip=", clip, " seam=", seam, " gap=", peak_gap, " farthest=", farthest,
+		" landing=", landing)
 	lab.free()
 
 
@@ -792,6 +796,9 @@ func run() -> void:
 	await check_stacked_wall_handoff(1.35, 24, 1150.0, [&"Zombie_Walk"])
 	await check_stacked_wall_handoff(1.35, 130, 800.0, [&"Zombie_Walk_Variant1"])
 	await check_one_foot_stacked_wall_landing()
-	await check_wall_shoulder_rebound()
+	await check_wall_shoulder_rebound(1.08, 77, &"Zombie_ExpressiveRun", 0.145, 17.0 / 60.0)
+	await check_wall_shoulder_rebound(1.08, 73, &"Zombie_ExpressiveWalk", 0.145)
+	await check_wall_shoulder_rebound(1.35, 73, &"Zombie_ExpressiveWalk", 0.145)
+	await check_wall_shoulder_rebound(1.08, 73, &"Zombie_Walk_Variant1", 0.26)
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
