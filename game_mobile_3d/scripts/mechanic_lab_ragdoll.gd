@@ -45,6 +45,8 @@ var _handoff_query_snapshot: Dictionary[PhysicalBone3D, PhysicsShapeQueryParamet
 var _handoff_ray_region: AABB
 var _handoff_region_floor: AABB
 var _handoff_region_wall: AABB
+var _handoff_wall_inner: AABB
+var _handoff_wall_outer: AABB
 var _sample_names: Array[String]
 var _sample_bone_ids: Array[int]
 var _sample_body_offsets: Array[Transform3D]
@@ -382,6 +384,8 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 	_handoff_ray_region = region
 	_handoff_region_floor = floor_bounds
 	_handoff_region_wall = wall_bounds
+	_handoff_wall_inner = wall_bounds.grow(-2.0 * PROJECTION_COLLISION_MARGIN)
+	_handoff_wall_outer = wall_bounds.grow(PROJECTION_COLLISION_MARGIN)
 	var source: Array[Transform3D] = []
 	for bone in skeleton.get_bone_count():
 		source.append(skeleton.get_bone_pose(bone))
@@ -618,10 +622,17 @@ func _wall_ray_crosses(space: PhysicsDirectSpaceState3D, origin: Vector3, endpoi
 	if _handoff_ray_region.has_volume():
 		# The region query excluded only the known floor and wall boxes.
 		var ray_bounds := AABB(start.min(finish), (finish - start).abs()).grow(PROJECTION_COLLISION_MARGIN)
-		if _handoff_ray_region.encloses(ray_bounds) and not _handoff_region_wall.intersects(ray_bounds) \
-				and not _handoff_region_floor.intersects(ray_bounds):
-			wall_crossings[endpoint] = false
-			return false
+		if _handoff_ray_region.encloses(ray_bounds) and not _handoff_region_floor.intersects(ray_bounds):
+			if not _handoff_region_wall.intersects(ray_bounds):
+				wall_crossings[endpoint] = false
+				return false
+			# The ray starts outside a padded box and reaches the inset interior.
+			# Its horizontal entry face therefore rejects the pose even at tolerance.
+			if tolerance <= PROJECTION_COLLISION_MARGIN and _handoff_wall_inner.has_volume() \
+					and not _handoff_wall_outer.has_point(start) \
+					and _handoff_wall_inner.intersects_segment(start, finish) != null:
+				wall_crossings[endpoint] = true
+				return true
 	var crosses := false
 	if start.distance_squared_to(finish) > SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
 		_handoff_ray.from = start
