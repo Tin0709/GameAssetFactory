@@ -278,6 +278,9 @@ var _flat_brace_weight := 0.0
 var _had_upper_body_brace := false
 var _landing_gravity_sent := NAN
 var _landing_linear_damp_sent := NAN
+var _wall_landing_age := 0.0
+var _wall_landing_chest: Transform3D
+var _wall_landing_head: Transform3D
 var _terrain_rest_age := 0.0
 var _terrain_rest_duration := 0.0
 var _terrain_rest_strict := false
@@ -1272,6 +1275,10 @@ func _update_death(delta: float) -> void:
 			_absorb_late_foot_rebounds(contact)
 		if not limbs_supporting and contact.linear < DEATH_LIMB_SUPPORT_MAX_SPEED:
 			limbs_supporting = _has_tuned_wall_brace(contact)
+		if limbs_supporting:
+			_wall_landing_age = 0.0
+		elif sabre_finisher and source_rig and is_instance_valid(_corpse_floor) and not is_baby:
+			limbs_supporting = _has_sustained_wall_landing(delta, contact)
 		_limb_support_age = _limb_support_age + delta if limbs_supporting else 0.0
 	if not _corpse_landed and (contact.core_supports > 0 or _limb_support_age >= DEATH_LIMB_SUPPORT_DURATION - 0.00001):
 		_corpse_landed = true
@@ -1294,6 +1301,45 @@ func _update_death(delta: float) -> void:
 		if sabre_finisher and not _corpse_parked:
 			_assist_flat_wall_descent(delta, contact)
 			_assist_suspended_sabre_descent(contact)
+
+func _has_sustained_wall_landing(delta: float, motion: Dictionary) -> bool:
+	if _corpse_floor.disabled or _corpse_age < WALL_BRACE_MIN_AGE or ragdoll.use_tuned_wall_sweep \
+			or not is_equal_approx(ragdoll_gravity_multiplier, 1.0) \
+			or motion.supports != 1 or not motion.leg_supported or motion.core_supports != 0:
+		_wall_landing_age = 0.0
+		return false
+	# A free torso can hang between a planted foot and a head against the wall.
+	# Let the usual brace rules handle direct support through the chest.
+	var chest: PhysicalBone3D = ragdoll.bodies.Chest
+	var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if chest_state == null or chest_state.get_contact_count() > 0:
+		_wall_landing_age = 0.0
+		return false
+	var floor_body := _corpse_floor.get_parent()
+	if not (Ragdoll._body_supported_by(ragdoll.bodies["Leg.L"], floor_body) \
+			or Ragdoll._body_supported_by(ragdoll.bodies["Leg.R"], floor_body)) \
+			or not ragdoll.has_flat_wall_rest_support(true) \
+			or ragdoll.max_anchor_error() > Ragdoll.SOURCE_ANCHOR_TOLERANCE:
+		_wall_landing_age = 0.0
+		return false
+	var chest_pose := chest.global_transform
+	var head_pose: Transform3D = ragdoll.bodies.Head.global_transform
+	# Require the head and chest to stay in a small pose envelope before
+	# transitioning to landing gravity. Momentary wall contacts can still roll off.
+	if _wall_landing_age <= 0.0 or _wall_landing_pose_moved(_wall_landing_chest, chest_pose) \
+			or _wall_landing_pose_moved(_wall_landing_head, head_pose):
+		_wall_landing_chest = chest_pose
+		_wall_landing_head = head_pose
+		_wall_landing_age = delta
+		return false
+	_wall_landing_age += delta
+	return _wall_landing_age >= CORPSE_WALL_REST_TIME - 0.00001
+
+
+static func _wall_landing_pose_moved(start: Transform3D, pose: Transform3D) -> bool:
+	return start.origin.distance_squared_to(pose.origin) > CORPSE_FLAT_WALL_REST_SHIFT ** 2 \
+		or start.basis.get_rotation_quaternion().angle_to(pose.basis.get_rotation_quaternion()) > CORPSE_FLAT_WALL_REST_TURN
+
 
 func _absorb_late_foot_rebounds(contact: Dictionary) -> void:
 	var left: PhysicalBone3D = ragdoll.bodies["Leg.L"]
