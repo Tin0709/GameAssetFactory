@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
 [ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
@@ -19,6 +19,7 @@
 [ext_resource type="Resource" path="res://assets/graphics/biomes/forest_reference.tres" id="forest_reference"]
 [ext_resource type="Script" path="res://scripts/local_diffuse_region.gd" id="diffuse_type"]
 [ext_resource type="Script" path="res://scripts/local_mist_region.gd" id="mist_type"]
+[ext_resource type="Texture2D" path="res://assets/graphics/world_map_terrain_transport_v001/near_wall_coverage.res" id="near_wall"]
 
 [sub_resource type="Resource" id="CliffDiffuse"]
 script = ExtResource("diffuse_type")
@@ -42,6 +43,8 @@ scatter_multiplier = Vector3(0.85, 1.28, 2.2)
 [node name="WorldMap" instance=ExtResource("base")]
 script = ExtResource("map")
 biome_graphics = ExtResource("forest_reference")
+near_wall_coverage = ExtResource("near_wall")
+near_wall_layout_sha256 = "53e243bb23f95f17990d02d8871393fa1a26c5aa67ae79314361b5cdc1c6f805"
 distant_terrain_origin = Vector3(45, -11.5, -46.5)
 distant_terrain_layout_sha = "53e243bb23f95f17990d02d8871393fa1a26c5aa67ae79314361b5cdc1c6f805"
 cliff_vista_origin = Vector3(-29, -8, -54)

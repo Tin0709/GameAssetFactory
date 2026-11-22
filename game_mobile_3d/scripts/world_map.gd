@@ -24,6 +24,9 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export_file("*.json") var map_layout_path := DATA
 ## Assign a graphics resource independently of the imported layout.
 @export var biome_graphics: BiomeGraphicsProfile
+## Optional ground-level sky coverage baked from the selected block layout.
+@export var near_wall_coverage: Texture2D
+@export var near_wall_layout_sha256 := ""
 ## Optional sky-occlusion lattice baked for this layout.
 @export var mist_sky_field: MistSkyField
 @export var comparison_biomes: Array[BiomeGraphicsProfile] = []
@@ -300,6 +303,7 @@ func _ready() -> void:
 			showcase.mist.set_sky_field(spruce_sky.mist_sky_field(), spruce_sky.mist_sky_current)
 		showcase._refresh_lighting_mix(&"mist_sky_scatter")
 	showcase.prepare_grass_terrace_shadow()
+	showcase.prepare_near_wall_lighting()
 	_setup_far_shadow_review()
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 

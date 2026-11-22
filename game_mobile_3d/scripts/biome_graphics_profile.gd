@@ -175,6 +175,9 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Strength of the sky and fill response for ground below the proven canopy field.
 @export var canopy_ground_fill := Vector2.ZERO
 @export_range(0.0, 1.0) var canopy_ground_fill_overcast := 1.0
+## How much incident sky and supplemental fill to remove beside a wall.
+@export var near_wall_fill := Vector2.ZERO
+@export_range(0.0, 1.0) var near_wall_fill_overcast := 1.0
 ## Shadow recovery for dark greens in the optional reference finish.
 @export_range(0., 1., .01) var daylight_green_grade_scale := 0.
 ## Keep the reference local-exposure blur footprint steadier when zooming out.
