@@ -1026,7 +1026,14 @@ func _is_in_melee_cone(planar_offset: Vector3) -> bool:
 
 func _face_target(offset: Vector3, delta: float) -> void:
 	if Vector2(offset.x, offset.z).length_squared() > 0.0001:
-		rotation.y = lerp_angle(rotation.y, atan2(offset.x, offset.z), minf(delta * 10.0, 1.0))
+		var current_rotation := rotation
+		var next_rotation := current_rotation
+		next_rotation.y = lerp_angle(current_rotation.y, atan2(offset.x, offset.z), minf(delta * 10.0, 1.0))
+		# A body motion can change the basis without changing the reported Euler angle.
+		# Only skip the write if Godot would rebuild the same local basis.
+		if next_rotation.y != current_rotation.y or not is_instance_valid(_corpse_floor) \
+				or basis != Basis.from_euler(next_rotation, rotation_order) * Basis.from_scale(scale):
+			rotation = next_rotation
 
 func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	if animation.current_animation in [SPAWN, ATTACK, STAGGER]:
