@@ -30,12 +30,18 @@ venv/
 .ruff_cache/
 
 # =========================
-# Blender backups / temp
+# Local Blender projects and recovery copies
 # =========================
-*.blend1
-*.blend2
-*.blend3
-*.blend@
+*.[bB][lL][eE][nN][dD]
+*.[bB][lL][eE][nN][dD][0-9]*
+*.[bB][lL][eE][nN][dD]@*
+*.[bB][lL][eE][nN][dD]~
+*.[bB][lL][eE][nN][dD].[bB][aA][kK]
+*.[bB][lL][eE][nN][dD].[bB][aA][kK][0-9]*
+*.[bB][lL][eE][nN][dD].[bB][aA][cC][kK][uU][pP]
+*.[bB][lL][eE][nN][dD].[bB][aA][cC][kK][uU][pP][0-9]*
+*.[bB][lL][eE][nN][dD].[oO][lL][dD]
+*.[bB][lL][eE][nN][dD].[oO][lL][dD][0-9]*
 *.tmp
 *.bak
 

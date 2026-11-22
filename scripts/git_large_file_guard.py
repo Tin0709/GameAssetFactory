@@ -8,6 +8,7 @@ import subprocess
 import sys
 
 MIB = 1024 * 1024
+LOCAL_BLEND = re.compile(rb"\.blend(?:[0-9].*|@.*|~|\.(?:bak|backup|old)(?:[0-9].*)?)?\Z", re.IGNORECASE)
 LFS_POINTER = re.compile(
     rb"version https://git-lfs.github.com/spec/v1\n"
     rb"oid sha256:[0-9a-f]{64}\nsize (?:0|[1-9][0-9]*)\n"
@@ -30,6 +31,12 @@ def inspect_staged(repo):
                       "--diff-filter=ACMRT", "--no-renames").split(b"\0")) - {b""}
     if not changed:
         return []
+    blender_issues = [
+        ("BLOCK", f"{os.fsdecode(path)!r}: Blender projects and backups must stay local.")
+        for path in sorted(changed) if LOCAL_BLEND.search(path)
+    ]
+    if blender_issues:
+        return blender_issues
     entries = []
     for record in git(repo, "ls-files", "--stage", "-z").split(b"\0"):
         if not record:
@@ -84,7 +91,7 @@ def main(argv=None):
     for level, message in issues:
         print(f"large-file guard {level}: {message}", file=sys.stderr)
     if issues:
-        print("Review generated artifacts or choose path-specific LFS deliberately; "
+        print("Review staged paths and generated artifacts; "
               "this check does not change tracking.", file=sys.stderr)
     return 1 if any(level == "BLOCK" for level, _ in issues) else 0
 

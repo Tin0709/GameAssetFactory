@@ -1,5 +1,28 @@
 # Large Git files and optional commit guard
 
+## Local Blender projects
+
+Keep Blender projects and recovery copies in the local Blender backup folder.
+Existing working files remain at their original paths on the Windows checkout.
+On another existing clone, copy Blender files outside the worktree before
+pulling the policy commit. Git can remove formerly tracked files when updating
+that clone. Restore those working copies from the backup when needed.
+
+The ignore rules apply to Blender projects and numbered or recovery backups.
+The pre-commit guard also rejects forced additions or changes to those paths.
+Blender-related Python scripts and documentation remain normal Git files.
+The older Blender versions remain available through the existing Git history,
+subject to LFS availability.
+
+FBX, GLB, glTF, WAV, MP3, OGG and ZIP retain their existing LFS rules.
+Keep large experimental exports, textures and research data in the local
+backup folder. Review the full outgoing commit range and run
+`git lfs push --dry-run origin main` before publishing non-code assets.
+A later deletion in the same outgoing range does not remove the earlier
+pointer from that range. The Windows checkout also guards against publishing
+new LFS objects in a normal push. The GitHub LFS budget is set separately in
+the repository owner's billing settings.
+
 The 2026-10-15 warning identified one ordinary Git file:
 `blender/animation/reviews/player_animation_library_v1/actions_stuff_idle_v001/head_face_audit/source_index.json`.
 It is 67,047,538 bytes (63.94 MiB), including in the committed Git object. It is

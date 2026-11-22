@@ -60,6 +60,19 @@ class GitToolTests(unittest.TestCase):
         result = self.run_tool()
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_blender_projects_and_backups_stay_local(self):
+        for name in ("Scout.blend", "sandbox/CASE.BLEND12", "sandbox/auto.blend@",
+                     "scene.blend~", "scene.blend.backup", "scene.blend.bak2"):
+            with self.subTest(name=name):
+                self.stage(name)
+        self.stage("blender/readme.md")
+        self.stage("tools/scene.blend.py")
+        result = self.run_tool()
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertEqual(result.stderr.count("must stay local"), 6)
+        self.assertNotIn("scene.blend.py", result.stderr)
+        self.assertNotIn("blender/readme.md", result.stderr)
+
     @unittest.skipUnless(os.name == 'nt', 'Windows console allocation regression')
     def test_guard_git_child_has_no_console_when_called_from_pythonw(self):
         compiler = Path(os.environ.get('WINDIR', r'C:\Windows')) / 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
@@ -139,11 +152,11 @@ pathlib.Path({str(output)!r}).write_bytes(guard.git(pathlib.Path({str(self.repo)
         self.assertIn("ordinary staged Git blob", result.stderr)
 
     def test_valid_lfs_pointer_uses_staged_filter_and_not_worktree_size(self):
-        self.attributes("*.blend filter=lfs diff=lfs merge=lfs -text\n")
-        self.stage("large asset.blend", POINTER)
-        with (self.repo / "large asset.blend").open("wb") as stream:
+        self.attributes("*.glb filter=lfs diff=lfs merge=lfs -text\n")
+        self.stage("large asset.glb", POINTER)
+        with (self.repo / "large asset.glb").open("wb") as stream:
             stream.truncate(101 * MIB)
-        (self.repo / ".gitattributes").write_text("*.blend -filter\n")
+        (self.repo / ".gitattributes").write_text("*.glb -filter\n")
         result = self.run_tool()
         self.assertEqual(result.returncode, 0, result.stderr)
 
@@ -154,24 +167,24 @@ pathlib.Path({str(output)!r}).write_bytes(guard.git(pathlib.Path({str(self.repo)
         self.assertIn("filter=lfs", result.stderr)
 
     def test_fake_pointer_header_cannot_bypass_lfs_validation(self):
-        self.attributes("*.blend filter=lfs\n")
+        self.attributes("*.glb filter=lfs\n")
         for malformed in [POINTER + b"payload\n", POINTER.replace(b"a" * 64, b"xyz"),
                           POINTER.replace(b"size 200000000", b"size -3")]:
             with self.subTest(pointer=malformed[-24:]):
-                self.stage("bad.blend", malformed)
+                self.stage("bad.glb", malformed)
                 result = self.run_tool()
                 self.assertEqual(result.returncode, 1, result.stderr)
                 self.assertIn("invalid LFS pointer", result.stderr)
 
     def test_empty_lfs_file_is_allowed(self):
-        self.attributes("*.blend filter=lfs\n")
-        self.stage("empty.blend", b"")
+        self.attributes("*.glb filter=lfs\n")
+        self.stage("empty.glb", b"")
         self.assertEqual(self.run_tool().returncode, 0)
 
     def test_symlink_in_lfs_pattern_is_not_filtered(self):
-        self.attributes("*.blend filter=lfs\n")
-        oid = self.git("hash-object", "-w", "--stdin", data=b"real-asset.blend").decode().strip()
-        self.git("update-index", "--add", "--cacheinfo", f"120000,{oid},link.blend")
+        self.attributes("*.glb filter=lfs\n")
+        oid = self.git("hash-object", "-w", "--stdin", data=b"real-asset.glb").decode().strip()
+        self.git("update-index", "--add", "--cacheinfo", f"120000,{oid},link.glb")
         result = self.run_tool()
         self.assertEqual(result.returncode, 0, result.stderr)
 
