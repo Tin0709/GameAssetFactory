@@ -252,7 +252,8 @@ func _physics_process(delta: float) -> void:
 		var node: MeshInstance3D = bolt.node
 		var start := node.global_position
 		var speed: float = bolt.speed
-		var end := start + Vector3(bolt.direction) * speed * minf(delta, bolt.life)
+		var travel_time := minf(delta, bolt.life)
+		var end := start + Vector3(bolt.direction) * speed * travel_time
 		var hit := _sweep_bolt(space, start, end, BOLT_MASK)
 		var trail: Dictionary = bolt.trail
 		var direction: Vector3 = bolt.direction
@@ -262,12 +263,15 @@ func _physics_process(delta: float) -> void:
 			var travel := (endpoint - start).dot(direction)
 			trail.distance += clampf(travel, 0.0, start.distance_to(end) + BOLT_RADIUS)
 			trail.stopped = true
-			trail.tail_age = maxf(0.0, delta - travel / speed)
+			# Time the impact from the swept sphere, which reaches a surface
+			# before its centre reaches the returned surface point.
+			var impact_step := delta - travel_time * float(hit.get("motion_fraction", 1.0))
+			trail.tail_age = impact_step
 			_bolts.remove_at(index)
 			_remove_bolt(node)
 			if not hit.is_empty():
 				_embed_on_terrain(hit, bolt.direction)
-				_report_impact(hit, direction, bolt.serial, bolt.strike)
+				_report_impact(hit, direction, bolt.serial, bolt.strike, impact_step)
 		else:
 			node.global_position = end
 			trail.distance += start.distance_to(end)
@@ -285,9 +289,10 @@ func _ammo_capacity() -> int:
 func _ammo_recharge_period() -> float:
 	return RECHARGE_PERIOD
 
-func _report_impact(hit: Dictionary, direction: Vector3, serial: int, _strike: Dictionary) -> void:
+func _report_impact(hit: Dictionary, direction: Vector3, serial: int, _strike: Dictionary,
+		impact_step := 0.0) -> void:
 	if impact_sparks != null:
-		impact_sparks.burst(hit.position, direction, hit.normal)
+		impact_sparks.burst(hit.position, direction, hit.normal, impact_step)
 	bolt_impact.emit(hit, direction, serial)
 
 func _update_trails() -> void:
@@ -391,19 +396,21 @@ func _sweep_bolt(space: PhysicsDirectSpaceState3D, start: Vector3, end: Vector3,
 	_sweep_query.motion = Vector3.ZERO
 	# Motion casts ignore shapes already overlapping the sphere.
 	var hit := space.get_rest_info(_sweep_query)
+	var motion_fraction := 0.0
 	if hit.is_empty():
 		var travel := end - start
 		_sweep_query.motion = travel
-		var fractions := space.cast_motion(_sweep_query)
+		motion_fraction = space.cast_motion(_sweep_query)[1]
 		# Probe just inside contact to obtain its collider and surface point.
 		_sweep_query.motion = Vector3.ZERO
 		var distance := travel.length()
-		var contact_distance := minf(distance, distance * fractions[1] + CONTACT_PROBE_DISTANCE)
+		var contact_distance := minf(distance, distance * motion_fraction + CONTACT_PROBE_DISTANCE)
 		_sweep_query.transform.origin = start + travel.normalized() * contact_distance
 		hit = space.get_rest_info(_sweep_query)
 	if not hit.is_empty():
 		hit.collider = instance_from_id(hit.collider_id)
 		hit.position = hit.point
+		hit.motion_fraction = motion_fraction
 	return hit
 
 func _remove_bolt(bolt: MeshInstance3D) -> void:

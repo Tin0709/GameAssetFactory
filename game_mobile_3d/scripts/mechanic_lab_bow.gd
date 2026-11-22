@@ -102,8 +102,9 @@ func fire_arrow(origin: Vector3, direction: Vector3, serial: int, clearance_star
 	return _fire_projectile(origin, direction, serial, clearance_start, 90.0 if charged else 45.0,
 		CHARGED_STRIKE if charged else NORMAL_STRIKE)
 
-func _report_impact(hit: Dictionary, direction: Vector3, serial: int, strike: Dictionary) -> void:
-	super._report_impact(hit, direction, serial, strike)
+func _report_impact(hit: Dictionary, direction: Vector3, serial: int, strike: Dictionary,
+		impact_step := 0.0) -> void:
+	super._report_impact(hit, direction, serial, strike, impact_step)
 	arrow_impact.emit(hit, direction, serial, strike)
 
 func setup_audio(audio: Node, root: String) -> void:
