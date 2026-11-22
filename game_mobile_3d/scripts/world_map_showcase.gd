@@ -1721,7 +1721,8 @@ func prepare_near_wall_lighting() -> void:
 	_refresh_near_wall_slider()
 
 func _near_wall_fill_available() -> bool:
-	return _near_wall_field != null and _path_sun_available() and _biome_profile.near_wall_fill.is_finite() and _biome_profile.near_wall_fill != Vector2.ZERO
+	return (_near_wall_field != null and _path_sun_available()
+		and _biome_profile.near_wall_fill.is_finite() and _biome_profile.near_wall_fill != Vector2.ZERO)
 
 func _refresh_near_wall_slider() -> void:
 	var slider: HSlider = _lighting_sliders.get(&"near_wall_fill")
@@ -1733,7 +1734,8 @@ func _sync_near_wall_lighting(has_shadow_fill: bool) -> void:
 	if has_shadow_fill and _near_wall_fill_available():
 		var amount := _lighting_scale(&"near_wall_fill") * _day_grass_shadow_weight()
 		var cloudy := clampf(_biome_profile.near_wall_fill_overcast, 0., 1.)
-		var gain := _biome_profile.near_wall_fill.clamp(Vector2.ZERO, Vector2(.44, .90)) * amount * lerpf(1., cloudy, _weather.weight)
+		var gain := _biome_profile.near_wall_fill.clamp(Vector2.ZERO, Vector2(.44, .90))
+		gain *= amount * lerpf(1., cloudy, _weather.weight)
 		if gain != Vector2.ZERO:
 			if not _near_wall_bound:
 				RenderingServer.global_shader_parameter_set("gaf_near_wall_field", _near_wall_field)
