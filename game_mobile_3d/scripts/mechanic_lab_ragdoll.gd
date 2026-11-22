@@ -713,6 +713,73 @@ func has_flat_wall_rest_support(core_grounded: bool) -> bool:
 				return true
 	return false
 
+func has_unbalanced_single_wall_support(minimum_margin: float) -> bool:
+	if not _upper_body_on_single_wall():
+		return false
+	var floor := _flat_floor.get_parent()
+	if not _body_supported_by(bodies["Leg.L"], floor) or not _body_supported_by(bodies["Leg.R"], floor):
+		return false
+	var footprint := PackedVector2Array()
+	for name in ["Leg.L", "Leg.R"]:
+		var collider := bodies[name].get_child(0) as CollisionShape3D
+		var half := (collider.shape as BoxShape3D).size * 0.5
+		var pose := collider.global_transform
+		for x: float in [-1.0, 1.0]:
+			for y: float in [-1.0, 1.0]:
+				for z: float in [-1.0, 1.0]:
+					var corner := pose * (Vector3(x, y, z) * half)
+					footprint.append(Vector2(corner.x, corner.z))
+	# Use the complete foot boxes. Single reported points can lose their
+	# contact patch for a tick even while the feet still carry the body.
+	var hull := Geometry2D.convex_hull(footprint)
+	var center := Vector3.ZERO
+	var mass := 0.0
+	for part in _physical_parts:
+		var state := PhysicsServer3D.body_get_direct_state(part.rid)
+		if state == null:
+			return false
+		center += (state.transform.origin + state.center_of_mass) * part.body.mass
+		mass += part.body.mass
+	var projected_center := Vector2(center.x, center.z) / mass
+	if Geometry2D.is_point_in_polygon(projected_center, hull):
+		return false
+	for i in hull.size() - 1:
+		var edge := Geometry2D.get_closest_point_to_segment(projected_center, hull[i], hull[i + 1])
+		if edge.distance_to(projected_center) <= minimum_margin:
+			return false
+	return true
+
+
+func _upper_body_on_single_wall() -> bool:
+	var wall := RID()
+	var face := -1
+	var normal := Vector3.ZERO
+	for name in ["Chest", "Head", "Leg.L", "Leg.R"]:
+		var body: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			return false
+		var upper_body: bool = name == "Chest" or name == "Head"
+		var touched_wall := false
+		for i in state.get_contact_count():
+			var next := state.get_contact_local_normal(i)
+			if absf(next.y) >= MAX_WALL_NORMAL_Y or not _is_fixed_wall(state.get_contact_collider_object(i)):
+				continue
+			if not upper_body:
+				return false
+			var rid := state.get_contact_collider(i)
+			var shape := state.get_contact_collider_shape(i)
+			if wall.is_valid() and (wall != rid or face != shape or normal.dot(next) < 0.95):
+				return false
+			wall = rid
+			face = shape
+			normal = next
+			touched_wall = true
+		if upper_body and not touched_wall:
+			return false
+	return true
+
+
 func has_wall_rest_with_near_foot() -> bool:
 	if _flat_floor.disabled or not has_flat_wall_rest_support(true):
 		return false

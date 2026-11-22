@@ -271,6 +271,8 @@ var _landing_age := INF
 var _roll_damping_weight := 0.0
 var _late_roll_damping := 0.0
 var _wall_brace_age := 0.0
+var _wall_descent_weight := 0.0
+var _wall_descent_unsupported_age := 0.0
 var _wall_gravity := false
 var _flat_brace_weight := 0.0
 var _had_upper_body_brace := false
@@ -1277,6 +1279,7 @@ func _update_death(delta: float) -> void:
 		_update_landing_forces(delta, sabre_finisher, supported, contact)
 		_check_corpse_settled(delta, contact)
 		if sabre_finisher and not _corpse_parked:
+			_assist_flat_wall_descent(delta, contact)
 			_assist_suspended_sabre_descent(contact)
 
 func _absorb_late_foot_rebounds(contact: Dictionary) -> void:
@@ -1392,6 +1395,40 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		body.angular_damp = angular_damp
 	_landing_gravity_sent = final_gravity
 	_landing_linear_damp_sent = linear_damp
+
+func _assist_flat_wall_descent(delta: float, motion: Dictionary) -> void:
+	if not is_instance_valid(_corpse_floor) or _corpse_floor.disabled or is_baby \
+			or ragdoll.source_joints.is_empty() or ragdoll.use_tuned_wall_sweep \
+			or not is_equal_approx(ragdoll_gravity_multiplier, 1.0):
+		return
+	var target := float(_should_restore_wall_gravity(delta, motion))
+	_wall_descent_weight = move_toward(_wall_descent_weight, target, delta / SABRE_BRACE_BLEND_TIME)
+	if _wall_descent_weight <= 0.0:
+		return
+	# The floor roll keeps its normal contact state while the torso slides down the wall.
+	var acceleration := Vector3.DOWN * (ZOMBIE_GRAVITY - get_gravity().length()) * _wall_descent_weight
+	for body: PhysicalBone3D in ragdoll.bodies.values():
+		PhysicsServer3D.body_apply_central_force(body.get_rid(), acceleration * body.mass)
+
+
+func _should_restore_wall_gravity(delta: float, motion: Dictionary) -> bool:
+	if not ragdoll.floor_landing_blended or _corpse_age < WALL_BRACE_MIN_AGE or motion.core_supports > 0:
+		_wall_brace_age = 0.0
+		_wall_descent_unsupported_age = 0.0
+		return false
+	var axis := absf(_corpse_axis().normalized().y)
+	if _wall_descent_weight > 0.0 and axis > SABRE_LOW_ROLL_MAX_AXIS_Y:
+		# As the body tips, a foot may briefly leave the floor.
+		_wall_descent_unsupported_age = 0.0 if motion.leg_supported else _wall_descent_unsupported_age + delta
+		if _wall_descent_unsupported_age < CORPSE_SETTLE_TIME:
+			return true
+	var braced: bool = axis > CORPSE_UPRIGHT_AXIS_Y and motion.supports == 2 and motion.leg_supported \
+		and motion.linear <= CORPSE_SETTLE_SPEED and motion.angular <= CORPSE_SETTLE_SPIN \
+		and ragdoll.has_unbalanced_single_wall_support(DEATH_FLOOR_CONTACT_MARGIN * 2.0)
+	_wall_brace_age = _wall_brace_age + delta if braced else 0.0
+	_wall_descent_unsupported_age = 0.0
+	return _wall_brace_age >= CORPSE_SETTLE_TIME
+
 
 func _assist_suspended_sabre_descent(motion: Dictionary) -> void:
 	if _settled_seconds > 0.0 or _corpse_age < SABRE_SUSPENDED_DESCENT_MIN_AGE or not is_instance_valid(_corpse_floor) \
