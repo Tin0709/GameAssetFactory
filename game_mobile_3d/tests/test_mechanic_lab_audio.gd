@@ -3,6 +3,7 @@ extends SceneTree
 
 const COMBAT_AUDIO = preload("res://scripts/mechanic_lab_combat_audio.gd")
 const ZOMBIE = preload("res://scripts/mechanic_lab_zombie.gd")
+const LAB_SCRIPT = preload("res://scripts/mechanic_lab.gd")
 var failures: Array[String] = []
 var checks := 0
 
@@ -137,14 +138,26 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 		"Turning off lab audio stops movement voices immediately")
 	await check_movement_support(lab, movement, toggle)
 	toggle.button_pressed = true
-	movement.groups.grass.clear()
 	movement.groups.land_grass.clear()
 	var previous_slot: int = movement._step_index
 	var previous_landing: int = movement.event_count.landing
+	var previous_steps: int = movement.event_count.grass
 	var previous_roles: Array = movement._step_landing.duplicate()
-	lab.player.surface_contact.emit(lab.player.global_position, true)
+	var touchdowns: Array[Vector3] = []
+	lab.player.surface_contact.connect(func(point, landed):
+		if landed:
+			touchdowns.append(point))
+	check(lab.player.drop_for_lab(0.35), "The missing landing media fixture starts a real drop")
+	for i in 45:
+		await physics_frame
+		if not touchdowns.is_empty():
+			break
+	check(touchdowns.size() == 1 and lab.player.is_on_floor(), "The player still lands on grass without landing media")
 	check(movement._step_index == previous_slot and movement.event_count.landing == previous_landing
-		and movement._step_landing == previous_roles, "A landing with no verified media leaves the voice pool untouched")
+		and movement.event_count.grass == previous_steps and movement._step_landing == previous_roles,
+		"A missing landing family never spends a verified footstep or changes the voice pool")
+	lab.player.surface_contact.emit(lab.player.global_position, false)
+	check(movement.event_count.grass == previous_steps + 1, "Footsteps still play without a landing family")
 	toggle.button_pressed = false
 	print("MECHANIC_LAB_MOVEMENT_AUDIO steps=", steps, " landing=", movement.event_count.landing,
 		" step_peak=", peak, " landing_peak=", landing_peak)
@@ -225,6 +238,58 @@ func check_movement_audio_manifest_fallback() -> void:
 				"Ground contacts dispatch the verified grass step and landing banks (%s)" % fixture)
 		lab.free()
 	DirAccess.remove_absolute(stale)
+
+func check_movement_audio_partial_bundle() -> void:
+	var directory := ProjectSettings.globalize_path("user://mechanic_lab_step_only_%d" % OS.get_process_id())
+	var manifest_dir := directory.path_join("godot_lab/overworld_fidelity_v001")
+	var manifest_path := manifest_dir.path_join("bundle.private.json")
+	var step_path := directory.path_join("step.ogg")
+	var original_step := LAB_SCRIPT.WeaponSource.research_root().path_join(LAB_SCRIPT.GRASS_STEP_DIRECTORY) \
+		.path_join("sfx_player_stepGrass-001_soundWave.ogg")
+	var prepared := DirAccess.make_dir_recursive_absolute(manifest_dir) == OK \
+		and DirAccess.copy_absolute(original_step, step_path) == OK
+	check(prepared, "A copied bundle can carry its own verified footstep without a landing bank")
+	if not prepared:
+		return
+	var manifest := FileAccess.open(manifest_path, FileAccess.WRITE)
+	check(manifest != null, "The step-only audio manifest can be written")
+	if manifest == null:
+		return
+	var sample: Array = LAB_SCRIPT.GRASS_STEP_SAMPLES[0]
+	manifest.store_string(JSON.stringify({
+		"schema": "private_overworld_v1", "private_only": true,
+		"audio": {"grass": [{"name": "fixture_step", "path": step_path, "sha256": sample[0], "seconds": sample[1]}]},
+		"audio_config": {"footsteps_db": -11.0},
+	}))
+	manifest.close()
+	var setting := "MD2_OVERWORLD_BUNDLE"
+	var saved_manifest := OS.get_environment(setting)
+	var had_manifest := OS.has_environment(setting)
+	OS.set_environment(setting, manifest_path)
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	if had_manifest:
+		OS.set_environment(setting, saved_manifest)
+	else:
+		OS.unset_environment(setting)
+	var movement = lab.get_node_or_null("MovementAudio")
+	check(movement != null, "A step-only manifest creates the Lab movement mixer")
+	if movement != null:
+		check(movement.groups.grass.size() == 1 and movement.groups.grass[0].name == "fixture_step"
+			and movement.config.footsteps_db == -11.0, "Recovery preserves the selected bundle step and mix")
+		check(movement.groups.land_grass.size() == 4 and movement.rejected_count == 0,
+			"A step-only bundle recovers all four checksum-pinned MD2 landings from Research")
+		lab.get_node("HUD/CombatAudioToggle").button_pressed = true
+		for i in 12:
+			await physics_frame
+		lab.player.surface_contact.emit(lab.player.global_position, true)
+		check(movement.event_count.grass == 0 and movement.event_count.landing == 1
+			and movement.last_sources.get("land_grass", "").begins_with("sfx_player_land_grassPath_"),
+			"The recovered landing reaches the Lab without playing the copied bundle's footstep")
+	lab.free()
+	for path in [manifest_path, step_path, manifest_dir, manifest_dir.get_base_dir(), directory]:
+		DirAccess.remove_absolute(path)
 
 func check_landing_voice_under_step_burst(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
@@ -1802,6 +1867,7 @@ func run() -> void:
 	await check_local_hurt(bus, capture)
 	await check_movement_audio(bus, capture)
 	await check_movement_audio_manifest_fallback()
+	await check_movement_audio_partial_bundle()
 	await check_landing_voice_under_step_burst(bus, capture)
 	await check_run_step_after_landing(bus, capture)
 	await check_sabre_debris_audio(bus, capture)
