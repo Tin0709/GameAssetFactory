@@ -63,6 +63,9 @@ func run() -> void:
 	check(await await_clip(baby, [STYLED_WALK], 90), "The Baby Zombie also switches to the source move clip")
 	check(baby.animation.get_animation(STYLED_WALK) != adult.animation.get_animation(STYLED_WALK),
 		"Both rigs use their own retargeted poses")
+	if "--require-baby-source" in OS.get_cmdline_user_args():
+		check(is_equal_approx(baby.animation.get_animation(STYLED_WALK).length, Zombie.ActionsStuff.BABY_STRIDE_SECONDS),
+			"The source Baby Zombie uses its own 0.4375-second stride")
 	lab.player.position = adult.position + Vector3(7.0, 0.0, 0.0)
 	var steps: Array[Vector3] = []
 	adult.step_audio.connect(func(point: Vector3):
