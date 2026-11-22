@@ -22,7 +22,6 @@ const BONE_MAP := [
 	[&"J_Spine", &"Spine", Vector3(0, 0.1125, 0)],
 	[&"J_Shoulders", &"Chest", Vector3(0, 0.28125, 0)],
 	[&"J_Neck", &"Neck", Vector3(0, 0.28125, 0)],
-	[&"J_Head", &"Head", Vector3.ZERO],
 	[&"J_L_Arm", &"Arm.L", Vector3(0.3375, 0.28125, 0)],
 	[&"J_R_Arm", &"Arm.R", Vector3(-0.3375, 0.28125, 0)],
 	[&"J_L_Leg", &"Leg.L", Vector3(0.1125, 0, 0)],
@@ -74,7 +73,7 @@ static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
 		mapped_bones.append(bone)
 		var bone_path := NodePath("%s:%s" % [path, binding[0]])
 		var source_path := NodePath(":%s" % binding[1])
-		var source_rest := Quaternion(Vector3.BACK, PI) if i >= 5 else Quaternion.IDENTITY
+		var source_rest := Quaternion(Vector3.BACK, PI) if i >= 4 else Quaternion.IDENTITY
 		var parent := skeleton.get_bone_global_rest(skeleton.get_bone_parent(bone))
 		var to_local := parent.basis.get_rotation_quaternion().inverse()
 		var rest := skeleton.get_bone_rest(bone)
@@ -105,6 +104,7 @@ static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
 	var rotations: Array[Quaternion] = []
 	positions.resize(channels.size())
 	rotations.resize(channels.size())
+	var head_track := source.find_track(NodePath(":Head"), Animation.TYPE_ROTATION_3D)
 	var sample_count := 0 if hold_pose else ceili(source_length * BAKE_RATE)
 	for sample in range(sample_count + 1):
 		var t := minf(sample / BAKE_RATE, source_length)
@@ -115,14 +115,17 @@ static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
 				- (channel.source_rest_position as Vector3))
 			var facing := (source.rotation_track_interpolate(channel.source_rotation, t)
 				* (channel.source_rest_inverse as Quaternion))
+			if i == 3:
+				# Eyes and mouth are siblings of J_Head under J_Neck on both MD2 rigs.
+				facing *= source.rotation_track_interpolate(head_track, t)
 			positions[i] = (channel.rest_position as Vector3) + (channel.to_local as Quaternion) * offset * rig_scale
 			rotations[i] = ((channel.to_local as Quaternion) * facing * (channel.to_model as Quaternion)
 				* (channel.rest_rotation as Quaternion)).normalized()
 		# Retargeting changes limb lengths and joint locations. Seat the lowest
 		# sole corner at ground level on this rig, keeping the source swing foot.
 		var hips := hip_parent * Transform3D(Basis(rotations[0]), positions[0])
-		var low := minf(_sole_y(hips, positions[7], rotations[7], channels[7], leg_length),
-			_sole_y(hips, positions[8], rotations[8], channels[8], leg_length))
+		var low := minf(_sole_y(hips, positions[6], rotations[6], channels[6], leg_length),
+			_sole_y(hips, positions[7], rotations[7], channels[7], leg_length))
 		positions[0] -= hip_parent.basis.inverse() * Vector3.UP * low
 		for i in channels.size():
 			clip.position_track_insert_key(channels[i].position, output_time, positions[i])
