@@ -19,6 +19,7 @@ global uniform float gaf_stone_warmth_luma_trim;
 global uniform vec2 gaf_path_sun_response;
 global uniform vec2 gaf_path_sun_core;
 global uniform vec3 gaf_path_sun_core_direction;
+global uniform vec4 gaf_path_projector_lift;
 varying vec2 stone_sunset_position;
 varying float terrain_canopy_ground_ev;
 // RGB carries incident light. The fourth component carries near-wall coverage.
@@ -71,8 +72,9 @@ void light() {
 	}
 	float path_weight = 0.0;
 	float path_core_weight = 0.0;
+	float path_transmission_gain = 1.0;
 	if (LIGHT_IS_DIRECTIONAL && ground_grade == 2 && surface_top > .998 && use_source_terrain
-			&& dot(gaf_path_sun_response + gaf_path_sun_core, vec2(1.0)) > 0.0
+			&& (dot(gaf_path_sun_response + gaf_path_sun_core, vec2(1.0)) > 0.0 || gaf_path_projector_lift.w > 0.0)
 			&& distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= .005) {
 		// Match the dirt part of the blended shoulder and keep the neighboring grass.
 		float dirt = smoothstep(1.02, 1.22, ALBEDO.r / max(ALBEDO.g, .0001));
@@ -83,6 +85,11 @@ void light() {
 		}
 		if (dot(world_key, gaf_path_sun_core_direction) > .9999) {
 			path_core_weight = dirt;
+		}
+		if (gaf_path_projector_lift.w > 0.0 && dot(world_key, gaf_path_projector_lift.xyz) > .9999) {
+			float opening = smoothstep(.72, .97, shadow_attenuation);
+			float projected_margin = smoothstep(.36, .60, cloud_transmission);
+			path_transmission_gain += gaf_path_projector_lift.w * dirt * opening * projected_margin * (1.0 - cloud_transmission);
 		}
 	}
 	vec3 shadow_diffuse = gaf_shadow_diffuse(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
@@ -218,8 +225,10 @@ void light() {
 #endif
 		vec3 diffuse_incident = incident;
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
-		if (max(path_weight, path_core_weight) > 0.0) {
-			float beam = shadow_attenuation * cloud_transmission;
+		if (max(path_weight, path_core_weight) > 0.0 || path_transmission_gain > 1.0) {
+			// Evaluate the same path response at the adjusted transmission so its shoulder stays monotone.
+			float beam = shadow_attenuation * cloud_transmission * path_transmission_gain;
+			diffuse_incident *= path_transmission_gain;
 			if (path_weight > 0.0) {
 				// Redistribute the existing Sun response in the midrange.
 				float edge = smoothstep(.12, .47, beam) * (1.0 - smoothstep(.62, .93, beam));

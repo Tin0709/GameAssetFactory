@@ -135,6 +135,10 @@ gaf_path_sun_core_direction={
 "type": "vec3",
 "value": Vector3(0, 0, 0)
 }
+gaf_path_projector_lift={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
 gaf_grass_terrace_shadow_state={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 0)
