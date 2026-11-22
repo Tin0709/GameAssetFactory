@@ -638,6 +638,7 @@ func check_wall_brace_impact(seed: int, wall_angle: float, strike_angle: float, 
 
 
 func run() -> void:
+	await check_sabre_sliding_down_one_wall()
 	await run_case(true)
 	await run_case(false)
 	await check_wall_handoff()
@@ -714,6 +715,5 @@ func run() -> void:
 	await check_wall_brace_impact(69, 45.0, -85.0, "AirAttack", false, Zombie.IDLE)
 	await check_wall_brace_impact(74, 45.0, -85.0, "Attack", false, Zombie.ATTACK)
 	await check_wall_brace_impact(29, 27.0, -58.0, "Attack", false, Zombie.ATTACK, 100.0, 2)
-	await check_sabre_sliding_down_one_wall()
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
