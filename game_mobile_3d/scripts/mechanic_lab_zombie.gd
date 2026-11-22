@@ -731,18 +731,18 @@ func _update_target_sight(delta: float, sample_ai: bool) -> void:
 		_sight_state_seconds = 0.0
 		return
 	var point := target.global_position
-	var delay := LAB_SIGHT_LOSS_DELAY if _target_aggressive else _sight_delay
 	if global_position.distance_squared_to(point) > _sight_radius_squared:
 		_target_visible = false
-	elif sample_ai or _needs_windup_sight(point) or (_target_visible != _target_aggressive
-			and _sight_state_seconds + delta >= delay - 0.000001):
-		# A staggered sample can be stale when the pending state change is due.
+	elif sample_ai or _target_visible != _target_aggressive or _needs_windup_sight(point):
+		# Once a transition starts, a brief change in cover must interrupt its clock.
+		# Keep routine crowd checks staggered after the state stabilizes.
 		_target_visible = _clear_sight_to(point)
 		if _target_visible:
 			_last_seen_position = point
 	if _target_visible == _target_aggressive:
 		_sight_state_seconds = 0.0
 	else:
+		var delay := LAB_SIGHT_LOSS_DELAY if _target_aggressive else _sight_delay
 		_sight_state_seconds += delta
 		if _sight_state_seconds >= delay - 0.000001:
 			_target_aggressive = _target_visible

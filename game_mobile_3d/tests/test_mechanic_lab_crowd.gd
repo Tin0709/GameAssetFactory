@@ -271,7 +271,7 @@ func check_crowd_sight_deadline(group: Node) -> void:
 			failures.append("Crowd sight deadline must validate current cover (was aggressive %s, now visible %s)"
 				% [was_aggressive, visible])
 	print("CROWD_SIGHT_DEADLINE states=", observed)
-	if stride >= 3:
+	if stride > 1:
 		await check_crowd_sight_interruption(zombie, player, start, open, hidden, stride)
 	wall.free()
 
@@ -288,7 +288,7 @@ func check_crowd_sight_interruption(zombie: ZOMBIE, player: CharacterBody3D, sta
 		zombie._attack_cooldown = 10.0
 		player.global_position = hidden if was_aggressive else open
 		# Let a scheduled scan start the timer. Interrupt it on the next tick,
-		# with the regular scan still at least two ticks away.
+		# before the next regular scan.
 		zombie._crowd_slot = Engine.get_physics_frames() % stride
 		zombie.set_physics_process(true)
 		await physics_frame
