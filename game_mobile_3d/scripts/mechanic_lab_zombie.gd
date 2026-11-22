@@ -631,8 +631,8 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 	var clip := animation.current_animation
 	if clip != ATTACK:
 		var expressive := Gait.is_gait(clip)
-		var play_steps := (step_audio.has_connections() and clip in WALK_STEP_NOTIFIES and is_on_floor()
-			and not _skipped_blocked_step)
+		var play_steps := (not _skipped_blocked_step and clip in WALK_STEP_NOTIFIES and is_on_floor()
+			and step_audio.has_connections())
 		if play_steps or expressive:
 			var motion := get_real_velocity().slide(Vector3.UP)
 			play_steps = motion.length_squared() >= STEP_MIN_SPEED_SQUARED \
@@ -847,7 +847,8 @@ func _clear_chase_detour() -> void:
 	_chase_stalled_seconds = 0.0
 	_chase_detour_around_zombie = false
 
-func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float, sample_ai: bool) -> Vector3:
+func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distance: float,
+		delta: float, sample_ai: bool) -> Vector3:
 	if _chase_detour.is_finite():
 		_chase_detour_time -= delta
 		var travel := (_chase_detour - global_position).slide(Vector3.UP)
@@ -875,7 +876,7 @@ func _chase_detour_velocity(offset: Vector3, stop_distance: float, delta: float,
 
 	# The offset uses the last confirmed sighting. Plan around a new
 	# obstacle on that route while the target is still remembered.
-	if not is_on_wall() or get_real_velocity().dot(offset) >= MIN_WALL_PROGRESS_SPEED * offset.length():
+	if not is_on_wall() or get_real_velocity().dot(offset) >= MIN_WALL_PROGRESS_SPEED * target_distance:
 		_chase_stalled_seconds = 0.0
 		return Vector3.ZERO
 	_chase_stalled_seconds += delta
@@ -1036,7 +1037,8 @@ func _face_target(offset: Vector3, delta: float) -> void:
 			rotation = next_rotation
 
 func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
-	if animation.current_animation in [SPAWN, ATTACK, STAGGER]:
+	var clip := animation.current_animation
+	if clip == SPAWN or clip == ATTACK or clip == STAGGER:
 		return Vector3.ZERO
 	if in_lab and not _target_aggressive:
 		return _roam_velocity(delta, sample_ai)
@@ -1050,9 +1052,10 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	offset.y = 0.0
 	var distance := offset.length()
 	var stop_distance := _melee_approach if target_visible else LAB_LAST_SEEN_STOP_DISTANCE
-	if (in_lab and distance > stop_distance + MELEE_RANGE_TOLERANCE
-			and is_on_floor() and not _corpse_floor.disabled):
-		var detour := _chase_detour_velocity(offset, stop_distance, delta, sample_ai)
+	var needs_approach := distance > stop_distance + MELEE_RANGE_TOLERANCE
+	var grounded_lab_approach := in_lab and needs_approach and is_on_floor() and not _corpse_floor.disabled
+	if grounded_lab_approach:
+		var detour := _chase_detour_velocity(offset, distance, stop_distance, delta, sample_ai)
 		if not detour.is_zero_approx():
 			_face_target(detour, delta)
 			_play_gait()
@@ -1060,9 +1063,10 @@ func _chase_velocity(delta: float, in_lab: bool, sample_ai: bool) -> Vector3:
 	elif in_lab:
 		_clear_chase_detour()
 	_face_target(offset, delta)
-	if distance > stop_distance + MELEE_RANGE_TOLERANCE:
-		var travel := offset.normalized() * minf(_chase_speed, (distance - stop_distance) / delta)
-		if in_lab and is_on_floor() and not _corpse_floor.disabled:
+	if needs_approach:
+		var direction := offset / distance if grounded_lab_approach else offset.normalized()
+		var travel := direction * minf(_chase_speed, (distance - stop_distance) / delta)
+		if grounded_lab_approach:
 			travel = _limit_lab_pursuit_to_floor(travel, delta)
 		if travel.is_zero_approx():
 			_play_loop(IDLE)
