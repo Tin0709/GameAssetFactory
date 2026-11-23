@@ -122,7 +122,7 @@ func run() -> void:
 		Vector2(100.0, 100.0), true, DeathPose.AS_FLAT)
 	await check_tuned_contact(35, 27.0, 0.20, Strike.AIR, -58.0, Vector2(100.0, 100.0), true, DeathPose.AS_FLAT)
 	# Launch alone can pin a foot against the floor and a side of the corner.
-	await check_tuned_contact(2, 27.0, 0.25, Strike.SABRE, -58.0, Vector2(1000.0, 100.0), true)
+	await check_tuned_contact(2, 27.0, 0.30, Strike.SABRE, -58.0, Vector2(1000.0, 100.0), true)
 	# An A&S stride can hit two sides before the head or a foot reaches a wall.
 	await check_tuned_contact(25, 27.0, 0.37, Strike.SABRE, -58.0,
 		Vector2(1000.0, 100.0), true, DeathPose.AS_CORNER)
