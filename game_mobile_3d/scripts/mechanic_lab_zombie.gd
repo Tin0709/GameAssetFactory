@@ -1248,7 +1248,7 @@ func _living_clip(clip: StringName) -> StringName:
 	return clip
 
 func _play_loop(clip: StringName) -> void:
-	if actions_stuff_animation and not is_on_floor() and _is_air_clip(animation.current_animation):
+	if actions_stuff_animation and not is_on_floor() and _is_air_clip(animation.assigned_animation):
 		return
 	clip = _living_clip(clip)
 	if animation.current_animation != clip:
@@ -1288,7 +1288,8 @@ func _is_air_clip(clip: StringName) -> bool:
 func _update_air_animation(travel: Vector3) -> void:
 	if not actions_stuff_animation or not animation.has_animation(ActionsStuff.FALL):
 		return
-	var current := animation.current_animation
+	# The assigned clip still identifies the held pose after a long fall.
+	var current := animation.assigned_animation
 	if is_on_floor():
 		if _is_air_clip(current):
 			if travel.is_zero_approx():
@@ -1296,7 +1297,7 @@ func _update_air_animation(travel: Vector3) -> void:
 			else:
 				_play_gait()
 		return
-	var living := _living_state(current)
+	var living := _living_state(animation.current_animation)
 	if living == ATTACK or living == SPAWN or living == STAGGER:
 		return
 	var next := current
