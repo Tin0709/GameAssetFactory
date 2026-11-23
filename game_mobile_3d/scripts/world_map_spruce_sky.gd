@@ -18,6 +18,7 @@ var applied_ground_fill := Vector2.ZERO
 var applied_terrain_contrast := 1.0
 var applied_directional_ground := 0.0
 var _directional_ground_rect := Vector4.ZERO
+var _directional_ground_texture: ImageTexture
 var applied_pre_twilight := 0.
 var _level: Node3D
 var _camera: Camera3D
@@ -310,16 +311,18 @@ func load_directional_ground(relative: String, digest: String, canopy_digest: St
 		return false
 	var size := Vector2i(int(grid.x), int(grid.y))
 	var path := root.path_join(relative).get_base_dir().path_join("afternoon_canopy_expanded.rg")
+	if not FileAccess.file_exists(path):
+		return false
 	var data := FileAccess.get_file_as_bytes(path)
 	if data.size() != size.x * size.y * 2 or FileAccess.get_sha256(path) != profile.get("payload_sha256"):
 		return false
 	var image := Image.create_from_data(size.x, size.y, false, Image.FORMAT_RG8, data)
-	var texture := ImageTexture.create_from_image(image)
-	if texture == null:
+	_directional_ground_texture = ImageTexture.create_from_image(image)
+	if _directional_ground_texture == null:
 		return false
 	_directional_ground_rect = Vector4(origin.x, origin.z, grid.z, 0.0)
 	RenderingServer.global_shader_parameter_set("gaf_directional_ground_height", Vector2(origin.y, height_span))
-	RenderingServer.global_shader_parameter_set("gaf_directional_ground_sky", texture)
+	RenderingServer.global_shader_parameter_set("gaf_directional_ground_sky", _directional_ground_texture)
 	return true
 
 
