@@ -1,9 +1,13 @@
 extends RefCounted
 
 const SOURCE_PATH := "res://scenes/dev/actions_stuff_research/zombie_combat/source_library.res"
-const BabyStride := preload("res://scripts/mechanic_lab_zombie_baby_stride.gd")
+const Pack := preload("res://scripts/mechanic_lab_zombie_actions_pack.gd")
 const IDLE := &"Zombie_AS_Idle"
 const MOVE := &"Zombie_AS_Move"
+const PURSUIT := &"Zombie_AS_Pursuit"
+const ALERT := &"Zombie_AS_Alert"
+const JUMP := &"Zombie_AS_Jump"
+const FALL := &"Zombie_AS_Fall"
 const ATTACK := &"Zombie_AS_Attack"
 const SPAWN := &"Zombie_AS_Spawn"
 const STAGGER := &"Zombie_AS_Stagger"
@@ -17,6 +21,8 @@ const SOURCE_LEG_HEIGHT := 0.675
 const SOURCE_RELEASE := 10.0 / 60.0
 const SOURCE_CONTACT := 12.0 / 60.0
 const BAKE_RATE := 60.0
+const ALERT_TIME := 0.7083
+const BABY_IDLE_PERIOD := 360.0 / 130.0
 
 # Bind transforms of the Mobs research rig in the same +Z-facing space as MD2.
 # The four rigid limb bones have a 180° Z rotation in that source bind pose.
@@ -32,7 +38,7 @@ const BONE_MAP := [
 ]
 
 static func build(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: Vector3,
-		spawn_duration: float, stagger_seconds: float, baby: bool) -> void:
+		spawn_duration: float, stagger_seconds: float, baby: bool, pack: Dictionary) -> void:
 	if not ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary"):
 		return
 	var source := ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary
@@ -44,25 +50,47 @@ static func build(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: 
 			return
 	var library := player.get_animation_library(&"")
 	var idle_source := source.get_animation(&"Idle")
-	var move_source := BabyStride.build(idle_source, BAKE_RATE) if baby else null
-	if move_source == null:
-		move_source = source.get_animation(&"Walk")
+	var move_source := source.get_animation(&"Walk")
+	var attack_source := source.get_animation(&"Attack")
+	if not pack.is_empty():
+		var bindings := BONE_MAP + [[&"", &"Head", Vector3.ZERO]]
+		var alert: Dictionary = pack.alert.duplicate()
+		alert.held_time = ALERT_TIME
+		if baby:
+			idle_source = Pack.bake(bindings, [pack.baby_idle], BABY_IDLE_PERIOD, true, BAKE_RATE, true)
+			var baby_stance: Dictionary = pack.baby_idle.duplicate()
+			baby_stance.held_time = 0.0
+			move_source = Pack.bake(bindings, [baby_stance, pack.baby_move, alert],
+				BABY_STRIDE_SECONDS, true, BAKE_RATE, true)
+			# Both ages share the source attack layer. The baby uses its own
+			# breathing pose and the already-raised arms underneath the swing.
+			attack_source = Pack.bake(bindings, [alert, pack.attack],
+				pack.attack.animation_length, false, BAKE_RATE, true, idle_source)
+		else:
+			var pursuit_source := Pack.bake(bindings, [pack.pursuit, alert],
+				STRIDE_SECONDS, true, BAKE_RATE, true)
+			library.add_animation(PURSUIT, _bake(skeleton, player.get_parent(), pursuit_source))
+		var alert_source := Pack.bake(bindings, [alert], idle_source.length, true, BAKE_RATE, true, idle_source)
+		library.add_animation(ALERT, _bake(skeleton, player.get_parent(), alert_source))
+		for state: Array in [[JUMP, pack.jump], [FALL, pack.fall]]:
+			var air := Pack.bake(bindings, [state[1]], state[1].animation_length, false,
+				BAKE_RATE, false, idle_source)
+			library.add_animation(state[0], _bake(skeleton, player.get_parent(), air, Vector3.ZERO, 0.0, false))
 	var idle := _bake(skeleton, player.get_parent(), idle_source)
 	var move := _bake(skeleton, player.get_parent(), move_source)
-	var attack := _bake(skeleton, player.get_parent(), source.get_animation(&"Attack"),
-		attack_timing)
+	var attack := _bake(skeleton, player.get_parent(), attack_source, attack_timing)
 	library.add_animation(IDLE, idle)
 	library.add_animation(MOVE, move)
 	library.add_animation(ATTACK, attack)
-	# A&S has no mapped skeletal spawn or stagger. Spawn plays the start of
-	# its idle and stagger blends to its idle pose while the Lab keeps knockback.
+	# The pack has no skeletal spawn or stagger. Use a short section of its
+	# breathing pose for both while the Lab retains spawn and hit timing.
 	library.add_animation(SPAWN, _bake(skeleton, player.get_parent(),
-		source.get_animation(&"Idle"), Vector3.ZERO, spawn_duration))
+		idle_source, Vector3.ZERO, spawn_duration))
 	library.add_animation(STAGGER, _bake(skeleton, player.get_parent(),
-		source.get_animation(&"Idle"), Vector3.ZERO, stagger_seconds, true))
+		idle_source, Vector3.ZERO, stagger_seconds))
 
 static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
-		attack_timing := Vector3.ZERO, intro_length := 0.0, hold_pose := false) -> Animation:
+		attack_timing := Vector3.ZERO, intro_length := 0.0, grounded := true) -> Animation:
 	var clip := Animation.new()
 	var source_length := minf(source.length, intro_length) if intro_length > 0.0 else source.length
 	clip.length = attack_timing.z if attack_timing.z > 0.0 else source_length
@@ -112,7 +140,7 @@ static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
 	positions.resize(channels.size())
 	rotations.resize(channels.size())
 	var head_track := source.find_track(NodePath(":Head"), Animation.TYPE_ROTATION_3D)
-	var sample_count := 0 if hold_pose else ceili(source_length * BAKE_RATE)
+	var sample_count := ceili(source_length * BAKE_RATE)
 	for sample in range(sample_count + 1):
 		var t := minf(sample / BAKE_RATE, source_length)
 		var output_time := _attack_time(t, source.length, attack_timing) if attack_timing.z > 0.0 else t
@@ -130,10 +158,11 @@ static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
 				* (channel.rest_rotation as Quaternion)).normalized()
 		# Retargeting changes limb lengths and joint locations. Seat the lowest
 		# sole corner at ground level on this rig, keeping the source swing foot.
-		var hips := hip_parent * Transform3D(Basis(rotations[0]), positions[0])
-		var low := minf(_sole_y(hips, positions[6], rotations[6], channels[6], leg_length),
-			_sole_y(hips, positions[7], rotations[7], channels[7], leg_length))
-		positions[0] -= hip_parent.basis.inverse() * Vector3.UP * low
+		if grounded:
+			var hips := hip_parent * Transform3D(Basis(rotations[0]), positions[0])
+			var low := minf(_sole_y(hips, positions[6], rotations[6], channels[6], leg_length),
+				_sole_y(hips, positions[7], rotations[7], channels[7], leg_length))
+			positions[0] -= hip_parent.basis.inverse() * Vector3.UP * low
 		for i in channels.size():
 			clip.position_track_insert_key(channels[i].position, output_time, positions[i])
 			clip.rotation_track_insert_key(channels[i].rotation, output_time, rotations[i])
