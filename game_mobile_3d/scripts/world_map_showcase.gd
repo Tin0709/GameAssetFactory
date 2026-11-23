@@ -2431,6 +2431,11 @@ func refresh_daylight_shading() -> void:
 			# Calibrated in the WorldMap 12:00 A/B against the captured Forest light pattern.
 			noon_projection = .32 * _lighting_scale(&"noon_projected_sun") * _noon_lighting_weight()
 	projected_sun.set_weight(_lighting_scale(&"projected_sun") * (phase + noon_projection))
+	var weather_mip_bias := 0.
+	if phase > 0. and not _flat_lab and not _balanced_preview and _weather_profile != null:
+		weather_mip_bias = _weather_profile.projected_sun_mip_bias * _weather.weight \
+			* _day_grass_shadow_weight() * _lighting_scale(&"overcast_shadow_softness")
+	projected_sun.set_weather_mip_bias(weather_mip_bias)
 	var shift := Vector2.ZERO if _flat_lab else level.projected_sun_shift as Vector2
 	projected_sun.set_shift(shift * _lighting_scale(&"projected_sun_position"))
 	var region_available := _projected_region_available()
@@ -3811,6 +3816,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"shadow_softness", &"overcast_shadow_softness"]:
 		level.look.refresh_directional_shadow_blur(level.get_node("Sun"))
+		if changed_effect == &"overcast_shadow_softness":
+			refresh_daylight_shading()
 		return
 	if changed_effect == &"sun_pockets":
 		level.look.refresh_daylight_cloud_shape()

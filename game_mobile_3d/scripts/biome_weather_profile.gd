@@ -13,6 +13,8 @@ extends Resource
 @export var shadow_reduction_by_hour: Curve
 ## Fraction added to the shadow filter radius at full cloud cover, by normalized hour.
 @export var shadow_blur_gain_by_hour: Curve
+## Mip bias for the existing projected-sun texture at full cloud cover in the morning and afternoon.
+@export_range(0., 4., .05) var projected_sun_mip_bias := 0.
 
 @export_group("Phase color")
 ## Restores some of the resolved time-of-day key hue at the cloudy key's luminance.

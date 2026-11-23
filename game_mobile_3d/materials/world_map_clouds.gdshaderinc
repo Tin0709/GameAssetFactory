@@ -9,6 +9,7 @@ global uniform vec2 gaf_projected_sun_shift;
 global uniform vec4 gaf_projected_sun_local_region;
 global uniform vec2 gaf_projected_sun_local_shift;
 global uniform float gaf_projected_sun_softness;
+global uniform float gaf_projected_sun_mip_bias;
 global uniform float gaf_projected_sun_openings;
 global uniform vec4 gaf_projected_path_recovery_region;
 global uniform float gaf_projected_path_recovery_amount;
@@ -33,7 +34,8 @@ float world_cloud_shade(vec3 world) {
 		plane += gaf_projected_sun_local_shift * influence;
 	}
 	float warp = texture(gaf_projected_sun_mask, plane * 0.2 + cloud_time * vec2(0.6, -0.6)).g;
-	vec3 projected = texture(gaf_projected_sun_mask, plane / 30.0 + warp * 0.003).rgb;
+	vec3 projected = texture(gaf_projected_sun_mask, plane / 30.0 + warp * 0.003,
+		gaf_projected_sun_mip_bias).rgb;
 	float mask = mix(projected.r, projected.b, gaf_projected_sun_softness);
 	float transmission = mix(current_shade, 0.1 + 0.9 * mask, gaf_projected_sun_strength);
 	if (gaf_projected_sun_openings > 0.0) {

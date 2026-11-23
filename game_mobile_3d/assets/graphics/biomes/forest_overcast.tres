@@ -28,6 +28,7 @@ additional_fog = 0.065
 saturation_scale = 0.95
 shadow_reduction_by_hour = SubResource("OvercastShadow")
 shadow_blur_gain_by_hour = SubResource("OvercastShadowBlur")
+projected_sun_mip_bias = 3.0
 spatial_extinction_scale = 1.14
 phase_key_color_retention = 0.5
 ambient_chroma_reduction = 0.35

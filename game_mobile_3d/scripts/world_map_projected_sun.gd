@@ -10,6 +10,7 @@ const SHIFT := &"gaf_projected_sun_shift"
 const LOCAL_REGION := &"gaf_projected_sun_local_region"
 const LOCAL_SHIFT := &"gaf_projected_sun_local_shift"
 const SOFTNESS := &"gaf_projected_sun_softness"
+const MIP_BIAS := &"gaf_projected_sun_mip_bias"
 const MASK := &"gaf_projected_sun_mask"
 const OPENINGS := &"gaf_projected_sun_openings"
 const CONTRAST := &"gaf_projected_sun_contrast"
@@ -24,6 +25,7 @@ var _local_region := Vector4.ZERO
 var _local_shift := Vector2.ZERO
 var _soft_path := ""
 var _softness := 0.0
+var _mip_bias := 0.
 var _softness_loaded := false
 var _opening_recovery := 0.
 var _contrast := Vector4.ZERO
@@ -90,8 +92,15 @@ func set_weight(weight: float) -> void:
 	_weight = weight
 	RenderingServer.global_shader_parameter_set(STRENGTH, weight)
 	if _weight <= 0.0:
+		set_weather_mip_bias(0.)
 		set_local_alignment(Vector4.ZERO, Vector2.ZERO)
 		set_path_recovery(Vector4.ZERO, 0.)
+
+func set_weather_mip_bias(value: float) -> void:
+	var applied := clampf(value, 0., 4.) if _weight > 0. and is_finite(value) else 0.
+	if applied != _mip_bias:
+		_mip_bias = applied
+		RenderingServer.global_shader_parameter_set(MIP_BIAS, applied)
 
 func set_opening_recovery(amount: float, phase_response: float = 0.) -> void:
 	var projection_weight := clampf(_weight / .40, 0., 1.)
@@ -159,6 +168,7 @@ func release() -> void:
 	RenderingServer.global_shader_parameter_set(LOCAL_REGION, Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set(LOCAL_SHIFT, Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set(SOFTNESS, 0.)
+	RenderingServer.global_shader_parameter_set(MIP_BIAS, 0.)
 	RenderingServer.global_shader_parameter_set(OPENINGS, 0.)
 	RenderingServer.global_shader_parameter_set(CONTRAST, Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set(MASK, null)
@@ -169,6 +179,7 @@ func release() -> void:
 	_local_region = Vector4.ZERO
 	_local_shift = Vector2.ZERO
 	_softness = 0.
+	_mip_bias = 0.
 	_softness_loaded = false
 	_soft_path = ""
 	_texture = null

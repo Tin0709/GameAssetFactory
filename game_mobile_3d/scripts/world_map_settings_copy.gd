@@ -35,7 +35,7 @@ const ITEMS := {
 		"Giảm ảnh hưởng của vùng nền xa lên độ bù sáng quanh nhân vật ở góc rộng.",
 		"Thử ở bậc đá lúc 19:30 với zoom xa. 0% dùng trọng số lấy mẫu gốc."],
 	"overcast_shadow": ["Dịu bóng trưa nhiều mây", "Overcast Noon shadow contrast", "Giảm độ đậm của bóng cây và địa hình khi mây dày quanh giữa trưa.", "Bật Trời nhiều mây lúc 12:00 và so 0% với 100%."],
-	"overcast_shadow_softness": ["Mép bóng sáng chiều nhiều mây", "Cloudy morning and afternoon shadow edges", "Mở rộng mép bóng theo lượng mây vào sáng và chiều. Độ đậm của bóng giữ theo preset giờ và thời tiết.", "Bật Trời nhiều mây lúc 07:00 hoặc 16:30 rồi so 0% với 100%."],
+	"overcast_shadow_softness": ["Mép bóng sáng chiều nhiều mây", "Cloudy morning and afternoon shadow edges", "Làm dịu mép bóng và các vệt nắng nhỏ theo lượng mây vào sáng và chiều. Độ đậm bóng giữ theo preset giờ và thời tiết.", "Bật Trời nhiều mây lúc 07:00 hoặc 16:30 rồi so 0% với 100%."],
 	"overcast_phase_color": ["Giữ sắc nắng theo giờ khi nhiều mây", "Overcast phase color", "Giữ một phần sắc nguồn sáng theo giờ và làm dịu sắc xanh của ánh trời trong preset nhiều mây.", "Bật Trời nhiều mây và so 0% với 100% lúc 07:00, 16:30 hoặc 18:30."],
 	"ambient_by_hour": ["Ánh trời sáng và chiều", "Time-of-day skylight", "Cỏ, đá và nhân vật nhận thêm ánh trời theo preset biome vào sáng và chiều. Nắng trực tiếp giữ cường độ riêng.", "So 0% với mặc định 100% lúc 07:00 hoặc 16:30. Buổi trưa, chạng vạng và đêm giữ mức hiện tại."],
 	"ambient_tint_by_hour": ["Sắc ánh trời theo giờ", "Time-of-day skylight tint", "Đổi sắc ánh trời lên các bề mặt theo preset biome và giữ độ sáng của nguồn.", "Trong Forest, so 0% và 100% ở 07:00 để thấy bóng mát hơn, rồi ở 09:00 để thấy bóng dịu xanh hơn. Có hiệu ứng cả khi trời nhiều mây."],
