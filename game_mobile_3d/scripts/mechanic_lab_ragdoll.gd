@@ -460,7 +460,7 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 				and _wall_blocks_every_handoff_shift(space, collision_mask, wall, wall_bounds, region, floor_bounds):
 			shift_known = false
 			continue
-		if idle_weight < 1.0 and _wall_handoff_part_cannot_clear(space, region, wall_bounds, floor_bounds):
+		if idle_weight < 1.0 and _wall_handoff_part_cannot_clear(region, wall_bounds, floor_bounds):
 			shift_known = false
 			continue
 		var clear_parts := _find_clear_handoff_parts(region, floor_bounds, wall_bounds)
@@ -563,8 +563,7 @@ func _wall_blocks_every_handoff_shift(space: PhysicsDirectSpaceState3D, collisio
 			return true
 	return false
 
-func _wall_handoff_part_cannot_clear(space: PhysicsDirectSpaceState3D, region: AABB,
-		wall: AABB, floor_box: AABB) -> bool:
+func _wall_handoff_part_cannot_clear(region: AABB, wall: AABB, floor_box: AABB) -> bool:
 	if not region.has_volume():
 		return false
 	var wall_axis := Vector3.AXIS_X if wall.size.x < wall.size.z else Vector3.AXIS_Z
@@ -591,11 +590,9 @@ func _wall_handoff_part_cannot_clear(space: PhysicsDirectSpaceState3D, region: A
 		var envelope := bounds.grow(shift_margin)
 		if not region.encloses(envelope) or envelope.intersects(floor_box):
 			continue
-		# Confirm with the physics query at maximum travel toward the nearer face.
-		var escape := Vector3.ZERO
-		escape[wall_axis] = -HANDOFF_MAX_SHIFT if low_depth <= high_depth else HANDOFF_MAX_SHIFT
-		if not _wall_handoff_part_is_clear(space, body, pose.translated(escape)):
-			return true
+		# Neither broad face clears the allowed overlap at maximum travel.
+		# The certified envelope rules out the floor, other colliders, and relief at a wall edge.
+		return true
 	return false
 
 func _preserve_wall_handoff_branches(space: PhysicsDirectSpaceState3D, collision_mask: int,
