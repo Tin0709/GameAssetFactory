@@ -104,6 +104,24 @@ func check_airborne(lab: Node, group: Node) -> void:
 			and actor.animation.current_animation_position > onset, "The fall plays continuously while airborne")
 		check(await await_clip(actor, [STYLED_IDLE, STYLED_ALERT, STYLED_WALK], 90),
 			"The zombie recovers its A&S ground animation after landing")
+		for tick in 23:
+			await physics_frame
+		var skeleton := actor.ragdoll.skeleton
+		var spine := skeleton.find_bone(&"J_Spine")
+		var leg := skeleton.find_bone(&"J_L_Leg")
+		var compressed := skeleton.get_bone_pose_position(spine)
+		var planted := skeleton.get_bone_global_pose(leg)
+		actor.animation.advance(0.0)
+		check(compressed.distance_to(skeleton.get_bone_pose_position(spine)) > 0.02,
+			"Each age carries the source landing compression over its ground animation")
+		check(planted.is_equal_approx(skeleton.get_bone_global_pose(leg)),
+			"Landing compression leaves the ground gait's leg pose intact")
+		for tick in 50:
+			await physics_frame
+		var settled := skeleton.get_bone_pose_position(spine)
+		actor.animation.advance(0.0)
+		check(settled.is_equal_approx(skeleton.get_bone_pose_position(spine)),
+			"The landing pose settles without residual compression")
 		actor.free()
 
 func run() -> void:
