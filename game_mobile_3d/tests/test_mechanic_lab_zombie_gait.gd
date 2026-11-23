@@ -26,8 +26,14 @@ func await_clip(actor: Zombie, clips: Array, timeout := 300) -> bool:
 	return false
 
 func select(mode: OptionButton, index: int) -> void:
-	mode.select(index)
-	mode.item_selected.emit(index)
+	var menu := mode.get_popup()
+	var key := KEY_F7 + index
+	menu.set_item_accelerator(index, key)
+	var input := InputEventKey.new()
+	input.keycode = key
+	input.pressed = true
+	check(menu.activate_item_by_event(input) and mode.selected == index,
+		"The zombie style can be activated through the menu")
 
 func run() -> void:
 	var lab := Lab.instantiate()
