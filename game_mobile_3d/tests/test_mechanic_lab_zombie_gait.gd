@@ -58,7 +58,7 @@ func idle_audio_ticks(mode: OptionButton, actors: Array[Zombie], style: int,
 	return ticks
 
 func check_stationary_run(actor: Zombie) -> void:
-	var samples := [0]
+	var samples: Array[int] = [0]
 	var count_sample := func(): samples[0] += 1
 	actor._skipped_blocked_step = true
 	actor._play_gait()
