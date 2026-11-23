@@ -516,23 +516,39 @@ func check_non_grass_landing(lab, dust: Node3D) -> void:
 	slab.add_child(collision)
 	lab.add_child(slab)
 	var heavy_landings: Array[Vector3] = []
+	var heavy_ticks: Array[int] = []
 	var record_heavy := func(point: Vector3, _direction: Vector3, _serial: int, _height: float):
 		heavy_landings.append(point)
+		heavy_ticks.append(Engine.get_physics_frames())
 	lab.player.heavy_jump_landed.connect(record_heavy)
 	toggle.button_pressed = true
-	for heavy in [false, true]:
+	for attack: StringName in [&"ordinary", &"sabre", &"sword"]:
+		var heavy := attack != &"ordinary"
+		if attack == &"sword":
+			lab._select_weapon(lab.Weapon.SWORD)
+			check(lab._equipped_weapon == lab.Weapon.SWORD, "The slab fixture equips Sword before takeoff")
 		lab.reset_player()
 		lab.player.global_position = Vector3(0.53, 1.0, 0.0)
 		var ordinary_before: int = movement.event_count.landing
 		var heavy_before: int = audio._next_choice.get(&"slam_grass", 0)
+		var sword_before: int = audio._next_choice.get(&"slam", 0)
 		heavy_landings.clear()
+		heavy_ticks.clear()
 		if heavy:
 			lab.player.global_position.y = 5.0
 			await press_heavy_attack()
 		var peak_dust := 0
+		var sword_tick := -1
+		var sword_point := Vector3.INF
 		for i in 70:
 			await physics_frame
 			peak_dust = maxi(peak_dust, visible_particles(dust))
+			if sword_tick < 0 and audio._next_choice.get(&"slam", 0) != sword_before:
+				sword_tick = Engine.get_physics_frames() - 1
+				for voice: AudioStreamPlayer3D in audio._voices:
+					if voice.stream in audio._groups[&"slam"]:
+						sword_point = voice.global_position
+						break
 		check(lab.player.is_on_floor() and lab.player.global_position.y > 0.20,
 			"The player's capsule comes to rest on the raised slab")
 		check(heavy_landings.size() == int(heavy) and peak_dust == 0
@@ -542,7 +558,15 @@ func check_non_grass_landing(lab, dust: Node3D) -> void:
 		print("MECHANIC_LAB_SLAB_LANDING heavy=", heavy, " y=", lab.player.global_position.y,
 			" peak_dust=", peak_dust, " grass_landings=", movement.event_count.landing - ordinary_before,
 			" heavy_landings=", heavy_landings.size())
+		if attack == &"sword":
+			check(heavy_ticks.size() == 1 and sword_tick == heavy_ticks[0]
+				and audio._next_choice.get(&"slam", 0) == (sword_before + 1) % audio._groups[&"slam"].size(),
+				"Sword plays one verified heavy-hit sample on touchdown without a grass layer")
+			check(sword_point.is_finite() and absf(sword_point.y - 0.24) < 0.015,
+				"The Sword heavy-hit sample starts on the slab's real support surface")
+			print("MECHANIC_LAB_SWORD_SLAB_AUDIO tick=", sword_tick, " support=", sword_point)
 	lab.player.heavy_jump_landed.disconnect(record_heavy)
+	lab._select_weapon(lab.Weapon.SABRE)
 	toggle.button_pressed = false
 	slab.free()
 	lab.reset_player()
