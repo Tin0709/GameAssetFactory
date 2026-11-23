@@ -4,6 +4,9 @@ const Lab := preload("res://scenes/dev/MechanicLab.tscn")
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const STYLED_IDLE := &"Zombie_AS_Idle"
 const STYLED_WALK := &"Zombie_AS_Move"
+const STYLED_RUN := &"Zombie_AS_Pursuit"
+const STYLED_FALL := &"Zombie_AS_Fall"
+const STYLED_ALERT := &"Zombie_AS_Alert"
 const STYLED_ATTACK := &"Zombie_AS_Attack"
 const STYLED_SPAWN := &"Zombie_AS_Spawn"
 const STYLED_STAGGER := &"Zombie_AS_Stagger"
@@ -87,7 +90,7 @@ func run() -> void:
 	root.add_child(lab)
 	current_scene = lab
 	var mode := lab.get_node_or_null("HUD/ZombieGait") as OptionButton
-	check(mode != null and mode.item_count == 2 and mode.selected == 0 and not mode.disabled
+	check(mode != null and mode.item_count == 2 and not mode.disabled
 		and not mode.is_item_disabled(1),
 		"The Lab offers MD2 and Actions & Stuff for both zombie types")
 	if failures > 0:
@@ -103,6 +106,19 @@ func run() -> void:
 		return
 	var adult := group.get_child(0) as Zombie
 	var baby := group.get_child(1) as Zombie
+	if "--require-baby-source" in OS.get_cmdline_user_args():
+		check(mode.selected == 1, "Full A&S is selected when the verified pack is available")
+		check(adult.animation.current_animation == STYLED_SPAWN
+			and baby.animation.current_animation == STYLED_SPAWN, "Both ages spawn in the selected A&S style")
+		for actor: Zombie in [adult, baby]:
+			check(actor.animation.has_animation(STYLED_ALERT) and actor.animation.has_animation(STYLED_FALL),
+				"Each age has source alert and airborne poses")
+			if actor.animation.has_animation(STYLED_FALL):
+				actor.position.y = 3.0
+				actor.animation.play(STYLED_IDLE)
+				check(await await_clip(actor, [STYLED_FALL], 20), "A live fall selects the A&S fall clip")
+		check(adult.animation.has_animation(STYLED_RUN), "The adult has a distinct sourced pursuit gait")
+	select(mode, 0)
 	adult.position = Vector3.ZERO
 	baby.position = Vector3(-32.0, 0.0, 0.0)
 	lab.player.position = Vector3(26.0, 0.0, 0.0)
@@ -122,12 +138,13 @@ func run() -> void:
 			"The source Baby Zombie uses its own 0.4375-second stride")
 	lab.player.position = adult.position + Vector3(7.0, 0.0, 0.0)
 	var steps: Array[Vector3] = []
+	var pursuit := STYLED_RUN if "--require-baby-source" in OS.get_cmdline_user_args() else STYLED_WALK
 	adult.step_audio.connect(func(point: Vector3):
-		if adult.animation.current_animation == STYLED_WALK:
+		if adult.animation.current_animation == pursuit:
 			steps.append(adult.to_local(point)))
 	for tick in 40:
 		await physics_frame
-	check(adult.animation.current_animation == STYLED_WALK, "An adult uses the source stride in pursuit")
+	check(adult.animation.current_animation == pursuit, "An adult uses the source pursuit animation")
 	check(absf(adult.get_real_velocity().slide(Vector3.UP).length() - Zombie.CHASE_SPEED) < 0.05,
 		"The expressive run keeps the pursuit speed")
 	for tick in 43:
