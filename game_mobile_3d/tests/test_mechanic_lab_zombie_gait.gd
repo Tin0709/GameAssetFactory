@@ -70,9 +70,10 @@ func check_stationary_run(actor: Zombie) -> void:
 		actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
 	check(actor.animation.current_animation == STYLED_WALK and after_first > 0 and samples[0] == after_first,
 		"A blocked A&S stride publishes its pose once and reuses it while the phase holds")
+	var before_seek := samples[0]
 	actor.animation.seek(0.24)
 	actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
-	check(samples[0] == after_first + 1, "Seeking the held clip publishes the newly requested pose")
+	check(samples[0] == before_seek + 1, "Seeking the held clip publishes the newly requested pose")
 	actor.animation.stop(true)
 	actor._play_gait()
 	actor.animation.seek(0.24)
