@@ -21,6 +21,7 @@ global uniform vec2 gaf_path_sun_core;
 global uniform vec3 gaf_path_sun_core_direction;
 global uniform vec4 gaf_path_projector_lift;
 global uniform vec4 gaf_stone_projector_lift;
+global uniform float gaf_stone_top_sun_gain;
 varying vec2 stone_sunset_position;
 varying float terrain_canopy_ground_ev;
 global uniform float gaf_canopy_terrain_contrast;
@@ -273,6 +274,14 @@ void light() {
 #endif
 		vec3 diffuse_incident = incident;
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
+		if (gaf_stone_top_sun_gain > 0.0 && LIGHT_IS_DIRECTIONAL && ground_grade == 3 &&
+				surface_top > .998 && use_source_terrain &&
+				dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_projector_lift.xyz) > .9999 &&
+				distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= .005) {
+			// Ramp in after the dim shoulder so the shaded stone keeps its existing response.
+			float beam = shadow_attenuation * cloud_transmission;
+			diffuse_incident *= 1.0 + gaf_stone_top_sun_gain * smoothstep(.48, .88, beam);
+		}
 		if (gaf_stone_projector_lift.w > 0.0 && LIGHT_IS_DIRECTIONAL && ground_grade == 3 &&
 				use_source_terrain && surface_top > .998 && shadow_attenuation > 0.0 &&
 				gaf_projected_sun_strength > .05 &&
