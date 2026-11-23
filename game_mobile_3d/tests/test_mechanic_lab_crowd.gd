@@ -13,6 +13,7 @@ const WALL_HANDOFF_POSES := [[ZOMBIE.ATTACK, 3, 17],
 const AS_ADULT_WALL_POSES := [[ZOMBIE.ActionsStuff.IDLE, 6, 11],
 	[ZOMBIE.ActionsStuff.MOVE, 0, 7], [ZOMBIE.ActionsStuff.ATTACK, 2, 6]]
 const AS_BABY_WALL_POSE := [ZOMBIE.ActionsStuff.ATTACK, 6, 9]
+const AS_BABY_113_WALL_POSE := [ZOMBIE.ActionsStuff.ATTACK, 2, 10]
 const ACTIONS_STUFF_CLIPS := [ZOMBIE.ActionsStuff.SPAWN, ZOMBIE.ActionsStuff.IDLE,
 	ZOMBIE.ActionsStuff.MOVE, ZOMBIE.ActionsStuff.PURSUIT, ZOMBIE.ActionsStuff.ALERT,
 	ZOMBIE.ActionsStuff.JUMP, ZOMBIE.ActionsStuff.FALL, ZOMBIE.ActionsStuff.ATTACK, ZOMBIE.ActionsStuff.STAGGER]
@@ -374,7 +375,10 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool, actions_stuf
 		if wall_handoff and i < wall_members:
 			var pose: Array
 			if actions_stuff:
-				pose = AS_BABY_WALL_POSE if zombie.is_baby else AS_ADULT_WALL_POSES[i % AS_ADULT_WALL_POSES.size()]
+				if zombie.is_baby:
+					pose = AS_BABY_113_WALL_POSE if group.full_actions_stuff_available else AS_BABY_WALL_POSE
+				else:
+					pose = AS_ADULT_WALL_POSES[i % AS_ADULT_WALL_POSES.size()]
 				start_time = zombie.animation.get_animation(pose[0]).length * float(pose[2]) / 16.0
 			else:
 				pose = WALL_HANDOFF_POSES[2 if zombie.is_baby else i % WALL_HANDOFF_POSES.size()]
