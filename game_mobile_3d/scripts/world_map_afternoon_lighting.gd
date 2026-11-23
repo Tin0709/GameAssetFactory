@@ -47,7 +47,7 @@ func setup(level: Node3D, sky: Node) -> void:
 		return
 	var west := _air_atlas(air, air.texture, proof.west)
 	var east := _air_atlas(air, air.east_texture, proof.east)
-	var terrain = level.regional_sky_region._load_volume(proof.terrain.path, proof.terrain.sha256,
+	var terrain: ImageTexture3D = level.regional_sky_region._load_volume(proof.terrain.path, proof.terrain.sha256,
 		int(proof.terrain.depth))
 	if west == null or east == null or terrain == null:
 		return
@@ -61,6 +61,8 @@ func setup(level: Node3D, sky: Node) -> void:
 		if not field.available():
 			return
 		actor_fields.append(field)
+	if actor_fields.size() != 2:
+		return
 
 	_noon_axis = Vector3(noon.x, 0., noon.z).normalized()
 	_right = Vector3.UP.cross(_noon_axis).normalized()
@@ -75,7 +77,7 @@ func setup(level: Node3D, sky: Node) -> void:
 		_terrain_directions.append(_vector(row.dir))
 		_terrain_layers.append(row.layer)
 	_actor_fields = actor_fields
-	_terrain_texture_set(terrain)
+	terrain_texture = terrain
 	_review = review
 	_casters_current = Callable(sky, "east_casters_current")
 	air.texture = west
@@ -111,10 +113,6 @@ func _under_root(root: String, relative: String) -> String:
 
 func _vector(values: Array) -> Vector3:
 	return Vector3(values[0], values[1], values[2])
-
-
-func _terrain_texture_set(value: ImageTexture3D) -> void:
-	terrain_texture = value
 
 
 func apply(sun: DirectionalLight3D) -> void:

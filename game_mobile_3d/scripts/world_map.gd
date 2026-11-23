@@ -123,6 +123,9 @@ var biome_controller: BiomeGraphics
 @export var forest_canopy_extension_sha256 := ""
 @export var east_air_profile := ""
 @export var east_air_profile_sha256 := ""
+## Optional directional lighting for this placement, relative to the research directory.
+@export var afternoon_lighting_profile := ""
+@export var afternoon_lighting_sha256 := ""
 @export var forest_road_layout_profile := ""
 @export var forest_road_layout_sha256 := ""
 @export var terrain_canopy_sky_profile := ""
@@ -306,6 +309,7 @@ func _ready() -> void:
 		elif spruce_sky.proof_ready:
 			showcase.mist.set_sky_field(spruce_sky.mist_sky_field(), spruce_sky.mist_sky_current)
 		showcase._refresh_lighting_mix(&"mist_sky_scatter")
+	showcase.afternoon_lighting.setup(self, spruce_sky)
 	showcase.prepare_grass_terrace_shadow()
 	showcase.prepare_near_wall_lighting()
 	_setup_far_shadow_review()

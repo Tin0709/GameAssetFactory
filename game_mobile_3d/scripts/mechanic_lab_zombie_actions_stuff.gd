@@ -128,6 +128,21 @@ static func build(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: 
 	library.add_animation(STAGGER, _bake(skeleton, player.get_parent(),
 		idle_source, Vector3.ZERO, stagger_seconds))
 
+class RetargetBone:
+	var rest_position: Vector3
+	var rest_rotation: Quaternion
+	var source_rest_position: Vector3
+	var source_rest_inverse: Quaternion
+	var to_local: Quaternion
+	var to_model: Quaternion
+	var source_position: int
+	var source_rotation: int
+	var position: int
+	var rotation: int
+	var sole: Vector3
+	var across: Vector3
+	var depth: Vector3
+
 static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
 		attack_timing := Vector3.ZERO, intro_length := 0.0, grounded := true) -> Animation:
 	var clip := Animation.new()
@@ -135,9 +150,10 @@ static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
 	clip.length = attack_timing.z if attack_timing.z > 0.0 else source_length
 	clip.loop_mode = source.loop_mode if intro_length == 0.0 else Animation.LOOP_NONE
 	var path := model.get_path_to(skeleton)
-	var channels: Array[Dictionary] = []
+	var channels: Array[RetargetBone] = []
 	var hip := skeleton.find_bone(&"J_Hip")
 	var hip_parent := skeleton.get_bone_global_rest(skeleton.get_bone_parent(hip))
+	var floor_up := hip_parent.basis.inverse() * Vector3.UP
 	var leg_length := skeleton.get_bone_global_rest(hip).origin.y
 	var rig_scale := leg_length / SOURCE_LEG_HEIGHT
 	var mapped_bones: Array[int] = []
@@ -151,18 +167,23 @@ static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
 		var parent := skeleton.get_bone_global_rest(skeleton.get_bone_parent(bone))
 		var to_local := parent.basis.get_rotation_quaternion().inverse()
 		var rest := skeleton.get_bone_rest(bone)
-		channels.append({
-			"rest_position": rest.origin,
-			"rest_rotation": rest.basis.get_rotation_quaternion(),
-			"source_rest_position": binding[2],
-			"source_rest_inverse": source_rest.inverse(),
-			"to_local": to_local,
-			"to_model": to_local.inverse(),
-			"source_position": source.find_track(source_path, Animation.TYPE_POSITION_3D),
-			"source_rotation": source.find_track(source_path, Animation.TYPE_ROTATION_3D),
-			"position": _track(clip, bone_path, Animation.TYPE_POSITION_3D),
-			"rotation": _track(clip, bone_path, Animation.TYPE_ROTATION_3D),
-		})
+		var channel := RetargetBone.new()
+		channel.rest_position = rest.origin
+		channel.rest_rotation = rest.basis.get_rotation_quaternion()
+		channel.source_rest_position = binding[2]
+		channel.source_rest_inverse = source_rest.inverse()
+		channel.to_local = to_local
+		channel.to_model = to_local.inverse()
+		channel.source_position = source.find_track(source_path, Animation.TYPE_POSITION_3D)
+		channel.source_rotation = source.find_track(source_path, Animation.TYPE_ROTATION_3D)
+		channel.position = _track(clip, bone_path, Animation.TYPE_POSITION_3D)
+		channel.rotation = _track(clip, bone_path, Animation.TYPE_ROTATION_3D)
+		if i >= 6 and grounded:
+			var foot_basis := channel.rest_rotation.inverse() * to_local
+			channel.sole = foot_basis * (Vector3.DOWN * leg_length)
+			channel.across = foot_basis * Vector3.RIGHT
+			channel.depth = foot_basis * Vector3.BACK
+		channels.append(channel)
 	# Clear pose channels left by a previous MD2 clip. The hands, feet and face
 	# inherit the rigid parent motion without any source joint bends or scales.
 	for bone in skeleton.get_bone_count():
@@ -186,22 +207,22 @@ static func _bake(skeleton: Skeleton3D, model: Node, source: Animation,
 		for i in channels.size():
 			var channel := channels[i]
 			var offset := (source.position_track_interpolate(channel.source_position, t)
-				- (channel.source_rest_position as Vector3))
+				- channel.source_rest_position)
 			var facing := (source.rotation_track_interpolate(channel.source_rotation, t)
-				* (channel.source_rest_inverse as Quaternion))
+				* channel.source_rest_inverse)
 			if i == 3:
 				# Eyes and mouth are siblings of J_Head under J_Neck on both MD2 rigs.
 				facing *= source.rotation_track_interpolate(head_track, t)
-			positions[i] = (channel.rest_position as Vector3) + (channel.to_local as Quaternion) * offset * rig_scale
-			rotations[i] = ((channel.to_local as Quaternion) * facing * (channel.to_model as Quaternion)
-				* (channel.rest_rotation as Quaternion)).normalized()
+			positions[i] = channel.rest_position + channel.to_local * offset * rig_scale
+			rotations[i] = (channel.to_local * facing * channel.to_model
+				* channel.rest_rotation).normalized()
 		# Retargeting changes limb lengths and joint locations. Seat the lowest
 		# sole corner at ground level on this rig, keeping the source swing foot.
 		if grounded:
 			var hips := hip_parent * Transform3D(Basis(rotations[0]), positions[0])
 			var low := minf(_sole_y(hips, positions[6], rotations[6], channels[6], leg_length),
 				_sole_y(hips, positions[7], rotations[7], channels[7], leg_length))
-			positions[0] -= hip_parent.basis.inverse() * Vector3.UP * low
+			positions[0] -= floor_up * low
 		for i in channels.size():
 			clip.position_track_insert_key(channels[i].position, output_time, positions[i])
 			clip.rotation_track_insert_key(channels[i].rotation, output_time, rotations[i])
@@ -212,13 +233,12 @@ static func _track(clip: Animation, path: NodePath, type: Animation.TrackType) -
 	clip.track_set_path(index, path)
 	return index
 
-static func _sole_y(hips: Transform3D, pivot: Vector3, rotation: Quaternion, channel: Dictionary,
+static func _sole_y(hips: Transform3D, pivot: Vector3, rotation: Quaternion, channel: RetargetBone,
 		leg_length: float) -> float:
 	var leg := hips * Transform3D(Basis(rotation), pivot)
-	var from_model: Quaternion = (channel.rest_rotation as Quaternion).inverse() * (channel.to_local as Quaternion)
-	var sole := leg * (from_model * (Vector3.DOWN * leg_length))
-	var across := leg.basis * (from_model * Vector3.RIGHT)
-	var depth := leg.basis * (from_model * Vector3.BACK)
+	var sole := leg * channel.sole
+	var across := leg.basis * channel.across
+	var depth := leg.basis * channel.depth
 	return sole.y - (absf(across.y) + absf(depth.y)) * leg_length / 6.0
 
 static func _attack_time(t: float, duration: float, timing: Vector3) -> float:

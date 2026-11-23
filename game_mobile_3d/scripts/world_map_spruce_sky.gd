@@ -435,6 +435,8 @@ func refresh() -> void:
 			var weather := lerpf(1.0, profile.directional_ground_sky_overcast, review._weather.weight)
 			directional_ground = clampf(curve.sample(review.hour / 24.0), 0.0, 1.0) * weather
 			directional_ground *= review._lighting_scale(&"canopy_ground_fill")
+	if review.afternoon_lighting.active:
+		directional_ground *= review.afternoon_lighting.stock_sky_weight
 	if directional_ground != applied_directional_ground:
 		applied_directional_ground = directional_ground
 		_directional_ground_rect.w = directional_ground

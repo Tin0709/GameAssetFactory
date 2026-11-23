@@ -96,12 +96,15 @@ func refresh(force:bool=false)->void:
    and (level.look.player_local_light_enabled or level.look.player_reflection_enabled):
    var local:bool=local_phase_bounce.available() and local_phase_bounce.fade(p)>0.
    var bounce=local_phase_bounce if local else phase_bounce
+   var afternoon=level.showcase.afternoon_lighting
+   if afternoon.active:bounce=afternoon.actor_field(p)
    if bounce.available():
     var slots:Vector4=level.showcase.directional_air.sun_slots()
+    if afternoon.active:slots=afternoon.actor_slots(slots)
     var values:PackedVector3Array=bounce.sample(p,slots)
     if values.size()==18:
      bounce_sun=values
-     var phase_strength := sun.light_energy * bounce_mix * slots.w * bounce.fade(p) * (1. - noon_weight)
+     var phase_strength: float = sun.light_energy * bounce_mix * slots.w * bounce.fade(p) * (1. - noon_weight)
      if key_strength > 0. and phase_strength > 0.:
       # Both fields share the same shader key. Interpolate their probe values
       # by energy so the combined incident light is continuous through Noon.

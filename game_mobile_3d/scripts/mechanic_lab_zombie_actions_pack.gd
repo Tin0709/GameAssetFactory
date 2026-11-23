@@ -54,6 +54,14 @@ class Channel:
 				else:
 					components.append(float(component))
 
+	func varies_with_time() -> bool:
+		if not times.is_empty():
+			return times.size() > 1 or before[0] != after[0]
+		for component: Variant in components:
+			if component is Expression:
+				return true
+		return false
+
 	func sample(time: float, grounded: bool) -> Vector3:
 		if times.is_empty():
 			var point := Vector3.ZERO
@@ -121,24 +129,40 @@ static func bake(bindings: Array, layers: Array[Dictionary], duration: float, lo
 		var base_rot := base.find_track(path, Animation.TYPE_ROTATION_3D) if base else -1
 		var position_channels: Array[Channel] = []
 		var rotation_channels: Array[Channel] = []
+		# Evaluate held and constant channels once, then add layers in source order.
+		var held_positions: Array[Vector3] = []
+		var held_rotations: Array[Vector3] = []
 		for layer: Dictionary in layers:
 			var channels: Dictionary = layer.bones.get(CHANNELS.get(bone, ""), {})
-			position_channels.append(Channel.new(channels.get("position")))
-			rotation_channels.append(Channel.new(channels.get("rotation")))
+			var position := Channel.new(channels.get("position"))
+			var rotation := Channel.new(channels.get("rotation"))
+			var held := layer.has("held_time")
+			var time: float = layer.get("held_time", 0.0)
+			var static_position := held or not position.varies_with_time()
+			var static_rotation := held or not rotation.varies_with_time()
+			position_channels.append(null if static_position else position)
+			rotation_channels.append(null if static_rotation else rotation)
+			held_positions.append(position.sample(time, grounded) if static_position else Vector3.ZERO)
+			held_rotations.append(rotation.sample(time, grounded) if static_rotation else Vector3.ZERO)
+		var rest_position: Vector3 = bindings[i][2]
+		var rest_facing := Quaternion(Vector3.BACK, PI) if i >= 4 and i <= 7 else Quaternion.IDENTITY
 		for sample in range(samples + 1):
 			var time := minf(sample / rate, duration)
 			var offset := Vector3.ZERO
 			var angle := Vector3.ZERO
 			for layer_index in layers.size():
-				var clock: float = layers[layer_index].get("held_time", time)
-				offset += position_channels[layer_index].sample(clock, grounded)
-				angle += rotation_channels[layer_index].sample(clock, grounded)
-			var point: Vector3 = bindings[i][2]
-			var facing := Quaternion(Vector3.BACK, PI) if i >= 4 and i <= 7 else Quaternion.IDENTITY
-			if base_pos >= 0:
-				point = base.position_track_interpolate(base_pos, fposmod(time, base.length))
-			if base_rot >= 0:
-				facing = base.rotation_track_interpolate(base_rot, fposmod(time, base.length))
+				var position := position_channels[layer_index]
+				var rotation := rotation_channels[layer_index]
+				offset += position.sample(time, grounded) if position != null else held_positions[layer_index]
+				angle += rotation.sample(time, grounded) if rotation != null else held_rotations[layer_index]
+			var point := rest_position
+			var facing := rest_facing
+			if base != null:
+				var base_time := fposmod(time, base.length)
+				if base_pos >= 0:
+					point = base.position_track_interpolate(base_pos, base_time)
+				if base_rot >= 0:
+					facing = base.rotation_track_interpolate(base_rot, base_time)
 			# Source facing is -Z and Lab facing is +Z.
 			point += offset * Vector3(1, 1, -1) * SOURCE_PIXEL
 			var angles := angle * (PI / 180.0) * Vector3(1, -1, -1)

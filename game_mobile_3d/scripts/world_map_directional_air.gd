@@ -235,6 +235,9 @@ func sun_slots() -> Vector4:
 	gain *= smoothstep(0., .2, _sun.shadow_opacity)
 	if gain <= 0. or _sun.light_energy <= 0.:
 		return Vector4.ZERO
+	var afternoon = _review.afternoon_lighting
+	if afternoon.active:
+		return afternoon.air_slots(h, _sun.global_basis.z.normalized(), gain) if _geometry_current() else Vector4.ZERO
 	var sample_hour := h
 	if _review.sunrise_elevation_active:
 		sample_hour = _hour_for_elevation(_sun.global_basis.z.y, h)

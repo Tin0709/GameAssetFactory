@@ -302,9 +302,18 @@ func _refresh_day_bounce() -> void:
 			and review._source_terrain_toggle != null and review._source_terrain_toggle.button_pressed \
 			and is_active():
 		var sun: DirectionalLight3D = level.get_node("Sun")
-		var sample := _regional_sky.sun_bounce_sample(hour, sun.global_basis.z.normalized())
+		var direction := sun.global_basis.z.normalized()
+		var afternoon = review.afternoon_lighting
+		var sample: Vector2 = afternoon.terrain_sample(hour, direction) if afternoon.active \
+			else _regional_sky.sun_bounce_sample(hour, direction)
 		if sample.y > 0.0 and sun.is_visible_in_tree() and sun.shadow_enabled and sun.light_energy > 0.0:
-			_load_day_bounce()
+			if afternoon.active:
+				day_bounce_texture = afternoon.terrain_texture
+				matched_day_bounce_active = false
+			else:
+				if day_bounce_texture == afternoon.terrain_texture:
+					day_bounce_texture = null
+				_load_day_bounce()
 			if day_bounce_texture != null:
 				var c := sun.light_color.srgb_to_linear()
 				var rgb := Vector3(c.r, c.g, c.b) * (sun.light_energy * sample.y * strength)

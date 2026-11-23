@@ -23,6 +23,7 @@ const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
 const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
 const CrownWind := preload("res://scripts/world_map_crown_wind.gd")
 const DirectionalAir := preload("res://scripts/world_map_directional_air.gd")
+const AfternoonLighting := preload("res://scripts/world_map_afternoon_lighting.gd")
 const PlayerContact := preload("res://scripts/world_map_player_contact.gd")
 const ProjectedSun := preload("res://scripts/world_map_projected_sun.gd")
 const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
@@ -449,6 +450,7 @@ var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
 var mist:Node3D
 var directional_air := DirectionalAir.new()
+var afternoon_lighting := AfternoonLighting.new()
 var player_contact: Node
 var spatial_mist:=true
 var near_haze_enabled: bool:
@@ -3930,6 +3932,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		_apply_key_mix(sun)
 		_apply_sunrise_key(sun)
 		_apply_sunrise_elevation(sun)
+		afternoon_lighting.apply(sun)
 		# In full shade, block the direct beam and leave ambient fill to its own path.
 		_apply_direct_shadow_opacity(sun)
 		if _player_light!=null:
@@ -4204,6 +4207,7 @@ func apply_time()->void:
 		_publish_dawn_turf_color()
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
+		afternoon_lighting.active=false
 		_sync_canopy_direct()
 		key_response_active=false
 		key_direction_active=false
@@ -4216,6 +4220,8 @@ func apply_time()->void:
 		return
 	if env!=_environment:_capture_day()
 	var use_forest:=forest_active()
+	if not use_forest:
+		afternoon_lighting.active=false
 	var sun:DirectionalLight3D=level.get_node("Sun")
 	level.look.refresh_directional_shadow_blur(sun)
 	level.look.refresh_daylight_cloud_shape()
