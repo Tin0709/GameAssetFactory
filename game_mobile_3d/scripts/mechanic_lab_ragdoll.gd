@@ -1072,8 +1072,9 @@ func _constrain_free_anchor_motion(body: PhysicalBone3D, state: PhysicsDirectBod
 	if not floor_landing_blended:
 		# During first impact, a short downward component can cause the ground
 		# sweep to discard nearly all of a free leg's sideways anchor recovery.
-		var room := bounds.position.y - floor_half.y - PROJECTION_COLLISION_MARGIN
-		motion.y = maxf(motion.y, -maxf(room, 0.0))
+		var limit := -maxf(bounds.position.y - floor_half.y - PROJECTION_COLLISION_MARGIN, 0.0)
+		if motion.y < limit and not _floor_roll_nears_obstacle(_flat_floor.get_parent().get_rid(), true):
+			motion.y = limit
 		return motion
 	# Keep the preceding floor recovery when the joint would move a limb
 	# below the resting clearance. Keep the tighter Sabre roll behavior.
