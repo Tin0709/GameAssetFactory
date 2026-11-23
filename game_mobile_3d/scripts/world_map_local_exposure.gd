@@ -2,6 +2,8 @@ extends CompositorEffect
 ## A bounded local contrast adjustment on the resolved scene before Godot's tone curve.
 
 const TILE_SIZE := 16
+const FILTERED_METER_MIN_PIXELS := 1600 * 900
+const FILTERED_METER_FORMAT := RenderingDevice.DATA_FORMAT_R32_SFLOAT
 const HDR_FORMAT := RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT
 var _source_format:=0
 const COLOR_FORMAT := RenderingDevice.DATA_FORMAT_A2B10G10R10_UNORM_PACK32
@@ -37,6 +39,35 @@ void main() {
 	result = sum / 16.0;
 }
 """
+const METER_AREA := """
+float sample_meter_area(vec2 pixel) {
+	vec2 grid = vec2(textureSize(log_meter, 0));
+	vec2 uv = pixel / (16.0 * grid);
+	vec2 step_uv = 1.5 / grid;
+	float value = textureLod(log_meter, uv, 0.0).r * 0.40;
+	value += 0.15 * (
+		textureLod(log_meter, uv + vec2(step_uv.x, 0.0), 0.0).r +
+		textureLod(log_meter, uv - vec2(step_uv.x, 0.0), 0.0).r +
+		textureLod(log_meter, uv + vec2(0.0, step_uv.y), 0.0).r +
+		textureLod(log_meter, uv - vec2(0.0, step_uv.y), 0.0).r
+	);
+	return value;
+}
+"""
+const FILTERED_METER_AREA := """
+float sample_meter_area(vec2 pixel) {
+	vec2 uv = (pixel / 8.0 + 0.5) / vec2(textureSize(log_meter, 0));
+	return textureLod(log_meter, uv, 0.0).r;
+}
+"""
+const FILTER_METER := """#version 450
+layout(set=0,binding=1) uniform sampler2D log_meter;
+layout(location=0) out float result;
+""" + METER_AREA + """
+void main() {
+	result = sample_meter_area((gl_FragCoord.xy - 0.5) * 8.0);
+}
+"""
 const APPLY := """#version 450
 layout(set=0,binding=0) uniform sampler2D source_color;
 layout(set=0,binding=1) uniform sampler2D log_meter;
@@ -44,22 +75,14 @@ layout(set=0,binding=2) uniform sampler2D soft_light;
 layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; vec4 finish; };
 layout(location=0) out vec4 result;
 const vec3 luma = vec3(0.2126, 0.7152, 0.0722);
+""" + METER_AREA + """
 void main() {
 	vec4 color = texelFetch(source_color, ivec2(gl_FragCoord.xy), 0);
 	if (settings.x <= 0.0 && air.x <= 0.0) {
 		result = color;
 		return;
 	}
-	vec2 grid = vec2(textureSize(log_meter, 0));
-	vec2 uv = gl_FragCoord.xy / (16.0 * grid);
-	vec2 step_uv = 1.5 / grid;
-	float log_area = textureLod(log_meter, uv, 0.0).r * 0.40;
-	log_area += 0.15 * (
-		textureLod(log_meter, uv + vec2(step_uv.x, 0.0), 0.0).r +
-		textureLod(log_meter, uv - vec2(step_uv.x, 0.0), 0.0).r +
-		textureLod(log_meter, uv + vec2(0.0, step_uv.y), 0.0).r +
-		textureLod(log_meter, uv - vec2(0.0, step_uv.y), 0.0).r
-	);
+	float log_area = sample_meter_area(gl_FragCoord.xy);
 	float y = dot(color.rgb, luma);
 	float log_pixel = log2(max(y, 0.002*(air.z>.5?2.0:1.0)));
 	// Let the current pixel moderate a dark or bright neighborhood.
@@ -148,7 +171,7 @@ func set_coherent_bloom_source(value:bool)->void:
 	_guard.lock();_coherent_bloom_source=value;_guard.unlock()
 func _coherent_air_source(block:int=4)->String:
 	# Reuse the single authoritative gain body; no independently drifting formula.
-	var first:=APPLY.find("\tvec2 grid =")
+	var first:=APPLY.find("\tfloat log_area =")
 	var last:=APPLY.find("\tvec3 adjusted =")
 	if first<0 or last<=first:
 		_report("error","Scene exposure gain contract changed");return ""
@@ -157,7 +180,7 @@ func _coherent_air_source(block:int=4)->String:
 	var main_start:=AIR_SOURCE.find("void main(){")
 	if main_start<0:
 		_report("error","Bloom source exposure contract changed");return ""
-	var source:=AIR_SOURCE.substr(0,main_start)+fn+"""void main(){
+	var source:=AIR_SOURCE.substr(0,main_start)+METER_AREA+fn+"""void main(){
  ivec2 dimensions=textureSize(source_color,0);
  ivec2 first=ivec2(gl_FragCoord.xy)*4;vec3 sum=vec3(0.);
  for(int y=0;y<4;y++)for(int x=0;x<4;x++){
@@ -284,6 +307,10 @@ func _sample(binding: int, sampler: RID, texture: RID) -> RDUniform:
 	return uniform
 
 func _prepare_pass(rd: RenderingDevice, fragment: String, framebuffer: RID, uniforms: Array[RDUniform]) -> bool:
+	if _meter_lattice.is_valid() and fragment.contains(METER_AREA):
+		fragment = fragment.replace(METER_AREA, FILTERED_METER_AREA)
+		uniforms = uniforms.duplicate()
+		uniforms[1] = _sample(1, uniforms[1].get_ids()[0], _meter_lattice)
 	var source := RDShaderSource.new()
 	source.source_vertex = VERTEX
 	source.source_fragment = fragment
@@ -312,7 +339,30 @@ func _prepare_pass(rd: RenderingDevice, fragment: String, framebuffer: RID, unif
 	return true
 
 var _air_bytes:=0
+var _air_pass_start := 2
 var _air_pass_end:=5
+var _meter_lattice := RID()
+
+func _build_filtered_meter(rd: RenderingDevice, meter: RID, meter_size: Vector2i, linear: RID) -> int:
+	if not rd.sampler_is_format_supported_for_filter(FILTERED_METER_FORMAT, RenderingDevice.SAMPLER_FILTER_LINEAR):
+		return 0
+	# The five bilinear taps change slope on half-cell boundaries. Sampling
+	# their sum on that grid preserves the filter, including its clamped edges.
+	var extent := meter_size * 2 + Vector2i.ONE
+	var resource_count := _resources.size()
+	var filtered := _texture(rd, extent.x, extent.y, FILTERED_METER_FORMAT)
+	if not filtered.is_valid():
+		return 0
+	var target := _keep(rd.framebuffer_create([filtered]))
+	if not target.is_valid() or not _prepare_pass(rd, FILTER_METER, target, [_sample(1, linear, meter)]):
+		# Preserve the original five-tap path if this optional pass cannot build.
+		while _resources.size() > resource_count:
+			rd.free_rid(_resources.pop_back())
+		_report("error", "")
+		return 0
+	_meter_lattice = filtered
+	return extent.x * extent.y * 4
+
 func _build_air(rd:RenderingDevice,copy:RID,meter:RID,format:RDTextureFormat,linear:RID)->RID:
 	var small: Array[RID]=[]
 	for i in 3:
@@ -344,12 +394,17 @@ func _build(rd: RenderingDevice, color: RID, format: RDTextureFormat) -> bool:
 	if not nearest.is_valid() or not linear.is_valid(): return false
 	if not _prepare_pass(rd, COPY, copy_fb, [_sample(0, nearest, color)]): return false
 	if not _prepare_pass(rd, METER, meter_fb, [_sample(0, nearest, copy)]): return false
+	var filtered_bytes := 0
+	if format.width * format.height >= FILTERED_METER_MIN_PIXELS:
+		filtered_bytes = _build_filtered_meter(rd, meter, Vector2i(width, height), linear)
+	_air_pass_start = _passes.size()
 	var soft:=_build_air(rd,copy,meter,format,linear)
 	if not soft.is_valid():return false
 	_air_pass_end=_passes.size()
 	if not _prepare_pass(rd, APPLY, _scene_framebuffer, [_sample(0, nearest, copy), _sample(1, linear, meter),_sample(2,linear,soft)]): return false
 	_report("coherent_bloom",_render_coherent_bloom)
-	_report("bytes", format.width * format.height * (8 if format.format==HDR_FORMAT else 4) + width * height * 2 + _air_bytes)
+	_report("meter_lattice_bytes", filtered_bytes)
+	_report("bytes", format.width * format.height * (8 if format.format==HDR_FORMAT else 4) + width * height * 2 + _air_bytes + filtered_bytes)
 	_guard.lock()
 	if _state.rebuilds == 0: _state.first_build_us = Time.get_ticks_usec() - start
 	_state.rebuilds += 1
@@ -396,7 +451,7 @@ func _render_callback(kind: int, data: RenderData) -> void:
 		parameters.encode_float(24,1.)
 	var needs_soft_light := parameters.decode_float(16) > 0.0 or finish_needs_soft_light
 	for index in _passes.size():
-		if index >= 2 and index < _air_pass_end and not needs_soft_light: continue
+		if index >= _air_pass_start and index < _air_pass_end and not needs_soft_light: continue
 		var pass_data := _passes[index]
 		var list := rd.draw_list_begin(pass_data[0])
 		rd.draw_list_bind_render_pipeline(list, pass_data[1])
@@ -421,6 +476,8 @@ func _release(rd: RenderingDevice) -> void:
 		rd.free_rid(rid)
 	_resources.clear()
 	_passes.clear()
+	_meter_lattice = RID()
+	_report("meter_lattice_bytes", 0)
 	_report("bytes", 0)
 	_color = RID()
 	_scene_uniform = RID()
