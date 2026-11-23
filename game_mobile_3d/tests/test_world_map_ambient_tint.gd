@@ -20,10 +20,13 @@ func linear_rgb(color: Color) -> Vector3:
 	var linear := color.srgb_to_linear()
 	return Vector3(linear.r, linear.g, linear.b)
 
-func check_tint(before: Color, after: Color, label: String) -> void:
+func check_tint(before: Color, after: Color, label: String, warm := false) -> void:
 	var source := linear_rgb(before)
 	var target := linear_rgb(after)
-	check(target.z > source.z and target.x < source.x, label + " cools the existing sky tint")
+	var red_up := target.x > source.x
+	var blue_up := target.z > source.z
+	check(red_up == warm and blue_up != warm and source.x != target.x and source.z != target.z,
+		label + " shifts the existing sky in the expected direction")
 	check(absf(target.dot(LUMA) - source.dot(LUMA)) < 1e-6, label + " preserves linear luminance")
 
 func run() -> void:
@@ -32,6 +35,7 @@ func run() -> void:
 		var base := Color(.68, .73, .81, .6)
 		var at_peak: Color = FOREST.call("tint_ambient", 7., base)
 		check_tint(base, at_peak, "Forest at 07:00")
+		check_tint(base, FOREST.call("tint_ambient", 9., base), "Forest at 09:00", true)
 		check(is_equal_approx(at_peak.a, base.a), "Ambient tint preserves alpha")
 		for hour in [0., 5.1, 10., 12., 16.5, 19.5, 22.]:
 			check(FOREST.call("tint_ambient", hour, base) == base, "Forest outside the morning curve is exact at %s" % hour)
@@ -48,17 +52,18 @@ func run() -> void:
 		var slider := showcase._lighting_sliders.get(CONTROL) as HSlider
 		check(slider != null and slider.value == 1., "WorldMap has a default-on live slider")
 		if slider != null:
-			for cloud: float in [0., 1.]:
-				showcase.set_weather(cloud, 0.)
-				showcase.set_hour(7.)
-				slider.value = 0.
-				var base := env.ambient_light_color
-				var energy := env.ambient_light_energy
-				var key := [sun.light_color, sun.light_energy, sun.rotation]
-				slider.value = 1.
-				check_tint(base, env.ambient_light_color, "Live Forest, cloud %s" % cloud)
-				check(env.ambient_light_energy == energy and key == [sun.light_color, sun.light_energy, sun.rotation],
-					"Live tint preserves source strength and direct key")
+			for hour: float in [7., 9.]:
+				for cloud: float in [0., 1.]:
+					showcase.set_weather(cloud, 0.)
+					showcase.set_hour(hour)
+					slider.value = 0.
+					var base := env.ambient_light_color
+					var energy := env.ambient_light_energy
+					var key := [sun.light_color, sun.light_energy, sun.rotation]
+					slider.value = 1.
+					check_tint(base, env.ambient_light_color, "Live Forest at %s, cloud %s" % [hour, cloud], hour == 9.)
+					check(env.ambient_light_energy == energy and key == [sun.light_color, sun.light_energy, sun.rotation],
+						"Live tint preserves source strength and direct key")
 			for hour: float in [12., 16.5, 19.5, 22.]:
 				showcase.set_hour(hour)
 				slider.value = 0.
@@ -93,6 +98,11 @@ func run() -> void:
 		profile.set("ambient_tint_ratio", FOREST.get("ambient_tint_ratio"))
 		meadow.biome_controller.set_profile(profile)
 		check_tint(original, env.ambient_light_color, "Portable Meadow route with a custom preset")
+		meadow.biome_controller.set_profile(MEADOW)
+		meadow.showcase.set_hour(9.)
+		original = env.ambient_light_color
+		meadow.biome_controller.set_profile(profile)
+		check_tint(original, env.ambient_light_color, "Portable Meadow route at 09:00", true)
 	meadow.free()
 	await process_frame
 	print("AMBIENT_TINT checks=", checks, " failures=", JSON.stringify(failures))
