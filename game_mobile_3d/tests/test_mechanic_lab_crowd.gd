@@ -14,7 +14,8 @@ const AS_ADULT_WALL_POSES := [[ZOMBIE.ActionsStuff.IDLE, 6, 11],
 	[ZOMBIE.ActionsStuff.MOVE, 0, 7], [ZOMBIE.ActionsStuff.ATTACK, 2, 6]]
 const AS_BABY_WALL_POSE := [ZOMBIE.ActionsStuff.ATTACK, 6, 9]
 const ACTIONS_STUFF_CLIPS := [ZOMBIE.ActionsStuff.SPAWN, ZOMBIE.ActionsStuff.IDLE,
-	ZOMBIE.ActionsStuff.MOVE, ZOMBIE.ActionsStuff.ATTACK, ZOMBIE.ActionsStuff.STAGGER]
+	ZOMBIE.ActionsStuff.MOVE, ZOMBIE.ActionsStuff.PURSUIT, ZOMBIE.ActionsStuff.ALERT,
+	ZOMBIE.ActionsStuff.JUMP, ZOMBIE.ActionsStuff.FALL, ZOMBIE.ActionsStuff.ATTACK, ZOMBIE.ActionsStuff.STAGGER]
 var lab: Node3D
 var mixed_crowd := false
 var first_tick_started := 0
@@ -44,15 +45,14 @@ func run() -> void:
 	lab = LAB.instantiate()
 	root.add_child(lab)
 	current_scene = lab
-	if actions_stuff:
-		var mode := lab.get_node("HUD/ZombieGait") as OptionButton
-		if mode.is_item_disabled(1):
-			printerr("The crowd needs the verified Actions & Stuff animation library")
-			lab.free()
-			quit(1)
-			return
-		mode.select(1)
-		mode.item_selected.emit(1)
+	var mode := lab.get_node("HUD/ZombieGait") as OptionButton
+	if actions_stuff and mode.is_item_disabled(1):
+		printerr("The crowd needs the verified Actions & Stuff animation library")
+		lab.free()
+		quit(1)
+		return
+	mode.select(int(actions_stuff))
+	mode.item_selected.emit(mode.selected)
 	root.size = Vector2i(960, 540)
 	var rid := root.get_viewport_rid()
 	RenderingServer.viewport_set_measure_render_time(rid, true)
