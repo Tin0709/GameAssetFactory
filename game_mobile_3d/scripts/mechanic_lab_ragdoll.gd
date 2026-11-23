@@ -23,6 +23,7 @@ const WALL_ARM_HANDOFF_MIN_GAP := 3.5 * SOURCE_ANCHOR_TOLERANCE
 const WALL_NECK_BRACE_MIN_GAP := 2.5 * SOURCE_ANCHOR_TOLERANCE
 const WALL_NECK_LANDING_BLEND_END := 0.5
 const WALL_SHOULDER_SLIDE_WINDOW := 5.0 / 60.0
+const BABY_ATTACK_HANDOFF_SWEEP_TICKS := 2
 const WALL_SLIDE_MIN_GAP := 4.0 * SOURCE_ANCHOR_TOLERANCE
 const FIRST_WALL_SHOULDER_SLIDE_MIN_GAP := 0.17
 const TUNED_LIMB_RECOVERY_GAP := 8.0 * SOURCE_ANCHOR_TOLERANCE
@@ -58,6 +59,7 @@ var use_tuned_wall_sweep := false
 var use_tuned_floor_support := false
 var use_baby_floor_anchors := false
 var reconcile_attack_shoulders := false
+var sweep_baby_attack_handoff := false
 var _baby_wall_anchors := false
 var _baby_waiting_for_wall_contact := false
 var wall_handoff_animation: AnimationPlayer
@@ -91,6 +93,10 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 		for name: String in bodies:
 			var body: PhysicalBone3D = bodies[name]
 			_tuned_wall_poses[name] = body.global_position
+	elif sweep_baby_attack_handoff:
+		for name: String in ["Arm.L", "Arm.R"]:
+			var body: PhysicalBone3D = bodies[name]
+			_tuned_wall_poses[name] = body.global_position
 	return true
 
 func _correct_physical_pose() -> void:
@@ -98,8 +104,16 @@ func _correct_physical_pose() -> void:
 	# Every physical bone calls this, but pose correction already processes the whole rig.
 	if not running or _pose_correction_frame == frame:
 		return
-	if not use_tuned_wall_sweep:
+	if _tuned_wall_poses.is_empty():
 		super._correct_physical_pose()
+		return
+	if not use_tuned_wall_sweep:
+		_sweep_tuned_lab_walls(true)
+		super._correct_physical_pose()
+		if frame >= _launch_frame + BABY_ATTACK_HANDOFF_SWEEP_TICKS:
+			_tuned_wall_poses.clear()
+		else:
+			_save_wall_sweep_positions()
 		return
 	_sweep_tuned_lab_walls()
 	super._correct_physical_pose()
@@ -112,13 +126,16 @@ func _correct_physical_pose() -> void:
 		# A floor hit can hide a wall from the first ray. Check the
 		# corrected pose before saving the start of the next sweep.
 		_sweep_tuned_lab_walls()
-	for name: String in bodies:
+	_save_wall_sweep_positions()
+
+func _save_wall_sweep_positions() -> void:
+	for name: String in _tuned_wall_poses:
 		var body: PhysicalBone3D = bodies[name]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if state != null:
 			_tuned_wall_poses[name] = state.transform.origin
 
-func _sweep_tuned_lab_walls() -> void:
+func _sweep_tuned_lab_walls(through_wall_only := false) -> void:
 	# A fast, rotating part can reach the far side before Godot reports its
 	# first contact. Sweep its centre and leave surface contacts to the solver.
 	for name: String in _tuned_wall_poses:
@@ -146,6 +163,16 @@ func _sweep_tuned_lab_walls() -> void:
 			if hit.is_empty() or not _is_fixed_wall(hit.collider) or absf(hit.normal.y) >= MAX_WALL_NORMAL_Y:
 				start = finish
 				break
+			if through_wall_only:
+				# Leave ordinary contacts to the solver. An opposing hit on
+				# the same shape confirms the arm crossed the wall.
+				_handoff_ray.from = finish
+				_handoff_ray.to = start
+				var reverse := space.intersect_ray(_handoff_ray)
+				if reverse.is_empty() or reverse.rid != hit.rid or reverse.shape != hit.shape \
+						or (reverse.normal as Vector3).dot(hit.normal) >= 0.0:
+					start = finish
+					break
 			if use_baby_floor_anchors and use_tuned_floor_support:
 				use_baby_floor_anchors = false
 				_baby_wall_anchors = true

@@ -142,9 +142,62 @@ func run() -> void:
 	# The overlap can also start after the floor sweep predicts the wall.
 	await check_tuned_contact(31, 13.0, 0.37, Strike.SWORD, -44.0,
 		Vector2(1000.0, 100.0), true, DeathPose.AS_CORNER)
+	await check_source_attack_wall_crossing()
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", step_phases.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_source_attack_wall_crossing() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group: Node = lab.get_node("Zombies")
+	if not group.full_actions_stuff_available:
+		lab.free()
+		return
+
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(0.30, 3.0, 12.4)
+	collider.shape = shape
+	wall.add_child(collider)
+	lab.add_child(wall)
+	wall.position = Vector3(4.5, 1.5, -1.85)
+	group._spawn_serial = 1807
+	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
+	var baby := group.get_child(0) as Zombie
+	baby.set_physics_process(false)
+	baby.position = Vector3(4.016132, 0.02, 4.02811)
+	baby.rotation.y = 3.0348207950592
+	baby.animation.stop()
+	baby.ragdoll.skeleton.reset_bone_poses()
+	baby.animation.play(Zombie.ActionsStuff.ATTACK)
+	baby.animation.advance(0.0)
+	baby.animation.seek(0.360434250057217, true)
+	await physics_frame
+	await physics_frame
+	baby.ragdoll.sample(1.0 / 60.0)
+	baby.ragdoll.sample(1.0 / 60.0)
+	baby.take_hit(100, Vector3(0.759013, 0.0, 0.651075).normalized(), Vector2.ZERO, 0.0,
+		1150.0, Zombie.DeathStrike.SABRE_FINISHER)
+	baby.set_physics_process(true)
+	var far_face := wall.position.x + shape.size.x * 0.5
+	var peak_x := -INF
+	var sampled := 0
+	for frame in 3:
+		await physics_frame
+		if not baby.ragdoll.running:
+			continue
+		var arm: PhysicalBone3D = baby.ragdoll.bodies["Arm.R"]
+		peak_x = maxf(peak_x, arm.global_position.x)
+		sampled += 1
+		if sampled == 2:
+			break
+	check(sampled >= 2 and peak_x < far_face,
+		"The baby attack-to-ragdoll handoff keeps the arm from crossing the wall in its first two solves")
+	print("LAB_BABY_AS_ATTACK_WALL samples=", sampled, " peak_x=", peak_x, " far_face=", far_face)
+	lab.free()
 
 func check_prewarmed_spawn() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
