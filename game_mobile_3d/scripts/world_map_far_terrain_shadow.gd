@@ -345,12 +345,13 @@ func _ordered_keys(keys: Array, single_index: int) -> Array:
 
 enum PairStatus {READY, HOLD, WAIT, ERROR}
 
-func _prepare_pair(zone: Dictionary, keys: Array, blend: float, single_index: int, direction: Vector3, cap: float) -> PairStatus:
-	var angle:=cos(deg_to_rad(BOUND_DEGREES))
-	if (blend < 1. - SINGLE_KEY_EPSILON and direction.dot(_p3(keys[0].light)) < angle) or \
-			(blend > SINGLE_KEY_EPSILON and direction.dot(_p3(keys[1].light)) < angle):
-		failure="The current sun falls outside the baked direction"
-		return PairStatus.ERROR
+func _matches_direction(keys: Array, blend: float, direction: Vector3) -> bool:
+	var minimum_dot := cos(deg_to_rad(BOUND_DEGREES))
+	return (blend >= 1. - SINGLE_KEY_EPSILON or direction.dot(_p3(keys[0].light)) >= minimum_dot) \
+			and (blend <= SINGLE_KEY_EPSILON or direction.dot(_p3(keys[1].light)) >= minimum_dot)
+
+
+func _prepare_pair(zone: Dictionary, keys: Array, single_index: int, direction: Vector3, cap: float, blend: float) -> PairStatus:
 	for key: Dictionary in keys:
 		var key_error: String=_stream.error_for(key)
 		if not key_error.is_empty():
@@ -370,7 +371,7 @@ func _prepare_pair(zone: Dictionary, keys: Array, blend: float, single_index: in
 			return PairStatus.READY
 	if _active==zone:
 		var best := {}
-		var match_angle := angle
+		var match_angle := cos(deg_to_rad(BOUND_DEGREES))
 		for tile: Dictionary in _tiles.values():
 			if tile.zone!=zone.id:
 				continue
@@ -418,8 +419,15 @@ func _restore(minute := 0., drop_textures := true) -> void:
 	RenderingServer.global_shader_parameter_set("gaf_far_depth_next",_dummy)
 
 func wants_receivers(player: Vector3, minute: float) -> bool:
-	return _stream != null and sun.shadow_enabled and is_finite(minute) and minute >= _first and minute < _last \
-			and (not _active.is_empty() or not _choose(Vector2(player.x, player.z)).is_empty())
+	if _stream == null or not is_instance_valid(sun) or not sun.shadow_enabled \
+			or not is_finite(minute) or minute < _first or minute >= _last:
+		return false
+	var zone := _active if not _active.is_empty() else _choose(Vector2(player.x, player.z))
+	if zone.is_empty():
+		return false
+	# A different solar preset can have the same clock time and a different light vector.
+	var keys := _neighbor_keys(zone, minute)
+	return _matches_direction(keys, _blend_at(keys, minute), sun.global_basis.z.normalized())
 
 
 func update_shadow(delta: float, player: Vector3, velocity: Vector3,
@@ -454,9 +462,15 @@ func update_shadow(delta: float, player: Vector3, velocity: Vector3,
 	var zone := choice if _active.is_empty() else _active
 	var keys:=_neighbor_keys(zone,minute)
 	var blend:=_blend_at(keys,minute)
+	if not _matches_direction(keys, blend, direction):
+		_stream.update([])
+		_waiting = false
+		failure = "The current sun falls outside the baked direction"
+		_restore(minute)
+		return
 	var single_index:=_single_key_index(blend)
 	_request_tiles(zone,choice,keys,minute,position,velocity,single_index)
-	var status:=_prepare_pair(zone,keys,blend,single_index,direction,_distance_cap(zone,player))
+	var status:=_prepare_pair(zone,keys,single_index,direction,_distance_cap(zone,player),blend)
 	_waiting=status==PairStatus.WAIT
 	if status==PairStatus.ERROR:
 		_restore(minute)
