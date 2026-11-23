@@ -5,7 +5,6 @@ extends RefCounted
 const FRAGMENT="""#version 450
 layout(set=0,binding=0) uniform sampler2D encoded_scene;
 layout(set=0,binding=1,std430) readonly buffer Baseline{vec4 base[];};
-layout(push_constant,std430) uniform Settings{vec4 settings;vec4 air;};
 layout(location=0) out vec4 result;
 const vec3 luma_weights=vec3(.299,.587,.114);
 const float distances[12]=float[12](1.,1.5,2.,2.,2.,2.,2.,2.,2.,2.,4.,8.);

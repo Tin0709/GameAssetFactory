@@ -307,7 +307,8 @@ func _prepare_pass(rd: RenderingDevice, fragment: String, framebuffer: RID, unif
 	var binding := _keep(rd.uniform_set_create(uniforms, shader, 0))
 	if not binding.is_valid(): return false
 	if _passes.is_empty(): _scene_uniform = binding
-	_passes.append([framebuffer, pipeline, binding])
+	var takes_parameters := fragment.contains("layout(push_constant")
+	_passes.append([framebuffer, pipeline, binding, takes_parameters])
 	return true
 
 var _air_bytes:=0
@@ -400,7 +401,7 @@ func _render_callback(kind: int, data: RenderData) -> void:
 		var list := rd.draw_list_begin(pass_data[0])
 		rd.draw_list_bind_render_pipeline(list, pass_data[1])
 		rd.draw_list_bind_uniform_set(list, pass_data[2], 0)
-		if index >= 1: rd.draw_list_set_push_constant(list, parameters, parameters.size())
+		if pass_data[3]: rd.draw_list_set_push_constant(list, parameters, parameters.size())
 		rd.draw_list_draw(list, false, 1, 3)
 		rd.draw_list_end()
 	_guard.lock()
