@@ -143,20 +143,34 @@ void light() {
 		shadow_diffuse *= mix(1.0, gaf_terrace_shadow_fill(stone_sunset_position), weight);
 	}
 	vec2 canopy_delta = vec2(0.0);
-	if (terrain_canopy_incident.w >= 0.0 && gaf_canopy_ground_fill.x > 0.0 && shadow_diffuse.g > 0.0 &&
-			terrain_canopy_ground_ev != 0.0 && shadow_attenuation < .58) {
-		canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev, shadow_attenuation);
-		if (gaf_canopy_terrain_contrast > 1.0) {
-			// Bound the added contrast where the moving key shadow changes coverage.
-			vec2 boosted = gaf_canopy_ground_delta(terrain_canopy_ground_ev * gaf_canopy_terrain_contrast, shadow_attenuation);
-			canopy_delta += clamp(boosted - canopy_delta, vec2(-.13), vec2(.13));
-		}
-		if (shadow_attenuation < .47) {
-			// Shaded turf receives more diffuse fill than the blades above it.
-			float coverage = 1.0 - smoothstep(.74, .94, terrain_canopy_sky);
-			float cast_shade = 1.0 - smoothstep(.065, .47, shadow_attenuation);
-			float phase = min(gaf_canopy_ground_fill.x / .75, 1.0);
-			canopy_delta.x -= .12 * coverage * cast_shade * phase;
+	if (terrain_canopy_incident.w >= 0.0 && gaf_canopy_ground_fill.x > 0.0 && terrain_canopy_ground_ev != 0.0) {
+		// Positive diffuse return at a canopy opening fades across the penumbra.
+		// Preserve the existing response in the canopy interior.
+		const float return_end = .75;
+		bool opening = terrain_canopy_ground_ev > 0.0;
+		bool shadow_fill = shadow_diffuse.g > 0.0;
+		bool key = LIGHT_IS_DIRECTIONAL && gaf_shadow_diffuse_sun.w > 0.0 &&
+			dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_shadow_diffuse_sun.xyz) > .9999 &&
+			distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= .005;
+		if ((opening && shadow_attenuation < return_end && (shadow_fill || key)) ||
+				(!opening && shadow_attenuation < .58 && shadow_fill)) {
+			float visibility = opening ? 0.0 : shadow_attenuation;
+			canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev, visibility);
+			if (gaf_canopy_terrain_contrast > 1.0) {
+				// Bound the added contrast where the moving key shadow changes coverage.
+				vec2 boosted = gaf_canopy_ground_delta(terrain_canopy_ground_ev * gaf_canopy_terrain_contrast, visibility);
+				canopy_delta += clamp(boosted - canopy_delta, vec2(-.13), vec2(.13));
+			}
+			if (opening) {
+				canopy_delta *= 1.0 - shadow_attenuation / return_end;
+			}
+			if (shadow_fill && shadow_attenuation < .47) {
+				// Shaded turf receives more diffuse fill than the blades above it.
+				float coverage = 1.0 - smoothstep(.74, .94, terrain_canopy_sky);
+				float cast_shade = 1.0 - smoothstep(.065, .47, shadow_attenuation);
+				float phase = min(gaf_canopy_ground_fill.x / .75, 1.0);
+				canopy_delta.x -= .12 * coverage * cast_shade * phase;
+			}
 		}
 	}
 	DIFFUSE_LIGHT += shadow_diffuse * (ground_fill * (1.0 + canopy_delta.y));
