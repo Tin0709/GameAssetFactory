@@ -258,7 +258,7 @@ vec3 recover_daylight_shadow_color(vec3 graded, vec3 original, vec3 previous) {
  vec3 target = original * (y / original_y);
  return mix(previous, target, base[4].x * cool_mask * neutral_source * shade_mask);
 }
-vec3 recover_green_shade(vec3 graded, vec3 original) {
+vec3 recover_green_shade(vec3 graded, vec3 original, float preserve_contrast) {
  if (base[4].y <= 0.0) return graded;
  float y = dot(graded, luma);
  float original_y = dot(original, luma);
@@ -273,7 +273,9 @@ vec3 recover_green_shade(vec3 graded, vec3 original) {
  float removed_green = restore_red * luma.r / luma.g;
  vec3 chroma = graded + weight * vec3(restore_red, -removed_green, 0.);
  float y_restore = clamp((original_y - y) * .50, 0.0, .022);
- return chroma * (1.0 + weight * y_restore / y);
+ // Keep the color recovery and reduce only the extra brightness at bloom-filled edges.
+ float luma_retention = 1.0 - preserve_contrast * (0.40 / 0.70);
+ return chroma * (1.0 + weight * y_restore * luma_retention / y);
 }
 // Bring distant shaded colors towards the integrated fog source at fixed luminance.
 vec3 match_air_chroma(vec3 color, vec3 incident_air, float depth_weight, vec2 uv) {
@@ -338,7 +340,7 @@ vec3 lift_shaded_detail(vec3 color, float shadow_depth, float preserve_contrast)
   vec3 mixed_finish = mix(original_finish, inverse_display(clamp(display,0.,1.)), base[1].z);
   vec3 previous_finish = recover_twilight_shadow_color(mixed_finish, original_finish);
   vec3 neutral_finish = recover_daylight_shadow_color(mixed_finish, original_finish, previous_finish);
-  vec3 finish = recover_green_shade(neutral_finish, original_finish);
+  vec3 finish = recover_green_shade(neutral_finish, original_finish, preserve_contrast);
   vec3 shaded = lift_shaded_detail(finish, shadow_depth, preserve_contrast);
   result = vec4(match_air_chroma(shaded, incident_air, shadow_depth, shade_uv), color.a);
  """)
