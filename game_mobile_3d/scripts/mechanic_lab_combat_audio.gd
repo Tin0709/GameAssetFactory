@@ -654,6 +654,8 @@ func slam_landed(point: Vector3, surface: String = "grass") -> void:
 		return
 	if sword_equipped:
 		_play(&"slam", point, SLAM_GAIN_DB, -1, true)
+	if surface.is_empty():
+		return
 	var group := StringName("slam_" + surface)
 	if _surface_landing_voices.is_empty():
 		_play(group, point, SURFACE_LANDING_GAIN_DB)

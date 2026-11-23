@@ -1237,6 +1237,12 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 		_slam_swing_frame = Engine.get_physics_frames() + ceili(SABRE_LANDING_SWING_DELAY * Engine.physics_ticks_per_second)
 	var contact := _grass_landing_contact_at(point)
 	if contact.is_empty():
+		# The Sword impact belongs to the weapon. It still has a confirmed
+		# contact on a solid floor whose material has no debris cue.
+		if _equipped_weapon == Weapon.SWORD:
+			var support := _actor_floor_support(player, point, true)
+			if not support.is_empty():
+				_combat_audio.slam_landed(support.position, "")
 		return
 	var delay_ticks := ceili(_heavy_debris_delay() * Engine.physics_ticks_per_second)
 	if delay_ticks > 0:
