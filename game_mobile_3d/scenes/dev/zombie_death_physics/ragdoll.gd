@@ -615,13 +615,13 @@ func _slide_supported_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState
 		state.transform = state.transform.translated(slide)
 
 func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, motion: Vector3,
-		require_overlap := false) -> void:
+		require_overlap := false, max_initial_depth := TERRAIN_DEEP_RESIDUAL) -> void:
 	var points := _terrain_contact_points(body, state, Vector3.ZERO)
 	var escape_fraction := 0.0
 	for i in range(0, points.size(), 2):
 		var offset := points[i + 1] - points[i]
 		var depth := offset.length()
-		if depth > TERRAIN_DEEP_RESIDUAL:
+		if depth > max_initial_depth:
 			return
 		if depth <= PROJECTION_COLLISION_MARGIN:
 			continue
