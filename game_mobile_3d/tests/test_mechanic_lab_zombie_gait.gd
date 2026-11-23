@@ -35,6 +35,28 @@ func select(mode: OptionButton, index: int) -> void:
 	check(menu.activate_item_by_event(input) and mode.selected == index,
 		"The zombie style can be activated through the menu")
 
+func idle_audio_ticks(mode: OptionButton, actors: Array[Zombie], style: int,
+		switch_mid_idle := false) -> Array[Array]:
+	var ticks: Array[Array] = [[], []]
+	select(mode, style)
+	for actor in actors:
+		actor.set_physics_process(false)
+		actor._play_gait()
+		actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+		actor._play_loop(Zombie.IDLE)
+	for tick in 450:
+		if switch_mid_idle and tick in [23, 260]:
+			select(mode, 1 - mode.selected)
+			for actor in actors:
+				actor._play_loop(Zombie.IDLE)
+		for i in actors.size():
+			var actor := actors[i]
+			var before := actor._idle_audio_index
+			actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+			if actor._idle_audio_index != before:
+				ticks[i].append(tick + 1)
+	return ticks
+
 func run() -> void:
 	var lab := Lab.instantiate()
 	root.add_child(lab)
@@ -141,5 +163,14 @@ func run() -> void:
 		for tick in 3:
 			await physics_frame
 		check(next_baby.ragdoll.running, "The Baby Zombie still uses its MD2 death ragdoll")
+	var actors: Array[Zombie] = [adult, baby]
+	var md2_cues := idle_audio_ticks(mode, actors, 0)
+	var styled_cues := idle_audio_ticks(mode, actors, 1)
+	var switched_cues := idle_audio_ticks(mode, actors, 1, true)
+	check(md2_cues == [[5, 205, 405], [5, 49, 93, 137, 181, 225, 269, 313, 357, 401, 445]],
+		"The authored-length MD2 idle clips provide the existing audio cadence for both ages")
+	check(styled_cues == md2_cues and switched_cues == md2_cues,
+		"A&S idle and live style changes retain the MD2 audio cadence for both ages")
+	print("MECHANIC_LAB_IDLE_CLOCK md2=", md2_cues, " as=", styled_cues, " switched=", switched_cues)
 	print("MECHANIC_LAB_ZOMBIE_GAIT failures=", failures, " footsteps=", steps.size())
 	quit(0 if failures == 0 else 1)
