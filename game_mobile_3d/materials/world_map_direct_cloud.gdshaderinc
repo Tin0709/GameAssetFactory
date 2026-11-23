@@ -46,7 +46,8 @@ void light() {
 	float shadow_attenuation = GAF_RESOLVE_TERRAIN_SHADOW;
 	float point_transfer=gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
 	float point_attenuation=shadow_attenuation*point_transfer;
-	vec3 key_color = LIGHT_COLOR * gaf_opening_gain(LIGHT_IS_DIRECTIONAL, shadow_attenuation * cloud_transmission);
+	float direct_opening_gain = gaf_opening_gain(LIGHT_IS_DIRECTIONAL, shadow_attenuation * cloud_transmission);
+	vec3 key_color = LIGHT_COLOR * direct_opening_gain;
 #ifdef GAF_WORLD_CANOPY_DIRECT_SOFTNESS
 	if (LIGHT_IS_DIRECTIONAL && canopy_direct_coverage > 0.0 &&
 			dot(mat3(INV_VIEW_MATRIX) * LIGHT, canopy_direct.xyz) > 0.9999) {
@@ -253,16 +254,24 @@ void light() {
 		vec3 diffuse_incident = incident;
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 		if (gaf_stone_projector_lift.w > 0.0 && LIGHT_IS_DIRECTIONAL && ground_grade == 3 &&
-				use_source_terrain && surface_top > .998 && shadow_attenuation > .80 &&
-				gaf_projected_sun_strength > .05 && cloud_transmission > .24 && cloud_transmission < .94 &&
+				use_source_terrain && surface_top > .998 && shadow_attenuation > 0.0 &&
+				gaf_projected_sun_strength > .05 &&
 				dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_projector_lift.xyz) > .9999 &&
 				distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= .005) {
-			// Restore part of the projected midrange without moving either end of its response curve.
-			float t = (cloud_transmission - .24) / .70;
-			float shoulder = 4.0 * t * (1.0 - t);
-			float opening = smoothstep(.80, .985, shadow_attenuation);
-			float lift = .70 * gaf_stone_projector_lift.w * opening * shoulder * shoulder;
-			diffuse_incident *= 1.0 + lift / cloud_transmission;
+			// Geometry already attenuates the incident Sun. Let part of the projected
+			// daylight response reach the penumbra without raising the open-light peak.
+			if (cloud_transmission > .24 && cloud_transmission < .94) {
+				float t = (cloud_transmission - .24) / .70;
+				float shoulder = 4.0 * t * (1.0 - t);
+				float penumbra_opening = mix(smoothstep(.80, .985, shadow_attenuation), 1.0, .55);
+				float lift = .70 * gaf_stone_projector_lift.w * penumbra_opening * shoulder * shoulder;
+				diffuse_incident *= 1.0 + lift / cloud_transmission;
+			}
+			if (shadow_attenuation < 1.0 && cloud_transmission > .60 && gaf_sun_opening_gain > 0.0) {
+				float full_gain = gaf_opening_gain(true, cloud_transmission);
+				float amount = min(gaf_stone_projector_lift.w * (.55 / .15), .55);
+				diffuse_incident *= mix(1.0, full_gain / direct_opening_gain, amount);
+			}
 		}
 		if (max(path_weight, path_core_weight) > 0.0 || path_transmission_gain > 1.0) {
 			// Evaluate the same path response at the adjusted transmission so its shoulder stays monotone.
