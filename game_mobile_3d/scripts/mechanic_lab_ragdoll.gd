@@ -1046,8 +1046,12 @@ func _distribute_floor_lift(lifts: Dictionary[PhysicalBone3D, float], depths: Di
 
 func _constrain_free_anchor_motion(body: PhysicalBone3D, state: PhysicsDirectBodyState3D,
 		motion: Vector3) -> Vector3:
-	if (motion.y >= 0.0 or not floor_landing_blended
-			or not is_instance_valid(_flat_floor) or _flat_floor.disabled):
+	if motion.y >= 0.0 or not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return motion
+	var early_baby_leg := (use_baby_floor_anchors and not use_tuned_wall_sweep
+		and Vector2(motion.x, motion.z).length_squared() > BABY_SUPPORTED_LEG_SLIDE_GAP ** 2
+		and (body == bodies["Leg.L"] or body == bodies["Leg.R"]))
+	if not floor_landing_blended and not early_baby_leg:
 		return motion
 	var floor_box := _flat_floor.shape as BoxShape3D
 	var floor_pose := _flat_floor.global_transform
@@ -1064,6 +1068,12 @@ func _constrain_free_anchor_motion(body: PhysicalBone3D, state: PhysicsDirectBod
 	var target := bounds.position + local_motion
 	if (target.x < -floor_half.x or target.x + bounds.size.x > floor_half.x
 			or target.z < -floor_half.z or target.z + bounds.size.z > floor_half.z):
+		return motion
+	if not floor_landing_blended:
+		# During first impact, a short downward component can cause the ground
+		# sweep to discard nearly all of a free leg's sideways anchor recovery.
+		var room := bounds.position.y - floor_half.y - PROJECTION_COLLISION_MARGIN
+		motion.y = maxf(motion.y, -maxf(room, 0.0))
 		return motion
 	# Keep the preceding floor recovery when the joint would move a limb
 	# below the resting clearance. Keep the tighter Sabre roll behavior.
