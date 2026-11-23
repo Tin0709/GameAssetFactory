@@ -1038,14 +1038,28 @@ func _replace_weapon_slot(start: int, onset: bool, frame: int) -> int:
 	return older_slot
 
 func _replace_attack_slot(first: int, start: int, group: StringName, frame: int, point: Vector3) -> int:
-	# A swing fills spare voices. Telegraphs and confirmed hits take precedence.
+	# Confirmed hits can always reclaim a swing. Distant windups wait for its onset.
 	if group == &"baby_swing":
 		return -1
+	var contact := group == &"zombie_hit" or group == &"baby_hit"
+	var ear := _zombie_listener_position()
+	var distance_squared := point.distance_squared_to(ear)
 	for offset in VOICES_PER_POOL:
 		var slot := (start + offset) % VOICES_PER_POOL
-		if _voice_groups[first + slot] == &"baby_swing":
+		var index := first + slot
+		if _voice_groups[index] != &"baby_swing":
+			continue
+		var voice := _voices[index]
+		if contact or not ear.is_finite() or distance_squared <= voice.global_position.distance_squared_to(ear):
+			return slot
+		if not _zombie_onset_pending(voice, frame - _started_frames[index]):
 			return slot
 	return _replace_priority_slot(first, start, &"zombie_hit", group, frame, point, &"baby_hit")
+
+func _zombie_onset_pending(voice: AudioStreamPlayer3D, age: int) -> bool:
+	# Catch-up ticks can advance before the mixer reaches the sample onset.
+	return (age <= ceili(ZOMBIE_ONSET_SECONDS * Engine.physics_ticks_per_second)
+		or voice.get_playback_position() < ZOMBIE_ONSET_SECONDS * voice.pitch_scale)
 
 func _replace_priority_slot(first: int, start: int, priority_group: StringName, group: StringName,
 		frame: int, point: Vector3, secondary_priority := &"") -> int:
@@ -1055,7 +1069,6 @@ func _replace_priority_slot(first: int, start: int, priority_group: StringName, 
 	var priority := group == priority_group or group == secondary_priority
 	var compare_onsets := is_instance_valid(zombie_listener)
 	var listener := zombie_listener.global_position if compare_onsets else Vector3.ZERO
-	var onset_ticks := ceili(ZOMBIE_ONSET_SECONDS * Engine.physics_ticks_per_second)
 	var farthest := point.distance_squared_to(listener)
 	var farther_onset := -1
 	var older_slot := -1
@@ -1070,10 +1083,7 @@ func _replace_priority_slot(first: int, start: int, priority_group: StringName, 
 		var age := frame - _started_frames[voice_index]
 		if priority != playing_priority or age <= 0:
 			continue
-		# Physics can catch up several ticks while the audio mixer is still
-		# at the start of a voice. Check the stream's playhead as well.
-		if compare_onsets and (age <= onset_ticks
-				or voice.get_playback_position() < ZOMBIE_ONSET_SECONDS * voice.pitch_scale):
+		if compare_onsets and _zombie_onset_pending(voice, age):
 			var distance := voice.global_position.distance_squared_to(listener)
 			if distance > farthest:
 				farthest = distance
