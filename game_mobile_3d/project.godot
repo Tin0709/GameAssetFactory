@@ -307,6 +307,18 @@ gaf_canopy_terrain_contrast={
 "type": "float",
 "value": 1.0
 }
+gaf_directional_ground_sky={
+"type": "sampler2D",
+"value": ""
+}
+gaf_directional_ground_rect={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
+gaf_directional_ground_height={
+"type": "vec2",
+"value": Vector2(0, 1)
+}
 gaf_spruce_sky_camera={
 "type": "vec3",
 "value": Vector3(0, 0, 0)

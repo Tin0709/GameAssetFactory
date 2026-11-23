@@ -190,6 +190,9 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0.0, 1.0) var canopy_ground_fill_overcast := 1.0
 ## Contrast of the existing shade response on the terrain surface.
 @export_range(1.0, 2.0, 0.01) var canopy_terrain_contrast := 1.0
+## Relative sky response on a terrain surface below a verified canopy field.
+@export var directional_ground_sky_by_hour: Curve
+@export_range(0.0, 1.0) var directional_ground_sky_overcast := 0.45
 ## How much incident sky and supplemental fill to remove beside a wall.
 @export var near_wall_fill := Vector2.ZERO
 @export_range(0.0, 1.0) var near_wall_fill_overcast := 1.0

@@ -71,7 +71,11 @@ vec3 terrain_contact_response(vec3 albedo,float contact){
 	vec3 reflectance=clamp(albedo,vec3(0.0),vec3(0.5));
 	return vec3(single)+returned*reflectance/max(vec3(1.0)-(1.0-return_ratio)*reflectance,vec3(0.00001));
 }
-vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec3 receiver_visibility,float face_y,vec3 camera_position,out vec3 path_sky_excess,out vec2 path_sky_chroma_delta){
+global uniform sampler2D gaf_directional_ground_sky : filter_linear, repeat_disable;
+global uniform vec4 gaf_directional_ground_rect;
+global uniform vec2 gaf_directional_ground_height;
+
+vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec3 receiver_visibility,float face_y,vec3 camera_position,vec3 world_position,out vec3 path_sky_excess,out vec2 path_sky_chroma_delta){
 	vec3 sky = terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
@@ -96,6 +100,21 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec
 		sky_fill = mix(sky_fill, gaf_turf_ambient(sky_fill), turf);
 	}
 	vec3 diffuse_sky = gaf_pre_twilight_diffuse(sky_fill, camera_position);
+	if (gaf_directional_ground_rect.w > 0.0 && use_source_terrain && face_y > .998 &&
+			distance(camera_position, gaf_spruce_sky_camera) <= .01 &&
+			(ground_grade == 1 || ground_grade == 2)) {
+		vec2 p = (world_position.xz - gaf_directional_ground_rect.xy) / gaf_directional_ground_rect.z;
+		vec2 grid = vec2(textureSize(gaf_directional_ground_sky, 0));
+		if (all(greaterThanEqual(p, vec2(0.0))) && all(lessThanEqual(p, grid - 1.0))) {
+			vec2 response = textureLod(gaf_directional_ground_sky, (p + .5) / grid, 0.0).rg;
+			float surface_y = gaf_directional_ground_height.x + response.g * gaf_directional_ground_height.y;
+			float deck = 1.0 - smoothstep(.075, .22, abs(world_position.y - surface_y));
+			float turf = smoothstep(1.04, 1.20, color.g/max(color.r,.0001)) *
+				smoothstep(1.12, 1.35, color.g/max(color.b,.0001));
+			float delta_ev = (response.r - (128.0 / 255.0)) * 1.10;
+			diffuse_sky *= exp2(delta_ev * gaf_directional_ground_rect.w * deck * turf);
+		}
+	}
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (ground_grade == 3 && stone_dusk_sky_chroma > 0.0) {
 		// Calibrated on direct-free Forest receivers. Retain the diffuse sky's luminance.

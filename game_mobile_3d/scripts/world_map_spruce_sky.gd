@@ -16,6 +16,8 @@ var applied_sky_color := 0.
 var applied_edge_return := 0.
 var applied_ground_fill := Vector2.ZERO
 var applied_terrain_contrast := 1.0
+var applied_directional_ground := 0.0
+var _directional_ground_rect := Vector4.ZERO
 var applied_pre_twilight := 0.
 var _level: Node3D
 var _camera: Camera3D
@@ -90,6 +92,8 @@ func setup(level: Node3D) -> void:
 	RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_extent", Vector3(_dimensions))
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", _texture)
+	RenderingServer.global_shader_parameter_set("gaf_directional_ground_rect", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_directional_ground_sky", null)
 	proof_ready = true
 	set_process(true)
 
@@ -286,6 +290,39 @@ func _layout_profile(root: String, relative: String, digest: String) -> Dictiona
 	var profile: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	return profile if profile is Dictionary else {}
 
+func load_directional_ground(relative: String, digest: String, canopy_digest: String) -> bool:
+	if not proof_ready or relative.is_empty() or _owner == null or _owner.get_ref() != self:
+		return false
+	var root := OS.get_environment("MD2_RESEARCH_ROOT")
+	if root.is_empty():
+		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
+	root = root.simplify_path().replace("\\", "/").trim_suffix("/")
+	var profile := _layout_profile(root, relative, digest)
+	if profile.get("schema") != "terrain_directional_canopy_sky/1" or profile.get("canopy_sha256") != canopy_digest \
+			or profile.get("map_sha256") != FileAccess.get_sha256(_level.map_layout_path):
+		return false
+	var grid := _checked_vector(profile.get("grid"))
+	var origin := _checked_vector(profile.get("origin"))
+	var height_span: Variant = profile.get("height_span")
+	if not grid.is_finite() or not origin.is_finite() or grid.x != floorf(grid.x) or grid.y != floorf(grid.y) \
+			or grid.x < 2.0 or grid.y < 2.0 or grid.x > 256.0 or grid.y > 256.0 or grid.z < .25 or grid.z > 2.0 \
+			or not (height_span is float or height_span is int) or not is_finite(height_span) or height_span <= 0.0:
+		return false
+	var size := Vector2i(int(grid.x), int(grid.y))
+	var path := root.path_join(relative).get_base_dir().path_join("afternoon_canopy_expanded.rg")
+	var data := FileAccess.get_file_as_bytes(path)
+	if data.size() != size.x * size.y * 2 or FileAccess.get_sha256(path) != profile.get("payload_sha256"):
+		return false
+	var image := Image.create_from_data(size.x, size.y, false, Image.FORMAT_RG8, data)
+	var texture := ImageTexture.create_from_image(image)
+	if texture == null:
+		return false
+	_directional_ground_rect = Vector4(origin.x, origin.z, grid.z, 0.0)
+	RenderingServer.global_shader_parameter_set("gaf_directional_ground_height", Vector2(origin.y, height_span))
+	RenderingServer.global_shader_parameter_set("gaf_directional_ground_sky", texture)
+	return true
+
+
 func _layout_texture(path: String, digest: String, dimensions: Vector3i) -> ImageTexture3D:
 	if not FileAccess.file_exists(path):
 		return null
@@ -329,6 +366,7 @@ func refresh() -> void:
 		applied_edge_return = 0.
 		applied_ground_fill = Vector2.ZERO
 		applied_terrain_contrast = 1.0
+		applied_directional_ground = 0.0
 		applied_pre_twilight = 0.
 		return
 	var strength := 0.
@@ -375,6 +413,18 @@ func refresh() -> void:
 	if contrast != applied_terrain_contrast:
 		applied_terrain_contrast = contrast
 		RenderingServer.global_shader_parameter_set("gaf_canopy_terrain_contrast", contrast)
+	var directional_ground := 0.0
+	if ground_fill.x > 0.0 and _directional_ground_rect.z > 0.0 and review._biome_profile != null:
+		var profile: Resource = review._biome_profile
+		var curve: Curve = profile.directional_ground_sky_by_hour
+		if curve != null:
+			var weather := lerpf(1.0, profile.directional_ground_sky_overcast, review._weather.weight)
+			directional_ground = clampf(curve.sample(review.hour / 24.0), 0.0, 1.0) * weather
+			directional_ground *= review._lighting_scale(&"canopy_ground_fill")
+	if directional_ground != applied_directional_ground:
+		applied_directional_ground = directional_ground
+		_directional_ground_rect.w = directional_ground
+		RenderingServer.global_shader_parameter_set("gaf_directional_ground_rect", _directional_ground_rect)
 	var receiver: float = review.pre_twilight_receiver_weight()
 	if receiver != applied_pre_twilight:
 		applied_pre_twilight = receiver
@@ -394,4 +444,6 @@ func _exit_tree() -> void:
 		RenderingServer.global_shader_parameter_set("gaf_canopy_terrain_contrast", 1.)
 		RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", null)
+		RenderingServer.global_shader_parameter_set("gaf_directional_ground_rect", Vector4.ZERO)
+		RenderingServer.global_shader_parameter_set("gaf_directional_ground_sky", null)
 		_owner = null

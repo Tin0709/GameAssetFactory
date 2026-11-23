@@ -125,6 +125,8 @@ var biome_controller: BiomeGraphics
 @export var east_air_profile_sha256 := ""
 @export var forest_road_layout_profile := ""
 @export var forest_road_layout_sha256 := ""
+@export var terrain_canopy_sky_profile := ""
+@export var terrain_canopy_sky_sha256 := ""
 @export var forest_basin_layout_profile := ""
 @export var forest_basin_layout_sha256 := ""
 ## Previous verified placement for research workspaces missing the current bake.
@@ -289,6 +291,8 @@ func _ready() -> void:
 	if preferred_layout:
 		var extension := spruce_sky.apply_canopy_extension(forest_canopy_extension_profile, forest_canopy_extension_sha256,
 			forest_preferred_layout_profile, forest_preferred_layout_sha256)
+		if extension:
+			spruce_sky.load_directional_ground(terrain_canopy_sky_profile, terrain_canopy_sky_sha256, forest_canopy_extension_sha256)
 		if extension and showcase.mist != null and showcase.directional_air.load_east(
 				east_air_profile, east_air_profile_sha256, forest_canopy_extension_sha256, spruce_sky):
 			showcase.mist.effect.east_directional_grid = showcase.directional_air.east_texture

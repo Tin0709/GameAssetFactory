@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=31 format=3]
+[gd_resource type="Resource" load_steps=32 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -39,6 +39,10 @@ point_count = 8
 [sub_resource type="Curve" id="LowForestMistPhase"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.8125, 0), 0.0, 0.0, 0, 0, Vector2(0.833333333, 1), 0.0, 0.0, 0, 0, Vector2(0.854166667, 1), 0.0, 0.0, 0, 0, Vector2(0.885416667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 6
+
+[sub_resource type="Curve" id="DirectionalGroundSky"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.65625, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.6), 0.0, 0.0, 0, 0, Vector2(0.729166667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
 
 [sub_resource type="Curve" id="AfternoonKey"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.65), 0.0, 0.0, 0, 0, Vector2(0.772916667, 0.65), 0.0, 0.0, 0, 0, Vector2(0.8125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -167,6 +171,7 @@ grass_terrace_shadow_fill = Vector2(1.15, 0.9)
 canopy_ground_fill = Vector2(0.75, 1.1)
 canopy_ground_fill_overcast = 0.78
 canopy_terrain_contrast = 1.9
+directional_ground_sky_by_hour = SubResource("DirectionalGroundSky")
 near_wall_fill = Vector2(0.22, 0.66)
 near_wall_fill_overcast = 0.82
 daylight_green_grade_scale = 1.0
