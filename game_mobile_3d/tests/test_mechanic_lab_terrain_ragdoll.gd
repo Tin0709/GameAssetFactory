@@ -834,7 +834,7 @@ func run() -> void:
 	if OS.get_cmdline_user_args().has("--compound-contact-arm"):
 		await check_corner_ragdoll(20, 2.0, true, -1.0, 0.29, Zombie.DeathStrike.SABRE_FINISHER,
 			1150.0, true, CornerFixture.NONE, Vector2.ONE, deg_to_rad(27.0), Zombie.ActionsStuff.ATTACK)
-		await check_corner_ragdoll(2, 2.0, true, -1.0, 0.30, Zombie.DeathStrike.SABRE_FINISHER,
+		await check_corner_ragdoll(2, 2.0, true, -1.0, 0.23, Zombie.DeathStrike.SABRE_FINISHER,
 			1150.0, true, CornerFixture.NONE, Vector2.ONE, deg_to_rad(27.0), Zombie.ActionsStuff.ATTACK)
 		print("LAB_COMPOUND_CONTACT_ARM failures=", failures)
 		quit(0 if failures.is_empty() else 1)
