@@ -177,6 +177,8 @@ func check_aerial_contact_pose(lab) -> void:
 		var contacts: Array[Vector3] = []
 		group.sabre_contact.connect(func(point, _direction, _clip, _index, _serial, _lethal):
 			contacts.append(point), CONNECT_ONE_SHOT)
+		var landings: Array[Vector3] = []
+		group.sabre_landing.connect(func(point, _serial): landings.append(point), CONNECT_ONE_SHOT)
 		await start_sabre_dive(lab)
 		for i in Engine.physics_ticks_per_second:
 			await physics_frame
@@ -184,6 +186,7 @@ func check_aerial_contact_pose(lab) -> void:
 				break
 		check(contacts.size() == 1, "The aerial attack hits one target in slot %d" % slot)
 		if not contacts.is_empty():
+			var clock: float = lab.player.effects.clock
 			lab.player.render_presenter.prepare(0.0)
 			sparks._process(0.0)
 			lab._process(0.0)
@@ -191,15 +194,27 @@ func check_aerial_contact_pose(lab) -> void:
 			check(early_count == 0, "Aerial body sparks wait for the contact pose in slot %d" % slot)
 			if slot != lab.Weapon.SABRE:
 				check(not lab._impact_light.visible, "The landing light waits for the contact pose in slot %d" % slot)
-				check(lab._light_sample_time == lab.player.effects.clock,
+				check(is_equal_approx(lab._light_sample_time, clock),
 					"The landing light uses the current physics pose in slot %d" % slot)
+				check(landings.size() == 1, "The weapon reports one floor contact in slot %d" % slot)
+				if landings.size() == 1:
+					var floor_count := 0
+					var floor_point := landings[0] + Vector3.UP * 0.12
+					for i in lab.player.effects.particles.size():
+						var particle: Dictionary = lab.player.effects.particles[i]
+						if is_equal_approx(particle.born, clock) and floor_point.is_equal_approx(particle.position):
+							floor_count += 1
+							check(lab.player.effects.particle_at(i, lab.player.render_presenter.display_clock).life == 0.0
+								and lab.player.effects.particle_at(i, clock).life > 0.0,
+								"A floor particle appears first on the contact pose")
+					check(floor_count == 8, "One floor burst starts on the contact pose in slot %d" % slot)
 			lab.player.render_presenter.prepare(1.0)
 			sparks._process(0.0)
 			lab._process(0.0)
 			check(sparks._streaks.visible_instance_count == 9, "One body burst starts on the contact pose in slot %d" % slot)
-			for i in sparks._streaks.visible_instance_count:
-				var origin: Vector3 = sparks._streaks.get_instance_transform(i).origin
-				check(is_equal_approx(origin.distance_to(contacts[0]), 0.21), "Body sparks start at their struck target")
+			for spark in sparks._particles:
+				if spark.age < spark.lifetime:
+					check(is_equal_approx(spark.origin.distance_to(contacts[0]), 0.21), "Body sparks start at their struck target")
 			if slot != lab.Weapon.SABRE:
 				check(lab._impact_light.visible and is_equal_approx(lab._impact_light.light_energy, 2.3),
 					"The floor flash keeps priority over the body flash at full intensity in slot %d" % slot)
