@@ -130,6 +130,9 @@ func run() -> void:
 	await check_tuned_contact(20, 0.0, 0.32, Strike.SWORD, -90.0, Vector2(1000.0, 100.0), true)
 	await check_tuned_contact(4, 13.0, 0.37, Strike.SABRE_FINISHER, -44.0,
 		Vector2(1000.0, 100.0), true, DeathPose.AS_CORNER)
+	# The overlap can also start after the floor sweep predicts the wall.
+	await check_tuned_contact(31, 13.0, 0.37, Strike.SWORD, -44.0,
+		Vector2(1000.0, 100.0), true, DeathPose.AS_CORNER)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", step_phases.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)

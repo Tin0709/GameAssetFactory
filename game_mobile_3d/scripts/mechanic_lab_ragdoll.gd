@@ -1184,12 +1184,8 @@ func _recover_baby_floor_anchors() -> void:
 		if tuned and not checked_obstacles:
 			if _floor_roll_nears_obstacle(floor_rid, true):
 				use_baby_floor_anchors = false
-				# A leg box can already overlap the wall before the contact manifold updates.
-				_baby_wall_anchors = use_tuned_floor_support or (leg and distance > TUNED_LIMB_RECOVERY_GAP
-					and _test_projection_motion(joint.body, state.transform, Vector3.ZERO, floor_rid)
-					and absf(_projection_hit.get_collision_normal().y) < MAX_WALL_NORMAL_Y
-					and _is_fixed_wall(_projection_hit.get_collider()))
-				_baby_waiting_for_wall_contact = not _baby_wall_anchors
+				_baby_wall_anchors = use_tuned_floor_support
+				_baby_waiting_for_wall_contact = not use_tuned_floor_support
 				return
 			checked_obstacles = true
 		if _test_projection_motion(joint.body, state.transform, motion, floor_rid):
@@ -1197,10 +1193,30 @@ func _recover_baby_floor_anchors() -> void:
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
 
-func _baby_leg_touches_wall() -> bool:
+func _baby_leg_needs_wall_recovery() -> bool:
+	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return false
+	var floor_body := _flat_floor.get_parent() as StaticBody3D
+	var chest: PhysicalBone3D = bodies.Chest
+	var parent := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	if floor_body == null or parent == null:
+		return false
 	for name in ["Leg.L", "Leg.R"]:
-		var state := PhysicsServer3D.body_get_direct_state((bodies[name] as PhysicalBone3D).get_rid())
-		if state != null and _has_fixed_wall_contact(state):
+		var leg: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(leg.get_rid())
+		if state == null:
+			continue
+		if _has_fixed_wall_contact(state):
+			return true
+		var joint: Dictionary = source_joints.get(name, {})
+		if joint.is_empty():
+			continue
+		var gap: Vector3 = (parent.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
+		# A leg can overlap the wall before the contact manifold updates.
+		if gap.length_squared() > TUNED_LIMB_RECOVERY_GAP ** 2 \
+				and _test_projection_motion(leg, state.transform, Vector3.ZERO, floor_body.get_rid()) \
+				and absf(_projection_hit.get_collision_normal().y) < MAX_WALL_NORMAL_Y \
+				and _is_fixed_wall(_projection_hit.get_collider()):
 			return true
 	return false
 
@@ -1534,7 +1550,7 @@ func _project_source_anchors() -> void:
 		use_baby_floor_anchors = false
 		_baby_wall_anchors = true
 	# A predictive sweep can end the floor correction one tick before contact.
-	if _baby_waiting_for_wall_contact and _baby_leg_touches_wall():
+	if _baby_waiting_for_wall_contact and _baby_leg_needs_wall_recovery():
 		_baby_waiting_for_wall_contact = false
 		_baby_wall_anchors = true
 	if _baby_wall_anchors:
