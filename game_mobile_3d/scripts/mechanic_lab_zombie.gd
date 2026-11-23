@@ -252,6 +252,8 @@ var _roam_wait := LAB_ROAM_DELAY
 var _roam_blocked_seconds := 0.0
 var _roam_rng := RandomNumberGenerator.new()
 var _idle_audio_index := 0
+var _idle_audio_phase := 0.0
+var _idle_audio_period := 0.0
 var _crowd_slot := 0
 var _blocked_walk := false
 var _blocking_zombie_id := 0
@@ -409,6 +411,8 @@ func _ready() -> void:
 		body.collision_mask = 0
 	if is_instance_valid(_corpse_floor):
 		ragdoll.prepare_source_joints()
+		if animation.has_animation(IDLE):
+			_idle_audio_period = animation.get_animation(IDLE).length
 	if _death_profile == null:
 		_death_profile = DeathProfile.new()
 		_death_profile.angular_impulse = 0.8
@@ -638,6 +642,8 @@ func _integrate_knockback(delta: float) -> Vector3:
 func _advance_animation(delta: float, travel: Vector3) -> void:
 	var clip := animation.current_animation
 	var state := _living_state(clip)
+	if state != IDLE:
+		_idle_audio_phase = 0.0
 	if state != ATTACK:
 		var expressive := Gait.is_gait(clip)
 		var source_stride := clip == ActionsStuff.MOVE
@@ -659,12 +665,19 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 				var forward_speed := motion.dot(global_basis.z) if not _skipped_blocked_step else 0.0
 				delta *= clampf(forward_speed / speed, 0.0, 1.0)
 		var play_idle := state == IDLE and idle_audio.has_connections()
-		var previous_phase := animation.current_animation_position if play_steps or play_idle else 0.0
+		var clip_drives_audio := play_steps or (play_idle and _idle_audio_period <= 0.0)
+		var previous_phase := animation.current_animation_position if clip_drives_audio else 0.0
 		animation.advance(delta)
 		if play_steps:
 			_emit_walk_step(clip, previous_phase)
 		elif play_idle:
-			_emit_idle_audio(previous_phase)
+			if _idle_audio_period > 0.0:
+				# Follow the MD2 idle duration for this rig through visual style changes.
+				previous_phase = _idle_audio_phase
+				_idle_audio_phase = fposmod(previous_phase + delta, _idle_audio_period)
+				_emit_idle_audio(previous_phase, _idle_audio_phase)
+			else:
+				_emit_idle_audio(previous_phase, animation.current_animation_position)
 		return
 	var before := animation.current_animation_position
 	var lab := is_instance_valid(_corpse_floor)
@@ -684,8 +697,7 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 	if before < _attack_contact and after >= _attack_contact:
 		_check_melee_contact()
 
-func _emit_idle_audio(previous_phase: float) -> void:
-	var phase := animation.current_animation_position
+func _emit_idle_audio(previous_phase: float, phase: float) -> void:
 	var crossed := IDLE_AUDIO_NOTIFY_TIME > previous_phase and IDLE_AUDIO_NOTIFY_TIME <= phase
 	if phase < previous_phase:
 		crossed = IDLE_AUDIO_NOTIFY_TIME > previous_phase or IDLE_AUDIO_NOTIFY_TIME <= phase
