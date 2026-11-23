@@ -1,6 +1,6 @@
 extends SceneTree
 
-const GateCases := [
+const GATE_CASES := [
 	[Vector2(42.5, 33.5), 0.0],
 	[Vector2(44.5, -10.5), 0.0],
 	[Vector2(44.5, 34.5), 1.0],
@@ -22,7 +22,7 @@ func run() -> void:
 	var geometry: Node = world.geometry
 	var failures: Array[String] = []
 	if geometry.has_method("cutaway_visibility"):
-		for item: Array in GateCases:
+		for item: Array in GATE_CASES:
 			var at: Vector2 = item[0]
 			var feet := Vector3(at.x, world.surface_height(at.x, at.y) + .02, at.y)
 			camera.position = feet + world.CAMERA_OFFSET
@@ -31,6 +31,6 @@ func run() -> void:
 				failures.append("%s uses weight %s, expected %s" % [at, actual, item[1]])
 	else:
 		failures.append("The cutaway does not evaluate upper-body occlusion.")
-	print("TERRAIN_REVEAL cases=", GateCases.size(), " failures=", failures)
+	print("TERRAIN_REVEAL cases=", GATE_CASES.size(), " failures=", failures)
 	world.free()
 	quit(0 if failures.is_empty() else 1)
