@@ -200,6 +200,7 @@ path_projector_lift = 0.58
 path_shade_sky = 1.0
 path_sky_chroma = 1.0
 stone_projector_lift = 0.15
+stone_top_sun_gain = 0.28
 bark_irradiance_by_hour = SubResource("ForestBarkIrradiance")
 spruce_leaf_filter = 1.0
 spruce_gap_coverage_by_hour = SubResource("SpruceGapCoveragePhase")

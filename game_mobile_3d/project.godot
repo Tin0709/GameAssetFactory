@@ -147,6 +147,10 @@ gaf_stone_projector_lift={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 0)
 }
+gaf_stone_top_sun_gain={
+"type": "float",
+"value": 0.0
+}
 gaf_path_sky_chroma={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 0)

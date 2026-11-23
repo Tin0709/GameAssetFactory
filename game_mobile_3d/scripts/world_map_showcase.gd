@@ -133,6 +133,7 @@ var _path_projector_lift := Vector4.ZERO
 var _path_shade_sky := Vector4.ZERO
 var _path_sky_chroma := Vector4.ZERO
 var _stone_projector_lift := Vector4.ZERO
+var _stone_top_sun_gain := 0.
 var _shadow_diffuse_tint := Vector3.ONE
 const LIGHTING_MIX_CONTROLS := {
 	&"day_cycle_pacing": ["Độ dài chu kỳ ngày / đêm", 1.],
@@ -539,6 +540,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_path_shade_sky", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_sky_chroma", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_projector_lift", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_stone_top_sun_gain", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1094,6 +1096,7 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_path_shade_sky", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_path_sky_chroma", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_projector_lift", Vector4.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_stone_top_sun_gain", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_shade_reach", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_wall_return", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_sheltered_stone_return", 0.)
@@ -1661,6 +1664,7 @@ func _sync_shadow_diffuse() -> void:
 	var path_shade_sky := Vector4.ZERO
 	var path_sky_chroma := Vector4.ZERO
 	var stone_projector := Vector4.ZERO
+	var stone_top_sun_gain := 0.
 	if (not _balanced_preview and _shadow_diffuse_available() and atmosphere_review == "combined"
 			and forest_active() and level.terrain_light.is_active()):
 		var sun: DirectionalLight3D = level.get_node("Sun")
@@ -1674,12 +1678,15 @@ func _sync_shadow_diffuse() -> void:
 					var key_direction := sun.global_basis.z.normalized()
 					path_projector = Vector4(key_direction.x, key_direction.y, key_direction.z, strength)
 			if _stone_projector_lift_available():
-				var strength := clampf(_biome_profile.stone_projector_lift, 0., .20)
-				strength *= _day_grass_shadow_weight() * _lighting_scale(&"stone_projector_lift")
+				var patch_weight := _day_grass_shadow_weight() * _lighting_scale(&"stone_projector_lift")
+				var strength := clampf(_biome_profile.stone_projector_lift, 0., .20) * patch_weight
 				strength *= lerpf(1., .55, _weather.weight)
 				if strength > 0.:
 					var direction := sun.global_basis.z.normalized()
 					stone_projector = Vector4(direction.x, direction.y, direction.z, strength)
+					if is_finite(_biome_profile.stone_top_sun_gain):
+						stone_top_sun_gain = clampf(_biome_profile.stone_top_sun_gain, 0., .55) \
+							* patch_weight * lerpf(1., .60, _weather.weight)
 			if _path_sky_chroma_available():
 				var strength := clampf(_biome_profile.path_sky_chroma, 0., 1.)
 				strength *= _day_grass_shadow_weight() * _lighting_scale(&"path_sky_chroma")
@@ -1771,6 +1778,9 @@ func _sync_shadow_diffuse() -> void:
 	if stone_projector != _stone_projector_lift:
 		_stone_projector_lift = stone_projector
 		RenderingServer.global_shader_parameter_set("gaf_stone_projector_lift", stone_projector)
+	if stone_top_sun_gain != _stone_top_sun_gain:
+		_stone_top_sun_gain = stone_top_sun_gain
+		RenderingServer.global_shader_parameter_set("gaf_stone_top_sun_gain", stone_top_sun_gain)
 
 func prepare_grass_terrace_shadow() -> void:
 	if _grass_terrace_shadow_available() and _lighting_scale(&"grass_terrace_shadow_fill") > 0.:

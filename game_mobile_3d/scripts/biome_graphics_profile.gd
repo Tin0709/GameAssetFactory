@@ -68,6 +68,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., 1.) var path_sky_chroma := 0.0
 ## Recover some projected Sun on exposed upper stone faces.
 @export_range(0., .20) var stone_projector_lift := 0.0
+## Extra Sun diffuse on the fully lit part of the same stone patches.
+@export_range(0., .55) var stone_top_sun_gain := 0.0
 @export_range(0., .56) var stone_wall_shadow_fill := 0.0
 ## Reduction of supplemental shadow fill at the foot of supported stone risers.
 @export_range(0.0, 0.66) var stone_foot_fill := 0.0
