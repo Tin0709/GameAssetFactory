@@ -1928,7 +1928,7 @@ func _slide_wall_shoulder_anchors() -> void:
 		# The shoulder can lose its solver contact while the wall still
 		# blocks the motion to its anchor. Use the swept contact in that tick.
 		var swept := contacts == 0
-		if swept and (not initial_collision or not free_torso or distance <= WALL_SLIDE_MIN_GAP
+		if swept and (not initial_collision or not free_torso
 				or not _test_projection_motion(limb, state.transform, gap)
 				or _projection_hit.get_collision_count() == 0):
 			continue
