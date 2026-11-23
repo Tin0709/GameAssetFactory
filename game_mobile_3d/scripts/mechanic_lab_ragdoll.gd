@@ -1730,6 +1730,25 @@ func _slide_contacting_shoulder(limb: PhysicalBone3D, state: PhysicsDirectBodySt
 		_project_contacting_anchor(limb, state, motion, true, TERRAIN_DEEP_OVERLAP)
 		if state.transform != pose:
 			return true
+		if depth <= TERRAIN_DEEP_RESIDUAL:
+			continue
+		# In a corner the first slide can exit this wall and enter the other.
+		# Keep the wall clearance and slide along the line shared by both faces.
+		var blocked := _terrain_contact_points(limb, state, motion)
+		for i in range(0, blocked.size(), 2):
+			var overlap := blocked[i + 1] - blocked[i]
+			if overlap.length_squared() <= PROJECTION_COLLISION_MARGIN ** 2:
+				continue
+			var other_normal := overlap.normalized()
+			if absf(other_normal.y) >= MAX_WALL_NORMAL_Y or absf(normal.dot(other_normal)) >= 0.25:
+				continue
+			var edge := normal.cross(other_normal).normalized()
+			var retreat := normal * clearance + edge * clampf(gap.dot(edge), -slide_limit, slide_limit)
+			if (gap - retreat).length_squared() >= gap.length_squared():
+				continue
+			_project_contacting_anchor(limb, state, retreat, true, TERRAIN_DEEP_OVERLAP)
+			if state.transform != pose:
+				return true
 	return false
 
 
