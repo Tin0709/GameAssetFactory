@@ -5,6 +5,7 @@ const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const STYLED_IDLE := &"Zombie_AS_Idle"
 const STYLED_WALK := &"Zombie_AS_Move"
 const STYLED_RUN := &"Zombie_AS_Pursuit"
+const STYLED_JUMP := &"Zombie_AS_Jump"
 const STYLED_FALL := &"Zombie_AS_Fall"
 const STYLED_ALERT := &"Zombie_AS_Alert"
 const STYLED_ATTACK := &"Zombie_AS_Attack"
@@ -71,7 +72,8 @@ func check_stationary_run(actor: Zombie) -> void:
 	var after_first := samples[0]
 	for tick in 4:
 		actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
-	check(actor.animation.current_animation == STYLED_WALK and after_first > 0 and samples[0] == after_first,
+	check(actor.animation.current_animation in [STYLED_WALK, STYLED_RUN]
+		and after_first > 0 and samples[0] == after_first,
 		"A blocked A&S stride publishes its pose once and reuses it while the phase holds")
 	var before_seek := samples[0]
 	actor.animation.seek(0.24)
@@ -84,6 +86,25 @@ func check_stationary_run(actor: Zombie) -> void:
 	actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
 	check(samples[0] > after_restart, "Replaying the held clip refreshes its pose even at the same phase")
 	actor.animation.mixer_applied.disconnect(count_sample)
+
+func check_airborne(lab: Node, group: Node) -> void:
+	for baby: bool in [false, true]:
+		var count := group.get_child_count()
+		group._spawn_at(Vector3(33.0, 3.0, 25.0), Vector3(33.0, 3.0, 29.0),
+			lab.player, lab.get_node("CombatEffects"), true, baby)
+		var actor := group.get_child(count) as Zombie
+		actor.animation.play(STYLED_IDLE)
+		actor.velocity.y = 3.0
+		check(await await_clip(actor, [STYLED_JUMP], 12), "Each age uses source jump during upward travel")
+		check(await await_clip(actor, [STYLED_FALL], 45), "Each age uses source fall during downward travel")
+		var onset := actor.animation.current_animation_position
+		for tick in 5:
+			await physics_frame
+		check(actor.animation.current_animation == STYLED_FALL
+			and actor.animation.current_animation_position > onset, "The fall plays continuously while airborne")
+		check(await await_clip(actor, [STYLED_IDLE, STYLED_ALERT, STYLED_WALK], 90),
+			"The zombie recovers its A&S ground animation after landing")
+		actor.free()
 
 func run() -> void:
 	var lab := Lab.instantiate()
@@ -106,17 +127,16 @@ func run() -> void:
 		return
 	var adult := group.get_child(0) as Zombie
 	var baby := group.get_child(1) as Zombie
+	var full: bool = group.full_actions_stuff_available
 	if "--require-baby-source" in OS.get_cmdline_user_args():
+		check(full, "The verified source pack is available for both ages")
+	if full:
 		check(mode.selected == 1, "Full A&S is selected when the verified pack is available")
 		check(adult.animation.current_animation == STYLED_SPAWN
 			and baby.animation.current_animation == STYLED_SPAWN, "Both ages spawn in the selected A&S style")
 		for actor: Zombie in [adult, baby]:
 			check(actor.animation.has_animation(STYLED_ALERT) and actor.animation.has_animation(STYLED_FALL),
 				"Each age has source alert and airborne poses")
-			if actor.animation.has_animation(STYLED_FALL):
-				actor.position.y = 3.0
-				actor.animation.play(STYLED_IDLE)
-				check(await await_clip(actor, [STYLED_FALL], 20), "A live fall selects the A&S fall clip")
 		check(adult.animation.has_animation(STYLED_RUN), "The adult has a distinct sourced pursuit gait")
 	select(mode, 0)
 	adult.position = Vector3.ZERO
@@ -133,12 +153,12 @@ func run() -> void:
 	check(await await_clip(baby, [STYLED_WALK], 90), "The Baby Zombie also switches to the source move clip")
 	check(baby.animation.get_animation(STYLED_WALK) != adult.animation.get_animation(STYLED_WALK),
 		"Both rigs use their own retargeted poses")
-	if "--require-baby-source" in OS.get_cmdline_user_args():
+	if full:
 		check(is_equal_approx(baby.animation.get_animation(STYLED_WALK).length, Zombie.ActionsStuff.BABY_STRIDE_SECONDS),
 			"The source Baby Zombie uses its own 0.4375-second stride")
 	lab.player.position = adult.position + Vector3(7.0, 0.0, 0.0)
 	var steps: Array[Vector3] = []
-	var pursuit := STYLED_RUN if "--require-baby-source" in OS.get_cmdline_user_args() else STYLED_WALK
+	var pursuit := STYLED_RUN if full else STYLED_WALK
 	adult.step_audio.connect(func(point: Vector3):
 		if adult.animation.current_animation == pursuit:
 			steps.append(adult.to_local(point)))
@@ -198,7 +218,8 @@ func run() -> void:
 		check(hits[0] == 1, "One A&S Baby Zombie swing applies damage exactly once")
 		# End the encounter so the next swing cannot preempt the idle pose.
 		lab.player.position = Vector3(5.0, 0.0, 5.5)
-		check(await await_clip(next_baby, [STYLED_IDLE]), "The attack returns to the A&S idle")
+		check(await await_clip(next_baby, [STYLED_ALERT if full else STYLED_IDLE]),
+			"The attack returns to the Baby Zombie's sourced resting pose")
 		next_baby.take_hit(1, Vector3.BACK, Zombie.DEFAULT_DEATH_IMPULSE, Zombie.BABY_MAX_POISE)
 		check(next_baby.animation.current_animation == STYLED_STAGGER, "The A&S mode does not play a native living stagger montage")
 		next_baby.take_hit(next_baby.health, Vector3.BACK)
@@ -216,5 +237,8 @@ func run() -> void:
 	print("MECHANIC_LAB_IDLE_CLOCK md2=", md2_cues, " as=", styled_cues, " switched=", switched_cues)
 	check_stationary_run(adult)
 	check_stationary_run(baby)
+	if full:
+		lab.player.position = Vector3(-25.0, 0.0, -25.0)
+		await check_airborne(lab, group)
 	print("MECHANIC_LAB_ZOMBIE_GAIT failures=", failures, " footsteps=", steps.size())
 	quit(0 if failures == 0 else 1)
