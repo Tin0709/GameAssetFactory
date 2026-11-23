@@ -90,6 +90,7 @@ func run() -> void:
 	await check_overlapping_landing_dust(lab, dust)
 	await check_source_dust_batch(lab, dust)
 	await check_gauntlet_debris(lab, dust)
+	await check_source_dust_and_wake_order(lab, dust, wind)
 	await check_running_wake_support(lab, wind)
 	await check_running_wake_render_clock(lab, wind, dust)
 	await check_floor_edge_landing(lab, dust)
@@ -138,6 +139,39 @@ func check_source_dust_batch(lab, dust) -> void:
 	dust.clear()
 	check(not dust.is_processing() and batch.multimesh.visible_instance_count == 0 and not batch.visible,
 		"Clearing the emitter immediately clears the landing draw")
+	lab.reset_player()
+
+
+func check_source_dust_and_wake_order(lab, dust, wind) -> void:
+	var batch := dust.get_node_or_null("LandingDustBatch") as MultiMeshInstance3D
+	if batch == null:
+		return
+	lab.reset_player()
+	for i in 3:
+		await physics_frame
+	var center: Vector3 = lab.player.global_position
+	var far: Vector3 = center + lab.camera.global_basis.x * 3.0
+	dust._emit_run_dust(center, "grass", 1.0)
+	dust._emit_run_dust(far, "grass", 1.0)
+	dust._emit_run_dust(far + lab.camera.global_basis.x, "grass", 1.0)
+	var wake = wind._wakes[0]
+	wake.origin = center + Vector3.UP * 0.20
+	wake.trailing = Vector3.FORWARD
+	wake.contact_tick = Engine.get_physics_frames()
+	wake.mesh.show()
+	wind.set_process(true)
+	await physics_frame
+	dust._process(0.0)
+	var individual := 0
+	for particle in dust._particles:
+		if particle.sprite.visible and particle.sprite.layers != 0:
+			individual += 1
+	check(batch.multimesh.visible_instance_count == 2 and individual == 1,
+		"Smoke over a wind wake keeps its own draw order while the separated puffs stay batched")
+	wind.clear()
+	dust._process(0.0)
+	check(batch.multimesh.visible_instance_count == 3,
+		"All eligible puffs batch again when the wake expires")
 	lab.reset_player()
 
 
@@ -224,10 +258,12 @@ func check_running_wake_render_clock(lab, wind, dust) -> void:
 			draw_mismatches += int((puff.sprite.layers != 0) == pending)
 		else:
 			var drawn := 0
+			var individual := 0
 			for particle in dust._particles:
 				if particle.sprite.visible and particle.run_drag > 0.0 and particle.contact_tick <= render_tick:
 					drawn += 1
-			draw_mismatches += int(dust._landing_batch.multimesh.visible_instance_count != drawn)
+					individual += int(particle.sprite.layers != 0)
+			draw_mismatches += int(dust._landing_batch.multimesh.visible_instance_count + individual != drawn)
 		var progress: float = puff.age / wind.LIFETIME
 		if progress >= 1.0:
 			continue

@@ -9,6 +9,8 @@ const GAUNTLET_DEBRIS_HASH := "b700bc41b85fd6afb00a76bdf7966d708557ac11b01b54eea
 const GAUNTLET_DEBRIS_GRAVITY := 14.7
 const GAUNTLET_IMPACT_DUST_FORWARD := 0.90
 const FRAMES := [0, 9, 10, 16, 24, 25]
+# All six nearest-filtered masks fit inside the central 12 by 12 texels.
+const SMOKE_VISIBLE_FRACTION := 12.0 / 16.0
 const CAPACITY := 16
 const SOURCE_LANDING_CAPACITY := 24
 const LANDING_SHADER := preload("res://materials/mechanic_lab_landing_dust.gdshader")
@@ -47,6 +49,7 @@ var _actor: CharacterBody3D
 var _ground: CollisionShape3D
 var _terrain_contact: Callable
 var _landing_contact: Callable
+var wind_overlaps: Callable
 var _heavy_delay: Callable
 var _particles: Array[Particle] = []
 var _next := 0
@@ -163,6 +166,7 @@ func _sync_landing_batch() -> void:
 				or Color(particle.sprite.modulate, 1.0) != SURFACE_DUST.grass):
 			can_batch = false
 			break
+	var camera := get_viewport().get_camera_3d() if wind_overlaps.is_valid() else null
 	var count := 0
 	var bounds := AABB()
 	var largest_size := 0.0
@@ -171,13 +175,14 @@ func _sync_landing_batch() -> void:
 		if not sprite.visible or particle.draw_pending or particle.debris_drag > 0.0 \
 				or (particle.landing_tick < 0 and particle.run_drag <= 0.0):
 			continue
-		var layers := 0 if can_batch else 1
+		var size := sprite.pixel_size * 16.0
+		var batch_sprite: bool = can_batch and (camera == null or not wind_overlaps.call(camera, sprite.global_position, size * SMOKE_VISIBLE_FRACTION))
+		var layers := 0 if batch_sprite else 1
 		if sprite.layers != layers:
 			sprite.layers = layers
-		if not can_batch:
+		if not batch_sprite:
 			continue
 		var point := to_local(sprite.global_position)
-		var size := sprite.pixel_size * 16.0
 		instances.set_instance_transform(count, Transform3D(Basis.IDENTITY, point))
 		instances.set_instance_custom_data(count, Color(float(sprite.frame), sprite.modulate.a, size, 0.0))
 		bounds = AABB(point, Vector3.ZERO) if count == 0 else bounds.expand(point)

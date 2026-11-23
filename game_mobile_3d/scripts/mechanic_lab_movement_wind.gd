@@ -4,6 +4,8 @@ const EffectSource := preload("res://scripts/mechanic_lab_effect_source.gd")
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Materials/Wind/T_WhirlWind.png"
 const SOURCE_SHA256 := "b0db34beb364606e0c335593c69dfefcf41fd4f374b51c26d8ce1b134574a0e7"
 const CAPACITY := 4
+const QUAD_SIZE := Vector2(1.02, 0.36)
+const DRIFT_DISTANCE := 0.16
 const RUN_SPEED_FRACTION := 0.85
 const LIFETIME := 0.19
 const TINT := Color(0.87, 0.94, 0.92, 0.34)
@@ -21,6 +23,7 @@ var _terrain_contact: Callable
 var _wakes: Array[Wake] = []
 var _next := 0
 var _physics_clock := false
+var _visible_footprint: Rect2
 
 func setup(actor: CharacterBody3D, terrain_contact := Callable(), physics_clock := false,
 		cull_mode: BaseMaterial3D.CullMode = BaseMaterial3D.CULL_BACK) -> bool:
@@ -30,10 +33,15 @@ func setup(actor: CharacterBody3D, terrain_contact := Callable(), physics_clock 
 	_actor = actor
 	_terrain_contact = terrain_contact
 	_physics_clock = physics_clock
+	# Account for the transparent part of the source image, including a texel for filtering.
+	var footprint := image.get_used_rect().grow(1).intersection(Rect2i(Vector2i.ZERO, image.get_size()))
+	var pixels := Vector2(image.get_size())
+	_visible_footprint = Rect2((Vector2(footprint.position) / pixels - Vector2.ONE * 0.5) * QUAD_SIZE,
+		Vector2(footprint.size) / pixels * QUAD_SIZE)
 	var texture := ImageTexture.create_from_image(image)
 	var quad := QuadMesh.new()
 	quad.orientation = PlaneMesh.FACE_Y
-	quad.size = Vector2(1.02, 0.36)
+	quad.size = QUAD_SIZE
 	for i in CAPACITY:
 		var wake := Wake.new()
 		wake.material = StandardMaterial3D.new()
@@ -104,10 +112,36 @@ func _process(delta: float) -> void:
 			wake.mesh.hide()
 			continue
 		var progress := wake.age / LIFETIME
-		wake.mesh.global_position = wake.origin + wake.trailing * progress * 0.16
+		wake.mesh.global_position = wake.origin + wake.trailing * progress * DRIFT_DISTANCE
 		wake.material.albedo_color.a = TINT.a * (1.0 - smoothstep(0.12, 1.0, progress))
 		active = true
 	set_process(active)
+
+func overlaps_smoke(camera: Camera3D, point: Vector3, size: float) -> bool:
+	if not is_processing() or not is_visible_in_tree():
+		return false
+	var camera_basis := camera.global_basis
+	for wake in _wakes:
+		if not wake.mesh.visible:
+			continue
+		if camera.projection != Camera3D.PROJECTION_ORTHOGONAL:
+			return true
+		# Project the whole drifting wake onto the camera's screen axes.
+		# A smoke sprite overlapping it needs its original depth sort.
+		var trailing := wake.trailing
+		var lateral := trailing.cross(Vector3.UP)
+		var drift := trailing * (DRIFT_DISTANCE * 0.5)
+		var footprint_center := _visible_footprint.get_center()
+		var offset := point - wake.origin - trailing * footprint_center.x - lateral * footprint_center.y - drift
+		var half := _visible_footprint.size * 0.5
+		var half_width := absf(camera_basis.x.dot(trailing)) * half.x \
+			+ absf(camera_basis.x.dot(lateral)) * half.y + absf(camera_basis.x.dot(drift))
+		var half_height := absf(camera_basis.y.dot(trailing)) * half.x \
+			+ absf(camera_basis.y.dot(lateral)) * half.y + absf(camera_basis.y.dot(drift))
+		if absf(camera_basis.x.dot(offset)) < half_width + size * 0.5 \
+				and absf(camera_basis.y.dot(offset)) < half_height + size * 0.5:
+			return true
+	return false
 
 func clear() -> void:
 	for wake in _wakes:

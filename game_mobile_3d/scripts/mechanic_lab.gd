@@ -290,6 +290,8 @@ func _ready() -> void:
 		# M_WhirlWind_Emissive uses a two-sided material.
 		if wind.setup(player, _player_foot_contact_at, true, BaseMaterial3D.CULL_DISABLED):
 			add_child(wind)
+			if is_instance_valid(dust):
+				dust.wind_overlaps = wind.overlaps_smoke
 		else:
 			wind.free()
 		var contact_sparks := ContactSparks.new()
