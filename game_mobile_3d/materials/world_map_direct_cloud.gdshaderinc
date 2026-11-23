@@ -144,6 +144,13 @@ void light() {
 	if (terrain_canopy_incident.w >= 0.0 && gaf_canopy_ground_fill.x > 0.0 && shadow_diffuse.g > 0.0 &&
 			terrain_canopy_ground_ev != 0.0 && shadow_attenuation < .58) {
 		canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev, shadow_attenuation);
+		if (shadow_attenuation < .47) {
+			// Shaded turf receives more diffuse fill than the blades above it.
+			float coverage = 1.0 - smoothstep(.74, .94, terrain_canopy_sky);
+			float cast_shade = 1.0 - smoothstep(.065, .47, shadow_attenuation);
+			float phase = min(gaf_canopy_ground_fill.x / .75, 1.0);
+			canopy_delta.x -= .12 * coverage * cast_shade * phase;
+		}
 	}
 	DIFFUSE_LIGHT += shadow_diffuse * (ground_fill * (1.0 + canopy_delta.y));
 	DIFFUSE_LIGHT += terrain_canopy_incident.rgb * canopy_delta.x;
