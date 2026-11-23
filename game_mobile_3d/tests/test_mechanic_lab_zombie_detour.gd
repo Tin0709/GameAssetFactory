@@ -576,7 +576,80 @@ func check_recess_after_occlusion(member_count: int, yaw: float, baby: bool, clo
 	lab.free()
 	await physics_frame
 
+func check_last_sighting_at_two_faces(member_count: int) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	lab.get_node("Zombies")._spawn_serial = 6039
+	var zombies := spawn_detour_group(lab, member_count, true)
+	if zombies == null:
+		lab.free()
+		return
+	var chaser := zombies.get_child(0) as ZOMBIE
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 683874
+	var yaw := rng.randf_range(-PI * 0.6, PI * 0.6)
+	var heading := Basis(Vector3.UP, yaw)
+	var tip := rng.randf_range(-0.7, 0.7)
+	var apex := Vector3(tip, 0.0, -1.7)
+	var left := Vector3(tip - rng.randf_range(0.72, 2.87), 0.0, rng.randf_range(-4.7, -3.25))
+	var right := Vector3(tip + rng.randf_range(0.72, 2.87), 0.0, rng.randf_range(-4.7, -3.25))
+	var rear := Vector3(tip + rng.randf_range(-2.15, 2.15), 0.0, rng.randf_range(-5.3, -3.5))
+	var rear_end := rear + Vector3(rng.randf_range(0.5, 1.5), 0.0, rng.randf_range(-0.9, 0.9))
+	for edge: Array in [[left, apex, 0.42], [apex, right, 0.42], [rear, rear_end, 0.40]]:
+		var offset: Vector3 = edge[1] - edge[0]
+		var center: Vector3 = heading * ((edge[0] + edge[1]) * 0.5)
+		center.y = edge[2] * 0.5
+		add_wall(lab, center, Vector3(offset.length(), edge[2], 0.19), yaw + atan2(-offset.z, offset.x))
+	chaser.position = heading * Vector3(rng.randf_range(-0.7, 0.7), 0.02, -4.98)
+	lab.player.position = heading * Vector3(rng.randf_range(-0.65, 0.65), 0.02, 0.0)
+	chaser.rotation.y = yaw
+	chaser.animation.play(ZOMBIE.IDLE)
+	chaser.animation.advance(0.0)
+	var damage: Array[int] = []
+	chaser.melee_hit.connect(func(amount: int): damage.append(amount))
+	var known := Vector3.INF
+	var hidden_tick := -1
+	var reacquired_tick := -1
+	var routed_hidden := false
+	var remembered := true
+	var saw_two_faces := false
+	for tick in 230:
+		await physics_frame
+		if not known.is_finite() and chaser.is_on_wall() and chaser._target_aggressive and chaser._target_visible:
+			known = chaser._last_seen_position
+			add_wall(lab, heading * Vector3(0.0, 1.3, -0.8), Vector3(1.3, 2.6, 0.19), yaw)
+			lab.player.position += heading.z * 0.18
+		if known.is_finite() and not chaser._target_visible and reacquired_tick < 0:
+			if hidden_tick < 0:
+				hidden_tick = tick
+			if not chaser._target_aggressive:
+				break
+			remembered = remembered and chaser._last_seen_position == known and damage.is_empty()
+			saw_two_faces = saw_two_faces or chaser.get_slide_collision_count() >= 2
+			routed_hidden = routed_hidden or chaser._chase_detour_next.is_finite()
+		elif hidden_tick >= 0 and reacquired_tick < 0 and chaser._target_visible:
+			reacquired_tick = tick
+		if not damage.is_empty():
+			break
+	if hidden_tick < 0 or not saw_two_faces or not remembered or not routed_hidden \
+			or reacquired_tick <= hidden_tick or damage != [ZOMBIE.BABY_MELEE_DAMAGE]:
+		failures.append("A Baby Zombie blocked on two faces should reach its remembered route and only hit after reacquiring sight")
+	print("LAB_TWO_FACE_SIGHTING members=", member_count, " hidden_tick=", hidden_tick,
+		" two_faces=", saw_two_faces, " routed_hidden=", routed_hidden, " remembered=", remembered,
+		" reacquired_tick=", reacquired_tick, " hits=", damage)
+	lab.free()
+	await physics_frame
+
+
 func run() -> void:
+	if OS.get_cmdline_user_args().has("--last-sighting-two-faces"):
+		await check_last_sighting_at_two_faces(1)
+		await check_last_sighting_at_two_faces(100)
+		print("LAB_LAST_SIGHTING_TWO_FACES failures=", failures)
+		quit(0 if failures.is_empty() else 1)
+		return
 	await check_open_back_recess(1, 0.0)
 	await check_open_back_recess(100, deg_to_rad(31.0), true)
 	await check_recess_after_occlusion(1, 0.0, false)
