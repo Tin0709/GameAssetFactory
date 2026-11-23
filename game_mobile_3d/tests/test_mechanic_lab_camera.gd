@@ -49,6 +49,7 @@ func run() -> void:
 	await check_sabre_dive(lab)
 	if DisplayServer.get_name() != "headless":
 		await check_sabre_dive_presentation(lab)
+	await check_aerial_contact_pose(lab)
 	lab.free()
 	print("PAWN_SHAKE_RANGE failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -155,6 +156,58 @@ func start_sabre_dive(lab) -> void:
 	event = InputEventKey.new()
 	event.physical_keycode = KEY_E
 	root.push_input(event, true)
+
+func check_aerial_contact_pose(lab) -> void:
+	lab.set_process(false)
+	var group := lab.get_node("Zombies")
+	var sparks = lab.get_node("ContactSparks")
+	sparks.process_mode = Node.PROCESS_MODE_DISABLED
+	for slot: int in [lab.Weapon.SABRE, lab.Weapon.SWORD, lab.Weapon.AXE]:
+		lab.reset_player()
+		for i in 8:
+			await physics_frame
+		lab._select_weapon(slot)
+		check(lab._equipped_weapon == slot, "The aerial contact test equips slot %d" % slot)
+		lab.get_node("HUD/SpawnZombie").pressed.emit()
+		var forward: Vector3 = lab.player.visual.global_basis.z
+		var target = group.get_child(0)
+		target.set_physics_process(false)
+		target.collision_layer = 0
+		target.global_position = lab.player.global_position + forward * 1.5
+		var contacts: Array[Vector3] = []
+		group.sabre_contact.connect(func(point, _direction, _clip, _index, _serial, _lethal):
+			contacts.append(point), CONNECT_ONE_SHOT)
+		await start_sabre_dive(lab)
+		for i in Engine.physics_ticks_per_second:
+			await physics_frame
+			if not contacts.is_empty():
+				break
+		check(contacts.size() == 1, "The aerial attack hits one target in slot %d" % slot)
+		if not contacts.is_empty():
+			lab.player.render_presenter.prepare(0.0)
+			sparks._process(0.0)
+			lab._process(0.0)
+			var early_count: int = sparks._streaks.visible_instance_count
+			check(early_count == 0, "Aerial body sparks wait for the contact pose in slot %d" % slot)
+			if slot != lab.Weapon.SABRE:
+				check(not lab._impact_light.visible, "The landing light waits for the contact pose in slot %d" % slot)
+				check(lab._light_sample_time == lab.player.effects.clock,
+					"The landing light uses the current physics pose in slot %d" % slot)
+			lab.player.render_presenter.prepare(1.0)
+			sparks._process(0.0)
+			lab._process(0.0)
+			check(sparks._streaks.visible_instance_count == 9, "One body burst starts on the contact pose in slot %d" % slot)
+			for i in sparks._streaks.visible_instance_count:
+				var origin: Vector3 = sparks._streaks.get_instance_transform(i).origin
+				check(is_equal_approx(origin.distance_to(contacts[0]), 0.21), "Body sparks start at their struck target")
+			if slot != lab.Weapon.SABRE:
+				check(lab._impact_light.visible and is_equal_approx(lab._impact_light.light_energy, 2.3),
+					"The floor flash keeps priority over the body flash at full intensity in slot %d" % slot)
+			print("AERIAL_CONTACT_POSE slot=", slot, " early_streaks=", early_count,
+				" on_pose_streaks=", sparks._streaks.visible_instance_count)
+		target.free()
+		if contacts.is_empty():
+			break
 
 func check_sabre_dive_presentation(lab) -> void:
 	lab.reset_player()
