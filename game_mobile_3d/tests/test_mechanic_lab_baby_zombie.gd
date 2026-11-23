@@ -16,6 +16,12 @@ func check(condition: bool, message: String) -> void:
 		printerr("FAIL ", message)
 
 func run() -> void:
+	if OS.get_cmdline_user_args().has("--wall-rebound"):
+		# Use a fresh physics space so earlier runs cannot change joint solve order.
+		await check_tuned_contact(9, 0.0, 0.30, Strike.AIR, -90.0, Vector2(1000.0, 100.0), true)
+		print("LAB_BABY_WALL_REBOUND failures=", failures)
+		quit(0 if failures.is_empty() else 1)
+		return
 	# Start this corner replay with a prewarmed rig, as in the live Lab.
 	await check_tuned_contact(9, 13.0, 0.80, Strike.AIR, -44.0, Vector2(1000.0, 100.0), true)
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
