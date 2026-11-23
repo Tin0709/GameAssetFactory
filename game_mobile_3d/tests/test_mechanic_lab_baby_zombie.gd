@@ -99,6 +99,7 @@ func run() -> void:
 		"The baby lands with the full rig connected and releases the simulation at rest")
 	lab.free()
 	await check_prewarmed_spawn()
+	await check_spawn_during_prewarm()
 	await check_tuned_contact(26)
 	await check_tuned_contact(13, 0.0, 0.90)
 	await check_tuned_contact(25, 27.0, 1.00)
@@ -144,8 +145,19 @@ func check_prewarmed_spawn() -> void:
 	current_scene = lab
 	var group: Node = lab.get_node("Zombies")
 	check(group.get("_baby_visual") == null, "Opening the Lab does not import the baby rig synchronously")
-	for frame in 9:
+	var last_pending := 0
+	var partial_frames := 0
+	for frame in 24:
 		await process_frame
+		if group.get("_baby_visual") != null:
+			break
+		var pending: Variant = group.get("_baby_bake_steps")
+		if pending is Array and not pending.is_empty():
+			if last_pending > 0:
+				check(last_pending - pending.size() <= 1, "Baby prewarm bakes at most one step per render frame")
+			last_pending = pending.size()
+			partial_frames += 1
+	check(partial_frames > 1, "Baby prewarm spreads the animation bake over multiple render frames")
 	check(group.get_child_count() == 0 and group.get("_baby_visual") is PackedScene,
 		"The idle Lab prepares the Baby Zombie without spawning one")
 	var button := lab.get_node("HUD/SpawnBabyZombie") as Button
@@ -158,6 +170,30 @@ func check_prewarmed_spawn() -> void:
 		check(zombie.is_baby and skin is Texture2D, "The prepared Baby Zombie keeps its verified skin")
 	if group.get_child_count() == 2:
 		check_walk_contacts(group.get_child(0) as Zombie)
+	lab.free()
+
+func check_spawn_during_prewarm() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group: Node = lab.get_node("Zombies")
+	var staged: Node3D
+	for frame in 24:
+		await process_frame
+		staged = group.get("_baby_build_model") as Node3D
+		if staged != null:
+			break
+	check(staged != null and group.get("_baby_visual") == null,
+		"A detached Baby Zombie rig is available during prewarm")
+	var button := lab.get_node("HUD/SpawnBabyZombie") as Button
+	button.pressed.emit()
+	var packed := group.get("_baby_visual") as PackedScene
+	check(group.get_child_count() == 1 and packed != null and not is_instance_valid(staged),
+		"An early press completes the in-progress rig and spawns exactly one Baby Zombie")
+	await process_frame
+	await process_frame
+	check(group.get_child_count() == 1 and group.get("_baby_visual") == packed,
+		"Resuming prewarm does not rebuild the completed rig or spawn an extra zombie")
 	lab.free()
 
 func check_walk_contacts(baby: Zombie) -> void:
