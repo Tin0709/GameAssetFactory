@@ -11,6 +11,7 @@ const CLIPS := {
 	"attack": ["craixf", 3641430, 2733, "a9b11271057f6d0964b621f35796c0b18c63f9969081f6eeacb92eecd3daec4d"],
 	"jump": ["liruwo", 3669873, 1990, "f2514086d2600adcdba7674bbbf04d07cc4996ccb1caae172287a0d0caefedce"],
 	"fall": ["efxmad", 3671864, 2430, "cb43c8a7ed66ddf50fe825706365933dcf5dc2be4690ae307e609972f773167f"],
+	"land": ["ogdnrx", 3674295, 1174, "a87de59242a0128a036525703713076324985b7e226eccf9543af457fb8165df"],
 }
 const CHANNELS := {
 	&"Hips": "waist", &"Chest": "body", &"Neck": "head",

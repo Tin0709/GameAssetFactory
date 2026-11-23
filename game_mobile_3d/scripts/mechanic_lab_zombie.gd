@@ -209,6 +209,8 @@ var health := TRAINING_HEALTH:
 var is_baby := false
 var expressive_gait := false
 var actions_stuff_animation := false
+var actions_stuff_landing: ActionsStuff.LandingPose
+var _actions_landing_time := -1.0
 var _body_height := HEIGHT
 var _chase_speed := CHASE_SPEED
 var _roam_speed := LAB_ROAM_SPEED
@@ -547,6 +549,8 @@ func _physics_process(delta: float) -> void:
 		_update_walk_blocker(destination)
 	_update_air_animation(travel)
 	_advance_animation(delta, travel)
+	if _actions_landing_time >= 0.0:
+		_advance_landing(delta)
 	ragdoll.sample(delta)
 
 func _recover_crowd_floor() -> void:
@@ -678,7 +682,7 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 		if source_stride and delta == 0.0:
 			# The first stationary tick can still apply a new pose or blend weight.
 			# The authored A&S move clip only writes transforms.
-			if _stationary_gait_phase != animation.current_animation_position:
+			if _actions_landing_time >= 0.0 or _stationary_gait_phase != animation.current_animation_position:
 				animation.advance(0.0)
 				_stationary_gait_phase = animation.current_animation_position
 		else:
@@ -1300,6 +1304,8 @@ func _update_air_animation(travel: Vector3) -> void:
 	var current := animation.assigned_animation
 	if is_on_floor():
 		if _is_air_clip(current):
+			if actions_stuff_landing != null:
+				_actions_landing_time = 0.0
 			if travel.is_zero_approx():
 				_play_loop(IDLE)
 			else:
@@ -1315,6 +1321,17 @@ func _update_air_animation(travel: Vector3) -> void:
 		next = ActionsStuff.JUMP
 	if next != current:
 		animation.play(next, 0.16 if next == ActionsStuff.FALL else 0.24)
+
+func _advance_landing(delta: float) -> void:
+	if not actions_stuff_animation or not is_on_floor():
+		_actions_landing_time = -1.0
+		return
+	_actions_landing_time += delta
+	var time := _actions_landing_time - ActionsStuff.LANDING_DELAY
+	if time >= actions_stuff_landing.duration:
+		_actions_landing_time = -1.0
+	elif time >= 0.0:
+		actions_stuff_landing.apply(ragdoll.skeleton, time)
 
 func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE,
 		stagger: float = MAX_POISE, knockback_strength: float = 500.0, death_strike := DeathStrike.GROUND,

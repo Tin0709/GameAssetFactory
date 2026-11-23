@@ -142,6 +142,8 @@ var _actions_stuff_animation := false
 var actions_stuff_available := false
 var full_actions_stuff_available := false
 var _actions_stuff_pack: Dictionary = {}
+var _adult_landing: Zombie.ActionsStuff.LandingPose
+var _baby_landing: Zombie.ActionsStuff.LandingPose
 var _ragdoll_layout: Dictionary
 var _baby_visual: PackedScene
 var _baby_ragdoll_layout: Dictionary
@@ -247,6 +249,7 @@ func _spawn_at(point: Vector3, floor_position: Vector3, player: CharacterBody3D,
 	zombie.configure(scene.instantiate(), player, effects, _digits, _spawn_serial, layout,
 		corpse_floor, health_bars, damage_numbers, baby)
 	zombie.actions_stuff_animation = _actions_stuff_animation
+	zombie.actions_stuff_landing = _baby_landing if baby else _adult_landing
 	zombie.melee_hit.connect(player_hit.emit)
 	zombie.melee_audio.connect(baby_attack_audio.emit if baby else zombie_attack_audio.emit)
 	if baby and zombie_swing_audio.has_connections():
@@ -689,6 +692,12 @@ func _add_actions_stuff(player: AnimationPlayer, skeleton: Skeleton3D, baby: boo
 	var contact := Zombie.BABY_ATTACK_CONTACT if baby else Zombie.MELEE_CONTACT_TIME
 	Zombie.ActionsStuff.build(player, skeleton, Vector3(release, contact, player.get_animation(Zombie.ATTACK).length),
 		player.get_animation(Zombie.SPAWN).length, Zombie.STAGGER_DURATION, baby, _actions_stuff_pack)
+	if player.has_animation(Zombie.ActionsStuff.FALL):
+		var landing := Zombie.ActionsStuff.LandingPose.new(skeleton, _actions_stuff_pack.land)
+		if baby:
+			_baby_landing = landing
+		else:
+			_adult_landing = landing
 
 func _add_baby_clips(directory: String, player: AnimationPlayer) -> bool:
 	if not player.has_animation(BABY_IDLE):

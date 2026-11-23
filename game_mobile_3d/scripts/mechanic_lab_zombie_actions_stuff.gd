@@ -22,6 +22,7 @@ const SOURCE_RELEASE := 10.0 / 60.0
 const SOURCE_CONTACT := 12.0 / 60.0
 const BAKE_RATE := 60.0
 const ALERT_TIME := 0.7083
+const LANDING_DELAY := 0.15 # A&S ground recovery controller.
 const BABY_IDLE_PERIOD := 360.0 / 130.0
 
 # Bind transforms of the Mobs research rig in the same +Z-facing space as MD2.
@@ -36,6 +37,44 @@ const BONE_MAP := [
 	[&"J_L_Leg", &"Leg.L", Vector3(0.1125, 0, 0)],
 	[&"J_R_Leg", &"Leg.R", Vector3(-0.1125, 0, 0)],
 ]
+
+class LandingPose:
+	var duration: float
+	var _rig_scale: float
+	var _joints: Array[Dictionary] = []
+
+	func _init(skeleton: Skeleton3D, source: Dictionary) -> void:
+		duration = source.animation_length
+		var hip := skeleton.find_bone(&"J_Hip")
+		_rig_scale = skeleton.get_bone_global_rest(hip).origin.y / SOURCE_LEG_HEIGHT
+		# Put the waist compression above the hips so the planted legs keep their stride.
+		# Leave out the pack's whole-body squash to retain rigid blocks.
+		for binding: Array in [[&"J_Spine", "waist"], [&"J_Neck", "head"],
+				[&"J_L_Arm", "leftarm"], [&"J_R_Arm", "rightarm"]]:
+			var bone := skeleton.find_bone(binding[0])
+			var parent := skeleton.get_bone_global_rest(skeleton.get_bone_parent(bone))
+			var channels: Dictionary = source.bones[binding[1]]
+			_joints.append({
+				"bone": bone,
+				"to_local": parent.basis.get_rotation_quaternion().inverse(),
+				"position": Pack.Channel.new(channels.position) if channels.has("position") else null,
+				"rotation": Pack.Channel.new(channels.rotation) if channels.has("rotation") else null,
+			})
+
+	func apply(skeleton: Skeleton3D, time: float) -> void:
+		for joint: Dictionary in _joints:
+			var bone: int = joint.bone
+			var to_local: Quaternion = joint.to_local
+			if joint.position != null:
+				var offset: Vector3 = joint.position.sample(time, true)
+				offset *= Vector3(1, 1, -1) * Pack.SOURCE_PIXEL * _rig_scale
+				skeleton.set_bone_pose_position(bone, skeleton.get_bone_pose_position(bone) + to_local * offset)
+			if joint.rotation != null:
+				var angles: Vector3 = joint.rotation.sample(time, true)
+				angles *= (PI / 180.0) * Vector3(1, -1, -1)
+				var rotation := Basis.from_euler(angles, EULER_ORDER_ZYX).get_rotation_quaternion()
+				skeleton.set_bone_pose_rotation(bone, (to_local * rotation * to_local.inverse()
+					* skeleton.get_bone_pose_rotation(bone)).normalized())
 
 static func build(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: Vector3,
 		spawn_duration: float, stagger_seconds: float, baby: bool, pack: Dictionary) -> void:
