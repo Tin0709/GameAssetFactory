@@ -235,10 +235,12 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., 1., .01) var dusk_key_fade_strength := 0.
 ## Ambient multiplier before weather, in normalized hours. An empty track uses 1.
 @export var ambient_energy_by_hour: Curve
-## Signed ambient color weight in normalized hours. Negative values reverse the channel ratios.
+## Signed ambient color weight in normalized hours.
 @export var ambient_tint_by_hour: Curve
 ## Linear RGB channel ratios. The adjustment preserves the incoming luminance.
 @export var ambient_tint_ratio := Vector3.ONE
+## Optional linear RGB ratios for negative weights. Zero uses the reciprocal of ambient_tint_ratio.
+@export var ambient_tint_negative_ratio := Vector3.ZERO
 @export var day_path_chroma_by_hour: Curve
 @export var fog_density_by_hour: Curve
 
@@ -260,14 +262,20 @@ func ambient_hour_scale(hour: float, strength: float = 1.) -> float:
 	return lerpf(1., authored, clampf(strength, 0., 1.))
 
 func tint_ambient(hour: float, color: Color, strength: float = 1.) -> Color:
-	if ambient_tint_by_hour == null or strength <= 0. or ambient_tint_ratio == Vector3.ONE:
+	if ambient_tint_by_hour == null or strength <= 0.:
 		return color
 	var amount := clampf(DayNight.sample_curve(ambient_tint_by_hour, fposmod(hour, 24.) / 24., 0.), -1., 1.)
-	var ratio := ambient_tint_ratio
-	var smallest := minf(ratio.x, minf(ratio.y, ratio.z))
-	if amount == 0. or not ratio.is_finite() or smallest < 0.:
+	if amount == 0.:
 		return color
-	if amount < 0.:
+	var ratio := ambient_tint_ratio
+	var inverse := amount < 0.
+	if inverse and ambient_tint_negative_ratio != Vector3.ZERO:
+		ratio = ambient_tint_negative_ratio
+		inverse = false
+	var smallest := minf(ratio.x, minf(ratio.y, ratio.z))
+	if ratio == Vector3.ONE or not ratio.is_finite() or smallest < 0.:
+		return color
+	if inverse:
 		if smallest == 0.:
 			return color
 		ratio = Vector3.ONE / ratio
