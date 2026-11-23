@@ -1919,6 +1919,8 @@ func _slide_wall_shoulder_anchors() -> void:
 		var distance := gap.length()
 		if distance <= min_gap:
 			continue
+		if initial_collision and not use_tuned_wall_sweep and _restore_arm_across_wall(limb, state, core, gap):
+			continue
 		var contacts := state.get_contact_count()
 		var free_torso := core.get_contact_count() == 0
 		if (initial_collision and free_torso and contacts >= 2
@@ -1952,6 +1954,39 @@ func _slide_wall_shoulder_anchors() -> void:
 			# the contact face does not deepen the starting overlap.
 			_slide_along_wall(limb, state, gap, normal, wall_rid)
 			break
+
+
+func _restore_arm_across_wall(limb: PhysicalBone3D, state: PhysicsDirectBodyState3D,
+		core: PhysicsDirectBodyState3D, gap: Vector3) -> bool:
+	var arm := state.transform.origin
+	var chest := core.transform.origin
+	for index in state.get_contact_count():
+		var normal := state.get_contact_local_normal(index)
+		if absf(normal.y) > PROJECTION_COLLISION_MARGIN:
+			continue
+		var contact := state.get_contact_collider_position(index)
+		if normal.dot(arm - contact) <= PROJECTION_COLLISION_MARGIN or normal.dot(chest - contact) >= 0.0:
+			continue
+		var wall := state.get_contact_collider(index)
+		if not _is_fixed_wall(state.get_contact_collider_object(index)) or not _is_single_box(wall):
+			continue
+		# Require the same box to block the route from the torso and report
+		# opposing faces. An ordinary near-side rebound leaves the arm alone.
+		_handoff_ray.collision_mask = limb.collision_mask
+		_handoff_ray.from = Vector3(chest.x, arm.y, chest.z)
+		_handoff_ray.to = arm
+		var hit := state.get_space_state().intersect_ray(_handoff_ray)
+		if hit.is_empty() or hit.rid != wall or normal.dot(hit.normal) > -0.99:
+			continue
+		var near_normal: Vector3 = hit.normal
+		var entry: Vector3 = hit.position
+		var retreat := near_normal * (near_normal.dot(entry - arm) + 2.0 * PROJECTION_COLLISION_MARGIN)
+		if (gap - retreat).length_squared() >= gap.length_squared() 				or _test_projection_motion(limb, state.transform, retreat, wall):
+			continue
+		state.transform = state.transform.translated(retreat)
+		state.linear_velocity -= near_normal * minf(state.linear_velocity.dot(near_normal), 0.0)
+		return true
+	return false
 
 func _recover_rebounding_wall_legs() -> void:
 	# At extreme launch, a wall can hold a leg down while the torso rebounds.

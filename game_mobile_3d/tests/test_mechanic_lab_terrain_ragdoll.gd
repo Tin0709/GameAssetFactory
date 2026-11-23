@@ -402,13 +402,19 @@ func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: Strin
 
 func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := true, landing_gravity := -1.0,
 		max_anchor_gap := INF, strike: Zombie.DeathStrike = Zombie.DeathStrike.SABRE_FINISHER,
-		strength := 1150.0, shared_wall := false, fixture := CornerFixture.NONE, tuning := Vector2.ONE) -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+		strength := 1150.0, shared_wall := false, fixture := CornerFixture.NONE, tuning := Vector2.ONE,
+		wall_yaw := 0.0, pose := &"") -> void:
+	var lab: Node3D = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
 	var frozen := fixture in [CornerFixture.PINCHED_ARM_FROZEN_WALLS, CornerFixture.FROZEN_WALLS]
-	var first_wall := terrain(lab, Vector3(4.5, 1.5, -1.85), Vector3(0.30, 3.0, 12.4), 0.0, frozen)
-	var second_wall := terrain(lab, Vector3(-1.70, 1.5, 4.5), Vector3(12.7, 3.0, 0.30), 0.0, frozen)
+	var layout: Node3D = lab
+	if wall_yaw != 0.0:
+		layout = Node3D.new()
+		layout.rotation.y = wall_yaw
+		lab.add_child(layout)
+	var first_wall := terrain(layout, Vector3(4.5, 1.5, -1.85), Vector3(0.30, 3.0, 12.4), 0.0, frozen)
+	var second_wall := terrain(layout, Vector3(-1.70, 1.5, 4.5), Vector3(12.7, 3.0, 0.30), 0.0, frozen)
 	if shared_wall:
 		second_wall.get_child(0).reparent(first_wall)
 		second_wall.free()
@@ -429,10 +435,17 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 	rng.seed = 472031 + seed
 	var gap := rng.randf_range(0.47, 0.70) if seed % 128 < 64 else rng.randf_range(0.9, 3.0)
 	zombie.global_position = Vector3(4.35 - gap, 0.02, 4.35 - gap + rng.randf_range(-0.035, 0.035))
-	zombie.rotation.y = rng.randf_range(-PI, PI)
+	zombie.rotation.y = rng.randf_range(-PI, PI) + wall_yaw
+	if layout != lab:
+		zombie.global_position = layout.to_global(zombie.global_position)
 	zombie.animation.stop()
 	zombie.ragdoll.skeleton.reset_bone_poses()
-	zombie.animation.play(zombie.ATTACK if seed % 2 == 0 else zombie.WALK_CLIPS[seed % 3])
+	var clip: StringName = pose if pose != &"" else (zombie.ATTACK if seed % 2 == 0 else zombie.WALK_CLIPS[seed % 3])
+	if not zombie.animation.has_animation(clip):
+		check(false, "The corner fixture needs its source pose")
+		lab.free()
+		return
+	zombie.animation.play(clip)
 	zombie.animation.advance(0.0)
 	zombie.animation.seek(rng.randf_range(0.05, 0.40), true)
 	await ticks(2)
@@ -441,7 +454,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 	var direction := Vector3(1, 0, 1).normalized().rotated(Vector3.UP, rng.randf_range(-0.18, 0.18))
 	zombie.ragdoll_launch_multiplier = tuning.x
 	zombie.ragdoll_gravity_multiplier = tuning.y
-	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, strength, strike)
+	zombie.take_hit(100, layout.global_basis * direction if layout != lab else direction, Vector2.ZERO, 0.0, strength, strike)
 	zombie.set_physics_process(true)
 	var last_simulated: Array[Transform3D] = []
 	var skeleton: Skeleton3D = zombie.ragdoll.skeleton
@@ -466,7 +479,8 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		peak_gap = maxf(peak_gap, zombie.ragdoll.max_anchor_error())
 		var upper_wall_faces := 0
 		for part: PhysicalBone3D in zombie.ragdoll.bodies.values():
-			farthest = maxf(farthest, maxf(part.global_position.x, part.global_position.z))
+			var position := layout.to_local(part.global_position) if layout != lab else part.global_position
+			farthest = maxf(farthest, maxf(position.x, position.z))
 			var state := PhysicsServer3D.body_get_direct_state(part.get_rid())
 			for index in state.get_contact_count():
 				var collider := state.get_contact_collider_object(index)
@@ -758,6 +772,12 @@ func check_wall_entry_rays() -> void:
 	fixture.free()
 
 func run() -> void:
+	if OS.get_cmdline_user_args().has("--rotated-wall-arm"):
+		await check_corner_ragdoll(24, 4.90, true, -1.0, 0.18, Zombie.DeathStrike.SABRE_FINISHER,
+			1150.0, false, CornerFixture.NONE, Vector2.ONE, deg_to_rad(27.0), Zombie.ActionsStuff.ATTACK)
+		print("LAB_ROTATED_WALL_ARM failures=", failures)
+		quit(0 if failures.is_empty() else 1)
+		return
 	await check_wall_entry_rays()
 	await run_case(true)
 	await run_case(false)
