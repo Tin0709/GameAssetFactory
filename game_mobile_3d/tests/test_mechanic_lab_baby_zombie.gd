@@ -142,12 +142,17 @@ func run() -> void:
 	# The overlap can also start after the floor sweep predicts the wall.
 	await check_tuned_contact(31, 13.0, 0.37, Strike.SWORD, -44.0,
 		Vector2(1000.0, 100.0), true, DeathPose.AS_CORNER)
-	await check_source_attack_wall_crossing()
+	await check_source_attack_wall_crossing(1807, Vector3(4.016132, 0.02, 4.02811), 3.0348207950592,
+		0.360434250057217, Vector3(0.759013, 0.0, 0.651075))
+	# This arm enters the box on the first solve and exits on the second.
+	await check_source_attack_wall_crossing(1816, Vector3(4.071743, 0.02, 4.088961), 2.74148535728455,
+		0.227994393575615, Vector3(0.702169, 0.0, 0.71201))
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", step_phases.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 
-func check_source_attack_wall_crossing() -> void:
+func check_source_attack_wall_crossing(serial: int, start: Vector3, yaw: float,
+		attack_time: float, direction: Vector3) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -164,23 +169,22 @@ func check_source_attack_wall_crossing() -> void:
 	wall.add_child(collider)
 	lab.add_child(wall)
 	wall.position = Vector3(4.5, 1.5, -1.85)
-	group._spawn_serial = 1807
+	group._spawn_serial = serial
 	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
 	var baby := group.get_child(0) as Zombie
 	baby.set_physics_process(false)
-	baby.position = Vector3(4.016132, 0.02, 4.02811)
-	baby.rotation.y = 3.0348207950592
+	baby.position = start
+	baby.rotation.y = yaw
 	baby.animation.stop()
 	baby.ragdoll.skeleton.reset_bone_poses()
 	baby.animation.play(Zombie.ActionsStuff.ATTACK)
 	baby.animation.advance(0.0)
-	baby.animation.seek(0.360434250057217, true)
+	baby.animation.seek(attack_time, true)
 	await physics_frame
 	await physics_frame
 	baby.ragdoll.sample(1.0 / 60.0)
 	baby.ragdoll.sample(1.0 / 60.0)
-	baby.take_hit(100, Vector3(0.759013, 0.0, 0.651075).normalized(), Vector2.ZERO, 0.0,
-		1150.0, Zombie.DeathStrike.SABRE_FINISHER)
+	baby.take_hit(100, direction.normalized(), Vector2.ZERO, 0.0, 1150.0, Zombie.DeathStrike.SABRE_FINISHER)
 	baby.set_physics_process(true)
 	var far_face := wall.position.x + shape.size.x * 0.5
 	var peak_x := -INF
@@ -194,9 +198,9 @@ func check_source_attack_wall_crossing() -> void:
 		sampled += 1
 		if sampled == 2:
 			break
-	check(sampled >= 2 and peak_x < far_face,
-		"The baby attack-to-ragdoll handoff keeps the arm from crossing the wall in its first two solves")
-	print("LAB_BABY_AS_ATTACK_WALL samples=", sampled, " peak_x=", peak_x, " far_face=", far_face)
+	check(sampled == 2 and peak_x < far_face,
+		"Baby attack pose %d keeps the arm from crossing the wall during handoff" % serial)
+	print("LAB_BABY_AS_ATTACK_WALL serial=", serial, " samples=", sampled, " peak_x=", peak_x, " far_face=", far_face)
 	lab.free()
 
 func check_prewarmed_spawn() -> void:

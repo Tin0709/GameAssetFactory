@@ -55,6 +55,7 @@ var _prepared_source_joints: Array[PhysicalPart]
 var _wall_handoff_frame := -1
 var _launch_frame := -1
 var _tuned_wall_poses: Dictionary[String, Vector3]
+var _baby_handoff_wall_entries: Dictionary[String, Dictionary]
 var use_tuned_wall_sweep := false
 var use_tuned_floor_support := false
 var use_baby_floor_anchors := false
@@ -69,6 +70,7 @@ var wall_handoff_idle_pose: Array[Transform3D]
 static var _handoff_bounds_shape: BoxShape3D
 static var _handoff_bounds_query: PhysicsShapeQueryParameters3D
 static var _handoff_ray := PhysicsRayQueryParameters3D.new()
+static var _handoff_entry_point_query := PhysicsPointQueryParameters3D.new()
 static var _handoff_box_queries: Dictionary[BoxShape3D, PhysicsShapeQueryParameters3D]
 static var _body_shapes: Dictionary[Vector3, BoxShape3D]
 
@@ -108,12 +110,22 @@ func _correct_physical_pose() -> void:
 		super._correct_physical_pose()
 		return
 	if not use_tuned_wall_sweep:
-		_sweep_tuned_lab_walls(true)
+		var first_solve := frame <= _launch_frame + 1
+		if first_solve:
+			_sweep_tuned_lab_walls(true)
 		super._correct_physical_pose()
-		if frame >= _launch_frame + BABY_ATTACK_HANDOFF_SWEEP_TICKS:
+		if not first_solve:
+			# The regular solver can already return an arm to the entry side.
+			_sweep_tuned_lab_walls(true)
+		if frame >= _launch_frame + roundi(WALL_SHOULDER_SLIDE_WINDOW * Engine.physics_ticks_per_second):
+			_baby_handoff_wall_entries.clear()
 			_tuned_wall_poses.clear()
-		else:
-			_save_wall_sweep_positions()
+		elif frame >= _launch_frame + BABY_ATTACK_HANDOFF_SWEEP_TICKS:
+			# Keep following an exit only for arms with a confirmed entry.
+			for name: String in _tuned_wall_poses.keys():
+				if not _baby_handoff_wall_entries.has(name):
+					_tuned_wall_poses.erase(name)
+		_save_wall_sweep_positions()
 		return
 	_sweep_tuned_lab_walls()
 	super._correct_physical_pose()
@@ -160,19 +172,11 @@ func _sweep_tuned_lab_walls(through_wall_only := false) -> void:
 			if not hit.is_empty() and is_instance_valid(_flat_floor) \
 					and hit.collider == _flat_floor.get_parent() and hit.normal.is_equal_approx(Vector3.UP):
 				hit = _wall_after_flat_floor(space, body, state.transform, hit.position, finish)
+			if through_wall_only:
+				hit = _confirmed_baby_wall_entry(space, body, state.transform, name, start, finish, hit, sweep == 0)
 			if hit.is_empty() or not _is_fixed_wall(hit.collider) or absf(hit.normal.y) >= MAX_WALL_NORMAL_Y:
 				start = finish
 				break
-			if through_wall_only:
-				# Leave ordinary contacts to the solver. An opposing hit on
-				# the same shape confirms the arm crossed the wall.
-				_handoff_ray.from = finish
-				_handoff_ray.to = start
-				var reverse := space.intersect_ray(_handoff_ray)
-				if reverse.is_empty() or reverse.rid != hit.rid or reverse.shape != hit.shape \
-						or (reverse.normal as Vector3).dot(hit.normal) >= 0.0:
-					start = finish
-					break
 			if use_baby_floor_anchors and use_tuned_floor_support:
 				use_baby_floor_anchors = false
 				_baby_wall_anchors = true
@@ -190,6 +194,48 @@ func _sweep_tuned_lab_walls(through_wall_only := false) -> void:
 			pose.origin = start
 			state.transform = pose
 			state.linear_velocity = velocity
+
+func _confirmed_baby_wall_entry(space: PhysicsDirectSpaceState3D, body: PhysicalBone3D, pose: Transform3D,
+		part_name: String, start: Vector3, finish: Vector3, forward: Dictionary, actual_step: bool) -> Dictionary:
+	var valid_forward := not forward.is_empty() and _is_fixed_wall(forward.collider) \
+		and absf(forward.normal.y) < MAX_WALL_NORMAL_Y
+	var entry: Dictionary = _baby_handoff_wall_entries.get(part_name, {}) if actual_step else {}
+	if not valid_forward and entry.is_empty():
+		return {}
+	_handoff_ray.from = finish
+	_handoff_ray.to = start
+	var reverse := space.intersect_ray(_handoff_ray)
+	if valid_forward and _same_wall_shape(forward, reverse) and (reverse.normal as Vector3).dot(forward.normal) < 0.0:
+		_baby_handoff_wall_entries.erase(part_name)
+		return forward
+	if not entry.is_empty() and _same_wall_shape(entry, reverse):
+		# A ray starting inside misses the entry face. Check that the old
+		# sample was inside the same shape before using the saved face.
+		_baby_handoff_wall_entries.erase(part_name)
+		if (reverse.normal as Vector3).dot(entry.normal) < -0.99 and _wall_shape_contains(space, start, entry):
+			var collider := body.get_child(0) as CollisionShape3D
+			var box := collider.shape as BoxShape3D
+			if box != null:
+				# Seat the whole arm box on the entry side in a two-step crossing.
+				var normal: Vector3 = entry.normal
+				var world_box := pose * collider.transform
+				var radius := (world_box.basis.transposed() * normal).abs().dot(box.size * 0.5)
+				entry.position += normal * (radius - normal.dot(world_box.origin - pose.origin))
+			return entry
+	if actual_step and valid_forward and _wall_shape_contains(space, finish, forward):
+		_baby_handoff_wall_entries[part_name] = forward
+	return {}
+
+static func _same_wall_shape(hit: Dictionary, other: Dictionary) -> bool:
+	return not other.is_empty() and hit.rid == other.rid and hit.shape == other.shape
+
+func _wall_shape_contains(space: PhysicsDirectSpaceState3D, point: Vector3, wall: Dictionary) -> bool:
+	_handoff_entry_point_query.position = point
+	_handoff_entry_point_query.collision_mask = _handoff_ray.collision_mask
+	for overlap: Dictionary in space.intersect_point(_handoff_entry_point_query, 4):
+		if _same_wall_shape(wall, overlap):
+			return true
+	return false
 
 
 func _wall_after_flat_floor(space: PhysicsDirectSpaceState3D, body: PhysicalBone3D,
@@ -2385,6 +2431,7 @@ func _set_source_joint_bias(joint: RID, bias: float) -> void:
 
 func release(visible_world_pose: Array[Transform3D] = []) -> void:
 	_prepared_source_joints.clear()
+	_baby_handoff_wall_entries.clear()
 	super.release(visible_world_pose)
 	_source_joint_biases.clear()
 	_sample_names.clear()
