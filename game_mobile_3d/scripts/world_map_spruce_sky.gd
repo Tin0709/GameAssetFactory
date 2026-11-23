@@ -310,7 +310,7 @@ func load_directional_ground(relative: String, digest: String, canopy_digest: St
 			or not (height_span is float or height_span is int) or not is_finite(height_span) or height_span <= 0.0:
 		return false
 	var size := Vector2i(int(grid.x), int(grid.y))
-	var path := root.path_join(relative).get_base_dir().path_join("afternoon_canopy_expanded.rg")
+	var path := root.path_join(relative).get_base_dir().path_join("terrain_canopy_sky.rg8")
 	if not FileAccess.file_exists(path):
 		return false
 	var data := FileAccess.get_file_as_bytes(path)
