@@ -974,8 +974,10 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 			var reach := _chase_speed * available
 			if reach > LAB_DETOUR_LENGTH:
 				_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, false, true, reach)
-		if not _chase_detour.is_finite() and fixed_blocker and _target_visible:
-			_chase_detour = _retreat_detour(space, bounds, normal, offset, stop_distance)
+		if not _chase_detour.is_finite() and fixed_blocker:
+			var retreat_budget := INF if _target_visible else _chase_speed * (LAB_SIGHT_LOSS_DELAY - _sight_state_seconds)
+			if retreat_budget > 2.0 * LAB_DETOUR_MIN_LENGTH:
+				_chase_detour = _retreat_detour(space, bounds, normal, offset, stop_distance, retreat_budget)
 		if _chase_detour.is_finite():
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
 			# Returning directly through the blocker would undo this side step.
@@ -1077,12 +1079,13 @@ func _detour_floor_travel(origin: Vector3, travel: Vector3, extent: Vector3) -> 
 	return (_corpse_floor.to_global(local) - origin).slide(Vector3.UP)
 
 func _retreat_detour(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3,
-		target_offset: Vector3, stop_distance: float) -> Vector3:
-	# A visible target can draw a chaser into a recess with blocked side legs.
-	# Commit to backing out only when a checked side leg reconnects to the approach.
+		target_offset: Vector3, stop_distance: float, distance_budget: float) -> Vector3:
+	# The two legs must fit in the remaining sight-loss window when following a
+	# remembered target. Both still require a checked connection to its approach.
 	_prepare_lab_path_sweep(true)
 	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
-	var retreat := _detour_floor_travel(global_position, normal.normalized() * LAB_DETOUR_LENGTH, extent)
+	var retreat_distance := minf(LAB_DETOUR_LENGTH, distance_budget - LAB_DETOUR_MIN_LENGTH)
+	var retreat := _detour_floor_travel(global_position, normal.normalized() * retreat_distance, extent)
 	retreat *= _lab_path_fraction(space, retreat)
 	if retreat.length_squared() <= LAB_DETOUR_MIN_LENGTH ** 2 or not _lab_path_end_clear(space, retreat):
 		return Vector3.INF
@@ -1095,7 +1098,8 @@ func _retreat_detour(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, norma
 	var approach := target_offset - retreat
 	var best := Vector3.INF
 	var best_length := INF
-	var side_distance := minf(_chase_speed * LAB_DETOUR_TIMEOUT, LAB_DETOUR_LENGTH * 1.5)
+	var side_distance := minf(minf(_chase_speed * LAB_DETOUR_TIMEOUT, LAB_DETOUR_LENGTH * 1.5),
+		distance_budget - retreat.length())
 	for direction in [lateral, -lateral]:
 		var travel := _detour_floor_travel(origin, direction * side_distance, extent)
 		travel *= _lab_path_fraction(space, travel)
