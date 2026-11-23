@@ -407,7 +407,7 @@ func refresh_oak_root_beds() -> void:
 		material.set_shader_parameter("oak_root_sites", _oak_root_sites)
 		material.set_shader_parameter("oak_root_beds", 0.85 if oak_root_beds_active() else 0.0)
 	level.geometry.reset_cutaway_materials()
-	level.geometry.update_cutaway(level.player.position, level.get_node("Camera3D").position, level.view_mode == "gameplay")
+	level.refresh_terrain_cutaway(level.player.global_position)
 
 func configure_path_materials() -> void:
 	var grass: Texture2D
@@ -446,12 +446,12 @@ func set_canopy_contact(enabled: bool) -> void:
 	if stage != 2: return
 	level.geometry.reset_cutaway_materials()
 	_apply_review_shaders()
-	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
+	level.refresh_terrain_cutaway(level.player.global_position)
 
 func refresh_canopy_contact() -> void:
 	level.geometry.reset_cutaway_materials()
 	_apply_review_shaders()
-	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
+	level.refresh_terrain_cutaway(level.player.global_position)
 
 func _apply_canopy_contact() -> void:
 	if not canopy_contact_active(): return
@@ -634,7 +634,7 @@ func _refresh_cloud_look() -> void:
 	level.geometry.reset_cutaway_materials()
 	_apply_review_shaders()
 	_apply_daylight_pockets()
-	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
+	level.refresh_terrain_cutaway(level.player.global_position)
 	publish_clouds(cloud_clock)
 	if level.get("showcase") != null:
 		level.showcase.refresh_daylight_shading()
@@ -861,7 +861,7 @@ func _refresh_ground_bounce() -> void:
 	level.geometry.reset_cutaway_materials()
 	_apply_review_shaders()
 	var focus: Vector3 = level.presentation.player_position()
-	level.geometry.update_cutaway(focus, level.get_node("Camera3D").position, level.view_mode == "gameplay")
+	level.refresh_terrain_cutaway(focus)
 
 func _bind_ground_radiance() -> void:
 	if not _ground_bounce_applied: return
@@ -1240,7 +1240,7 @@ func set_stage(value: int) -> void:
 	if _source_path_edge_filter > 0.0:
 		_publish_source_path_edge_filter()
 	refresh_oak_root_beds()
-	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
+	level.refresh_terrain_cutaway(level.player.global_position)
 	publish_clouds(cloud_clock)
 
 func _physics_process(delta: float) -> void:

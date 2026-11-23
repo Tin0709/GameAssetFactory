@@ -6,6 +6,7 @@ const CAMERA_SIZE_DEFAULT := 14.5
 const CAMERA_SIZE_MIN := 6.0
 const CAMERA_SIZE_MAX := 42.0
 const CAMERA_ZOOM_STEP := 1.15
+const CUTAWAY_BLEND_SPEED := 9.0
 # Extend the orthographic depth range past the view origin for foreground cliffs.
 const GAMEPLAY_CAMERA_NEAR := -8.0
 const GROVE_REVIEW := preload("res://scripts/world_map_grove.gd")
@@ -164,6 +165,7 @@ var heavy_landing_audio: CombatAudio
 var _camera_ground_y := NAN
 var _camera_size_target := CAMERA_SIZE_DEFAULT
 var _camera_zooming := false
+var _cutaway_visibility := 0.
 var _extended_camera_depth := true
 @onready var _original_camera_near: float = $Camera3D.near
 @onready var player: CharacterBody3D = $Actors/Player
@@ -513,7 +515,7 @@ func _process(delta: float) -> void:
 		var focus: Vector3 = presentation.player_position()
 		_update_camera_near(camera)
 		camera.position=Vector3(focus.x,_camera_ground_y,focus.z)+CAMERA_OFFSET
-		geometry.update_cutaway(focus,camera.global_position)
+		refresh_terrain_cutaway(focus, delta)
 		if grove != null and (grove.visible or grove.spruce_visible()):grove.update_focus(camera,focus,true)
 	sync_canopy_player_cue()
 	if presentation.enabled and look != null and look.active:
@@ -524,6 +526,13 @@ func sync_canopy_player_cue() -> void:
 		canopy_player_cue.sync(self, showcase._lighting_scale(&"canopy_player_cue"),
 			showcase.canopy_cue_day_tone_weight(), showcase.canopy_cue_clarity_weight(),
 			showcase.canopy_cue_opacity_scale($Camera3D.size))
+
+func refresh_terrain_cutaway(focus: Vector3, delta: float = 0.) -> void:
+	var camera: Camera3D = $Camera3D
+	var wanted: float = geometry.cutaway_visibility(focus, camera) if view_mode == "gameplay" else 0.
+	_cutaway_visibility = move_toward(_cutaway_visibility, wanted, delta * CUTAWAY_BLEND_SPEED) if delta > 0. else wanted
+	geometry.update_cutaway(focus, camera.global_position, true, _cutaway_visibility)
+
 
 func set_review_view(mode: String) -> void:
 	if showcase!=null:showcase.begin_environment_edit()
@@ -542,7 +551,7 @@ func set_review_view(mode: String) -> void:
 			camera.far=300.0;camera.size=150.0
 			camera.position=Vector3(-8.5,140,-1)
 		# Zero-length cutaway corridor restores native materials for overview.
-		geometry.update_cutaway(Vector3.ZERO,Vector3.ZERO)
+		refresh_terrain_cutaway(Vector3.ZERO)
 	_update_camera_near(camera)
 	if look != null:look.refresh_atmosphere()
 	if biome_controller != null:biome_controller.refresh()
