@@ -117,9 +117,9 @@ func run() -> void:
 	await check_floor_then_wall()
 	# A free leg near the ground needs to recover from a sideways gap
 	# even when its full anchor correction would point into the grass.
-	await check_tuned_contact(3, 27.0, 0.18, Strike.SABRE_FINISHER, -58.0,
+	await check_tuned_contact(3, 27.0, 0.12, Strike.SABRE_FINISHER, -58.0,
 		Vector2(100.0, 100.0), true, true)
-	await check_tuned_contact(35, 27.0, 0.18, Strike.AIR, -58.0, Vector2(100.0, 100.0), true, true)
+	await check_tuned_contact(35, 27.0, 0.20, Strike.AIR, -58.0, Vector2(100.0, 100.0), true, true)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", step_phases.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
