@@ -207,6 +207,7 @@ mist_rear_chroma = 0.58
 mist_sky_scatter_by_hour = SubResource("ForestMistSky")
 mist_dusk_sky_scatter_by_hour = SubResource("ForestDuskMistSky")
 mist_sky_scatter_tint = Vector3(0.72, 1, 1.26)
+mist_day_sky_scatter_chroma = 0.5
 ground_haze = SubResource("ForestGroundHaze")
 ground_haze_strength = 1.0
 grove_mist_by_hour = SubResource("GroveMistPhase")

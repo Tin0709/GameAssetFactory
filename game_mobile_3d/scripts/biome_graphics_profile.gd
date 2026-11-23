@@ -136,6 +136,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Independent twilight gain, sharing the same map provider and tint as daytime.
 @export var mist_dusk_sky_scatter_by_hour: Curve
 @export var mist_sky_scatter_tint := Vector3.ONE
+## Daylight chroma of the sky source, at fixed linear luminance.
+@export_range(0., 1., .01) var mist_day_sky_scatter_chroma := 1.
 @export_range(0., 1., .01) var local_mist_strength := .65
 ## Multiplies the first map region by normalized hour. A missing or empty curve uses 1.
 @export var local_mist_by_hour: Curve
@@ -290,6 +292,11 @@ func sample_mist_sky_scatter(time: float, env: Environment, strength: float = 1.
 	if tint_luma <= .000001:
 		return Vector4.ZERO
 	tint *= ambient.dot(luma) / tint_luma
+	var daylight := maxf(day, 0.)
+	var day_chroma := clampf(mist_day_sky_scatter_chroma, 0., 1.)
+	if daylight > 0. and day_chroma < 1.:
+		var daylight_share := daylight / (daylight + maxf(dusk, 0.))
+		tint = tint.lerp(Vector3.ONE * tint.dot(luma), (1. - day_chroma) * daylight_share)
 	return Vector4(tint.x, tint.y, tint.z, gain)
 
 func sample_ground_haze(hour: float, subject_depth_m: float, map_base_y: float,
