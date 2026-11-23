@@ -1425,14 +1425,17 @@ func _recover_baby_wall_anchors() -> void:
 	var chest_half := chest_box.size * 0.5
 	# When the floor and a wall block a limb, move the chest toward
 	# the residual instead of trying to push the limb through the corner.
-	for pass_index in 2:
+	# High-force wall rebounds can leave a severe gap after both bounded passes.
+	# Recheck the residual with the same floor clamp and collision sweep.
+	for pass_index in 3:
+		var gap_limit := BABY_LARGE_LEG_SLIDE_GAP if pass_index == 2 else BABY_FLOOR_ANCHOR_GAP
 		for joint in _source_anchor_projections:
 			var child := PhysicsServer3D.body_get_direct_state(joint.rid)
 			if child == null:
 				continue
 			var gap := (parent.transform * joint.parent_frame).origin - (child.transform * joint.child_frame).origin
 			var distance := gap.length()
-			if distance <= BABY_FLOOR_ANCHOR_GAP:
+			if distance <= gap_limit:
 				continue
 			var motion := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
 			var moved := _slide_floor_wall_part(joint.body, child, joint.half_size,
