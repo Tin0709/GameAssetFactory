@@ -226,7 +226,7 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., 1., .01) var dusk_key_fade_strength := 0.
 ## Ambient multiplier before weather, in normalized hours. An empty track uses 1.
 @export var ambient_energy_by_hour: Curve
-## Optional weight of the ambient color adjustment, in normalized hours.
+## Signed ambient color weight in normalized hours. Negative values reverse the channel ratios.
 @export var ambient_tint_by_hour: Curve
 ## Linear RGB channel ratios. The adjustment preserves the incoming luminance.
 @export var ambient_tint_ratio := Vector3.ONE
@@ -253,19 +253,23 @@ func ambient_hour_scale(hour: float, strength: float = 1.) -> float:
 func tint_ambient(hour: float, color: Color, strength: float = 1.) -> Color:
 	if ambient_tint_by_hour == null or strength <= 0. or ambient_tint_ratio == Vector3.ONE:
 		return color
-	var amount := clampf(DayNight.sample_curve(ambient_tint_by_hour, fposmod(hour, 24.) / 24., 0.), 0., 1.)
-	if amount <= 0. or not ambient_tint_ratio.is_finite():
+	var amount := clampf(DayNight.sample_curve(ambient_tint_by_hour, fposmod(hour, 24.) / 24., 0.), -1., 1.)
+	var ratio := ambient_tint_ratio
+	var smallest := minf(ratio.x, minf(ratio.y, ratio.z))
+	if amount == 0. or not ratio.is_finite() or smallest < 0.:
 		return color
-	if ambient_tint_ratio.x < 0. or ambient_tint_ratio.y < 0. or ambient_tint_ratio.z < 0.:
-		return color
+	if amount < 0.:
+		if smallest == 0.:
+			return color
+		ratio = Vector3.ONE / ratio
 	var linear := color.srgb_to_linear()
 	var source := Vector3(linear.r, linear.g, linear.b)
-	var target := source * ambient_tint_ratio
+	var target := source * ratio
 	var target_luma := target.dot(LINEAR_LUMA)
 	if not is_finite(target_luma) or target_luma <= 0.:
 		return color
 	target *= source.dot(LINEAR_LUMA) / target_luma
-	var rgb := source.lerp(target, amount * clampf(strength, 0., 1.))
+	var rgb := source.lerp(target, absf(amount) * clampf(strength, 0., 1.))
 	return Color(rgb.x, rgb.y, rgb.z, color.a).linear_to_srgb()
 
 func sample_mist_entry_scatter(time: float) -> float:

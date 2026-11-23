@@ -23,9 +23,8 @@ func linear_rgb(color: Color) -> Vector3:
 func check_tint(before: Color, after: Color, label: String, warm := false) -> void:
 	var source := linear_rgb(before)
 	var target := linear_rgb(after)
-	var red_up := target.x > source.x
-	var blue_up := target.z > source.z
-	check(red_up == warm and blue_up != warm and source.x != target.x and source.z != target.z,
+	var direction := 1. if warm else -1.
+	check((target.x - source.x) * direction > 0. and (target.z - source.z) * direction < 0.,
 		label + " shifts the existing sky in the expected direction")
 	check(absf(target.dot(LUMA) - source.dot(LUMA)) < 1e-6, label + " preserves linear luminance")
 
