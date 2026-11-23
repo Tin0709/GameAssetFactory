@@ -8,6 +8,8 @@ const FIXTURE_HP := 10000
 # Clip, heading in sixteenths of a turn, and source frame at 30 FPS.
 const WALL_HANDOFF_POSES := [[ZOMBIE.ATTACK, 3, 17],
 	[ZOMBIE.WALK_CLIPS[0], 2, 11], [ZOMBIE.STAGGER, 11, 7]]
+const ACTIONS_STUFF_CLIPS := [ZOMBIE.ActionsStuff.SPAWN, ZOMBIE.ActionsStuff.IDLE,
+	ZOMBIE.ActionsStuff.MOVE, ZOMBIE.ActionsStuff.ATTACK, ZOMBIE.ActionsStuff.STAGGER]
 var lab: Node3D
 var mixed_crowd := false
 var first_tick_started := 0
@@ -32,10 +34,20 @@ func _initialize() -> void:
 
 func run() -> void:
 	mixed_crowd = OS.get_cmdline_user_args().has("--mixed-crowd")
+	var actions_stuff := OS.get_cmdline_user_args().has("--actions-stuff")
 	var synchronous := OS.get_cmdline_user_args().has("--sync-spawn")
 	lab = LAB.instantiate()
 	root.add_child(lab)
 	current_scene = lab
+	if actions_stuff:
+		var mode := lab.get_node("HUD/ZombieGait") as OptionButton
+		if mode.is_item_disabled(1):
+			printerr("The crowd needs the verified Actions & Stuff animation library")
+			lab.free()
+			quit(1)
+			return
+		mode.select(1)
+		mode.item_selected.emit(1)
 	root.size = Vector2i(960, 540)
 	var rid := root.get_viewport_rid()
 	RenderingServer.viewport_set_measure_render_time(rid, true)
@@ -88,6 +100,13 @@ func run() -> void:
 	Input.action_release("move_backward")
 	await check_zombie_dust()
 	await check_crowd_melee(group)
+	if actions_stuff:
+		var styled := 0
+		for zombie: ZOMBIE in group.get_children():
+			styled += int(zombie.animation.assigned_animation in ACTIONS_STUFF_CLIPS)
+		if styled != COUNT:
+			failures.append("All living crowd members must use the selected Actions & Stuff animations")
+		print("CROWD_ACTIONS_STUFF actors=", styled)
 	await check_blocked_chase(group)
 	await check_crowd_windup_occlusion(group)
 	await check_crowd_windup_range(group)
@@ -213,7 +232,7 @@ func check_packed_patrol(group: Node) -> void:
 				await physics_frame
 				if not follower._roam_destination.is_finite():
 					break
-			if follower._roam_destination.is_finite() or follower.animation.current_animation != ZOMBIE.IDLE:
+			if follower._roam_destination.is_finite() or follower._living_state(follower.animation.current_animation) != ZOMBIE.IDLE:
 				failures.append("A sustained blockage ends the patrol leg even when collision retries are staggered")
 		else:
 			blocker.global_position += Vector3.RIGHT * 2.0
@@ -717,14 +736,14 @@ func check_crowd_windup_occlusion(group: Node) -> void:
 	zombie.set_physics_process(true)
 	await physics_frame
 	var hidden_windups := windups.size()
-	if hidden_windups != 0 or zombie.animation.current_animation == ZOMBIE.ATTACK or zombie._attack_cooldown > 0.0:
+	if hidden_windups != 0 or zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK or zombie._attack_cooldown > 0.0:
 		failures.append("A wall inserted between crowd sight checks prevents the windup and its sound")
 	wall.free()
 	for i in 12:
 		await physics_frame
 		if windups.size() > hidden_windups:
 			break
-	if windups.size() - hidden_windups != 1 or zombie.animation.current_animation != ZOMBIE.ATTACK:
+	if windups.size() - hidden_windups != 1 or zombie._living_state(zombie.animation.current_animation) != ZOMBIE.ATTACK:
 		failures.append("The zombie starts one windup when the player's path is clear again")
 	print("CROWD_OCCLUDED_WINDUP hidden=", hidden_windups, " visible=", windups.size() - hidden_windups)
 	zombie.melee_audio.disconnect(listen)
@@ -773,7 +792,7 @@ func check_crowd_windup_range(group: Node) -> void:
 			await physics_frame
 			if windups.size() > escaped_windups:
 				break
-		if windups.size() - escaped_windups != 1 or zombie.animation.current_animation != ZOMBIE.ATTACK:
+		if windups.size() - escaped_windups != 1 or zombie._living_state(zombie.animation.current_animation) != ZOMBIE.ATTACK:
 			failures.append("The zombie starts one windup when the target is back in reach: %s" % escape)
 		print("CROWD_WINDUP_RANGE escape=", escape, " invalid=", escaped_windups,
 			" valid=", windups.size() - escaped_windups)
@@ -812,7 +831,7 @@ func check_crowd_windup_focus(group: Node) -> void:
 			await physics_frame
 		zombie._attack_cooldown = 0.0
 		await physics_frame
-		if zombie.animation.current_animation != ZOMBIE.ATTACK:
+		if zombie._living_state(zombie.animation.current_animation) != ZOMBIE.ATTACK:
 			failures.append("The crowd focus fixture starts a real windup")
 			continue
 		if covered:
