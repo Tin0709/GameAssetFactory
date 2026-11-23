@@ -288,6 +288,11 @@ vec3 match_air_chroma(vec3 color, vec3 incident_air, float depth_weight, vec2 uv
  vec3 target = clamp(incident_air / air_y, vec3(0.54), vec3(1.68));
  target *= y / max(dot(target, luma), 0.00001);
  float mix_weight = clamp(base[5].x * depth_weight * actor * shade, 0.0, 0.72);
+ // Preserve the color already present in the fogged source. Large shifts in
+ // a single channel can make the same shaded surface change hue as the view moves.
+ vec3 relative_shift = abs(target - color) / max(color, vec3(0.012));
+ float strongest_shift = max(relative_shift.r, max(relative_shift.g, relative_shift.b));
+ mix_weight = min(mix_weight, 0.12 / max(strongest_shift, 0.001));
  return mix(color, target, mix_weight);
 }
 vec3 lift_shaded_detail(vec3 color, float shadow_depth, float preserve_contrast) {
