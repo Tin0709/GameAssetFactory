@@ -65,5 +65,7 @@ void light(){
 	if (gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && gaf_is_player_point(LIGHT_IS_DIRECTIONAL,LIGHT_COLOR.b)) {
 		diffuse_color *= gaf_diffuse_chroma_scale(ALBEDO,LIGHT_COLOR,vec3(1.247,1.0,1.078),gaf_lantern_grass_tone);
 	}
-	DIFFUSE_LIGHT+=response*diffuse_color*(shadow_attenuation*point_transfer*cloud/PI);
+	float patch_scale = gaf_projected_patch_scale(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
+		cloud, shadow_attenuation, .58);
+	DIFFUSE_LIGHT+=response*diffuse_color*(shadow_attenuation*point_transfer*cloud*patch_scale/PI);
 }

@@ -326,6 +326,14 @@ void light() {
 				vec3(1.489,1.0,1.479),turf*gaf_lantern_grass_tone);
 		}
 #endif
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+		if (gaf_projected_sun_contrast.w > 0.0 && surface_top > .998 && use_source_terrain) {
+			float warm_ground = smoothstep(1.02, 1.22, ALBEDO.r / max(ALBEDO.g, .0001));
+			float pivot = ground_grade == 3 ? .62 : mix(.58, .74, warm_ground);
+			diffuse_incident *= gaf_projected_patch_scale(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
+				cloud_transmission, shadow_attenuation, pivot);
+		}
+#endif
 #ifdef GAF_WORLD_BURLEY
 		float nv = clamp(dot(NORMAL, VIEW), 0.0, 1.0);
 #ifdef GAF_WORLD_TERRAIN_PBR

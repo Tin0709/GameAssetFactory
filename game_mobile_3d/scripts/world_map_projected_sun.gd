@@ -12,6 +12,7 @@ const LOCAL_SHIFT := &"gaf_projected_sun_local_shift"
 const SOFTNESS := &"gaf_projected_sun_softness"
 const MASK := &"gaf_projected_sun_mask"
 const OPENINGS := &"gaf_projected_sun_openings"
+const CONTRAST := &"gaf_projected_sun_contrast"
 const RECOVERY_REGION := &"gaf_projected_path_recovery_region"
 const RECOVERY_AMOUNT := &"gaf_projected_path_recovery_amount"
 
@@ -25,6 +26,7 @@ var _soft_path := ""
 var _softness := 0.0
 var _softness_loaded := false
 var _opening_recovery := 0.
+var _contrast := Vector4.ZERO
 var _recovery_region := Vector4.ZERO
 var _recovery_amount := 0.
 
@@ -101,6 +103,15 @@ func set_opening_recovery(amount: float, phase_response: float = 0.) -> void:
 	_opening_recovery = applied
 	RenderingServer.global_shader_parameter_set(OPENINGS, applied)
 
+func set_contrast(direction: Vector3, amount: float) -> void:
+	var applied := Vector4.ZERO
+	if _weight > .05 and direction.is_finite() and not direction.is_zero_approx() and is_finite(amount) and amount > 0.:
+		var key := direction.normalized()
+		applied = Vector4(key.x, key.y, key.z, minf(amount, 1.))
+	if applied != _contrast:
+		_contrast = applied
+		RenderingServer.global_shader_parameter_set(CONTRAST, applied)
+
 
 func set_shift(shift: Vector2) -> void:
 	var applied := shift if _weight > 0.0 and shift.is_finite() else Vector2.ZERO
@@ -149,9 +160,11 @@ func release() -> void:
 	RenderingServer.global_shader_parameter_set(LOCAL_SHIFT, Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set(SOFTNESS, 0.)
 	RenderingServer.global_shader_parameter_set(OPENINGS, 0.)
+	RenderingServer.global_shader_parameter_set(CONTRAST, Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set(MASK, null)
 	_weight = 0.
 	_opening_recovery = 0.
+	_contrast = Vector4.ZERO
 	_shift = Vector2.ZERO
 	_local_region = Vector4.ZERO
 	_local_shift = Vector2.ZERO

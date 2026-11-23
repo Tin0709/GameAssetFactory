@@ -2446,6 +2446,11 @@ func refresh_daylight_shading() -> void:
 	else:
 		projected_sun.set_path_recovery(Vector4.ZERO, 0.)
 	var gain := .64 * _lighting_scale(&"sun_opening") * phase if not _balanced_preview else 0.
+	var patch_contrast := 0.
+	if gain > 0. and atmosphere_review == "combined" and _biome_profile != null:
+		var weather_scale := lerpf(1., _biome_profile.projected_sun_patch_overcast_scale, _weather.weight)
+		patch_contrast = _biome_profile.projected_sun_patch_contrast * weather_scale * clampf(gain / (.64 * .75), 0., 1.)
+	projected_sun.set_contrast(sun.global_basis.z, patch_contrast)
 	if gain != _opening_gain:
 		_opening_gain = gain
 		RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", gain)

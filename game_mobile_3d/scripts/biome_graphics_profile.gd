@@ -44,6 +44,9 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., 2., .01) var actor_ground_light_cloudy_scale := 1.
 ## Optional normalized-hour blend towards stronger sunlight in openings of a map's projection.
 @export var projected_opening_recovery_by_hour: Curve
+## Redistribute direct sunlight between the darker and brighter parts of the projection.
+@export_range(0., 1., .01) var projected_sun_patch_contrast := 0.
+@export_range(0., 1., .01) var projected_sun_patch_overcast_scale := 1.
 ## Local share of lost sunlight to restore within the map's authored region.
 @export var projected_path_recovery_by_hour: Curve
 @export_range(0., 1., .01) var projected_path_recovery_overcast_scale := 1.

@@ -11,6 +11,21 @@ global uniform sampler2D gaf_grass_terrace_shadow_field : filter_nearest, repeat
 global uniform vec4 gaf_near_wall_fill;
 global uniform sampler2D gaf_near_wall_field : filter_nearest, repeat_disable;
 global uniform vec4 gaf_turf_sun_chroma;
+global uniform vec4 gaf_projected_sun_contrast;
+
+float gaf_projected_patch_scale(bool directional, vec3 view_light, mat4 inverse_view,
+		float transmission, float visibility, float pivot) {
+	if (!directional || gaf_projected_sun_contrast.w <= 0.0 || visibility <= .58 ||
+			dot(mat3(inverse_view) * view_light, gaf_projected_sun_contrast.xyz) < .9999 ||
+			distance(inverse_view[3].xyz, gaf_point_kernel_camera) > .005) {
+		return 1.0;
+	}
+	// Keep both endpoints fixed and blend in through geometric penumbra.
+	float t = clamp(transmission, 0.0, 1.0);
+	float strength = gaf_projected_sun_contrast.w * smoothstep(.58, .84, visibility);
+	float shoulder = min(t / pivot, (1.0 - t) / (1.0 - pivot));
+	return 1.0 + strength * (t - pivot) * shoulder / max(t, .00001);
+}
 
 float gaf_turf_sun_weight(bool directional, vec3 view_light, mat4 inverse_view, float visibility) {
 	if (!directional || gaf_turf_sun_chroma.w <= 0.0 ||
