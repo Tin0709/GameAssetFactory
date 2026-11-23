@@ -1612,6 +1612,9 @@ func _project_source_anchors() -> void:
 					distance = gap.length()
 					if distance <= largest_gap:
 						continue
+				elif first_wall_window and chest_state.get_contact_count() == 0 \
+						and _recover_shallow_wall_shoulder(limb, state, gap):
+					continue
 			var shift := _wall_anchor_motion(state, gap, not is_arm or not first_contact, is_arm)
 			if early_wall_landing and not shift.is_zero_approx():
 				var toward_anchor := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
@@ -1704,6 +1707,31 @@ func _project_source_anchors() -> void:
 		if _wall_chest_shift_preserves_joints(gaps, largest_gap, fallback) \
 				and not _test_projection_motion(chest, chest_state.transform, fallback):
 			chest_state.transform = chest_state.transform.translated(fallback)
+
+
+func _recover_shallow_wall_shoulder(limb: PhysicalBone3D, state: PhysicsDirectBodyState3D, gap: Vector3) -> bool:
+	for index in state.get_contact_count():
+		var normal := state.get_contact_local_normal(index)
+		if absf(normal.y) >= MAX_WALL_NORMAL_Y or gap.dot(normal) >= 0.0 \
+				or state.linear_velocity.dot(normal) <= 0.0 \
+				or not _is_fixed_wall(state.get_contact_collider_object(index)):
+			continue
+		var depth := _deepest_contact(_terrain_contact_points(limb, state, Vector3.ZERO))
+		if depth <= PROJECTION_COLLISION_MARGIN or depth > TERRAIN_DEEP_RESIDUAL:
+			continue
+		# Clear the shallow starting overlap while closing the part of the
+		# shoulder gap that runs parallel to the wall.
+		var clearance := depth + 2.0 * PROJECTION_COLLISION_MARGIN
+		var slide_limit := sqrt(CONTACT_ANCHOR_RECOVERY_MAX_SHIFT ** 2 - clearance ** 2)
+		var motion := gap.slide(normal).limit_length(slide_limit) + normal * clearance
+		if (gap - motion).length_squared() >= gap.length_squared():
+			continue
+		var pose := state.transform
+		_project_contacting_anchor(limb, state, motion, true)
+		if state.transform != pose:
+			return true
+	return false
+
 
 func _recover_deep_shoulder_contact(limb: PhysicalBone3D, state: PhysicsDirectBodyState3D,
 		gap: Vector3, distance: float) -> bool:
