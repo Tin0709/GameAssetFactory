@@ -60,6 +60,9 @@ func run() -> void:
 	caste.mesh=mesh.mesh
 	for node in [light,view,mesh,caste]:
 		fixture.add_child(node)
+	mesh.position.x = 50.
+	caste.position = mesh.position
+	light.shadow_enabled = true
 	var chunks := [{"visual":mesh,"caster":caste}]
 	var directory:=ProjectSettings.globalize_path("user://test_far_shadow_manifest")
 	assert(DirAccess.make_dir_recursive_absolute(directory)==OK)
@@ -101,6 +104,11 @@ func run() -> void:
 	check(valid.configure(light,view,chunks,directory,layout),"Well-formed manifest accepts original geometry")
 	check(not valid.configure(light,view,chunks,directory,layout),"Mounted cache remains owned by the same controller")
 	check(valid.snapshot().zone=="" and valid.snapshot().resident==0,"Configuration avoids texture allocation")
+	check(valid.wants_receivers(Vector3.ZERO, 1001.), "Matching key direction requests receiver materials")
+	light.rotate_y(PI)
+	check(not valid.wants_receivers(Vector3.ZERO, 1001.), "An incompatible key direction keeps native receiver materials")
+	light.rotate_y(-PI)
+	check(valid.wants_receivers(Vector3.ZERO, 1001.), "Returning to the baked direction can bind receivers again")
 	valid.free()
 	fixture.free()
 	finish()
