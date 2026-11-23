@@ -8,6 +8,11 @@ const FIXTURE_HP := 10000
 # Clip, heading in sixteenths of a turn, and source frame at 30 FPS.
 const WALL_HANDOFF_POSES := [[ZOMBIE.ATTACK, 3, 17],
 	[ZOMBIE.WALK_CLIPS[0], 2, 11], [ZOMBIE.STAGGER, 11, 7]]
+# These A&S samples straddle the wall with the same legal capsule clearance.
+# The last value is the position in sixteenths of the retargeted clip.
+const AS_ADULT_WALL_POSES := [[ZOMBIE.ActionsStuff.IDLE, 6, 11],
+	[ZOMBIE.ActionsStuff.MOVE, 0, 7], [ZOMBIE.ActionsStuff.ATTACK, 2, 6]]
+const AS_BABY_WALL_POSE := [ZOMBIE.ActionsStuff.ATTACK, 6, 9]
 const ACTIONS_STUFF_CLIPS := [ZOMBIE.ActionsStuff.SPAWN, ZOMBIE.ActionsStuff.IDLE,
 	ZOMBIE.ActionsStuff.MOVE, ZOMBIE.ActionsStuff.ATTACK, ZOMBIE.ActionsStuff.STAGGER]
 var lab: Node3D
@@ -113,7 +118,7 @@ func run() -> void:
 	await check_crowd_windup_focus(group)
 	var wall_handoff := OS.get_cmdline_user_args().has("--wall-handoff-ragdolls")
 	var packed := wall_handoff or OS.get_cmdline_user_args().has("--packed-ragdolls")
-	await launch_ragdolls(group, packed, wall_handoff)
+	await launch_ragdolls(group, packed, wall_handoff, actions_stuff)
 	var bars := group.get_node_or_null("../ZombieHealthBars") as MultiMeshInstance3D
 	if bars != null and bars.multimesh.visible_instance_count != 0:
 		failures.append("A lethal hit immediately removes the zombie's overhead bar")
@@ -342,7 +347,7 @@ func check_zombie_dust() -> void:
 	if dust.multimesh.visible_instance_count != 0 or dust.is_processing():
 		failures.append("Clearing the crowd dust removes all instances and stops processing")
 
-func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
+func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool, actions_stuff: bool) -> void:
 	var wall_members := COUNT
 	if wall_handoff:
 		for arg in OS.get_cmdline_user_args():
@@ -361,19 +366,23 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 		await physics_frame
 	var spacing := 0.9 if packed else 4.0
 	var start := spacing * 4.5
+	var styled := 0
 	for i in COUNT:
 		var zombie := group.get_child(i) as ZOMBIE
-		var clip := ZOMBIE.IDLE
+		var clip := ZOMBIE.ActionsStuff.IDLE if actions_stuff else ZOMBIE.IDLE
 		var start_time := 0.0
 		if wall_handoff and i < wall_members:
-			# Match the legal capsule clearance from the straddled-wall tests.
-			# The stagger pose straddles the wall for the shorter Baby Zombie rig.
-			var pose: Array = WALL_HANDOFF_POSES[2 if zombie.is_baby else i % WALL_HANDOFF_POSES.size()]
+			var pose: Array
+			if actions_stuff:
+				pose = AS_BABY_WALL_POSE if zombie.is_baby else AS_ADULT_WALL_POSES[i % AS_ADULT_WALL_POSES.size()]
+				start_time = zombie.animation.get_animation(pose[0]).length * float(pose[2]) / 16.0
+			else:
+				pose = WALL_HANDOFF_POSES[2 if zombie.is_baby else i % WALL_HANDOFF_POSES.size()]
+				start_time = float(pose[2]) / 30.0
 			var wall_x := 4.35 - zombie._live_capsule.radius - 0.02
 			zombie.global_position = Vector3(wall_x, 0.02, (i - 49.5) * spacing)
 			zombie.rotation.y = TAU * float(pose[1]) / 16.0
 			clip = pose[0]
-			start_time = float(pose[2]) / 30.0
 		else:
 			# Leave the rest of the same 100-zombie burst in open space.
 			var grid_offset := start * 2.0 if wall_handoff else start
@@ -392,6 +401,27 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool) -> void:
 				zombie.animation.seek(start_time, true)
 			zombie.ragdoll.sample(1.0 / 60.0)
 			zombie.ragdoll.sample(1.0 / 60.0)
+		styled += int(zombie.animation.current_animation in ACTIONS_STUFF_CLIPS)
+	if actions_stuff and packed:
+		print("CROWD_AS_DEATH_POSES ", styled)
+		if styled != COUNT:
+			failures.append("Every prepared actor must carry an A&S pose into death")
+	# This code runs inside the physics signal. The next signal observes the
+	# completed lethal tick even when multiple physics steps share one render.
+	var death_tick := Engine.get_physics_frames()
+	physics_frame.connect(func():
+		var adults := 0
+		var babies := 0
+		for zombie: ZOMBIE in group.get_children():
+			if zombie.ragdoll.running:
+				adults += int(not zombie.is_baby)
+				babies += int(zombie.is_baby)
+		first_tick_ragdolls = adults + babies
+		var steps := Engine.get_physics_frames() - death_tick
+		print("CROWD_FIRST_DEATH_TICK adults=", adults, " babies=", babies, " steps=", steps)
+		if steps != 1:
+			failures.append("The first ragdoll sample must follow the lethal tick")
+	, CONNECT_ONE_SHOT)
 	var hit_start := Time.get_ticks_usec()
 	for zombie: ZOMBIE in group.get_children():
 		zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
@@ -930,8 +960,6 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 					active += 1
 			if label == "simultaneous_ragdolls" and i == 30:
 				check_crowd_corpse_fade(group)
-			if label == "simultaneous_ragdolls" and i == 1:
-				first_tick_ragdolls = active
 			if label == "corpse_cleanup" and i == 149:
 				late_active_ragdolls = active
 			active_peak = maxi(active_peak, active)
