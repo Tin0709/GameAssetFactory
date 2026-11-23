@@ -351,7 +351,7 @@ func _matches_direction(keys: Array, blend: float, direction: Vector3) -> bool:
 			and (blend <= SINGLE_KEY_EPSILON or direction.dot(_p3(keys[1].light)) >= minimum_dot)
 
 
-func _prepare_pair(zone: Dictionary, keys: Array, single_index: int, direction: Vector3, cap: float, blend: float) -> PairStatus:
+func _prepare_pair(zone: Dictionary, keys: Array, blend: float, single_index: int, direction: Vector3, cap: float) -> PairStatus:
 	for key: Dictionary in keys:
 		var key_error: String=_stream.error_for(key)
 		if not key_error.is_empty():
@@ -470,7 +470,7 @@ func update_shadow(delta: float, player: Vector3, velocity: Vector3,
 		return
 	var single_index:=_single_key_index(blend)
 	_request_tiles(zone,choice,keys,minute,position,velocity,single_index)
-	var status:=_prepare_pair(zone,keys,single_index,direction,_distance_cap(zone,player),blend)
+	var status:=_prepare_pair(zone,keys,blend,single_index,direction,_distance_cap(zone,player))
 	_waiting=status==PairStatus.WAIT
 	if status==PairStatus.ERROR:
 		_restore(minute)
