@@ -1049,6 +1049,25 @@ func check_baby_zombie_swing(bus: int, capture: AudioEffectCapture) -> void:
 		"Windup and confirmed contact can each replace a swing when the attack pool is full")
 	check(audio._play(&"baby_swing", point, -20.0) == null,
 		"A swing never steals an occupied attack voice")
+	audio.reset()
+	var ear: Vector3 = audio.zombie_listener.global_position
+	var nearby: Array[Vector3] = []
+	for i in COMBAT_AUDIO.VOICES_PER_POOL:
+		nearby.append(ear + Vector3.RIGHT * (i + 2))
+		audio.baby_swing(nearby[i])
+	audio.flush_zombie_combat_cues()
+	var windup_choice: int = audio._next_choice.get(&"zombie_windup", 0)
+	for i in 100:
+		audio.zombie_attack(ear + Vector3.FORWARD * (12.0 + i * 0.15), false)
+	audio.flush_zombie_combat_cues()
+	check(attacks.all(func(voice): return voice.playing and voice.stream in bank and voice.global_position in nearby)
+		and audio._next_choice.get(&"zombie_windup", 0) == windup_choice,
+		"A distant crowd cannot cut off nearby swing onsets or consume windup variants")
+	var onset_mixed := await wait_for_zombie_onset(attacks)
+	audio.zombie_attack(ear + Vector3.FORWARD * 12.0, false)
+	audio.flush_zombie_combat_cues()
+	check(onset_mixed and attacks.any(func(voice): return voice.playing and voice.stream in audio._groups[&"zombie_windup"]),
+		"Distant windups can reuse a swing voice after the mixer plays the onset")
 	toggle.button_pressed = false
 	check(attacks.all(func(voice): return not voice.playing), "Muting stops Baby Zombie swings")
 	lab.free()
