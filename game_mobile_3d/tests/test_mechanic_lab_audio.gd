@@ -1669,10 +1669,11 @@ func check_zombie_idle_audio(bus: int, capture: AudioEffectCapture) -> void:
 	zombie.connect(&"idle_audio", func(point: Vector3):
 		idle_events.append(zombie.animation.current_animation_position)
 		idle_point.append(point))
-	zombie.animation.play(ZOMBIE.IDLE, 0.0)
 	var early_events := 0
 	for i in 64:
-		zombie.animation.seek(0.0, true)
+		zombie.animation.play(ZOMBIE.WALK_CLIPS[0], 0.0)
+		zombie._advance_animation(0.0, Vector3.ZERO)
+		zombie.animation.play(ZOMBIE.IDLE, 0.0)
 		var count := idle_events.size()
 		zombie._advance_animation(0.05, Vector3.ZERO)
 		early_events += idle_events.size() - count
@@ -1682,7 +1683,7 @@ func check_zombie_idle_audio(bus: int, capture: AudioEffectCapture) -> void:
 		"Idle vocalization rolls its chance only on the authored 0.0669 second contact")
 	var idle_index := zombie._idle_audio_index
 	var idle_length := zombie.animation.get_animation(ZOMBIE.IDLE).length
-	zombie.animation.seek(idle_length - 0.03, true)
+	zombie._advance_animation(idle_length - 0.10, Vector3.ZERO)
 	zombie._advance_animation(0.10, Vector3.ZERO)
 	check(zombie._idle_audio_index == idle_index + 1, "Loop wrap rechecks the authored idle cue once")
 	var cue_count := idle_events.size()
