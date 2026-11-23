@@ -201,10 +201,7 @@ func _process(_delta:float)->void:
    RenderingServer.global_shader_parameter_set("gaf_local_mist_dy",dy)
   _publish_region(&"gaf_local_mist_center",&"gaf_local_mist_radii",local)
   _publish_region(&"gaf_additional_mist_center",&"gaf_additional_mist_radii",additional)
- _set_gate(ready)
- # Resizing keeps the same active receivers while the compute field rebuilds.
- # Swapping their shaders during the rebuild can leave stale GPU bindings.
- _sync_materials(ready or (state.error.is_empty() and not _bound_materials.is_empty()))
+ _set_gate(ready);_sync_materials(ready)
 func suspend() -> void:
  hide()
  _process(0.)
