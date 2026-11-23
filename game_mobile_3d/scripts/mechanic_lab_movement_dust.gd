@@ -9,15 +9,6 @@ const GAUNTLET_DEBRIS_HASH := "b700bc41b85fd6afb00a76bdf7966d708557ac11b01b54eea
 const GAUNTLET_DEBRIS_GRAVITY := 14.7
 const GAUNTLET_IMPACT_DUST_FORWARD := 0.90
 const FRAMES := [0, 9, 10, 16, 24, 25]
-# Half-open pixel bounds of the nonzero alpha in the verified smoke atlas.
-const SMOKE_CELL_BOUNDS := {
-	0: Vector4(4, 5, 12, 14),
-	9: Vector4(4, 3, 11, 11),
-	10: Vector4(3, 3, 13, 12),
-	16: Vector4(4, 5, 12, 14),
-	24: Vector4(4, 6, 12, 13),
-	25: Vector4(2, 4, 14, 13),
-}
 # All six nearest-filtered masks fit inside the central 12 by 12 texels.
 const SMOKE_VISIBLE_FRACTION := 12.0 / 16.0
 const CAPACITY := 16
@@ -148,8 +139,6 @@ func _create_landing_batch() -> void:
 	material.set_shader_parameter("smoke_mask", _smoke_texture)
 	material.set_shader_parameter("dust_tint", SURFACE_DUST.grass)
 	material.set_shader_parameter("camera_range_squared", SOURCE_CAMERA_RANGE ** 2)
-	material.set_shader_parameter("cell_bounds", source_smoke_cell_bounds())
-	material.set_shader_parameter("crop_smoke_atlas", true)
 	var quad := QuadMesh.new()
 	quad.material = material
 	var instances := MultiMesh.new()
@@ -207,15 +196,6 @@ func _sync_landing_batch() -> void:
 
 func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:
 	return batch.setup(_smoke_texture, _run_alpha, _run_alpha_duration, true)
-
-static func source_smoke_cell_bounds() -> PackedVector4Array:
-	var bounds := PackedVector4Array()
-	bounds.resize(32)
-	bounds.fill(Vector4(0, 0, 1, 1))
-	for cell: int in SMOKE_CELL_BOUNDS:
-		# Keep one transparent texel around the original alpha support.
-		bounds[cell] = (SMOKE_CELL_BOUNDS[cell] + Vector4(-1, -1, 1, 1)) / 16.0
-	return bounds
 
 func use_gauntlet_debris(equipped: Callable, impact_contact: Callable) -> void:
 	var image := EffectSource.load_image(GAUNTLET_DEBRIS_SOURCE, GAUNTLET_DEBRIS_HASH, Vector2i(16, 16))

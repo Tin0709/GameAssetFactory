@@ -4,22 +4,9 @@ render_mode unshaded, depth_draw_never, cull_disabled, shadows_disabled;
 uniform sampler2D smoke_mask : filter_nearest, repeat_disable;
 uniform vec4 dust_tint : source_color;
 uniform float camera_range_squared;
-uniform bool crop_smoke_atlas = false;
-uniform vec4 cell_bounds[32];
 varying flat vec3 sprite_data;
 
 void vertex() {
-	float cell = INSTANCE_CUSTOM.x;
-	// Keep the original rasterization when the atlas is less than 2 pixels per texel.
-	vec2 projected_size = abs(vec2(PROJECTION_MATRIX[0][0], PROJECTION_MATRIX[1][1]))
-		* VIEWPORT_SIZE * (INSTANCE_CUSTOM.z * 0.5);
-	if (crop_smoke_atlas && PROJECTION_MATRIX[3][3] == 1.0
-			&& min(projected_size.x, projected_size.y) >= 32.0) {
-		vec4 bounds = cell_bounds[int(cell)];
-		vec2 center = (bounds.xy + bounds.zw) * 0.5 - vec2(0.5);
-		VERTEX.xy = VERTEX.xy * (bounds.zw - bounds.xy) + vec2(center.x, -center.y);
-		UV = mix(bounds.xy, bounds.zw, UV);
-	}
 	VERTEX.xy *= INSTANCE_CUSTOM.z;
 	vec3 to_camera = MODEL_MATRIX[3].xyz - CAMERA_POSITION_WORLD;
 	if (dot(to_camera, to_camera) > camera_range_squared) {
@@ -27,6 +14,7 @@ void vertex() {
 	}
 	MODELVIEW_MATRIX = VIEW_MATRIX * mat4(
 		INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], MODEL_MATRIX[3]);
+	float cell = INSTANCE_CUSTOM.x;
 	sprite_data = vec3(mod(cell, 8.0), floor(cell / 8.0), INSTANCE_CUSTOM.y);
 }
 

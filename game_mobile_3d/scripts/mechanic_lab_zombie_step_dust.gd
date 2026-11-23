@@ -7,6 +7,15 @@ const ALPHA_SAMPLES := 54
 const TICK_WRAP := 2048
 const INSTANCE_FLOATS := 16
 const BUFFER_UPLOAD_MIN := 48
+# Half-open pixel bounds of the nonzero alpha in the verified smoke atlas.
+const SMOKE_CELL_BOUNDS := {
+	0: Vector4(4, 5, 12, 14),
+	9: Vector4(4, 3, 11, 11),
+	10: Vector4(3, 3, 13, 12),
+	16: Vector4(4, 5, 12, 14),
+	24: Vector4(4, 6, 12, 13),
+	25: Vector4(2, 4, 14, 13),
+}
 
 class Puff:
 	var origin: Vector3
@@ -33,7 +42,13 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float,
 	_material.shader = SHADER
 	_material.set_shader_parameter("smoke_mask", texture)
 	if verified_smoke_atlas and RenderingServer.get_current_rendering_method() == "mobile":
-		_material.set_shader_parameter("cell_bounds", MovementDust.source_smoke_cell_bounds())
+		var cell_bounds := PackedVector4Array()
+		cell_bounds.resize(32)
+		cell_bounds.fill(Vector4(0, 0, 1, 1))
+		for cell: int in SMOKE_CELL_BOUNDS:
+			# Keep one transparent texel around the original alpha support.
+			cell_bounds[cell] = (SMOKE_CELL_BOUNDS[cell] + Vector4(-1, -1, 1, 1)) / 16.0
+		_material.set_shader_parameter("cell_bounds", cell_bounds)
 		_material.set_shader_parameter("crop_smoke_atlas", true)
 	_material.set_shader_parameter("dust_tint", MovementDust.SURFACE_DUST.grass)
 	_material.set_shader_parameter("alpha_curve", alpha)
