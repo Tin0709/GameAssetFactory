@@ -204,13 +204,28 @@ vec3 terrain_opening_fill(vec3 receiver_visibility, float sole) {
 // Recovered split-sum consumer form; independently integrated GGX LUT.
 // Existing diffuse transport is only a low-frequency incident-radiance proxy.
 #ifdef GAF_TERRAIN_NIGHT_SKY
-vec3 gaf_stone_reflection_balance(vec3 reflected, vec3 diffuse) {
-	if (stone_twilight_strength <= 0.0 || ground_grade != 3) return reflected;
+global uniform float gaf_canopy_turf_reflection_color;
+
+vec3 gaf_terrain_reflection_balance(vec3 reflected, vec3 diffuse, vec3 albedo, float face_y) {
 	const vec3 luma = vec3(.2126, .7152, .0722);
-	// Cap the separate reflection estimate at 10% of diffuse plus reflection.
-	float max_y = dot(diffuse, luma) / 9.0;
-	float scale = min(1.0, max_y / max(dot(reflected, luma), 1.e-7));
-	return reflected * mix(1.0, scale, stone_twilight_strength);
+	if (ground_grade == 3) {
+		if (stone_twilight_strength <= 0.0) return reflected;
+		// Cap the separate reflection estimate at 10% of diffuse plus reflection.
+		float max_y = dot(diffuse, luma) / 9.0;
+		float scale = min(1.0, max_y / max(dot(reflected, luma), 1.e-7));
+		return reflected * mix(1.0, scale, stone_twilight_strength);
+	}
+	if (gaf_canopy_turf_reflection_color <= 0.0 || !use_source_terrain || face_y <= .998 ||
+			(ground_grade != 1 && ground_grade != 2)) return reflected;
+	float canopy = 1.0 - smoothstep(.76, .96, terrain_canopy_sky);
+	float turf = smoothstep(1.04, 1.20, albedo.g / max(albedo.r, .0001)) *
+		smoothstep(1.12, 1.35, albedo.g / max(albedo.b, .0001));
+	float blend = gaf_canopy_turf_reflection_color * canopy * turf;
+	float diffuse_y = dot(diffuse, luma);
+	if (blend <= 0.0 || diffuse_y <= .00001) return reflected;
+	// Bring broad reflection chroma toward the shaded surface lighting at fixed luminance.
+	vec3 matched = diffuse * (dot(reflected, luma) / diffuse_y);
+	return mix(reflected, matched, blend);
 }
 #endif
 vec3 terrain_reflected(vec3 normal,vec3 view,float rough,float visibility,float cloud,float contact,float source_spec){

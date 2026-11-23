@@ -16,6 +16,7 @@ var applied_sky_color := 0.
 var applied_edge_return := 0.
 var applied_ground_fill := Vector2.ZERO
 var applied_terrain_contrast := 1.0
+var applied_turf_reflection_color := 0.0
 var applied_directional_ground := 0.0
 var _directional_ground_rect := Vector4.ZERO
 var _directional_ground_texture: ImageTexture
@@ -90,6 +91,7 @@ func setup(level: Node3D) -> void:
 	RenderingServer.global_shader_parameter_set("gaf_canopy_edge_return", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_ground_fill", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_terrain_contrast", 1.)
+	RenderingServer.global_shader_parameter_set("gaf_canopy_turf_reflection_color", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_extent", Vector3(_dimensions))
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", _texture)
@@ -369,6 +371,7 @@ func refresh() -> void:
 		applied_edge_return = 0.
 		applied_ground_fill = Vector2.ZERO
 		applied_terrain_contrast = 1.0
+		applied_turf_reflection_color = 0.0
 		applied_directional_ground = 0.0
 		applied_pre_twilight = 0.
 		return
@@ -416,6 +419,14 @@ func refresh() -> void:
 	if contrast != applied_terrain_contrast:
 		applied_terrain_contrast = contrast
 		RenderingServer.global_shader_parameter_set("gaf_canopy_terrain_contrast", contrast)
+	var turf_reflection_color := 0.0
+	if ground_fill.x > 0.0 and review._biome_profile != null:
+		var profile_strength: float = review._biome_profile.canopy_turf_reflection_color
+		if is_finite(profile_strength):
+			turf_reflection_color = clampf(profile_strength, 0.0, 1.0) * minf(ground_fill.x / .55, 1.0)
+	if turf_reflection_color != applied_turf_reflection_color:
+		applied_turf_reflection_color = turf_reflection_color
+		RenderingServer.global_shader_parameter_set("gaf_canopy_turf_reflection_color", turf_reflection_color)
 	var directional_ground := 0.0
 	if ground_fill.x > 0.0 and _directional_ground_rect.z > 0.0 and review._biome_profile != null:
 		var profile: Resource = review._biome_profile
@@ -445,6 +456,7 @@ func _exit_tree() -> void:
 		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_return", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_ground_fill", Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_terrain_contrast", 1.)
+		RenderingServer.global_shader_parameter_set("gaf_canopy_turf_reflection_color", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_pre_twilight_receiver", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", null)
 		RenderingServer.global_shader_parameter_set("gaf_directional_ground_rect", Vector4.ZERO)

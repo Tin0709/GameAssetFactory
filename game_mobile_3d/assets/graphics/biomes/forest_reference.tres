@@ -171,6 +171,7 @@ grass_terrace_shadow_fill = Vector2(1.15, 0.9)
 canopy_ground_fill = Vector2(0.75, 1.1)
 canopy_ground_fill_overcast = 0.78
 canopy_terrain_contrast = 1.9
+canopy_turf_reflection_color = 0.82
 directional_ground_sky_by_hour = SubResource("DirectionalGroundSky")
 near_wall_fill = Vector2(0.22, 0.66)
 near_wall_fill_overcast = 0.82

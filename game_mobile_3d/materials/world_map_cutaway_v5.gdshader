@@ -173,7 +173,7 @@ void fragment() {
 	EMISSION+=ALBEDO*(1.0-METALLIC)*gaf_replay_incident(cutaway_world,surface_normal)*receiver_contact*sole;
 	if (terrain_rough_reflection) {
 		vec3 reflected = terrain_reflected(normalize(NORMAL), normalize(VIEW), ROUGHNESS, AO, cloud_transmission, receiver_contact, native_specular);
-		EMISSION += gaf_stone_reflection_balance(reflected, diffuse_fill);
+		EMISSION += gaf_terrain_reflection_balance(reflected, diffuse_fill, ALBEDO, surface_top);
 	}
 #else
 	EMISSION += gaf_local_environment_delta(ALBEDO, METALLIC, cutaway_world, surface_normal) * AO;
