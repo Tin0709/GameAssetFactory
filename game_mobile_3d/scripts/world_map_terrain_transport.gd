@@ -309,7 +309,7 @@ func _refresh_day_bounce() -> void:
 		if sample.y > 0.0 and sun.is_visible_in_tree() and sun.shadow_enabled and sun.light_energy > 0.0:
 			if afternoon.active:
 				day_bounce_texture = afternoon.terrain_texture
-				matched_day_bounce_active = false
+				matched_day_bounce_active = true
 			else:
 				if day_bounce_texture == afternoon.terrain_texture:
 					day_bounce_texture = null
@@ -318,6 +318,10 @@ func _refresh_day_bounce() -> void:
 				var c := sun.light_color.srgb_to_linear()
 				var rgb := Vector3(c.r, c.g, c.b) * (sun.light_energy * sample.y * strength)
 				key = Vector4(rgb.x, rgb.y, rgb.z, sample.x)
+	if key == Vector4.ZERO and day_bounce_texture != null \
+			and day_bounce_texture == review.afternoon_lighting.terrain_texture:
+		day_bounce_texture = null
+		matched_day_bounce_active = false
 	var focus: float = review.stone_bounce_focus_weight() if key != Vector4.ZERO else 0.
 	if key != day_bounce_key or focus != stone_bounce_focus or previous_texture != day_bounce_texture:
 		day_bounce_key = key
