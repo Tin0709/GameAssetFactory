@@ -199,6 +199,8 @@ func check_sword_finisher_push(lab, group) -> void:
 	check(selector.selected == 0 and not group.sword_equipped, "Switch back to Sabre after the Sword combo ends")
 
 func check_bow_knockback(lab, group) -> void:
+	lab.reset_player()
+	await ticks(5)
 	var selector := lab.get_node("HUD/Weapon") as OptionButton
 	selector.select(6)
 	selector.item_selected.emit(6)
