@@ -145,7 +145,12 @@ void light() {
 	vec2 canopy_delta = vec2(0.0);
 	if (terrain_canopy_incident.w >= 0.0 && gaf_canopy_ground_fill.x > 0.0 && shadow_diffuse.g > 0.0 &&
 			terrain_canopy_ground_ev != 0.0 && shadow_attenuation < .58) {
-		canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev * gaf_canopy_terrain_contrast, shadow_attenuation);
+		canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev, shadow_attenuation);
+		if (gaf_canopy_terrain_contrast > 1.0) {
+			// Bound the added contrast where the moving key shadow changes coverage.
+			vec2 boosted = gaf_canopy_ground_delta(terrain_canopy_ground_ev * gaf_canopy_terrain_contrast, shadow_attenuation);
+			canopy_delta += clamp(boosted - canopy_delta, vec2(-.13), vec2(.13));
+		}
 		if (shadow_attenuation < .47) {
 			// Shaded turf receives more diffuse fill than the blades above it.
 			float coverage = 1.0 - smoothstep(.74, .94, terrain_canopy_sky);

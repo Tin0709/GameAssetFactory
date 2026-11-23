@@ -1,6 +1,7 @@
 extends SceneTree
 
 enum Strike { SABRE, SABRE_FINISHER, AIR, SWORD }
+enum DeathPose { MD2, AS_FLAT, AS_CORNER }
 
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 
@@ -118,8 +119,13 @@ func run() -> void:
 	# A free leg near the ground needs to recover from a sideways gap
 	# even when its full anchor correction would point into the grass.
 	await check_tuned_contact(3, 27.0, 0.12, Strike.SABRE_FINISHER, -58.0,
-		Vector2(100.0, 100.0), true, true)
-	await check_tuned_contact(35, 27.0, 0.20, Strike.AIR, -58.0, Vector2(100.0, 100.0), true, true)
+		Vector2(100.0, 100.0), true, DeathPose.AS_FLAT)
+	await check_tuned_contact(35, 27.0, 0.20, Strike.AIR, -58.0, Vector2(100.0, 100.0), true, DeathPose.AS_FLAT)
+	# Launch alone can pin a foot against the floor and a side of the corner.
+	await check_tuned_contact(2, 27.0, 0.25, Strike.SABRE, -58.0, Vector2(1000.0, 100.0), true)
+	# An A&S stride can hit two sides before the head or a foot reaches a wall.
+	await check_tuned_contact(25, 27.0, 0.37, Strike.SABRE, -58.0,
+		Vector2(1000.0, 100.0), true, DeathPose.AS_CORNER)
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", step_phases.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -172,7 +178,7 @@ func check_walk_contacts(baby: Zombie) -> void:
 			"The Baby Zombie step matches the source sole and phase at frame 2 or 8")
 
 func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, strike_kind := Strike.SABRE,
-		strike_yaw := INF, tuning := Vector2(1000.0, 1000.0), prewarm := false, actions_stuff_floor := false) -> void:
+		strike_yaw := INF, tuning := Vector2(1000.0, 1000.0), prewarm := false, death_pose := DeathPose.MD2) -> void:
 	var launch_percent := tuning.x
 	var gravity_percent := tuning.y
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
@@ -185,7 +191,7 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, strike_k
 	lab.get_node("HUD/RagdollTuning/Launch/Slider").value = launch_percent
 	lab.get_node("HUD/RagdollTuning/Gravity/Slider").value = gravity_percent
 	var corner: Node3D
-	if actions_stuff_floor:
+	if death_pose == DeathPose.AS_FLAT:
 		corner = Node3D.new()
 		corner.rotation.y = deg_to_rad(wall_yaw)
 		lab.add_child(corner)
@@ -202,12 +208,15 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, strike_k
 		baby.position = corner.to_global(baby.position)
 		baby.rotation.y += corner.rotation.y
 	var clips := [Zombie.IDLE, Zombie.WALK_CLIPS[0], Zombie.ATTACK]
-	if actions_stuff_floor:
+	if death_pose != DeathPose.MD2:
 		clips = [Zombie.ActionsStuff.IDLE, Zombie.ActionsStuff.MOVE, Zombie.ActionsStuff.ATTACK]
 	var clip: StringName = clips[seed % clips.size()]
 	baby.animation.play(clip)
 	baby.animation.advance(0.0)
-	baby.animation.seek(baby.animation.get_animation(clip).length * (seed % 10) * 0.1, true)
+	var clip_length := baby.animation.get_animation(clip).length
+	if death_pose == DeathPose.AS_CORNER and clip == Zombie.ActionsStuff.MOVE:
+		clip_length = minf(Zombie.ActionsStuff.STRIDE_SECONDS, clip_length)
+	baby.animation.seek(clip_length * (seed % 10) * 0.1, true)
 	await physics_frame
 	for sample in 2:
 		baby.ragdoll.sample(1.0 / 60.0)
@@ -237,7 +246,7 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, strike_k
 		if not baby.ragdoll.running:
 			continue
 		gap = maxf(gap, baby.ragdoll.max_anchor_error())
-		if corner != null and not actions_stuff_floor:
+		if corner != null and death_pose != DeathPose.AS_FLAT:
 			for part: PhysicalBone3D in baby.ragdoll.bodies.values():
 				var local := corner.to_local(part.global_position)
 				crossed = crossed or (local.y > 0.0 and local.y < 7.9 and (local.x > 6.13 or local.z < 0.07))
@@ -253,7 +262,7 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, strike_k
 		"At %d%% launch and %d%% gravity the Baby Zombie settles with limited joint stretch and no wall crossings"
 		% [launch_percent, gravity_percent])
 	print("LAB_BABY_TUNED_CONTACT launch=", launch_percent, " gravity_slider=", gravity_percent, " seed=", seed, " yaw=", wall_yaw, " strike_yaw=", strike_yaw, " gap=", gap, " crossed=", crossed,
-		" parked=", baby._corpse_parked, " impulse=", impulse, " gravity=", gravity, " as_floor=", actions_stuff_floor)
+		" parked=", baby._corpse_parked, " impulse=", impulse, " gravity=", gravity, " death_pose=", death_pose)
 	lab.free()
 
 func check_first_wall_neck_contact(frozen := false) -> void:

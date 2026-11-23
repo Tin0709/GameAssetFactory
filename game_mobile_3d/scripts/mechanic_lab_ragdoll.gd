@@ -57,6 +57,7 @@ var use_tuned_wall_sweep := false
 var use_tuned_floor_support := false
 var use_baby_floor_anchors := false
 var _baby_wall_anchors := false
+var _baby_waiting_for_wall_contact := false
 var wall_handoff_animation: AnimationPlayer
 var wall_handoff_idle: StringName
 var wall_handoff_idle_pose: Array[Transform3D]
@@ -1173,6 +1174,10 @@ func _recover_baby_floor_anchors() -> void:
 				or maxf(absf(end.z), absf(local.origin.z)) + extent.z > floor_half.z:
 			continue
 		if above_floor:
+			if not use_tuned_floor_support and _has_fixed_wall_contact(parent):
+				# A pinned chest can open a free leg's joint while it is still airborne.
+				_recover_baby_wall_anchors()
+				return
 			_recover_raised_leg_wall_overlap(joint, state, motion, floor_rid,
 				floor_pose.origin.y + floor_half.y)
 			continue
@@ -1180,6 +1185,7 @@ func _recover_baby_floor_anchors() -> void:
 			if _floor_roll_nears_obstacle(floor_rid, true):
 				use_baby_floor_anchors = false
 				_baby_wall_anchors = use_tuned_floor_support
+				_baby_waiting_for_wall_contact = not use_tuned_floor_support
 				return
 			checked_obstacles = true
 		if _test_projection_motion(joint.body, state.transform, motion, floor_rid):
@@ -1187,7 +1193,15 @@ func _recover_baby_floor_anchors() -> void:
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
 
-func _leg_has_side_contact(state: PhysicsDirectBodyState3D) -> bool:
+func _baby_leg_touches_wall() -> bool:
+	for name in ["Leg.L", "Leg.R"]:
+		var state := PhysicsServer3D.body_get_direct_state((bodies[name] as PhysicalBone3D).get_rid())
+		if state != null and _has_fixed_wall_contact(state):
+			return true
+	return false
+
+
+func _has_fixed_wall_contact(state: PhysicsDirectBodyState3D) -> bool:
 	for contact in state.get_contact_count():
 		if absf(state.get_contact_local_normal(contact).y) < MAX_WALL_NORMAL_Y \
 				and _is_fixed_wall(state.get_contact_collider_object(contact)):
@@ -1210,7 +1224,7 @@ func _recover_raised_leg_wall_overlap(joint: PhysicalPart, state: PhysicsDirectB
 		# a limb still braced on a side face can close the gap along it.
 		var first_contact_ticks := roundi(WALL_SHOULDER_SLIDE_WINDOW * Engine.physics_ticks_per_second)
 		if not use_tuned_floor_support and Engine.get_physics_frames() - _launch_frame > first_contact_ticks \
-				and _leg_has_side_contact(state):
+				and _has_fixed_wall_contact(state):
 			_slide_floor_wall_part(joint.body, state, joint.half_size, motion, floor_y, floor)
 		return
 	var separated := pose.translated(retreat)
@@ -1514,6 +1528,10 @@ func _project_source_anchors() -> void:
 	# The head box can touch the wall before its center reaches the wall sweep.
 	if use_baby_floor_anchors and use_tuned_wall_sweep and _baby_neck_needs_wall_recovery():
 		use_baby_floor_anchors = false
+		_baby_wall_anchors = true
+	# A predictive sweep can end the floor correction one tick before contact.
+	if _baby_waiting_for_wall_contact and _baby_leg_touches_wall():
+		_baby_waiting_for_wall_contact = false
 		_baby_wall_anchors = true
 	if _baby_wall_anchors:
 		_recover_baby_wall_anchors()
@@ -1928,7 +1946,7 @@ func _recover_rebounding_wall_legs() -> void:
 		if joint.name != "Leg.L" and joint.name != "Leg.R":
 			continue
 		var state := PhysicsServer3D.body_get_direct_state(joint.rid)
-		if state == null or not _leg_has_side_contact(state):
+		if state == null or not _has_fixed_wall_contact(state):
 			continue
 		var gap := (core.transform * joint.parent_frame).origin - (state.transform * joint.child_frame).origin
 		var distance := gap.length()
