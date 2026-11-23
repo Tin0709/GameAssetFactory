@@ -421,6 +421,78 @@ func check_direct_approach_after_cover_opens(member_count: int, yaw: float) -> v
 	lab.free()
 	await physics_frame
 
+func check_direct_approach_blocked_by_peer(baby: bool, yaw: float) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var zombies := spawn_detour_group(lab, 100, baby)
+	if zombies == null:
+		lab.free()
+		return
+	var heading := Basis(Vector3.UP, yaw)
+	lab.player.position = Vector3(0.0, 0.02, 0.0)
+	var cover := add_wall(lab, heading * Vector3(0.0, 0.2, -2.25), Vector3(2.5, 0.4, 0.30), yaw)
+	var chaser := zombies.get_child(0) as ZOMBIE
+	var peer := zombies.get_child(1) as ZOMBIE
+	chaser.position = heading * Vector3(0.0, 0.02, -4.2)
+	chaser.animation.play(ZOMBIE.IDLE, 0.0)
+	chaser.animation.advance(0.0)
+	var damage: Array[int] = []
+	chaser.melee_hit.connect(func(amount: int): damage.append(amount))
+	for tick in 150:
+		await physics_frame
+		if chaser._chase_detour.is_finite():
+			break
+	var waypoint := chaser._chase_detour
+	if not waypoint.is_finite():
+		failures.append("The chaser must start a detour around the terrain")
+		lab.free()
+		return
+	peer.global_position = heading * Vector3(0.0, 0.02, -1.85)
+	await physics_frame
+	cover.free()
+	var space := chaser.get_world_3d().direct_space_state
+	var travel: Vector3 = (lab.player.global_position - chaser.global_position).slide(Vector3.UP)
+	var approach := travel.move_toward(Vector3.ZERO, chaser._melee_approach)
+	chaser._prepare_lab_path_sweep()
+	var terrain_clear := chaser._lab_path_end_clear(space, approach) and chaser._lab_path_fraction(space, approach) >= 1.0
+	chaser._prepare_lab_path_sweep(true)
+	var peer_blocks := not chaser._lab_path_end_clear(space, approach) or chaser._lab_path_fraction(space, approach) < 1.0
+	var origin := chaser.global_position
+	var kept_waypoint := true
+	var blocked_ticks := 0
+	for tick in 8:
+		await physics_frame
+		travel = (lab.player.global_position - chaser.global_position).slide(Vector3.UP)
+		approach = travel.move_toward(Vector3.ZERO, chaser._melee_approach)
+		chaser._prepare_lab_path_sweep(true)
+		if not chaser._lab_path_end_clear(space, approach) or chaser._lab_path_fraction(space, approach) < 1.0:
+			blocked_ticks += 1
+			kept_waypoint = kept_waypoint and chaser._chase_detour == waypoint
+	var progress := (chaser.global_position - origin).dot((waypoint - origin).normalized())
+	if not terrain_clear or not peer_blocks or blocked_ticks < 4 or not kept_waypoint \
+			or progress <= 0.2 or not damage.is_empty():
+		failures.append("An opened route blocked by a live peer should keep the usable wall detour")
+	peer.global_position += heading.x * 6.0
+	PhysicsServer3D.body_set_state(peer.get_rid(), PhysicsServer3D.BODY_STATE_TRANSFORM, peer.global_transform)
+	var resumed := false
+	for tick in 8:
+		await physics_frame
+		resumed = resumed or not chaser._chase_detour.is_finite()
+	for tick in 150:
+		await physics_frame
+		if not damage.is_empty():
+			break
+	var expected := ZOMBIE.BABY_MELEE_DAMAGE if baby else ZOMBIE.MELEE_DAMAGE
+	if not resumed or damage != [expected]:
+		failures.append("The opened approach should resume after the peer moves and produce one normal hit")
+	print("LAB_PEER_REJOIN baby=", baby, " terrain_clear=", terrain_clear, " peer_blocks=", peer_blocks,
+		" blocked_ticks=", blocked_ticks, " retained=", kept_waypoint, " progress=", progress,
+		" resumed=", resumed, " hits=", damage)
+	lab.free()
+	await physics_frame
+
 func check_v_corner_escape(member_count: int) -> void:
 	var lab := LAB.instantiate()
 	root.add_child(lab)
@@ -662,6 +734,8 @@ func run() -> void:
 	await check_short_static_detour(1, 0.0, 4.1, Vector3(-0.8, 0.02, 0.0), 225)
 	await check_direct_approach_after_cover_opens(1, 0.0)
 	await check_direct_approach_after_cover_opens(100, deg_to_rad(27.0))
+	await check_direct_approach_blocked_by_peer(false, 0.0)
+	await check_direct_approach_blocked_by_peer(true, deg_to_rad(27.0))
 	await check_detour(1, 0.0, false)
 	await check_detour(100, deg_to_rad(27.0), true)
 	await check_detour(100, deg_to_rad(27.0), true, false, false, true)

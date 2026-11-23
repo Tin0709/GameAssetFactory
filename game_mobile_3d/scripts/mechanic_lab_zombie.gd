@@ -249,7 +249,6 @@ var _chase_detour_next := Vector3.INF
 var _chase_detour_time := 0.0
 var _partial_detour_origin := Vector3.INF
 var _partial_detour_target := Vector3.INF
-var _chase_detour_around_zombie := false
 var _chase_stalled_seconds := 0.0
 var _roam_origin := Vector3.ZERO
 var _roam_destination := Vector3.INF
@@ -910,7 +909,6 @@ func _clear_chase_detour() -> void:
 	_chase_detour_next = Vector3.INF
 	_chase_detour_time = 0.0
 	_chase_stalled_seconds = 0.0
-	_chase_detour_around_zombie = false
 
 func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distance: float,
 		delta: float, sample_ai: bool) -> Vector3:
@@ -935,15 +933,13 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 			var direct_clear := false
 			if sample_ai:
 				var space := get_world_3d().direct_space_state
-				_prepare_lab_path_sweep(_chase_detour_around_zombie)
+				# Terrain and peers can both obstruct the shortcut while we detour.
+				_prepare_lab_path_sweep(true)
 				# Chase stops at the approach margin, even if the target's center
 				# has no room for this zombie's capsule.
 				var approach := offset.move_toward(Vector3.ZERO, stop_distance)
-				if _chase_detour_around_zombie:
-					# A crowded destination often rejects the route before the sweep.
-					direct_clear = _lab_path_end_clear(space, approach) and _lab_path_fraction(space, approach) >= 1.0
-				else:
-					direct_clear = _lab_path_fraction(space, approach) >= 1.0 and _lab_path_end_clear(space, approach)
+				# Reject a crowded endpoint before spending a sweep on the approach.
+				direct_clear = _lab_path_end_clear(space, approach) and _lab_path_fraction(space, approach) >= 1.0
 			if not direct_clear:
 				return travel * (minf(_chase_speed, (distance - LAB_WAYPOINT_ARRIVAL) / delta) / distance)
 			_partial_detour_origin = Vector3.INF
@@ -992,8 +988,6 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 				_chase_detour = _retreat_detour(space, bounds, normal, offset, stop_distance, retreat_budget)
 		if _chase_detour.is_finite():
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
-			# Returning directly through the blocker would undo this side step.
-			_chase_detour_around_zombie = living_blocker
 			return (_chase_detour - global_position).slide(Vector3.UP).normalized() * _chase_speed
 		# The second face of a corner can expose a connected route to the last
 		# sighting. Try at most one other fixed face before the next retry.
