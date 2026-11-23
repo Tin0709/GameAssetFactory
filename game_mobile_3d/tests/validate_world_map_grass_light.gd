@@ -37,6 +37,17 @@ func run()->void:
 		w.set_reference_look(true)
 		await process_frame
 		check(material.get_shader_parameter(STEP_COVERAGE) == 1., "Returning to Combined restores stepped-terrain coverage")
+		var receivers := preload("res://scripts/world_map_far_shadow_receivers.gd").new()
+		receivers.mist_variant = w.showcase.mist.material_variant
+		var authored := receivers.authored_shader(material.shader)
+		check(receivers.bind([material]), "Grass shader can receive far terrain shadows")
+		check(receivers.authored_shader(material.shader) == authored, "Far shadows and mist retain the grass lighting source")
+		p.set_grass_lighting(true)
+		check(receivers.authored_shader(material.shader).code.count("#define GAF_REFERENCE_GRASS_LIGHTING") == 1,
+			"Refreshing grass through an active far receiver keeps one lighting define")
+		receivers.release()
+		check(receivers.authored_shader(material.shader).code.count("#define GAF_REFERENCE_GRASS_LIGHTING") == 1,
+			"Releasing far receivers preserves the latest grass shader")
 		check(w.showcase._lighting_sliders.has(StringName(STEP_COVERAGE)), "Terrain step coverage has a settings slider")
 		var preset_path := "user://grass_step_%d.cfg" % OS.get_process_id()
 		w.showcase.set_lighting_scale(&"grass_step_coverage", .4)
