@@ -34,7 +34,8 @@ func run() -> void:
 	root.add_child(lab)
 	current_scene = lab
 	var mode := lab.get_node_or_null("HUD/ZombieGait") as OptionButton
-	check(mode != null and mode.item_count == 2 and mode.selected == 0 and not mode.disabled,
+	check(mode != null and mode.item_count == 2 and mode.selected == 0 and not mode.disabled
+		and not mode.is_item_disabled(1),
 		"The Lab offers MD2 and Actions & Stuff for both zombie types")
 	if failures > 0:
 		quit(1)

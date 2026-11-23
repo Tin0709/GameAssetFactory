@@ -245,7 +245,6 @@ func _ready() -> void:
 	gait_picker.add_item("Zombie · Actions & Stuff")
 	gait_picker.select(0)
 	gait_picker.disabled = $HUD/SpawnZombie.disabled
-	gait_picker.set_item_disabled(1, not $Zombies.actions_stuff_available)
 	gait_picker.item_selected.connect(func(index: int): $Zombies.set_actions_stuff_animation(index == 1))
 	$HUD/CombatAudioToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
@@ -319,6 +318,7 @@ func _ready() -> void:
 		add_child(bars)
 		$Zombies.health_bars = bars
 		$Zombies.setup_combat(player)
+		gait_picker.set_item_disabled(1, not $Zombies.actions_stuff_available)
 		var glyphs: Array[Texture2D] = $Zombies.damage_digits()
 		if glyphs.size() == DamageNumbers.DIGIT_COUNT:
 			var numbers := DamageNumbers.new()
