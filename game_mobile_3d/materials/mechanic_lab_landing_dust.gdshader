@@ -10,7 +10,11 @@ varying flat vec3 sprite_data;
 
 void vertex() {
 	float cell = INSTANCE_CUSTOM.x;
-	if (crop_smoke_atlas) {
+	// Keep the original rasterization when the atlas is less than 2 pixels per texel.
+	vec2 projected_size = abs(vec2(PROJECTION_MATRIX[0][0], PROJECTION_MATRIX[1][1]))
+		* VIEWPORT_SIZE * (INSTANCE_CUSTOM.z * 0.5);
+	if (crop_smoke_atlas && PROJECTION_MATRIX[3][3] == 1.0
+			&& min(projected_size.x, projected_size.y) >= 32.0) {
 		vec4 bounds = cell_bounds[int(cell)];
 		vec2 center = (bounds.xy + bounds.zw) * 0.5 - vec2(0.5);
 		VERTEX.xy = VERTEX.xy * (bounds.zw - bounds.xy) + vec2(center.x, -center.y);
