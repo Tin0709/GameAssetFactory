@@ -32,8 +32,12 @@ const TRAIL_SHADER := preload("res://materials/mechanic_lab_polaris_trail.gdshad
 const ImpactSparks := preload("res://scripts/mechanic_lab_polaris_impact.gd")
 const TRAIL_LIFETIME := 0.30
 const TRAIL_WIDTH := 0.08
-const TRAIL_FADE_END_AGE := 0.60 * TRAIL_LIFETIME
-const TRAIL_SAMPLE_SECONDS := 1.0 / 60.0
+const TRAIL_ALPHA_END := 0.60
+const TRAIL_FADE_END_AGE := TRAIL_ALPHA_END * TRAIL_LIFETIME
+# NS_ArrowTrail's 48-sample opacity LUT bridges the change of slope
+# between samples 15 and 16. The samples on either side are collinear.
+const TRAIL_ALPHA_BLEND_START := TRAIL_ALPHA_END * 15.0 / 47.0
+const TRAIL_ALPHA_BLEND_END := TRAIL_ALPHA_END * 16.0 / 47.0
 # BP_ArrowProp uses the same source mesh, scaled to 0.6 with a -6 cm offset.
 const EMBEDDED_SCALE := 0.6
 const EMBEDDED_OFFSET := 0.06
@@ -315,7 +319,6 @@ func _update_trails() -> void:
 		var sideways := direction.cross(camera.global_basis.z).normalized()
 		if sideways.is_zero_approx():
 			sideways = camera.global_basis.x
-		var segments := ceili(duration / TRAIL_SAMPLE_SECONDS)
 		if not has_surface:
 			_trail_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 			has_surface = true
@@ -323,8 +326,12 @@ func _update_trails() -> void:
 		var lateral := to_local_space.basis * sideways
 		var previous_width := TRAIL_WIDTH * 0.5 * (1.0 - 0.5 * age / TRAIL_LIFETIME)
 		var previous_alpha := _trail_opacity(age / TRAIL_LIFETIME)
-		for sample in range(1, segments + 1):
-			var seconds_back := duration * float(sample) / segments
+		var blend_start := clampf(TRAIL_ALPHA_BLEND_START * TRAIL_LIFETIME - age, 0.0, duration)
+		var blend_end := clampf(TRAIL_ALPHA_BLEND_END * TRAIL_LIFETIME - age, 0.0, duration)
+		var previous_seconds_back := 0.0
+		for seconds_back: float in [blend_start, blend_end, duration]:
+			if seconds_back <= previous_seconds_back:
+				continue
 			var normalized_age := (age + seconds_back) / TRAIL_LIFETIME
 			var width := TRAIL_WIDTH * 0.5 * (1.0 - 0.5 * normalized_age)
 			var opacity := _trail_opacity(normalized_age)
@@ -342,6 +349,7 @@ func _update_trails() -> void:
 			previous_point = point
 			previous_width = width
 			previous_alpha = opacity
+			previous_seconds_back = seconds_back
 	if has_surface:
 		_trail_mesh.surface_end()
 	_trail_renderer.visible = has_surface
@@ -351,8 +359,12 @@ func _add_trail_vertex(point: Vector3, opacity: float) -> void:
 	_trail_mesh.surface_add_vertex(point)
 
 static func _trail_opacity(normalized_age: float) -> float:
-	# The two line segments reproduce the cooked opacity LUT.
-	return maxf(0.0, maxf(1.0 - 4.0 * normalized_age, 0.3 - 0.5 * normalized_age))
+	if normalized_age <= TRAIL_ALPHA_BLEND_START:
+		return 1.0 - 4.0 * normalized_age
+	if normalized_age < TRAIL_ALPHA_BLEND_END:
+		var blend := inverse_lerp(TRAIL_ALPHA_BLEND_START, TRAIL_ALPHA_BLEND_END, normalized_age)
+		return lerpf(1.0 - 4.0 * TRAIL_ALPHA_BLEND_START, 0.3 - 0.5 * TRAIL_ALPHA_BLEND_END, blend)
+	return maxf(0.0, 0.3 - 0.5 * normalized_age)
 
 func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
 	var collider := hit.collider as StaticBody3D

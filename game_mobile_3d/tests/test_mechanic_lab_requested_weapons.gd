@@ -490,6 +490,7 @@ func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
 	check(props_on_contact == 1 and bow._embedded_arrows.size() == 1
 		and is_zero_approx(bow._embedded_arrows[0].age),
 		"The Bow wall prop appears on impact at the start of its wobble")
+	check_arrow_ribbon_sections(bow, 1, "charged Bow at a close wall")
 	var contact_distance := wall.position.z - box.size.z * 0.5 - CrossPollinator.BOLT_RADIUS
 	var expected_age := elapsed - contact_distance / 90.0
 	if bow.impact_sparks != null:
@@ -513,10 +514,10 @@ func check_crossbow_trail(lab: Node3D) -> void:
 	check(ribbon != null, "Polaris has a shared ribbon renderer")
 	if ribbon == null:
 		return
-	check(is_equal_approx(CrossPollinator._trail_opacity(0.2), 0.2)
+	check(is_equal_approx(CrossPollinator._trail_opacity(0.2), 0.2099290788)
 		and is_equal_approx(CrossPollinator._trail_opacity(0.5), 0.05)
 		and is_zero_approx(CrossPollinator._trail_opacity(0.6)),
-		"Polaris opacity follows the measured two-segment curve")
+		"Polaris opacity follows the cooked LUT between the two transition samples")
 	var wall := StaticBody3D.new()
 	var collider := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -531,6 +532,7 @@ func check_crossbow_trail(lab: Node3D) -> void:
 	await ticks(4)
 	check(ribbon.visible and crossbow._trails.size() == 1 and crossbow._bolts.size() == 1,
 		"A travelling bolt draws a ribbon in the shared renderer")
+	check_arrow_ribbon_sections(crossbow, 3, "travelling Polaris")
 	await ticks(8)
 	check(ribbon.visible and ribbon.mesh.get_surface_count() == 1
 		and crossbow._bolts.is_empty() and crossbow._trails.size() == 1,
@@ -538,6 +540,7 @@ func check_crossbow_trail(lab: Node3D) -> void:
 	if crossbow._trails.size() == 1:
 		check(absf(float(crossbow._trails[0].distance) - 3.95) < 0.03,
 			"The ribbon stops at the wall surface")
+	check_arrow_ribbon_sections(crossbow, 1, "Polaris tail after the opacity transition")
 	await ticks(18)
 	check(not ribbon.visible and crossbow._trails.is_empty(), "The last ribbon sample expires after 0.30 seconds")
 	crossbow.fire(origin, Vector3.BACK, -202, origin)
@@ -548,6 +551,44 @@ func check_crossbow_trail(lab: Node3D) -> void:
 	crossbow.reset()
 	check(not ribbon.visible and crossbow._trails.is_empty(), "Reset clears the flying ribbon immediately")
 	wall.queue_free()
+
+func check_arrow_ribbon_sections(projectile: Node3D, spans: int, fixture: String) -> void:
+	var ribbon := projectile.get_node("ArrowTrail") as MeshInstance3D
+	if projectile._trails.size() != 1 or ribbon.mesh.get_surface_count() != 1:
+		check(false, "%s provides one ribbon for source-curve inspection" % fixture)
+		return
+	var arrays := ribbon.mesh.surface_get_arrays(0)
+	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var colors: PackedColorArray = arrays[Mesh.ARRAY_COLOR]
+	var trail: Dictionary = projectile._trails[0]
+	var direction: Vector3 = trail.direction
+	var age: float = trail.tail_age
+	var speed: float = trail.speed
+	var head := Vector3(trail.origin) + direction * float(trail.distance)
+	var ages := [age, minf(age + float(trail.distance) / speed, 0.18)]
+	if spans == 3:
+		ages.insert(1, 0.18 * 15.0 / 47.0)
+		ages.insert(2, 0.18 * 16.0 / 47.0)
+	var section_counts := PackedInt32Array()
+	section_counts.resize(ages.size())
+	var geometry_matches := vertices.size() == spans * 6 and vertices.size() == colors.size()
+	for i in mini(vertices.size(), colors.size()):
+		var offset := ribbon.to_global(vertices[i]) - head
+		var sample_age := age - offset.dot(direction) / speed
+		for section in ages.size():
+			var expected_age: float = ages[section]
+			if absf(sample_age - expected_age) > 0.00001:
+				continue
+			section_counts[section] += 1
+			var t := expected_age / 0.3
+			var expected_alpha := maxf(0.0, 1.0 - 4.0 * t if t <= 0.2 else 0.3 - 0.5 * t)
+			var half_width := 0.04 * (1.0 - 0.5 * t)
+			geometry_matches = geometry_matches and absf(colors[i].a - expected_alpha) < 0.004
+			geometry_matches = geometry_matches and absf(offset.slide(direction).length() - half_width) < 0.00005
+			break
+	var expected_counts := PackedInt32Array([3, 6, 6, 3]) if spans == 3 else PackedInt32Array([3, 3])
+	check(geometry_matches and section_counts == expected_counts,
+		"%s uses exactly the source opacity spans and taper" % fixture)
 
 func check_crossbow_collision_radius(lab: Node3D) -> void:
 	var crossbow = lab._crossbow
