@@ -962,6 +962,7 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 	var bounds := _corpse_floor.shape as BoxShape3D
 	if bounds == null:
 		return Vector3.ZERO
+	var first_wall_normal := Vector3.ZERO
 	for i in get_slide_collision_count():
 		var collision := get_slide_collision(i)
 		var obstacle := collision.get_collider() as CollisionObject3D
@@ -971,6 +972,9 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 		var normal := collision.get_normal().slide(Vector3.UP)
 		if (not fixed_blocker and not living_blocker) \
 				or obstacle == _corpse_floor.get_parent() or normal.dot(offset) >= -0.1:
+			continue
+		var alternate_face := not first_wall_normal.is_zero_approx()
+		if alternate_face and (not fixed_blocker or normal.normalized().dot(first_wall_normal) > 0.98):
 			continue
 		var space := get_world_3d().direct_space_state
 		var packed_blocker: bool = living_blocker and get_parent().has_living_crowd
@@ -991,7 +995,11 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 			# Returning directly through the blocker would undo this side step.
 			_chase_detour_around_zombie = living_blocker
 			return (_chase_detour - global_position).slide(Vector3.UP).normalized() * _chase_speed
-		break
+		# The second face of a corner can expose a connected route to the last
+		# sighting. Try at most one other fixed face before the next retry.
+		if _target_visible or not fixed_blocker or alternate_face:
+			break
+		first_wall_normal = normal.normalized()
 	return Vector3.ZERO
 
 func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3,
