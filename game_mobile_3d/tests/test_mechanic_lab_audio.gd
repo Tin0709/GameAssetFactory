@@ -1176,6 +1176,8 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
+	var group := lab.get_node("Zombies")
+	group.set_actions_stuff_animation(false) # The phase assertions below measure MD2's three original walk clips.
 	var audio = lab.get_node("CombatAudio")
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
 	toggle.button_pressed = true
@@ -1187,7 +1189,6 @@ func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	var voices: Array = audio._voices.slice(3 * COMBAT_AUDIO.VOICES_PER_POOL, 4 * COMBAT_AUDIO.VOICES_PER_POOL)
 	for voice in voices:
 		voice.bus = AudioServer.get_bus_name(bus)
-	var group := lab.get_node("Zombies")
 	var button := lab.get_node("HUD/SpawnZombie") as Button
 	button.pressed.emit()
 	var zombie := group.get_child(0) as ZOMBIE
