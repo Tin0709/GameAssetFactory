@@ -36,6 +36,16 @@ func run() -> void:
 		check_tint(base, at_peak, "Forest at 07:00")
 		check_tint(base, FOREST.call("tint_ambient", 9., base), "Forest at 09:00", true)
 		check(is_equal_approx(at_peak.a, base.a), "Ambient tint preserves alpha")
+		var legacy := FOREST.duplicate()
+		legacy.set("ambient_tint_negative_ratio", Vector3.ZERO)
+		var legacy_rgb := linear_rgb(legacy.call("tint_ambient", 9., base))
+		var forest_rgb := linear_rgb(FOREST.call("tint_ambient", 9., base))
+		check(forest_rgb.x / forest_rgb.y > legacy_rgb.x / legacy_rgb.y * 1.10,
+			"Forest raises red relative to green during the late morning")
+		check(absf(log((forest_rgb.z / forest_rgb.y) / (legacy_rgb.z / legacy_rgb.y)) / log(2.)) < .02,
+			"The late-morning correction preserves the approved blue-to-green ratio")
+		check(legacy.call("tint_ambient", 7., base) == at_peak,
+			"The negative curve endpoint keeps the existing dawn color")
 		for hour in [0., 5.1, 10., 12., 16.5, 19.5, 22.]:
 			check(FOREST.call("tint_ambient", hour, base) == base, "Forest outside the morning curve is exact at %s" % hour)
 		check(FOREST.call("tint_ambient", 7., base, 0.) == base, "A disabled strength is exact")
