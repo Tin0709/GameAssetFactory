@@ -87,12 +87,12 @@ func run() -> void:
 	zombie.free()
 	await check_sabre_windup_retarget(lab, group)
 	await check_sword_finisher_push(lab, group)
+	await check_bow_knockback(lab, group)
 	await check_sabre_landing_damage(lab, group)
 	await check_coincident_sabre_landing(lab, group)
 	await check_crowd(lab, group)
 	await check_sabre_height_thresholds(lab, group)
 	await check_sabre_edge_support(lab, group)
-	await check_bow_knockback(lab, group)
 	lab.free()
 	print("MECHANIC_LAB_KNOCKBACK first_chase_step=", first_chase_step,
 		" travel=", furthest - at_contact, " failures=", failures)
@@ -214,9 +214,10 @@ func check_bow_knockback(lab, group) -> void:
 			lab.reset_player()
 			await ticks(ceili(hz * 0.25))
 			var origin: Vector3 = lab.player.global_position
+			var slot: int = group.get_child_count()
 			group._spawn_at(origin + Vector3.BACK * 6.5, origin, lab.player,
 				lab.get_node("CombatEffects"), false, baby)
-			var zombie := group.get_child(0) as ZOMBIE
+			var zombie := group.get_child(slot) as ZOMBIE
 			zombie.max_health = 100
 			zombie.health = 100
 			await ticks(4)
@@ -242,6 +243,11 @@ func check_bow_knockback(lab, group) -> void:
 			check(is_equal_approx(start_lock, 0.4) and lock_ticks == expected_lock_ticks,
 				shot + " disables movement control for 0.4 seconds from projectile contact")
 			zombie.free()
+	lab.reset_player()
+	await ticks(5)
+	selector.select(0)
+	selector.item_selected.emit(0)
+	check(selector.selected == 0, "Switch back to Sabre after the Bow fixture")
 
 func check_sabre_landing_damage(lab, group) -> void:
 	lab.reset_player()
