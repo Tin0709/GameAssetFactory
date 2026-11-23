@@ -30,6 +30,10 @@ const NAMED := {
 	"BiomePreset": "biome-preset",
 	"BiomeQuality": "biome-quality",
 	"ActorGroundLightScale": "actor-ground-light",
+	"DisplayEdgeStrength": "display_edge_strength",
+	"PortableNightBloom": "night_soft_bloom",
+	"StoneLedgeOcclusion": "stone_foot_fill",
+	"TerrainMistVisibility": "terrain_mist_visibility",
 	"SettingsPresetMessage": "preset-message",
 }
 const PHASES := ["morning", "day", "golden", "night"]
@@ -409,6 +413,13 @@ func _rebuild(_text: String = "") -> void:
 			_add_row(biome, "biome-preset")
 			_add_row(biome, "biome-quality")
 			_add_row(biome, "actor-ground-light")
+			_add_row(biome, "display_edge_strength")
+			_add_row(biome, "night_soft_bloom")
+			_add_row(biome, "stone_foot_fill")
+			_add_row(biome, "terrain_mist_visibility")
+			var mix := _section("Preset ánh sáng")
+			_add_row_buttons(mix, ["preset"] + PRESETS)
+			_add_row(mix, "preset-message")
 		_add_row(_section("Điều khiển trong game"), "keys-help")
 	elif _active == 0:
 		_build_quick()

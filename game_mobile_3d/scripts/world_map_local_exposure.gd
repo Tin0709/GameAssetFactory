@@ -1,6 +1,8 @@
 extends CompositorEffect
 ## A bounded local contrast adjustment on the resolved scene before Godot's tone curve.
 
+const EDGES = preload("res://scripts/world_map_display_edges.gd")
+
 const TILE_SIZE := 16
 const FILTERED_METER_MIN_PIXELS := 1600 * 900
 const FILTERED_METER_FORMAT := RenderingDevice.DATA_FORMAT_R32_SFLOAT
@@ -128,7 +130,13 @@ vec3 prefilter_air(vec3 scene_color) {
  // Threshold in physical luminance, independently of packed target encoding.
  float value = dot(scene_color, vec3(0.2126, 0.7152, 0.0722)) * (air.z > .5 ? 1. : 2.);
  float highlights = smoothstep(0.025, 0.15, value);
- return scene_color * mix(1.0, highlights, finish.x);
+ float response = mix(1.0, highlights, finish.x);
+ if (finish.y > 0.0) {
+  // Retain soft detail in shaded surfaces while preserving the black floor and bright cores.
+  float shoulder = smoothstep(.023, .038, value) * (1.0 - smoothstep(.058, .108, value));
+  response = mix(response, 1.0, finish.y * shoulder);
+ }
+ return scene_color * response;
 }
 """
 const AIR_SOURCE := """#version 450
@@ -198,6 +206,7 @@ var _air_bloom:=false
 var _air_response:=1.
 var _bloom_local_response := 0.
 var _bloom_prefilter := 0.
+var _bloom_shadow_support := 0.
 var _air_spread:=1.
 func set_air_bloom_spread(value: float) -> void:
 	var spread := clampf(value, 0., 2.) if is_finite(value) else 1.
@@ -215,6 +224,13 @@ func set_bloom_prefilter(value: float) -> void:
 	if amount == _bloom_prefilter:
 		return
 	_bloom_prefilter = amount
+	set_neutral(false)
+
+func set_bloom_shadow_support(value: float) -> void:
+	var amount := clampf(value, 0., 1.) if is_finite(value) else 0.
+	if amount == _bloom_shadow_support:
+		return
+	_bloom_shadow_support = amount
 	set_neutral(false)
 
 func set_bloom_local_response(value: float) -> void:
@@ -237,14 +253,22 @@ var _color := RID()
 var _resources: Array[RID] = []
 var _passes: Array[Array] = []
 var _scene_framebuffer := RID()
-var _scene_uniform := RID()
+var _scene_input := RID()
+var _scene_edge := Vector2(0., 1.)
+var _render_scene_edges := false
+var _scene_edges_failed := false
+var _scene_bindings: Array[RID] = []
 
 func _init() -> void:
 	effect_callback_type = EFFECT_CALLBACK_TYPE_POST_TRANSPARENT
 	access_resolved_color = true
 
 func set_neutral(neutral: bool) -> void:
-	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16*_air_response if _air_bloom and not neutral else 0.,_bloom_local_response if not neutral else 0.,0.,_air_spread,_bloom_prefilter if not neutral else 0.,0.,0.,0.])
+	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [
+		.16 * _air_response if _air_bloom and not neutral else 0.,
+		_bloom_local_response if not neutral else 0., 0., _air_spread,
+		_bloom_prefilter if not neutral else 0., _bloom_shadow_support if not neutral else 0., 0., 0.,
+	])
 	parameters[0] = 0.0 if neutral else _review_strength
 	_guard.lock()
 	_parameters = parameters.to_byte_array()
@@ -258,6 +282,13 @@ func set_review_strength(value: float) -> void:
 	# Scene-local art setting; preserve the established finite gain clamps.
 	_review_strength = clampf(value, 0.0, REVIEW_PARAMETERS[0]) if is_finite(value) else REVIEW_PARAMETERS[0]
 	set_neutral(false)
+
+func set_scene_edges(weight: float, exposure: float) -> void:
+	var control := Vector2(clampf(weight, 0., 1.) if is_finite(weight) else 0.,
+		clampf(exposure, .1, 4.) if is_finite(exposure) else 1.)
+	_guard.lock()
+	_scene_edge = control
+	_guard.unlock()
 
 func snapshot() -> Dictionary:
 	_guard.lock()
@@ -333,7 +364,10 @@ func _prepare_pass(rd: RenderingDevice, fragment: String, framebuffer: RID, unif
 	if not rd.render_pipeline_is_valid(pipeline): return false
 	var binding := _keep(rd.uniform_set_create(uniforms, shader, 0))
 	if not binding.is_valid(): return false
-	if _passes.is_empty(): _scene_uniform = binding
+	for uniform in uniforms:
+		if _scene_input in uniform.get_ids():
+			_scene_bindings.append(binding)
+			break
 	var takes_parameters := fragment.contains("layout(push_constant")
 	_passes.append([framebuffer, pipeline, binding, takes_parameters])
 	return true
@@ -378,33 +412,56 @@ func _build_air(rd:RenderingDevice,copy:RID,meter:RID,format:RDTextureFormat,lin
 	_air_bytes=ceili(float(format.width)/4.)*ceili(float(format.height)/4.)*12
 	return small[2]
 
+func _use_finish_scratch() -> bool:
+	return _render_scene_edges
+
+func _finish_scratch_format(format: int) -> int:
+	return format
+
+func _prepare_output(rd: RenderingDevice, scratch_fb: RID, scratch: RID, uniforms: Array[RDUniform], use_scratch: bool) -> bool:
+	if not use_scratch:
+		return _prepare_pass(rd, APPLY, _scene_framebuffer, uniforms)
+	if not _prepare_pass(rd, APPLY, scratch_fb, uniforms):
+		return false
+	var linear := _sampler(rd, RenderingDevice.SAMPLER_FILTER_LINEAR)
+	if not linear.is_valid() or not _prepare_pass(rd, EDGES.SCENE_HDR, _scene_framebuffer, [_sample(0, linear, scratch)]):
+		return false
+	_report("scene_edges_active", true)
+	return true
+
 func _build(rd: RenderingDevice, color: RID, format: RDTextureFormat) -> bool:
 	var start := Time.get_ticks_usec()
 	var width := ceili(float(format.width) / TILE_SIZE)
 	var height := ceili(float(format.height) / TILE_SIZE)
-	var copy := _texture(rd, format.width, format.height, format.format)
+	_scene_input = color
+	var use_scratch := _use_finish_scratch()
+	var scratch_format := _finish_scratch_format(format.format) if use_scratch else format.format
+	var scratch := _texture(rd, format.width, format.height, scratch_format)
 	var meter := _texture(rd, width, height, RenderingDevice.DATA_FORMAT_R16_SFLOAT)
-	if not copy.is_valid() or not meter.is_valid(): return false
-	var copy_fb := _keep(rd.framebuffer_create([copy]))
+	if not scratch.is_valid() or not meter.is_valid(): return false
+	var scratch_fb := _keep(rd.framebuffer_create([scratch]))
 	var meter_fb := _keep(rd.framebuffer_create([meter]))
 	_scene_framebuffer = _keep(rd.framebuffer_create([color]))
-	if not copy_fb.is_valid() or not meter_fb.is_valid() or not _scene_framebuffer.is_valid(): return false
+	if not scratch_fb.is_valid() or not meter_fb.is_valid() or not _scene_framebuffer.is_valid(): return false
 	var nearest := _sampler(rd, RenderingDevice.SAMPLER_FILTER_NEAREST)
 	var linear := _sampler(rd, RenderingDevice.SAMPLER_FILTER_LINEAR)
 	if not nearest.is_valid() or not linear.is_valid(): return false
-	if not _prepare_pass(rd, COPY, copy_fb, [_sample(0, nearest, color)]): return false
-	if not _prepare_pass(rd, METER, meter_fb, [_sample(0, nearest, copy)]): return false
+	# Edge resolve writes to the scratch texture first. Its earlier passes can
+	# sample the resolved scene directly while that renderer attachment is intact.
+	var source := color if use_scratch else scratch
+	if not use_scratch and not _prepare_pass(rd, COPY, scratch_fb, [_sample(0, nearest, color)]): return false
+	if not _prepare_pass(rd, METER, meter_fb, [_sample(0, nearest, source)]): return false
 	var filtered_bytes := 0
 	if format.width * format.height >= FILTERED_METER_MIN_PIXELS:
 		filtered_bytes = _build_filtered_meter(rd, meter, Vector2i(width, height), linear)
 	_air_pass_start = _passes.size()
-	var soft:=_build_air(rd,copy,meter,format,linear)
+	var soft:=_build_air(rd, source, meter, format, linear)
 	if not soft.is_valid():return false
 	_air_pass_end=_passes.size()
-	if not _prepare_pass(rd, APPLY, _scene_framebuffer, [_sample(0, nearest, copy), _sample(1, linear, meter),_sample(2,linear,soft)]): return false
+	if not _prepare_output(rd, scratch_fb, scratch, [_sample(0, nearest, source), _sample(1, linear, meter), _sample(2, linear, soft)], use_scratch): return false
 	_report("coherent_bloom",_render_coherent_bloom)
 	_report("meter_lattice_bytes", filtered_bytes)
-	_report("bytes", format.width * format.height * (8 if format.format==HDR_FORMAT else 4) + width * height * 2 + _air_bytes + filtered_bytes)
+	_report("bytes", format.width * format.height * (8 if scratch_format == HDR_FORMAT else 4) + width * height * 2 + _air_bytes + filtered_bytes)
 	_guard.lock()
 	if _state.rebuilds == 0: _state.first_build_us = Time.get_ticks_usec() - start
 	_state.rebuilds += 1
@@ -423,6 +480,15 @@ func _render_callback(kind: int, data: RenderData) -> void:
 	if coherent!=_render_coherent_bloom:
 		_release(rd);_render_coherent_bloom=coherent
 		_report("coherent_bloom",coherent)
+	_guard.lock()
+	var edge_control := _scene_edge
+	_guard.unlock()
+	if edge_control.x == 0.:
+		_scene_edges_failed = false
+	var edge_requested := edge_control.x > 0. and not _scene_edges_failed
+	if edge_requested != _render_scene_edges:
+		_release(rd)
+		_render_scene_edges = edge_requested
 	var color := buffers.get_color_layer(0)
 	if not color.is_valid(): return
 	if color != _color:
@@ -432,14 +498,27 @@ func _render_callback(kind: int, data: RenderData) -> void:
 			_report("error", "Local exposure requires a supported resolved scene color")
 			return
 		_source_format=format.format;_report("color_format",_source_format)
-		if not _build(rd, color, format):
+		var ready := _build(rd, color, format)
+		if not ready and _render_scene_edges:
+			var problem := failure()
+			_release(rd)
+			_report("scene_edges_error", problem if not problem.is_empty() else "Could not prepare HDR edge pass")
+			_report("error", "")
+			_render_scene_edges = false
+			_scene_edges_failed = true
+			ready = _build(rd, color, format)
+		if not ready:
 			_release(rd)
 			if _state.error.is_empty(): _report("error", "Could not prepare local exposure passes")
 			return
+		if _render_scene_edges:
+			_report("scene_edges_error", "")
 		_color = color
 	_guard.lock()
 	var parameters := _parameters.duplicate()
 	_guard.unlock()
+	parameters.encode_float(40, edge_control.y)
+	parameters.encode_float(44, edge_control.x if _render_scene_edges else 0.)
 	var finish_needs_soft_light := _finish_needs_soft_light()
 	# air.y stores the response in [0, 1]. Add 2 when diffusion needs the same filtered light even without bloom.
 	if finish_needs_soft_light:
@@ -471,7 +550,7 @@ func _release(rd: RenderingDevice) -> void:
 	_resources.reverse()
 	for rid in _resources:
 		# Engine-owned color can disappear during resize, taking borrowed bindings with it.
-		if rid == _scene_uniform and not rd.uniform_set_is_valid(rid): continue
+		if rid in _scene_bindings and not rd.uniform_set_is_valid(rid): continue
 		if rid == _scene_framebuffer and not rd.framebuffer_is_valid(rid): continue
 		rd.free_rid(rid)
 	_resources.clear()
@@ -479,6 +558,8 @@ func _release(rd: RenderingDevice) -> void:
 	_meter_lattice = RID()
 	_report("meter_lattice_bytes", 0)
 	_report("bytes", 0)
+	_report("scene_edges_active", false)
 	_color = RID()
-	_scene_uniform = RID()
+	_scene_bindings.clear()
+	_scene_input = RID()
 	_scene_framebuffer = RID()

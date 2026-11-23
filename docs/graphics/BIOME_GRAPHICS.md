@@ -154,6 +154,12 @@ Forest lưu thông số hai lớp sương thấp trong preset tham chiếu. **S�
 
 Map import nạp khí quyển từ preset portable. Dữ liệu khí quyển Forest theo hash chỉ được đọc trên đường chạy tham chiếu. Quy trình dựng map mới dùng cùng controller và shader. Vùng sương cục bộ, vị trí đèn và các trường ánh sáng theo hình học vẫn thuộc từng scene.
 
+**Stone Ledge Occlusion By Hour** điều chỉnh suy giảm ánh sáng môi trường ở chân mặt đá đứng có bậc đỡ. Bộ nhận dùng bản đồ độ cao terrain sẵn có và chia sẻ cách tính với vật liệu mặt cắt camera. **Rìa rừng ẩm** đạt mức 0,16 lúc 07:00 và 0,20 lúc 16:30, lùi về 0 quanh trưa và từ 19:00. Vào **Đồ họa bản đồ → Chiều sâu chân bậc đá** để so 0% và 100%. Mức Cân bằng và Đầy đủ trên Mobile dùng đường cong khi biome khai báo. Preset Meadow, mức Nhẹ và Compatibility dùng giá trị 0.
+
+**Terrain Mist Visibility By Hour** đặt phần ánh tán xạ của sương chịu che khuất bởi địa hình. **Rìa rừng ẩm** dùng 0,32 lúc 07:00 và 16:30. Vào **Đồ họa bản đồ → Ánh sương theo địa hình** để điều chỉnh hoặc so với 0%. Mỗi scene có thể trỏ `terrain_mist_visibility_path` tới trường R8 riêng. Bộ nạp kiểm SHA của layout trước khi dùng. Mật độ, truyền sáng, đèn cục bộ và hai túi sương theo map giữ công thức hiện hành.
+
+Tạo trường mới với `py -3 scripts/bake_terrain_mist_visibility.py <runtime.json> <output-stem>` có NumPy. Chạy Godot từ thư mục `game_mobile_3d` với `--script res://tools/pack_terrain_mist_visibility.gd -- <output-stem.json> res://<map-folder>/mist_visibility.res` để đóng resource. Bước đóng gói cần renderer cho texture 3D. Gán resource vào trường đường dẫn của scene. Sau khi đổi layout cần bake lại trường để hash khớp.
+
 **Grove Mist By Hour** đặt độ nhận sương của thân và tán cho những map dùng hệ thống cây Grove. Forest chuyển mượt về cách đã duyệt quanh 12:00 và dùng độ nhận sương đầy đủ như terrain ở 09:30 và 14:15. Curve trống giữ cách cũ. Trong WorldMap, **Sương & hiệu ứng → Sương cục bộ → Sương đồng nhất trên cây** điều chỉnh mức pha trộn với curve. Map Meadow hiện dùng hệ cây khác.
 
 **Ánh trời dịu trên mặt bên của Valorie** nằm ở **Nhân vật → Ánh sáng trên nhân vật**. Preset Forest bật 100%, rõ nhất khi Valorie đứng trong râm ở 07:00 hoặc 16:30. **Actor Side Sky By Hour** điều khiển thời gian tác động. Material phải nhận trường ánh trời nhân vật đã xác minh và dùng đường diffuse trong Forward Mobile. Mặt hướng lên, kiếm, ánh nắng trực tiếp và đèn hông dùng cấu hình riêng. Curve trống hoặc preset lưu trước v178 thiếu mục này cho gain bằng 0.
@@ -181,6 +187,14 @@ Map import nạp khí quyển từ preset portable. Dữ liệu khí quyển For
 ## Mức chất lượng theo map và thiết bị
 
 Chọn **Biome Quality** trong Inspector của map. **Đầy đủ** là mặc định. **Cân bằng** giữ spatial mist với lưới thưa hơn và dùng glow tích hợp. **Nhẹ** dùng depth fog và glow tích hợp. Tất cả dùng chung giờ, mây, màu, ánh sáng và tonemapping của biome. Với preset bật spatial mist, **Essential Fog Scale** chỉnh lượng depth fog dự phòng ở mức Nhẹ. So ba mức ngay trong map bằng **Shift+F7**. Phím này chỉ đổi mức của phiên đang chơi. Biome Quality áp dụng cho map portable. Forest vẫn đi qua cấu hình tham chiếu riêng.
+
+Preset **Rìa rừng ẩm** đặt **Làm mượt mép hình** ở 60% khi dùng mức **Đầy đủ**. Mở mục **Đồ họa bản đồ** trong cài đặt để so với 0%, hoặc đặt mặc định qua **Display Edge Strength** trong resource biome. Bộ lọc dùng chung texture trung gian với adaptive bloom và local exposure. Nó đo tương phản từ ảnh HDR, hòa màu trong không gian cảnh trước khi Godot tonemap và áp dụng grade. Lịch của adaptive bloom cũng điều tiết cường độ lọc, đưa hiệu ứng về 0 quanh trưa. Mức **Cân bằng** và **Nhẹ** dùng cấu hình khử răng cưa sẵn có của cảnh. Thiết lập này cũng dùng được trên đường Device Review, nơi phase finish riêng của Forest không được nạp.
+
+Bộ lọc chung cho Device Review và Forest F5 nội suy vị trí kết thúc dò khi chênh sáng sát ngưỡng. Khi hai hướng mép gần như ngang nhau, nó pha màu đối xứng từ bốn điểm lân cận. Vùng tương phản thấp giữ màu gốc. Cách này giảm điểm nhấp nháy ở cỏ khi đổi chiếu sáng hoặc di chuyển camera và dùng cùng số lượt xử lý hậu kỳ.
+
+**Adaptive Bloom Shadow Support By Hour** đặt tỷ lệ giữ lại ánh sáng từ các tông tối vừa trong bước lọc nguồn bloom. Mức **Đầy đủ** của preset **Rìa rừng ẩm** tăng từ 0 lúc 19:30 lên 0,54 lúc 22:00 và lùi về 0 lúc 05:15. Vào **Đồ họa bản đồ → Ánh tán mềm ban đêm** để so 0% và 100%. Lõi phát sáng mạnh và vùng gần đen giữ đường lọc gốc. Hiệu ứng dùng buffer bloom hiện hành. Profile không khai báo curve có giá trị 0.
+
+**Ánh hắt từ nền** trong preset Rìa rừng ẩm dùng hai nguồn khuếch tán dành cho nhân vật portable. Khi mẫu ở xa rơi xuống một tầng thấp, hệ thống tìm mặt ngang gần cao độ chân hơn. Nếu phía đó thiếu điểm nền và có vách gần, hệ thống lấy nguồn nhẹ từ vách, giảm cường độ ở khoảng cách gần và chuyển dần khi nhân vật đi qua bậc. Mức Nhẹ và mốc trưa của preset giữ đường xử lý trước đó. Dùng thanh ở mục **Đồ họa bản đồ** để điều chỉnh.
 
 ## Đèn môi trường trên map import
 

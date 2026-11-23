@@ -128,6 +128,7 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 		steps.append(func():
 			var idle := source_clips[IDLE]
 			var alert_source := Pack.bake(bindings, [alert], idle.length, true, BAKE_RATE, true, idle)
+			source_clips[ALERT] = alert_source
 			library.add_animation(ALERT, _bake(skeleton, model, alert_source)))
 		for state: Array in [[JUMP, pack.jump], [FALL, pack.fall]]:
 			var name: StringName = state[0]
@@ -138,15 +139,18 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 	steps.append(func(): library.add_animation(IDLE, _bake(skeleton, model, source_clips[IDLE])))
 	steps.append(func(): library.add_animation(MOVE, _bake(skeleton, model, source_clips[MOVE])))
 	steps.append(func(): library.add_animation(ATTACK, _bake(skeleton, model, source_clips[ATTACK], attack_timing)))
-	# Spawn and stagger use short breathing sections to match the Lab timing.
-	# Keep the existing A&S adult spawn adapter so the initial pose stays stable.
+	# A&S has no corresponding spawn or stagger montage. Use the breathing
+	# stance for each age and let the Lab keep its existing one-shot timing.
+	var resting_clip := ALERT if baby and not pack.is_empty() else IDLE
 	steps.append(func():
-		var spawn_source: Animation = source_clips[IDLE]
+		var spawn_source: Animation = source_clips[resting_clip]
+		# Keep the adult entrance from the evaluated A&S library. Its initial
+		# pose also initializes the dormant physical bones before their handoff.
 		if not baby and preview != null and preview.has_animation(&"Idle"):
 			spawn_source = preview.get_animation(&"Idle")
 		library.add_animation(SPAWN, _bake(skeleton, model, spawn_source, Vector3.ZERO, spawn_duration)))
-	steps.append(func():
-		library.add_animation(STAGGER, _bake(skeleton, model, source_clips[IDLE], Vector3.ZERO, stagger_seconds)))
+	steps.append(func(): library.add_animation(STAGGER,
+		_bake(skeleton, model, source_clips[resting_clip], Vector3.ZERO, stagger_seconds)))
 	return steps
 
 class RetargetBone:

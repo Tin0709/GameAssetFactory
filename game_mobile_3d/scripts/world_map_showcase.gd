@@ -183,6 +183,8 @@ const LIGHTING_MIX_CONTROLS := {
 	&"shadow_diffuse_return": ["Ánh dịu trong bóng trên đất và cỏ", 1.],
 	&"ground_shadow_fill_reduction": ["Chiều sâu bóng trên cỏ và mặt đá", 1.],
 	&"stone_foot_fill": ["Chiều sâu chân bậc đá", 1.],
+	&"terrain_mist_visibility": ["Ánh sương theo địa hình", 1.],
+	&"actor_ground_light": ["Ánh hắt từ nền", 1.],
 	&"stone_top_shadow_fill": ["Chiều sâu bóng trên bậc đá", 1.],
 	&"path_sun_response": ["Tương phản nắng trên lối đất", 1.],
 	&"path_sun_core": ["Sắc nắng trên lối đất", 1.],
@@ -233,6 +235,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"daylight_shadow_grade": ["Dịu sắc xanh trong bóng ban ngày", 1.],
 	&"daylight_shadow_luminance": ["Chi tiết vùng râm sáng và chiều", 1.],
 	&"daylight_shadow_edge_contrast": ["Tương phản rìa bóng râm", 1.],
+	&"display_edge_strength": ["Làm mượt mép hình", 1.],
 	&"daylight_green_grade": ["Dịu màu cỏ và lá trong bóng", 1.],
 	&"spruce_sky": ["Forest canopy sky", 1.],
 	&"canopy_edge_fill": ["Ánh trời rìa tán", 1.],
@@ -364,7 +367,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 229
+const LIGHTING_MIX_VERSION := 231
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -375,6 +378,7 @@ var moonlight_enabled := true
 var night_reference_atmosphere := true
 var _night_reference_toggle: CheckButton
 const BALANCED_ATMOSPHERE := {
+	&"display_edge_strength": 0.,
 	&"bloom_local_response": 0.,
 	&"night_bloom_prefilter": 0.,
 	&"projected_sun": 0.,
@@ -2256,6 +2260,10 @@ func _refresh_direct_shadow_opacity() -> void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"display_edge_strength":
+		if level != null and level.biome_controller != null:
+			return level.biome_controller.display_edge_default()
+		return _biome_profile.display_edge_strength if _biome_profile != null else 0.
 	if effect == &"twilight_ground_ambient" and _biome_profile != null:
 		return _biome_profile.twilight_ground_shade_strength
 	if effect == &"alternate_local_mist":
@@ -3273,6 +3281,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 229 and effect == &"daylight_shadow_edge_contrast":
 			missing_value = 0.
+		if version < 230 and effect == &"display_edge_strength":
+			missing_value = 0.
 		if version < 219 and effect == &"stone_top_shadow_fill":
 			missing_value = 0.
 		if version < 217 and effect == &"stone_foot_fill":
@@ -3429,6 +3439,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 207 and effect == &"east_sunlit_mist":
 			missing_value = 0.
+		if version < 231 and effect == &"actor_ground_light":
+			missing_value = _lighting_scale_default(effect)
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -3444,6 +3456,23 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	return OK
 
 func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
+	if changed_effect in [&"", &"actor_ground_light"] and level.biome_controller != null:
+		level.biome_controller.refresh_actor_ground_settings()
+		if changed_effect == &"actor_ground_light":
+			return
+	if changed_effect in [&"", &"terrain_mist_visibility"] and level.biome_controller != null:
+		level.biome_controller.refresh_mist_visibility()
+		if changed_effect == &"terrain_mist_visibility":
+			return
+	if changed_effect in [&"", &"stone_foot_fill"] and level.biome_controller != null:
+		level.biome_controller.refresh_stone_ledge()
+		if changed_effect == &"stone_foot_fill":
+			return
+	if changed_effect in [&"", &"display_edge_strength", &"night_soft_bloom"] \
+			and level != null and level.biome_controller != null:
+		level.biome_controller.refresh_finish_settings()
+		if changed_effect != &"":
+			return
 	if _balanced_toggle != null:
 		_balanced_toggle.set_pressed_no_signal(_balanced_preview)
 	if _near_haze_toggle != null:
@@ -3763,7 +3792,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_publish_stone_twilight_color()
 		return
 	if changed_effect in [&"twilight_shadow_color", &"cool_shadow_detail", &"daylight_shadow_grade",
-			&"daylight_green_grade", &"daylight_shadow_luminance", &"daylight_shadow_edge_contrast"]:
+			&"daylight_green_grade", &"daylight_shadow_luminance", &"daylight_shadow_edge_contrast", &"display_edge_strength"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -4504,7 +4533,7 @@ static func _mix_readout(effect: StringName, value: float) -> String:
 		return "Bậc đá" if value == 1. else "Lối rừng"
 	return "%d%%" % roundi(value * 100.)
 
-func _build_lighting_mix(box: VBoxContainer) -> void:
+func _build_lighting_presets(box: VBoxContainer, include_scene_presets: bool) -> void:
 	var header := HBoxContainer.new()
 	box.add_child(header)
 	var title := Label.new()
@@ -4551,11 +4580,11 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 	message.hide()
 	box.add_child(message)
 	var scene_mix: SceneLightingMix = level.scene_lighting_mix
-	if scene_mix != null and not scene_mix.strengths.is_empty():
+	if include_scene_presets and scene_mix != null and not scene_mix.strengths.is_empty():
 		_scene_mix_button = _make_scene_mix_button(scene_mix, message)
 		_scene_mix_button.name = "SceneLightingMix"
 		actions.add_sibling(_scene_mix_button)
-	for preset_index: int in level.additional_lighting_mixes.size():
+	for preset_index: int in (level.additional_lighting_mixes.size() if include_scene_presets else 0):
 		var extra: SceneLightingMix = level.additional_lighting_mixes[preset_index]
 		if extra == null or extra.strengths.is_empty():
 			continue
@@ -4582,7 +4611,12 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		else:
 			message.text = "Could not load mix: " + error_string(error)
 		message.show())
+
+func _build_lighting_mix(box: VBoxContainer) -> void:
+	_build_lighting_presets(box, true)
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
+		if effect == &"actor_ground_light":
+			continue
 		var spec: Array = LIGHTING_MIX_CONTROLS[effect]
 		var row := HBoxContainer.new()
 		box.add_child(row)
@@ -4709,6 +4743,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = _mist_front_transfer_available()
 		if effect == &"daylight_shadow_edge_contrast":
 			slider.editable = _shadow_edge_contrast_editable()
+		if effect == &"display_edge_strength":
+			slider.editable = slider.editable and phase_finish.available()
 		if effect == &"basin_sunlit_mist":
 			slider.editable = directional_air.region_available()
 		if effect == &"east_sunlit_mist":
@@ -4811,6 +4847,7 @@ func build_basic_settings(biome: Node = null) -> void:
 	var status: Label
 	if biome != null:
 		status = biome.add_settings_controls(box)
+		_build_lighting_presets(box, false)
 	var help := Label.new()
 	help.name = "SettingsKeysHelp"
 	if biome != null:
@@ -5072,9 +5109,6 @@ func _build_ui()->void:
 	var finish_toggle:=CheckButton.new();finish_toggle.name="PhaseFinish";finish_toggle.text="Air · humid Forest finishing (Noon preserved)";finish_toggle.button_pressed=phase_finish.requested;finish_toggle.disabled=not phase_finish.available();finish_toggle.focus_mode=Control.FOCUS_NONE;box.add_child(finish_toggle)
 	finish_toggle.tooltip_text="Original phase bridge: recovered-shaped exposure and private grading, smoothly returning to the approved Noon. Rendering units/clock are original mappings; phone cost unverified. OFF restores the previous finish."
 	finish_toggle.toggled.connect(phase_finish.set_requested);phase_finish.toggle=finish_toggle;phase_finish.source_toggle=grade_toggle
-	var edges:=CheckButton.new();edges.name="DisplayEdges";edges.text="Air - display-edge softness (experimental)";edges.focus_mode=Control.FOCUS_NONE;edges.button_pressed=phase_finish.edge_softening;edges.disabled=not phase_finish.available();box.add_child(edges)
-	edges.tooltip_text="Independent edge resampling after owned phase grading, before UI. Observed FXAA controls; not bit-exact native code or humidity. Original phase fade preserves Noon. Extra RGB10 target/pass. OFF pending visual review and handset cost."
-	edges.toggled.connect(phase_finish.set_edge_softening);phase_finish.edge_toggle=edges
 	var hdr_toggle:=CheckButton.new();hdr_toggle.text="Air · preserve HDR highlights (higher bandwidth)";hdr_toggle.button_pressed=hdr_air;hdr_toggle.focus_mode=Control.FOCUS_NONE;box.add_child(hdr_toggle);hdr_toggle.toggled.connect(set_hdr_air)
 	var times:=HBoxContainer.new();box.add_child(times)
 	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Sunset",18.5],["Lantern onset",19.25],["Twilight",19.5],["Night",22.],["Dawn",2.5]]:

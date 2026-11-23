@@ -483,6 +483,9 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		overlaps: Array[Dictionary], initial_bounds: AABB) -> Vector3:
 	var wall := RID()
 	var wall_bounds := AABB()
+	var local_wall_bounds := AABB()
+	var wall_from_world := Transform3D.IDENTITY
+	var axis_aligned := false
 	for overlap in overlaps:
 		var candidate := overlap.collider as PhysicsBody3D
 		if not _is_fixed_wall(candidate) or candidate == _flat_floor.get_parent() or not _is_single_box(candidate.get_rid()):
@@ -490,12 +493,23 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		var rid := candidate.get_rid()
 		var pose: Transform3D = PhysicsServer3D.body_get_state(rid, PhysicsServer3D.BODY_STATE_TRANSFORM)
 		pose *= PhysicsServer3D.body_get_shape_transform(rid, 0)
-		if pose.basis != Basis.IDENTITY:
-			continue
 		var half: Vector3 = PhysicsServer3D.shape_get_data(PhysicsServer3D.body_get_shape(rid, 0))
+		if pose.basis == Basis.IDENTITY:
+			axis_aligned = true
+			wall = rid
+			wall_bounds = AABB(pose.origin - half, half * 2.0)
+			wall_from_world = Transform3D.IDENTITY
+			local_wall_bounds = wall_bounds
+			break
+		# Only admit level, unscaled boxes. Horizontal shifts have the same
+		# maximum length in world and wall coordinates.
+		if wall.is_valid() or pose.basis.y != Vector3.UP \
+				or not pose.basis.is_equal_approx(pose.basis.orthonormalized()):
+			continue
 		wall = rid
-		wall_bounds = AABB(pose.origin - half, half * 2.0)
-		break
+		local_wall_bounds = AABB(-half, half * 2.0)
+		wall_from_world = pose.affine_inverse()
+		wall_bounds = pose * local_wall_bounds
 	var region := AABB()
 	var floor_bounds := AABB()
 	if wall.is_valid():
@@ -545,11 +559,11 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 		# A blend can produce the same collider poses, especially from Idle.
 		if idle_weight != 0.25 and current == previous and (idle_weight < 1.0 or shift_known):
 			continue
-		if idle_weight < 1.0 and wall.is_valid() \
+		if idle_weight < 1.0 and axis_aligned \
 				and _wall_blocks_every_handoff_shift(space, collision_mask, wall, wall_bounds, region, floor_bounds):
 			shift_known = false
 			continue
-		if idle_weight < 1.0 and _wall_handoff_part_cannot_clear(region, wall_bounds, floor_bounds):
+		if idle_weight < 1.0 and _wall_handoff_part_cannot_clear(region, local_wall_bounds, floor_bounds, wall_from_world):
 			shift_known = false
 			continue
 		var clear_parts := _find_clear_handoff_parts(region, floor_bounds, wall_bounds)
@@ -652,7 +666,8 @@ func _wall_blocks_every_handoff_shift(space: PhysicsDirectSpaceState3D, collisio
 			return true
 	return false
 
-func _wall_handoff_part_cannot_clear(region: AABB, wall: AABB, floor_box: AABB) -> bool:
+func _wall_handoff_part_cannot_clear(region: AABB, wall: AABB, floor_box: AABB,
+		wall_from_world: Transform3D) -> bool:
 	if not region.has_volume():
 		return false
 	var wall_axis := Vector3.AXIS_X if wall.size.x < wall.size.z else Vector3.AXIS_Z
@@ -664,7 +679,8 @@ func _wall_handoff_part_cannot_clear(region: AABB, wall: AABB, floor_box: AABB) 
 		if not local_box.has_volume():
 			continue
 		var pose: Transform3D = current[name]
-		var bounds := pose * local_box
+		var world_bounds := pose * local_box
+		var bounds := world_bounds if wall_from_world == Transform3D.IDENTITY else (wall_from_world * pose) * local_box
 		var low_depth := bounds.end[wall_axis] - wall.position[wall_axis]
 		var high_depth := wall.end[wall_axis] - bounds.position[wall_axis]
 		var in_wall := minf(low_depth, high_depth)
@@ -676,7 +692,7 @@ func _wall_handoff_part_cannot_clear(region: AABB, wall: AABB, floor_box: AABB) 
 		# Leave enough room at the wall edges that only the two broad faces can separate the part.
 		if minf(y_room, tangent_room) <= in_wall + 2.0 * shift_margin:
 			continue
-		var envelope := bounds.grow(shift_margin)
+		var envelope := world_bounds.grow(shift_margin)
 		if not region.encloses(envelope) or envelope.intersects(floor_box):
 			continue
 		# Neither broad face clears the allowed overlap at maximum travel.

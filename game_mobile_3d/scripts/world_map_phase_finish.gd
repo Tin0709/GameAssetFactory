@@ -10,17 +10,18 @@ var REFERENCE: Script
 var _source_reference: Script
 var requested:=true
 var active:=false
-var edge_softening:=false
+var edge_softening: bool:
+ get: return showcase != null and showcase._lighting_scale(&"display_edge_strength") > 0.
 var source_order:=false
 var source_order_toggle:CheckButton
 func set_source_order(value:bool)->void:
  source_order=value;refresh()
-func set_edge_softening(value:bool)->void:
- edge_softening=value;refresh()
+func set_edge_softening(value: bool) -> void:
+ if showcase != null:
+  showcase.set_lighting_scale(&"display_edge_strength", 1. if value else 0.)
 var last_error:=""
 var toggle:CheckButton
 var source_toggle:CheckButton
-var edge_toggle:CheckButton
 var _profile_path:=""
 var _profile_sha:=""
 var _verified:=false
@@ -81,7 +82,7 @@ func release()->void:
   _effect.set_daylight_shadow_edge_contrast(0.)
   _effect.set_bloom_diffusion(0.)
   if _effect.has_method("set_bloom_source_reference"):_effect.set_bloom_source_reference(null,false,0.)
-  _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_display_edges(false)
+  _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_display_edges(0.)
   _effect.set_review_strength(_saved_strength*showcase.local_exposure_mix_scale())
  if _compositor!=null and _native!=null:
   var keep:Array[CompositorEffect]=[]
@@ -124,7 +125,7 @@ func refresh()->void:
   compositor.compositor_effects=chain
  if _environment==null:
   if not effect.configure_finish(true,env,weight):_fail("Unsupported original finish; previous appearance restored");return
- effect.set_display_edges(edge_softening);effect.set_reference_hour(showcase.reference_hour());effect.prepare_reference_grade(true)
+ effect.set_display_edges(showcase._lighting_scale(&"display_edge_strength"));effect.set_reference_hour(showcase.reference_hour());effect.prepare_reference_grade(true)
  if effect.has_method("set_bloom_source_reference"):
   var chain:=compositor.compositor_effects
   var adjacent:=chain.find(effect)>0 and chain[chain.find(effect)-1]==_native
@@ -217,8 +218,6 @@ func _publish_humid_light(effect: CompositorEffect) -> void:
 func _process(_delta:float)->void:
  refresh()
  if toggle!=null:toggle.set_pressed_no_signal(requested)
- if edge_toggle!=null:
-  edge_toggle.set_pressed_no_signal(edge_softening);edge_toggle.disabled=not available()
  if source_order_toggle!=null:
   source_order_toggle.set_pressed_no_signal(source_order)
   source_order_toggle.disabled=not available()or not showcase.coherent_bloom or showcase.source_bloom_shape

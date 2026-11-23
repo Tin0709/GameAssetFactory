@@ -15,6 +15,7 @@ render_mode cull_disabled, diffuse_burley, specular_disabled;
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
+#include "res://materials/world_map_local_diffuse_field.gdshaderinc"
 #include "res://materials/world_map_player_contact.gdshaderinc"
 #include "res://materials/world_map_regional_sky.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/grass_normal_v001/world_normal.gdshaderinc"
@@ -119,6 +120,10 @@ void vertex(){
 		grass_terrain_responses.y = gaf_near_wall_strength(MODEL_MATRIX[3].xz);
 	}
 	study_ground_sky_at_root = study_ground_sky_mix > 0.0 ? grass_ground_sky(MODEL_MATRIX[3].xz) : vec4(0.0);
+	if (tinted_grass && !IN_SHADOW_PASS) {
+		study_ground_sky_at_root.rgb *= gaf_local_diffuse_field_gain(
+			MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz, gaf_local_diffuse_field_strength.y);
+	}
 	study_raw_canopy_sky = gaf_spruce_sky(MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz);
 	study_canopy_sky_at_root = gaf_ground_canopy_sky(study_raw_canopy_sky);
 	grass_canopy_ground_ev = !IN_SHADOW_PASS && tinted_grass && gaf_canopy_ground_fill.x > 0.0

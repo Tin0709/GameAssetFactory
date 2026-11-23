@@ -5,6 +5,7 @@ const MOVE := [&"move_left", &"move_right", &"move_forward", &"move_backward"]
 const HOURS := [7., 12., 16.5, 19.5, 22.]
 const STICK_RADIUS := 65.
 const BUTTON_SIZE := Vector2(88., 58.)
+const MOUSE_POINTER := -2
 const Benchmark := preload("res://scripts/world_map_device_benchmark.gd")
 const REVIEW_SITES := [
 	{"name": "Lối rừng", "position": Vector2(-22.5, 17.5), "zoom": 18.},
@@ -109,11 +110,15 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventScreenDrag and event.index == _stick_id:
 		_move_stick(get_global_transform_with_canvas().affine_inverse() * event.position)
 		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.device != InputEvent.DEVICE_ID_EMULATION:
+		var point: Vector2 = get_global_transform_with_canvas().affine_inverse() * event.position
+		if _press(MOUSE_POINTER, point) if event.pressed else _release(MOUSE_POINTER):
+			get_viewport().set_input_as_handled()
 
 
 func _press(index: int, point: Vector2) -> bool:
 	var measuring := _benchmark != null and _benchmark.active
-	if not measuring and _stick_id < 0 and point.distance_to(_stick_center()) <= STICK_RADIUS * 1.35:
+	if not measuring and index != MOUSE_POINTER and _stick_id < 0 and point.distance_to(_stick_center()) <= STICK_RADIUS * 1.35:
 		_stick_id = index
 		_move_stick(point)
 		return true

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=33 format=3]
+[gd_resource type="Resource" load_steps=34 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -43,6 +43,10 @@ point_count = 6
 [sub_resource type="Curve" id="DirectionalGroundSky"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.65625, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.6), 0.0, 0.0, 0, 0, Vector2(0.729166667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 5
+
+[sub_resource type="Curve" id="LocalDiffuseFieldHours"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 1), 0.0, 0.0, 0, 0, Vector2(0.364583333, 0), 0.0, 0.0, 0, 0, Vector2(0.625, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.78), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 8
 
 [sub_resource type="Curve" id="AfternoonKey"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.65), 0.0, 0.0, 0, 0, Vector2(0.772916667, 0.65), 0.0, 0.0, 0, 0, Vector2(0.8125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -164,6 +168,7 @@ day_path_chroma_by_hour = SubResource("ForestDayPathChroma")
 shadow_grade_recovery_by_hour = SubResource("ShadowGradeRecovery")
 daylight_shadow_luminance_scale = 0.3
 daylight_shadow_edge_contrast = 0.7
+display_edge_strength = 1.0
 daylight_shade_retention = 0.55
 daylight_air_chroma = 0.36
 green_shadow_exposure_trim = 0.16
@@ -181,6 +186,9 @@ canopy_ground_fill_overcast = 0.78
 canopy_terrain_contrast = 1.9
 canopy_turf_reflection_color = 0.82
 directional_ground_sky_by_hour = SubResource("DirectionalGroundSky")
+local_diffuse_field_by_hour = SubResource("LocalDiffuseFieldHours")
+local_diffuse_field_strength = Vector2(0.68, 0.60)
+local_diffuse_field_overcast = 0.65
 near_wall_fill = Vector2(0.22, 0.66)
 near_wall_fill_overcast = 0.82
 daylight_green_grade_scale = 1.0

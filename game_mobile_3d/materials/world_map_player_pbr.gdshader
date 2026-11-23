@@ -36,6 +36,7 @@ uniform float actor_view_fill_chroma = 0.0;
 uniform float actor_twilight_view_fill = 0.0;
 uniform float actor_shade_sky = 0.0;
 uniform float actor_side_sky = 0.0;
+global uniform float gaf_actor_diffuse_field_delta;
 varying vec3 actor_world;
 varying float actor_canopy_sky;
 #ifdef GAF_PLAYER_DIRECT
@@ -147,6 +148,14 @@ void fragment(){
 				}
 			}
 			if (recovered_roughness || gaf_matte_opening) incident = gaf_local_diffuse(incident, actor_world, wn);
+			if (gaf_actor_diffuse_field_delta != 0.0 && (recovered_roughness || gaf_matte_opening)
+					&& distance(CAMERA_POSITION_WORLD, gaf_spruce_sky_camera) <= .01) {
+				// Only the local diffuse light changes. The ground-facing side receives most of the return.
+				float lower = .08 + .78 * (1. - smoothstep(-.43, .85, wn.y));
+				vec3 ground_sky = player_cube_sky(vec3(0., -1., 0.), height, actor_canopy_sky);
+				vec3 local_sky = player_cube_sky(wn, height, actor_canopy_sky);
+				incident += mix(ground_sky, local_sky, .72) * (lower * gaf_actor_diffuse_field_delta);
+			}
 			EMISSION+=ALBEDO*(1.-METALLIC)*incident*visible_sky;
 			AO=0.; // Replace engine diffuse sky instead of stacking two ambient terms.
 			AO_LIGHT_AFFECT=0.;

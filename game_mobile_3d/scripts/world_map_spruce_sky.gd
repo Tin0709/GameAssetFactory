@@ -6,6 +6,7 @@ const PROOF_SHA := "155d6221f111ab2479aba2dae86841cf33055f5adf351789b61781eab295
 const PHASE := preload("res://scripts/world_map_phase_finish.gd")
 const MistSkyField = preload("res://scripts/mist_sky_field.gd")
 const ActorBounce = preload("res://scripts/world_map_actor_bounce.gd")
+const LocalDiffuseField = preload("res://scripts/local_diffuse_field.gd")
 static var _owner: WeakRef
 
 var proof_ready := false
@@ -18,8 +19,14 @@ var applied_ground_fill := Vector2.ZERO
 var applied_terrain_contrast := 1.0
 var applied_turf_reflection_color := 0.0
 var applied_directional_ground := 0.0
+var applied_diffuse_field := Vector2.ZERO
+var applied_actor_diffuse_delta := 0.
 var _directional_ground_rect := Vector4.ZERO
 var _directional_ground_texture: ImageTexture
+var _local_diffuse_field: LocalDiffuseField
+var _local_diffuse_image: Image
+var _diffuse_actor_position := Vector3.INF
+var _diffuse_actor_exposure := 0.
 var applied_pre_twilight := 0.
 var _level: Node3D
 var _camera: Camera3D
@@ -97,6 +104,9 @@ func setup(level: Node3D) -> void:
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", _texture)
 	RenderingServer.global_shader_parameter_set("gaf_directional_ground_rect", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_directional_ground_sky", null)
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_field_strength", Vector2.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_field", null)
+	RenderingServer.global_shader_parameter_set("gaf_actor_diffuse_field_delta", 0.)
 	proof_ready = true
 	set_process(true)
 
@@ -359,6 +369,41 @@ func east_casters_current() -> bool:
 	return not _east_casters.is_empty() and _geometry_current() and _east_casters.all(
 		func(caster: MeshInstance3D) -> bool: return caster.is_visible_in_tree())
 
+func set_local_diffuse_field(field: LocalDiffuseField) -> void:
+	if _owner == null or _owner.get_ref() != self:
+		return
+	_local_diffuse_field = field if field != null and field.matches_layout(_level.map_layout_path) else null
+	applied_diffuse_field = Vector2.ZERO
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_field_strength", Vector2.ZERO)
+	_local_diffuse_image = null
+	_diffuse_actor_position = Vector3.INF
+	_refresh_actor_diffuse_field()
+	if _local_diffuse_field == null:
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_field", null)
+		return
+	_local_diffuse_image = _local_diffuse_field.texture.get_image()
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_field", _local_diffuse_field.texture)
+	RenderingServer.global_shader_parameter_set("gaf_local_diffuse_field_rect", _local_diffuse_field.bounds())
+
+func _refresh_actor_diffuse_field() -> void:
+	var delta := 0.
+	if applied_diffuse_field.x > 0. and _local_diffuse_image != null and _level.player_light.is_active():
+		var position: Vector3 = _level.presentation.player_position()
+		if position.is_finite():
+			if position != _diffuse_actor_position:
+				_diffuse_actor_position = position
+				# Sample an area below the actor so crossing a field edge has no temporal lag.
+				var xz := Vector2(position.x, position.z)
+				var exposure := .40 * _local_diffuse_field.sample_exposure(_local_diffuse_image, xz)
+				for offset: Vector2 in [Vector2(.55, 0.), Vector2(-.55, 0.), Vector2(0., .55), Vector2(0., -.55)]:
+					exposure += .15 * _local_diffuse_field.sample_exposure(_local_diffuse_image, xz + offset)
+				var deck := 1. - smoothstep(.36, 1.20, abs(position.y - _local_diffuse_field.surface_y))
+				_diffuse_actor_exposure = exposure * deck
+			delta = pow(2., _diffuse_actor_exposure * applied_diffuse_field.x) - 1.
+	if delta != applied_actor_diffuse_delta:
+		applied_actor_diffuse_delta = delta
+		RenderingServer.global_shader_parameter_set("gaf_actor_diffuse_field_delta", delta)
+
 func _process(_delta: float) -> void:
 	refresh()
 
@@ -373,6 +418,8 @@ func refresh() -> void:
 		applied_terrain_contrast = 1.0
 		applied_turf_reflection_color = 0.0
 		applied_directional_ground = 0.0
+		applied_diffuse_field = Vector2.ZERO
+		applied_actor_diffuse_delta = 0.
 		applied_pre_twilight = 0.
 		return
 	var strength := 0.
@@ -441,6 +488,18 @@ func refresh() -> void:
 		applied_directional_ground = directional_ground
 		_directional_ground_rect.w = directional_ground
 		RenderingServer.global_shader_parameter_set("gaf_directional_ground_rect", _directional_ground_rect)
+	var diffuse_field := Vector2.ZERO
+	if _local_diffuse_field != null and ground_fill.x > 0.0 and not review._balanced_preview:
+		var profile: Resource = review._biome_profile
+		var phase: Curve = profile.local_diffuse_field_by_hour
+		var gains: Vector2 = profile.local_diffuse_field_strength
+		if phase != null and gains.is_finite():
+			var weather := lerpf(1., profile.local_diffuse_field_overcast, review._weather.weight)
+			diffuse_field = gains.clamp(Vector2.ZERO, Vector2.ONE) * clampf(phase.sample(review.hour / 24.), 0., 1.) \
+				* weather * review._lighting_scale(&"canopy_ground_fill")
+	if diffuse_field != applied_diffuse_field:
+		applied_diffuse_field = diffuse_field
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_field_strength", diffuse_field)
 	var receiver: float = review.pre_twilight_receiver_weight()
 	if receiver != applied_pre_twilight:
 		applied_pre_twilight = receiver
@@ -448,6 +507,7 @@ func refresh() -> void:
 	if (strength > 0. or receiver > 0.) and _published_camera != _camera.global_position:
 		_published_camera = _camera.global_position
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_camera", _published_camera)
+	_refresh_actor_diffuse_field()
 
 func _exit_tree() -> void:
 	if _owner != null and _owner.get_ref() == self:
@@ -463,4 +523,7 @@ func _exit_tree() -> void:
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", null)
 		RenderingServer.global_shader_parameter_set("gaf_directional_ground_rect", Vector4.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_directional_ground_sky", null)
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_field_strength", Vector2.ZERO)
+		RenderingServer.global_shader_parameter_set("gaf_local_diffuse_field", null)
+		RenderingServer.global_shader_parameter_set("gaf_actor_diffuse_field_delta", 0.)
 		_owner = null

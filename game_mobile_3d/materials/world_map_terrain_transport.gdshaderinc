@@ -1,6 +1,7 @@
 // Original baked GAF irradiance, terrain-only. No native source coefficients.
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
+#include "res://materials/world_map_local_diffuse_field.gdshaderinc"
 global uniform float gaf_stone_foot_fill;
 global uniform vec4 gaf_path_shade_sky;
 global uniform vec4 gaf_path_sky_chroma;
@@ -100,6 +101,9 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec
 		sky_fill = mix(sky_fill, gaf_turf_ambient(sky_fill), turf);
 	}
 	vec3 diffuse_sky = gaf_pre_twilight_diffuse(sky_fill, camera_position);
+	if (use_source_terrain && face_y > .998 && (ground_grade == 1 || ground_grade == 2)) {
+		diffuse_sky *= gaf_local_diffuse_field_gain(world_position, camera_position, gaf_local_diffuse_field_strength.x);
+	}
 	if (gaf_directional_ground_rect.w > 0.0 && use_source_terrain && face_y > .998 &&
 			distance(camera_position, gaf_spruce_sky_camera) <= .01 &&
 			(ground_grade == 1 || ground_grade == 2)) {

@@ -9,6 +9,7 @@ const DiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
 const ActorGroundLight = preload("res://scripts/world_map_actor_ground_light.gd")
 const Palette = preload("res://scripts/world_map_showcase_palette.gd")
 const MistVolume = preload("res://scripts/world_map_atmosphere_volume.gd")
+const TerrainMistVisibility = preload("res://scripts/terrain_mist_visibility.gd")
 const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
 const PathFixture = preload("res://scripts/world_map_forest_path_light.gd")
 const PathLamppost = preload("res://scripts/world_map_path_lamppost.gd")
@@ -33,10 +34,19 @@ var _settings_status: Label
 var _settings_preset: OptionButton
 var _settings_quality: OptionButton
 var _actor_ground_light: ActorGroundLight
-var _actor_ground_scale := 1.
 var _actor_ground_slider: HSlider
 var _actor_ground_drag_before := 1.
+var _display_edge_slider: HSlider
+var _display_edge_drag_before := 0.
+var _night_bloom_slider: HSlider
+var _night_bloom_drag_before := 1.
+var _stone_ledge_slider: HSlider
+var _stone_ledge_drag_before := 1.
+var _stone_ledge_occlusion := 0.
 var _mist: MistVolume
+var _mist_light_binding: Dictionary = {}
+var _mist_visibility_slider: HSlider
+var _mist_visibility_before := 1.
 var _allow_spatial_mist := true
 var _path_fixture := PathFixture.new()
 var _path_lamppost := PathLamppost.new()
@@ -56,11 +66,13 @@ var _allow_local_diffuse := true
 func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> void:
 	_world = world
 	DiffuseRegion.claim(self)
+	RenderingServer.global_shader_parameter_set("gaf_portable_ledge_occlusion", 0.)
 	quality = world.biome_quality
 	_choices.append(profile)
 	for choice in alternatives:
 		if choice != null and not choice.use_forest_reference and not _choices.has(choice):
 			_choices.append(choice)
+	_load_terrain_mist_visibility()
 	set_profile(profile)
 	var start_overcast: float = world.biome_start_overcast
 	var start_hour: float = world.biome_start_hour
@@ -90,14 +102,75 @@ func add_settings_controls(parent: VBoxContainer) -> Label:
 		_actor_ground_slider.name = "ActorGroundLightScale"
 		_actor_ground_slider.max_value = 1.
 		_actor_ground_slider.step = .05
-		_actor_ground_slider.value = _actor_ground_scale
 		_actor_ground_slider.tooltip_text = "Kéo về 0 để so sánh với ánh sáng gốc. Áp dụng lúc thiếu sáng."
 		_actor_ground_slider.value_changed.connect(set_actor_ground_scale)
-		_actor_ground_slider.drag_started.connect(func(): _actor_ground_drag_before = _actor_ground_scale)
+		_actor_ground_slider.drag_started.connect(func():
+			_actor_ground_drag_before = _world.showcase._lighting_scale(&"actor_ground_light"))
 		_actor_ground_slider.drag_ended.connect(func(changed: bool):
-			if changed and not is_equal_approx(_actor_ground_drag_before, _actor_ground_scale):
+			if changed:
 				_world.showcase._settings.remember_edit(set_actor_ground_scale.bind(_actor_ground_drag_before)))
 		parent.add_child(_actor_ground_slider)
+
+	if _choices.any(func(profile: Profile) -> bool: return profile.adaptive_bloom):
+		_display_edge_slider = HSlider.new()
+		_display_edge_slider.name = "DisplayEdgeStrength"
+		_display_edge_slider.max_value = 1.
+		_display_edge_slider.step = .05
+		_display_edge_slider.tooltip_text = "Giảm rung ở mép đá, lá và nhân vật khi đổi góc nhìn. Dùng ở mức Đầy đủ cùng hậu kỳ của biome."
+		_display_edge_slider.value_changed.connect(func(value: float):
+			_world.showcase.set_lighting_scale(&"display_edge_strength", value))
+		_display_edge_slider.drag_started.connect(func():
+			_display_edge_drag_before = _world.showcase._lighting_scale(&"display_edge_strength"))
+		_display_edge_slider.drag_ended.connect(func(changed: bool):
+			if changed:
+				_world.showcase._settings.remember_edit(_world.showcase.set_lighting_scale.bind(
+					&"display_edge_strength", _display_edge_drag_before)))
+		parent.add_child(_display_edge_slider)
+
+	if _choices.any(func(profile: Profile) -> bool: return profile.adaptive_bloom_shadow_support_by_hour != null):
+		_night_bloom_slider = HSlider.new()
+		_night_bloom_slider.name = "PortableNightBloom"
+		_night_bloom_slider.max_value = 1.
+		_night_bloom_slider.step = .05
+		_night_bloom_slider.value_changed.connect(func(value: float):
+			_world.showcase.set_lighting_scale(&"night_soft_bloom", value))
+		_night_bloom_slider.drag_started.connect(func():
+			_night_bloom_drag_before = _world.showcase._lighting_scale(&"night_soft_bloom"))
+		_night_bloom_slider.drag_ended.connect(func(changed: bool):
+			if changed:
+				_world.showcase._settings.remember_edit(_world.showcase.set_lighting_scale.bind(
+					&"night_soft_bloom", _night_bloom_drag_before)))
+		parent.add_child(_night_bloom_slider)
+
+	if _choices.any(func(profile: Profile) -> bool: return profile.stone_ledge_occlusion_by_hour != null):
+		_stone_ledge_slider = HSlider.new()
+		_stone_ledge_slider.name = "StoneLedgeOcclusion"
+		_stone_ledge_slider.max_value = 1.
+		_stone_ledge_slider.step = .05
+		_stone_ledge_slider.value_changed.connect(func(value: float):
+			_world.showcase.set_lighting_scale(&"stone_foot_fill", value))
+		_stone_ledge_slider.drag_started.connect(func():
+			_stone_ledge_drag_before = _world.showcase._lighting_scale(&"stone_foot_fill"))
+		_stone_ledge_slider.drag_ended.connect(func(changed: bool):
+			if changed:
+				_world.showcase._settings.remember_edit(_world.showcase.set_lighting_scale.bind(
+					&"stone_foot_fill", _stone_ledge_drag_before)))
+		parent.add_child(_stone_ledge_slider)
+
+	if not _mist_light_binding.is_empty():
+		_mist_visibility_slider = HSlider.new()
+		_mist_visibility_slider.name = "TerrainMistVisibility"
+		_mist_visibility_slider.max_value = 1.
+		_mist_visibility_slider.step = .05
+		_mist_visibility_slider.value_changed.connect(func(value: float):
+			_world.showcase.set_lighting_scale(&"terrain_mist_visibility", value))
+		_mist_visibility_slider.drag_started.connect(func():
+			_mist_visibility_before = _world.showcase._lighting_scale(&"terrain_mist_visibility"))
+		_mist_visibility_slider.drag_ended.connect(func(changed: bool):
+			if changed:
+				_world.showcase._settings.remember_edit(_world.showcase.set_lighting_scale.bind(
+					&"terrain_mist_visibility", _mist_visibility_before)))
+		parent.add_child(_mist_visibility_slider)
 
 	_settings_status = Label.new()
 	parent.add_child(_settings_status)
@@ -116,8 +189,84 @@ func _refresh_settings() -> void:
 	if _settings_quality.selected != quality:
 		_settings_quality.select(quality)
 	if _actor_ground_slider != null:
+		_actor_ground_slider.set_value_no_signal(_world.showcase._lighting_scale(&"actor_ground_light"))
 		_actor_ground_slider.editable = quality != Quality.ESSENTIAL and _profile.actor_ground_light_by_hour != null \
 			and _actor_ground_light != null and _actor_ground_light.supported
+
+	if _display_edge_slider != null:
+		_display_edge_slider.set_value_no_signal(_world.showcase._lighting_scale(&"display_edge_strength"))
+		_display_edge_slider.editable = quality == Quality.FULL and _profile.adaptive_bloom \
+			and RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
+
+	if _night_bloom_slider != null:
+		_night_bloom_slider.set_value_no_signal(_world.showcase._lighting_scale(&"night_soft_bloom"))
+		_night_bloom_slider.editable = (quality == Quality.FULL and _profile.adaptive_bloom
+			and _profile.adaptive_bloom_gain > 0. and _profile.adaptive_bloom_shadow_support_by_hour != null
+			and RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null)
+
+	if _stone_ledge_slider != null:
+		_stone_ledge_slider.set_value_no_signal(_world.showcase._lighting_scale(&"stone_foot_fill"))
+		_stone_ledge_slider.editable = _stone_ledge_available()
+
+	if _mist_visibility_slider != null:
+		_mist_visibility_slider.set_value_no_signal(_world.showcase._lighting_scale(&"terrain_mist_visibility"))
+		_mist_visibility_slider.editable = _mist_visibility_available()
+
+func _load_terrain_mist_visibility() -> void:
+	var path: String = _world.terrain_mist_visibility_path
+	if (not _choices.any(func(profile: Profile) -> bool: return profile.terrain_mist_visibility_by_hour != null)
+			or RenderingServer.get_current_rendering_method() != "mobile"
+			or RenderingServer.get_rendering_device() == null or path.is_empty() or not ResourceLoader.exists(path)):
+		return
+	var field := load(path) as TerrainMistVisibility
+	if field != null:
+		_mist_light_binding = field.binding_for_layout(_world.map_layout_path)
+
+func _mist_visibility_available() -> bool:
+	return (not _mist_light_binding.is_empty() and quality != Quality.ESSENTIAL and _profile.spatial_mist
+		and _profile.terrain_mist_visibility_by_hour != null and _world.look.stage == 2)
+
+func refresh_mist_visibility() -> void:
+	_refresh_settings()
+	_update_mist_visibility()
+
+func _update_mist_visibility() -> void:
+	if _mist_light_binding.is_empty():
+		return
+	var gain := 0.
+	if _mist_visibility_available():
+		var phase: float = _world.showcase.hour / 24.
+		gain = clampf(DayNight.sample_curve(_profile.terrain_mist_visibility_by_hour, phase, 0.), 0., .8)
+		gain *= _world.showcase._lighting_scale(&"terrain_mist_visibility")
+	_mist_light_binding.valid = gain > 0.
+	_mist_light_binding.ambient_floor = 1. - gain
+
+func _stone_ledge_available() -> bool:
+	return (_profile.stone_ledge_occlusion_by_hour != null and quality != Quality.ESSENTIAL
+		and _world.look.stage == 2 and RenderingServer.get_current_rendering_method() == "mobile")
+
+func refresh_stone_ledge() -> void:
+	_refresh_settings()
+	_update_stone_ledge()
+
+func _update_stone_ledge() -> void:
+	if not DiffuseRegion.owns(self):
+		return
+	var strength := 0.
+	if _stone_ledge_available():
+		var phase: float = _world.showcase.hour / 24.
+		var maximum := DayNight.sample_curve(_profile.stone_ledge_occlusion_by_hour, phase, 0.)
+		strength = clampf(maximum, 0., .35) * _world.showcase._lighting_scale(&"stone_foot_fill")
+	if strength != _stone_ledge_occlusion:
+		_stone_ledge_occlusion = strength
+		RenderingServer.global_shader_parameter_set("gaf_portable_ledge_occlusion", strength)
+
+func display_edge_default() -> float:
+	return _profile.display_edge_strength if _profile != null else 0.
+
+func refresh_finish_settings() -> void:
+	_refresh_settings()
+	_update_finish()
 
 func set_profile(profile: Profile) -> void:
 	if profile == null or profile.use_forest_reference:
@@ -179,10 +328,12 @@ func _has_actor_ground_settings() -> bool:
 
 
 func set_actor_ground_scale(value: float) -> void:
-	_actor_ground_scale = clampf(value, 0., 1.)
-	if _actor_ground_slider != null:
-		_actor_ground_slider.set_value_no_signal(_actor_ground_scale)
+	_world.showcase.set_lighting_scale(&"actor_ground_light", value)
+
+
+func refresh_actor_ground_settings() -> void:
 	_update_actor_ground_light(_world.showcase.hour)
+	_refresh_settings()
 
 
 func _update_actor_ground_light(hour: float) -> void:
@@ -197,7 +348,8 @@ func _update_actor_ground_light(hour: float) -> void:
 	var power := 0.
 	if quality != Quality.ESSENTIAL and _world.look.stage == 2 and _world.view_mode == "gameplay":
 		power = DayNight.sample_curve(curve, hour / 24., 0.)
-		power *= lerpf(1., _profile.actor_ground_light_cloudy_scale, weather_weight) * _actor_ground_scale
+		power *= lerpf(1., _profile.actor_ground_light_cloudy_scale, weather_weight)
+		power *= _world.showcase._lighting_scale(&"actor_ground_light")
 	_actor_ground_light.set_power(power)
 
 
@@ -205,6 +357,8 @@ func refresh() -> void:
 	var hour: float = _world.showcase.hour
 	_update_actor_ground_light(hour)
 	_refresh_settings()
+	_update_stone_ledge()
+	_update_mist_visibility()
 	if _world.look.stage != 2:
 		_world.showcase.sync_cliff_vista(false)
 		_update_local_diffuse()
@@ -331,7 +485,12 @@ func _update_finish() -> void:
 			_finish_effect.set_air_bloom_response(_profile.adaptive_bloom_gain * weight)
 			_finish_effect.set_bloom_local_response(_profile.adaptive_bloom_response)
 			_finish_effect.set_bloom_prefilter(_profile.adaptive_bloom_prefilter)
+			var phase: float = _world.showcase.hour / 24.
+			var shadow_support := DayNight.sample_curve(_profile.adaptive_bloom_shadow_support_by_hour, phase, 0.)
+			_finish_effect.set_bloom_shadow_support(shadow_support * _world.showcase._lighting_scale(&"night_soft_bloom"))
 			_finish_effect.set_air_bloom_spread(_profile.adaptive_bloom_spread)
+			_finish_effect.set_scene_edges(_world.showcase._lighting_scale(&"display_edge_strength") * weight,
+				env.tonemap_exposure)
 	if combined:
 		# Keep native glow until the custom pass has completed one successful frame.
 		var custom_bloom := false
@@ -358,6 +517,8 @@ func _ensure_compositor(camera: Camera3D) -> void:
 	camera.compositor = _finish_compositor
 
 func _exit_tree() -> void:
+	if DiffuseRegion.owns(self):
+		RenderingServer.global_shader_parameter_set("gaf_portable_ledge_occlusion", 0.)
 	DiffuseRegion.release(self)
 	if is_instance_valid(_mist):
 		_mist.suspend()
@@ -403,6 +564,8 @@ func _prepare_spatial_mist(env: Environment, clear_fog_color: Color, time: float
 		_mist.setup()
 		_mist.set_sky_field(_world.mist_sky_field)
 		_mist.material_provider = _mist_materials
+		if not _mist_light_binding.is_empty():
+			_mist.light_provider = func() -> Dictionary: return _mist_light_binding
 		_mist.compositor_owned = _owns_finish_compositor
 		_mist.path_light_provider = _fixture_air
 		_mist.noise_strength = .28

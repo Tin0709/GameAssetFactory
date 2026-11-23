@@ -17,6 +17,9 @@ render_mode diffuse_burley, depth_draw_always, cull_disabled;
 #include "res://materials/world_map_replay_bounce.gdshaderinc"
 #include "res://materials/world_map_player_contact.gdshaderinc"
 #endif
+#ifndef GAF_WORLD_SPATIAL_TERRAIN
+#include "res://materials/world_map_ledge_occlusion.gdshaderinc"
+#endif
 #include "res://materials/world_map_local_diffuse.gdshaderinc"
 #ifdef GAF_WORLD_GROUND_BOUNCE
 #include "res://materials/world_map_ground_bounce.gdshaderinc"
@@ -176,6 +179,9 @@ void fragment() {
 		EMISSION += gaf_terrain_reflection_balance(reflected, diffuse_fill, ALBEDO, surface_top);
 	}
 #else
+	float ledge_visibility = portable_ledge_visibility(cutaway_world, surface_normal);
+	if (ledge_visibility < 1.0) AO_LIGHT_AFFECT = 0.0;
+	AO *= ledge_visibility;
 	EMISSION += gaf_local_environment_delta(ALBEDO, METALLIC, cutaway_world, surface_normal) * AO;
 #endif
 #ifdef GAF_SHARED_MIST

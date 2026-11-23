@@ -227,6 +227,10 @@ gaf_local_diffuse_ambient={
 "type": "vec3",
 "value": Vector3(0, 0, 0)
 }
+gaf_portable_ledge_occlusion={
+"type": "float",
+"value": 0.0
+}
 gaf_projected_sun_strength={
 "type": "float",
 "value": 0.0
@@ -334,6 +338,22 @@ gaf_directional_ground_rect={
 gaf_directional_ground_height={
 "type": "vec2",
 "value": Vector2(0, 1)
+}
+gaf_local_diffuse_field={
+"type": "sampler2D",
+"value": ""
+}
+gaf_local_diffuse_field_rect={
+"type": "vec4",
+"value": Vector4(0, 0, 1, 0)
+}
+gaf_local_diffuse_field_strength={
+"type": "vec2",
+"value": Vector2(0, 0)
+}
+gaf_actor_diffuse_field_delta={
+"type": "float",
+"value": 0.0
 }
 gaf_spruce_sky_camera={
 "type": "vec3",

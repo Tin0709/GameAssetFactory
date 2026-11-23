@@ -21,6 +21,7 @@ const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 const BiomeGraphicsProfile = preload("res://scripts/biome_graphics_profile.gd")
 const BiomeGraphics = preload("res://scripts/biome_graphics.gd")
 const LocalDiffuseRegion = preload("res://scripts/local_diffuse_region.gd")
+const LocalDiffuseField = preload("res://scripts/local_diffuse_field.gd")
 const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export_file("*.json") var map_layout_path := DATA
 ## Assign a graphics resource independently of the imported layout.
@@ -30,6 +31,8 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var near_wall_layout_sha256 := ""
 ## Optional sky-occlusion lattice baked for this layout.
 @export var mist_sky_field: MistSkyField
+## Optional terrain visibility for portable mist. Loaded only by that renderer path.
+@export_file("*.res") var terrain_mist_visibility_path := ""
 @export var comparison_biomes: Array[BiomeGraphicsProfile] = []
 ## Graphics budget for portable biomes. The Forest reference keeps its existing settings.
 @export var biome_quality: BiomeGraphics.Quality = BiomeGraphics.Quality.FULL
@@ -88,6 +91,7 @@ var biome_controller: BiomeGraphics
 @export var regional_sky_region: RegionalSkyRegion
 @export var local_diffuse_region: LocalDiffuseRegion
 @export var additional_local_diffuse_region: LocalDiffuseRegion
+@export var local_diffuse_field: LocalDiffuseField
 ## Centre X/Z and radius X/Z of the late-day stone highlight adjustment.
 @export var stone_sunset_region := Vector4.ZERO
 @export var scene_lighting_mix: SceneLightingMix
@@ -127,6 +131,9 @@ var biome_controller: BiomeGraphics
 ## Optional directional lighting for this placement, relative to the research directory.
 @export var afternoon_lighting_profile := ""
 @export var afternoon_lighting_sha256 := ""
+## Optional calibration for the west directional-air atlas in the verified lighting profile.
+@export var afternoon_west_air_payload := ""
+@export var afternoon_west_air_sha256 := ""
 @export var forest_road_layout_profile := ""
 @export var forest_road_layout_sha256 := ""
 @export var terrain_canopy_sky_profile := ""
@@ -298,6 +305,7 @@ func _ready() -> void:
 			forest_preferred_layout_profile, forest_preferred_layout_sha256)
 		if extension:
 			spruce_sky.load_directional_ground(terrain_canopy_sky_profile, terrain_canopy_sky_sha256, forest_canopy_extension_sha256)
+			spruce_sky.set_local_diffuse_field(local_diffuse_field)
 		if extension and showcase.mist != null and showcase.directional_air.load_east(
 				east_air_profile, east_air_profile_sha256, forest_canopy_extension_sha256, spruce_sky):
 			showcase.mist.effect.east_directional_grid = showcase.directional_air.east_texture
@@ -410,19 +418,34 @@ func terrain_contact_at(sole: Vector3, depth := .30, clearance := .08) -> Dictio
 	if not geometry.is_ancestor_of(hit.collider):
 		return {}
 	var position: Vector3 = hit.position
+	var surface := _terrain_surface_at(position - Vector3.UP * .01)
+	return {"position": position, "surface": surface} if not surface.is_empty() else {}
+
+func terrain_wall_contact_at(origin: Vector3, along: Vector3) -> Dictionary:
+	var query := PhysicsRayQueryParameters3D.create(origin, origin + along, 1)
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty() or absf(hit.normal.y) > .23 or origin.distance_squared_to(hit.position) < .36 * .36:
+		return {}
+	var surface := ""
+	if hit.collider.get_meta(&"gaf_boulder_support", false):
+		surface = "stone"
+	elif geometry.is_ancestor_of(hit.collider):
+		surface = _terrain_surface_at(hit.position - hit.normal * .02)
+	return {"position": hit.position, "normal": hit.normal, "surface": surface} if not surface.is_empty() else {}
+
+func _terrain_surface_at(inside: Vector3) -> String:
 	var offset: Array = runtime.offset
-	var block := Vector3i(floori(position.x - float(offset[0])),
-		floori(position.y - float(offset[1]) - 0.01), floori(position.z - float(offset[2])))
+	var block := Vector3i(floori(inside.x - float(offset[0])),
+		floori(inside.y - float(offset[1])), floori(inside.z - float(offset[2])))
 	var tile: Dictionary = runtime.palette[geometry.cells[block]] if geometry.cells.has(block) else {}
 	if tile.get("category") != "terrain":
-		return {}
+		return ""
 	var kind: String = tile.kind
-	var surface := "grass"
 	if kind.begins_with("dirt"):
-		surface = "dirt"
-	elif kind.begins_with("stone"):
-		surface = "stone"
-	return {"position": position, "surface": surface}
+		return "dirt"
+	if kind.begins_with("stone"):
+		return "stone"
+	return "grass"
 
 func surface_height(x: float,z: float) -> float:
 	var column:=Vector2i(floori(x-float(runtime.offset[0])),floori(z-float(runtime.offset[2])))

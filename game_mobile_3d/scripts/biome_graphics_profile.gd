@@ -73,6 +73,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., .56) var stone_wall_shadow_fill := 0.0
 ## Reduction of supplemental shadow fill at the foot of supported stone risers.
 @export_range(0.0, 0.66) var stone_foot_fill := 0.0
+## Ambient occlusion at supported stone risers on portable maps. X is normalized hour.
+@export var stone_ledge_occlusion_by_hour: Curve
 ## Linear sky luminance at the center of the stone shelf fill response, morning and afternoon.
 @export var stone_top_shadow_fill_pivot := Vector2.ZERO
 ## Reduction of the path's supplemental shadow fill and gain for moderately lit dirt.
@@ -131,6 +133,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Added light near the entry to the spatial mist, sampled by normalized hour.
 ## An empty track leaves the original medium lighting in place.
 @export var mist_entry_scatter_by_hour: Curve
+## Portion of ambient in-scattering subject to static terrain visibility.
+@export var terrain_mist_visibility_by_hour: Curve
 ## Fraction of entry lighting shifted deeper into the same medium.
 @export_range(0., 1., .01) var mist_entry_depth_balance := 0.
 @export var mist_front_transfer_by_hour: Curve
@@ -173,6 +177,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., .52, .01) var daylight_shadow_luminance_scale := 0.
 ## Fraction of the detail lift withheld where daylight bloom already fills a shadow.
 @export_range(0., 1., .01) var daylight_shadow_edge_contrast := 0.
+## Strength of edge smoothing in the biome's active finish, before HUD rendering.
+@export_range(0., 1., .01) var display_edge_strength := 0.
 ## Fraction of the daylight shadow lift retained as contrast behind the fog entry.
 @export_range(0., 1., .01) var daylight_shade_retention := 0.
 ## Blends the mist source color into normally exposed distant shadows in the depth-aware finish.
@@ -201,6 +207,9 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0.0, 1.0, 0.01) var canopy_turf_reflection_color := 0.0
 ## Relative sky response on a terrain surface below a verified canopy field.
 @export var directional_ground_sky_by_hour: Curve
+@export var local_diffuse_field_by_hour: Curve
+@export var local_diffuse_field_strength := Vector2.ZERO
+@export_range(0., 1.) var local_diffuse_field_overcast := 1.
 @export_range(0.0, 1.0) var directional_ground_sky_overcast := 0.45
 ## How much incident sky and supplemental fill to remove beside a wall.
 @export var near_wall_fill := Vector2.ZERO
@@ -225,6 +234,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export_range(0., 4., .01) var adaptive_bloom_gain := .5
 @export_range(0., 1., .01) var adaptive_bloom_response := .65
 @export_range(0., 1., .01) var adaptive_bloom_prefilter := .72
+## Restore part of the diffuse shadow band lost to bloom prefiltering. X is normalized hour.
+@export var adaptive_bloom_shadow_support_by_hour: Curve
 @export_range(0., 2., .01) var adaptive_bloom_spread := .82
 
 @export_group("Day and night")

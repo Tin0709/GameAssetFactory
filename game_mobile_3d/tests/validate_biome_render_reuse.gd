@@ -469,6 +469,22 @@ func run() -> void:
 				and attached_compositor.compositor_effects.has(graphics._finish_effect)
 				and graphics._finish_effect.snapshot().frames > 0,
 				"A map opened at noon adds bloom at dusk on the same compositor as the warmed medium")
+			var edge_slider := map.find_child("DisplayEdgeStrength",true,false) as HSlider
+			check(edge_slider != null and is_equal_approx(edge_slider.value,.60),
+				"Woodland defaults to a moderate portable edge strength")
+			for index in 6:
+				await process_frame
+				await RenderingServer.frame_post_draw
+			var edges: Dictionary = graphics._finish_effect.snapshot()
+			check(edges.get("scene_edges_active",false), "Portable edge pass runs after bounded exposure and before engine grading")
+			map.showcase.set_lighting_scale(&"display_edge_strength",0.)
+			for index in 6:
+				await process_frame
+				await RenderingServer.frame_post_draw
+			var original: Dictionary = graphics._finish_effect.snapshot()
+			check(not original.get("scene_edges_active",false) and original.bytes == edges.bytes,
+				"Turning off portable edges keeps the same scratch memory budget and only removes the filter")
+			map.showcase.set_lighting_scale(&"display_edge_strength",.60)
 			check(env.fog_density > 0., "Ordinary materials keep valid native fog while custom receivers substitute the medium")
 			var full_bytes: int = graphics._mist.effect.snapshot().bytes
 			graphics.set_quality(1)
@@ -479,6 +495,8 @@ func run() -> void:
 			check(graphics._mist.visible and balanced_bytes > 0 and balanced_bytes < full_bytes,
 				"Changing from Full to Balanced rebuilds a smaller mist grid")
 			check(not graphics._finish_effect.enabled, "Balanced skips adaptive bloom")
+			check(edge_slider != null and not edge_slider.editable and not graphics._finish_effect.snapshot().get("scene_edges_active",false),
+				"Balanced releases the edge filter with the adaptive finish")
 			graphics.set_quality(2)
 			map.showcase.set_hour(19.5)
 			for index in 8:

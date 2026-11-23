@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
 [ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
@@ -20,6 +20,8 @@
 [ext_resource type="Script" path="res://scripts/local_diffuse_region.gd" id="diffuse_type"]
 [ext_resource type="Script" path="res://scripts/local_mist_region.gd" id="mist_type"]
 [ext_resource type="Texture2D" path="res://assets/graphics/world_map_terrain_transport_v001/near_wall_coverage.res" id="near_wall"]
+[ext_resource type="Script" path="res://scripts/local_diffuse_field.gd" id="diffuse_field_type"]
+[ext_resource type="Texture2D" path="res://assets/graphics/worldmap_west_diffuse_field.res" id="west_diffuse_texture"]
 
 [sub_resource type="Resource" id="CliffDiffuse"]
 script = ExtResource("diffuse_type")
@@ -33,6 +35,14 @@ center_xz = Vector2(-22.8, -39.5)
 radii_m = Vector2(8.5, 7.75)
 opening_world = Vector3(-17.5, 7.25, -33.5)
 
+[sub_resource type="Resource" id="WestDiffuseField"]
+script = ExtResource("diffuse_field_type")
+texture = ExtResource("west_diffuse_texture")
+origin_xz = Vector2(-42.5, 2.5)
+spacing_m = 0.25
+surface_y = 3.0
+layout_sha256 = "53e243bb23f95f17990d02d8871393fa1a26c5aa67ae79314361b5cdc1c6f805"
+
 [sub_resource type="Resource" id="WestGroveMist"]
 script = ExtResource("mist_type")
 center_m = Vector3(-38.5, 3.7, 9.5)
@@ -43,6 +53,7 @@ scatter_multiplier = Vector3(0.85, 1.28, 2.2)
 [node name="WorldMap" instance=ExtResource("base")]
 script = ExtResource("map")
 biome_graphics = ExtResource("forest_reference")
+terrain_mist_visibility_path = "res://assets/graphics/worldmap_mist_visibility.res"
 near_wall_coverage = ExtResource("near_wall")
 near_wall_layout_sha256 = "53e243bb23f95f17990d02d8871393fa1a26c5aa67ae79314361b5cdc1c6f805"
 distant_terrain_origin = Vector3(45, -11.5, -46.5)
@@ -71,6 +82,7 @@ night_mist_region = ExtResource("night_mist")
 regional_sky_region = ExtResource("regional_sky")
 local_diffuse_region = SubResource("CliffDiffuse")
 additional_local_diffuse_region = SubResource("BasinDiffuse")
+local_diffuse_field = SubResource("WestDiffuseField")
 stone_sunset_region = Vector4(-22, -40, 13.5, 10.5)
 scene_lighting_mix = ExtResource("forest_mix")
 additional_lighting_mixes = Array[ExtResource("mix_type")]([ExtResource("night_mix"), ExtResource("soft_cliff_mix"), ExtResource("forest_air_mix"), ExtResource("humid_forest_mix"), ExtResource("forest_sun_shadow_mix"), ExtResource("forest_dawn_mix"), ExtResource("forest_dawn_reference_mix")])
@@ -90,6 +102,8 @@ east_air_profile = "graphics_vfx/acquisition_20261114/analysis/forest_east_direc
 east_air_profile_sha256 = "cf4d7e4807eef521a443e8561911132fc69ad606ee03ba41a6c59a4c123dec31"
 afternoon_lighting_profile = "graphics_vfx/acquisition_20261114/analysis/forest_sunset_continuity_20261123/worldmap_afternoon.private.json"
 afternoon_lighting_sha256 = "f1c9285c865bbf59d344726a6226c86237d5a6baa7b108c4568c018f71bde117"
+afternoon_west_air_payload = "graphics_vfx/acquisition_20261114/analysis/forest_mist_scatter_height_20261124/west_understory.private.r8"
+afternoon_west_air_sha256 = "c34e85e5b7561b2facac45bde504f6e8e2b838a65b2ed790da70473c4e5bde35"
 forest_road_layout_profile = "graphics_vfx/acquisition_20261114/analysis/forest_walkable_path_1794754860257/matched_layout/layout.private.json"
 forest_road_layout_sha256 = "302d1e76450bc295ca16be0286e5b7d481b09684bc77d0675663fade2f2fbb31"
 far_terrain_shadow_cache = "graphics_vfx/acquisition_20261114/analysis/forest_shadow_walk_coverage_20261118/expanded"

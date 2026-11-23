@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=16 format=3]
+[gd_resource type="Resource" load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -58,6 +58,18 @@ point_count = 9
 _data = [Vector2(0, 0.44), 0.0, 0.0, 0, 0, Vector2(0.20833333, 0.30), 0.0, 0.0, 0, 0, Vector2(0.29166667, 0.46), 0.0, 0.0, 0, 0, Vector2(0.40625, 0), 0.0, 0.0, 0, 0, Vector2(0.59375, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.25), 0.0, 0.0, 0, 0, Vector2(0.8125, 0.50), 0.0, 0.0, 0, 0, Vector2(0.91666667, 0.46), 0.0, 0.0, 0, 0, Vector2(1, 0.44), 0.0, 0.0, 0, 0]
 point_count = 9
 
+[sub_resource type="Curve" id="StoneLedgeOcclusionHours"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.22916667, 0), 0.0, 0.0, 0, 0, Vector2(0.29166667, 0.16), 0.0, 0.0, 0, 0, Vector2(0.47916667, 0), 0.0, 0.0, 0, 0, Vector2(0.52083333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.20), 0.0, 0.0, 0, 0, Vector2(0.79166667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 8
+
+[sub_resource type="Curve" id="TerrainMistVisibilityHours"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.22916667, 0), 0.0, 0.0, 0, 0, Vector2(0.29166667, 0.32), 0.0, 0.0, 0, 0, Vector2(0.47916667, 0), 0.0, 0.0, 0, 0, Vector2(0.52083333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.32), 0.0, 0.0, 0, 0, Vector2(0.79166667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 8
+
+[sub_resource type="Curve" id="NightBloomShadowSupport"]
+_data = [Vector2(0, 0.54), 0.0, 0.0, 0, 0, Vector2(0.14583333, 0.54), 0.0, 0.0, 0, 0, Vector2(0.21875, 0), 0.0, 0.0, 0, 0, Vector2(0.8125, 0), 0.0, 0.0, 0, 0, Vector2(0.91666667, 0.54), 0.0, 0.0, 0, 0, Vector2(1, 0.54), 0.0, 0.0, 0, 0]
+point_count = 6
+
 [resource]
 script = ExtResource("profile")
 display_name = "Rìa rừng ẩm"
@@ -69,6 +81,7 @@ shadow_blur = 1.55
 shadow_opacity = 0.74
 local_diffuse_strength = 0.35
 local_diffuse_by_hour = SubResource("DiffuseHours")
+stone_ledge_occlusion_by_hour = SubResource("StoneLedgeOcclusionHours")
 actor_ground_light_by_hour = SubResource("ActorGroundLightHours")
 actor_ground_light_cloudy_scale = 1.5
 noon_sky_color = Color(0.45, 0.62, 0.68, 1)
@@ -81,6 +94,7 @@ spatial_mist = true
 mist_extinction = 0.011
 mist_height_falloff = 0.25
 mist_scatter = 0.42
+terrain_mist_visibility_by_hour = SubResource("TerrainMistVisibilityHours")
 mist_scatter_color_by_hour = SubResource("WoodlandScatterTint")
 mist_scatter_energy_by_hour = SubResource("WoodlandScatterEnergy")
 local_mist_strength = 0.58
@@ -91,12 +105,14 @@ exposure = 0.96
 saturation = 0.95
 contrast = 1.06
 glow_bloom = 0.028
+display_edge_strength = 0.6
 adaptive_bloom = true
 adaptive_bloom_by_hour = SubResource("AdaptiveBloomPhase")
 local_exposure = 0.045
 adaptive_bloom_gain = 0.45
 adaptive_bloom_response = 0.65
 adaptive_bloom_prefilter = 0.72
+adaptive_bloom_shadow_support_by_hour = SubResource("NightBloomShadowSupport")
 adaptive_bloom_spread = 0.82
 day_night = ExtResource("day_night")
 key_energy_by_hour = SubResource("WoodlandKey")

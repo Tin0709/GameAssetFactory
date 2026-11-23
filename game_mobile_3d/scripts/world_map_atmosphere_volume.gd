@@ -145,7 +145,8 @@ func _process(_delta:float)->void:
  if light.get("texture")!=null:light_rid=light.texture.get_rid()
  var near_fade_start := float(_profile.get("near_fade_start", 0.)) if near_layer.y > 0. else 0.
  if light.get("valid",false):
-  _append(light.origin,data,1.);_append(light.step,data,.2);_append(light.dimensions,data,near_fade_start)
+  var ambient_floor := clampf(float(light.get("ambient_floor", .2)), 0., 1.)
+  _append(light.origin,data,1.);_append(light.step,data,ambient_floor);_append(light.dimensions,data,near_fade_start)
  else:
   for i in 2:_append(Vector3.ZERO,data)
   _append(Vector3.ZERO,data,near_fade_start)

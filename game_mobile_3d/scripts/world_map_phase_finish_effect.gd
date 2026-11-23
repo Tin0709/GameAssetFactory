@@ -1,7 +1,6 @@
 extends "res://scripts/world_map_reference_grade.gd"
 ## Original bridge between the approved GAF finish and a private reference transfer.
 ## The Filmic/BCS order follows Godot's public mathematical operations; verified on GPU.
-const EDGES=preload("res://scripts/world_map_display_edges.gd")
 const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
 const BASELINE_BYTES := 96
 const DAYLIGHT_SHADOW_GRADE_OFFSET := 64
@@ -10,11 +9,14 @@ const DAYLIGHT_SHADOW_LUMINANCE_OFFSET := 72
 const DAYLIGHT_SHADE_RETENTION_OFFSET := 76
 const DAYLIGHT_AIR_CHROMA_OFFSET := 80
 const DAYLIGHT_SHADOW_EDGE_CONTRAST_OFFSET := 84
-var _edge_requested:=false
+const DISPLAY_EDGE_STRENGTH_OFFSET := 88
+var _edge_weight := 0.
 var _render_edge:=false
 var _reported_size:=Vector2i.ZERO
-func set_display_edges(value:bool)->void:
- _guard.lock();_edge_requested=value;_guard.unlock()
+func set_display_edges(value: float) -> void:
+ _guard.lock()
+ _edge_weight = clampf(value, 0., 1.) if is_finite(value) else 0.
+ _guard.unlock()
 var _finish_wanted:=false
 var _render_finish:=false
 var _baseline:=PackedByteArray()
@@ -124,7 +126,8 @@ func _render_callback(kind:int,data:RenderData)->void:
  var wanted := _finish_wanted
  var baseline := _baseline.duplicate()
  var generation := _palette_generation
- var edge := _edge_requested and wanted and _reference_enabled and _reference_requested and not _reference_blocked
+ var edge_weight := _edge_weight
+ var edge := edge_weight > 0. and wanted and _reference_enabled and _reference_requested and not _reference_blocked
  var diffusion_active := wanted and _reference_requested and not _reference_blocked
  var humid_weight := _humid_weight if diffusion_active else 0.
  var daylight_haze := _daylight_haze_weight if diffusion_active else 0.
@@ -158,6 +161,7 @@ func _render_callback(kind:int,data:RenderData)->void:
   baseline.encode_float(DAYLIGHT_SHADE_RETENTION_OFFSET, shade_retention)
   baseline.encode_float(DAYLIGHT_AIR_CHROMA_OFFSET, air_chroma)
   baseline.encode_float(DAYLIGHT_SHADOW_EDGE_CONTRAST_OFFSET, shadow_edge_contrast)
+  baseline.encode_float(DISPLAY_EDGE_STRENGTH_OFFSET, edge_weight if edge else 0.)
  var depth_changed := _depth_diffusion.refresh_sources(rd, buffers, depth_mist)
  if depth_changed or wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
@@ -378,26 +382,39 @@ func _append_diffusion_depth(rd: RenderingDevice, uniforms: Array[RDUniform]) ->
  uniforms.append(settings)
  return DepthDiffusion.SHADER
 
-func _prepare_finish_pass(rd: RenderingDevice, fragment: String, framebuffer: RID, uniforms: Array[RDUniform]) -> bool:
+func _prepare_pass(rd: RenderingDevice, fragment: String, framebuffer: RID, uniforms: Array[RDUniform]) -> bool:
  var first := _passes.size()
  var ready := super._prepare_pass(rd, fragment, framebuffer, uniforms)
  if fragment == APPLY and ready and _depth_diffusion.settings_buffer.is_valid():
   _depth_diffusion.uniform_set = _passes[first][2]
  return ready
 
-func _prepare_pass(rd:RenderingDevice,fragment:String,framebuffer:RID,uniforms:Array[RDUniform])->bool:
- if fragment!=APPLY or not _render_edge or not _render_finish or not _reference_requested or _reference_blocked:return _prepare_finish_pass(rd,fragment,framebuffer,uniforms)
- # _color is assigned after _build; borrow source_color texture dimensions instead.
- var source:RID=uniforms[0].get_ids()[1]
- var format:=rd.texture_get_format(source)
- var image:=_texture(rd,format.width,format.height,COLOR_FORMAT)
- if not image.is_valid():_report("error","Display-edge target unsupported");return false
- var target:=_keep(rd.framebuffer_create([image]))
- if not target.is_valid():return false
- if not _prepare_finish_pass(rd,fragment,target,uniforms):return false
- if not _baseline_buffer.is_valid():_report("error","Display edges require owned final color transfer");return false
- var parameters:=RDUniform.new();parameters.uniform_type=RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER;parameters.binding=1;parameters.add_id(_baseline_buffer)
- var linear:=_sampler(rd,RenderingDevice.SAMPLER_FILTER_LINEAR)
- if not linear.is_valid()or not super._prepare_pass(rd,EDGES.FRAGMENT,framebuffer,[_sample(0,linear,image),parameters]):return false
- _report("edge_active",true);_report("edge_bytes",format.width*format.height*4);_report("edge_size",[format.width,format.height]);_report("edge_error","")
+
+func _use_finish_scratch() -> bool:
+ return _render_edge and not _reference_blocked
+
+func _finish_scratch_format(_format: int) -> int:
+ return COLOR_FORMAT
+
+func _prepare_output(rd: RenderingDevice, scratch_fb: RID, scratch: RID, uniforms: Array[RDUniform], encoded: bool) -> bool:
+ if not encoded:
+  return super._prepare_output(rd, scratch_fb, scratch, uniforms, false)
+ if not _prepare_pass(rd, APPLY, scratch_fb, uniforms):
+  return false
+ if not _baseline_buffer.is_valid():
+  _report("error", "Display edges require owned final color transfer")
+  return false
+ var parameters := RDUniform.new()
+ parameters.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+ parameters.binding = 1
+ parameters.add_id(_baseline_buffer)
+ var linear := _sampler(rd, RenderingDevice.SAMPLER_FILTER_LINEAR)
+ if not linear.is_valid() or not super._prepare_pass(rd, EDGES.FRAGMENT, _scene_framebuffer,
+   [_sample(0, linear, scratch), parameters]):
+  return false
+ var format := rd.texture_get_format(scratch)
+ _report("edge_active", true)
+ _report("edge_bytes", 0) # Alias of the existing scene-color scratch target.
+ _report("edge_size", [format.width, format.height])
+ _report("edge_error", "")
  return true

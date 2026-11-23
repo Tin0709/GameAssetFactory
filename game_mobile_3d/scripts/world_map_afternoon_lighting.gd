@@ -45,7 +45,14 @@ func setup(level: Node3D, sky: Node) -> void:
 	var noon := Basis.from_euler(review._day.sun_rotation * (PI / 180.), level.get_node("Sun").rotation_order).z
 	if not noon.is_equal_approx(_vector(proof.noon)):
 		return
-	var west := _air_atlas(air, air.texture, proof.west)
+	var west: ImageTexture3D
+	if not level.afternoon_west_air_payload.is_empty():
+		var calibrated: Dictionary = proof.west.duplicate()
+		calibrated.path = level.afternoon_west_air_payload
+		calibrated.sha256 = level.afternoon_west_air_sha256
+		west = _air_atlas(air, air.texture, calibrated)
+	if west == null:
+		west = _air_atlas(air, air.texture, proof.west)
 	var east := _air_atlas(air, air.east_texture, proof.east)
 	var terrain: ImageTexture3D = level.regional_sky_region._load_volume(proof.terrain.path, proof.terrain.sha256,
 		int(proof.terrain.depth))

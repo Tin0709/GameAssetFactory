@@ -87,6 +87,23 @@ func check_stationary_run(actor: Zombie) -> void:
 	check(samples[0] > after_restart, "Replaying the held clip refreshes its pose even at the same phase")
 	actor.animation.mixer_applied.disconnect(count_sample)
 
+func check_stagger_stance(actor: Zombie, resting_clip: StringName) -> void:
+	var skeleton := actor.ragdoll.skeleton
+	var arm := skeleton.find_bone(&"J_R_Arm")
+	var spawn_pose := skeleton.get_bone_pose(arm)
+	var playback := actor.animation
+	playback.play(resting_clip, 0.0)
+	playback.advance(0.0)
+	var resting_pose := skeleton.get_bone_pose(arm)
+	if actor.is_baby:
+		check(spawn_pose.is_equal_approx(resting_pose), "A&S baby spawn opens in its alerted resting stance")
+	playback.play(STYLED_STAGGER, 0.0)
+	playback.advance(0.0)
+	check(resting_pose.is_equal_approx(skeleton.get_bone_pose(arm)),
+		"A&S stagger preserves this age's resting stance (baby=%s)" % actor.is_baby)
+	playback.play(STYLED_SPAWN, 0.0)
+	playback.advance(0.0)
+
 func check_airborne(lab: Node, group: Node) -> void:
 	for baby: bool in [false, true]:
 		var count := group.get_child_count()
@@ -158,6 +175,8 @@ func run() -> void:
 		check(adult.animation.has_animation(STYLED_RUN), "The adult has a distinct sourced pursuit gait")
 		check(is_equal_approx(adult.animation.get_animation(STYLED_WALK).length, Zombie.ActionsStuff.STRIDE_SECONDS),
 			"Full A&S uses the adult 1.13 patrol cycle")
+		check_stagger_stance(adult, STYLED_IDLE)
+		check_stagger_stance(baby, STYLED_ALERT)
 	select(mode, 0)
 	adult.position = Vector3.ZERO
 	baby.position = Vector3(-32.0, 0.0, 0.0)
