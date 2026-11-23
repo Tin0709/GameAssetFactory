@@ -41,6 +41,7 @@ const BABY_WALL_CHEST_SHIFT := 0.10
 const FLOOR_WALL_MAX_RECOVERY_TRAVEL := 0.20
 
 var _handoff_query_snapshot: Dictionary[PhysicalBone3D, PhysicsShapeQueryParameters3D]
+var _handoff_box_snapshot: Dictionary[PhysicalBone3D, AABB]
 var _handoff_ray_region: AABB
 var _handoff_region_floor: AABB
 var _handoff_region_wall: AABB
@@ -283,8 +284,12 @@ func _handoff_wall_clearance() -> Vector3:
 					var query: PhysicsShapeQueryParameters3D = _handoff_box_queries.get(collider.shape)
 					if query != null:
 						_handoff_query_snapshot[body] = query
+						# Every candidate uses the same local box and collider offset.
+						var size: Vector3 = (collider.shape as BoxShape3D).size
+						_handoff_box_snapshot[body] = AABB(-0.5 * size, size)
 		var shift := _blend_wall_handoff(space, collision_mask, overlaps, bounds)
 		_handoff_query_snapshot.clear()
+		_handoff_box_snapshot.clear()
 		return shift
 	return super._handoff_wall_clearance()
 
@@ -469,18 +474,21 @@ func _find_clear_handoff_parts(region: AABB, floor_bounds: AABB,
 		return clear_parts
 	# Endpoints and midpoints can translate horizontally by at most HANDOFF_MAX_SHIFT.
 	var margin := Vector3(HANDOFF_MAX_SHIFT, 0.0, HANDOFF_MAX_SHIFT) + Vector3.ONE * PROJECTION_COLLISION_MARGIN
-	for name: String in current:
-		var body: PhysicalBone3D = bodies[name]
-		var collider := body.get_child(0) as CollisionShape3D
-		var box := collider.shape as BoxShape3D
-		if box == null:
-			continue
-		var pose: Transform3D = current[name] * collider.transform
-		var bounds := pose * AABB(-0.5 * box.size, box.size)
+	for part: PhysicalPart in _physical_parts:
+		var shape_bounds: AABB = _handoff_box_snapshot.get(part.body, AABB())
+		var pose: Transform3D = current[part.name]
+		if not shape_bounds.has_volume():
+			var collider := part.body.get_child(0) as CollisionShape3D
+			var box := collider.shape as BoxShape3D
+			if box == null:
+				continue
+			pose *= collider.transform
+			shape_bounds = AABB(-0.5 * box.size, box.size)
+		var bounds := pose * shape_bounds
 		bounds.position -= margin
 		bounds.size += 2.0 * margin
 		if region.encloses(bounds) and not bounds.intersects(floor_bounds) and not bounds.intersects(wall_bounds):
-			clear_parts[name] = true
+			clear_parts[part.name] = true
 	return clear_parts
 
 func _wall_blocks_every_handoff_shift(space: PhysicsDirectSpaceState3D, collision_mask: int,
