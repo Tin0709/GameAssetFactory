@@ -771,7 +771,71 @@ func check_wall_entry_rays() -> void:
 		"An exterior ray reaching the same wall interior rejects the pose")
 	fixture.free()
 
+func check_free_arm_at_compound_wall() -> void:
+	var lab: Node3D = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var wall := terrain(lab, Vector3(0, 1.5, 4.50), Vector3(12, 3, 0.30), 0.0)
+	var other := terrain(lab, Vector3(4.50, 1.5, 0), Vector3(0.30, 3, 12), 0.0)
+	other.get_child(0).reparent(wall)
+	other.free()
+	var group := lab.get_node("Zombies")
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	if group.get_child_count() != 1:
+		check(false, "The compound shoulder fixture loads an adult")
+		lab.free()
+		return
+	var zombie := group.get_child(0) as Zombie
+	var ragdoll := zombie.ragdoll
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(0, 3.0, 0)
+	await ticks(1)
+	for sample in 2:
+		ragdoll.sample(1.0 / 60.0)
+	zombie.take_hit(100, Vector3.FORWARD, Vector2.ZERO, 0.0, 1150.0, Zombie.DeathStrike.SABRE_FINISHER)
+	zombie.set_physics_process(true)
+	await ticks(1)
+	zombie.set_physics_process(false)
+	check(ragdoll.running and ragdoll._wall_handoff_frame < 0, "The compound shoulder starts from a clean launch")
+	if not ragdoll.running:
+		lab.free()
+		return
+	var limb: PhysicalBone3D = ragdoll.bodies["Arm.L"]
+	var chest: PhysicalBone3D = ragdoll.bodies.Chest
+	var arm := PhysicsServer3D.body_get_direct_state(limb.get_rid())
+	var core := PhysicsServer3D.body_get_direct_state(chest.get_rid())
+	# Restore the third-step compound-wall sample independently of solver ordering.
+	var start := Transform3D(Basis(Quaternion(-0.19653854, 0.93974185, 0.12168454, -0.25189444)),
+		Vector3(3.00102735, 1.58355558, 3.96992183))
+	core.transform = Transform3D(Basis(Quaternion(-0.00200266, -0.59945297, 0.79507399, 0.09224670)),
+		Vector3(3.90424490, 1.29187953, 3.90114474))
+	var joint: Dictionary = ragdoll.source_joints["Arm.L"]
+	var parent_frame: Transform3D = joint.parent_frame
+	var child_frame: Transform3D = joint.child_frame
+	arm.transform = start
+	arm.linear_velocity = Vector3(-22.0, -8.5, -0.9)
+	var linear := arm.linear_velocity
+	var angular := arm.angular_velocity
+	var orientation := arm.transform.basis
+	var overlap := ragdoll._deepest_contact(ragdoll._terrain_contact_points(limb, arm, Vector3.ZERO))
+	check(arm.get_contact_count() == 0 and overlap > 0.02 and overlap < 0.035,
+		"The released arm still starts inside a shallow wall overlap")
+	ragdoll._slide_wall_shoulder_anchors()
+	var gap := (core.transform * parent_frame).origin.distance_to((arm.transform * child_frame).origin)
+	check(gap < 0.06 and ragdoll._terrain_contact_points(limb, arm, Vector3.ZERO).is_empty(),
+		"The free shoulder can return to its source anchor through a clear path")
+	check(arm.transform.basis.is_equal_approx(orientation) and arm.linear_velocity == linear and arm.angular_velocity == angular,
+		"The shoulder correction preserves rotation and rebound velocities")
+	print("LAB_COMPOUND_FREE_ARM gap=", gap, " start_overlap=", overlap)
+	lab.free()
+
+
 func run() -> void:
+	if OS.get_cmdline_user_args().has("--compound-free-arm"):
+		await check_free_arm_at_compound_wall()
+		print("LAB_COMPOUND_ARM failures=", failures)
+		quit(0 if failures.is_empty() else 1)
+		return
 	if OS.get_cmdline_user_args().has("--rotated-wall-arm"):
 		await check_corner_ragdoll(24, 4.90, true, -1.0, 0.18, Zombie.DeathStrike.SABRE_FINISHER,
 			1150.0, false, CornerFixture.NONE, Vector2.ONE, deg_to_rad(27.0), Zombie.ActionsStuff.ATTACK)

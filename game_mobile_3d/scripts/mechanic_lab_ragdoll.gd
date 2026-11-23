@@ -1940,6 +1940,15 @@ func _slide_wall_shoulder_anchors() -> void:
 			if not _is_fixed_wall(wall) or absf(normal.y) >= MAX_WALL_NORMAL_Y:
 				continue
 			var normal_gap := gap.dot(normal)
+			if swept and not use_tuned_wall_sweep and normal_gap > 0.0 \
+					and _projection_hit.get_collision_safe_fraction() == 0.0:
+				# A shallow starting overlap can stop a forward cast even
+				# when the correction points away from the wall.
+				var pose := state.transform
+				var recovery := gap * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
+				_project_contacting_anchor(limb, state, recovery, true)
+				if state.transform != pose:
+					break
 			# An arm rebounding from the wall can also close a tangential
 			# gap while the torso is free. Leave wall-normal motion to physics.
 			var rebounding := normal_gap < 0.0 and free_torso \
@@ -1981,7 +1990,8 @@ func _restore_arm_across_wall(limb: PhysicalBone3D, state: PhysicsDirectBodyStat
 		var near_normal: Vector3 = hit.normal
 		var entry: Vector3 = hit.position
 		var retreat := near_normal * (near_normal.dot(entry - arm) + 2.0 * PROJECTION_COLLISION_MARGIN)
-		if (gap - retreat).length_squared() >= gap.length_squared() 				or _test_projection_motion(limb, state.transform, retreat, wall):
+		if (gap - retreat).length_squared() >= gap.length_squared() \
+				or _test_projection_motion(limb, state.transform, retreat, wall):
 			continue
 		state.transform = state.transform.translated(retreat)
 		state.linear_velocity -= near_normal * minf(state.linear_velocity.dot(near_normal), 0.0)
