@@ -1048,7 +1048,7 @@ func _constrain_free_anchor_motion(body: PhysicalBone3D, state: PhysicsDirectBod
 		motion: Vector3) -> Vector3:
 	if motion.y >= 0.0 or not is_instance_valid(_flat_floor) or _flat_floor.disabled:
 		return motion
-	var early_baby_leg := (use_baby_floor_anchors and not use_tuned_wall_sweep
+	var early_baby_leg: bool = (not floor_landing_blended and use_baby_floor_anchors and not use_tuned_wall_sweep
 		and Vector2(motion.x, motion.z).length_squared() > BABY_SUPPORTED_LEG_SLIDE_GAP ** 2
 		and (body == bodies["Leg.L"] or body == bodies["Leg.R"]))
 	if not floor_landing_blended and not early_baby_leg:
