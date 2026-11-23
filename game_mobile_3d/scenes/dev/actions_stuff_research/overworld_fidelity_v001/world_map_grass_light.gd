@@ -1,5 +1,6 @@
 extends RefCounted
 ## Captured parameter stays external; lighting response is independently authored.
+const FarShadowReceivers := preload("res://scripts/world_map_far_shadow_receivers.gd")
 const GROUND_SKY_PATH = "res://assets/graphics/world_map_terrain_transport_v001/grass_sky.res"
 var world:Node3D
 var configured:=false
@@ -51,7 +52,8 @@ func supported()->bool:
 
 func restore()->void:
 	for row:Dictionary in _records:
-		if preload("res://scripts/world_map_atmosphere_volume.gd").base_shader(row.material.shader)==row.variant:row.material.shader=row.original
+		if FarShadowReceivers.authored_shader(row.material.shader) == row.variant:
+			row.material.shader = row.original
 	_records.clear();active=false;edge_sampling_active=false
 	_ground_sky_state=Vector4.INF
 	_grass_shade_color = Vector3.INF
@@ -72,7 +74,7 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 	if not enabled or not supported():return
 	for material:ShaderMaterial in materials:
 		if material.get_shader_parameter("tinted_grass")!=true:continue
-		var source:Shader=preload("res://scripts/world_map_atmosphere_volume.gd").base_shader(material.shader)
+		var source := FarShadowReceivers.authored_shader(material.shader)
 		var variants:Dictionary=_variants.get_or_add(source,{})
 		if not variants.has(edge_sampling):
 			var variant:=Shader.new();variant.resource_name="Grass lighting · captured world normal"
