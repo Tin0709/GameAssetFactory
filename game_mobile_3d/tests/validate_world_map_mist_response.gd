@@ -34,4 +34,10 @@ func _initialize():
  host.hour=7.;host.phase_air.anchors=[]
  var missing={"scatter_energy":.25};host._apply_mist_source(missing,{"linear_scatter":Vector3.ONE},Vector3.ONE)
  check(missing.scatter_energy==.25,"missing proof")
+ var forest_profile := load("res://assets/graphics/biomes/forest_reference.tres") as Resource
+ var scatter_track := forest_profile.get("mist_front_scatter_by_hour") as Curve
+ check(scatter_track != null and is_equal_approx(scatter_track.sample(.375),1.2),"Forest brings in-scattering forward at 09:00")
+ if scatter_track != null:
+  for time:float in [7.,12.,16.5,19.5,22.]:
+   check(scatter_track.sample(time/24.)==0.,"Approved phase keeps the earlier scattering depth: "+str(time))
  print("MIST_SOURCE_UNIT checks=",checks," failures=",JSON.stringify(failures));host.free();quit(0 if failures.is_empty()else 1)
