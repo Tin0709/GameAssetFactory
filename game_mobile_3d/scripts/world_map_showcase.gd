@@ -230,6 +230,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"cool_shadow_detail": ["Cool shadow detail", 1.],
 	&"daylight_shadow_grade": ["Dịu sắc xanh trong bóng ban ngày", 1.],
 	&"daylight_shadow_luminance": ["Chi tiết vùng râm sáng và chiều", 1.],
+	&"daylight_shadow_edge_contrast": ["Tương phản rìa bóng râm", 1.],
 	&"daylight_green_grade": ["Dịu màu cỏ và lá trong bóng", 1.],
 	&"spruce_sky": ["Forest canopy sky", 1.],
 	&"canopy_edge_fill": ["Ánh trời rìa tán", 1.],
@@ -361,7 +362,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 228
+const LIGHTING_MIX_VERSION := 229
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -3240,6 +3241,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 228 and effect == &"mist_front_transfer":
 			missing_value = 0.
+		if version < 229 and effect == &"daylight_shadow_edge_contrast":
+			missing_value = 0.
 		if version < 219 and effect == &"stone_top_shadow_fill":
 			missing_value = 0.
 		if version < 217 and effect == &"stone_foot_fill":
@@ -3561,6 +3564,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and _daylight_shade_retention_editable()
 		if effect == &"daylight_shadow_luminance":
 			slider.editable = slider.editable and phase_finish != null and phase_finish.available()
+		if effect == &"daylight_shadow_edge_contrast":
+			slider.editable = slider.editable and _shadow_edge_contrast_editable()
 		if effect == &"twilight_shadow_lift":
 			slider.editable = slider.editable and phase_finish != null and phase_finish.available() and sky_response.twilight_available()
 		if effect == &"twilight_soft_bloom":
@@ -3728,7 +3733,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_publish_stone_twilight_color()
 		return
 	if changed_effect in [&"twilight_shadow_color", &"cool_shadow_detail", &"daylight_shadow_grade",
-			&"daylight_green_grade", &"daylight_shadow_luminance"]:
+			&"daylight_green_grade", &"daylight_shadow_luminance", &"daylight_shadow_edge_contrast"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -4096,6 +4101,16 @@ func daylight_shadow_luminance() -> float:
 	if _biome_profile == null:
 		return 0.
 	return _daylight_grade_phase() * _biome_profile.daylight_shadow_luminance_scale * _lighting_scale(&"daylight_shadow_luminance")
+
+func daylight_shadow_edge_contrast() -> float:
+	if _biome_profile == null:
+		return 0.
+	return _daylight_grade_phase() * _biome_profile.daylight_shadow_edge_contrast \
+		* _lighting_scale(&"daylight_shadow_edge_contrast")
+
+func _shadow_edge_contrast_editable() -> bool:
+	return _biome_profile != null and _biome_profile.daylight_shadow_edge_contrast > 0. \
+		and phase_finish != null and phase_finish.available() and DepthDiffusion.supported(level.get_viewport())
 
 func daylight_green_grade_weight() -> float:
 	if _biome_profile == null:
@@ -4655,6 +4670,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.editable = slider.editable and _mist_entry_depth_available()
 		if effect == &"mist_front_transfer":
 			slider.editable = _mist_front_transfer_available()
+		if effect == &"daylight_shadow_edge_contrast":
+			slider.editable = _shadow_edge_contrast_editable()
 		if effect == &"basin_sunlit_mist":
 			slider.editable = directional_air.region_available()
 		if effect == &"east_sunlit_mist":

@@ -162,6 +162,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export var shadow_grade_recovery_by_hour: Curve
 ## Maximum luminance gain for shaded detail under the same hour curve.
 @export_range(0., .52, .01) var daylight_shadow_luminance_scale := 0.
+## Fraction of the detail lift withheld where daylight bloom already fills a shadow.
+@export_range(0., 1., .01) var daylight_shadow_edge_contrast := 0.
 ## Fraction of the daylight shadow lift retained as contrast behind the fog entry.
 @export_range(0., 1., .01) var daylight_shade_retention := 0.
 ## Blends the mist source color into normally exposed distant shadows in the depth-aware finish.

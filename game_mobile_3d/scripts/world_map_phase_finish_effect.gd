@@ -9,6 +9,7 @@ const DAYLIGHT_GREEN_GRADE_OFFSET := 68
 const DAYLIGHT_SHADOW_LUMINANCE_OFFSET := 72
 const DAYLIGHT_SHADE_RETENTION_OFFSET := 76
 const DAYLIGHT_AIR_CHROMA_OFFSET := 80
+const DAYLIGHT_SHADOW_EDGE_CONTRAST_OFFSET := 84
 var _edge_requested:=false
 var _render_edge:=false
 var _reported_size:=Vector2i.ZERO
@@ -33,6 +34,7 @@ var _twilight_shadow_weight := 0.
 var _daylight_shadow_grade := 0.
 var _daylight_green_grade := 0.
 var _daylight_shadow_luminance := 0.
+var _daylight_shadow_edge_contrast := 0.
 var _bloom_diffusion_mix := 0.
 var _depth_diffusion := DepthDiffusion.new()
 var _humid_depth := PackedByteArray()
@@ -70,6 +72,11 @@ func set_daylight_green_grade(weight: float) -> void:
 func set_daylight_shadow_luminance(gain: float) -> void:
  _guard.lock()
  _daylight_shadow_luminance = clampf(gain, 0., .52) if is_finite(gain) else 0.
+ _guard.unlock()
+
+func set_daylight_shadow_edge_contrast(weight: float) -> void:
+ _guard.lock()
+ _daylight_shadow_edge_contrast = clampf(weight, 0., 1.) if is_finite(weight) else 0.
  _guard.unlock()
 
 func set_bloom_diffusion(weight: float) -> void:
@@ -132,6 +139,7 @@ func _render_callback(kind:int,data:RenderData)->void:
  var daylight_shadow_grade := _daylight_shadow_grade if wanted and _reference_enabled else 0.
  var daylight_green_grade := _daylight_green_grade if wanted and _reference_enabled else 0.
  var daylight_shadow_luminance := _daylight_shadow_luminance if wanted and _reference_enabled else 0.
+ var shadow_edge_contrast := _daylight_shadow_edge_contrast if diffusion_active else 0.
  var bloom_diffusion_mix := _bloom_diffusion_mix if diffusion_active else 0.
  _guard.unlock()
  if not baseline.is_empty():
@@ -149,6 +157,7 @@ func _render_callback(kind:int,data:RenderData)->void:
   baseline.encode_float(DAYLIGHT_SHADOW_LUMINANCE_OFFSET, daylight_shadow_luminance)
   baseline.encode_float(DAYLIGHT_SHADE_RETENTION_OFFSET, shade_retention)
   baseline.encode_float(DAYLIGHT_AIR_CHROMA_OFFSET, air_chroma)
+  baseline.encode_float(DAYLIGHT_SHADOW_EDGE_CONTRAST_OFFSET, shadow_edge_contrast)
  var depth_changed := _depth_diffusion.refresh_sources(rd, buffers, depth_mist)
  if depth_changed or wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
@@ -204,7 +213,7 @@ func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUnifor
 layout(set=0,binding=6,std430)readonly buffer Baseline{vec4 base[];};
 vec3 gaf_display(vec3 c){return mix(12.92*c,1.055*pow(max(c,vec3(0.)),vec3(1./2.4))-.055,greaterThan(c,vec3(.0031308)));}
 vec3 gaf_filmic(vec3 c){return ((c*(.88*c+.06)+.002)/(c*(.88*c+.6)+.06))-(.01/.3);}
-vec3 diffuse_humid_light(vec3 source, vec3 surrounding, vec2 uv, inout float shadow_depth, inout vec3 incident_air){
+vec3 diffuse_humid_light(vec3 source, vec3 surrounding, vec2 uv, inout float shadow_depth, inout vec3 incident_air, inout float subject_depth_delta){
  float y = dot(source, luma);
  float nearby = dot(surrounding, luma);
  float separation = length((uv - base[2].xy) * base[2].zw);
@@ -279,9 +288,9 @@ vec3 match_air_chroma(vec3 color, vec3 incident_air, float depth_weight, vec2 uv
  float mix_weight = clamp(base[5].x * depth_weight * actor * shade, 0.0, 0.72);
  return mix(color, target, mix_weight);
 }
-vec3 lift_shaded_detail(vec3 color, float shadow_depth) {
+vec3 lift_shaded_detail(vec3 color, float shadow_depth, float preserve_contrast) {
  // Keep the foreground's detail lift. Reduce it smoothly where the existing mist builds up.
- float gain = base[4].z * (1.0 - base[4].w * shadow_depth);
+ float gain = base[4].z * (1.0 - base[4].w * shadow_depth) * (1.0 - preserve_contrast);
  if (gain <= 0.0) return color;
  float luminance = dot(color, luma);
  // Preserve the darkest contacts and sunlit faces. A shared RGB gain retains the shadow hue.
@@ -291,7 +300,7 @@ vec3 lift_shaded_detail(vec3 color, float shadow_depth) {
 """
  var diffusion_condition := "base[1].w > 0."
  if not depth_shader.is_empty():
-  helpers = depth_shader + helpers.replace("float limit = .58 * max(y, .022);", """vec2 depth_sample = gaf_diffusion_depth_sample(uv, incident_air);
+  helpers = depth_shader + helpers.replace("float limit = .58 * max(y, .022);", """vec2 depth_sample = gaf_diffusion_depth_sample(uv, incident_air, subject_depth_delta);
  shadow_depth = depth_sample.y;
  float depth_scale = depth_sample.x;
  weight *= mix(1.0, depth_scale, diffusion_depth.layer.w);
@@ -307,13 +316,21 @@ vec3 lift_shaded_detail(vec3 color, float shadow_depth) {
  weight += day_mix;""")
   diffusion_condition += " || base[3].y > 0. || base[5].x > 0."
  fragment=fragment.replace("void main() {",helpers+"void main() {")
- fragment=fragment.replace("if (air.x > 0.0) {", "vec2 shade_uv = vec2(0.0); vec3 incident_air = vec3(0.0); float shadow_depth = 0.0; if (air.x > 0.0 || air.y >= 2.0) {")
- fragment=fragment.replace("adjusted += spread * (air.x * bloom_gain);","if (" + diffusion_condition + ") { shade_uv = uv_air; adjusted = diffuse_humid_light(adjusted, spread, uv_air, shadow_depth, incident_air); }" + """
+ fragment=fragment.replace("if (air.x > 0.0) {", "vec2 shade_uv = vec2(0.0); vec3 incident_air = vec3(0.0); float shadow_depth = 0.0; float subject_depth_delta = 1e4; float preserve_contrast = 0.0; if (air.x > 0.0 || air.y >= 2.0) {")
+ fragment=fragment.replace("adjusted += spread * (air.x * bloom_gain);","if (" + diffusion_condition + ") { shade_uv = uv_air; adjusted = diffuse_humid_light(adjusted, spread, uv_air, shadow_depth, incident_air, subject_depth_delta); }" + """
   // Use the existing bloom samples to soften bright-to-dark transitions before tonemapping.
   if (base[3].w > 0.0 && air.x > 0.0) {
    adjusted += (spread - adjusted) * min(air.x * base[3].w, 0.48);
   }
-  adjusted += spread * (air.x * bloom_gain);
+  vec3 bloom_light = spread * (air.x * bloom_gain);
+  if (base[5].y > 0.0 && subject_depth_delta < 5.5) {
+   // Keep the late detail lift from filling a shadow already brightened by bloom.
+   float bloom_ratio = dot(bloom_light, luma) / max(dot(adjusted, luma), .018);
+   float outside_actor = smoothstep(1.0, 1.65, length((shade_uv - base[2].xy) * base[2].zw));
+   float near_subject = 1.0 - smoothstep(1.2, 5.5, subject_depth_delta);
+   preserve_contrast = base[5].y * smoothstep(.035, .15, bloom_ratio) * outside_actor * near_subject;
+  }
+  adjusted += bloom_light;
  """)
  fragment=fragment.replace("if (settings.x <= 0.0 && air.x <= 0.0)","if (settings.x < 0.0)")
  fragment=fragment.replace("result=vec4(inverse_display(clamp(display,0.,1.)),color.a);", """
@@ -322,7 +339,7 @@ vec3 lift_shaded_detail(vec3 color, float shadow_depth) {
   vec3 previous_finish = recover_twilight_shadow_color(mixed_finish, original_finish);
   vec3 neutral_finish = recover_daylight_shadow_color(mixed_finish, original_finish, previous_finish);
   vec3 finish = recover_green_shade(neutral_finish, original_finish);
-  vec3 shaded = lift_shaded_detail(finish, shadow_depth);
+  vec3 shaded = lift_shaded_detail(finish, shadow_depth, preserve_contrast);
   result = vec4(match_air_chroma(shaded, incident_air, shadow_depth, shade_uv), color.a);
  """)
  if _render_edge:
