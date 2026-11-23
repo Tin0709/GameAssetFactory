@@ -147,6 +147,7 @@ func run() -> void:
 	# This arm enters the box on the first solve and exits on the second.
 	await check_source_attack_wall_crossing(1816, Vector3(4.071743, 0.02, 4.088961), 2.74148535728455,
 		0.227994393575615, Vector3(0.702169, 0.0, 0.71201))
+	await check_source_attack_corner_anchors()
 	print("LAB_BABY_ZOMBIE speed=", peak_speed, " damage=", hits, " steps=", step_phases.size(),
 		" joint_gap=", peak_gap, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
@@ -169,23 +170,7 @@ func check_source_attack_wall_crossing(serial: int, start: Vector3, yaw: float,
 	wall.add_child(collider)
 	lab.add_child(wall)
 	wall.position = Vector3(4.5, 1.5, -1.85)
-	group._spawn_serial = serial
-	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
-	var baby := group.get_child(0) as Zombie
-	baby.set_physics_process(false)
-	baby.position = start
-	baby.rotation.y = yaw
-	baby.animation.stop()
-	baby.ragdoll.skeleton.reset_bone_poses()
-	baby.animation.play(Zombie.ActionsStuff.ATTACK)
-	baby.animation.advance(0.0)
-	baby.animation.seek(attack_time, true)
-	await physics_frame
-	await physics_frame
-	baby.ragdoll.sample(1.0 / 60.0)
-	baby.ragdoll.sample(1.0 / 60.0)
-	baby.take_hit(100, direction.normalized(), Vector2.ZERO, 0.0, 1150.0, Zombie.DeathStrike.SABRE_FINISHER)
-	baby.set_physics_process(true)
+	var baby := await start_source_attack_death(group, serial, start, yaw, attack_time, direction)
 	var far_face := wall.position.x + shape.size.x * 0.5
 	var peak_x := -INF
 	var sampled := 0
@@ -202,6 +187,62 @@ func check_source_attack_wall_crossing(serial: int, start: Vector3, yaw: float,
 		"Baby attack pose %d keeps the arm from crossing the wall during handoff" % serial)
 	print("LAB_BABY_AS_ATTACK_WALL serial=", serial, " samples=", sampled, " peak_x=", peak_x, " far_face=", far_face)
 	lab.free()
+
+func check_source_attack_corner_anchors() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group: Node = lab.get_node("Zombies")
+	if not group.full_actions_stuff_available:
+		lab.free()
+		return
+	var wall := StaticBody3D.new()
+	for box: Array in [[Vector3(4.5, 1.5, -1.85), Vector3(0.30, 3.0, 12.4)],
+			[Vector3(-1.70, 1.5, 4.5), Vector3(12.7, 3.0, 0.30)]]:
+		var shape := BoxShape3D.new()
+		shape.size = box[1]
+		var collider := CollisionShape3D.new()
+		collider.shape = shape
+		collider.position = box[0]
+		wall.add_child(collider)
+	lab.add_child(wall)
+	wall.rotation.y = deg_to_rad(27.0)
+	# The attacking arms are past perpendicular when one hits the wall.
+	var baby := await start_source_attack_death(group, 1814, wall.to_global(Vector3(3.999337, 0.02, 3.975852)),
+		wall.rotation.y - 0.432244300842285, 0.40374709769069,
+		wall.global_basis * Vector3(0.754494, 0.0, 0.656307))
+	var gap := 0.0
+	for frame in 160:
+		await physics_frame
+		if baby._corpse_parked:
+			break
+		if baby.ragdoll.running:
+			gap = maxf(gap, baby.ragdoll.max_anchor_error())
+	check(gap > 0.0 and gap < 0.25 and baby._corpse_parked,
+		"The attacking baby settles at the corner without a large source joint stretch")
+	print("LAB_BABY_AS_CORNER_ANCHORS gap=", gap, " parked=", baby._corpse_parked)
+	lab.free()
+
+func start_source_attack_death(group: Node, serial: int, start: Vector3, yaw: float,
+		attack_time: float, direction: Vector3) -> Zombie:
+	group._spawn_serial = serial
+	group.get_node("../HUD/SpawnBabyZombie").pressed.emit()
+	var baby := group.get_child(0) as Zombie
+	baby.set_physics_process(false)
+	baby.position = start
+	baby.rotation.y = yaw
+	baby.animation.stop()
+	baby.ragdoll.skeleton.reset_bone_poses()
+	baby.animation.play(Zombie.ActionsStuff.ATTACK)
+	baby.animation.advance(0.0)
+	baby.animation.seek(attack_time, true)
+	await physics_frame
+	await physics_frame
+	baby.ragdoll.sample(1.0 / 60.0)
+	baby.ragdoll.sample(1.0 / 60.0)
+	baby.take_hit(100, direction.normalized(), Vector2.ZERO, 0.0, 1150.0, Zombie.DeathStrike.SABRE_FINISHER)
+	baby.set_physics_process(true)
+	return baby
 
 func check_prewarmed_spawn() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()

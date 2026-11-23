@@ -61,6 +61,7 @@ var use_tuned_floor_support := false
 var use_baby_floor_anchors := false
 var reconcile_attack_shoulders := false
 var sweep_baby_attack_handoff := false
+var _baby_attack_near_wall := false
 var _baby_wall_anchors := false
 var _baby_waiting_for_wall_contact := false
 var wall_handoff_animation: AnimationPlayer
@@ -286,10 +287,19 @@ func prepare_source_joints() -> void:
 func _build_source_joints() -> void:
 	if _prepared_source_joints.is_empty():
 		super._build_source_joints()
+	else:
+		for projection in _prepared_source_joints:
+			_attach_source_joint(projection)
+		_prepared_source_joints.clear()
+	if not _baby_attack_near_wall:
 		return
-	for projection in _prepared_source_joints:
-		_attach_source_joint(projection)
-	_prepared_source_joints.clear()
+	# Use the same reduced bias as the live solver for cones already past
+	# perpendicular. The first wall contact can arrive before its first update.
+	for joint: PhysicalPart in _source_anchor_projections:
+		var parent_pose: Transform3D = current[source_joints[joint.name].parent] * joint.parent_frame
+		var child_pose: Transform3D = current[joint.name] * joint.child_frame
+		if parent_pose.basis.x.dot(child_pose.basis.x) <= 0.0:
+			_set_source_joint_bias(joint.joint, CONE_OVERSHOOT_BIAS)
 
 func sample(delta: float) -> void:
 	# Both dictionaries keep the same body keys, so the older buffer can be overwritten.
@@ -313,6 +323,7 @@ func prepare_handoff_samples(delta: float, verify_transform: bool) -> void:
 	sample(delta)
 
 func _handoff_wall_clearance() -> Vector3:
+	_baby_attack_near_wall = false
 	if not is_instance_valid(_flat_floor):
 		return super._handoff_wall_clearance()
 	var shoulder_blocked_by_wall := reconcile_attack_shoulders and _fit_attack_shoulders()
@@ -340,6 +351,11 @@ func _handoff_wall_clearance() -> Vector3:
 	_handoff_bounds_query.collision_mask = collision_mask
 	var space := skeleton.get_world_3d().direct_space_state
 	var overlaps := space.intersect_shape(_handoff_bounds_query, 2)
+	if sweep_baby_attack_handoff and not use_tuned_wall_sweep:
+		for overlap: Dictionary in overlaps:
+			if overlap.collider != _flat_floor.get_parent() and _is_fixed_wall(overlap.collider):
+				_baby_attack_near_wall = true
+				break
 	if overlaps.is_empty():
 		return Vector3.ZERO
 	if overlaps.size() == 1 and _is_floor_top_overlap(overlaps[0].rid, bounds):
