@@ -1,8 +1,11 @@
 extends RefCounted
 
 const PACK_FILE := "source/pack/animations/f2da1072.json"
-const PACK_HASH := "22fcee4689ab7507b73975fc36a3f9e78f18e2d03671dbf74eb2bf5e40615083"
 const MOVE_BABY := "animation.oreville_ans.spjybv"
+# Byte range of the complete named animation entry in the A&S 1.13 source pack.
+const CLIP_OFFSET := 3677420
+const CLIP_SIZE := 1212
+const CLIP_HASH := "ba5752e0566f81ad0d7603220531f8967a5bd8c94c1668909231a6cb007731e4"
 const SOURCE_PIXEL := 0.675 / 12.0
 const CHANNELS := {
 	&"Hips": "waist", &"Chest": "body", &"Neck": "head",
@@ -57,11 +60,9 @@ static func build(idle: Animation, rate: float) -> Animation:
 	if root.is_empty():
 		var project := ProjectSettings.globalize_path("res://").simplify_path().trim_suffix("/")
 		root = project.get_base_dir().get_base_dir().path_join("ACT-Research-1.13")
-	var path := root.path_join(PACK_FILE)
-	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != PACK_HASH:
+	var source := _read_source_clip(root.path_join(PACK_FILE))
+	if source.is_empty():
 		return null
-	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
-	var source: Dictionary = data.animations[MOVE_BABY]
 	var clip := Animation.new()
 	clip.length = float(source.animation_length)
 	clip.loop_mode = Animation.LOOP_LINEAR
@@ -91,3 +92,17 @@ static func build(idle: Animation, rate: float) -> Animation:
 			clip.position_track_insert_key(location_track, time, pos)
 			clip.rotation_track_insert_key(rotation_track, time, pose.normalized())
 	return clip
+
+static func _read_source_clip(path: String) -> Dictionary:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null or file.get_length() < CLIP_OFFSET + CLIP_SIZE:
+		return {}
+	# Parse just the verified clip so startup does not load the rest of the pack.
+	file.seek(CLIP_OFFSET)
+	var bytes := file.get_buffer(CLIP_SIZE)
+	var digest := HashingContext.new()
+	if (bytes.size() != CLIP_SIZE or digest.start(HashingContext.HASH_SHA256) != OK
+			or digest.update(bytes) != OK or digest.finish().hex_encode() != CLIP_HASH):
+		return {}
+	var data: Dictionary = JSON.parse_string("{" + bytes.get_string_from_utf8() + "}")
+	return data[MOVE_BABY]
