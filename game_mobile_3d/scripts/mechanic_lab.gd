@@ -322,6 +322,12 @@ func _ready() -> void:
 		$Zombies.health_bars = bars
 		$Zombies.setup_combat(player)
 		gait_picker.set_item_disabled(1, not $Zombies.actions_stuff_available)
+		if $Zombies.full_actions_stuff_available:
+			gait_picker.select(1)
+			$Zombies.set_actions_stuff_animation(true)
+		elif $Zombies.actions_stuff_available:
+			gait_picker.set_item_text(1, "Zombie · A&S cơ bản")
+			gait_picker.set_item_tooltip(1, "Cần thư viện Actions & Stuff 1.13 để dùng đủ animation.")
 		var glyphs: Array[Texture2D] = $Zombies.damage_digits()
 		if glyphs.size() == DamageNumbers.DIGIT_COUNT:
 			var numbers := DamageNumbers.new()

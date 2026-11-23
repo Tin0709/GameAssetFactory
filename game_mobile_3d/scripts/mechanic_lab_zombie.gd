@@ -40,6 +40,7 @@ const WALK_STEP_NOTIFIES := {
 		Vector3((Gait.PLANT + 0.5) * Gait.RUN_DURATION, -0.125, EXPRESSIVE_RUN_REACH)],
 	# Source stride touchdown near 0.30 s left and 0.73 s right.
 	ActionsStuff.MOVE: [Vector3(0.30, 0.125, 0.24), Vector3(0.73, -0.125, 0.16)],
+	ActionsStuff.PURSUIT: [Vector3(0.30, 0.125, 0.24), Vector3(0.73, -0.125, 0.16)],
 }
 const STEP_MIN_SPEED_SQUARED := 0.15 * 0.15
 const SPAWN := &"Zombie_Spawn"
@@ -543,6 +544,7 @@ func _physics_process(delta: float) -> void:
 		_blocked_walk = crowd_walking and is_on_floor() and is_on_wall() \
 			and get_real_velocity().slide(Vector3.UP).length_squared() < BLOCKED_WALK_MAX_SPEED_SQUARED
 		_update_walk_blocker(destination)
+	_update_air_animation(travel)
 	_advance_animation(delta, travel)
 	ragdoll.sample(delta)
 
@@ -651,7 +653,7 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 		_idle_audio_phase = 0.0
 	if state != ATTACK:
 		var expressive := Gait.is_gait(clip)
-		var source_stride := clip == ActionsStuff.MOVE
+		var source_stride := clip == ActionsStuff.MOVE or clip == ActionsStuff.PURSUIT
 		var play_steps := (not _skipped_blocked_step and clip in WALK_STEP_NOTIFIES and is_on_floor()
 			and step_audio.has_connections())
 		if play_steps or expressive or source_stride:
@@ -728,7 +730,7 @@ func _emit_idle_audio(previous_phase: float, phase: float) -> void:
 func _emit_walk_step(clip: StringName, previous_phase: float) -> void:
 	var phase := animation.current_animation_position
 	var wrapped := phase < previous_phase
-	if clip == ActionsStuff.MOVE:
+	if clip == ActionsStuff.MOVE or clip == ActionsStuff.PURSUIT:
 		var end := phase + animation.current_animation_length if wrapped else phase
 		var baby_stride := _has_source_baby_stride()
 		var contacts: Array = ActionsStuff.BABY_CONTACTS if baby_stride else WALK_STEP_NOTIFIES[clip]
@@ -1227,7 +1229,7 @@ func _confirm_windup_target(point: Vector3) -> bool:
 
 func _living_state(clip: StringName) -> StringName:
 	match clip:
-		ActionsStuff.IDLE: return IDLE
+		ActionsStuff.IDLE, ActionsStuff.ALERT: return IDLE
 		ActionsStuff.SPAWN: return SPAWN
 		ActionsStuff.ATTACK: return ATTACK
 		ActionsStuff.STAGGER: return STAGGER
@@ -1236,13 +1238,18 @@ func _living_state(clip: StringName) -> StringName:
 func _living_clip(clip: StringName) -> StringName:
 	if actions_stuff_animation and animation.has_animation(ActionsStuff.IDLE):
 		match clip:
-			IDLE: return ActionsStuff.IDLE
+			IDLE:
+				if animation.has_animation(ActionsStuff.ALERT) and (is_baby or _target_aggressive):
+					return ActionsStuff.ALERT
+				return ActionsStuff.IDLE
 			SPAWN: return ActionsStuff.SPAWN
 			ATTACK: return ActionsStuff.ATTACK
 			STAGGER: return ActionsStuff.STAGGER
 	return clip
 
 func _play_loop(clip: StringName) -> void:
+	if actions_stuff_animation and not is_on_floor() and _is_air_clip(animation.current_animation):
+		return
 	clip = _living_clip(clip)
 	if animation.current_animation != clip:
 		animation.play(clip, 0.13)
@@ -1251,12 +1258,21 @@ func _play_gait() -> void:
 	var clip := _walk_clip
 	if actions_stuff_animation and animation.has_animation(ActionsStuff.MOVE):
 		clip = ActionsStuff.MOVE
+		if _target_aggressive and animation.has_animation(ActionsStuff.PURSUIT):
+			clip = ActionsStuff.PURSUIT
 	elif expressive_gait:
 		clip = Gait.RUN if _target_aggressive else Gait.WALK
 	var previous := animation.current_animation
 	if clip == previous:
 		return
-	if (clip == ActionsStuff.MOVE or previous == ActionsStuff.MOVE
+	if ((clip == ActionsStuff.MOVE and previous == ActionsStuff.PURSUIT)
+			or (clip == ActionsStuff.PURSUIT and previous == ActionsStuff.MOVE)):
+		# The source walk and pursuit have the same leg keys every 0.75 s.
+		var phase := fposmod(animation.current_animation_position, ActionsStuff.STRIDE_SECONDS)
+		animation.play(clip, 0.13)
+		animation.seek(phase)
+		return
+	if (clip in [ActionsStuff.MOVE, ActionsStuff.PURSUIT] or previous in [ActionsStuff.MOVE, ActionsStuff.PURSUIT]
 			or previous not in WALK_STEP_NOTIFIES or not (expressive_gait or Gait.is_gait(previous))):
 		_play_loop(clip)
 		return
@@ -1265,6 +1281,31 @@ func _play_gait() -> void:
 	var phase := fposmod(progress - Gait.plant_phase(previous) + Gait.plant_phase(clip), 1.0)
 	animation.play(clip, 0.13)
 	animation.seek(phase * animation.current_animation_length)
+
+func _is_air_clip(clip: StringName) -> bool:
+	return clip == ActionsStuff.JUMP or clip == ActionsStuff.FALL
+
+func _update_air_animation(travel: Vector3) -> void:
+	if not actions_stuff_animation or not animation.has_animation(ActionsStuff.FALL):
+		return
+	var current := animation.current_animation
+	if is_on_floor():
+		if _is_air_clip(current):
+			if travel.is_zero_approx():
+				_play_loop(IDLE)
+			else:
+				_play_gait()
+		return
+	var living := _living_state(current)
+	if living == ATTACK or living == SPAWN or living == STAGGER:
+		return
+	var next := current
+	if velocity.y < -0.5:
+		next = ActionsStuff.FALL
+	elif velocity.y > 0.5 and current != ActionsStuff.FALL:
+		next = ActionsStuff.JUMP
+	if next != current:
+		animation.play(next, 0.16 if next == ActionsStuff.FALL else 0.24)
 
 func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE,
 		stagger: float = MAX_POISE, knockback_strength: float = 500.0, death_strike := DeathStrike.GROUND,
