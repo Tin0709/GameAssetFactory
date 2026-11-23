@@ -100,6 +100,7 @@ func run() -> void:
 	lab.free()
 	await check_prewarmed_spawn()
 	await check_spawn_during_prewarm()
+	await check_exit_during_prewarm()
 	await check_tuned_contact(26)
 	await check_tuned_contact(13, 0.0, 0.90)
 	await check_tuned_contact(25, 27.0, 1.00)
@@ -195,6 +196,22 @@ func check_spawn_during_prewarm() -> void:
 	check(group.get_child_count() == 1 and group.get("_baby_visual") == packed,
 		"Resuming prewarm does not rebuild the completed rig or spawn an extra zombie")
 	lab.free()
+
+func check_exit_during_prewarm() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group: Node = lab.get_node("Zombies")
+	var staged: Node3D
+	for frame in 24:
+		await process_frame
+		staged = group.get("_baby_build_model") as Node3D
+		if staged != null:
+			break
+	check(staged != null, "The exit fixture reaches a suspended Baby Zombie bake")
+	lab.free()
+	await process_frame
+	check(not is_instance_valid(staged), "Closing the Lab frees the detached rig before prewarm resumes")
 
 func check_walk_contacts(baby: Zombie) -> void:
 	var clip: StringName = Zombie.WALK_CLIPS[0]

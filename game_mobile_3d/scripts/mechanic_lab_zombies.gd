@@ -655,6 +655,7 @@ func _prewarm_baby_assets() -> void:
 	if not is_inside_tree() or _baby_visual != null:
 		return
 	if not _begin_baby_build():
+		_clear_baby_build()
 		return
 	var building := _baby_build_model
 	# Yield before each stage so the deferred bake never consumes one frame.
@@ -668,6 +669,7 @@ func _prewarm_baby_assets() -> void:
 
 func _load_baby_assets() -> void:
 	if not _begin_baby_build():
+		_clear_baby_build()
 		return
 	# A live spawn press reuses the detached rig and finishes its remaining work.
 	while not _baby_bake_steps.is_empty():
