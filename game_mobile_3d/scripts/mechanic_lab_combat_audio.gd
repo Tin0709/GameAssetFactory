@@ -412,6 +412,8 @@ var zombie_listener: AudioListener3D
 var _groups: Dictionary[StringName, Array] = {}
 var _loaded_melee_tools: Dictionary[StringName, bool] = {}
 var _base_sample_jobs: Array[Callable] = []
+var _weapon_sample_jobs: Dictionary[StringName, Array] = {}
+var _equipment_samples_queued := false
 var _base_samples_queued := false
 var _voices: Array[AudioStreamPlayer3D] = []
 var _surface_landing_voices: Array[AudioStreamPlayer3D] = []
@@ -453,8 +455,13 @@ func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"", preview
 		return
 	if _voices.is_empty():
 		_load_audio()
+	if not _voices.is_empty() and not _equipment_samples_queued:
+		_equipment_samples_queued = true
+		var root := _research_root()
+		for group: StringName in MELEE_SWITCH_SAMPLES:
+			_queue_melee_switch_samples(root, group)
 	if not melee_tool.is_empty():
-		load_melee_tool(_research_root(), melee_tool)
+		prepare_melee_tool(_research_root(), melee_tool)
 	# The project starts with Master muted for quiet tests.
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
@@ -464,6 +471,7 @@ func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"", preview
 		preview = _weapon_hit_group()
 		if not melee_tool.is_empty():
 			preview = _tool_group(melee_tool, 5)
+			_finish_weapon_samples(preview)
 			if not _groups.has(preview):
 				# Some tools only have a verified swing in the local export.
 				preview = _tool_group(melee_tool, 0)
@@ -506,6 +514,7 @@ func weapon_contact(point: Vector3, serial: int, clip := "", tool := &"") -> voi
 		var group := _weapon_hit_group()
 		if tool != &"":
 			group = _tool_group(tool, 5)
+			_finish_weapon_samples(group)
 		elif clip.begins_with("NativeGauntlet"):
 			group = &"gauntlet_hit"
 		_play(group, point, HIT_GAIN_DB, -1, true)
@@ -554,7 +563,7 @@ func load_gauntlets(root: String) -> void:
 	for i in MAULER_DIVE_HASHES.size():
 		_load_sample(root, &"mauler_dive", MAULER_DIVE % (i + 1), MAULER_DIVE_HASHES[i])
 
-func load_melee_tool(root: String, tool: StringName) -> void:
+func prepare_melee_tool(root: String, tool: StringName) -> void:
 	if root.is_empty() or not TOOL_SAMPLES.has(tool) or _loaded_melee_tools.has(tool):
 		return
 	_loaded_melee_tools[tool] = true
@@ -571,32 +580,54 @@ func load_melee_tool(root: String, tool: StringName) -> void:
 		var hashes: Array = sample[1]
 		for i in hashes.size():
 			var stem := pattern % (i + 1) if "%02d" in pattern else pattern
-			_load_sample(root, group, TOOL_AUDIO + folder + stem + ".ogg", hashes[i])
+			_queue_weapon_sample(root, group, TOOL_AUDIO + folder + stem + ".ogg", hashes[i])
+	# The next input can start the first swing in the same tick as the equip.
+	_finish_weapon_samples(_tool_group(tool, 0))
 
 static func _tool_group(tool: StringName, slot: int) -> StringName:
 	return StringName("tool_%s_%d" % [tool, slot])
 
 func tool_swung(tool: StringName, point: Vector3, index: int, airborne: bool) -> void:
 	if enabled:
-		_play(_tool_group(tool, 3 if airborne else index), point, HIT_GAIN_DB)
+		var group := _tool_group(tool, 3 if airborne else index)
+		_finish_weapon_samples(group)
+		_play(group, point, HIT_GAIN_DB)
 
 func tool_landed(tool: StringName, point: Vector3) -> void:
 	if enabled:
-		_play(_tool_group(tool, 4), point, SLAM_GAIN_DB, -1, true)
+		var group := _tool_group(tool, 4)
+		_finish_weapon_samples(group)
+		_play(group, point, SLAM_GAIN_DB, -1, true)
 
 func melee_switched(weapon: StringName, equipped: bool, point: Vector3) -> void:
 	if not enabled or _voices.is_empty() or weapon.is_empty():
 		return
 	var group := StringName("%s_%s" % [weapon, "equip" if equipped else "unequip"])
-	if not _groups.has(group):
-		var samples: Dictionary = MELEE_SWITCH_SAMPLES.get(group, {})
-		if samples.is_empty():
-			return
-		var folder := "3_weapons_melee_equip/" if equipped else "4_weapons_melee_unequip/"
-		var root := _research_root()
-		for stem: String in samples:
-			_load_sample(root, group, TOOL_AUDIO + folder + stem + ".ogg", samples[stem])
+	if not MELEE_SWITCH_SAMPLES.has(group):
+		return
+	if not _groups.has(group) and not _weapon_sample_jobs.has(group):
+		_queue_melee_switch_samples(_research_root(), group)
+	_finish_weapon_samples(group)
 	_play(group, point, EQUIP_GAIN_DB)
+
+func _queue_melee_switch_samples(root: String, group: StringName) -> void:
+	var samples: Dictionary = MELEE_SWITCH_SAMPLES[group]
+	var folder := "4_weapons_melee_unequip/" if group.ends_with("_unequip") else "3_weapons_melee_equip/"
+	for stem: String in samples:
+		_queue_weapon_sample(root, group, TOOL_AUDIO + folder + stem + ".ogg", samples[stem])
+
+func _queue_weapon_sample(root: String, group: StringName, relative: String, checksum: String) -> void:
+	if not _weapon_sample_jobs.has(group):
+		_weapon_sample_jobs[group] = []
+	_weapon_sample_jobs[group].append(_load_sample.bind(root, group, relative, checksum))
+
+func _finish_weapon_samples(group: StringName) -> void:
+	if not _weapon_sample_jobs.has(group):
+		return
+	# Drain only this family's remaining variants before choosing a stream.
+	for job: Callable in _weapon_sample_jobs[group]:
+		job.call()
+	_weapon_sample_jobs.erase(group)
 
 func crossbow_switched(equipped: bool, point: Vector3) -> void:
 	if enabled:
@@ -840,11 +871,21 @@ func queue_base_samples() -> void:
 		_queue_base_samples()
 
 func prepare_queued_samples() -> void:
-	if _base_sample_jobs.is_empty():
+	if _base_sample_jobs.is_empty() and (not enabled or _weapon_sample_jobs.is_empty()):
 		return
 	var deadline := Time.get_ticks_usec() + CROWD_SAMPLE_BUDGET_USEC
-	for sample in mini(_base_sample_jobs.size(), 2):
-		_base_sample_jobs.pop_front().call()
+	for sample in 2:
+		if not _base_sample_jobs.is_empty():
+			_base_sample_jobs.pop_front().call()
+		elif enabled and not _weapon_sample_jobs.is_empty():
+			var group: StringName = _weapon_sample_jobs.keys()[0]
+			var jobs: Array = _weapon_sample_jobs[group]
+			var job: Callable = jobs.pop_front()
+			job.call()
+			if jobs.is_empty():
+				_weapon_sample_jobs.erase(group)
+		else:
+			break
 		if Time.get_ticks_usec() >= deadline:
 			break
 

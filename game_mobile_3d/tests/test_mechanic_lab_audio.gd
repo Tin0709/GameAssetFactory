@@ -1616,10 +1616,14 @@ func check_zombie_attack_onsets(audio: COMBAT_AUDIO, group: Node,
 
 func wait_for_zombie_onset(voices: Array[AudioStreamPlayer3D]) -> bool:
 	var deadline := Time.get_ticks_msec() + 500
+	# The mixer and physics tick may clear their onset guards on different frames.
+	var guard_ticks := ceili(COMBAT_AUDIO.ZOMBIE_ONSET_SECONDS * Engine.physics_ticks_per_second)
+	var earliest_tick := Engine.get_physics_frames() + guard_ticks + 1
 	while Time.get_ticks_msec() < deadline:
-		for voice in voices:
-			if not voice.playing or voice.get_playback_position() / voice.pitch_scale >= COMBAT_AUDIO.ZOMBIE_ONSET_SECONDS:
-				return true
+		if Engine.get_physics_frames() >= earliest_tick:
+			for voice in voices:
+				if not voice.playing or voice.get_playback_position() / voice.pitch_scale >= COMBAT_AUDIO.ZOMBIE_ONSET_SECONDS:
+					return true
 		await process_frame
 	return false
 
@@ -1637,7 +1641,12 @@ func check_melee_tool_variants(audio: Node3D, bus: int, capture: AudioEffectCapt
 	}
 	for tool: StringName in counts:
 		audio.reset()
-		audio.load_melee_tool(audio._research_root(), tool)
+		audio.prepare_melee_tool(audio._research_root(), tool)
+		for frame in 70:
+			if audio._weapon_sample_jobs.is_empty():
+				break
+			audio.prepare_queued_samples()
+			await process_frame
 		for slot in counts[tool].size():
 			var group := StringName("tool_%s_%d" % [tool, slot])
 			check(audio._groups.get(group, []).size() == counts[tool][slot],
@@ -1824,6 +1833,52 @@ func check_first_enable_after_preparation() -> void:
 	lab.free()
 	await create_timer(0.12).timeout
 
+func check_first_melee_switch_preparation() -> void:
+	var lab := preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var audio := lab.get_node("CombatAudio") as COMBAT_AUDIO
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var menu := lab.get_node("HUD/Weapon") as OptionButton
+	for frame in 80:
+		await process_frame
+	check(not audio._groups.has(&"pickaxe_equip"), "Muted startup leaves optional equipment audio unloaded")
+	toggle.button_pressed = true
+	var samples_before: int = audio._groups.values().reduce(func(total, samples): return total + samples.size(), 0)
+	audio.prepare_queued_samples()
+	var samples_added: int = audio._groups.values().reduce(func(total, samples): return total + samples.size(), 0) - samples_before
+	check(samples_added in [1, 2], "One idle preparation slice adds at most two optional samples")
+	for frame in 80:
+		await process_frame
+	var equip_clips: Array = audio._groups.get(&"pickaxe_equip", []).duplicate()
+	check(equip_clips.size() == 3 and audio._next_choice.get(&"pickaxe_equip", 0) == 0,
+		"The active Lab prepares verified equipment variants before the first menu switch")
+	menu.select(8)
+	menu.item_selected.emit(8)
+	check(menu.selected == 8 and audio._voices.any(func(voice): return voice.playing and voice.stream in equip_clips),
+		"The real weapon picker plays the prepared equipment cue on its first switch")
+	check(audio._groups.get(&"tool_pickaxe_0", []).size() == 3
+		and not audio._groups.has(&"tool_pickaxe_1") and not audio._groups.has(&"tool_pickaxe_4"),
+		"The first audible equip prepares the first swing and defers unused combat families")
+	audio.tool_landed(&"pickaxe", lab.player.global_position)
+	var landing_clips: Array = audio._groups.get(&"tool_pickaxe_4", []).duplicate()
+	check(landing_clips.size() == 3 and audio._voices.any(func(voice): return voice.playing and voice.stream in landing_clips),
+		"An immediate landing can play the complete requested family while preparation is pending")
+	toggle.button_pressed = false
+	for frame in 24:
+		await process_frame
+	check(not audio._groups.has(&"tool_pickaxe_1"), "Muting pauses optional weapon preparation")
+	toggle.button_pressed = true
+	for frame in 40:
+		await process_frame
+	check(audio._groups.get(&"tool_pickaxe_1", []).size() == 3
+		and audio._groups.get(&"tool_pickaxe_4", []) == landing_clips
+		and audio._groups.get(&"pickaxe_equip", []) == equip_clips,
+		"Resuming preparation completes the tool bank without appending duplicate samples")
+	toggle.button_pressed = false
+	await create_timer(0.12).timeout
+	lab.free()
+
 func run() -> void:
 	var camera := Camera3D.new()
 	root.add_child(camera)
@@ -1920,6 +1975,7 @@ func run() -> void:
 	await check_landing_voice_under_step_burst(bus, capture)
 	await check_run_step_after_landing(bus, capture)
 	await check_first_enable_after_preparation()
+	await check_first_melee_switch_preparation()
 	await check_sabre_debris_audio(bus, capture)
 	await check_sabre_crowd_audio(bus, capture)
 	await check_zombie_steps(bus, capture)
