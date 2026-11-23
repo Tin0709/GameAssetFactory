@@ -461,6 +461,12 @@ func check_v_corner_escape(member_count: int) -> void:
 
 
 
+func add_open_back_recess(lab: Node3D, heading: Basis, yaw: float) -> PhysicsBody3D:
+	var front := add_wall(lab, heading * Vector3(0.0, 0.2, -2.10), Vector3(1.9, 0.4, 0.22), yaw)
+	for side: float in [-1.0, 1.0]:
+		add_wall(lab, heading * Vector3(side * 0.86, 0.2, -3.36), Vector3(0.22, 0.4, 2.61), yaw)
+	return front
+
 func check_open_back_recess(member_count: int, yaw: float, baby_chaser := false) -> void:
 	var lab := LAB.instantiate()
 	root.add_child(lab)
@@ -476,9 +482,7 @@ func check_open_back_recess(member_count: int, yaw: float, baby_chaser := false)
 	chaser.position = heading * Vector3(0.0, 0.02, -3.9)
 	chaser.animation.play(ZOMBIE.IDLE, 0.0)
 	chaser.animation.advance(0.0)
-	add_wall(lab, heading * Vector3(0.0, 0.2, -2.10), Vector3(1.9, 0.4, 0.22), yaw)
-	for side: float in [-1.0, 1.0]:
-		add_wall(lab, heading * Vector3(side * 0.86, 0.2, -3.36), Vector3(0.22, 0.4, 2.61), yaw)
+	add_open_back_recess(lab, heading, yaw)
 	var damage: Array[int] = []
 	chaser.melee_hit.connect(func(amount: int): damage.append(amount))
 	var backed_out := false
@@ -508,9 +512,77 @@ func check_open_back_recess(member_count: int, yaw: float, baby_chaser := false)
 	await physics_frame
 
 
+func check_recess_after_occlusion(member_count: int, yaw: float, baby: bool, closed := false) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var zombies := spawn_detour_group(lab, member_count, baby)
+	if zombies == null:
+		lab.free()
+		return
+	var heading := Basis(Vector3.UP, yaw)
+	lab.player.position = heading * Vector3(0.0 if baby else 0.90, 0.02, 0.0)
+	var chaser := zombies.get_child(0) as ZOMBIE
+	chaser.position = heading * Vector3(0.0, 0.02, -3.9)
+	chaser.animation.play(ZOMBIE.IDLE, 0.0)
+	chaser.animation.advance(0.0)
+	var front := add_open_back_recess(lab, heading, yaw)
+	if closed:
+		add_wall(lab, heading * Vector3(0.0, 1.5, -4.70), Vector3(1.9, 3.0, 0.24), yaw)
+	var damage: Array[int] = []
+	chaser.melee_hit.connect(func(amount: int): damage.append(amount))
+	var approached := false
+	for tick in 100:
+		await physics_frame
+		if chaser._target_visible and chaser._target_aggressive and chaser.is_on_wall():
+			approached = true
+			break
+	var known := chaser._last_seen_position
+	front.free()
+	add_wall(lab, heading * Vector3(0.0, 1.5, -2.10), Vector3(1.9, 3.0, 0.22), yaw)
+	lab.player.position += heading.z * 0.45
+	var queued_retreat := false
+	var backed_out := false
+	var reacquired := false
+	var remembered := true
+	var hidden_hits := 0
+	var hit_tick := -1
+	for tick in 236:
+		await physics_frame
+		if chaser._target_aggressive and not chaser._target_visible:
+			remembered = remembered and chaser._last_seen_position == known
+			queued_retreat = queued_retreat or chaser._chase_detour_next.is_finite()
+			backed_out = backed_out or chaser.global_position.dot(heading.z) < -4.9
+			hidden_hits = damage.size()
+		elif queued_retreat and chaser._target_visible:
+			reacquired = true
+		if not damage.is_empty():
+			hit_tick = tick
+			break
+		if not chaser._target_aggressive:
+			break
+	var expected := ZOMBIE.BABY_MELEE_DAMAGE if baby else ZOMBIE.MELEE_DAMAGE
+	if not approached or not remembered or hidden_hits > 0:
+		failures.append("The occluded recess tracks only the confirmed sighting and cannot hit the hidden target")
+	if closed:
+		if queued_retreat or not damage.is_empty() or chaser._target_aggressive:
+			failures.append("A sealed recess should wait for the sighting to expire")
+	elif not queued_retreat or not backed_out or not reacquired or damage != [expected]:
+		failures.append("An open recess should allow a retreat while hidden and melee only after reacquiring sight")
+	print("LAB_REMEMBERED_RECESS members=", member_count, " yaw=", rad_to_deg(yaw), " baby=", baby,
+		" closed=", closed, " route=", queued_retreat, " backed_out=", backed_out, " remembered=", remembered,
+		" reacquired=", reacquired, " hit_tick=", hit_tick, " hits=", damage, " hidden_hits=", hidden_hits)
+	lab.free()
+	await physics_frame
+
 func run() -> void:
 	await check_open_back_recess(1, 0.0)
 	await check_open_back_recess(100, deg_to_rad(31.0), true)
+	await check_recess_after_occlusion(1, 0.0, false)
+	await check_recess_after_occlusion(100, deg_to_rad(31.0), true)
+	await check_recess_after_occlusion(100, deg_to_rad(-17.0), true)
+	await check_recess_after_occlusion(100, deg_to_rad(31.0), true, true)
 	await check_v_corner_escape(1)
 	await check_v_corner_escape(100)
 	await check_short_static_detour(1, 0.0, 2.5, Vector3(-1.25, 0.02, 3.5), 232)
