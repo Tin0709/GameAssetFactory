@@ -49,6 +49,10 @@ func source_step_dust_size() -> float:
 	# still use the audio-only locomotion effects.
 	if crossbow_equipped and active_clip in [CrossPollinator.SHOT, CrossPollinator.RECOVERY]:
 		return 0.0
+	# The A&S Shovel run takes the verified MD2 Master Run dust profile.
+	# Emit it from the supported sole already sampled by the Lab.
+	if hybrid_motion != null and hybrid_motion.uses_shovel_run(self, active_clip):
+		return 1.0
 	var step_clip := active_clip
 	# During a moving attack, the leg pose can advance a separate gait.
 	if step_clip not in GAITS and _gait_cycles_this_tick > 0.0 and source_gait != null:

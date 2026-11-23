@@ -719,13 +719,28 @@ func check_shovel_run(lab: Node3D, menu: OptionButton) -> void:
 	var reference_grip_sample: Transform3D = lab._weapon_mesh.transform
 	var max_source_angle_error := 0.0
 	var contacts: Array[Vector3] = []
+	var dust := lab.get_node("MovementDust")
+	var run_dust_matches: Array[bool] = []
+	var walk_puff_counts: Array[int] = []
 	var trace := func(point: Vector3, landed: bool):
-		if not landed and player.active_clip == "Run":
+		if landed:
+			return
+		var support: Dictionary = lab._player_foot_contact_at(point)
+		if support.is_empty():
+			return
+		var tick := Engine.get_physics_frames()
+		var puffs: Array = dust._particles.filter(func(p): return p.sprite.visible and p.contact_tick == tick)
+		if player.active_clip == "Run":
 			contacts.append(point)
+			run_dust_matches.append(puffs.size() == 1 and puffs[0].run_drag > 0.0
+				and puffs[0].origin.is_equal_approx(Vector3(support.position) + Vector3.UP * 0.20)
+				and is_equal_approx(puffs[0].sprite.pixel_size * 16.0, 1.0))
+		elif player.active_clip == "Walk" and player.current_speed <= player.walk_speed + 0.01:
+			walk_puff_counts.append(puffs.size())
 	player.surface_contact.connect(trace)
 	player.scripted_input = true
 	player.requested_direction = Vector2.DOWN
-	await ticks(24)
+	await ticks(70)
 	check(player.active_clip == "Walk" and player.clips.Walk.source_name == "Player_Shovel_Walk"
 		and player.hybrid_motion.last_kind == "MD2Walk", "Shovel's walk remains its MD2 source")
 	player.requested_run = true
@@ -756,6 +771,10 @@ func check_shovel_run(lab: Node3D, menu: OptionButton) -> void:
 		"Shovel stays at its existing hand attachment during the full-body run")
 	check(contacts.size() >= 4 and minimum_sole > -0.035,
 		"Shovel's Actions & Stuff run still produces repeated grass contacts")
+	check(run_dust_matches.size() >= 4 and not run_dust_matches.has(false),
+		"Each supported Shovel run contact uses one MD2 Master Run puff")
+	check(walk_puff_counts.size() >= 2 and walk_puff_counts.all(func(count: int): return count == 2),
+		"Shovel's native walking clip keeps its existing dust profile")
 	player.requested_run = false
 	await ticks(23)
 	check(player.active_clip == "Walk" and player.source_transition.incoming_weight >= 0.99,
