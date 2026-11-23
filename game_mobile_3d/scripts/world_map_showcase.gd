@@ -4719,7 +4719,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"sun_pockets":
 			slider.tooltip_text = "Deepen the existing F3 daylight shade on terrain, grass and the player. 0% restores the previous light pattern. Noon and night keep their current lighting."
 		if effect == &"sun_opening":
-			slider.tooltip_text = "Lift sunlit openings on the ground, grass and player at dawn and in the afternoon. 0% restores the previous response. Requires F3 direct shading."
+			slider.tooltip_text = "Làm rõ ánh nắng tại khoảng hở dưới tán. Thử lúc 07:00 hoặc 16:30 trong Forest khi bật F3."
 		if effect == &"projected_sun":
 			slider.editable = projected_sun.available()
 			slider.tooltip_text = "Try 65% at 07:00 or 16:30. The private Forest projection shapes the sunlight between shadows. Requires F3 direct cloud shading and the verified private reference."
