@@ -57,6 +57,30 @@ func idle_audio_ticks(mode: OptionButton, actors: Array[Zombie], style: int,
 				ticks[i].append(tick + 1)
 	return ticks
 
+func check_stationary_run(actor: Zombie) -> void:
+	var samples := [0]
+	var count_sample := func(): samples[0] += 1
+	actor._skipped_blocked_step = true
+	actor._play_gait()
+	actor.animation.seek(0.16)
+	actor.animation.mixer_applied.connect(count_sample)
+	actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+	var after_first := samples[0]
+	for tick in 4:
+		actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+	check(actor.animation.current_animation == STYLED_WALK and after_first > 0 and samples[0] == after_first,
+		"A blocked A&S stride publishes its pose once and reuses it while the phase holds")
+	actor.animation.seek(0.24)
+	actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+	check(samples[0] == after_first + 1, "Seeking the held clip publishes the newly requested pose")
+	actor.animation.stop(true)
+	actor._play_gait()
+	actor.animation.seek(0.24)
+	var after_restart := samples[0]
+	actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+	check(samples[0] > after_restart, "Replaying the held clip refreshes its pose even at the same phase")
+	actor.animation.mixer_applied.disconnect(count_sample)
+
 func run() -> void:
 	var lab := Lab.instantiate()
 	root.add_child(lab)
@@ -172,5 +196,7 @@ func run() -> void:
 	check(styled_cues == md2_cues and switched_cues == md2_cues,
 		"A&S idle and live style changes retain the MD2 audio cadence for both ages")
 	print("MECHANIC_LAB_IDLE_CLOCK md2=", md2_cues, " as=", styled_cues, " switched=", switched_cues)
+	check_stationary_run(adult)
+	check_stationary_run(baby)
 	print("MECHANIC_LAB_ZOMBIE_GAIT failures=", failures, " footsteps=", steps.size())
 	quit(0 if failures == 0 else 1)
