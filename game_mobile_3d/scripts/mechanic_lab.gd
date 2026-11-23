@@ -126,7 +126,8 @@ var _slam_audio_frame := -1
 var _slam_audio_point: Vector3
 var _contact_sparks: ContactSparks
 var _grounded_impact_dispatch := false
-var _grounded_contact_fx: Array[Dictionary] = []
+var _pending_melee_contact_fx: Array[Dictionary] = []
+var _combat_pose_frame := -1
 var _movement_audio: MovementAudio
 var _kai_skin: KaiSkin
 var _md2_skin_visibility: Dictionary[MeshInstance3D, bool] = {}
@@ -1163,10 +1164,12 @@ func _set_combat_audio(enabled: bool) -> void:
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, _lethal: bool) -> void:
 	var tool_hit: StringName = MELEE_AUDIO_NAMES.get(_equipped_weapon, &"") if clip != Bow.ACTION and clip != CrossPollinator.SHOT else &""
 	_combat_audio.weapon_contact(point, serial, clip, tool_hit)
-	if _grounded_impact_dispatch:
-		_grounded_contact_fx.append({"point": point, "direction": direction, "clip": clip, "serial": serial})
-	else:
-		_show_contact_fx(point, direction, clip, serial)
+	var melee_pose := _grounded_impact_dispatch or clip == "AirAttack"
+	if melee_pose and _combat_pose_frame != Engine.get_physics_frames():
+		_pending_melee_contact_fx.append({"point": point, "direction": direction, "clip": clip, "serial": serial})
+		return
+	var sample_time := float(player.effects.clock) if melee_pose else -1.0
+	_show_contact_fx(point, direction, clip, serial, sample_time)
 
 func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: int, sample_time := -1.0) -> void:
 	var has_arrow_sparks := clip == CrossPollinator.SHOT and _crossbow != null and _crossbow.impact_sparks != null
@@ -1265,39 +1268,40 @@ func _on_sabre_landing(point: Vector3, serial: int) -> void:
 		_combat_audio.gauntlet_slam_landed(point)
 	elif MELEE_AUDIO_NAMES.has(_equipped_weapon):
 		_combat_audio.tool_landed(MELEE_AUDIO_NAMES[_equipped_weapon], point)
-	if _equipped_weapon != Weapon.SABRE:
-		_show_landing_burst(point, serial)
-		return
 	var frame := Engine.get_physics_frames()
-	var rate := Engine.physics_ticks_per_second
-	_slam_shake_frame = frame + ceili(SABRE_LANDING_SHAKE_DELAY * rate)
-	_slam_burst_frame = frame + ceili(SABRE_LANDING_BURST_DELAY * rate)
+	if _equipped_weapon == Weapon.SABRE:
+		var rate := Engine.physics_ticks_per_second
+		_slam_shake_frame = frame + ceili(SABRE_LANDING_SHAKE_DELAY * rate)
+		_slam_burst_frame = frame + ceili(SABRE_LANDING_BURST_DELAY * rate)
+	elif _combat_pose_frame == frame:
+		_show_landing_burst(point, serial, player.effects.clock)
+		return
+	else:
+		_slam_burst_frame = frame
 	_slam_burst_point = point
 	_slam_burst_serial = serial
 
-func _show_landing_burst(point: Vector3, serial: int) -> void:
-	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
-	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
+func _show_landing_burst(point: Vector3, serial: int, sample_time: float) -> void:
+	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP, true)
+	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3, sample_time)
 
 func _sample_combat_fx() -> void:
-	if _grounded_contact_fx.is_empty() and _slam_shake_frame < 0 and _slam_burst_frame < 0:
+	# Immediate melee can be dispatched before this sample. Delayed air contacts
+	# can also arrive after it and use the pose already sampled in this tick.
+	_combat_pose_frame = Engine.get_physics_frames()
+	if _pending_melee_contact_fx.is_empty() and _slam_shake_frame < 0 and _slam_burst_frame < 0:
 		return
 	var sample_time: float = player.effects.clock
-	# Damage has already landed. Show it when the render presenter reaches this pose.
-	for contact in _grounded_contact_fx:
+	# Keep the floor flash first when both contacts request light for the same swing.
+	if _slam_burst_frame >= 0 and _combat_pose_frame >= _slam_burst_frame:
+		_slam_burst_frame = -1
+		_show_landing_burst(_slam_burst_point, _slam_burst_serial, sample_time)
+	for contact in _pending_melee_contact_fx:
 		_show_contact_fx(contact.point, contact.direction, contact.clip, contact.serial, sample_time)
-	_grounded_contact_fx.clear()
-	var frame := Engine.get_physics_frames()
-	if _slam_shake_frame >= 0 and frame >= _slam_shake_frame:
+	_pending_melee_contact_fx.clear()
+	if _slam_shake_frame >= 0 and _combat_pose_frame >= _slam_shake_frame:
 		_slam_shake_frame = -1
 		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION, sample_time)
-	if _slam_burst_frame < 0 or frame < _slam_burst_frame:
-		return
-	_slam_burst_frame = -1
-	# Record the authored event after the actor has advanced this physics pose.
-	var point := _slam_burst_point
-	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP, true)
-	_start_contact_light(point + Vector3.UP * 0.60, _slam_burst_serial, 2.3, sample_time)
 
 func _start_contact_light(point: Vector3, serial: int, energy: float, sample_time := -1.0) -> void:
 	if _light_serial == serial:
@@ -1312,7 +1316,8 @@ func _start_contact_light(point: Vector3, serial: int, energy: float, sample_tim
 	_impact_light.visible = _light_pending
 
 func _clear_contact_light() -> void:
-	_grounded_contact_fx.clear()
+	_pending_melee_contact_fx.clear()
+	_combat_pose_frame = -1
 	_slam_burst_frame = -1
 	_light_serial = -1
 	_light_remaining = 0.0
