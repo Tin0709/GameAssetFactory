@@ -3,7 +3,7 @@ extends Node3D
 const FIELD=preload("res://scripts/world_map_mist_field.gd")
 const MistSkyField = preload("res://scripts/mist_sky_field.gd")
 const LocalMistRegion=preload("res://scripts/local_mist_region.gd")
-# The rear fade spans 5.8 m. A shift of at most 2.1 m keeps the sampled depth increasing.
+# The rear fade spans 5.8 m. A combined shift of at most 2.1 m keeps sampled depths increasing.
 const MAX_FRONT_TRANSFER_M := 2.1
 static var _owner:WeakRef
 var effect:CompositorEffect
