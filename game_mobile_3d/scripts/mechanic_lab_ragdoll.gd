@@ -1184,8 +1184,12 @@ func _recover_baby_floor_anchors() -> void:
 		if tuned and not checked_obstacles:
 			if _floor_roll_nears_obstacle(floor_rid, true):
 				use_baby_floor_anchors = false
-				_baby_wall_anchors = use_tuned_floor_support
-				_baby_waiting_for_wall_contact = not use_tuned_floor_support
+				# A leg box can already overlap the wall before the contact manifold updates.
+				_baby_wall_anchors = use_tuned_floor_support or (leg and distance > TUNED_LIMB_RECOVERY_GAP
+					and _test_projection_motion(joint.body, state.transform, Vector3.ZERO, floor_rid)
+					and absf(_projection_hit.get_collision_normal().y) < MAX_WALL_NORMAL_Y
+					and _is_fixed_wall(_projection_hit.get_collider()))
+				_baby_waiting_for_wall_contact = not _baby_wall_anchors
 				return
 			checked_obstacles = true
 		if _test_projection_motion(joint.body, state.transform, motion, floor_rid):
