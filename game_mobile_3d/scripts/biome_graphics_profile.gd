@@ -129,6 +129,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Fraction of entry lighting shifted deeper into the same medium.
 @export_range(0., 1., .01) var mist_entry_depth_balance := 0.
 @export var mist_front_transfer_by_hour: Curve
+## Additional in-scattering lookup distance in metres at the start of the mist.
+@export var mist_front_scatter_by_hour: Curve
 ## Mix of the rear ambient scattering tint during daylight.
 @export_range(0., 1., .01) var mist_rear_chroma := 0.
 ## Adds ambient sky color to the existing mist in partially occluded air.

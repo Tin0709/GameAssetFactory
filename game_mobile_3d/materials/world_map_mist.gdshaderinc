@@ -3,6 +3,7 @@ global uniform bool gaf_mist_enabled;
 global uniform float gaf_mist_far;
 global uniform float gaf_mist_near_entry;
 global uniform float gaf_mist_front_transfer;
+global uniform float gaf_mist_front_scatter_advance;
 global uniform sampler3D gaf_mist_volume : repeat_disable, filter_linear;
 global uniform vec3 gaf_mist_camera_position;
 global uniform vec3 gaf_mist_camera_direction;
@@ -32,16 +33,19 @@ vec4 gaf_surface_mist(vec2 uv,float view_depth,vec3 camera_position,vec3 directi
 	if(distance(camera_position,gaf_mist_camera_position)>.005 || dot(direction,gaf_mist_camera_direction)<.99999 || length(abs(projection_scale)-abs(gaf_mist_projection_scale))>.0001)return vec4(0.0);
 	// Bring the existing fog forward within the transition and keep the rear bank fixed.
 	float shift = gaf_mist_front_transfer;
-	if (shift > 0.0 && gaf_mist_near_entry > 0.0) {
+	float weight = 0.0;
+	if (max(shift, gaf_mist_front_scatter_advance) > 0.0 && gaf_mist_near_entry > 0.0) {
 		float offset = view_depth - gaf_mist_near_entry;
-		float weight = smoothstep(-4.0, -0.8, offset) * (1.0 - smoothstep(-0.8, 5.0, offset));
+		weight = smoothstep(-4.0, -0.8, offset) * (1.0 - smoothstep(-0.8, 5.0, offset));
 		view_depth += shift * weight;
 	}
 	float slice=sqrt(clamp(view_depth/gaf_mist_far,0.0,1.0))*31.0;
 	float entry=gaf_mist_near_entry;
+	float previous_slice = 0.0;
+	float next_depth = 0.0;
 	if (entry > 0.0) {
-		float previous_slice = floor(sqrt(entry/gaf_mist_far)*31.0);
-		float next_depth = gaf_mist_far * pow((previous_slice+1.0)/31.0, 2.0);
+		previous_slice = floor(sqrt(entry/gaf_mist_far)*31.0);
+		next_depth = gaf_mist_far * pow((previous_slice+1.0)/31.0, 2.0);
 		if (view_depth < next_depth && (gaf_local_mist_center.w > 0.0 || gaf_additional_mist_center.w > 0.0)) {
 			vec3 origin=gaf_local_mist_origin+gaf_local_mist_dx*uv.x+gaf_local_mist_dy*uv.y;
 			if (gaf_local_mist_center.w > 0.0) {
@@ -61,5 +65,15 @@ vec4 gaf_surface_mist(vec2 uv,float view_depth,vec3 camera_position,vec3 directi
 	}
 	vec4 medium=textureLod(gaf_mist_volume,vec3(uv,(slice+0.5)/32.0),0.0);
 	float opacity=clamp(1.0-medium.a,0.0,1.0);
+	if (gaf_mist_front_scatter_advance > 0.0 && weight > 0.0 && opacity > 0.0002) {
+		// Sample illumination farther along the same ray while preserving extinction.
+		float light_depth = view_depth + gaf_mist_front_scatter_advance * weight;
+		float light_slice = sqrt(clamp(light_depth / gaf_mist_far, 0.0, 1.0)) * 31.0;
+		if (light_depth < next_depth) {
+			light_slice = previous_slice + (light_depth - entry) / max(next_depth - entry, 0.00001);
+		}
+		vec3 incoming = textureLod(gaf_mist_volume, vec3(uv, (light_slice + 0.5) / 32.0), 0.0).rgb;
+		medium.rgb = mix(medium.rgb, incoming, smoothstep(0.0002, 0.0012, opacity));
+	}
 	return vec4(medium.rgb/max(opacity,0.000001),opacity);
 }

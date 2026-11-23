@@ -1179,7 +1179,8 @@ func _mist_entry_depth_available() -> bool:
 func _mist_front_transfer_available() -> bool:
 	return not _flat_lab and not _balanced_preview and atmosphere_review == "combined" \
 		and forest_active() and captured_mist_source and measured_atmosphere \
-		and _biome_profile != null and _biome_profile.mist_front_transfer_by_hour != null \
+		and _biome_profile != null and (_biome_profile.mist_front_transfer_by_hour != null \
+			or _biome_profile.mist_front_scatter_by_hour != null) \
 		and RenderingServer.get_current_rendering_method() == &"mobile" \
 		and RenderingServer.get_rendering_device() != null
 
@@ -1288,8 +1289,10 @@ func _update_mist()->void:
 			var cooler := linear * Vector3(.76, .85, 1.44)
 			sample.depth_scatter_color = (cooler * (linear.dot(luma) / maxf(cooler.dot(luma), .000001)) - linear) * noon
 		if _mist_front_transfer_available():
-			var shift := DayNight.sample_curve(_biome_profile.mist_front_transfer_by_hour, hour / 24., 0.)
-			sample.front_transfer_m = shift * _lighting_scale(&"mist_front_transfer")
+			var time := hour / 24.
+			var depth_strength := _lighting_scale(&"mist_front_transfer")
+			sample.front_transfer_m = DayNight.sample_curve(_biome_profile.mist_front_transfer_by_hour, time, 0.) * depth_strength
+			sample.front_scatter_advance_m = DayNight.sample_curve(_biome_profile.mist_front_scatter_by_hour, time, 0.) * depth_strength
 		var depth_mix := _lighting_scale(&"near_haze_depth")
 		if depth_mix > 0.:
 			sample.near_fade_start = lerpf(.4, NEAR_HAZE_FADE_START, depth_mix)

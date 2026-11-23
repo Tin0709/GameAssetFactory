@@ -41,6 +41,7 @@ func setup()->void:
  _owner=weakref(self)
  RenderingServer.global_shader_parameter_set("gaf_mist_enabled",false)
  RenderingServer.global_shader_parameter_set("gaf_mist_front_transfer",0.)
+ RenderingServer.global_shader_parameter_set("gaf_mist_front_scatter_advance",0.)
  RenderingServer.global_shader_parameter_set("gaf_local_mist_center",Vector4.ZERO)
  RenderingServer.global_shader_parameter_set("gaf_additional_mist_center",Vector4.ZERO)
  var image:=Image.create(64,64,false,Image.FORMAT_RF)
@@ -187,6 +188,9 @@ func _process(_delta:float)->void:
   var shift: float = _profile.get("front_transfer_m", 0.)
   shift = clampf(shift, 0., MAX_FRONT_TRANSFER_M) if near_layer.y > 0. and is_finite(shift) else 0.
   RenderingServer.global_shader_parameter_set("gaf_mist_front_transfer",shift)
+  var scatter_advance: float = _profile.get("front_scatter_advance_m", 0.)
+  scatter_advance = clampf(scatter_advance, 0., MAX_FRONT_TRANSFER_M - shift) if near_layer.y > 0. and is_finite(scatter_advance) else 0.
+  RenderingServer.global_shader_parameter_set("gaf_mist_front_scatter_advance",scatter_advance)
   RenderingServer.global_shader_parameter_set("gaf_mist_camera_position",_camera.global_position)
   RenderingServer.global_shader_parameter_set("gaf_mist_camera_direction",-_camera.global_basis.z)
   var projection:=_camera.get_camera_projection()
@@ -242,6 +246,7 @@ func _set_gate(value:bool):
  _gate=value;RenderingServer.global_shader_parameter_set("gaf_mist_enabled",value)
  if not value:
   RenderingServer.global_shader_parameter_set("gaf_mist_front_transfer",0.)
+  RenderingServer.global_shader_parameter_set("gaf_mist_front_scatter_advance",0.)
 func failure()->String:return "" if effect==null else str(effect.snapshot().error)
 func _exit_tree():
  if effect==null:return
@@ -252,6 +257,7 @@ func _exit_tree():
  if _owner!=null and _owner.get_ref()==self:
   RenderingServer.global_shader_parameter_set("gaf_mist_enabled",false)
   RenderingServer.global_shader_parameter_set("gaf_mist_front_transfer",0.)
+  RenderingServer.global_shader_parameter_set("gaf_mist_front_scatter_advance",0.)
   RenderingServer.global_shader_parameter_set("gaf_local_mist_center",Vector4.ZERO)
   RenderingServer.global_shader_parameter_set("gaf_additional_mist_center",Vector4.ZERO)
   RenderingServer.global_shader_parameter_set("gaf_mist_volume",null);_owner=null
