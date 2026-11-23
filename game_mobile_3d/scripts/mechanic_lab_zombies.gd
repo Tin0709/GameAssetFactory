@@ -148,6 +148,9 @@ var _ragdoll_layout: Dictionary
 var _baby_visual: PackedScene
 var _baby_ragdoll_layout: Dictionary
 var _baby_prepared_clips: Dictionary[String, Animation]
+var _baby_build_model: Node3D
+var _baby_build_layout: Dictionary
+var _baby_bake_steps: Array[Callable]
 var _digits: Array[Texture2D]
 var _last_spawn_search: SpawnSearch
 var _spawn_serial := 0
@@ -189,6 +192,9 @@ func set_actions_stuff_animation(enabled: bool) -> void:
 	for child in get_children():
 		if child is Zombie and child.health > 0:
 			child.actions_stuff_animation = enabled
+
+func _exit_tree() -> void:
+	_clear_baby_build()
 
 func setup_combat(attacker: CharacterBody3D) -> void:
 	_attacker = attacker
@@ -646,58 +652,106 @@ func _prewarm_baby_assets() -> void:
 			return
 		_baby_prepared_clips[path] = clip
 	await tree.process_frame
-	if is_inside_tree() and _baby_visual == null:
-		_load_baby_assets()
-	_baby_prepared_clips.clear()
+	if not is_inside_tree() or _baby_visual != null:
+		return
+	if not _begin_baby_build():
+		return
+	var building := _baby_build_model
+	# Yield before each stage so the deferred bake never consumes one frame.
+	while not _baby_bake_steps.is_empty():
+		await tree.process_frame
+		if not is_instance_valid(building) or _baby_build_model != building:
+			return
+		var step: Callable = _baby_bake_steps.pop_front()
+		step.call()
+	_finish_baby_build()
 
 func _load_baby_assets() -> void:
+	if not _begin_baby_build():
+		return
+	# A live spawn press reuses the detached rig and finishes its remaining work.
+	while not _baby_bake_steps.is_empty():
+		var step: Callable = _baby_bake_steps.pop_front()
+		step.call()
+	_finish_baby_build()
+
+func _begin_baby_build() -> bool:
+	if _baby_build_model != null:
+		return true
 	var root := _private_research_root()
 	if root.is_empty():
-		return
+		return false
 	var source := root.path_join(SOURCE_DIR)
 	var directory := source.path_join(BABY_DIR)
 	var digit_path := source.path_join("Cues/UI/T_DamageNumbers.png")
 	if not _verified(source.path_join(ZOMBIE_DIR).path_join("T_Zombie.png"), SKIN_HASH) \
 			or not _verified(digit_path, DIGIT_HASH):
-		return
+		return false
 	var idle_path := _clip_path(directory, BABY_IDLE)
 	if not _verified(idle_path, BABY_CLIPS[Zombie.IDLE][1]):
-		return
+		return false
 	var model := _import_gltf(idle_path, 0, false)
 	if model == null:
-		return
+		return false
 	var player := model.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	var skeleton := model.find_child("Skeleton3D", true, false) as Skeleton3D
-	if player != null and skeleton != null and _add_baby_clips(directory, player):
-		var layout := _fit_baby_ragdoll(skeleton)
-		Zombie.prepare_lab_skin(model, "SK_BabyZombie")
-		if actions_stuff_available:
-			_add_actions_stuff(player, skeleton, true)
-		player.play(Zombie.SPAWN)
-		player.advance(0.0)
-		player.stop(true)
-		model.set_meta(Zombie.PREPARED_SPAWN_POSE, true)
-		var packed := PackedScene.new()
-		if _digits.is_empty():
-			_digits = Feedback.load_digits(digit_path)
-		if not layout.is_empty() and _digits.size() == 10 and packed.pack(model) == OK:
-			layout.wall_handoff_idle_pose = Ragdoll.capture_wall_handoff_idle(skeleton, player, Zombie.IDLE)
-			_baby_ragdoll_layout = layout
-			_baby_visual = packed
-	model.free()
+	if player == null or skeleton == null or not _add_baby_clips(directory, player):
+		model.free()
+		return false
+	var layout := _fit_baby_ragdoll(skeleton)
+	if _digits.is_empty():
+		_digits = Feedback.load_digits(digit_path)
+	if layout.is_empty() or _digits.size() != 10:
+		model.free()
+		return false
+	Zombie.prepare_lab_skin(model, "SK_BabyZombie")
+	_baby_build_model = model
+	_baby_build_layout = layout
+	if actions_stuff_available:
+		_baby_bake_steps = _actions_stuff_steps(player, skeleton, true)
+	return true
+
+func _finish_baby_build() -> void:
+	var model := _baby_build_model
+	var player := model.get_node("AnimationPlayer") as AnimationPlayer
+	var skeleton := model.find_child("Skeleton3D", true, false) as Skeleton3D
+	player.play(Zombie.SPAWN)
+	player.advance(0.0)
+	player.stop(true)
+	model.set_meta(Zombie.PREPARED_SPAWN_POSE, true)
+	var packed := PackedScene.new()
+	if packed.pack(model) == OK:
+		_baby_build_layout.wall_handoff_idle_pose = Ragdoll.capture_wall_handoff_idle(skeleton, player, Zombie.IDLE)
+		_baby_ragdoll_layout = _baby_build_layout
+		_baby_visual = packed
+	_clear_baby_build()
+
+func _clear_baby_build() -> void:
+	_baby_bake_steps.clear()
 	_baby_prepared_clips.clear()
+	_baby_build_layout = {}
+	if _baby_build_model != null:
+		_baby_build_model.free()
+		_baby_build_model = null
 
 func _add_actions_stuff(player: AnimationPlayer, skeleton: Skeleton3D, baby: bool) -> void:
+	for step: Callable in _actions_stuff_steps(player, skeleton, baby):
+		step.call()
+
+func _actions_stuff_steps(player: AnimationPlayer, skeleton: Skeleton3D, baby: bool) -> Array[Callable]:
 	var release := Zombie.BABY_ATTACK_FOCUS_END if baby else Zombie.LAB_ATTACK_HIT_SECTION
 	var contact := Zombie.BABY_ATTACK_CONTACT if baby else Zombie.MELEE_CONTACT_TIME
-	Zombie.ActionsStuff.build(player, skeleton, Vector3(release, contact, player.get_animation(Zombie.ATTACK).length),
+	var steps := Zombie.ActionsStuff.bake_steps(player, skeleton,
+		Vector3(release, contact, player.get_animation(Zombie.ATTACK).length),
 		player.get_animation(Zombie.SPAWN).length, Zombie.STAGGER_DURATION, baby, _actions_stuff_pack)
-	if player.has_animation(Zombie.ActionsStuff.FALL):
-		var landing := Zombie.ActionsStuff.LandingPose.new(skeleton, _actions_stuff_pack.land)
-		if baby:
-			_baby_landing = landing
-		else:
-			_adult_landing = landing
+	if not steps.is_empty() and _actions_stuff_pack.has("land"):
+		steps.append(func():
+			var landing := Zombie.ActionsStuff.LandingPose.new(skeleton, _actions_stuff_pack.land)
+			if baby:
+				_baby_landing = landing
+			else:
+				_adult_landing = landing)
+	return steps
 
 func _add_baby_clips(directory: String, player: AnimationPlayer) -> bool:
 	if not player.has_animation(BABY_IDLE):

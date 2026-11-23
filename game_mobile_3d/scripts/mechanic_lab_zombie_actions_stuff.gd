@@ -78,55 +78,69 @@ class LandingPose:
 
 static func build(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: Vector3,
 		spawn_duration: float, stagger_seconds: float, baby: bool, pack: Dictionary) -> void:
+	for step: Callable in bake_steps(player, skeleton, attack_timing, spawn_duration, stagger_seconds, baby, pack):
+		step.call()
+
+static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: Vector3,
+		spawn_duration: float, stagger_seconds: float, baby: bool, pack: Dictionary) -> Array[Callable]:
 	if not ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary"):
-		return
+		return []
 	var source := ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary
 	if (source == null or not source.has_animation(&"Idle") or not source.has_animation(&"Walk")
 			or not source.has_animation(&"Attack")):
-		return
+		return []
 	for binding: Array in BONE_MAP:
 		if skeleton.find_bone(binding[0]) < 0:
-			return
+			return []
 	var library := player.get_animation_library(&"")
-	var idle_source := source.get_animation(&"Idle")
-	var move_source := source.get_animation(&"Walk")
-	var attack_source := source.get_animation(&"Attack")
+	var model := player.get_parent()
+	var source_clips: Dictionary[StringName, Animation] = {
+		IDLE: source.get_animation(&"Idle"),
+		MOVE: source.get_animation(&"Walk"),
+		ATTACK: source.get_animation(&"Attack"),
+	}
+	var steps: Array[Callable] = []
 	if not pack.is_empty():
 		var bindings := BONE_MAP + [[&"", &"Head", Vector3.ZERO]]
 		var alert: Dictionary = pack.alert.duplicate()
 		alert.held_time = ALERT_TIME
 		if baby:
-			idle_source = Pack.bake(bindings, [pack.baby_idle], BABY_IDLE_PERIOD, true, BAKE_RATE, true)
 			var baby_stance: Dictionary = pack.baby_idle.duplicate()
 			baby_stance.held_time = 0.0
-			move_source = Pack.bake(bindings, [baby_stance, pack.baby_move, alert],
-				BABY_STRIDE_SECONDS, true, BAKE_RATE, true)
+			steps.append(func():
+				source_clips[IDLE] = Pack.bake(bindings, [pack.baby_idle], BABY_IDLE_PERIOD, true, BAKE_RATE, true))
+			steps.append(func():
+				source_clips[MOVE] = Pack.bake(bindings, [baby_stance, pack.baby_move, alert],
+					BABY_STRIDE_SECONDS, true, BAKE_RATE, true))
 			# Both ages share the source attack layer. The baby uses its own
 			# breathing pose and the already-raised arms underneath the swing.
-			attack_source = Pack.bake(bindings, [alert, pack.attack],
-				pack.attack.animation_length, false, BAKE_RATE, true, idle_source)
+			steps.append(func():
+				source_clips[ATTACK] = Pack.bake(bindings, [alert, pack.attack],
+					pack.attack.animation_length, false, BAKE_RATE, true, source_clips[IDLE]))
 		else:
-			var pursuit_source := Pack.bake(bindings, [pack.pursuit, alert],
-				STRIDE_SECONDS, true, BAKE_RATE, true)
-			library.add_animation(PURSUIT, _bake(skeleton, player.get_parent(), pursuit_source))
-		var alert_source := Pack.bake(bindings, [alert], idle_source.length, true, BAKE_RATE, true, idle_source)
-		library.add_animation(ALERT, _bake(skeleton, player.get_parent(), alert_source))
+			steps.append(func():
+				var pursuit := Pack.bake(bindings, [pack.pursuit, alert], STRIDE_SECONDS, true, BAKE_RATE, true)
+				library.add_animation(PURSUIT, _bake(skeleton, model, pursuit)))
+		steps.append(func():
+			var idle := source_clips[IDLE]
+			var alert_source := Pack.bake(bindings, [alert], idle.length, true, BAKE_RATE, true, idle)
+			library.add_animation(ALERT, _bake(skeleton, model, alert_source)))
 		for state: Array in [[JUMP, pack.jump], [FALL, pack.fall]]:
-			var air := Pack.bake(bindings, [state[1]], state[1].animation_length, false,
-				BAKE_RATE, false, idle_source)
-			library.add_animation(state[0], _bake(skeleton, player.get_parent(), air, Vector3.ZERO, 0.0, false))
-	var idle := _bake(skeleton, player.get_parent(), idle_source)
-	var move := _bake(skeleton, player.get_parent(), move_source)
-	var attack := _bake(skeleton, player.get_parent(), attack_source, attack_timing)
-	library.add_animation(IDLE, idle)
-	library.add_animation(MOVE, move)
-	library.add_animation(ATTACK, attack)
+			var name: StringName = state[0]
+			var layer: Dictionary = state[1]
+			steps.append(func():
+				var air := Pack.bake(bindings, [layer], layer.animation_length, false, BAKE_RATE, false, source_clips[IDLE])
+				library.add_animation(name, _bake(skeleton, model, air, Vector3.ZERO, 0.0, false)))
+	steps.append(func(): library.add_animation(IDLE, _bake(skeleton, model, source_clips[IDLE])))
+	steps.append(func(): library.add_animation(MOVE, _bake(skeleton, model, source_clips[MOVE])))
+	steps.append(func(): library.add_animation(ATTACK, _bake(skeleton, model, source_clips[ATTACK], attack_timing)))
 	# The pack has no skeletal spawn or stagger. Use a short section of its
 	# breathing pose for both while the Lab retains spawn and hit timing.
-	library.add_animation(SPAWN, _bake(skeleton, player.get_parent(),
-		idle_source, Vector3.ZERO, spawn_duration))
-	library.add_animation(STAGGER, _bake(skeleton, player.get_parent(),
-		idle_source, Vector3.ZERO, stagger_seconds))
+	steps.append(func():
+		library.add_animation(SPAWN, _bake(skeleton, model, source_clips[IDLE], Vector3.ZERO, spawn_duration)))
+	steps.append(func():
+		library.add_animation(STAGGER, _bake(skeleton, model, source_clips[IDLE], Vector3.ZERO, stagger_seconds)))
+	return steps
 
 class RetargetBone:
 	var rest_position: Vector3
