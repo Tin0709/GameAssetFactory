@@ -33,11 +33,12 @@ func setup(actor: CharacterBody3D, terrain_contact := Callable(), physics_clock 
 	_actor = actor
 	_terrain_contact = terrain_contact
 	_physics_clock = physics_clock
-	# Account for the transparent part of the source image, including a texel for filtering.
-	var footprint := image.get_used_rect().grow(1).intersection(Rect2i(Vector2i.ZERO, image.get_size()))
-	var pixels := Vector2(image.get_size())
-	_visible_footprint = Rect2((Vector2(footprint.position) / pixels - Vector2.ONE * 0.5) * QUAD_SIZE,
-		Vector2(footprint.size) / pixels * QUAD_SIZE)
+	if _physics_clock:
+		# Account for the transparent part of the source image, including a texel for filtering.
+		var footprint := image.get_used_rect().grow(1).intersection(Rect2i(Vector2i.ZERO, image.get_size()))
+		var pixels := Vector2(image.get_size())
+		_visible_footprint = Rect2((Vector2(footprint.position) / pixels - Vector2.ONE * 0.5) * QUAD_SIZE,
+			Vector2(footprint.size) / pixels * QUAD_SIZE)
 	var texture := ImageTexture.create_from_image(image)
 	var quad := QuadMesh.new()
 	quad.orientation = PlaneMesh.FACE_Y
