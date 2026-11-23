@@ -27,6 +27,7 @@ const MIN_SUPPORT_NORMAL_Y := 0.5
 const MAX_WALL_NORMAL_Y := 0.10
 const HANDOFF_MIN_WALL_OVERLAP := 0.035
 const HANDOFF_WALL_REST_OVERLAP := 0.012
+const HANDOFF_SUPPORT_NORMAL_Y := 0.7
 const HANDOFF_MAX_SHIFT := 0.12
 const TERRAIN_MIN_FALL_SPEED := 2.0
 const TERRAIN_MIN_SUPPORT_Y := 0.85
@@ -269,7 +270,8 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 func _handoff_wall_clearance() -> Vector3:
 	return _solve_handoff_clearance()
 
-func _solve_handoff_clearance(clear_parts: Dictionary[String, bool] = {}) -> Vector3:
+func _solve_handoff_clearance(clear_parts: Dictionary[String, bool] = {},
+		reject_blocked_blend := false) -> Vector3:
 	# A caller may omit limbs whose full shift range has already been cleared.
 	# The living capsule can clear the wall while an animated limb overlaps it.
 	# Test the captured boxes before the solver can turn that overlap into a kick.
@@ -277,6 +279,8 @@ func _solve_handoff_clearance(clear_parts: Dictionary[String, bool] = {}) -> Vec
 	var depths: Dictionary[String, float] = {}
 	var candidates: Array[Vector3] = []
 	var initial_peak := 0.0
+	var blocking_depth := HANDOFF_WALL_REST_OVERLAP if reject_blocked_blend else INF
+	var blocking_part := ""
 	for part in _parts:
 		var name: String = part[0]
 		if clear_parts.has(name):
@@ -289,6 +293,9 @@ func _solve_handoff_clearance(clear_parts: Dictionary[String, bool] = {}) -> Vec
 		for i in range(0, points.size(), 2):
 			var offset := points[i + 1] - points[i]
 			var depth := offset.length()
+			if depth > blocking_depth and offset.y < depth * HANDOFF_SUPPORT_NORMAL_Y:
+				blocking_depth = depth
+				blocking_part = name
 			if depth <= deepest_wall or absf(offset.y) > depth * 0.7:
 				continue
 			var horizontal := Vector3(offset.x, 0.0, offset.z)
@@ -297,6 +304,19 @@ func _solve_handoff_clearance(clear_parts: Dictionary[String, bool] = {}) -> Vec
 			deepest_wall = depth
 		if not wall_motion.is_zero_approx() and not candidates.has(wall_motion):
 			candidates.append(wall_motion)
+	# Zero and the listed translations are the solver's only possible results.
+	# If one part fails the same clearance test at every result, this blend
+	# cannot be used. The full idle fallback still needs its best translation.
+	if not blocking_part.is_empty():
+		var body: PhysicalBone3D = bodies[blocking_part]
+		var pose: Transform3D = current[blocking_part]
+		var all_blocked := true
+		for motion in candidates:
+			if _wall_handoff_part_is_clear(space, body, pose.translated(motion)):
+				all_blocked = false
+				break
+		if all_blocked:
+			return Vector3.INF
 	var best := Vector3.ZERO
 	var best_depth := initial_peak
 	for motion in candidates:
@@ -324,6 +344,17 @@ func _handoff_clearance_depth(space: PhysicsDirectSpaceState3D, depths: Dictiona
 			return INF
 		peak = maxf(peak, after)
 	return peak
+
+func _wall_handoff_part_is_clear(space: PhysicsDirectSpaceState3D, body: PhysicalBone3D, pose: Transform3D) -> bool:
+	var points := _terrain_contacts_at(body, space, pose)
+	for i in range(0, points.size(), 2):
+		var separation := points[i + 1] - points[i]
+		var depth := separation.length()
+		# Upward separation can support the pose. A deep downward separation
+		# can pin a limb under an overhang or at the seam of two stacked boxes.
+		if depth > HANDOFF_WALL_REST_OVERLAP and separation.y < depth * HANDOFF_SUPPORT_NORMAL_Y:
+			return false
+	return true
 
 func _build_source_joints() -> void:
 	# PhysicalBone3D's automatic joint follows the Skeleton3D hierarchy and

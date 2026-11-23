@@ -15,7 +15,6 @@ const LOCAL_FLOOR_SHARED_LIFT := 0.033
 const FLOOR_CONTACT_GAP_DEPTH := 0.10
 const EARLY_FLOOR_WALL_LOOKAHEAD := 5.0 / 60.0
 const HANDOFF_TERRAIN_MASK := 1
-const HANDOFF_SUPPORT_NORMAL_Y := 0.7
 const WALL_HANDOFF_RECOVERY_SECONDS := 0.12
 const WALL_CHEST_MAX_SHIFT := 0.03
 const WALL_ARM_REBOUND_MAX_SHIFT := 0.045
@@ -423,7 +422,11 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 			shift_known = false
 			continue
 		var clear_parts := _find_clear_handoff_parts(region, floor_bounds, wall_bounds)
-		shift = _solve_handoff_clearance(clear_parts)
+		var candidate_shift := _solve_handoff_clearance(clear_parts, idle_weight < 1.0)
+		if not candidate_shift.is_finite():
+			shift_known = false
+			continue
+		shift = candidate_shift
 		shift_known = true
 		if idle_weight < 1.0 and _wall_handoff_is_clear(space, collision_mask, shift, "", {}, clear_parts):
 			rays_clear = true
@@ -584,17 +587,6 @@ func _wall_handoff_is_clear(space: PhysicsDirectSpaceState3D, collision_mask: in
 			continue
 		var pose: Transform3D = current[name]
 		if not _wall_handoff_part_is_clear(space, bodies[name], pose.translated(shift)):
-			return false
-	return true
-
-func _wall_handoff_part_is_clear(space: PhysicsDirectSpaceState3D, body: PhysicalBone3D, pose: Transform3D) -> bool:
-	var points := _terrain_contacts_at(body, space, pose)
-	for i in range(0, points.size(), 2):
-		var separation := points[i + 1] - points[i]
-		var depth := separation.length()
-		# Upward separation can support the pose. A deep downward separation
-		# can pin a limb under an overhang or at the seam of two stacked boxes.
-		if depth > HANDOFF_WALL_REST_OVERLAP and separation.y < depth * HANDOFF_SUPPORT_NORMAL_Y:
 			return false
 	return true
 
