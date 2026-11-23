@@ -12,6 +12,10 @@ const WALL_HANDOFF_POSES := [[ZOMBIE.ATTACK, 3, 17],
 # The last value is the position in sixteenths of the retargeted clip.
 const AS_ADULT_WALL_POSES := [[ZOMBIE.ActionsStuff.IDLE, 6, 11],
 	[ZOMBIE.ActionsStuff.MOVE, 0, 7], [ZOMBIE.ActionsStuff.ATTACK, 2, 6]]
+# In 1.13, the unalerted adult's arms stay clear of this wall. Use the
+# raised-arm poses that actually overlap it at the same capsule clearance.
+const AS_ADULT_113_WALL_POSES := [[ZOMBIE.ActionsStuff.ALERT, 0, 6],
+	[ZOMBIE.ActionsStuff.PURSUIT, 3, 5], [ZOMBIE.ActionsStuff.ATTACK, 2, 6]]
 const AS_BABY_WALL_POSE := [ZOMBIE.ActionsStuff.ATTACK, 6, 9]
 const AS_BABY_113_WALL_POSE := [ZOMBIE.ActionsStuff.ATTACK, 2, 10]
 const ACTIONS_STUFF_CLIPS := [ZOMBIE.ActionsStuff.SPAWN, ZOMBIE.ActionsStuff.IDLE,
@@ -378,7 +382,8 @@ func launch_ragdolls(group: Node, packed: bool, wall_handoff: bool, actions_stuf
 				if zombie.is_baby:
 					pose = AS_BABY_113_WALL_POSE if group.full_actions_stuff_available else AS_BABY_WALL_POSE
 				else:
-					pose = AS_ADULT_WALL_POSES[i % AS_ADULT_WALL_POSES.size()]
+					var poses := AS_ADULT_113_WALL_POSES if group.full_actions_stuff_available else AS_ADULT_WALL_POSES
+					pose = poses[i % poses.size()]
 				start_time = zombie.animation.get_animation(pose[0]).length * float(pose[2]) / 16.0
 			else:
 				pose = WALL_HANDOFF_POSES[2 if zombie.is_baby else i % WALL_HANDOFF_POSES.size()]

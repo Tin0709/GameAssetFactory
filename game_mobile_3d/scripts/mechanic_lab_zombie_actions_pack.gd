@@ -4,7 +4,9 @@ const PACK_FILE := "source/pack/animations/f2da1072.json"
 const SOURCE_PIXEL := 0.675 / 12.0
 # Named entries, byte ranges and hashes of the existing private A&S 1.13 pack.
 const CLIPS := {
+	"adult_idle": ["njeoqx", 3651626, 786, "e0df20c9cc136309085f45375182324cc28c3e53ec909b6b7e98a1ea4e96df29"],
 	"baby_idle": ["xzyuea", 3654047, 865, "6fde7684d3b40df1bb6b10ec5fcf80c2d1302cd91d2696073b955fa4430ef183"],
+	"adult_move": ["eoatfn", 3675470, 1949, "76fecaff9cc8033e6f55714d5e159df33947076885831fe47087f1455c68471e"],
 	"baby_move": ["spjybv", 3677420, 1212, "ba5752e0566f81ad0d7603220531f8967a5bd8c94c1668909231a6cb007731e4"],
 	"pursuit": ["witjtv", 3681487, 1868, "441610ee1c59eaeb919f73d3c3d605efaed1754b34510a2596fc8092d13b0f31"],
 	"alert": ["isqbxt", 3665073, 1619, "959fae79e4c923750f4f2d391f070227a9e0d3db6502029f9eabd0c840eb3bc2"],

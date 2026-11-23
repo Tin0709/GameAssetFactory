@@ -57,6 +57,7 @@ var _tuned_wall_poses: Dictionary[String, Vector3]
 var use_tuned_wall_sweep := false
 var use_tuned_floor_support := false
 var use_baby_floor_anchors := false
+var reconcile_attack_shoulders := false
 var _baby_wall_anchors := false
 var _baby_waiting_for_wall_contact := false
 var wall_handoff_animation: AnimationPlayer
@@ -241,6 +242,7 @@ func prepare_handoff_samples(delta: float, verify_transform: bool) -> void:
 func _handoff_wall_clearance() -> Vector3:
 	if not is_instance_valid(_flat_floor):
 		return super._handoff_wall_clearance()
+	var shoulder_blocked_by_wall := reconcile_attack_shoulders and _fit_attack_shoulders()
 
 	# Only skip the detailed queries when the entire captured rig clears terrain.
 	var bounds: AABB
@@ -270,7 +272,7 @@ func _handoff_wall_clearance() -> Vector3:
 	if overlaps.size() == 1 and _is_floor_top_overlap(overlaps[0].rid, bounds):
 		return Vector3.ZERO
 	var wall_tolerance := PROJECTION_COLLISION_MARGIN if use_tuned_wall_sweep else SOURCE_ANCHOR_TOLERANCE
-	if wall_handoff_animation != null and (_handoff_straddles_wall(
+	if wall_handoff_animation != null and (shoulder_blocked_by_wall or _handoff_straddles_wall(
 			space, collision_mask, Vector3.ZERO, wall_tolerance, {})
 			or _handoff_arm_needs_clearance(space, overlaps)):
 		_wall_handoff_frame = Engine.get_physics_frames()
@@ -292,6 +294,37 @@ func _handoff_wall_clearance() -> Vector3:
 		_handoff_box_snapshot.clear()
 		return shift
 	return super._handoff_wall_clearance()
+
+func _fit_attack_shoulders() -> bool:
+	# A&S can translate the shoulders during windup. Seat the MD2 joints
+	# before the first solve so the cone joints start from connected anchors.
+	var space := skeleton.get_world_3d().direct_space_state
+	var blocked_by_wall := false
+	for name in ["Arm.L", "Arm.R"]:
+		var joint: Dictionary = source_joints[name]
+		var pose: Transform3D = current[name]
+		var gap: Vector3 = (current[joint.parent] * joint.parent_frame).origin - (pose * joint.child_frame).origin
+		if gap.length_squared() <= (2.0 * SOURCE_ANCHOR_TOLERANCE) ** 2:
+			continue
+		var arm: PhysicalBone3D = bodies[name]
+		if _test_projection_motion(arm, pose, gap):
+			# The box can be embedded while its centre still clears the wall.
+			# Let the existing wall handoff choose a pose in that case.
+			var points := _terrain_contacts_at(arm, space, pose)
+			for i in range(0, points.size(), 2):
+				var offset := points[i + 1] - points[i]
+				var depth := offset.length()
+				if depth > TERRAIN_DEEP_RESIDUAL and absf(offset.y) < depth * MAX_WALL_NORMAL_Y:
+					blocked_by_wall = true
+					break
+			continue
+		var bone := arm.get_bone_id()
+		var parent_pose := skeleton.global_transform * skeleton.get_bone_global_pose(skeleton.get_bone_parent(bone))
+		skeleton.set_bone_pose_position(bone, skeleton.get_bone_pose_position(bone) + parent_pose.basis.inverse() * gap)
+		# Shift both samples so reseating the joint contributes no launch velocity.
+		current[name] = pose.translated(gap)
+		previous[name] = previous[name].translated(gap)
+	return blocked_by_wall
 
 static func _is_fixed_wall(body: Object) -> bool:
 	return body is StaticBody3D or (body is RigidBody3D and body.freeze)

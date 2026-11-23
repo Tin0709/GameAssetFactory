@@ -156,6 +156,8 @@ func run() -> void:
 			check(actor.animation.has_animation(STYLED_ALERT) and actor.animation.has_animation(STYLED_FALL),
 				"Each age has source alert and airborne poses")
 		check(adult.animation.has_animation(STYLED_RUN), "The adult has a distinct sourced pursuit gait")
+		check(is_equal_approx(adult.animation.get_animation(STYLED_WALK).length, Zombie.ActionsStuff.STRIDE_SECONDS),
+			"Full A&S uses the adult 1.13 patrol cycle")
 	select(mode, 0)
 	adult.position = Vector3.ZERO
 	baby.position = Vector3(-32.0, 0.0, 0.0)
@@ -201,6 +203,9 @@ func run() -> void:
 	check(adult.animation.current_animation == Zombie.ATTACK
 		and adult.animation.current_animation_position > attack_position,
 		"Changing the gait during a swing does not interrupt or restart the attack")
+	if full:
+		check(await await_clip(adult, [STYLED_ATTACK]),
+			"The next adult swing uses the A&S attack after a live style switch")
 
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	check(group.get_child_count() == 3, "A second adult spawns with the new style selected")

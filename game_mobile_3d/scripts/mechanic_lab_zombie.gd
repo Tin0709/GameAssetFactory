@@ -1409,6 +1409,8 @@ func _update_death(delta: float) -> void:
 	if not ragdoll.running:
 		var lab_floor := is_instance_valid(_corpse_floor)
 		ragdoll.prepare_handoff_samples(delta, lab_floor)
+		ragdoll.reconcile_attack_shoulders = lab_floor and source_rig \
+			and animation.assigned_animation == ActionsStuff.ATTACK and animation.has_animation(ActionsStuff.PURSUIT)
 		ragdoll.use_tuned_floor_support = lab_floor and ragdoll_gravity_multiplier > 1.0
 		ragdoll.use_tuned_wall_sweep = lab_floor and (
 			ragdoll_launch_multiplier > 1.0 or ragdoll_gravity_multiplier > 1.0)

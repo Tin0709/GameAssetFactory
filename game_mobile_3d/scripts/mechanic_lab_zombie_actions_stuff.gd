@@ -23,6 +23,7 @@ const SOURCE_CONTACT := 12.0 / 60.0
 const BAKE_RATE := 60.0
 const ALERT_TIME := 0.7083
 const LANDING_DELAY := 0.15 # A&S ground recovery controller.
+const ADULT_IDLE_PERIOD := 360.0 / 100.0
 const BABY_IDLE_PERIOD := 360.0 / 130.0
 
 # Bind transforms of the Mobs research rig in the same +Z-facing space as MD2.
@@ -83,44 +84,47 @@ static func build(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: 
 
 static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_timing: Vector3,
 		spawn_duration: float, stagger_seconds: float, baby: bool, pack: Dictionary) -> Array[Callable]:
-	if not ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary"):
-		return []
-	var source := ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary
-	if (source == null or not source.has_animation(&"Idle") or not source.has_animation(&"Walk")
-			or not source.has_animation(&"Attack")):
-		return []
 	for binding: Array in BONE_MAP:
 		if skeleton.find_bone(binding[0]) < 0:
 			return []
 	var library := player.get_animation_library(&"")
 	var model := player.get_parent()
-	var source_clips: Dictionary[StringName, Animation] = {
-		IDLE: source.get_animation(&"Idle"),
-		MOVE: source.get_animation(&"Walk"),
-		ATTACK: source.get_animation(&"Attack"),
-	}
+	var source_clips: Dictionary[StringName, Animation] = {}
 	var steps: Array[Callable] = []
-	if not pack.is_empty():
+	var preview: AnimationLibrary
+	if (pack.is_empty() or not baby) and ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary"):
+		preview = ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary
+	if pack.is_empty():
+		if (preview == null or not preview.has_animation(&"Idle") or not preview.has_animation(&"Walk")
+				or not preview.has_animation(&"Attack")):
+			return []
+		source_clips[IDLE] = preview.get_animation(&"Idle")
+		source_clips[MOVE] = preview.get_animation(&"Walk")
+		source_clips[ATTACK] = preview.get_animation(&"Attack")
+	else:
 		var bindings := BONE_MAP + [[&"", &"Head", Vector3.ZERO]]
+		var idle_layer: Dictionary = pack.baby_idle if baby else pack.adult_idle
+		var idle_period := BABY_IDLE_PERIOD if baby else ADULT_IDLE_PERIOD
 		var alert: Dictionary = pack.alert.duplicate()
 		alert.held_time = ALERT_TIME
+		steps.append(func():
+			source_clips[IDLE] = Pack.bake(bindings, [idle_layer], idle_period, true, BAKE_RATE, true))
 		if baby:
-			var baby_stance: Dictionary = pack.baby_idle.duplicate()
+			var baby_stance := idle_layer.duplicate()
 			baby_stance.held_time = 0.0
-			steps.append(func():
-				source_clips[IDLE] = Pack.bake(bindings, [pack.baby_idle], BABY_IDLE_PERIOD, true, BAKE_RATE, true))
 			steps.append(func():
 				source_clips[MOVE] = Pack.bake(bindings, [baby_stance, pack.baby_move, alert],
 					BABY_STRIDE_SECONDS, true, BAKE_RATE, true))
-			# Both ages share the source attack layer. The baby uses its own
-			# breathing pose and the already-raised arms underneath the swing.
-			steps.append(func():
-				source_clips[ATTACK] = Pack.bake(bindings, [alert, pack.attack],
-					pack.attack.animation_length, false, BAKE_RATE, true, source_clips[IDLE]))
 		else:
+			steps.append(func():
+				source_clips[MOVE] = Pack.bake(bindings, [pack.adult_move], STRIDE_SECONDS, true, BAKE_RATE, true))
 			steps.append(func():
 				var pursuit := Pack.bake(bindings, [pack.pursuit, alert], STRIDE_SECONDS, true, BAKE_RATE, true)
 				library.add_animation(PURSUIT, _bake(skeleton, model, pursuit)))
+		# Both ages share the source swing over their own breathing pose and raised arms.
+		steps.append(func():
+			source_clips[ATTACK] = Pack.bake(bindings, [alert, pack.attack],
+				pack.attack.animation_length, false, BAKE_RATE, true, source_clips[IDLE]))
 		steps.append(func():
 			var idle := source_clips[IDLE]
 			var alert_source := Pack.bake(bindings, [alert], idle.length, true, BAKE_RATE, true, idle)
@@ -134,10 +138,13 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 	steps.append(func(): library.add_animation(IDLE, _bake(skeleton, model, source_clips[IDLE])))
 	steps.append(func(): library.add_animation(MOVE, _bake(skeleton, model, source_clips[MOVE])))
 	steps.append(func(): library.add_animation(ATTACK, _bake(skeleton, model, source_clips[ATTACK], attack_timing)))
-	# The pack has no skeletal spawn or stagger. Use a short section of its
-	# breathing pose for both while the Lab retains spawn and hit timing.
+	# Spawn and stagger use short breathing sections to match the Lab timing.
+	# Keep the existing A&S adult spawn adapter so the initial pose stays stable.
 	steps.append(func():
-		library.add_animation(SPAWN, _bake(skeleton, model, source_clips[IDLE], Vector3.ZERO, spawn_duration)))
+		var spawn_source: Animation = source_clips[IDLE]
+		if not baby and preview != null and preview.has_animation(&"Idle"):
+			spawn_source = preview.get_animation(&"Idle")
+		library.add_animation(SPAWN, _bake(skeleton, model, spawn_source, Vector3.ZERO, spawn_duration)))
 	steps.append(func():
 		library.add_animation(STAGGER, _bake(skeleton, model, source_clips[IDLE], Vector3.ZERO, stagger_seconds)))
 	return steps
