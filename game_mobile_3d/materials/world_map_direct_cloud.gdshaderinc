@@ -23,6 +23,7 @@ global uniform vec4 gaf_path_projector_lift;
 global uniform vec4 gaf_stone_projector_lift;
 varying vec2 stone_sunset_position;
 varying float terrain_canopy_ground_ev;
+global uniform float gaf_canopy_terrain_contrast;
 // Turf uses the fourth component for near-wall coverage.
 // Warm paths set it to -1 minus the red chroma delta and store blue in terrain_canopy_ground_ev.
 // Their RGB incident light remains the excess used by the cast-shadow correction.
@@ -144,7 +145,7 @@ void light() {
 	vec2 canopy_delta = vec2(0.0);
 	if (terrain_canopy_incident.w >= 0.0 && gaf_canopy_ground_fill.x > 0.0 && shadow_diffuse.g > 0.0 &&
 			terrain_canopy_ground_ev != 0.0 && shadow_attenuation < .58) {
-		canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev, shadow_attenuation);
+		canopy_delta = gaf_canopy_ground_delta(terrain_canopy_ground_ev * gaf_canopy_terrain_contrast, shadow_attenuation);
 		if (shadow_attenuation < .47) {
 			// Shaded turf receives more diffuse fill than the blades above it.
 			float coverage = 1.0 - smoothstep(.74, .94, terrain_canopy_sky);

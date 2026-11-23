@@ -303,6 +303,10 @@ gaf_canopy_ground_fill={
 "type": "vec2",
 "value": Vector2(0, 0)
 }
+gaf_canopy_terrain_contrast={
+"type": "float",
+"value": 1.0
+}
 gaf_spruce_sky_camera={
 "type": "vec3",
 "value": Vector3(0, 0, 0)

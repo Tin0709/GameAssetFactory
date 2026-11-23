@@ -1856,6 +1856,10 @@ func canopy_ground_fill_strength() -> Vector2:
 	var cloudy := clampf(_biome_profile.canopy_ground_fill_overcast, 0., 1.)
 	return gains * lerpf(1., cloudy, _weather.weight) * (_day_grass_shadow_weight() * _lighting_scale(&"canopy_ground_fill"))
 
+func canopy_terrain_contrast() -> float:
+	var contrast := _biome_profile.canopy_terrain_contrast if _biome_profile != null else 1.
+	return clampf(contrast, 1., 2.) if is_finite(contrast) else 1.
+
 func _path_sun_available() -> bool:
 	return source_terrain_active and _shadow_diffuse_available() and not _balanced_preview \
 		and atmosphere_review == "combined" and forest_active()
