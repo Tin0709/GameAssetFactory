@@ -461,7 +461,56 @@ func check_v_corner_escape(member_count: int) -> void:
 
 
 
+func check_open_back_recess(member_count: int, yaw: float, baby_chaser := false) -> void:
+	var lab := LAB.instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.player.set_physics_process(false)
+	var zombies := spawn_detour_group(lab, member_count, baby_chaser)
+	if zombies == null:
+		lab.free()
+		return
+	var heading := Basis(Vector3.UP, yaw)
+	var chaser := zombies.get_child(0) as ZOMBIE
+	lab.player.position = Vector3(0.0, 0.02, 0.0)
+	chaser.position = heading * Vector3(0.0, 0.02, -3.9)
+	chaser.animation.play(ZOMBIE.IDLE, 0.0)
+	chaser.animation.advance(0.0)
+	add_wall(lab, heading * Vector3(0.0, 0.2, -2.10), Vector3(1.9, 0.4, 0.22), yaw)
+	for side: float in [-1.0, 1.0]:
+		add_wall(lab, heading * Vector3(side * 0.86, 0.2, -3.36), Vector3(0.22, 0.4, 2.61), yaw)
+	var damage: Array[int] = []
+	chaser.melee_hit.connect(func(amount: int): damage.append(amount))
+	var backed_out := false
+	var crossing := INF
+	var hit_tick := -1
+	var chosen_routes := 0
+	var was_detouring := false
+	for tick in 540:
+		await physics_frame
+		var point := heading.inverse() * chaser.global_position
+		backed_out = backed_out or point.z < -4.9
+		if not is_finite(crossing) and point.z > -2.10:
+			crossing = point.x
+		var detouring := chaser._chase_detour.is_finite()
+		chosen_routes += int(detouring and not was_detouring)
+		was_detouring = detouring
+		if not damage.is_empty():
+			hit_tick = tick
+			break
+	var expected_damage := ZOMBIE.BABY_MELEE_DAMAGE if baby_chaser else ZOMBIE.MELEE_DAMAGE
+	if not backed_out or not is_finite(crossing) or absf(crossing) < 1.12 or damage != [expected_damage]:
+		failures.append("A zombie with a visible target should escape a dead end through its open side and reach melee")
+	print("LAB_OPEN_BACK members=", member_count, " yaw=", rad_to_deg(yaw), " baby=", baby_chaser,
+		" backed_out=", backed_out, " crossing=", crossing, " hit=", hit_tick,
+		" routes=", chosen_routes, " final=", heading.inverse() * chaser.global_position)
+	lab.free()
+	await physics_frame
+
+
 func run() -> void:
+	await check_open_back_recess(1, 0.0)
+	await check_open_back_recess(100, deg_to_rad(31.0), true)
 	await check_v_corner_escape(1)
 	await check_v_corner_escape(100)
 	await check_short_static_detour(1, 0.0, 2.5, Vector3(-1.25, 0.02, 3.5), 232)

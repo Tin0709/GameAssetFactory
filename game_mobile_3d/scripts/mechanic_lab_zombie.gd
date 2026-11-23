@@ -241,6 +241,7 @@ var _target_aggressive := false
 var _sight_state_seconds := 0.0
 var _last_seen_position := Vector3.ZERO
 var _chase_detour := Vector3.INF
+var _chase_detour_next := Vector3.INF
 var _chase_detour_time := 0.0
 var _partial_detour_origin := Vector3.INF
 var _partial_detour_target := Vector3.INF
@@ -899,6 +900,7 @@ func _lab_path_end_clear(space: PhysicsDirectSpaceState3D, travel: Vector3) -> b
 
 func _clear_chase_detour() -> void:
 	_chase_detour = Vector3.INF
+	_chase_detour_next = Vector3.INF
 	_chase_detour_time = 0.0
 	_chase_stalled_seconds = 0.0
 	_chase_detour_around_zombie = false
@@ -909,6 +911,13 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 		_chase_detour_time -= delta
 		var travel := (_chase_detour - global_position).slide(Vector3.UP)
 		var distance := travel.length()
+		if _chase_detour_time > 0.0 and distance <= LAB_WAYPOINT_ARRIVAL and _chase_detour_next.is_finite():
+			_chase_detour = _chase_detour_next
+			_chase_detour_next = Vector3.INF
+			_chase_detour_time = LAB_DETOUR_TIMEOUT
+			_chase_stalled_seconds = 0.0
+			travel = (_chase_detour - global_position).slide(Vector3.UP)
+			distance = travel.length()
 		var stalled := is_on_wall() and get_real_velocity().dot(travel) < MIN_WALL_PROGRESS_SPEED * distance
 		_chase_stalled_seconds = _chase_stalled_seconds + delta if stalled else 0.0
 		if (_chase_detour_time > 0.0 and distance > LAB_WAYPOINT_ARRIVAL
@@ -963,6 +972,8 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 			var reach := _chase_speed * available
 			if reach > LAB_DETOUR_LENGTH:
 				_chase_detour = _choose_detour_waypoint(space, bounds, normal, offset, stop_distance, false, true, reach)
+		if not _chase_detour.is_finite() and fixed_blocker and _target_visible:
+			_chase_detour = _retreat_detour(space, bounds, normal, offset, stop_distance)
 		if _chase_detour.is_finite():
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
 			# Returning directly through the blocker would undo this side step.
@@ -996,10 +1007,7 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 	var best_connects := false
 	var approach := target_offset - clearance
 	for direction in [lateral, -lateral]:
-		var local := _corpse_floor.to_local(origin + direction * search_distance)
-		local.x = clampf(local.x, -extent.x, extent.x)
-		local.z = clampf(local.z, -extent.z, extent.z)
-		var travel := (_corpse_floor.to_global(local) - origin).slide(Vector3.UP)
+		var travel := _detour_floor_travel(origin, direction * search_distance, extent)
 		var max_distance := travel.length_squared()
 		# A sweep can only shorten this leg. Keep the earlier connected leg on a tie.
 		if max_distance <= min_distance or (best_connects and not fixed_blocker and max_distance <= best_distance):
@@ -1059,6 +1067,49 @@ func _choose_detour_waypoint(space: PhysicsDirectSpaceState3D, bounds: BoxShape3
 		if longer.is_finite() and longer.distance_squared_to(global_position) > best.distance_squared_to(global_position):
 			return longer
 	return best
+
+func _detour_floor_travel(origin: Vector3, travel: Vector3, extent: Vector3) -> Vector3:
+	var local := _corpse_floor.to_local(origin + travel)
+	local.x = clampf(local.x, -extent.x, extent.x)
+	local.z = clampf(local.z, -extent.z, extent.z)
+	return (_corpse_floor.to_global(local) - origin).slide(Vector3.UP)
+
+func _retreat_detour(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, normal: Vector3,
+		target_offset: Vector3, stop_distance: float) -> Vector3:
+	# A visible target can draw a chaser into a recess with blocked side legs.
+	# Commit to backing out only when a checked side leg reconnects to the approach.
+	_prepare_lab_path_sweep(true)
+	var extent := bounds.size * 0.5 - Vector3.ONE * _live_capsule.radius
+	var retreat := _detour_floor_travel(global_position, normal.normalized() * LAB_DETOUR_LENGTH, extent)
+	retreat *= _lab_path_fraction(space, retreat)
+	if retreat.length_squared() <= LAB_DETOUR_MIN_LENGTH ** 2 or not _lab_path_end_clear(space, retreat):
+		return Vector3.INF
+	var start := _lab_path_sweep.transform
+	_lab_path_sweep.transform = start.translated(retreat)
+	var origin := global_position + retreat
+	var lateral := normal.cross(Vector3.UP).normalized()
+	if _crowd_slot % 2 != 0:
+		lateral = -lateral
+	var approach := target_offset - retreat
+	var best := Vector3.INF
+	var best_length := INF
+	var side_distance := minf(_chase_speed * LAB_DETOUR_TIMEOUT, LAB_DETOUR_LENGTH * 1.5)
+	for direction in [lateral, -lateral]:
+		var travel := _detour_floor_travel(origin, direction * side_distance, extent)
+		travel *= _lab_path_fraction(space, travel)
+		if travel.length_squared() <= LAB_DETOUR_MIN_LENGTH ** 2:
+			continue
+		var length := travel.length() + maxf(0.0, (approach - travel).length() - stop_distance)
+		if length >= best_length or is_equal_approx(length, best_length) or not _lab_path_end_clear(space, travel):
+			continue
+		if _detour_reaches_approach(space, travel, approach, stop_distance):
+			best = origin + travel
+			best_length = length
+	_lab_path_sweep.transform = start
+	if best.is_finite():
+		_chase_detour_next = best
+		return origin
+	return Vector3.INF
 
 func _detour_reaches_approach(space: PhysicsDirectSpaceState3D, detour: Vector3,
 		target_offset: Vector3, stop_distance: float) -> bool:
