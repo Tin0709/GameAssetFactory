@@ -129,6 +129,7 @@ const LAB_LAST_SEEN_STOP_DISTANCE := 0.10
 const LAB_ROAM_RADIUS := 10.0
 const LAB_ROAM_DELAY := 1.0
 const LAB_WAYPOINT_ARRIVAL := 0.10
+const LAB_WAYPOINT_ROUNDING := 0.00001
 const LAB_WALL_STALL_TIME := 0.25
 const MIN_WALL_PROGRESS_SPEED := LAB_ROAM_SPEED * 0.10
 const LAB_ROAM_ATTEMPTS := 4
@@ -913,7 +914,10 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 		_chase_detour_time -= delta
 		var travel := (_chase_detour - global_position).slide(Vector3.UP)
 		var distance := travel.length()
-		if _chase_detour_time > 0.0 and distance <= LAB_WAYPOINT_ARRIVAL and _chase_detour_next.is_finite():
+		# Travel stops at the arrival margin. World-space rounding can leave
+		# the capsule just outside it, preventing the next leg from starting.
+		var arrival := LAB_WAYPOINT_ARRIVAL + LAB_WAYPOINT_ROUNDING
+		if _chase_detour_time > 0.0 and distance <= arrival and _chase_detour_next.is_finite():
 			_chase_detour = _chase_detour_next
 			_chase_detour_next = Vector3.INF
 			_chase_detour_time = LAB_DETOUR_TIMEOUT
@@ -922,7 +926,7 @@ func _chase_detour_velocity(offset: Vector3, target_distance: float, stop_distan
 			distance = travel.length()
 		var stalled := is_on_wall() and get_real_velocity().dot(travel) < MIN_WALL_PROGRESS_SPEED * distance
 		_chase_stalled_seconds = _chase_stalled_seconds + delta if stalled else 0.0
-		if (_chase_detour_time > 0.0 and distance > LAB_WAYPOINT_ARRIVAL
+		if (_chase_detour_time > 0.0 and distance > arrival
 				and _chase_stalled_seconds < LAB_WALL_STALL_TIME):
 			var direct_clear := false
 			if sample_ai:
@@ -1098,8 +1102,8 @@ func _retreat_detour(space: PhysicsDirectSpaceState3D, bounds: BoxShape3D, norma
 	var approach := target_offset - retreat
 	var best := Vector3.INF
 	var best_length := INF
-	var side_distance := minf(minf(_chase_speed * LAB_DETOUR_TIMEOUT, LAB_DETOUR_LENGTH * 1.5),
-		distance_budget - retreat.length())
+	var side_distance := minf(_chase_speed * LAB_DETOUR_TIMEOUT, LAB_DETOUR_LENGTH * 1.5)
+	side_distance = minf(side_distance, distance_budget - retreat.length())
 	for direction in [lateral, -lateral]:
 		var travel := _detour_floor_travel(origin, direction * side_distance, extent)
 		travel *= _lab_path_fraction(space, travel)
