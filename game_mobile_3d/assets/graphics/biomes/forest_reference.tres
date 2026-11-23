@@ -50,7 +50,7 @@ point_count = 8
 
 [sub_resource type="Curve" id="ForestAmbientHours"]
 max_value = 1.35
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.229166667, 1), 0.0, 0.0, 0, 0, Vector2(0.291666667, 1.35), 0.0, 0.0, 0, 0, Vector2(0.4375, 1), 0.0, 0.0, 0, 0, Vector2(0.583333333, 1), 0.0, 0.0, 0, 0, Vector2(0.6875, 1.35), 0.0, 0.0, 0, 0, Vector2(0.78125, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.229166667, 1), 0.0, 0.0, 0, 0, Vector2(0.354166667, 1.35), 0.0, 0.0, 0, 0, Vector2(0.4375, 1), 0.0, 0.0, 0, 0, Vector2(0.583333333, 1), 0.0, 0.0, 0, 0, Vector2(0.6875, 1.35), 0.0, 0.0, 0, 0, Vector2(0.78125, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 8
 
 [sub_resource type="Curve" id="ForestAmbientTintHours"]
