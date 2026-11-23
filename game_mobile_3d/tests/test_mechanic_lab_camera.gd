@@ -159,7 +159,7 @@ func start_sabre_dive(lab) -> void:
 
 func check_aerial_contact_pose(lab) -> void:
 	lab.set_process(false)
-	var group := lab.get_node("Zombies")
+	var group: Node = lab.get_node("Zombies")
 	var sparks = lab.get_node("ContactSparks")
 	sparks.process_mode = Node.PROCESS_MODE_DISABLED
 	for slot: int in [lab.Weapon.SABRE, lab.Weapon.SWORD, lab.Weapon.AXE]:
