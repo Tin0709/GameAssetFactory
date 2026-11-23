@@ -251,6 +251,7 @@ var _roam_destination := Vector3.INF
 var _roam_wait := LAB_ROAM_DELAY
 var _roam_blocked_seconds := 0.0
 var _roam_rng := RandomNumberGenerator.new()
+var _stationary_gait_phase := -1.0
 var _idle_audio_index := 0
 var _idle_audio_phase := 0.0
 var _idle_audio_period := 0.0
@@ -411,6 +412,9 @@ func _ready() -> void:
 		body.collision_mask = 0
 	if is_instance_valid(_corpse_floor):
 		ragdoll.prepare_source_joints()
+		if animation.has_animation(ActionsStuff.MOVE):
+			animation.animation_started.connect(_invalidate_stationary_gait)
+			animation.caches_cleared.connect(_invalidate_stationary_gait)
 		if animation.has_animation(IDLE):
 			_idle_audio_period = animation.get_animation(IDLE).length
 	if _death_profile == null:
@@ -667,7 +671,15 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 		var play_idle := state == IDLE and idle_audio.has_connections()
 		var clip_drives_audio := play_steps or (play_idle and _idle_audio_period <= 0.0)
 		var previous_phase := animation.current_animation_position if clip_drives_audio else 0.0
-		animation.advance(delta)
+		if source_stride and delta == 0.0:
+			# The first stationary tick can still apply a new pose or blend weight.
+			# The authored A&S move clip only writes transforms.
+			if _stationary_gait_phase != animation.current_animation_position:
+				animation.advance(0.0)
+				_stationary_gait_phase = animation.current_animation_position
+		else:
+			_stationary_gait_phase = -1.0
+			animation.advance(delta)
 		if play_steps:
 			_emit_walk_step(clip, previous_phase)
 		elif play_idle:
@@ -679,6 +691,7 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 			else:
 				_emit_idle_audio(previous_phase, animation.current_animation_position)
 		return
+	_stationary_gait_phase = -1.0
 	var before := animation.current_animation_position
 	var lab := is_instance_valid(_corpse_floor)
 	var montage_rate := LAB_MELEE_MONTAGE_RATE if lab and not is_baby else 1.0
@@ -696,6 +709,9 @@ func _advance_animation(delta: float, travel: Vector3) -> void:
 		swing_audio.emit(combat_center())
 	if before < _attack_contact and after >= _attack_contact:
 		_check_melee_contact()
+
+func _invalidate_stationary_gait(_clip := &"") -> void:
+	_stationary_gait_phase = -1.0
 
 func _emit_idle_audio(previous_phase: float, phase: float) -> void:
 	var crossed := IDLE_AUDIO_NOTIFY_TIME > previous_phase and IDLE_AUDIO_NOTIFY_TIME <= phase
