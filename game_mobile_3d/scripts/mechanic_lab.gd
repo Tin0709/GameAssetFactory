@@ -267,6 +267,7 @@ func _ready() -> void:
 		_combat_audio.name = "CombatAudio"
 		_combat_audio.zombie_listener = listener
 		add_child(_combat_audio)
+		_combat_audio.queue_base_samples()
 		_setup_movement_audio()
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
@@ -1398,8 +1399,6 @@ func _spawn_crowd_frame() -> void:
 	if _crowd_spawns_left == 0:
 		_stop_crowd_spawn()
 		$HUD/SpawnStatus.text = "Đã tạo %d zombie." % CROWD_SPAWN_COUNT
-		# Prepare the base audio after the spawn batches have finished.
-		_combat_audio.queue_crowd_samples()
 	else:
 		$HUD/SpawnStatus.text = "Đang tạo zombie… %d/%d" % [CROWD_SPAWN_COUNT - _crowd_spawns_left, CROWD_SPAWN_COUNT]
 

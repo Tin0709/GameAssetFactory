@@ -835,7 +835,7 @@ static func _research_root() -> String:
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	return OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research") if root.is_empty() else root
 
-func queue_crowd_samples() -> void:
+func queue_base_samples() -> void:
 	if OS.has_feature("editor"):
 		_queue_base_samples()
 

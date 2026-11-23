@@ -1777,6 +1777,33 @@ func check_equipped_weapon_previews(bus: int, capture: AudioEffectCapture) -> vo
 	await create_timer(0.12).timeout
 	lab.free()
 
+func check_first_enable_after_preparation() -> void:
+	var lab := preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var audio := lab.get_node("CombatAudio") as COMBAT_AUDIO
+	var master_muted := AudioServer.is_bus_mute(0)
+	check(audio != null, "MechanicLab has its private combat sound consumer")
+	if audio == null:
+		lab.free()
+		return
+	var initial := audio._groups.size()
+	for frame in 80:
+		await process_frame
+	check(initial == 0 and not audio.enabled and audio._voices.is_empty()
+		and AudioServer.is_bus_mute(0) == master_muted,
+		"Opening MechanicLab does not play sound or create combat voices")
+	var prepared := audio._groups.has(&"hit") and audio._groups.has(&"zombie_step") \
+		and audio._groups.has(&"slam_grass") and audio._base_sample_jobs.is_empty()
+	check(prepared, "Lab prepares its verified base sound bank without a crowd or audio toggle")
+	if prepared:
+		var next: AudioStream = audio._groups[&"hit"][0]
+		lab.get_node("HUD/CombatAudioToggle").button_pressed = true
+		check(audio._voices[0].stream == next and audio._next_choice.get(&"hit", 0) == 0,
+			"First enable previews the already prepared Sabre sample without consuming it")
+	lab.free()
+	await create_timer(0.12).timeout
+
 func run() -> void:
 	var camera := Camera3D.new()
 	root.add_child(camera)
@@ -1872,6 +1899,7 @@ func run() -> void:
 	await check_movement_audio_partial_bundle()
 	await check_landing_voice_under_step_burst(bus, capture)
 	await check_run_step_after_landing(bus, capture)
+	await check_first_enable_after_preparation()
 	await check_sabre_debris_audio(bus, capture)
 	await check_sabre_crowd_audio(bus, capture)
 	await check_zombie_steps(bus, capture)
