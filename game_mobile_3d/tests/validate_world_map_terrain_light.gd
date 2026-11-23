@@ -58,6 +58,18 @@ func check_caster_matched_bounce(world: Node3D) -> void:
 	region.sun_bounce_matched_sha256 = transport._regional_sky.sun_bounce_matched_sha256
 	region.sun_bounce_sha256 = "0".repeat(64)
 	check(region.load_matched_sun_bounce_texture(digest) == null, "Changed base field invalidates the correction")
+	var afternoon = world.showcase.afternoon_lighting
+	if afternoon.ready:
+		check(afternoon.active and transport.day_bounce_texture == afternoon.terrain_texture,
+			"Forest uses the matched afternoon field with the captured direction")
+		world.showcase.set_atmosphere_review("haze")
+		await process_frame
+		check(not afternoon.active and transport.day_bounce_key == Vector4.ZERO,
+			"Haze comparison clears the afternoon direction and terrain return")
+		world.showcase.set_atmosphere_review("combined")
+		await process_frame
+		check(afternoon.active and transport.day_bounce_texture == afternoon.terrain_texture,
+			"Combined comparison restores the verified afternoon field")
 	world.showcase.set_hour(12.)
 	await process_frame
 
