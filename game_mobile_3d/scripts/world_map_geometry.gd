@@ -5,6 +5,9 @@ const ASSET_DIRECTORY := "res://assets/environment/world_map_v1/"
 const LOOK_PRESET = preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const EPSILON := 0.00001
 const FACE_DIRECTIONS := [Vector3i.LEFT, Vector3i.RIGHT, Vector3i.FORWARD, Vector3i.BACK, Vector3i.DOWN, Vector3i.UP]
+const HALF_CELL_SCALE := Vector3(1., 2., 1.)
+const REVEAL_CHEST_HEIGHT := 1.19
+const REVEAL_SHOULDER_OFFSETS := [-.28, 0., .28]
 
 var cells: Dictionary[Vector3i, int] = {}
 var terrain_triangles := 0
@@ -528,11 +531,58 @@ func _build_multimeshes(chunk: Vector2i, origin: Vector3, kind: String, placemen
 
 var _current_cloud_time:=0.0
 var cutaway_shader: Shader = LOOK_PRESET.cutaway_shader
+var _cutaway_weight := 1.
 
 
-func update_cutaway(player_position: Vector3, camera_position: Vector3, enabled: bool = true) -> void:
+func cutaway_visibility(feet: Vector3, camera: Camera3D) -> float:
+	if camera.projection != Camera3D.PROJECTION_ORTHOGONAL:
+		return 1.
+	# Fade terrain when it blocks the upper body. Low steps can hide the boots
+	# with the same solid surface as the rest of the scene.
+	var axis := camera.global_basis.z.normalized()
+	var side := camera.global_basis.x.normalized()
+	var chest := feet + Vector3.UP * REVEAL_CHEST_HEIGHT
+	var reach := (camera.global_position - chest).dot(axis) - camera.near
+	var local_from_world := global_transform.affine_inverse()
+	var ray := (local_from_world.basis * axis) * HALF_CELL_SCALE
+	var covered := 0
+	for lateral: float in REVEAL_SHOULDER_OFFSETS:
+		var origin := local_from_world * (chest + side * lateral + axis * .025)
+		if _terrain_on_ray((origin - _offset) * HALF_CELL_SCALE, ray, reach - .025):
+			covered += 1
+	return float(covered) / REVEAL_SHOULDER_OFFSETS.size()
+
+
+func _terrain_on_ray(origin: Vector3, direction: Vector3, reach: float) -> bool:
+	var cell := Vector3i(origin.floor())
+	var step := Vector3i(direction.sign())
+	var interval := Vector3(INF, INF, INF)
+	var crossing := interval
+	for axis in 3:
+		if step[axis] == 0:
+			continue
+		interval[axis] = absf(1. / direction[axis])
+		var boundary := float(cell[axis]) + (1. if step[axis] > 0 else 0.)
+		crossing[axis] = (boundary - origin[axis]) / direction[axis]
+	var travelled := 0.
+	while travelled < reach:
+		var axis := crossing.min_axis_index()
+		var edge := crossing[axis]
+		# A shared edge or corner can touch a cell without entering its volume.
+		if edge > travelled + EPSILON and _occupied_halves.has(cell):
+			return true
+		travelled = edge
+		cell[axis] += step[axis]
+		crossing[axis] += interval[axis]
+	return false
+
+
+func update_cutaway(player_position: Vector3, camera_position: Vector3, enabled: bool = true,
+		weight: float = 1.) -> void:
 	# Coincident endpoints are the overview/controller contract for restoring imports.
-	enabled = enabled and player_position.distance_squared_to(camera_position) > EPSILON
+	enabled = enabled and weight > 0. and player_position.distance_squared_to(camera_position) > EPSILON
+	var weight_changed := weight != _cutaway_weight
+	_cutaway_weight = weight
 	var start := player_position + Vector3(0, 0.9, 0)
 	for item: Dictionary in _cutaway_chunks:
 		var visual: MeshInstance3D = item.visual
@@ -541,16 +591,19 @@ func update_cutaway(player_position: Vector3, camera_position: Vector3, enabled:
 		if active and item.materials.is_empty():
 			for surface in visual.mesh.get_surface_count():
 				item.materials.append(_make_cutaway_material(visual.mesh.surface_get_material(surface)))
-		if active != item.active:
+		var activation_changed: bool = active != item.active
+		if activation_changed:
 			for surface in visual.mesh.get_surface_count():
 				visual.set_surface_override_material(surface, item.materials[surface] if active else null)
 			visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if active else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 			item.caster.visible = active
 			item.active = active
-			if active:
-				for material: ShaderMaterial in item.materials:material.set_shader_parameter("cloud_time",_current_cloud_time)
 		if active:
 			for material: ShaderMaterial in item.materials:
+				if activation_changed:
+					material.set_shader_parameter("cloud_time", _current_cloud_time)
+				if activation_changed or weight_changed:
+					material.set_shader_parameter("cutaway_weight", weight)
 				material.set_shader_parameter("cutaway_start", start)
 				material.set_shader_parameter("cutaway_end", camera_position)
 
