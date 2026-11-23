@@ -60,9 +60,9 @@ func run() -> void:
 	lab._on_player_hit(94)
 	for i in 60:
 		await physics_frame
-		if attacker.animation.current_animation == ZOMBIE.ATTACK and attacker.animation.current_animation_position >= 0.33:
+		if attacker._living_state(attacker.animation.current_animation) == ZOMBIE.ATTACK and attacker.animation.current_animation_position >= 0.33:
 			break
-	check(attacker.animation.current_animation == ZOMBIE.ATTACK, "Zombie starts a real attack")
+	check(attacker._living_state(attacker.animation.current_animation) == ZOMBIE.ATTACK, "Zombie starts a real attack")
 	var had_ribbon := false
 	key(KEY_E, true)
 	for i in 30:

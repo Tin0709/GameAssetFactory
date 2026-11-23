@@ -22,6 +22,7 @@ func run() -> void:
 	var lab = load("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
+	lab.get_node("Zombies").set_actions_stuff_animation(false) # Reproduce the original MD2 launch poses.
 	var group = lab.get_node("Zombies")
 	check(group.damage_digits().size() == 10 and group._visual != null and group.get_child_count() == 0,
 		"Lab startup prepares the verified zombie model and digits before the first spawn")

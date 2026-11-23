@@ -309,7 +309,7 @@ func check_floor_edge_pursuit(member_count: int, yaw: float, corner: bool) -> vo
 		var position := heading.inverse() * chaser.global_position
 		farthest = maxf(farthest, maxf(position.x, position.z))
 		lost_floor = lost_floor or (i > 2 and not chaser.is_on_floor())
-	var waiting := chaser.animation.current_animation == ZOMBIE.IDLE
+	var waiting := chaser._living_state(chaser.animation.current_animation) == ZOMBIE.IDLE
 	if lost_floor or farthest < 49.46 or farthest > 49.61 or not waiting \
 			or not chaser._target_aggressive or not hits.is_empty():
 		failures.append("A partial pursuit should stop at supported ground and preserve real melee range")

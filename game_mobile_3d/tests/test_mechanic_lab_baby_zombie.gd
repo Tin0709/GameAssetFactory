@@ -23,6 +23,7 @@ func run() -> void:
 	current_scene = lab
 	lab.player.set_physics_process(false)
 	var group: Node = lab.get_node("Zombies")
+	group.set_actions_stuff_animation(false) # The phase assertions below measure MD2's original clips.
 	var button := lab.get_node_or_null("HUD/SpawnBabyZombie") as Button
 	check(button != null and not button.disabled, "The Lab offers a separate Baby Zombie button")
 	if button == null or button.disabled:

@@ -36,7 +36,7 @@ func run() -> void:
 	zombie.position = Vector3(0.0, 0.0, 4.0)
 	await ticks(28)
 	zombie.position = Vector3(0.0, 0.0, 2.45)
-	check(zombie.animation.current_animation in ZOMBIE.WALK_CLIPS, "The zombie is actively chasing before contact")
+	check(zombie.animation.current_animation in ZOMBIE.WALK_STEP_NOTIFIES, "The zombie is actively chasing before contact")
 	attack(true)
 	await ticks(2)
 	attack(false)
@@ -44,7 +44,7 @@ func run() -> void:
 		if zombie.health < 48:
 			break
 		await physics_frame
-	check(zombie.health == 36 and zombie.animation.current_animation != ZOMBIE.STAGGER,
+	check(zombie.health == 36 and zombie._living_state(zombie.animation.current_animation) != ZOMBIE.STAGGER,
 		"Actual E input lands one 12 damage hit below the poise threshold")
 	var at_contact: float = zombie.position.z
 	var last: float = at_contact
@@ -62,7 +62,7 @@ func run() -> void:
 	check(furthest > at_contact + 0.20, "A normal hit actually pushes the zombie away")
 	check(first_chase_step >= step_limit - 1 and first_chase_step <= step_limit + 1,
 		"The zombie resumes chasing after 0.4 s, measured step %d" % first_chase_step)
-	check(zombie.animation.current_animation in ZOMBIE.WALK_CLIPS, "The zombie returns to its locomotion clip")
+	check(zombie.animation.current_animation in ZOMBIE.WALK_STEP_NOTIFIES, "The zombie returns to its locomotion clip")
 	var after_chase: float = zombie.position.z
 	zombie.take_hit(3, Vector3.BACK, Vector2(200.0, 0.0), 0.0)
 	await ticks(2)
@@ -70,13 +70,13 @@ func run() -> void:
 
 	zombie.position = Vector3(0.0, 0.0, 1.36)
 	for i in Engine.physics_ticks_per_second:
-		if zombie.animation.current_animation == ZOMBIE.ATTACK and zombie.animation.current_animation_position >= 0.12:
+		if zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK and zombie.animation.current_animation_position >= 0.12:
 			break
 		await physics_frame
 	var player_hp: int = lab.player_health
 	var windup_position: float = zombie.animation.current_animation_position
 	zombie.take_hit(1, Vector3.RIGHT, Vector2(4.0, 0.0), 1.0)
-	check(zombie.animation.current_animation == ZOMBIE.ATTACK
+	check(zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK
 		and is_equal_approx(zombie.animation.current_animation_position, windup_position),
 		"A hit below the poise threshold preserves an active windup")
 	for i in Engine.physics_ticks_per_second:

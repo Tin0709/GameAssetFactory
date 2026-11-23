@@ -17,7 +17,7 @@ func ticks(count: int) -> void:
 
 func wait_for_windup(zombie) -> void:
 	for i in 120:
-		if zombie.animation.current_animation == ZOMBIE.ATTACK and zombie.animation.current_animation_position >= 0.15:
+		if zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK and zombie.animation.current_animation_position >= 0.15:
 			return
 		await physics_frame
 
@@ -36,11 +36,11 @@ func run() -> void:
 	zombie.health = 100
 	zombie.max_health = 100
 	await wait_for_windup(zombie)
-	check(zombie.animation.current_animation == ZOMBIE.ATTACK, "The zombie starts a real melee windup")
+	check(zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK, "The zombie starts a real melee windup")
 	zombie.take_hit(12, Vector3.BACK, Vector2.ZERO, 23.0)
-	check(zombie.animation.current_animation == ZOMBIE.ATTACK, "A single Sabre hit stays below 28 poise")
+	check(zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK, "A single Sabre hit stays below 28 poise")
 	zombie.take_hit(14, Vector3.BACK, Vector2.ZERO, 23.0)
-	check(zombie.animation.current_animation == ZOMBIE.STAGGER, "The second Sabre hit breaks poise and cancels the windup")
+	check(zombie._living_state(zombie.animation.current_animation) == ZOMBIE.STAGGER, "The second Sabre hit breaks poise and cancels the windup")
 	var start_frame := Engine.get_physics_frames()
 	var half_duration := roundi(0.25 * Engine.physics_ticks_per_second)
 	await ticks(half_duration)
@@ -49,7 +49,7 @@ func run() -> void:
 	check(zombie.health == 54 and is_equal_approx(zombie.animation.current_animation_position, pose_time),
 		"Another poise-breaking hit deals damage without restarting stagger")
 	for i in Engine.physics_ticks_per_second:
-		if zombie.animation.current_animation != ZOMBIE.STAGGER:
+		if zombie._living_state(zombie.animation.current_animation) != ZOMBIE.STAGGER:
 			break
 		await physics_frame
 	var elapsed := float(Engine.get_physics_frames() - start_frame) / Engine.physics_ticks_per_second
@@ -57,9 +57,9 @@ func run() -> void:
 		"The original stagger ends after 0.65 s (measured %.4f)" % elapsed)
 	check(lab.player_health == 100, "The interrupted windup never damages the player")
 	await wait_for_windup(zombie)
-	check(zombie.animation.current_animation == ZOMBIE.ATTACK, "Zombie resumes attacking after stagger")
+	check(zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK, "Zombie resumes attacking after stagger")
 	zombie.take_hit(20, Vector3.BACK, Vector2.ZERO, 37.0)
-	check(zombie.animation.current_animation == ZOMBIE.STAGGER, "A new poise break can stagger after the first one ends")
+	check(zombie._living_state(zombie.animation.current_animation) == ZOMBIE.STAGGER, "A new poise break can stagger after the first one ends")
 	lab.free()
 	print("MECHANIC_LAB_STAGGER duration=", elapsed, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)

@@ -145,9 +145,9 @@ func check_melee_focus(lab) -> void:
 		zombie.animation.advance(0.0)
 		for frame in 30:
 			await physics_frame
-			if zombie.animation.current_animation == ZOMBIE.ATTACK:
+			if zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK:
 				break
-		check(zombie.animation.current_animation == ZOMBIE.ATTACK, "The focus fixture begins a real windup")
+		check(zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK, "The focus fixture begins a real windup")
 		await ticks(4)
 		if fixture == "late sidestep":
 			await ticks(14)
@@ -186,9 +186,9 @@ func check_melee_height(lab) -> void:
 		if blocked:
 			for frame in 36:
 				await physics_frame
-				if zombie.animation.current_animation == ZOMBIE.ATTACK:
+				if zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK:
 					break
-			check(zombie.animation.current_animation == ZOMBIE.ATTACK, "The wall fixture starts with a real windup")
+			check(zombie._living_state(zombie.animation.current_animation) == ZOMBIE.ATTACK, "The wall fixture starts with a real windup")
 			wall = StaticBody3D.new()
 			var collider := CollisionShape3D.new()
 			var box := BoxShape3D.new()
@@ -201,7 +201,7 @@ func check_melee_height(lab) -> void:
 		var expected_health := 94 if height < 2.0 and not blocked else 100
 		check(lab.player_health == expected_health, "Zombie attack at height %.2f m with wall=%s" % [height, blocked])
 		if height > 2.0:
-			check(zombie.animation.current_animation != ZOMBIE.ATTACK, "Targets beyond the height limit do not start a windup")
+			check(zombie._living_state(zombie.animation.current_animation) != ZOMBIE.ATTACK, "Targets beyond the height limit do not start a windup")
 		if wall != null:
 			wall.free()
 		zombie.free()
@@ -288,14 +288,14 @@ func check_zombie_roam(lab) -> void:
 	var reached_idle := false
 	for frame in 30:
 		await physics_frame
-		if zombie.animation.current_animation == ZOMBIE.IDLE:
+		if zombie._living_state(zombie.animation.current_animation) == ZOMBIE.IDLE:
 			reached_idle = true
 			break
 	check(reached_idle, "A patrol starts from the ordinary spawned idle")
 	await ticks(57)
 	check(zombie.position.distance_to(origin) < 0.025, "An idle zombie first waits for one second")
 	await ticks(27)
-	check(zombie.position.distance_to(origin) > 0.5 and zombie.animation.current_animation in ZOMBIE.WALK_CLIPS,
+	check(zombie.position.distance_to(origin) > 0.5 and zombie.animation.current_animation in ZOMBIE.WALK_STEP_NOTIFIES,
 		"An unalerted zombie roams on its native walking clip")
 	var peak_distance := 0.0
 	var peak_speed := 0.0
@@ -305,9 +305,9 @@ func check_zombie_roam(lab) -> void:
 		await physics_frame
 		peak_distance = maxf(peak_distance, zombie.position.distance_to(origin))
 		peak_speed = maxf(peak_speed, zombie.get_real_velocity().slide(Vector3.UP).length())
-		if zombie.animation.current_animation == ZOMBIE.IDLE:
+		if zombie._living_state(zombie.animation.current_animation) == ZOMBIE.IDLE:
 			saw_pause = true
-		elif saw_pause and zombie.animation.current_animation in ZOMBIE.WALK_CLIPS:
+		elif saw_pause and zombie.animation.current_animation in ZOMBIE.WALK_STEP_NOTIFIES:
 			saw_second_walk = true
 	check(saw_pause and saw_second_walk and peak_distance <= 10.025,
 		"Patrol pauses before a new leg and stays within ten metres of the spawn")
@@ -427,7 +427,7 @@ func check_zombie_roam_stalled_slide(lab) -> void:
 	var first_remaining := (slide_position - destination).slide(Vector3.UP).length()
 	check(slide_ticks > 0 and slide_speed > 0.15 and first_remaining - remaining < 0.18,
 		"The inserted wall causes a sideways slide with almost no progress toward the destination")
-	check(slide_ticks <= 18 and not zombie._roam_destination.is_finite() and zombie.animation.current_animation == ZOMBIE.IDLE,
+	check(slide_ticks <= 18 and not zombie._roam_destination.is_finite() and zombie._living_state(zombie.animation.current_animation) == ZOMBIE.IDLE,
 		"A sideways scrape does not keep the obstructed patrol leg active")
 	check(step_events.is_empty() and dust._puffs.is_empty(),
 		"The authored foot contact emits neither a step nor a grass puff while only sliding along a wall")
