@@ -682,6 +682,7 @@ func run() -> void:
 	await check_active_crowd_at_floor_edge()
 	await check_paired_blocker_release()
 	await check_sight_after_crowd_dies()
+	await check_last_sighting_at_two_faces(1)
 	print("LAB_ZOMBIE_DETOUR failures=", failures)
 	quit(0 if failures.is_empty() else 1)
 
