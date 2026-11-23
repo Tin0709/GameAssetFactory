@@ -427,6 +427,9 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 				and _wall_blocks_every_handoff_shift(space, collision_mask, wall, wall_bounds, region, floor_bounds):
 			shift_known = false
 			continue
+		if idle_weight < 1.0 and _wall_handoff_part_cannot_clear(space, region, wall_bounds, floor_bounds):
+			shift_known = false
+			continue
 		var clear_parts := _find_clear_handoff_parts(region, floor_bounds, wall_bounds)
 		var candidate_shift := _solve_handoff_clearance(clear_parts, idle_weight < 1.0)
 		if not candidate_shift.is_finite():
@@ -524,6 +527,41 @@ func _wall_blocks_every_handoff_shift(space: PhysicsDirectSpaceState3D, collisio
 		var unobstructed := space.intersect_shape(_handoff_bounds_query, 1).is_empty()
 		_handoff_bounds_query.exclude = []
 		if unobstructed:
+			return true
+	return false
+
+func _wall_handoff_part_cannot_clear(space: PhysicsDirectSpaceState3D, region: AABB,
+		wall: AABB, floor_box: AABB) -> bool:
+	if not region.has_volume():
+		return false
+	var wall_axis := Vector3.AXIS_X if wall.size.x < wall.size.z else Vector3.AXIS_Z
+	var tangent_axis := Vector3.AXIS_Z if wall_axis == Vector3.AXIS_X else Vector3.AXIS_X
+	var shift_margin := HANDOFF_MAX_SHIFT + PROJECTION_COLLISION_MARGIN
+	for name: String in ["Arm.L", "Arm.R", "Head"]:
+		var body: PhysicalBone3D = bodies[name]
+		var local_box: AABB = _handoff_box_snapshot.get(body, AABB())
+		if not local_box.has_volume():
+			continue
+		var pose: Transform3D = current[name]
+		var bounds := pose * local_box
+		var low_depth := bounds.end[wall_axis] - wall.position[wall_axis]
+		var high_depth := wall.end[wall_axis] - bounds.position[wall_axis]
+		var in_wall := minf(low_depth, high_depth)
+		if in_wall <= shift_margin + HANDOFF_WALL_REST_OVERLAP:
+			continue
+		var y_room := minf(bounds.position.y - wall.position.y, wall.end.y - bounds.end.y)
+		var tangent_room := minf(bounds.position[tangent_axis] - wall.position[tangent_axis],
+			wall.end[tangent_axis] - bounds.end[tangent_axis])
+		# Leave enough room at the wall edges that only the two broad faces can separate the part.
+		if minf(y_room, tangent_room) <= in_wall + 2.0 * shift_margin:
+			continue
+		var envelope := bounds.grow(shift_margin)
+		if not region.encloses(envelope) or envelope.intersects(floor_box):
+			continue
+		# Confirm with the physics query at maximum travel toward the nearer face.
+		var escape := Vector3.ZERO
+		escape[wall_axis] = -HANDOFF_MAX_SHIFT if low_depth <= high_depth else HANDOFF_MAX_SHIFT
+		if not _wall_handoff_part_is_clear(space, body, pose.translated(escape)):
 			return true
 	return false
 
