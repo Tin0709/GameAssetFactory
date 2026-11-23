@@ -92,6 +92,7 @@ func run() -> void:
 	await check_crowd(lab, group)
 	await check_sabre_height_thresholds(lab, group)
 	await check_sabre_edge_support(lab, group)
+	await check_bow_knockback(lab, group)
 	lab.free()
 	print("MECHANIC_LAB_KNOCKBACK first_chase_step=", first_chase_step,
 		" travel=", furthest - at_contact, " failures=", failures)
@@ -196,6 +197,49 @@ func check_sword_finisher_push(lab, group) -> void:
 	selector.select(0)
 	selector.item_selected.emit(0)
 	check(selector.selected == 0 and not group.sword_equipped, "Switch back to Sabre after the Sword combo ends")
+
+func check_bow_knockback(lab, group) -> void:
+	var selector := lab.get_node("HUD/Weapon") as OptionButton
+	selector.select(6)
+	selector.item_selected.emit(6)
+	check(selector.selected == 6, "The projectile knockback fixture equips Bow")
+	if selector.selected != 6:
+		return
+	var hz := Engine.physics_ticks_per_second
+	var expected_lock_ticks := roundi(0.4 * hz)
+	for baby: bool in [false, true]:
+		for charged: bool in [false, true]:
+			lab.reset_player()
+			await ticks(ceili(hz * 0.25))
+			var origin: Vector3 = lab.player.global_position
+			group._spawn_at(origin + Vector3.BACK * 6.5, origin, lab.player,
+				lab.get_node("CombatEffects"), false, baby)
+			var zombie := group.get_child(0) as ZOMBIE
+			zombie.max_health = 100
+			zombie.health = 100
+			await ticks(4)
+			attack(true)
+			await ticks(ceili(hz * (0.40 if charged else 0.04)))
+			attack(false)
+			for tick in hz:
+				await physics_frame
+				if zombie.health < 100:
+					break
+			var expected_health := 46 if charged else 82
+			var contact_z := zombie.global_position.z
+			var furthest_z := contact_z
+			var start_lock := zombie._knockback_control_left
+			var lock_ticks := 0
+			while zombie._knockback_control_left > 0.00001 and lock_ticks <= hz:
+				lock_ticks += 1
+				await physics_frame
+				furthest_z = maxf(furthest_z, zombie.global_position.z)
+			var shot := "%s Bow against %s" % ["Charged" if charged else "Normal", "baby" if baby else "adult"]
+			check(zombie.health == expected_health and furthest_z > contact_z + 0.08,
+				shot + " applies the source damage and pushes the living target away")
+			check(is_equal_approx(start_lock, 0.4) and lock_ticks == expected_lock_ticks,
+				shot + " disables movement control for 0.4 seconds from projectile contact")
+			zombie.free()
 
 func check_sabre_landing_damage(lab, group) -> void:
 	lab.reset_player()
