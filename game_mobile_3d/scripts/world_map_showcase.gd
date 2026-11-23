@@ -3888,6 +3888,7 @@ func _apply_forest_dusk_backdrop(env: Environment) -> void:
 		env.background_color = env.background_color.lerp(backdrop, weight)
 
 func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
+	afternoon_lighting.active=false
 	key_response_active=false
 	sunrise_elevation_active = false
 	key_direction_active=false
