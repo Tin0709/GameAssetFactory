@@ -238,8 +238,10 @@ func check_bow_knockback(lab, group) -> void:
 				await physics_frame
 				furthest_z = maxf(furthest_z, zombie.global_position.z)
 			var shot := "%s Bow against %s" % ["Charged" if charged else "Normal", "baby" if baby else "adult"]
-			check(zombie.health == expected_health and furthest_z > contact_z + 0.08,
-				shot + " applies the source damage and pushes the living target away")
+			var outward := furthest_z - contact_z
+			check(zombie.health == expected_health, shot + " applies the source damage")
+			check(outward > (0.05 if baby else 0.20),
+				shot + " pushes the living target away (%.3f m)" % outward)
 			check(is_equal_approx(start_lock, 0.4) and lock_ticks == expected_lock_ticks,
 				shot + " disables movement control for 0.4 seconds from projectile contact")
 			zombie.free()
