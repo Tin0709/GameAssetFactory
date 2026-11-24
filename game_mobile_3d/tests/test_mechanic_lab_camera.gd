@@ -155,8 +155,11 @@ func check_melee_combo_shakes(lab) -> void:
 		print("MELEE_COMBO_SHAKE ", menu.get_item_text(weapon), " kicks=", kicks, " contact_lights=", lights)
 	group.sabre_contact.disconnect(record_contact)
 	target.free()
-	lab._select_weapon(lab.Weapon.SABRE)
 	lab.reset_player()
+	for i in 8:
+		await physics_frame
+	lab._select_weapon(lab.Weapon.SABRE)
+	check(lab._equipped_weapon == lab.Weapon.SABRE, "The combo matrix restores Sabre for the aerial checks")
 
 func check_sabre_dive(lab) -> void:
 	var landings: Array[int] = []
