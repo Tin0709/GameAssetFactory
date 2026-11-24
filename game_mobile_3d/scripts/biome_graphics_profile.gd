@@ -321,6 +321,11 @@ func tint_ambient(hour: float, color: Color, strength: float = 1.) -> Color:
 func sample_mist_entry_scatter(time: float) -> float:
 	return clampf(DayNight.sample_curve(mist_entry_scatter_by_hour, time, 0.), 0., 4.)
 
+func sample_mist_front(time: float, strength: float) -> Vector2:
+	return Vector2(
+		DayNight.sample_curve(mist_front_transfer_by_hour, time, 0.),
+		DayNight.sample_curve(mist_front_scatter_by_hour, time, 0.)) * strength
+
 func sample_mist_rear_ambient(time: float, region: Vector4, player_depth: float,
 		strength: float) -> PackedFloat32Array:
 	if not region.is_finite() or region.z < 0. or region.w <= region.z or not is_finite(player_depth) or player_depth <= 0.:

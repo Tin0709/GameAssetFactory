@@ -34,6 +34,7 @@ const NAMED := {
 	"PortableNightBloom": "night_soft_bloom",
 	"StoneLedgeOcclusion": "stone_foot_fill",
 	"TerrainMistVisibility": "terrain_mist_visibility",
+	"PortableMistFrontTransfer": "mist_front_transfer",
 	"SettingsPresetMessage": "preset-message",
 }
 const PHASES := ["morning", "day", "golden", "night"]

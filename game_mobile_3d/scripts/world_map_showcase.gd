@@ -1297,10 +1297,9 @@ func _update_mist()->void:
 			var cooler := linear * Vector3(.76, .85, 1.44)
 			sample.depth_scatter_color = (cooler * (linear.dot(luma) / maxf(cooler.dot(luma), .000001)) - linear) * noon
 		if _mist_front_transfer_available():
-			var time := hour / 24.
-			var depth_strength := _lighting_scale(&"mist_front_transfer")
-			sample.front_transfer_m = DayNight.sample_curve(_biome_profile.mist_front_transfer_by_hour, time, 0.) * depth_strength
-			sample.front_scatter_advance_m = DayNight.sample_curve(_biome_profile.mist_front_scatter_by_hour, time, 0.) * depth_strength
+			var front := _biome_profile.sample_mist_front(hour / 24., _lighting_scale(&"mist_front_transfer"))
+			sample.front_transfer_m = front.x
+			sample.front_scatter_advance_m = front.y
 		var depth_mix := _lighting_scale(&"near_haze_depth")
 		if depth_mix > 0.:
 			sample.near_fade_start = lerpf(.4, NEAR_HAZE_FADE_START, depth_mix)
@@ -3492,6 +3491,10 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	return OK
 
 func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
+	if changed_effect in [&"", &"mist_front_transfer"] and level.biome_controller != null:
+		level.biome_controller.refresh_mist_front()
+		if changed_effect == &"mist_front_transfer":
+			return
 	if changed_effect in [&"", &"actor_ground_light"] and level.biome_controller != null:
 		level.biome_controller.refresh_actor_ground_settings()
 		if changed_effect == &"actor_ground_light":

@@ -48,6 +48,8 @@ var _mist: MistVolume
 var _mist_light_binding: Dictionary = {}
 var _mist_visibility_slider: HSlider
 var _mist_visibility_before := 1.
+var _mist_front_slider: HSlider
+var _mist_front_drag_before := 1.
 var _allow_spatial_mist := true
 var _path_fixture := PathFixture.new()
 var _path_lamppost := PathLamppost.new()
@@ -182,6 +184,21 @@ func add_settings_controls(parent: VBoxContainer) -> Label:
 					&"terrain_mist_visibility", _mist_visibility_before)))
 		parent.add_child(_mist_visibility_slider)
 
+	if _choices.any(_has_mist_front):
+		_mist_front_slider = HSlider.new()
+		_mist_front_slider.name = "PortableMistFrontTransfer"
+		_mist_front_slider.max_value = 1.
+		_mist_front_slider.step = .05
+		_mist_front_slider.value_changed.connect(func(value: float):
+			_world.showcase.set_lighting_scale(&"mist_front_transfer", value))
+		_mist_front_slider.drag_started.connect(func():
+			_mist_front_drag_before = _world.showcase._lighting_scale(&"mist_front_transfer"))
+		_mist_front_slider.drag_ended.connect(func(changed: bool):
+			if changed:
+				_world.showcase._settings.remember_edit(_world.showcase.set_lighting_scale.bind(
+					&"mist_front_transfer", _mist_front_drag_before)))
+		parent.add_child(_mist_front_slider)
+
 	_settings_status = Label.new()
 	parent.add_child(_settings_status)
 	_refresh_settings()
@@ -221,6 +238,17 @@ func _refresh_settings() -> void:
 	if _mist_visibility_slider != null:
 		_mist_visibility_slider.set_value_no_signal(_world.showcase._lighting_scale(&"terrain_mist_visibility"))
 		_mist_visibility_slider.editable = _mist_visibility_available()
+
+	if _mist_front_slider != null:
+		_mist_front_slider.set_value_no_signal(_world.showcase._lighting_scale(&"mist_front_transfer"))
+		_mist_front_slider.editable = is_instance_valid(_mist) and _mist.visible and _has_mist_front(_profile)
+
+func _has_mist_front(profile: Profile) -> bool:
+	return profile.mist_front_transfer_by_hour != null or profile.mist_front_scatter_by_hour != null
+
+func refresh_mist_front() -> void:
+	_update_spatial_mist()
+	_refresh_settings()
 
 func _load_terrain_mist_visibility() -> void:
 	var path: String = _world.terrain_mist_visibility_path
@@ -652,9 +680,15 @@ func _update_spatial_mist() -> void:
 		var subject_depth := -camera.global_basis.z.dot(position - camera.global_position)
 		var near_layer: Vector3 = _mist_sample.near_layer
 		_mist_sample.ground_haze = _profile.sample_ground_haze(_world.showcase.hour, subject_depth, near_layer.z)
-		_mist_sample.rear_ambient = _profile.sample_mist_rear_ambient(_world.showcase.hour / 24.,
+		var time: float = _world.showcase.hour / 24.
+		var front := _profile.sample_mist_front(time, _world.showcase._lighting_scale(&"mist_front_transfer"))
+		_mist_sample.front_transfer_m = front.x
+		_mist_sample.front_scatter_advance_m = front.y
+		_mist_sample.rear_ambient = _profile.sample_mist_rear_ambient(time,
 			_world.mist_rear_ambient_region, subject_depth, _world.showcase._lighting_scale(&"mist_rear_ambient"))
 		_mist.publish(_mist_sample, position, near_layer.z, _world.look.elapsed, true, 0.)
+	if _mist_front_slider != null:
+		_mist_front_slider.editable = _mist.visible and _has_mist_front(_profile)
 
 func handle_key(event: InputEventKey) -> bool:
 	match event.physical_keycode:
