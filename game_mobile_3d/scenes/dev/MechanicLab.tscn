@@ -251,6 +251,29 @@ offset_bottom = 218.0
 focus_mode = 0
 tooltip_text = "Mức nhẹ ưu tiên 3 điểm va chạm gần nhất và dùng ít tia hơn."
 
+[node name="RagdollPhysicsButton" type="Button" parent="HUD"]
+offset_left = 762.0
+offset_top = 260.0
+offset_right = 978.0
+offset_bottom = 294.0
+focus_mode = 0
+toggle_mode = true
+text = "Vật lý ragdoll ▾"
+alignment = 0
+tooltip_text = "Chỉnh khối lượng, độ hãm và biên độ khớp từ cú kết liễu tiếp theo."
+
+[node name="RagdollPhysicsPanel" type="PanelContainer" parent="HUD"]
+visible = false
+offset_left = 508.0
+offset_top = 298.0
+offset_right = 858.0
+offset_bottom = 424.0
+theme_override_styles/panel = SubResource("defeat_card")
+
+[node name="Rows" type="VBoxContainer" parent="HUD/RagdollPhysicsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
 [node name="AudioMixButton" type="Button" parent="HUD"]
 offset_left = 990.0
 offset_top = 260.0

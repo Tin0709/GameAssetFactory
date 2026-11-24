@@ -58,6 +58,7 @@ var _wall_handoff_frame := -1
 var _launch_frame := -1
 var _tuned_wall_poses: Dictionary[String, Vector3]
 var _baby_handoff_wall_entries: Dictionary[String, Dictionary]
+var joint_span_multiplier := 1.0
 var use_tuned_wall_sweep := false
 var use_tuned_floor_support := false
 var use_baby_floor_anchors := false
@@ -302,6 +303,12 @@ func _build_source_joints() -> void:
 		var child_pose: Transform3D = current[joint.name] * joint.child_frame
 		if parent_pose.basis.x.dot(child_pose.basis.x) <= 0.0:
 			_set_source_joint_bias(joint.joint, CONE_OVERSHOOT_BIAS)
+
+func _attach_source_joint(projection: PhysicalPart) -> void:
+	if joint_span_multiplier != 1.0:
+		projection.swing_span = minf(projection.swing_span * joint_span_multiplier, PI)
+		projection.twist_span = minf(projection.twist_span * joint_span_multiplier, PI)
+	super._attach_source_joint(projection)
 
 func sample(delta: float) -> void:
 	# Both dictionaries keep the same body keys, so the older buffer can be overwritten.

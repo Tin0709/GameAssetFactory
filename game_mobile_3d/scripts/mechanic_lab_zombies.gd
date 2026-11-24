@@ -138,6 +138,9 @@ var equipped_air_offset := 0.0
 var equipped_air_delay := 0.0
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
+var ragdoll_mass_multiplier := 1.0
+var ragdoll_damping_multiplier := 1.0
+var ragdoll_joint_span_multiplier := 1.0
 @export_range(1.1, 5.0, 0.1) var corpse_lifetime := Zombie.CORPSE_LIFETIME:
 	set(seconds):
 		corpse_lifetime = seconds

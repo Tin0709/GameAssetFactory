@@ -226,6 +226,8 @@ var _attack_focus_end := LAB_ATTACK_HIT_SECTION
 var _telegraph_rate := TELEGRAPH_RATE
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
+var _death_mass_multiplier := 1.0
+var _death_damping_multiplier := 1.0
 var corpse_lifetime := CORPSE_LIFETIME
 var _feedback: Feedback
 var _mesh: MeshInstance3D
@@ -1386,6 +1388,14 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		_death_direction = direction
 		_death_strength = knockback_strength
 		_death_strike = death_strike
+		if is_instance_valid(_corpse_floor):
+			var group := get_parent()
+			_death_mass_multiplier = group.ragdoll_mass_multiplier
+			_death_damping_multiplier = group.ragdoll_damping_multiplier
+			ragdoll.joint_span_multiplier = group.ragdoll_joint_span_multiplier
+			if _death_mass_multiplier != 1.0:
+				for body: PhysicalBone3D in ragdoll.bodies.values():
+					body.mass *= _death_mass_multiplier
 		if is_instance_valid(_corpse_floor) and animation.current_animation == SPAWN:
 			# The source spawn clip scales J_Hip to 1%. The ragdoll's authored
 			# colliders and joint frames require the full-size skeleton.
@@ -1460,7 +1470,9 @@ func _update_death(delta: float) -> void:
 			head.friction = DEATH_SOURCE_FRICTION
 			head.bounce = DEATH_SOURCE_RESTITUTION
 		var angle := deg_to_rad(DEATH_LAUNCH_ANGLE)
-		var launch_impulse := _death_launch_speed(_death_strength) * mass * ragdoll_launch_multiplier
+		# Keep the strike's impulse constant as the same rig gets heavier or lighter.
+		var reference_mass := mass / _death_mass_multiplier
+		var launch_impulse := _death_launch_speed(_death_strength) * reference_mass * ragdoll_launch_multiplier
 		if is_baby:
 			launch_impulse *= BABY_DEATH_LAUNCH_SCALE
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
@@ -1475,9 +1487,17 @@ func _update_death(delta: float) -> void:
 			if _baby_death_profile == null:
 				_baby_death_profile = _death_profile.duplicate() as DeathProfile
 				# Match the smaller rig's inertia and share more of the hit across its body.
-				_baby_death_profile.angular_impulse *= mass / SOURCE_RIG_LAB_MASS * (BABY_HEIGHT / HEIGHT) ** 2
+				_baby_death_profile.angular_impulse *= reference_mass / SOURCE_RIG_LAB_MASS * (BABY_HEIGHT / HEIGHT) ** 2
 				_baby_death_profile.transport_fraction = 0.98
 			profile = _baby_death_profile
+		var scale_fallback_limits := not source_rig and ragdoll.joint_span_multiplier != 1.0
+		if _death_damping_multiplier != 1.0 or scale_fallback_limits:
+			# Share the standard profile across corpses. Only tuned deaths need a copy.
+			profile = profile.duplicate() as DeathProfile
+			profile.linear_damping *= _death_damping_multiplier
+			profile.angular_damping *= _death_damping_multiplier
+			if scale_fallback_limits:
+				profile.limit_scale *= ragdoll.joint_span_multiplier
 		if ragdoll.begin(profile, direction, "Chest", 0.0, flight_gravity,
 				_corpse_floor, floor_impact_limb_share, sabre_finisher, cos(angle) * launch_impulse, sin(angle) * launch_impulse):
 			_apply_death_tumble(_death_spin(direction), mass)
@@ -1646,7 +1666,8 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		# Share the existing ramp with the ordinary supported-roll damping.
 		var head: PhysicalBone3D = ragdoll.bodies.Head
 		var base_damping := lerpf(DEATH_LANDING_ANGULAR_DAMP, DEATH_SUPPORTED_ANGULAR_DAMP, roll_weight)
-		late_roll_damping = minf(target, maxf(head.angular_damp + damping_step - base_damping, 0.0))
+		var current_damping := head.angular_damp / _death_damping_multiplier
+		late_roll_damping = minf(target, maxf(current_damping + damping_step - base_damping, 0.0))
 	if is_equal_approx(contact_age, _landing_age) and is_equal_approx(roll_weight, _roll_damping_weight) \
 			and wall_gravity == _wall_gravity and is_equal_approx(flat_brace_weight, _flat_brace_weight) \
 			and is_equal_approx(late_roll_damping, _late_roll_damping):
@@ -1666,6 +1687,8 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 	var base_angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 	var angular_damp := lerpf(base_angular_damp, DEATH_SUPPORTED_ANGULAR_DAMP, roll_weight) + late_roll_damping
+	linear_damp *= _death_damping_multiplier
+	angular_damp *= _death_damping_multiplier
 	var final_gravity := gravity_scale * ragdoll_gravity_multiplier
 	# The six Lab bodies receive the same values. Roll damping can keep
 	# changing after these channels have finished their landing blend.

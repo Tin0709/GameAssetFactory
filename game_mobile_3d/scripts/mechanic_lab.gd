@@ -82,9 +82,17 @@ const MIX_ROWS := {
 	LabAudioMix.Layer.ZOMBIE: [&"Zombie", "Zombie"],
 	LabAudioMix.Layer.SURFACE: [&"Surface", "Bước / tiếp đất"],
 }
+const RAGDOLL_PHYSICS_ROWS := {
+	&"Mass": ["Khối lượng", 50.0, 200.0, &"ragdoll_mass_multiplier", "Đổi khối lượng của từng phần cơ thể."],
+	&"Damping": ["Độ hãm", 25.0, 200.0, &"ragdoll_damping_multiplier", "Đổi độ hãm khi di chuyển và xoay."],
+	&"JointSpan": ["Biên độ khớp", 50.0, 150.0, &"ragdoll_joint_span_multiplier", "Đổi góc xoay tối đa của các khớp."],
+}
 const PRESET_RANGES := {
 	"launch": ^"HUD/RagdollTuning/Launch/Slider",
 	"gravity": ^"HUD/RagdollTuning/Gravity/Slider",
+	"ragdoll_mass": ^"HUD/RagdollPhysicsPanel/Rows/Mass/Slider",
+	"ragdoll_damping": ^"HUD/RagdollPhysicsPanel/Rows/Damping/Slider",
+	"ragdoll_joint_span": ^"HUD/RagdollPhysicsPanel/Rows/JointSpan/Slider",
 	"corpse_seconds": ^"HUD/RagdollLifetime/Slider",
 	"camera_shake": ^"HUD/CameraShake/Slider",
 	"hitstop_ms": ^"HUD/Hitstop/Slider",
@@ -413,6 +421,7 @@ func _ready() -> void:
 	_setup_skin_selector(using_private and player_ready)
 	_setup_contact_spark_quality()
 	_setup_audio_mix_controls()
+	_setup_ragdoll_physics_controls()
 	_setup_tuning_presets()
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
@@ -1505,6 +1514,41 @@ func _setup_audio_mix_controls() -> void:
 func _set_mix_level(percent: float, layer: int, label: Label) -> void:
 	label.text = "%s · %d%%" % [MIX_ROWS[layer][1], roundi(percent)]
 	_lab_audio_mix.set_level(layer, percent)
+
+func _setup_ragdoll_physics_controls() -> void:
+	var button: Button = $HUD/RagdollPhysicsButton
+	var panel: PanelContainer = $HUD/RagdollPhysicsPanel
+	button.visible = $HUD/RagdollTuning.visible
+	if not button.visible:
+		return
+	button.toggled.connect(panel.set_visible)
+	for name: StringName in RAGDOLL_PHYSICS_ROWS:
+		var settings: Array = RAGDOLL_PHYSICS_ROWS[name]
+		var row := HBoxContainer.new()
+		row.name = name
+		panel.get_node("Rows").add_child(row)
+		var label := Label.new()
+		label.custom_minimum_size.x = 145.0
+		label.add_theme_font_size_override("font_size", 14)
+		label.text = "%s · 100%%" % settings[0]
+		row.add_child(label)
+		var slider := HSlider.new()
+		slider.name = "Slider"
+		slider.custom_minimum_size.y = 32.0
+		slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		slider.focus_mode = Control.FOCUS_NONE
+		slider.scrollable = false
+		slider.tooltip_text = settings[4] + " Áp dụng từ cú kết liễu tiếp theo."
+		slider.min_value = settings[1]
+		slider.max_value = settings[2]
+		slider.step = 5.0
+		slider.value = 100.0
+		slider.value_changed.connect(_set_ragdoll_physics.bind(settings[3], settings[0], label))
+		row.add_child(slider)
+
+func _set_ragdoll_physics(percent: float, property: StringName, title: String, label: Label) -> void:
+	$Zombies.set(property, percent * 0.01)
+	label.text = "%s · %d%%" % [title, roundi(percent)]
 
 func _setup_tuning_presets() -> void:
 	var button: MenuButton = $HUD/TuningPresets
