@@ -951,7 +951,9 @@ func check_ground_cue_render_hitch(lab, dust: Node3D) -> void:
 		for i in ceili(0.45 * Engine.physics_ticks_per_second):
 			await physics_frame
 		dust._process(0.45)
-		check(active_smoke.call().is_empty(), "An already displayed puff expires after a later hitch")
+		lab._process(0.45)
+		check(active_smoke.call().is_empty() and not lab._tool_slam_ring.visible and is_zero_approx(lab.camera.h_offset),
+			"After their first image, the dust, ring and kick expire during a later hitch")
 		dust.process_mode = dust_mode
 		lab.set_process(true)
 	lab.reset_player()
