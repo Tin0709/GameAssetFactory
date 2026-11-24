@@ -1,4 +1,7 @@
 extends Node3D
+
+const LabAudioMix := preload("res://scripts/mechanic_lab_audio_mix.gd")
+var lab_mix: LabAudioMix
 ## Extracted MD2 samples. Group selection and gains are local playback settings.
 
 const SourceFilePath := preload("res://scripts/source_file_path.gd")
@@ -938,10 +941,12 @@ func _load_audio() -> void:
 	_player_hurt_voice = AudioStreamPlayer.new()
 	_player_hurt_voice.name = "PlayerHurt"
 	_player_hurt_voice.volume_db = PLAYER_HURT_GAIN_DB
+	_player_hurt_voice.bus = _output_bus(LabAudioMix.Layer.MASTER)
 	add_child(_player_hurt_voice)
 	_player_defeat_voice = AudioStreamPlayer.new()
 	_player_defeat_voice.name = "PlayerDefeat"
 	_player_defeat_voice.volume_db = PLAYER_DEFEAT_GAIN_DB
+	_player_defeat_voice.bus = _output_bus(LabAudioMix.Layer.MASTER)
 	add_child(_player_defeat_voice)
 	_create_voices(FLIGHT_POOL * VOICES_PER_POOL)
 	_queue_base_samples()
@@ -954,21 +959,28 @@ func _load_audio() -> void:
 				_groups[baby_group] = _groups[source_group]
 	if _groups.has(&"slam_grass"):
 		for i in SURFACE_LANDING_VOICE_COUNT:
-			var voice := _new_spatial_voice(SPATIAL_VOICE_DISTANCE)
+			var voice := _new_spatial_voice(SPATIAL_VOICE_DISTANCE, LabAudioMix.Layer.SURFACE)
 			voice.name = "HeavyLandingSurface%d" % (i + 1)
 			_surface_landing_voices.append(voice)
 	if is_instance_valid(zombie_listener) and _groups.has(&"zombie_idle"):
-		_zombie_idle_voice = _new_spatial_voice(ZOMBIE_IDLE_DISTANCE)
+		_zombie_idle_voice = _new_spatial_voice(ZOMBIE_IDLE_DISTANCE, LabAudioMix.Layer.ZOMBIE)
 		_zombie_idle_voice.name = "ZombieIdle"
 		_zombie_idle_voice.volume_db = ZOMBIE_IDLE_GAIN_DB
 		_zombie_idle_voice.max_db = ZOMBIE_IDLE_GAIN_DB
 
 func _create_voices(count: int) -> void:
 	for i in count:
-		_voices.append(_new_spatial_voice(SPATIAL_VOICE_DISTANCE))
+		var index := _voices.size()
+		var weapon := index < VOICES_PER_POOL or index >= FLIGHT_POOL * VOICES_PER_POOL
+		var layer := LabAudioMix.Layer.WEAPON if weapon else LabAudioMix.Layer.ZOMBIE
+		_voices.append(_new_spatial_voice(SPATIAL_VOICE_DISTANCE, layer))
 
-func _new_spatial_voice(max_distance: float) -> AudioStreamPlayer3D:
+func _output_bus(layer: int) -> StringName:
+	return lab_mix.bus_name(layer) if lab_mix != null else &"Master"
+
+func _new_spatial_voice(max_distance: float, layer: int) -> AudioStreamPlayer3D:
 	var voice := AudioStreamPlayer3D.new()
+	voice.bus = _output_bus(layer)
 	voice.unit_size = 4.5
 	voice.max_distance = max_distance
 	# Preserve the source transient spectrum with distance and panning.

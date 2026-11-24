@@ -43,6 +43,7 @@ const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 const DamageNumbers := preload("res://scripts/mechanic_lab_damage_numbers.gd")
 const PLAYER_HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_player_hit_flash.gdshader")
 const ContactSparks := preload("res://scripts/mechanic_lab_contact_sparks.gd")
+const LabAudioMix := preload("res://scripts/mechanic_lab_audio_mix.gd")
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
 const SPAWN := Vector3(0.0, 0.03, 0.0)
 const MIN_CAMERA_SIZE := 4.5
@@ -75,11 +76,17 @@ const SABRE_LANDING_BURST_DELAY := 0.056890413
 enum PlayerSkin { MD2, KAI }
 enum PresetAction { SAVE_A, LOAD_A, SAVE_B, LOAD_B, DEFAULTS }
 
+const MIX_ROWS := [&"Master", &"Weapon", &"Zombie", &"Surface"]
+const MIX_LABELS := ["Tổng", "Vũ khí", "Zombie", "Bước / tiếp đất"]
 const PRESET_RANGES := {
 	"launch": ^"HUD/RagdollTuning/Launch/Slider",
 	"gravity": ^"HUD/RagdollTuning/Gravity/Slider",
 	"corpse_seconds": ^"HUD/RagdollLifetime/Slider",
 	"camera_shake": ^"HUD/CameraShake/Slider",
+	"sfx_master": ^"HUD/AudioMixPanel/Rows/Master/Slider",
+	"sfx_weapon": ^"HUD/AudioMixPanel/Rows/Weapon/Slider",
+	"sfx_zombie": ^"HUD/AudioMixPanel/Rows/Zombie/Slider",
+	"sfx_surface": ^"HUD/AudioMixPanel/Rows/Surface/Slider",
 }
 const PRESET_OPTIONS := {
 	"crowd_count": ^"HUD/CrowdSpawnCount",
@@ -136,6 +143,7 @@ var _previous_3d_scale: float
 var _previous_3d_scaling_mode: Viewport.Scaling3DMode
 var _render_scale_overridden := false
 var _combat_audio: CombatAudio
+var _lab_audio_mix: LabAudioMix
 var _zombie_step_dust: ZombieStepDust
 var _floor_snap_contact := KinematicCollision3D.new()
 var _slam_swing_frame := -1
@@ -296,9 +304,13 @@ func _ready() -> void:
 		listener.position.y = 1.55
 		listener.global_basis = camera.global_basis
 		listener.make_current()
+		_lab_audio_mix = LabAudioMix.new()
+		_lab_audio_mix.name = "LabAudioMix"
+		add_child(_lab_audio_mix)
 		_combat_audio = CombatAudio.new()
 		_combat_audio.name = "CombatAudio"
 		_combat_audio.zombie_listener = listener
+		_combat_audio.lab_mix = _lab_audio_mix
 		add_child(_combat_audio)
 		_combat_audio.queue_base_samples()
 		_setup_movement_audio()
@@ -391,6 +403,7 @@ func _ready() -> void:
 		_setup_weapon_selector()
 	_setup_skin_selector(using_private and player_ready)
 	_setup_contact_spark_quality()
+	_setup_audio_mix_controls()
 	_setup_tuning_presets()
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
@@ -1056,6 +1069,8 @@ func _prepare_movement_audio(bundle: PrivateOverworldBundle) -> MovementAudio:
 	movement.landing_contact = _grass_landing_contact_at
 	movement.protect_landing_voice = true
 	movement.allow_footstep_as_landing = false
+	for voice: AudioStreamPlayer3D in movement.step_voices:
+		voice.bus = _lab_audio_mix.bus_name(LabAudioMix.Layer.SURFACE)
 	return movement
 
 func _use_local_movement_bank(bundle: PrivateOverworldBundle) -> bool:
@@ -1422,6 +1437,40 @@ func _setup_contact_spark_quality() -> void:
 	picker.add_item("Tia va chạm · Nhẹ")
 	picker.select(0)
 	picker.item_selected.connect(func(index: int): _contact_sparks.set_reduced_budget(index == 1))
+
+func _setup_audio_mix_controls() -> void:
+	var button: Button = $HUD/AudioMixButton
+	var panel: PanelContainer = $HUD/AudioMixPanel
+	button.visible = _lab_audio_mix != null
+	if not button.visible:
+		return
+	if player.reference_audio != null:
+		for voice: AudioStreamPlayer in player.reference_audio.voices:
+			voice.bus = _lab_audio_mix.bus_name(LabAudioMix.Layer.WEAPON)
+	button.toggled.connect(panel.set_visible)
+	for layer in MIX_ROWS.size():
+		var row := HBoxContainer.new()
+		row.name = MIX_ROWS[layer]
+		panel.get_node("Rows").add_child(row)
+		var label := Label.new()
+		label.custom_minimum_size.x = 148.0
+		label.add_theme_font_size_override("font_size", 14)
+		row.add_child(label)
+		var slider := HSlider.new()
+		slider.name = "Slider"
+		slider.custom_minimum_size.y = 32.0
+		slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		slider.focus_mode = Control.FOCUS_NONE
+		slider.step = 5.0
+		slider.scrollable = false
+		slider.value = 100.0
+		slider.value_changed.connect(_set_mix_level.bind(layer, label))
+		row.add_child(slider)
+		_set_mix_level(slider.value, layer, label)
+
+func _set_mix_level(percent: float, layer: int, label: Label) -> void:
+	label.text = "%s · %d%%" % [MIX_LABELS[layer], roundi(percent)]
+	_lab_audio_mix.set_level(layer, percent)
 
 func _setup_tuning_presets() -> void:
 	var button: MenuButton = $HUD/TuningPresets
