@@ -77,7 +77,9 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 		if not turf and not material.has_meta("plains_foliage_transmission"):
 			continue
 		var source := FarShadowReceivers.authored_shader(material.shader)
-		var color_mips: Texture2D = material.get_meta("plains_foliage_color_mips", null) if edge_sampling else null
+		var color_mips: Texture2D
+		if edge_sampling and material.has_meta("plains_foliage_color_mips"):
+			color_mips = material.get_meta("plains_foliage_color_mips")
 		var features := Vector2i(int(edge_sampling), int(color_mips != null))
 		var variants:Dictionary=_variants.get_or_add(source,{})
 		if not variants.has(features):

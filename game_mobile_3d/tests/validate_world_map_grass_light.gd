@@ -74,6 +74,23 @@ func run()->void:
 				"Grass uses captured up normals while flowers and shrubs keep mesh normals")
 			check(is_equal_approx(mat.get_shader_parameter("study_transmission"),float(mat.get_meta("plains_foliage_transmission",.1248))),
 				"Regional foliage lighting retains the material-specific transmission")
+		var foliage_filters := 0
+		var msaa_active: bool = root.msaa_3d != Viewport.MSAA_DISABLED
+		for mat: ShaderMaterial in p.materials:
+			var filter_installed := mat.shader.code.contains("#define GAF_FOLIAGE_COLOR_MIPS")
+			var has_mips := mat.has_meta("plains_foliage_color_mips")
+			check(filter_installed == (has_mips and msaa_active),
+				"Only Plains flower and shrub atlases use the Mobile color filter")
+			if has_mips:
+				foliage_filters += 1
+				var texture: Texture2D = mat.get_meta("plains_foliage_color_mips")
+				check(texture.get_image().has_mipmaps(), "Linear alpha-weighted foliage mips are available")
+		check(foliage_filters == 2, "Both broad-leaf atlases are prepared")
+		p.set_grass_edge_sampling(false)
+		for mat: ShaderMaterial in p.materials:
+			check(not mat.shader.code.contains("#define GAF_FOLIAGE_COLOR_MIPS"),
+				"Foliage antialiasing toggle restores nearest color sampling")
+		p.set_grass_edge_sampling(true)
 		for node:MultiMeshInstance3D in p.get_children():
 			var plant_material := node.multimesh.mesh.surface_get_material(0) as ShaderMaterial
 			var casts: bool = plant_material.get_shader_parameter("tinted_grass") == true or plant_material.get_meta("plains_shrub", false)
