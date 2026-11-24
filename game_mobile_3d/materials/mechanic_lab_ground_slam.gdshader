@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, shadows_disabled;
 
+#include "res://materials/mechanic_lab_box_occlusion.gdshaderinc"
+
 uniform vec4 tint : source_color = vec4(0.9, 0.79, 0.58, 1.0);
 uniform float progress = 0.0;
 uniform int clip_count = 0;
@@ -26,14 +28,7 @@ void fragment() {
 		vec4 x = blocker_axes[2 * unit];
 		vec4 z = blocker_axes[2 * unit + 1];
 		vec2 direction = vec2(dot(floor_position, x.xy), dot(floor_position, z.xy));
-		vec2 inverse_direction = (step(vec2(0.0), direction) * 2.0 - 1.0) / max(abs(direction), vec2(0.000001));
-		vec2 centre = vec2(x.z, z.z);
-		vec2 extent = vec2(x.w, z.w);
-		vec2 lower = (-extent - centre) * inverse_direction;
-		vec2 upper = (extent - centre) * inverse_direction;
-		vec2 entry = min(lower, upper);
-		vec2 exit = max(lower, upper);
-		if (max(0.0, max(entry.x, entry.y)) <= min(1.0, min(exit.x, exit.y))) {
+		if (lab_box_occludes(vec2(x.z, z.z), direction, vec2(x.w, z.w))) {
 			discard;
 		}
 	}

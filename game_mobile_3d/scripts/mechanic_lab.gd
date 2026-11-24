@@ -39,6 +39,8 @@ const FLOOR_STEP_BANKS := {
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
 const ImpactMarks := preload("res://scripts/mechanic_lab_impact_marks.gd")
 const GROUND_SLAM_SHADER := preload("res://materials/mechanic_lab_ground_slam.gdshader")
+const AXE_WALL_SHADER := preload("res://materials/mechanic_lab_axe_wall.gdshader")
+const AXE_WALL_LIMIT := 4
 const GROUND_SLAM_RADIUS := 0.68
 const GROUND_SLAM_DURATION := 0.23
 const GROUND_SLAM_MAX_CLIPS := 8
@@ -233,6 +235,9 @@ var _movement_audio: MovementAudio
 var _kai_skin: KaiSkin
 var _md2_skin_visibility: Dictionary[MeshInstance3D, bool] = {}
 var _weapon_mesh: MeshInstance3D
+var _axe_wall_material: ShaderMaterial
+var _axe_wall_probe: PhysicsShapeQueryParameters3D
+var _axe_blocker_count := 0
 var _equipped_weapon := Weapon.SABRE
 var _sabre_mesh: Mesh
 var _sabre_mesh_transform: Transform3D
@@ -950,8 +955,40 @@ func _load_tool(index: int, root: String) -> bool:
 	var locomotion := MeleeTools.load_locomotion(player, root, tool)
 	if index == Weapon.SHOVEL and locomotion.is_empty():
 		return false
+	if index == Weapon.AXE:
+		_setup_axe_wall_material(mesh)
 	_tools[index] = {"mesh": mesh, "profile": profile, "locomotion": locomotion}
 	return true
+
+func _setup_axe_wall_material(mesh: Mesh) -> void:
+	var source := mesh.surface_get_material(0) as BaseMaterial3D
+	# SM_Axe is an opaque, nearest-filtered material with an albedo map
+	# and constant roughness/specular. Keep those values in the mask pass.
+	_axe_wall_material = ShaderMaterial.new()
+	_axe_wall_material.shader = AXE_WALL_SHADER
+	_axe_wall_material.set_shader_parameter(&"blade_texture", source.albedo_texture)
+	mesh.surface_set_material(0, _axe_wall_material)
+	var bounds := BoxShape3D.new()
+	bounds.size = Vector3(4.8, 5.0, 4.8)
+	_axe_wall_probe = PhysicsShapeQueryParameters3D.new()
+	_axe_wall_probe.shape = bounds
+	_axe_wall_probe.collision_mask = 1
+	_axe_wall_probe.exclude = [$Ground.get_rid(), player.get_rid()]
+
+func _sample_axe_wall_boxes() -> void:
+	var axes := PackedVector4Array()
+	if _equipped_weapon == Weapon.AXE and player.combo.active() and player.review_clip.is_empty():
+		_axe_wall_probe.transform = Transform3D(Basis.IDENTITY, player.global_position + Vector3.UP)
+		var hits := get_world_3d().direct_space_state.intersect_shape(_axe_wall_probe, AXE_WALL_LIMIT)
+		for hit in hits:
+			axes.append_array(_upright_box_axes(hit))
+	var count := floori(axes.size() / 3.0)
+	if count != _axe_blocker_count:
+		_axe_blocker_count = count
+		_axe_wall_material.set_shader_parameter(&"axe_blocker_count", count)
+	if count > 0:
+		axes.resize(3 * AXE_WALL_LIMIT)
+		_axe_wall_material.set_shader_parameter(&"blocker_axes", axes)
 
 func _load_bow(root: String) -> bool:
 	if _bow != null:
@@ -1173,6 +1210,8 @@ func _process(delta: float) -> void:
 		var charge_age: float = player.bow_charge_cue_age(presenter.display_clock) if _bow_mount.is_visible_in_tree() else -1.0
 		_bow.present_charge_cue(charge_age, presenter.display_meshes[_bow_display_mesh_index])
 	var focus: Vector3 = presentation.player_position()
+	if _axe_blocker_count > 0:
+		_axe_wall_material.set_shader_parameter(&"actor_xz", Vector2(focus.x, focus.z))
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
 	if not _pending_melee_feedback.is_empty():
 		_present_melee_feedback(player.render_presenter.display_clock)
@@ -1787,9 +1826,24 @@ func _clip_slam_at_walls(point: Vector3, planes: PackedVector3Array, blocker_axe
 	return false
 
 func _append_slam_box(blocker: Dictionary, origin: Vector3, axes: PackedVector4Array) -> bool:
+	var box := _upright_box_axes(blocker)
+	if box.is_empty():
+		return false
+	var height := box[2]
+	# A box above or below the ring does not cross its render plane.
+	if absf(origin.y * height.x + height.z) <= height.w:
+		var x := box[0]
+		var z := box[1]
+		x.z += origin.x * x.x + origin.z * x.y
+		z.z += origin.x * z.x + origin.z * z.y
+		axes.append(x)
+		axes.append(z)
+	return true
+
+func _upright_box_axes(blocker: Dictionary) -> PackedVector4Array:
 	var body := blocker.collider as CollisionObject3D
 	if body == null:
-		return false
+		return PackedVector4Array()
 	var shape_index: int = blocker.shape
 	var owner := body.shape_find_owner(shape_index)
 	for local_index in body.shape_owner_get_shape_count(owner):
@@ -1797,20 +1851,18 @@ func _append_slam_box(blocker: Dictionary, origin: Vector3, axes: PackedVector4A
 			continue
 		var box := body.shape_owner_get_shape(owner, local_index) as BoxShape3D
 		if box == null:
-			return false
+			return PackedVector4Array()
 		var shape_to_world := body.global_transform * body.shape_owner_get_transform(owner)
 		var to_shape := shape_to_world.affine_inverse()
 		if not is_zero_approx(to_shape.basis.x.y) or not is_zero_approx(to_shape.basis.z.y):
-			return false
-		var centre := to_shape * origin
+			return PackedVector4Array()
 		var half_size := box.size * 0.5
-		# The overlap queries a band above the floor. A box above or below
-		# the ring itself does not cross its render plane.
-		if absf(centre.y) <= half_size.y:
-			axes.append(Vector4(to_shape.basis.x.x, to_shape.basis.z.x, centre.x, half_size.x))
-			axes.append(Vector4(to_shape.basis.x.z, to_shape.basis.z.z, centre.z, half_size.z))
-		return true
-	return false
+		return PackedVector4Array([
+			Vector4(to_shape.basis.x.x, to_shape.basis.z.x, to_shape.origin.x, half_size.x),
+			Vector4(to_shape.basis.x.z, to_shape.basis.z.z, to_shape.origin.z, half_size.z),
+			Vector4(to_shape.basis.y.y, 0.0, to_shape.origin.y, half_size.y),
+		])
+	return PackedVector4Array()
 
 func _show_tool_ground_cues() -> void:
 	for event in _pending_tool_ground_cues:
@@ -1854,6 +1906,8 @@ func _sample_combat_fx() -> void:
 	# Immediate melee can be dispatched before this sample. Delayed air contacts
 	# can also arrive after it and use the pose already sampled in this tick.
 	_combat_pose_frame = Engine.get_physics_frames()
+	if _axe_wall_material != null and (_equipped_weapon == Weapon.AXE or _axe_blocker_count > 0):
+		_sample_axe_wall_boxes()
 	if not _pending_tool_ground_cues.is_empty():
 		_show_tool_ground_cues()
 	if _pending_melee_contact_fx.is_empty() and _slam_burst_frame < 0:
