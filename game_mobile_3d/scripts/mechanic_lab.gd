@@ -81,6 +81,9 @@ const HEAVY_SHAKE_DURATION := 0.20
 const FINISHER_SHAKE_INNER_RADIUS := 1.5
 const FINISHER_SHAKE_OUTER_RADIUS := 3.0
 const FINISHER_SHAKE_HEIGHT_FRACTION := 0.008
+# Both Gauntlets rows use MD2's SubtleFlashCameraShake class. Its amplitude
+# is unrecovered, so use a quieter version of the Lab's existing pulse.
+const GAUNTLET_FINISHER_SHAKE_HEIGHT_FRACTION := 0.004
 const PRIVATE_CONTROLS := "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E %s · R về giữa"
 const TIME_PRESETS := [2.5, 7.0, 12.0, 16.5, 18.5, 19.5, 22.0]
 # AM_Player_Sabre_JumpAttack: first PostAudioEvent minus LandingStart.
@@ -1374,7 +1377,8 @@ func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: 
 	if falloff <= 0.0:
 		return
 	_shake_serial = serial
-	_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION * falloff, sample_time)
+	var strength := GAUNTLET_FINISHER_SHAKE_HEIGHT_FRACTION if clip == "NativeGauntletAttack3" else FINISHER_SHAKE_HEIGHT_FRACTION
+	_start_camera_shake(strength * falloff, sample_time)
 
 func _start_camera_shake(strength: float, sample_time := -1.0) -> void:
 	_shake_strength = strength
