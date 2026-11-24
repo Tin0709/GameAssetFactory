@@ -78,6 +78,7 @@ func run() -> void:
 	await physics_frame
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
 	await check_ground_ribbon_edges(lab, selector)
+	await check_tool_slash_cues(lab, selector)
 	await check_curved_finisher_ribbon(lab, selector)
 	await check_sabre_dive(lab, selector)
 	await check_wall_ribbons(lab, selector)
@@ -132,6 +133,44 @@ func check_ground_ribbon_edges(lab, selector: OptionButton) -> void:
 		check(seen and ended, "%s passes both edges of its real ground trail" % weapon)
 		print("GROUND_RIBBON_EDGES weapon=", weapon, " start_delay_ms=", start_delay * 1000.0,
 			" end_shortfall_ms=", end_shortfall * 1000.0)
+	lab.reset_player()
+
+func check_tool_slash_cues(lab, selector: OptionButton) -> void:
+	# Sound and melee notifies have separate clocks. Compare the first sample
+	# to the resolved slash notify of each montage segment, not the hit frame.
+	var cues := {
+		lab.Weapon.CLEAVER: [0.099451, 0.143989, 0.268076],
+		lab.Weapon.PICKAXE: [0.121726, 0.175193, 0.243789],
+		lab.Weapon.SHOVEL: [0.143855, 0.395919, 0.265945],
+	}
+	for slot: int in cues:
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		selector.select(slot)
+		selector.item_selected.emit(slot)
+		var actor = lab.player
+		var effects = actor.effects
+		var weapon := selector.get_item_text(slot)
+		var recorded: Array[float] = []
+		attack(true)
+		for i in Engine.physics_ticks_per_second * 5:
+			await physics_frame
+			if actor.combo.phase != &"attack" or effects.serial != actor.combo.serial:
+				continue
+			var index: int = actor.combo.index
+			if index != recorded.size() or effects.samples.is_empty():
+				continue
+			var first: float = effects.samples[0].time
+			var cue: float = actor.combo.time - (effects.clock - first) * actor.combo.playback_rate()
+			recorded.append(cue)
+			check(absf(cue - float(cues[slot][index])) < 0.00001,
+				"%s combo %d emits at the source slash cue (%.6f)" % [weapon, index + 1, cue])
+			if recorded.size() == 3:
+				break
+		attack(false)
+		check(recorded.size() == 3, "%s reaches all three slash cues during held attack input" % weapon)
+		print("TOOL_SLASH_CUES weapon=", weapon, " source_seconds=", recorded)
 	lab.reset_player()
 
 func check_curved_finisher_ribbon(lab, selector: OptionButton) -> void:
