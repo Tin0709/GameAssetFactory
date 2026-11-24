@@ -132,6 +132,7 @@ func run() -> void:
 	await check_melee_feedback_order()
 	await check_crowd_sparks()
 	await check_blade_contact_spark_origin()
+	await check_gauntlet_contact_spark_origins()
 	await check_flash_during_render_hitch()
 	await check_splash_flash_strength()
 	await check_damage_numbers_during_render_hitch()
@@ -503,6 +504,87 @@ func check_blade_contact_spark_origin() -> void:
 					"The spark origin is on the victim capsule (baby: %s)" % baby)
 				print("BLADE_SPARK_ORIGIN baby=", baby, " radius=", capsule.radius, " distance=", distance)
 		zombie.free()
+	lab.free()
+
+func check_gauntlet_contact_spark_origins() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group := lab.get_node("Zombies")
+	var sparks := lab.get_node("ContactSparks") as ContactSparks
+	for basic: bool in [false, true]:
+		lab.reset_player()
+		await ticks(12)
+		lab._select_weapon(lab.Weapon.BASIC_GAUNTLETS if basic else lab.Weapon.GAUNTLETS)
+		if not group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, basic):
+			check(false, "The Gauntlets fixture spawns its real target")
+			break
+		var target = group.get_child(0)
+		target.set_physics_process(false)
+		target.global_position = lab.player.global_position + lab.player.visual.global_basis.z * 1.34
+		target.health = 100
+		var centres: Array[Vector3] = []
+		var frames: Array[int] = []
+		var expected: Array[Vector3] = []
+		var shown: Array[Vector3] = []
+		var record_hit := func(point: Vector3, _direction, _clip, index: int, _serial, _lethal):
+			if index == centres.size():
+				centres.append(point)
+				frames.append(Engine.get_physics_frames())
+		group.sabre_contact.connect(record_hit)
+		var measure_pose := func():
+			if expected.size() == centres.size() or frames.back() != Engine.get_physics_frames():
+				return
+			var index := expected.size()
+			var left := index == 2
+			var glove: MeshInstance3D
+			if basic:
+				glove = lab._basic_gauntlet_mounts[0 if left else 1]
+			else:
+				glove = lab._left_gauntlet if left else lab._right_gauntlet
+			var socket := glove.get_parent() as BoneAttachment3D
+			var skeleton: Skeleton3D = lab.player.skeleton
+			var box := glove.get_aabb()
+			var knuckle := box.get_center()
+			knuckle.z = box.end.z
+			var fist := skeleton.global_transform * skeleton.get_bone_global_pose(socket.bone_idx) * glove.transform * knuckle
+			var capsule: CapsuleShape3D = target._live_capsule
+			var half_axis := capsule.height * 0.5 - capsule.radius
+			var centre := centres[index]
+			var axis_point := centre
+			axis_point.y = clampf(fist.y, centre.y - half_axis, centre.y + half_axis)
+			expected.append(axis_point + (fist - axis_point).normalized() * capsule.radius)
+			if index == 1:
+				check(absf(lab.player.animation_player.current_animation_position - 0.30) < 0.035
+					and fist.y < 2.0, "The uppercut hits as the right glove rises through torso height")
+		lab.player.physics_pose_ready.connect(measure_pose)
+		var measure_birth := func():
+			if shown.size() >= expected.size():
+				return
+			var origin := Vector3.ZERO
+			var count := 0
+			for spark in sparks._particles:
+				if spark.age < spark.lifetime and is_zero_approx(spark.age):
+					origin += spark.origin - spark.velocity.normalized() * 0.21
+					count += 1
+			if count == 9:
+				shown.append(origin / count)
+		process_frame.connect(measure_birth)
+		attack(true)
+		for i in 160:
+			await physics_frame
+			if shown.size() == 3:
+				break
+		attack(false)
+		check(expected.size() == 3 and shown.size() == 3, "Three real punches emit three separate bursts")
+		for i in mini(expected.size(), shown.size()):
+			var error := shown[i].distance_to(expected[i])
+			check(error < 0.001, "Gauntlets hit %s emits from the capsule surface nearest the punching hand" % (i + 1))
+			print("GAUNTLET_SPARK_ORIGIN basic=", basic, " attack=", i + 1, " error_m=", error)
+		process_frame.disconnect(measure_birth)
+		lab.player.physics_pose_ready.disconnect(measure_pose)
+		group.sabre_contact.disconnect(record_hit)
+		target.free()
 	lab.free()
 
 func check_splash_flash_strength() -> void:
