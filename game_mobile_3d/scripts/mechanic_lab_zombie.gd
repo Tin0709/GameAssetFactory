@@ -1244,7 +1244,7 @@ func _confirm_windup_target(point: Vector3) -> bool:
 
 func _living_state(clip: StringName) -> StringName:
 	match clip:
-		ActionsStuff.IDLE, ActionsStuff.ALERT: return IDLE
+		ActionsStuff.IDLE, ActionsStuff.ALERT, ActionsStuff.ALERT_ENTER, ActionsStuff.ALERT_EXIT: return IDLE
 		ActionsStuff.SPAWN: return SPAWN
 		ActionsStuff.ATTACK: return ATTACK
 		ActionsStuff.STAGGER: return STAGGER
@@ -1265,9 +1265,22 @@ func _living_clip(clip: StringName) -> StringName:
 func _play_loop(clip: StringName) -> void:
 	if actions_stuff_animation and not is_on_floor() and _is_air_clip(animation.assigned_animation):
 		return
+	var previous := animation.current_animation
 	clip = _living_clip(clip)
-	if animation.current_animation != clip:
+	if clip == ActionsStuff.ALERT and animation.has_animation(ActionsStuff.ALERT_ENTER):
+		if previous in [ActionsStuff.IDLE, ActionsStuff.MOVE, ActionsStuff.ALERT_ENTER]:
+			clip = ActionsStuff.ALERT_ENTER
+	elif clip == ActionsStuff.IDLE and animation.has_animation(ActionsStuff.ALERT_EXIT):
+		if previous in [ActionsStuff.ALERT, ActionsStuff.PURSUIT, ActionsStuff.ALERT_EXIT]:
+			clip = ActionsStuff.ALERT_EXIT
+	if previous != clip:
+		var finished := animation.assigned_animation
 		animation.play(clip, 0.13)
+		# Carry the breathing phase from the authored transition into its loop.
+		if previous.is_empty() and ((finished == ActionsStuff.ALERT_ENTER and clip == ActionsStuff.ALERT)
+				or (finished == ActionsStuff.ALERT_EXIT and clip == ActionsStuff.IDLE)):
+			var phase := fposmod(animation.get_animation(finished).length, animation.current_animation_length)
+			animation.seek(phase)
 
 func _play_gait() -> void:
 	var clip := _walk_clip

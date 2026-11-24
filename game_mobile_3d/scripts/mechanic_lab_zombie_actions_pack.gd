@@ -10,6 +10,7 @@ const CLIPS := {
 	"baby_move": ["spjybv", 3677420, 1212, "ba5752e0566f81ad0d7603220531f8967a5bd8c94c1668909231a6cb007731e4"],
 	"pursuit": ["witjtv", 3681487, 1868, "441610ee1c59eaeb919f73d3c3d605efaed1754b34510a2596fc8092d13b0f31"],
 	"alert": ["isqbxt", 3665073, 1619, "959fae79e4c923750f4f2d391f070227a9e0d3db6502029f9eabd0c840eb3bc2"],
+	"alert_exit": ["oilkxc", 3666693, 1534, "4690a04c96ef84f6ebaa18e4947523d9c82874c02604dcecc406400920c2813f"],
 	"attack": ["craixf", 3641430, 2733, "a9b11271057f6d0964b621f35796c0b18c63f9969081f6eeacb92eecd3daec4d"],
 	"jump": ["liruwo", 3669873, 1990, "f2514086d2600adcdba7674bbbf04d07cc4996ccb1caae172287a0d0caefedce"],
 	"fall": ["efxmad", 3671864, 2430, "cb43c8a7ed66ddf50fe825706365933dcf5dc2be4690ae307e609972f773167f"],
@@ -131,6 +132,7 @@ static func bake(bindings: Array, layers: Array[Dictionary], duration: float, lo
 		var base_rot := base.find_track(path, Animation.TYPE_ROTATION_3D) if base else -1
 		var position_channels: Array[Channel] = []
 		var rotation_channels: Array[Channel] = []
+		var playback_rates: Array[float] = []
 		# Evaluate held and constant channels once, then add layers in source order.
 		var held_positions: Array[Vector3] = []
 		var held_rotations: Array[Vector3] = []
@@ -140,6 +142,7 @@ static func bake(bindings: Array, layers: Array[Dictionary], duration: float, lo
 			var rotation := Channel.new(channels.get("rotation"))
 			var held := layer.has("held_time")
 			var time: float = layer.get("held_time", 0.0)
+			playback_rates.append(layer.get("playback_rate", 1.0))
 			var static_position := held or not position.varies_with_time()
 			var static_rotation := held or not rotation.varies_with_time()
 			position_channels.append(null if static_position else position)
@@ -155,8 +158,9 @@ static func bake(bindings: Array, layers: Array[Dictionary], duration: float, lo
 			for layer_index in layers.size():
 				var position := position_channels[layer_index]
 				var rotation := rotation_channels[layer_index]
-				offset += position.sample(time, grounded) if position != null else held_positions[layer_index]
-				angle += rotation.sample(time, grounded) if rotation != null else held_rotations[layer_index]
+				var layer_time := time * playback_rates[layer_index]
+				offset += position.sample(layer_time, grounded) if position != null else held_positions[layer_index]
+				angle += rotation.sample(layer_time, grounded) if rotation != null else held_rotations[layer_index]
 			var point := rest_position
 			var facing := rest_facing
 			if base != null:

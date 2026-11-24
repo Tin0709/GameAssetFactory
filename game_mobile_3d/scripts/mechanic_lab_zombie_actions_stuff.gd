@@ -6,6 +6,8 @@ const IDLE := &"Zombie_AS_Idle"
 const MOVE := &"Zombie_AS_Move"
 const PURSUIT := &"Zombie_AS_Pursuit"
 const ALERT := &"Zombie_AS_Alert"
+const ALERT_ENTER := &"Zombie_AS_AlertEnter"
+const ALERT_EXIT := &"Zombie_AS_AlertExit"
 const JUMP := &"Zombie_AS_Jump"
 const FALL := &"Zombie_AS_Fall"
 const ATTACK := &"Zombie_AS_Attack"
@@ -22,6 +24,7 @@ const SOURCE_RELEASE := 10.0 / 60.0
 const SOURCE_CONTACT := 12.0 / 60.0
 const BAKE_RATE := 60.0
 const ALERT_TIME := 0.7083
+const ALERT_IDLE_RATE := 0.5
 const LANDING_DELAY := 0.15 # A&S ground recovery controller.
 const ADULT_IDLE_PERIOD := 360.0 / 100.0
 const BABY_IDLE_PERIOD := 360.0 / 130.0
@@ -118,10 +121,8 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 	var model := player.get_parent()
 	var source_clips: Dictionary[StringName, Animation] = {}
 	var steps: Array[Callable] = []
-	var preview: AnimationLibrary
-	if (pack.is_empty() or not baby) and ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary"):
-		preview = ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary
 	if pack.is_empty():
+		var preview := ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary +			if ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary") else null
 		if (preview == null or not preview.has_animation(&"Idle") or not preview.has_animation(&"Walk")
 				or not preview.has_animation(&"Attack")):
 			return []
@@ -157,6 +158,22 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 			var alert_source := Pack.bake(bindings, [alert], idle.length, true, BAKE_RATE, true, idle)
 			source_clips[ALERT] = alert_source
 			library.add_animation(ALERT, _bake(skeleton, model, alert_source)))
+		steps.append(func():
+			var raise_arms: Dictionary = pack.alert.duplicate()
+			if baby:
+				# Babies use the alert layer as their default stance. Fit the raise
+				# within their existing spawn window.
+				raise_arms.playback_rate = ALERT_TIME / spawn_duration
+				source_clips[SPAWN] = Pack.bake(bindings, [raise_arms], spawn_duration,
+					false, BAKE_RATE, true, source_clips[IDLE])
+			else:
+				raise_arms.playback_rate = ALERT_IDLE_RATE
+				var enter := Pack.bake(bindings, [raise_arms], ALERT_TIME / ALERT_IDLE_RATE,
+					false, BAKE_RATE, true, source_clips[IDLE])
+				library.add_animation(ALERT_ENTER, _bake(skeleton, model, enter))
+				var exit := Pack.bake(bindings, [pack.alert_exit], pack.alert_exit.animation_length,
+					false, BAKE_RATE, true, source_clips[IDLE])
+				library.add_animation(ALERT_EXIT, _bake(skeleton, model, exit)))
 		for state: Array in [[JUMP, pack.jump], [FALL, pack.fall]]:
 			var name: StringName = state[0]
 			var layer: Dictionary = state[1]
@@ -175,11 +192,7 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 	# stance for each age and let the Lab keep its existing one-shot timing.
 	var resting_clip := ALERT if baby and not pack.is_empty() else IDLE
 	steps.append(func():
-		var spawn_source: Animation = source_clips[resting_clip]
-		# Keep the adult entrance from the evaluated A&S library. Its initial
-		# pose also initializes the dormant physical bones before their handoff.
-		if not baby and preview != null and preview.has_animation(&"Idle"):
-			spawn_source = preview.get_animation(&"Idle")
+		var spawn_source: Animation = source_clips.get(SPAWN, source_clips[IDLE])
 		library.add_animation(SPAWN, _bake(skeleton, model, spawn_source, Vector3.ZERO, spawn_duration)))
 	steps.append(func(): library.add_animation(STAGGER,
 		_bake(skeleton, model, source_clips[resting_clip], Vector3.ZERO, stagger_seconds)))
