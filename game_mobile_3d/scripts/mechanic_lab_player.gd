@@ -10,6 +10,7 @@ const LabCombo := preload("res://scripts/mechanic_lab_combo.gd")
 signal bow_drawn
 signal bow_released(serial: int, charged: bool, target: Variant)
 signal tool_ground_cue(cue: Dictionary, serial: int, sample_time: float)
+signal tool_audio_cue(index: int, landing: bool, serial: int)
 
 const BOW_MIN_DRAW_SECONDS := 0.10
 const BOW_DRAW_BLEND_SECONDS := 0.12
@@ -464,6 +465,16 @@ func _animate(delta: float) -> void:
 	var previous_time: float = combo.time
 	var previous_serial: int = combo.serial
 	super._animate(delta)
+	if _grounded and review_clip.is_empty():
+		var cue_start := previous_time if combo.serial == previous_serial else 0.0
+		if combo.phase == &"attack" and combo.native_enabled:
+			var swing_time: float = combo.native_windows[combo.index].get("swing_audio_time", 0.0)
+			if cue_start < swing_time and swing_time <= combo.time:
+				tool_audio_cue.emit(combo.index, false, combo.serial)
+		elif combo.phase == &"air_attack" and combo.air_landing_started:
+			var landing_time: float = clips.AirAttack.get("landing_audio_time", 0.0)
+			if cue_start < landing_time and landing_time <= combo.time:
+				tool_audio_cue.emit(combo.index, true, combo.serial)
 	if _grounded and combo.serial == previous_serial and review_clip.is_empty():
 		if combo.phase == &"attack" and combo.native_enabled:
 			_emit_tool_ground_cues(combo.native_windows[combo.index].get("ground_effects", []), previous_time)

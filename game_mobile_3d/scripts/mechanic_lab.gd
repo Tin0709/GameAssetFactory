@@ -473,6 +473,7 @@ func _ready() -> void:
 		player.connect("heavy_jump_landed", _on_heavy_jump_landed)
 		_setup_tool_slam_ring()
 		player.tool_ground_cue.connect(_queue_tool_ground_cue)
+		player.tool_audio_cue.connect(_on_tool_audio_cue)
 		player.physics_pose_ready.connect(_sample_combat_fx)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
@@ -1413,14 +1414,25 @@ func _heavy_debris_delay() -> float:
 	return 0.0
 
 func _on_attack_accepted_timed(index: int, clip: String, serial: int, at: float) -> void:
-	# The Sabre aerial montage loops until support, so its cue follows the
-	# landing section. Other attacks keep their existing sample timing.
 	if MELEE_AUDIO_NAMES.has(_equipped_weapon):
-		_combat_audio.tool_swung(MELEE_AUDIO_NAMES[_equipped_weapon], player.global_position + Vector3.UP, index, clip == "AirAttack")
+		var airborne := clip == "AirAttack"
+		# Positive montage offsets are dispatched as the clip crosses the notify.
+		if not airborne and player.combo.native_enabled \
+				and player.combo.native_windows[index].get("swing_audio_time", 0.0) > 0.0:
+			return
+		_combat_audio.tool_swung(MELEE_AUDIO_NAMES[_equipped_weapon], player.global_position + Vector3.UP, index, airborne)
 	elif _equipped_weapon == Weapon.GAUNTLETS:
 		_combat_audio.gauntlet_swung(player.global_position + Vector3.UP, index, clip == "AirAttack")
 	elif clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
 		player.reference_audio.trigger_attack(index, clip, serial, at)
+
+func _on_tool_audio_cue(index: int, landing: bool, serial: int) -> void:
+	var tool: StringName = MELEE_AUDIO_NAMES[_equipped_weapon]
+	if not landing:
+		_combat_audio.tool_swung(tool, player.global_position + Vector3.UP, index, false)
+	elif _tool_touchdown.get("serial") == serial:
+		var point: Vector3 = _tool_touchdown.origin + _tool_touchdown.forward * $Zombies.air_centre_offset()
+		_combat_audio.tool_landed(tool, point)
 
 func _cancel_slam_audio() -> void:
 	_slam_audio_frame = -1
@@ -1637,7 +1649,7 @@ func _on_sabre_landing(point: Vector3, serial: int) -> void:
 		return
 	elif _equipped_weapon == Weapon.GAUNTLETS:
 		_combat_audio.gauntlet_slam_landed(point)
-	elif MELEE_AUDIO_NAMES.has(_equipped_weapon):
+	elif MELEE_AUDIO_NAMES.has(_equipped_weapon) and not player.clips.AirAttack.has("landing_audio_time"):
 		_combat_audio.tool_landed(MELEE_AUDIO_NAMES[_equipped_weapon], point)
 	if _slam_burst_serial != serial:
 		_slam_burst_point = point

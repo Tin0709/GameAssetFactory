@@ -110,6 +110,17 @@ const WINDOWS := [
 		Vector4(0.164172, 0.180649, 0.825099, 1.166666)],
 ]
 const RATES := [Vector3(1.43, 1.43, 1.43), Vector3(0.9, 0.9, 1.0), Vector3(1.4, 1.4, 1.2), Vector3.ONE]
+# PostAudioEvent times in the source clip clock after montage segment mapping.
+const GROUND_SWING_AUDIO := {
+	Tool.CLEAVER: Vector3(0.069257, 0.110463, 0.234550),
+	Tool.PICKAXE: Vector3(0.0, 0.017121, 0.186744),
+	Tool.SHOVEL: Vector3(0.175533, 0.251809, 0.0),
+}
+const LANDING_WEAPON_AUDIO := {
+	Tool.CLEAVER: 0.258477,
+	Tool.PICKAXE: 0.624878,
+	Tool.SHOVEL: 0.462851,
+}
 # Start at the slash notify in each montage segment. Stop following the blade
 # when its fast sweep ends in the Lab pose. The notify's Lifetime is separate
 # from that sampling window and controls the fade in real seconds.
@@ -284,6 +295,8 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 		var recovery := _clip(root, RECOVERIES[tool][i], prefix + "Recovery%d" % (i + 1), "recovery")
 		var timings: Vector4 = WINDOWS[tool][i]
 		var window := Source.window(attack, recovery, RATES[tool][i], timings.x, timings.y, timings.z)
+		if GROUND_SWING_AUDIO.has(tool):
+			window.swing_audio_time = GROUND_SWING_AUDIO[tool][i]
 		if tool < GROUND_SLASHES.size():
 			var slash: Vector3 = GROUND_SLASHES[tool][i]
 			window.trail_window = [slash.x, slash.y]
@@ -301,6 +314,8 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 		result.windows.append(window)
 	var air := _clip(root, AIR_CLIPS[tool], air_clip(tool), "attack")
 	air.air_trails = AIR_TRAILS[tool]
+	if LANDING_WEAPON_AUDIO.has(tool):
+		air.landing_audio_time = LANDING_WEAPON_AUDIO[tool]
 	if AIR_EFFECTS.has(tool):
 		air.ground_effects = AIR_EFFECTS[tool]
 	result.additional_clips.append(air)
