@@ -454,8 +454,10 @@ func check_crossbow_impact_burst(lab: Node3D, sparks: MultiMeshInstance3D) -> vo
 		var before_age: float = spark.age
 		var next_velocity: Vector3 = (spark.velocity + spark.acceleration * delta) / (1.0 + spark.drag * delta)
 		var next_point: Vector3 = spark.point + next_velocity * delta
-		await process_frame
-		await ticks(2)
+		for i in 8:
+			await physics_frame
+			if spark.age > before_age:
+				break
 		check(is_equal_approx(spark.age - before_age, delta) and spark.point.is_equal_approx(next_point),
 			"Existing Polaris sparks use a full source integration step after their first render")
 		print("MECHANIC_LAB_POLARIS_WALL_AGE expected=", expected_age, " actual=", before_age)
@@ -552,8 +554,10 @@ func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
 			"A charged Bow wall collision uses its own collision time for the sparks")
 		if not particles.is_empty():
 			print("MECHANIC_LAB_BOW_WALL_AGE expected=", expected_age, " actual=", particles[0].age)
-	await process_frame
-	await ticks(2)
+	for i in 8:
+		await physics_frame
+		if not bow._embedded_arrows.is_empty() and bow._embedded_arrows[0].age > 0.0:
+			break
 	if not bow._embedded_arrows.is_empty():
 		check(is_equal_approx(bow._embedded_arrows[0].age, delta),
 			"The Bow wall prop advances by one physics step after its first render")
@@ -640,6 +644,11 @@ func check_crossbow_trail(lab: Node3D) -> void:
 	if crossbow._trails.size() == 1:
 		check(absf(float(crossbow._trails[0].distance) - 3.95) < 0.03,
 			"The ribbon stops at the wall surface")
+		var final_transition := CrossPollinator.TRAIL_ALPHA_BLEND_END * CrossPollinator.TRAIL_LIFETIME
+		for i in 8:
+			if crossbow._trails.size() != 1 or crossbow._trails[0].tail_age >= final_transition:
+				break
+			await physics_frame
 	check_arrow_ribbon_sections(crossbow, 1, "Polaris tail after the opacity transition")
 	await ticks(18)
 	check(not ribbon.visible and crossbow._trails.is_empty(), "The last ribbon sample expires after 0.30 seconds")
