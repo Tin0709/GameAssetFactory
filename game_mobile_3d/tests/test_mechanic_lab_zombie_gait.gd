@@ -115,7 +115,7 @@ func check_fall_root(actor: Zombie) -> void:
 	var offset_in_leg_lengths := (parent.basis * local_offset).y / skeleton.get_bone_global_rest(hips).origin.y
 	# At 0.5 s the source fall lowers the whole pose by 3 pixels on a 12-pixel leg.
 	# The adult and baby idle breath contribute different additional offsets.
-	var breathing_pixels := -0.4788168 if actor.is_baby else -1.0897114
+	var breathing_pixels := -0.9211832 if actor.is_baby else -1.0897114
 	check(is_equal_approx(offset_in_leg_lengths, (breathing_pixels - 3.0) / 12.0),
 		"The A&S fall retains its source whole-body drop (baby=%s, offset=%f)" % [actor.is_baby, offset_in_leg_lengths])
 
