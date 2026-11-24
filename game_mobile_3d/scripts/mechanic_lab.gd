@@ -1462,11 +1462,13 @@ func _apply_preset_action(action: int) -> void:
 	if action in [PresetAction.SAVE_A, PresetAction.SAVE_B]:
 		config.set_value("preset", "settings", _capture_tuning())
 		var error := DirAccess.make_dir_recursive_absolute(tuning_preset_directory)
-		var staging := path + ".tmp"
+		var staging := "%s.%d.%d.tmp" % [path, OS.get_process_id(), Time.get_ticks_usec()]
 		if error == OK:
 			error = config.save(staging)
 		if error == OK:
 			error = DirAccess.rename_absolute(staging, path)
+		if error != OK and FileAccess.file_exists(staging):
+			DirAccess.remove_absolute(staging)
 		$HUD/SpawnStatus.text = ("Đã lưu cấu hình %s." if error == OK else "Không thể lưu cấu hình %s.") % slot
 		return
 	if not FileAccess.file_exists(path):
