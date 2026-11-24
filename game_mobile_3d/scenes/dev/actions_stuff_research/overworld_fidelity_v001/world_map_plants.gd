@@ -187,7 +187,7 @@ func _build_native_patches()->void:
 				var bounds:=source.get_aabb();pivot=Vector3(bounds.get_center().x,bounds.position.y,0.)
 			# Share corners within this card only when all shader inputs agree.
 			var card_vertices := {}
-			for i in arrays[Mesh.ARRAY_VERTEX].size():
+			for i: int in arrays[Mesh.ARRAY_VERTEX].size():
 				var position: Vector3 = arrays[Mesh.ARRAY_VERTEX][i]
 				var normal: Vector3 = arrays[Mesh.ARRAY_NORMAL][i]
 				var uv: Vector2 = arrays[Mesh.ARRAY_TEX_UV][i]
