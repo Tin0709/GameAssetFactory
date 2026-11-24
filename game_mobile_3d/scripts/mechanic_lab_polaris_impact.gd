@@ -12,6 +12,7 @@ const COLOR_DIVISOR := 250.0
 # uses that tint for an opening accent, with the existing warm fade.
 const CHARGED_ACCENT_RGB := Vector3(0.058977, 0.587809, 1.0)
 const SURFACE_GAP := 0.003
+const OPEN_SPRITE := Color(0.5, 0.5, 1.0)
 
 class Spark:
 	var point: Vector3
@@ -65,6 +66,7 @@ func setup(research_root: String) -> bool:
 	quad.material = material
 	multimesh = MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	multimesh.use_colors = true
 	multimesh.use_custom_data = true
 	multimesh.mesh = quad
 	multimesh.instance_count = CAPACITY
@@ -185,7 +187,19 @@ func advance(delta: float) -> bool:
 			length_axis = view.y
 		var width_axis := length_axis.cross(view.z)
 		var sprite := Basis(width_axis * size.x, length_axis * size.y, view.z)
+		var plane_data := OPEN_SPRITE
+		if not spark.surface.normal.is_zero_approx():
+			var normal := spark.surface.normal
+			var slope := Vector2(sprite.x.dot(normal), sprite.y.dot(normal))
+			var span := absf(slope.x) + absf(slope.y)
+			var clearance := maxf(0.0, spark.surface.distance_to(spark.point))
+			if clearance < span * 0.5:
+				# COLOR carries the normalized plane in the unit quad's XY.
+				# Keep the Niagara palette in INSTANCE_CUSTOM.
+				slope /= span
+				plane_data = Color(0.5 + 0.5 * slope.x, 0.5 + 0.5 * slope.y, clearance / span)
 		multimesh.set_instance_transform(count, inverse * Transform3D(sprite, spark.point))
+		multimesh.set_instance_color(count, plane_data)
 		multimesh.set_instance_custom_data(count, color)
 		count += 1
 	_active_count = count
