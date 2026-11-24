@@ -119,6 +119,19 @@ func check_fall_root(actor: Zombie) -> void:
 	check(is_equal_approx(offset_in_leg_lengths, (breathing_pixels - 3.0) / 12.0),
 		"The A&S fall retains its source whole-body drop (baby=%s, offset=%f)" % [actor.is_baby, offset_in_leg_lengths])
 
+func lowest_sole(skeleton: Skeleton3D) -> float:
+	var length := skeleton.get_bone_global_rest(skeleton.find_bone(&"J_Hip")).origin.y
+	var lowest := INF
+	for name: StringName in [&"J_L_Leg", &"J_R_Leg"]:
+		var leg := skeleton.find_bone(name)
+		var rest := skeleton.get_bone_global_rest(leg)
+		var pose := skeleton.global_transform * skeleton.get_bone_global_pose(leg)
+		for x: int in [-1, 1]:
+			for z: int in [-1, 1]:
+				var corner := rest.origin + Vector3(x * length / 6.0, -length, z * length / 6.0)
+				lowest = minf(lowest, (pose * (rest.affine_inverse() * corner)).y)
+	return lowest
+
 func check_airborne(lab: Node, group: Node) -> void:
 	for baby: bool in [false, true]:
 		var count := group.get_child_count()
@@ -137,7 +150,12 @@ func check_airborne(lab: Node, group: Node) -> void:
 			and actor.animation.current_animation_position > onset, "The fall plays continuously while airborne")
 		check(await await_clip(actor, [STYLED_IDLE, STYLED_ALERT, STYLED_WALK], 90),
 			"The zombie recovers its A&S ground animation after landing")
-		for tick in 23:
+		var lowest := INF
+		for tick in 8:
+			lowest = minf(lowest, lowest_sole(actor.ragdoll.skeleton))
+			await physics_frame
+		check(lowest >= -0.012, "The A&S landing blend keeps both soles above ground (baby=%s, lowest=%f)" % [actor.is_baby, lowest])
+		for tick in 15:
 			await physics_frame
 		var skeleton := actor.ragdoll.skeleton
 		var spine := skeleton.find_bone(&"J_Spine")
