@@ -14,6 +14,7 @@ var lab: Node3D
 var group: Zombies
 var audio: CombatAudio
 var dust: MultiMeshInstance3D
+var sparks: MultiMeshInstance3D
 var numbers: MultiMeshInstance3D
 var viewport: RID
 var cycle := 0
@@ -33,6 +34,7 @@ var draw_peak := 0
 var memory_peak := 0
 var gpu_memory_peak := 0
 var dust_peak := 0
+var sparks_peak := 0
 var damage_glyph_peak := 0
 var voices_peak := 0
 var player_hits := 0
@@ -71,6 +73,7 @@ func run() -> void:
 	audio = lab.get_node("CombatAudio")
 	numbers = lab.get_node_or_null("CombatEffects/ZombieDamageNumbers")
 	dust = lab.get_node_or_null("ZombieStepDust")
+	sparks = lab.get_node_or_null("ContactSparks/Streaks")
 	(lab.get_node("HUD/CombatAudioToggle") as CheckButton).button_pressed = audio_enabled
 	group.player_hit.connect(func(_damage: int): player_hits += 1)
 	viewport = root.get_viewport_rid()
@@ -81,6 +84,7 @@ func run() -> void:
 	print("POPULATION_SETUP ", JSON.stringify({
 		"populations": counts, "cycles": cycles, "output": label,
 		"viewport": [root.size.x, root.size.y], "physics_hz": Engine.physics_ticks_per_second,
+		"fps_cap": Engine.max_fps,
 		"renderer": RenderingServer.get_current_rendering_method(),
 		"adapter": RenderingServer.get_video_adapter_name(), "audio_driver": AudioServer.get_driver_name(),
 		"combat_audio": audio_enabled, "corpse_seconds": group.corpse_lifetime,
@@ -180,6 +184,7 @@ func start_phase(name: String) -> void:
 	memory_peak = 0
 	gpu_memory_peak = 0
 	dust_peak = 0
+	sparks_peak = 0
 	damage_glyph_peak = 0
 	voices_peak = 0
 	max_physics_ticks_per_frame = 0
@@ -210,6 +215,8 @@ func sample_frame() -> void:
 	gpu_memory_peak = maxi(gpu_memory_peak, int(Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)))
 	if dust != null:
 		dust_peak = maxi(dust_peak, dust.multimesh.visible_instance_count)
+	if sparks != null:
+		sparks_peak = maxi(sparks_peak, sparks.multimesh.visible_instance_count)
 	if numbers != null:
 		damage_glyph_peak = maxi(damage_glyph_peak, numbers.multimesh.visible_instance_count)
 	var playing := 0
@@ -227,7 +234,7 @@ func finish_phase() -> void:
 		"max_physics_ticks_per_frame": max_physics_ticks_per_frame,
 		"render_cpu_ms": stats(render_cpu_ms), "render_gpu_ms": stats(render_gpu_ms),
 		"peak_draws": draw_peak, "peak_static_bytes": memory_peak, "peak_video_bytes": gpu_memory_peak,
-		"peak_zombie_dust": dust_peak, "peak_damage_glyphs": damage_glyph_peak,
+		"peak_zombie_dust": dust_peak, "peak_contact_sparks": sparks_peak, "peak_damage_glyphs": damage_glyph_peak,
 		"peak_shared_combat_voices": voices_peak, "nodes": get_node_count(),
 	}))
 	phase = ""
