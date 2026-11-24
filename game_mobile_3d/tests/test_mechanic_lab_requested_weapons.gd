@@ -273,6 +273,7 @@ func run() -> void:
 	await check_crossbow_trail(lab)
 	await check_crossbow_impact_burst(lab, sparks)
 	await check_projectile_birth_frame(lab)
+	await check_projectile_surface_bounds(lab)
 	await ticks(12)
 	target.position = Vector3(2.5, 0.0, 3.0)
 	lab.player._q = true
@@ -564,6 +565,58 @@ func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
 	print("MECHANIC_LAB_BOW_WALL_CONTACT hits=", hits.size(), " props_on_contact=", props_on_contact)
 	bow.arrow_impact.disconnect(record)
 	bow.reset()
+	wall.queue_free()
+
+
+func check_projectile_surface_bounds(lab: Node3D) -> void:
+	var wall := StaticBody3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(3.0, 3.0, 0.14)
+	var collider := CollisionShape3D.new()
+	collider.shape = shape
+	wall.add_child(collider)
+	wall.position = Vector3(16.0, 1.5, 3.0)
+	wall.rotation.y = deg_to_rad(24.0)
+	lab.add_child(wall)
+	var arena := lab.get_node("Ground") as StaticBody3D
+	await ticks(2)
+	for weapon: Node3D in [lab._crossbow, lab._bow]:
+		if weapon.impact_sparks == null:
+			check(false, "The surface bounds fixture has the verified projectile emitters")
+			continue
+		for surface_slot in [-1, 0, 1, 2]:
+			var on_wall := surface_slot == -1
+			if not on_wall:
+				lab._select_floor_surface(surface_slot)
+			weapon.reset()
+			var hits: Array[Dictionary] = []
+			weapon.bolt_impact.connect(func(hit: Dictionary, _direction: Vector3, _serial: int):
+				hits.append(hit), CONNECT_ONE_SHOT)
+			var origin := Vector3(16.0, 1.25, 0.0) if on_wall else Vector3(20.0, 1.7, 0.0)
+			var direction := Vector3.BACK if on_wall else Vector3(0.45, -0.7, 0.4).normalized()
+			if weapon == lab._crossbow:
+				weapon.fire(origin, direction, 1970, origin)
+			else:
+				weapon.fire_arrow(origin, direction, 1971, origin, true)
+			var minimum := INF
+			var appeared := false
+			for i in 40:
+				await physics_frame
+				if hits.is_empty():
+					continue
+				var hit := hits[0]
+				for spark in weapon.impact_sparks._particles:
+					if spark.age >= spark.lifetime:
+						continue
+					appeared = true
+					var signed_distance: float = (spark.point - hit.position).dot(hit.normal)
+					minimum = minf(minimum, signed_distance)
+			check(hits.size() == 1 and hits[0].collider == (wall if on_wall else arena) and appeared,
+				"The projectile fixture records one solid contact and visible sparks")
+			check(minimum >= -0.0001, "All projectile sparks stay outside the impact plane")
+			print("PROJECTILE_SURFACE_BOUNDS bow=", weapon == lab._bow, " surface=", surface_slot, " minimum=", minimum)
+		weapon.reset()
+	lab._select_floor_surface(0)
 	wall.queue_free()
 
 func check_projectile_birth_frame(lab: Node3D) -> void:
