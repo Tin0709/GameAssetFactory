@@ -37,6 +37,7 @@ const GAUNTLET_HIT_HASHES := [
 const GAUNTLET_JUMP := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_%02d.ogg"
 const GAUNTLET_SLAM := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_gauntlets_unique_jump_attack_%02d.ogg"
 const TOOL_AUDIO := "Items/Weapons/Weapon_Melee/"
+const TOOL_LANDING_ACCENT_SLOT := 6
 const TOOL_SWING_AUDIO := "6_weapons_melee_basicCombo/Attack%d/"
 const TOOL_AIR_AUDIO := "7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/"
 const TOOL_SAMPLES := {
@@ -142,6 +143,7 @@ const TOOL_SAMPLES := {
 			"81f6c1432abe583495723495b4f246e376d58931ba2ad3fd325ddcd6976d57ec",
 			"9cc6d9d3cef4f4672ef1f647cdb2789d3138853d41cfc3b647ea23096b1e0d38",
 		]],
+		["sfx_shovel_HJA_dirt", ["a0273a74448c7fe45130696497109a3ccf22331ea80a524df397b2912940cc6c"]],
 	],
 	&"axe": [
 		["sfx_axe_attack_combo_01", ["bee4c3e4572bcc33a91d448c52aebbe3de7f814502ba02bde31b5831b6a195ef"]],
@@ -628,6 +630,10 @@ func tool_landed(tool: StringName, point: Vector3) -> void:
 		var group := _tool_group(tool, 4)
 		_finish_weapon_samples(group)
 		_play(group, point, SLAM_GAIN_DB, -1, true)
+
+func tool_landing_accent(tool: StringName, point: Vector3) -> void:
+	if enabled:
+		_play_weapon_cue(_tool_group(tool, TOOL_LANDING_ACCENT_SLOT), point, SURFACE_LANDING_GAIN_DB, true)
 
 func melee_switched(weapon: StringName, equipped: bool, point: Vector3) -> void:
 	if not enabled or _voices.is_empty() or weapon.is_empty():

@@ -11,6 +11,7 @@ signal bow_drawn
 signal bow_released(serial: int, charged: bool, target: Variant)
 signal tool_ground_cue(cue: Dictionary, serial: int, sample_time: float)
 signal tool_audio_cue(index: int, landing: bool, serial: int)
+signal tool_landing_accent_cue(serial: int)
 
 const BOW_MIN_DRAW_SECONDS := 0.10
 const BOW_DRAW_BLEND_SECONDS := 0.12
@@ -479,6 +480,9 @@ func _animate(delta: float) -> void:
 			var landing_time: float = clips.AirAttack.get("landing_audio_time", 0.0)
 			if cue_start < landing_time and landing_time <= combo.time:
 				tool_audio_cue.emit(combo.index, true, combo.serial)
+			var accent_time: float = clips.AirAttack.get("landing_accent_time", 0.0)
+			if cue_start < accent_time and accent_time <= combo.time:
+				tool_landing_accent_cue.emit(combo.serial)
 			if same_attack:
 				var cues: Array = sabre_landing_cues if combo.use_sabre_air_sections else clips.AirAttack.get("ground_effects", [])
 				_emit_tool_ground_cues(cues, previous_time)

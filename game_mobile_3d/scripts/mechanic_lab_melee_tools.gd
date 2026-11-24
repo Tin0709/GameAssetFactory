@@ -326,6 +326,8 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 	air.air_trails = AIR_TRAILS[tool]
 	if LANDING_WEAPON_AUDIO.has(tool):
 		air.landing_audio_time = LANDING_WEAPON_AUDIO[tool]
+	if tool == Tool.SHOVEL:
+		air.landing_accent_time = 0.466195
 	if AIR_EFFECTS.has(tool):
 		air.ground_effects = AIR_EFFECTS[tool]
 	result.additional_clips.append(air)

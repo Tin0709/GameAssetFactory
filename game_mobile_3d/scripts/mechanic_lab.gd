@@ -483,6 +483,7 @@ func _ready() -> void:
 		_setup_tool_slam_ring()
 		player.tool_ground_cue.connect(_queue_tool_ground_cue)
 		player.tool_audio_cue.connect(_on_tool_audio_cue)
+		player.tool_landing_accent_cue.connect(_on_tool_landing_accent_cue)
 		player.physics_pose_ready.connect(_sample_combat_fx)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
@@ -1477,6 +1478,12 @@ func _on_tool_audio_cue(index: int, landing: bool, serial: int) -> void:
 	elif _tool_touchdown.get("serial") == serial:
 		var point: Vector3 = _tool_touchdown.origin + _tool_touchdown.forward * $Zombies.air_centre_offset()
 		_combat_audio.tool_landed(tool, point)
+
+func _on_tool_landing_accent_cue(serial: int) -> void:
+	if _tool_touchdown.get("serial") != serial:
+		return
+	var point: Vector3 = _tool_touchdown.surface_contact.get("position", _tool_touchdown.origin)
+	_combat_audio.tool_landing_accent(MELEE_AUDIO_NAMES[_equipped_weapon], point)
 
 func _cancel_slam_audio() -> void:
 	_slam_audio_frame = -1
