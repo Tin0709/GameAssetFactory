@@ -702,6 +702,7 @@ func _prepare_spatial_mist(env: Environment, clear_fog_color: Color, time: float
 		"fog_begin": env.fog_depth_end,
 		"fog_color": tint,
 		"volume_density": density,
+		"region_overcast_weight": weather_weight,
 		"height_falloff": _profile.mist_height_falloff,
 		"near_layer": Vector3(env.fog_depth_begin, density, base_y),
 		"near_fade_start": .8,

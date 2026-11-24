@@ -152,13 +152,14 @@ func _process(_delta:float)->void:
   _append(Vector3.ZERO,data,near_fade_start)
  var local:=PackedFloat32Array()
  var additional:=PackedFloat32Array()
+ var overcast_weight: float = _profile.get("region_overcast_weight", 0.)
  if effect.has_method("configure_with_local_mist"):
   if near_layer.y>0. and _local_region!=null and _local_gain>0.:
-   local=_local_region.render_parameters(_local_gain)
+   local=_local_region.render_parameters(_local_gain, overcast_weight)
   var path:PackedFloat32Array=path_light_provider.call() if path_light_provider.is_valid() else PackedFloat32Array()
   if effect.has_method("configure_with_mist_regions"):
    if near_layer.y>0. and _additional_region!=null and _additional_gain>0.:
-    additional=_additional_region.render_parameters(_additional_gain)
+    additional=_additional_region.render_parameters(_additional_gain, overcast_weight)
    if effect.has_method("configure_with_depth_scatter"):
     var depth_scatter := float(_profile.get("depth_scatter",0.)) if near_layer.y>0. else 0.
     var depth_color: Vector3 = _profile.get("depth_scatter_color",Vector3.ZERO)

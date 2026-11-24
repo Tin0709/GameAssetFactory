@@ -13,6 +13,7 @@
 [sub_resource type="Resource" id="LowWesternMist"]
 script = ExtResource("local_mist")
 center_m = Vector3(0, 2.6, -8)
+overcast_center_offset_m = Vector3(-4.25, 0, 2.75)
 radii_m = Vector3(10, 1.9, 7)
 extinction_per_meter = 0.021
 scatter_multiplier = Vector3(0.9, 1.04, 1.23)
@@ -20,6 +21,7 @@ scatter_multiplier = Vector3(0.9, 1.04, 1.23)
 [sub_resource type="Resource" id="StoneGardenMist"]
 script = ExtResource("local_mist")
 center_m = Vector3(4.5, 2.7, -11.5)
+overcast_center_offset_m = Vector3(3.25, 0, -2.25)
 radii_m = Vector3(7, 1.65, 4)
 extinction_per_meter = 0.032
 scatter_multiplier = Vector3(0.9, 1.06, 1.24)
