@@ -2746,6 +2746,22 @@ func twilight_ground_ambient_scale() -> float:
 func grass_root_tone_mix() -> float:
 	return _lighting_scale(&"grass_root_tone") * _night_grass_weight()
 
+func flower_sun_response() -> Vector4:
+	if _biome_profile == null or _balanced_preview or level.view_mode != "gameplay" or atmosphere_review != "combined":
+		return Vector4.ZERO
+	var softness := _biome_profile.flower_sun_softness
+	if not is_finite(softness) or softness <= 0.:
+		return Vector4.ZERO
+	var phase := smoothstep(8., 11., hour) * (1. - smoothstep(14., 17.5, hour))
+	if phase <= 0.:
+		return Vector4.ZERO
+	var sun: DirectionalLight3D = level.get_node("Sun")
+	if not sun.is_visible_in_tree() or sun.light_energy <= 0.:
+		return Vector4.ZERO
+	var ray := sun.global_basis.z.normalized()
+	return Vector4(ray.x, ray.y, ray.z, clampf(softness, 0., 1.) * phase)
+
+
 func grass_night_albedo_mix() -> float:
 	if _balanced_preview or atmosphere_review != "combined" or not forest_active():
 		return 0.0

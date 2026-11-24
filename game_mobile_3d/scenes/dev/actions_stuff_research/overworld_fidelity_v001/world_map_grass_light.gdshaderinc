@@ -6,6 +6,9 @@
 #include "res://materials/world_map_foliage_light.gdshaderinc"
 uniform float study_grass_up_weight=0.0;
 uniform float study_transmission=0.1248;
+#ifdef GAF_FLOWER_DAYLIGHT_RESPONSE
+uniform vec4 petal_sun = vec4(0.0);
+#endif
 varying vec3 study_face;
 varying float study_tip_weight;
 varying float study_cloud;
@@ -65,6 +68,18 @@ void light(){
 		if (LIGHT_IS_DIRECTIONAL) {
 			response += world_foliage_lobe(study_face, LIGHT, VIEW, front, study_tip_weight, study_transmission);
 		}
+#ifdef GAF_FLOWER_DAYLIGHT_RESPONSE
+		if (LIGHT_IS_DIRECTIONAL && petal_sun.w > 0.0) {
+			vec3 world_light = mat3(INV_VIEW_MATRIX) * LIGHT;
+			if (dot(world_light, petal_sun.xyz) > .9999) {
+				// Blend toward a wider diffuse response on the flower heads.
+				// The result still passes through the same shadow and cloud visibility.
+				float petal = smoothstep(.53, .82, study_tip_weight);
+				float broad_diffuse = .65 * front + .35 * max(world_light.y, 0.0);
+				response = mix(response, vec3(broad_diffuse), petal * petal_sun.w);
+			}
+		}
+#endif
 		float gain = gaf_opening_gain(LIGHT_IS_DIRECTIONAL, shadow_attenuation * cloud);
 		vec3 diffuse_color = LIGHT_COLOR * gain;
 		float turf_sun = gaf_turf_sun_weight(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX, shadow_attenuation * cloud);

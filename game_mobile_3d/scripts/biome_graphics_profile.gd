@@ -194,6 +194,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Remove a fraction of the luminance added by the stone warmth tint.
 @export_range(0., 1., .01) var stone_warmth_luma_trim := 0.
 @export_range(0., 1., .01) var turf_sun_chroma := 0.
+## Strength of the wider direct diffuse response on flower heads near midday.
+@export_range(0., 1., .01) var flower_sun_softness := 0.
 ## Extra baked directional bounce on stone sides during morning and afternoon.
 @export_range(0., 2., .01) var stone_bounce_focus := 0.
 ## Range in exposure stops for sky fill from blade base to tip during daylight.

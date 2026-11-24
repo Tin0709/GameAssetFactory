@@ -25,6 +25,8 @@ var _shadow_footprint_scale := -1.
 var _shadow_wind_scale := -1.
 var _sunlight_stability := -1.
 var _step_coverage := -1.
+var _flower_materials: Array[ShaderMaterial] = []
+var _petal_sun := Vector4.INF
 
 func setup(level:Node3D,reader:RefCounted)->void:
 	world=level
@@ -68,6 +70,8 @@ func restore()->void:
 	_shadow_wind_scale = -1.
 	_sunlight_stability = -1.
 	_step_coverage = -1.
+	_flower_materials.clear()
+	_petal_sun = Vector4.INF
 
 func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->void:
 	restore()
@@ -90,7 +94,7 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 			if color_mips != null:
 				header += "\n#define GAF_FOLIAGE_COLOR_MIPS"
 			if flower:
-				header += "\n#define GAF_FLOWER_LANTERN_LAMBERT"
+				header += "\n#define GAF_FLOWER_LANTERN_LAMBERT\n#define GAF_FLOWER_DAYLIGHT_RESPONSE"
 			if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):header+="\n#define GAF_GRASS_FORCE_LAMBERT"
 			variant.code=source.code.replace("shader_type spatial;",header)
 			variants[features]=variant
@@ -103,6 +107,8 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 			material.set_shader_parameter("foliage_color_mips",color_mips)
 		material.set_shader_parameter("study_grass_up_weight",weight if turf else 0.)
 		material.set_shader_parameter("study_transmission",material.get_meta("plains_foliage_transmission",.1248))
+		if flower:
+			_flower_materials.append(material)
 	active=not _records.is_empty()
 	edge_sampling_active=active and edge_sampling
 	if world.terrain_light != null:
@@ -124,6 +130,12 @@ func sync()->void:
 		m.set_shader_parameter("cloud_shape",ground.get_shader_parameter("cloud_shape"))
 		m.set_shader_parameter("cloud_time",look.cloud_clock)
 	_sync_ground_sky()
+	if not _flower_materials.is_empty():
+		var sunlight: Vector4 = world.showcase.flower_sun_response()
+		if sunlight != _petal_sun:
+			_petal_sun = sunlight
+			for material: ShaderMaterial in _flower_materials:
+				material.set_shader_parameter("petal_sun", sunlight)
 	var step_coverage: float = world.showcase._lighting_scale(&"grass_step_coverage")
 	if step_coverage != _step_coverage:
 		_step_coverage = step_coverage
