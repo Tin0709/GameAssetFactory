@@ -90,6 +90,7 @@ const SABRE_LANDING_DEBRIS_DELAY := 0.045126423
 const SABRE_LANDING_SHAKE_DELAY := 0.052268848
 # AM_Player_Sabre_JumpAttack: one-shot PlayNiagaraEffect minus LandingStart.
 const SABRE_LANDING_BURST_DELAY := 0.056890413
+const SABRE_LANDING_BURST_REACH := 1.5
 
 enum PlayerSkin { MD2, KAI }
 enum PresetAction { SAVE_A, LOAD_A, SAVE_B, LOAD_B, DEFAULTS }
@@ -1391,7 +1392,15 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	elif TOOL_TYPES.has(_equipped_weapon):
 		player.begin_tool_landing()
 	# Evaluate the height tiers against the support rather than the capsule origin.
-	fall_height = maxf(0.0, fall_height + point.y - _landing_floor_height(point))
+	var floor_height := _landing_floor_height(point)
+	fall_height = maxf(0.0, fall_height + point.y - floor_height)
+	if _equipped_weapon == Weapon.SABRE:
+		var frame := Engine.get_physics_frames()
+		var rate := Engine.physics_ticks_per_second
+		_slam_shake_frame = frame + ceili(SABRE_LANDING_SHAKE_DELAY * rate)
+		_slam_burst_frame = frame + ceili(SABRE_LANDING_BURST_DELAY * rate)
+		_slam_burst_point = _sabre_impact_anchor(point, facing, floor_height)
+		_slam_burst_serial = serial
 	$Zombies.land_sabre(point, facing, serial, fall_height)
 	if not _combat_audio.enabled:
 		return
@@ -1415,21 +1424,40 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	else:
 		_combat_audio.slam_landed(contact.position, contact.surface)
 
+func _sabre_impact_anchor(point: Vector3, facing: Vector3, floor_height: float) -> Vector3:
+	var origin := Vector3(point.x, floor_height, point.z)
+	var forward := facing.slide(Vector3.UP).normalized()
+	var probe := Vector3.UP * 0.12
+	var space := get_world_3d().direct_space_state
+	var distance := SABRE_LANDING_BURST_REACH
+	var ray := PhysicsRayQueryParameters3D.create(origin + probe, origin + probe + forward * distance, 1, [player.get_rid()])
+	var obstruction := space.intersect_ray(ray)
+	if not obstruction.is_empty():
+		distance = maxf(0.0, (Vector3(obstruction.position) - origin).dot(forward) - 0.08)
+	var candidate := origin + forward * distance
+	ray.from = candidate + probe
+	ray.to = candidate - probe
+	var floor_contact := space.intersect_ray(ray)
+	if not floor_contact.is_empty() and floor_contact.normal.y >= cos(player.floor_max_angle):
+		return floor_contact.position
+
+	# At a ledge, use the sole's actual touchdown support even if the
+	# projected burst would reach the lower floor or empty space.
+	var support := _actor_floor_support(player, point)
+	return support.get("position", origin)
+
 func _on_sabre_landing(point: Vector3, serial: int) -> void:
-	if _equipped_weapon == Weapon.GAUNTLETS:
+	if _equipped_weapon == Weapon.SABRE:
+		return
+	elif _equipped_weapon == Weapon.GAUNTLETS:
 		_combat_audio.gauntlet_slam_landed(point)
 	elif MELEE_AUDIO_NAMES.has(_equipped_weapon):
 		_combat_audio.tool_landed(MELEE_AUDIO_NAMES[_equipped_weapon], point)
 	var frame := Engine.get_physics_frames()
-	if _equipped_weapon == Weapon.SABRE:
-		var rate := Engine.physics_ticks_per_second
-		_slam_shake_frame = frame + ceili(SABRE_LANDING_SHAKE_DELAY * rate)
-		_slam_burst_frame = frame + ceili(SABRE_LANDING_BURST_DELAY * rate)
-	elif _combat_pose_frame == frame:
+	if _combat_pose_frame == frame:
 		_show_landing_burst(point, serial, player.effects.clock)
 		return
-	else:
-		_slam_burst_frame = frame
+	_slam_burst_frame = frame
 	_slam_burst_point = point
 	_slam_burst_serial = serial
 
