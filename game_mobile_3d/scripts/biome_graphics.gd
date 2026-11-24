@@ -633,6 +633,8 @@ func _update_spatial_mist() -> void:
 		var subject_depth := -camera.global_basis.z.dot(position - camera.global_position)
 		var near_layer: Vector3 = _mist_sample.near_layer
 		_mist_sample.ground_haze = _profile.sample_ground_haze(_world.showcase.hour, subject_depth, near_layer.z)
+		_mist_sample.rear_ambient = _profile.sample_mist_rear_ambient(_world.showcase.hour / 24.,
+			_world.mist_rear_ambient_region, subject_depth, _world.showcase._lighting_scale(&"mist_rear_ambient"))
 		_mist.publish(_mist_sample, position, near_layer.z, _world.look.elapsed, true, 0.)
 
 func handle_key(event: InputEventKey) -> bool:

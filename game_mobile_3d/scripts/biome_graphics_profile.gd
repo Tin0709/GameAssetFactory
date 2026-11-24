@@ -142,6 +142,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export var mist_front_scatter_by_hour: Curve
 ## Mix of the rear ambient scattering tint during daylight.
 @export_range(0., 1., .01) var mist_rear_chroma := 0.
+## Reduction of ambient in-scattering behind the player in the map's optional region.
+@export var mist_rear_ambient_by_hour: Curve
 ## Adds ambient sky color to the existing mist in partially occluded air.
 @export var mist_sky_scatter_by_hour: Curve
 ## Independent twilight gain, sharing the same map provider and tint as daytime.
@@ -309,6 +311,16 @@ func tint_ambient(hour: float, color: Color, strength: float = 1.) -> Color:
 
 func sample_mist_entry_scatter(time: float) -> float:
 	return clampf(DayNight.sample_curve(mist_entry_scatter_by_hour, time, 0.), 0., 4.)
+
+func sample_mist_rear_ambient(time: float, region: Vector4, player_depth: float,
+		strength: float) -> PackedFloat32Array:
+	if not region.is_finite() or region.z < 0. or region.w <= region.z or not is_finite(player_depth) or player_depth <= 0.:
+		return PackedFloat32Array()
+	var amount := clampf(DayNight.sample_curve(mist_rear_ambient_by_hour, time, 0.) * strength, 0., .8)
+	if amount <= 0.:
+		return PackedFloat32Array()
+	return PackedFloat32Array([region.x, region.y, region.z * region.z, region.w * region.w,
+		amount, player_depth, 5., 10.])
 
 func sample_mist_sky_scatter(time: float, env: Environment, strength: float = 1.,
 		dusk_strength: float = 1.) -> Vector4:

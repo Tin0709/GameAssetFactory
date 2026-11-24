@@ -31,6 +31,8 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 @export var near_wall_layout_sha256 := ""
 ## Optional sky-occlusion lattice baked for this layout.
 @export var mist_sky_field: MistSkyField
+## Optional world XZ centre and inner/outer radii of one rear mist lighting region.
+@export var mist_rear_ambient_region := Vector4.ZERO
 ## Optional terrain visibility for portable mist. Loaded only by that renderer path.
 @export_file("*.res") var terrain_mist_visibility_path := ""
 @export var comparison_biomes: Array[BiomeGraphicsProfile] = []

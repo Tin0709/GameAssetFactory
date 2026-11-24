@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=34 format=3]
+[gd_resource type="Resource" load_steps=35 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -74,6 +74,10 @@ point_count = 8
 max_value = 4.0
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 3.8), 0.0, 0.0, 0, 0, Vector2(0.333333333, 3.8), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.645833333, 3.8), 0.0, 0.0, 0, 0, Vector2(0.6875, 3.8), 0.0, 0.0, 0, 0, Vector2(0.791666667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 10
+
+[sub_resource type="Curve" id="ForestMistRearAmbient"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.55), 0.0, 0.0, 0, 0, Vector2(0.375, 0), 0.0, 0.0, 0, 0, Vector2(0.625, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.55), 0.0, 0.0, 0, 0, Vector2(0.770833333, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 8
 
 [sub_resource type="Curve" id="ForestMistFrontTransfer"]
 max_value = 2.1
@@ -229,6 +233,7 @@ mist_entry_depth_balance = 0.55
 mist_front_transfer_by_hour = SubResource("ForestMistFrontTransfer")
 mist_front_scatter_by_hour = SubResource("ForestMistFrontScatter")
 mist_rear_chroma = 0.58
+mist_rear_ambient_by_hour = SubResource("ForestMistRearAmbient")
 mist_sky_scatter_by_hour = SubResource("ForestMistSky")
 mist_dusk_sky_scatter_by_hour = SubResource("ForestDuskMistSky")
 mist_sky_scatter_tint = Vector3(0.72, 1, 1.26)

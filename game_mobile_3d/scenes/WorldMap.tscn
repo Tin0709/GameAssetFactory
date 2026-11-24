@@ -54,6 +54,7 @@ scatter_multiplier = Vector3(0.85, 1.28, 2.2)
 script = ExtResource("map")
 biome_graphics = ExtResource("forest_reference")
 terrain_mist_visibility_path = "res://assets/graphics/worldmap_mist_visibility.res"
+mist_rear_ambient_region = Vector4(-27, 18, 10, 24)
 near_wall_coverage = ExtResource("near_wall")
 near_wall_layout_sha256 = "53e243bb23f95f17990d02d8871393fa1a26c5aa67ae79314361b5cdc1c6f805"
 distant_terrain_origin = Vector3(45, -11.5, -46.5)
