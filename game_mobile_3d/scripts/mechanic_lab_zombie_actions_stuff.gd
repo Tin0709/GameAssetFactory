@@ -122,7 +122,9 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 	var source_clips: Dictionary[StringName, Animation] = {}
 	var steps: Array[Callable] = []
 	if pack.is_empty():
-		var preview := ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary +			if ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary") else null
+		if not ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary"):
+			return []
+		var preview := ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary
 		if (preview == null or not preview.has_animation(&"Idle") or not preview.has_animation(&"Walk")
 				or not preview.has_animation(&"Attack")):
 			return []
