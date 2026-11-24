@@ -167,6 +167,7 @@ func _build_native_patches()->void:
 		if bundle.meshes.has(name):continue
 		var vertices:=PackedVector3Array();var normals:=PackedVector3Array()
 		var uvs:=PackedVector2Array();var roots:=PackedVector2Array();var motion:=PackedFloat32Array()
+		var indices := PackedInt32Array()
 		for card in 4:
 			var source_name:String=MEDIUM[(variant+card)%3] if card<3 else GRASSES[variant%2]
 			var source:Mesh=bundle.meshes[source_name]
@@ -184,16 +185,29 @@ func _build_native_patches()->void:
 				tilt=Basis(Vector3.FORWARD,grass_splay.angle(variant*4+card))
 				offset=rotation*Vector3(.12,0.,0.)
 				var bounds:=source.get_aabb();pivot=Vector3(bounds.get_center().x,bounds.position.y,0.)
+			# Share corners within this card only when all shader inputs agree.
+			var card_vertices := {}
 			for i in arrays[Mesh.ARRAY_VERTEX].size():
-				vertices.append(rotation*(pivot+tilt*(arrays[Mesh.ARRAY_VERTEX][i]-pivot))+offset)
-				normals.append(rotation*tilt*arrays[Mesh.ARRAY_NORMAL][i]);uvs.append(arrays[Mesh.ARRAY_TEX_UV][i])
-				var root:Vector2=arrays[Mesh.ARRAY_TEX_UV2][i]
-				var transformed:=rotation*Vector3(root.x,0.,root.y)+offset
-				roots.append(Vector2(transformed.x,transformed.z))
-				motion.append_array(PackedFloat32Array([source_motion[i*4],source_motion[i*4+1],source_motion[i*4+2]+float(card)*1.1,source_motion[i*4+3]]))
+				var position: Vector3 = arrays[Mesh.ARRAY_VERTEX][i]
+				var normal: Vector3 = arrays[Mesh.ARRAY_NORMAL][i]
+				var uv: Vector2 = arrays[Mesh.ARRAY_TEX_UV][i]
+				var root: Vector2 = arrays[Mesh.ARRAY_TEX_UV2][i]
+				var k := i * 4
+				var bend := Vector4(source_motion[k], source_motion[k + 1], source_motion[k + 2], source_motion[k + 3])
+				var corner := [position, normal, uv, root, bend]
+				if not card_vertices.has(corner):
+					card_vertices[corner] = vertices.size()
+					vertices.append(rotation * (pivot + tilt * (position - pivot)) + offset)
+					normals.append(rotation * tilt * normal)
+					uvs.append(uv)
+					var transformed := rotation * Vector3(root.x, 0., root.y) + offset
+					roots.append(Vector2(transformed.x, transformed.z))
+					motion.append_array(PackedFloat32Array([bend.x, bend.y, bend.z + float(card) * 1.1, bend.w]))
+				indices.append(card_vertices[corner])
 		var result:Array=[];result.resize(Mesh.ARRAY_MAX)
 		result[Mesh.ARRAY_VERTEX]=vertices;result[Mesh.ARRAY_NORMAL]=normals
 		result[Mesh.ARRAY_TEX_UV]=uvs;result[Mesh.ARRAY_TEX_UV2]=roots;result[Mesh.ARRAY_CUSTOM0]=motion
+		result[Mesh.ARRAY_INDEX] = indices
 		var mesh:=ArrayMesh.new()
 		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,result,[],{},Mesh.ARRAY_CUSTOM_RGBA_FLOAT<<Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT)
 		mesh.surface_set_material(0,bundle.meshes[MEDIUM[1]].surface_get_material(0))
