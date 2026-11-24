@@ -583,7 +583,8 @@ func check_projectile_birth_frame(lab: Node3D) -> void:
 		# 30 FPS physics batch can run before the first displayed impact.
 		await process_frame
 		var origin := Vector3(18.0, 1.25, 0.0)
-		var fired: bool = weapon.fire(origin, Vector3.BACK, 1900, origin) if weapon == lab._crossbow +			else weapon.fire_arrow(origin, Vector3.BACK, 1901, origin, true)
+		var fired: bool = (weapon.fire(origin, Vector3.BACK, 1900, origin) if weapon == lab._crossbow
+			else weapon.fire_arrow(origin, Vector3.BACK, 1901, origin, true))
 		for i in 6:
 			await process_frame
 			if not impacts.is_empty():
