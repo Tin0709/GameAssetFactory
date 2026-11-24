@@ -82,14 +82,26 @@ func check_new_weapons(lab: Node3D, menu: OptionButton, target: Node3D) -> void:
 		var bow = lab._bow
 		var mounted := lab._bow_mount as MeshInstance3D
 		var relaxed := mounted.mesh
+		var charge_cue := bow.get_node_or_null("BowChargeCue") as MeshInstance3D
+		check(charge_cue != null and not charge_cue.visible, "Idle Bow hides the full-draw cue")
 		target.global_position = lab.player.global_position + Vector3(0.0, 0.0, 4.0)
 		target.health = 100
 		attack(true)
-		await ticks(42)
+		await ticks(12)
+		check(charge_cue != null and not charge_cue.visible, "Partial draw does not show the full-draw cue")
+		await ticks(30)
+		check(charge_cue != null and charge_cue.visible, "Full draw shows a cue before ammunition is spent")
+		if charge_cue != null:
+			var presenter = lab.player.render_presenter
+			var pose: Transform3D = presenter.display_meshes[presenter.meshes.find(mounted)]
+			var nose: Vector3 = pose * (Vector3.BACK * bow.ARROW_OFFSET.z)
+			check(charge_cue.global_position.distance_to(nose) < 0.002,
+				"The ready cue follows the interpolated Bow muzzle")
 		check(bow.ammo == 15 and target.health == 100 and mounted.mesh != relaxed,
 			"Holding Bow draws its mesh and spends no ammo")
 		attack(false)
 		await ticks(5)
+		check(charge_cue != null and not charge_cue.visible, "Releasing Bow removes the full-draw cue")
 		check(bow._trails.size() == 1 and bow._trails[0].get("charged", false),
 			"Release through normal input marks a fully drawn Bow trail as charged")
 		await ticks(17)
@@ -104,10 +116,12 @@ func check_new_weapons(lab: Node3D, menu: OptionButton, target: Node3D) -> void:
 		check(bow.ammo == 13 and target.health == 28, "A short Bow tap fires one regular arrow for 18 damage")
 		await ticks(12)
 		attack(true)
-		await ticks(12)
+		await ticks(34)
+		check(charge_cue != null and charge_cue.visible, "A second full draw renews the ready cue")
 		lab.reset_player()
 		attack(false)
 		await ticks(25)
+		check(charge_cue != null and not charge_cue.visible, "Retry clears the full-draw cue")
 		check(bow.ammo == 15 and target.health == 28, "Reset cancels a draw before it fires")
 		await check_bow_wall_impact_frame(lab, bow)
 	target.health = 100
