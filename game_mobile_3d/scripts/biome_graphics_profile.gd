@@ -29,6 +29,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Daylight caster adjustment for maps with the grass lighting adapter.
 @export_range(0., 2., .01) var day_grass_shadow_compactness := 1.
 @export_range(0., .65, .01) var day_grass_shadow_footprint_reduction := 0.
+## Optional taper of the upper blades in the sun shadow pass, by normalized hour.
+@export var grass_shadow_tip_taper_by_hour: Curve
 ## Limit wind displacement in the directional shadow pass while retaining plant contact.
 @export_range(0., .75, .01) var day_grass_shadow_wind_reduction := 0.
 @export_range(0., 1., .01) var day_grass_sunlight_stability := 0.

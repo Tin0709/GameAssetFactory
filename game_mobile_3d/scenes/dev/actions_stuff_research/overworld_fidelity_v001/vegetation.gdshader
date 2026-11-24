@@ -31,6 +31,7 @@ uniform vec2 study_grass_ground_tone = vec2(0.0);
 uniform float study_grass_sky_height = 0.0;
 uniform float study_grass_night_albedo = 0.0;
 uniform float study_grass_shadow_height = 1.0;
+uniform float study_grass_shadow_tip_taper = 0.0;
 uniform float study_grass_shadow_footprint = 1.0;
 uniform float study_grass_shadow_wind = 1.0;
 uniform float study_grass_sunlight_stability = 0.0;
@@ -179,6 +180,10 @@ void vertex(){
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 	// Only the orthographic shadow draw uses the corrected blade height.
 	if (tinted_grass && IN_SHADOW_PASS && PROJECTION_MATRIX[3][3] > .5) {
+		if (study_grass_shadow_tip_taper > 0.0 && u > .45) {
+			// Pull the tip down in the caster while preserving the lower blade silhouette.
+			VERTEX.y -= h * study_grass_shadow_tip_taper * (u - .45) * smoothstep(.45, .65, u);
+		}
 		VERTEX.y *= study_grass_shadow_height;
 		if (study_grass_shadow_footprint < 1.0) {
 			VERTEX.xz = mix(UV2.xy, VERTEX.xz, study_grass_shadow_footprint);

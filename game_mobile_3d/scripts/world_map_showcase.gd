@@ -2806,6 +2806,13 @@ func grass_shadow_height_scale() -> float:
 	# without multiplying the existing low-sun correction a second time.
 	return lerpf(original_range, minf(original_range, .70), maxf(0., strength - 1.) * phase)
 
+func grass_shadow_tip_taper() -> float:
+	if _biome_profile == null or atmosphere_review != "combined" or _balanced_preview or not level.look.direct_clouds_active():
+		return 0.
+	var taper := DayNight.sample_curve(_biome_profile.grass_shadow_tip_taper_by_hour, hour / 24., 0.)
+	var compactness := _lighting_scale(&"day_grass_shadow_compactness") / maxf(1., _biome_profile.day_grass_shadow_compactness)
+	return clampf(taper * compactness, 0., .55)
+
 func grass_shadow_footprint_scale() -> float:
 	if _biome_profile == null or atmosphere_review != "combined" or _balanced_preview or not level.look.direct_clouds_active():
 		return 1.0
@@ -3901,11 +3908,11 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if sky != null:
 			sky.refresh()
 		return
-	if changed_effect in [&"grass_step_coverage", &"day_grass_shadow_footprint", &"day_grass_shadow_wind", &"day_grass_sunlight_stability"]:
+	if changed_effect in [&"grass_step_coverage", &"day_grass_shadow_compactness", &"day_grass_shadow_footprint", &"day_grass_shadow_wind", &"day_grass_sunlight_stability"]:
 		if plants != null:
 			plants.grass_light.sync()
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"day_grass_sky_height", &"day_grass_ground_tone", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"day_grass_shadow_compactness", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"canopy_edge_return", &"tree_shade"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"day_grass_sky_height", &"day_grass_ground_tone", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"spruce_sky", &"canopy_edge_fill", &"canopy_sky_color", &"canopy_edge_return", &"tree_shade"]:
 		return
 	if changed_effect in [&"actor_shade_sky", &"actor_side_sky", &"kai_shade_sky"]:
 		if level.player_light != null:

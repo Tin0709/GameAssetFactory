@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=36 format=3]
+[gd_resource type="Resource" load_steps=37 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -149,6 +149,10 @@ point_count = 6
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.604166667, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.5), 0.0, 0.0, 0, 0, Vector2(0.729166667, 0.5), 0.0, 0.0, 0, 0, Vector2(0.791666667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 6
 
+[sub_resource type="Curve" id="GrassShadowTipTaper"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.31), 0.0, 0.0, 0, 0, Vector2(0.40625, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
+
 [resource]
 script = ExtResource("profile")
 display_name = "Forest · Private reference"
@@ -157,6 +161,7 @@ twilight_ground_shade_strength = 0.35
 day_grass_shadow_compactness = 2.0
 source_path_edge_filter = 1.0
 day_grass_shadow_footprint_reduction = 0.65
+grass_shadow_tip_taper_by_hour = SubResource("GrassShadowTipTaper")
 day_grass_shadow_wind_reduction = 0.5
 day_grass_sunlight_stability = 0.5
 daylight_canopy_cue_opacity = 0.75

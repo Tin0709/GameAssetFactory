@@ -21,6 +21,7 @@ var _sky_height := -1.
 var _night_albedo := -1.
 var _twilight_ambient := -1.
 var _shadow_height_scale := -1.
+var _shadow_tip_taper := -1.
 var _shadow_footprint_scale := -1.
 var _shadow_wind_scale := -1.
 var _sunlight_stability := -1.
@@ -66,6 +67,7 @@ func restore()->void:
 	_night_albedo = -1.
 	_twilight_ambient = -1.
 	_shadow_height_scale = -1.
+	_shadow_tip_taper = -1.
 	_shadow_footprint_scale = -1.
 	_shadow_wind_scale = -1.
 	_sunlight_stability = -1.
@@ -156,6 +158,12 @@ func sync()->void:
 		_shadow_height_scale = shadow_scale
 		for row: Dictionary in _records:
 			row.material.set_shader_parameter("study_grass_shadow_height",shadow_scale)
+
+	var tip_taper: float = world.showcase.grass_shadow_tip_taper()
+	if tip_taper != _shadow_tip_taper:
+		_shadow_tip_taper = tip_taper
+		for row: Dictionary in _records:
+			row.material.set_shader_parameter("study_grass_shadow_tip_taper", tip_taper)
 
 	var footprint_scale: float = world.showcase.grass_shadow_footprint_scale()
 	if footprint_scale != _shadow_footprint_scale:
