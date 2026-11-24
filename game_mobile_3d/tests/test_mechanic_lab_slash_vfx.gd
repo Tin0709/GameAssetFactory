@@ -521,8 +521,8 @@ func check_sword_thrust_glint(lab, selector: OptionButton) -> void:
 		print("SWORD_THRUST wall=", wall_face, " seen=", seen, " first=", first_time, " last=", last_time, " furthest=", furthest)
 
 func check_wall_ribbons(lab, selector: OptionButton) -> void:
-	for slot in [0, 10]:
-		for airborne in [false, true]:
+	for slot in [0, 1, 2, 5, 8, 9, 10]:
+		for airborne in ([false, true] if slot in [0, 10] else [false]):
 			var wall_faces := [INF, 0.52, 0.9, 1.35] if airborne and slot == 10 else [INF, 0.9]
 			for wall_face: float in wall_faces:
 				lab.reset_player()
@@ -552,18 +552,20 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 				await physics_frame
 				attack(false)
 				var mesh: Mesh = actor.effects.ribbon.mesh
-				var axe_wall_material := lab._weapon_mesh.get_active_material(0) as ShaderMaterial if slot == 10 else null
+				var blade_wall_material: ShaderMaterial = lab._blade_wall_material
 				var boxes_seen := 0
-				if slot == 10:
-					check(axe_wall_material != null, "The Axe draw supports a terrain mask")
+				var used_during_swing := false
+				check(blade_wall_material != null, "The blade draw supports a terrain mask")
 				var frames := 0
 				var furthest := -INF
 				var nearest := INF
 				var until := Engine.get_physics_frames() + Engine.physics_ticks_per_second
 				while Engine.get_physics_frames() < until:
 					await process_frame
-					if axe_wall_material != null:
-						boxes_seen = maxi(boxes_seen, int(axe_wall_material.get_shader_parameter("axe_blocker_count")))
+					if blade_wall_material != null:
+						var count := int(blade_wall_material.get_shader_parameter("blade_blocker_count"))
+						boxes_seen = maxi(boxes_seen, count)
+						used_during_swing = used_during_swing or (count > 0 and lab._weapon_mesh.material_override == blade_wall_material)
 					if mesh.get_surface_count() == 0:
 						continue
 					frames += 1
@@ -571,11 +573,11 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 						furthest = maxf(furthest, point.dot(forward))
 						nearest = minf(nearest, point.dot(forward))
 				var context := "%s air=%s wall=%s" % [selector.get_item_text(slot), airborne, wall_face]
-				if slot == 10:
-					check(boxes_seen == int(wall != null), "The Axe mesh receives only the overlapping weapon wall in %s" % context)
+				check(boxes_seen == int(wall != null) and used_during_swing == (wall != null),
+					"The weapon mesh uses the mask when a wall overlaps its swing in %s" % context)
 				if slot == 10 and airborne and wall_face == 0.52:
 					check(frames == 0, "A wall entirely in front of the Axe dive's ribbon hides it")
-				else:
+				elif slot in [0, 10] or wall == null:
 					check(frames > 0, "The unobstructed portion of the ribbon still draws for %s" % context)
 				if wall != null:
 					check(furthest <= wall_face + 0.0001, "The ribbon ends on the player's side of the wall for %s" % context)
@@ -584,10 +586,10 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 					check(nearest > 0.52 and nearest < 0.9 and furthest > 1.35,
 						"The Axe dive is beyond the closest wall and straddles the middle and distant walls")
 				print("RIBBON_WALL ", context, " frames=", frames, " nearest=", nearest, " furthest=", furthest)
-				if axe_wall_material != null:
+				if blade_wall_material != null:
 					lab.reset_player()
-					check(axe_wall_material.get_shader_parameter("axe_blocker_count") == 0,
-						"Reset immediately removes any stale wall mask from the displayed Axe")
+					check(blade_wall_material.get_shader_parameter("blade_blocker_count") == 0,
+						"Reset immediately removes any stale wall mask from the displayed blade")
 
 func check_world_map_slash() -> void:
 	var world := (load("res://scenes/WorldMap.tscn") as PackedScene).instantiate()
