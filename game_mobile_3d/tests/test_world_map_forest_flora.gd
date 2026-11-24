@@ -112,6 +112,9 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 			"Fern participates in shared grass lighting")
 	test_fern_night_response(world, plants, assets)
 	var spring = plants.interaction
+	check(spring.image.get_format() == Image.FORMAT_RGH and spring.previous_image.get_format() == Image.FORMAT_RGH
+		and spring.pixels.size() == spring.size * spring.size * 4,
+		"Overworld contact only uploads the two half-float bend channels")
 	var point: Vector3 = world.player.global_position
 	for step in 8:
 		spring.advance(1. / 60., point + Vector3.RIGHT * float(step) * .1, Vector3.RIGHT * 6.)

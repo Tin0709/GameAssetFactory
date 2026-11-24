@@ -32,8 +32,13 @@ var previous:=Vector3.ZERO
 var initialized:=false
 var update_usec:=0
 var surface_height_provider:Callable # Optional original stepped-terrain adapter.
+var _texture_format := Image.FORMAT_RGBAH
+var _pixel_stride := 8
 
-func _init(covered_extent:float=EXTENT)->void:
+func _init(covered_extent:float=EXTENT,two_channels:=false)->void:
+	if two_channels:
+		_texture_format = Image.FORMAT_RGH
+		_pixel_stride = 4
 	extent=maxf(EXTENT,covered_extent)
 	size=maxi(SIZE,roundi(extent/CELL))
 	cell=extent/float(size)
@@ -41,11 +46,11 @@ func _init(covered_extent:float=EXTENT)->void:
 	x.resize(size*size);z.resize(size*size);vx.resize(size*size);vz.resize(size*size)
 	contact_weights.resize(size*size)
 	marked.resize(size*size);marked.fill(0)
-	pixels.resize(size*size*8);pixels.fill(0)
+	pixels.resize(size*size*_pixel_stride);pixels.fill(0)
 	previous_pixels=pixels.duplicate()
-	image=Image.create_from_data(size,size,false,Image.FORMAT_RGBAH,pixels)
+	image=Image.create_from_data(size,size,false,_texture_format,pixels)
 	texture=ImageTexture.create_from_image(image)
-	previous_image=Image.create_from_data(size,size,false,Image.FORMAT_RGBAH,previous_pixels)
+	previous_image=Image.create_from_data(size,size,false,_texture_format,previous_pixels)
 	previous_texture=ImageTexture.create_from_image(previous_image)
 
 func reset()->void:
@@ -119,7 +124,8 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 			if falloff==0. and absf(x[index])+absf(z[index])+absf(vx[index])+absf(vz[index])<.00002:
 				x[index]=0.;z[index]=0.;vx[index]=0.;vz[index]=0.;contact_weights[index]=0.;marked[index]=0
 				active[i]=active[active.size()-1];active.resize(active.size()-1)
-			pixels.encode_half(index*8,x[index]);pixels.encode_half(index*8+2,z[index])
+			var pixel_offset := index * _pixel_stride
+			pixels.encode_half(pixel_offset,x[index]);pixels.encode_half(pixel_offset+2,z[index])
 			i-=1
 	revision+=steps
 	previous=point;update_usec=Time.get_ticks_usec()-start
@@ -138,9 +144,9 @@ func upload(force_pair := false) -> bool:
 		previous_image = image
 		image = recycled_image
 	else:
-		previous_image.set_data(size, size, false, Image.FORMAT_RGBAH, previous_pixels)
+		previous_image.set_data(size, size, false, _texture_format, previous_pixels)
 		previous_texture.update(previous_image)
-	image.set_data(size, size, false, Image.FORMAT_RGBAH, pixels)
+	image.set_data(size, size, false, _texture_format, pixels)
 	texture.update(image)
 	uploaded_revision = revision
 	return reuse

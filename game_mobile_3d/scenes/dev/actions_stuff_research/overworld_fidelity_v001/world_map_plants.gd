@@ -65,7 +65,7 @@ func setup_world(level:Node3D)->void:
 	grass_light=GRASS_LIGHT.new();grass_light.setup(world,bundle)
 	grass_splay=GRASS_SPLAY.new();grass_splay.setup(bundle)
 	grass_wind=GRASS_WIND.new();grass_wind.setup(bundle)
-	interaction=Spring.new(104.)
+	interaction=Spring.new(104.,true)
 	interaction.reuse_previous_upload = true
 	interaction.surface_height_provider=world.surface_height
 	_rng.seed=110826
