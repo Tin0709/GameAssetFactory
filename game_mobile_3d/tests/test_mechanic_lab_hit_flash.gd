@@ -138,6 +138,7 @@ func run() -> void:
 	await check_splash_flash_strength()
 	await check_damage_numbers_during_render_hitch()
 	await check_overlapping_damage_number_positions()
+	await check_damage_number_bar_clearance()
 	if DisplayServer.get_name() != "headless":
 		await check_health_bar_visibility()
 	print("MECHANIC_LAB_HIT_FLASH failures=", failures)
@@ -328,6 +329,48 @@ func check_overlapping_damage_number_positions() -> void:
 	for number in numbers._numbers:
 		if assigned.has(number.hit_order):
 			check(number.layout_offset == assigned[number.hit_order], "A later hit does not move earlier numbers")
+	lab.free()
+
+func check_damage_number_bar_clearance() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group = lab.get_node("Zombies")
+	await ticks(13)
+	check(group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects")),
+		"The damage layout fixture spawns an adult zombie")
+	if group.get_child_count() != 1:
+		lab.free()
+		return
+	var zombie: CharacterBody3D = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = lab.player.global_position + lab.player.visual.global_basis.z * 1.4
+	attack(true)
+	await ticks(2)
+	attack(false)
+	var numbers = lab.get_node("CombatEffects/ZombieDamageNumbers")
+	for i in 60:
+		await process_frame
+		if not numbers._numbers.is_empty():
+			break
+	check(numbers._numbers.size() == 1 and zombie.health == 36 and zombie._feedback.bar_slot >= 0,
+		"A real Sabre hit displays two damage digits and retains the target's bar")
+	if numbers._numbers.size() == 1:
+		var camera: Camera3D = lab.camera
+		var bar_point: Vector3 = zombie._feedback.to_global(Vector3.UP * HealthBars.BAR_HEIGHT)
+		var bar_centre := Vector2(bar_point.dot(camera.global_basis.x), bar_point.dot(camera.global_basis.y))
+		var size := Vector2(0.86, 0.165)
+		var bar_rect := Rect2(bar_centre - size * 0.5, size)
+		var birth := damage_number_rectangles(numbers, camera)[0]
+		var offset: Vector2 = numbers._numbers[0].layout_offset
+		numbers.present(0.09)
+		var pop := damage_number_rectangles(numbers, camera)[0]
+		check(not birth.intersects(bar_rect) and not pop.intersects(bar_rect),
+			"The born number and its pop keep the target's bar readable")
+		check(numbers._numbers[0].layout_offset == offset and offset.length() <= 1.25,
+			"The placement stays attached to that hit without jumping during the pop")
+		print("DAMAGE_BAR_CLEARANCE birth=", birth.intersection(bar_rect).get_area(),
+			" pop=", pop.intersection(bar_rect).get_area(), " offset=", offset)
 	lab.free()
 
 func damage_number_rectangles(numbers, camera: Camera3D) -> Array[Rect2]:
