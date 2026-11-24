@@ -1551,7 +1551,8 @@ func _on_melee_contact_visual(zombie: CharacterBody3D, point: Vector3, serial: i
 		_pending_melee_feedback.append(visual)
 
 func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: int, sample_time := -1.0,
-		capsule := Vector2.ZERO, weapon_points := PackedVector3Array(), punch_axis := Vector3.ZERO) -> void:
+		capsule := Vector2.ZERO, weapon_points := PackedVector3Array(), punch_axis := Vector3.ZERO,
+		splash := false) -> void:
 	var effect_point := point
 	if not punch_axis.is_zero_approx():
 		# Light the same point on the target as the punch streaks.
@@ -1562,7 +1563,7 @@ func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: 
 	if not has_arrow_sparks:
 		if _contact_sparks != null:
 			_contact_sparks.queue_contact(effect_point, direction, player.global_position + Vector3.UP,
-				sample_time, capsule, weapon_points, punch_axis, clip == "AirAttack" and capsule.x > 0.0)
+				sample_time, capsule, weapon_points, punch_axis, clip == "AirAttack" and capsule.x > 0.0, splash)
 		else:
 			player.effects.contact(effect_point, direction, sample_time >= 0.0)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3",
@@ -1977,7 +1978,8 @@ func _publish_melee_contact(contact: Dictionary, sample_time: float, weapon_poin
 		_pending_melee_feedback.append(visual)
 	var spark_center: Vector3 = contact.get("spark_center", contact.point)
 	_show_contact_fx(spark_center, contact.direction, contact.clip, contact.serial,
-		sample_time, contact.get("capsule", Vector2.ZERO), weapon_points, punch_axis)
+		sample_time, contact.get("capsule", Vector2.ZERO), weapon_points, punch_axis,
+		contact.get("feedback", {}).get("splash", false))
 
 func _present_melee_feedback(display_time: float) -> void:
 	# Tone down overlapping splash highlights by attack. A separate strike

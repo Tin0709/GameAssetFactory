@@ -73,22 +73,26 @@ func set_budget_scale(scale: float) -> void:
 	_sparks_per_contact = ceili(SPARKS_PER_CONTACT * scale)
 	_pool_limit = _contact_budget * _sparks_per_contact
 	_next %= _pool_limit
-	# Preserve the nearest scheduled contacts and let visible sparks finish fading.
+	# Keep the direct hits and closest splash hits while visible sparks finish fading.
 	if _pending.size() > _contact_budget:
 		_pending.resize(_contact_budget)
 
 func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, sample_time := -1.0,
 		capsule := Vector2.ZERO, weapon_points := PackedVector3Array(), punch_axis := Vector3.ZERO,
-		aerial_blade := false) -> void:
+		aerial_blade := false, splash := false) -> void:
 	var distance := point.distance_squared_to(viewer)
 	var index := _pending.size()
-	while index > 0 and distance < float(_pending[index - 1].distance):
+	while index > 0:
+		var previous := _pending[index - 1]
+		var comes_after := distance >= float(previous.distance) if splash == previous.splash else splash
+		if comes_after:
+			break
 		index -= 1
 	if index == _contact_budget:
 		return
 	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance,
 		"sample_time": sample_time, "capsule": capsule, "weapon_points": weapon_points,
-		"punch_axis": punch_axis, "aerial_blade": aerial_blade})
+		"punch_axis": punch_axis, "aerial_blade": aerial_blade, "splash": splash})
 	if _pending.size() > _contact_budget:
 		_pending.pop_back()
 	set_process(true)
