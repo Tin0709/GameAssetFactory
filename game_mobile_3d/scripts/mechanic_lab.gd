@@ -997,6 +997,7 @@ func _blade_mask_for(mesh: Mesh) -> ShaderMaterial:
 	material.shader = BLADE_WALL_SHADER
 	material.set_shader_parameter(&"blade_texture", source.albedo_texture)
 	material.set_shader_parameter(&"double_sided", source.cull_mode == BaseMaterial3D.CULL_DISABLED)
+	material.set_shader_parameter(&"blade_blocker_count", 0)
 	if mesh == _sabre_mesh:
 		# Sabre packs roughness into green and metal into blue, and multiplies
 		# its white emission by a separate texture.
