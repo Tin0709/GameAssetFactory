@@ -739,7 +739,9 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 				var collision := CollisionShape3D.new()
 				collision.shape = box
 				shelf.add_child(collision)
-				shelf.position = forward * (1.24 + (i % 5) * 0.12) 					+ side * (0.26 if i < 5 else -0.26) + Vector3.UP * 0.069
+				var forward_offset := 1.24 + (i % 5) * 0.12
+				var side_offset := 0.26 if i < 5 else -0.26
+				shelf.position = forward * forward_offset + side * side_offset + Vector3.UP * 0.069
 				overhang.add_child(shelf)
 		if fixture == "arena_edge":
 			actor._reset_map_actor_at(Vector3(48.18, 0.015, 0), PI * 0.5)
