@@ -530,6 +530,11 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 					await physics_frame
 				selector.select(slot)
 				selector.item_selected.emit(slot)
+				var held_blade: MeshInstance3D = lab._weapon_mesh
+				var equipped_override := held_blade.material_override
+				if slot in [1, 2]:
+					check(equipped_override == held_blade.mesh.surface_get_material(0),
+						"The sword keeps its own material on the shared Sabre mount")
 				var actor: CharacterBody3D = lab.player
 				var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
 				var wall: StaticBody3D
@@ -590,6 +595,8 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 					lab.reset_player()
 					check(blade_wall_material.get_shader_parameter("blade_blocker_count") == 0,
 						"Reset immediately removes any stale wall mask from the displayed blade")
+					check(held_blade.material_override == equipped_override,
+						"Ending the wall mask restores the equipped material")
 
 func check_world_map_slash() -> void:
 	var world := (load("res://scenes/WorldMap.tscn") as PackedScene).instantiate()
