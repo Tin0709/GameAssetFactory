@@ -1729,7 +1729,9 @@ func _setup_tool_slam_ring() -> void:
 	_tool_slam_ring.hide()
 	$CombatEffects.add_child(_tool_slam_ring)
 	var box := BoxShape3D.new()
-	box.size = Vector3(mesh.size.x, 0.08, mesh.size.y)
+	# Sample a thin slab around the rendered ring so overhead objects do
+	# not exhaust the clipping budget before the plane is checked.
+	box.size = Vector3(mesh.size.x, 0.01, mesh.size.y)
 	_tool_slam_footprint.shape = box
 	_tool_slam_footprint.collision_mask = 1
 
@@ -1797,14 +1799,14 @@ func _clip_slam_to_stage(point: Vector3, planes: PackedVector3Array) -> bool:
 
 func _clip_slam_at_walls(point: Vector3, planes: PackedVector3Array, blocker_axes: PackedVector4Array) -> bool:
 	var space := get_world_3d().direct_space_state
-	_tool_slam_footprint.transform = Transform3D(Basis.IDENTITY, point + Vector3.UP * 0.06)
+	var start := point + Vector3.UP * GROUND_SLAM_HEIGHT
+	_tool_slam_footprint.transform = Transform3D(Basis.IDENTITY, start)
 	var available := GROUND_SLAM_MAX_CLIPS - planes.size()
 	var blockers := space.intersect_shape(_tool_slam_footprint, available + 1)
 	if blockers.size() > available:
 		return false
 	if blockers.is_empty():
 		return true
-	var start := point + Vector3.UP * GROUND_SLAM_HEIGHT
 	for i in range(blockers.size() - 1, -1, -1):
 		if _append_slam_box(blockers[i], start, blocker_axes):
 			blockers.remove_at(i)
