@@ -229,7 +229,8 @@ func _build_dense_planting()->void:
 		var scale_factor := 1.
 		var flower := ""
 		var plains: Dictionary = plains_planting.cells.get(cell,{})
-		var meadow := not fern and not plains.is_empty() and _off_path_cell(cell) +			and (plains.kind != "shrub" or plains_planting.shrub_roots.has(cell))
+		var meadow := (not fern and not plains.is_empty() and _off_path_cell(cell)
+			and (plains.kind != "shrub" or plains_planting.shrub_roots.has(cell)))
 		if fern:
 			asset = fern_asset
 			transform.origin = Vector3(cell.x + .5, position.y, cell.y + .5)
@@ -320,7 +321,8 @@ func _off_path(cell: Vector2i) -> bool:
 func _off_path_cell(cell: Vector2i) -> bool:
 	var source: Image = world.look.path_map_image
 	var pixel := Vector2i(Vector2(cell) - world.look.path_map_origin)
-	return Rect2i(Vector2i.ZERO,source.get_size()).has_point(pixel) +		and (roundi(source.get_pixelv(pixel).r) & 255) == 0
+	return (Rect2i(Vector2i.ZERO,source.get_size()).has_point(pixel)
+		and (roundi(source.get_pixelv(pixel).r) & 255) == 0)
 
 func _build_flower_centers()->void:
 	var colors:Array=FLOWERS.keys()
