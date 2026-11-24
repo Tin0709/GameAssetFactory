@@ -187,6 +187,6 @@ func _add_ribbon_strip(a: Dictionary, b: Dictionary, inner_u: float, ages: Vecto
 		_mesh.surface_add_vertex(points[corner])
 
 func reset()->void:
-	samples.clear();_was_active=false;serial=-1;clock=0.;_mesh.clear_surfaces()
+	samples.clear();_was_active=false;_ribbon_section=0;serial=-1;clock=0.;_mesh.clear_surfaces()
 	for particle:Dictionary in particles:particle.life=0.;particle.born=-INF;particle.history.clear()
 	if sparks!=null:present()

@@ -144,6 +144,7 @@ func check_curved_finisher_ribbon(lab, selector: OptionButton) -> void:
 	var effects = actor.effects
 	var sample_frames: Dictionary = {}
 	var bridged := false
+	var interpolated_in_gap := false
 	var observed_changeover := false
 	var burst_count := -1
 	attack(true)
@@ -156,13 +157,18 @@ func check_curved_finisher_ribbon(lab, selector: OptionButton) -> void:
 			burst_count = effects.bursts
 		if effects.serial != actor.combo.serial:
 			continue
-		var start: float = effects.clock - actor.combo.time / actor.combo.playback_rate()
+		var rate: float = actor.combo.playback_rate()
+		var start: float = effects.clock - actor.combo.time / rate
 		for sample in effects.samples:
-			var source_frame: float = (float(sample.time) - start) * actor.combo.playback_rate() * 30.0
+			var source_frame: float = (float(sample.time) - start) * rate * 30.0
 			sample_frames[snappedf(source_frame, 0.0001)] = true
 		var shown: Array = effects.samples_at(effects.clock)
-		if shown.size() > 2 and shown[0].time < start + 10.001 / 33.0 and shown[-1].time > start + 14.001 / 33.0:
+		var gap_start := start + 10.001 / (rate * 30.0)
+		var gap_end := start + 14.001 / (rate * 30.0)
+		if shown.size() > 2 and shown[0].time < gap_start and shown[-1].time > gap_end:
 			observed_changeover = true
+			var during_gap: Array = effects.samples_at(start + 13.99 / (rate * 30.0))
+			interpolated_in_gap = interpolated_in_gap or during_gap.any(func(sample): return sample.time > gap_start)
 			var mesh: Mesh = effects.ribbon.mesh
 			effects.present(effects.clock)
 			var vertex_count := 0
@@ -182,6 +188,7 @@ func check_curved_finisher_ribbon(lab, selector: OptionButton) -> void:
 	check(not frames.any(func(frame: float): return frame > 10.001 and frame < 13.999),
 		"The blade does not paint a ribbon during the rear turn")
 	check(observed_changeover and not bridged, "Visible pieces of the two arcs have no connecting triangle strip")
+	check(not interpolated_in_gap, "Interpolation cannot draw a bridge before the second arc")
 	check(burst_count >= 0 and effects.bursts - burst_count == 1,
 		"The dual arc keeps one legacy blade burst per swing")
 	print("CURVED_FINISHER_TRAIL gap_samples=", frames.filter(func(frame: float): return frame > 10.001 and frame < 13.999).size(),
