@@ -7,6 +7,8 @@ const SOURCE_SHA256 := "78d326787c4065d70e227ec386a7330f53621c8733ad114bc80eaea7
 const GAUNTLET_DEBRIS_SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Explosion/Materials/Debris/T_GenericDebris.png"
 const GAUNTLET_DEBRIS_HASH := "b700bc41b85fd6afb00a76bdf7966d708557ac11b01b54eeab4330932e3639f4"
 const GAUNTLET_DEBRIS_GRAVITY := 14.7
+# Project the two authored mesh-local offsets along the Lab's strike direction.
+const GAUNTLET_DEBRIS_FORWARD := 1.80
 const GAUNTLET_IMPACT_DUST_FORWARD := 0.90
 const FRAMES := [0, 9, 10, 16, 24, 25]
 # All six nearest-filtered masks fit inside the central 12 by 12 texels.
@@ -73,7 +75,7 @@ var _landing_drag := PackedFloat32Array()
 var _smoke_texture: Texture2D
 var _gauntlet_debris_texture: Texture2D
 var _using_gauntlets: Callable
-var _gauntlet_impact_contact: Callable
+var _gauntlet_impact_anchor: Callable
 
 func _ready() -> void:
 	set_physics_process(false)
@@ -206,12 +208,12 @@ func _sync_landing_batch() -> void:
 func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:
 	return batch.setup(_smoke_texture, _run_alpha, _run_alpha_duration, true)
 
-func use_gauntlet_debris(equipped: Callable, impact_contact: Callable) -> void:
+func use_gauntlet_debris(equipped: Callable, impact_anchor: Callable) -> void:
 	var image := EffectSource.load_image(GAUNTLET_DEBRIS_SOURCE, GAUNTLET_DEBRIS_HASH, Vector2i(16, 16))
 	if image != null:
 		_gauntlet_debris_texture = ImageTexture.create_from_image(image)
 		_using_gauntlets = equipped
-		_gauntlet_impact_contact = impact_contact
+		_gauntlet_impact_anchor = impact_anchor
 
 static func _load_mask() -> Texture2D:
 	var atlas := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(128, 64))
@@ -259,7 +261,8 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 			return
 		ground_point = _ground.to_global(Vector3(local.x, half.y, local.z))
 	if heavy and _gauntlet_debris_texture != null and _using_gauntlets.call():
-		_emit_gauntlet_debris(ground_point, surface)
+		var debris_point: Vector3 = _gauntlet_impact_anchor.call(ground_point, _heavy_landing_forward, GAUNTLET_DEBRIS_FORWARD)
+		_emit_gauntlet_debris(debris_point, surface)
 		_emit_gauntlet_impact_dust(ground_point, surface, _heavy_landing_forward)
 		return
 	if heavy and _heavy_delay.is_valid():
@@ -346,13 +349,7 @@ func _emit_gauntlet_debris(ground_point: Vector3, surface: String) -> void:
 func _emit_gauntlet_impact_dust(ground_point: Vector3, surface: String, forward: Vector3) -> void:
 	# The source montage calls a separate small dust effect. Reuse the Lab's
 	# pooled smoke sprite for a brief puff below the longer-lived debris.
-	if _gauntlet_impact_contact.is_valid():
-		# Use the notify's 90 cm offset along the Lab strike direction.
-		var strike_point := ground_point + forward * GAUNTLET_IMPACT_DUST_FORWARD
-		var contact: Dictionary = _gauntlet_impact_contact.call(strike_point)
-		if not contact.is_empty():
-			ground_point = contact.position
-			surface = contact.surface
+	ground_point = _gauntlet_impact_anchor.call(ground_point, forward, GAUNTLET_IMPACT_DUST_FORWARD)
 	var particle := _next_particle(_smoke_texture, SOURCE_CAMERA_RANGE)
 	particle.origin = ground_point + Vector3.UP * 0.16
 	particle.velocity = Vector3.UP * 0.33

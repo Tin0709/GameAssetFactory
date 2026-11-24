@@ -94,7 +94,6 @@ const SABRE_LANDING_BURST_DELAY := 0.056890413
 const SABRE_LANDING_BURST_REACH := 1.5
 # The Gauntlets debris notify names the impact decal at local Y 180 cm.
 # The Lab maps that axis along the strike direction.
-const GAUNTLET_IMPACT_MARK_REACH := 1.8
 
 enum PlayerSkin { MD2, KAI }
 enum PresetAction { SAVE_A, LOAD_A, SAVE_B, LOAD_B, DEFAULTS }
@@ -378,7 +377,7 @@ func _ready() -> void:
 		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _floor_landing_contact_at,
 				player.source_step_dust_size, true):
 			dust.use_source_landing(true)
-			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped, _floor_contact_at)
+			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped, _gauntlet_impact_anchor)
 			add_child(dust)
 			var zombie_dust := ZombieStepDust.new()
 			zombie_dust.name = "ZombieStepDust"
@@ -1439,7 +1438,7 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	if player.gauntlets_equipped and _gauntlet_impact_marks != null:
 		var mark_surface := _floor_landing_contact_at(point)
 		if not mark_surface.is_empty():
-			var anchor := _landing_impact_anchor(mark_surface.position, facing, floor_height, GAUNTLET_IMPACT_MARK_REACH)
+			var anchor := _gauntlet_impact_anchor(mark_surface.position, facing, MovementDust.GAUNTLET_DEBRIS_FORWARD)
 			_gauntlet_impact_marks.stamp(anchor, mark_surface.position, mark_surface.surface)
 	if not _combat_audio.enabled:
 		return
@@ -1462,6 +1461,17 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 		_slam_audio_frame = Engine.get_physics_frames() + delay_ticks
 	else:
 		_combat_audio.slam_landed(contact.position, contact.surface)
+
+func _gauntlet_impact_anchor(touchdown: Vector3, facing: Vector3, reach: float) -> Vector3:
+	# The debris and mark come from one source notify. Give those layers
+	# the same floor anchor and keep the separate puff inside the strike path.
+	var forward := facing.slide(Vector3.UP).normalized()
+	var start := touchdown + Vector3.UP * 0.12
+	var ray := PhysicsRayQueryParameters3D.create(start, start + forward * (reach + 0.08), 1)
+	if not get_world_3d().direct_space_state.intersect_ray(ray).is_empty():
+		return touchdown
+	var contact := _floor_contact_at(touchdown + forward * reach)
+	return contact.get("position", touchdown)
 
 func _landing_impact_anchor(point: Vector3, facing: Vector3, floor_height: float, reach: float) -> Vector3:
 	var origin := Vector3(point.x, floor_height, point.z)
