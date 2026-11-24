@@ -256,7 +256,7 @@ func check_crowd_sparks() -> void:
 	await process_frame
 	check(renderer.multimesh.visible_instance_count == 0 and not sparks.is_processing(),
 		"Reset clears the crowd sparks and stops their frame callback")
-	var quality := lab.get_node_or_null("HUD/ContactSparkQuality") as OptionButton
+	var quality := lab.get_node_or_null("HUD/ImpactFxPanel/Rows/ContactSparkQuality") as OptionButton
 	check(quality != null, "The Lab exposes a control for the contact spark budget")
 	if quality != null:
 		check(quality.selected == 0, "The Lab starts with the approved contact spark budget")

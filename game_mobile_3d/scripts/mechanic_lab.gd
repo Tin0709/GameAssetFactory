@@ -96,6 +96,8 @@ const PRESET_RANGES := {
 	"corpse_seconds": ^"HUD/RagdollLifetime/Slider",
 	"camera_shake": ^"HUD/CameraShake/Slider",
 	"hitstop_ms": ^"HUD/Hitstop/Slider",
+	"impact_opacity": ^"HUD/ImpactFxPanel/Rows/Opacity/Slider",
+	"impact_duration": ^"HUD/ImpactFxPanel/Rows/Duration/Slider",
 	"sfx_master": ^"HUD/AudioMixPanel/Rows/Master/Slider",
 	"sfx_weapon": ^"HUD/AudioMixPanel/Rows/Weapon/Slider",
 	"sfx_zombie": ^"HUD/AudioMixPanel/Rows/Zombie/Slider",
@@ -106,7 +108,7 @@ const PRESET_OPTIONS := {
 	"zombie_animation": ^"HUD/ZombieGait",
 	"render_scale": ^"HUD/RenderScale",
 	"frame_rate": ^"HUD/FrameRate",
-	"contact_spark_quality": ^"HUD/ContactSparkQuality",
+	"contact_spark_quality": ^"HUD/ImpactFxPanel/Rows/ContactSparkQuality",
 }
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD, CROSS_POLLINATOR, GAUNTLETS,
@@ -419,7 +421,7 @@ func _ready() -> void:
 		$Zombies.zombie_idle_audio.connect(_combat_audio.queue_zombie_idle)
 		_setup_weapon_selector()
 	_setup_skin_selector(using_private and player_ready)
-	_setup_contact_spark_quality()
+	_setup_impact_fx_controls()
 	_setup_audio_mix_controls()
 	_setup_ragdoll_physics_controls()
 	_setup_tuning_presets()
@@ -788,6 +790,7 @@ func _load_crossbow(root: String) -> bool:
 	_crossbow.bolt_launched.connect(_combat_audio.crossbow_flight)
 	_crossbow.bolt_ended.connect(_combat_audio.stop_crossbow_flight)
 	$CombatEffects.add_child(_crossbow)
+	_apply_impact_fx_settings()
 	_set_crossbow_ammo(_crossbow.ammo)
 	_combat_audio.queue_crossbow_samples(root)
 	return true
@@ -865,6 +868,7 @@ func _load_bow(root: String) -> bool:
 	_bow.ammo_changed.connect(_set_bow_ammo)
 	_bow.arrow_impact.connect(_on_bow_impact)
 	$CombatEffects.add_child(_bow)
+	_apply_impact_fx_settings()
 	_bow.setup_audio(_combat_audio, root)
 	player.bow_can_draw = func() -> bool: return _bow.ammo > 0
 	return true
@@ -1472,15 +1476,39 @@ func _set_hitstop(milliseconds: float) -> void:
 	if is_instance_valid(player):
 		player.hitstop_seconds = milliseconds / 1000.0
 
-func _setup_contact_spark_quality() -> void:
-	var picker: OptionButton = $HUD/ContactSparkQuality
-	picker.visible = _contact_sparks != null
-	if not picker.visible:
+func _setup_impact_fx_controls() -> void:
+	var button: Button = $HUD/ImpactFxButton
+	var panel: PanelContainer = $HUD/ImpactFxPanel
+	button.visible = _contact_sparks != null
+	if not button.visible:
 		return
-	picker.add_item("Tia va chạm · Đầy đủ")
-	picker.add_item("Tia va chạm · Nhẹ")
+	button.toggled.connect(panel.set_visible)
+	var picker := panel.get_node("Rows/ContactSparkQuality") as OptionButton
+	picker.add_item("Số tia · Đầy đủ")
+	picker.add_item("Số tia · Nhẹ")
 	picker.select(0)
-	picker.item_selected.connect(func(index: int): _contact_sparks.set_reduced_budget(index == 1))
+	picker.item_selected.connect(_apply_impact_fx_settings.unbind(1))
+	for path in ["Rows/Opacity/Slider", "Rows/Duration/Slider"]:
+		var slider := panel.get_node(path) as HSlider
+		slider.value_changed.connect(_apply_impact_fx_settings.unbind(1))
+	_apply_impact_fx_settings()
+
+func _apply_impact_fx_settings() -> void:
+	var opacity: float = $HUD/ImpactFxPanel/Rows/Opacity/Slider.value
+	var duration: float = $HUD/ImpactFxPanel/Rows/Duration/Slider.value
+	var reduced: bool = $HUD/ImpactFxPanel/Rows/ContactSparkQuality.selected == 1
+	$HUD/ImpactFxPanel/Rows/Opacity/Value.text = "Độ rõ · %d%%" % roundi(opacity)
+	$HUD/ImpactFxPanel/Rows/Duration/Value.text = "Thời gian · %d%%" % roundi(duration)
+	if _contact_sparks != null:
+		_contact_sparks.set_opacity(opacity * 0.01)
+		_contact_sparks.duration_scale = duration * 0.01
+		_contact_sparks.set_reduced_budget(reduced)
+	for projectile: CrossPollinator in [_crossbow, _bow]:
+		if projectile != null and projectile.impact_sparks != null:
+			var sparks := projectile.impact_sparks
+			sparks.set_opacity(opacity * 0.01)
+			sparks.duration_scale = duration * 0.01
+			sparks.reduced_budget = reduced
 
 func _setup_audio_mix_controls() -> void:
 	var button: Button = $HUD/AudioMixButton
