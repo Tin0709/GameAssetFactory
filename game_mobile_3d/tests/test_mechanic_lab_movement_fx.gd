@@ -901,7 +901,7 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 
 func check_ground_cue_render_hitch(lab, dust: Node3D) -> void:
 	var dust_mode := dust.process_mode
-	var dust_counts := {lab.Weapon.PICKAXE: 1, lab.Weapon.MEAT_CLEAVER: 2, lab.Weapon.AXE: 10}
+	var dust_counts := {lab.Weapon.PICKAXE: 1, lab.Weapon.CLEAVER: 2, lab.Weapon.AXE: 10}
 	var active_smoke := func() -> Array:
 		return dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag == 0.0)
 	for weapon: int in dust_counts:
