@@ -285,6 +285,33 @@ value = 100.0
 scrollable = false
 tooltip_text = "Chỉnh trọng lực của zombie khi chết. Áp dụng từ cú kết liễu tiếp theo."
 
+[node name="RagdollLifetime" type="HBoxContainer" parent="HUD"]
+offset_left = 447.0
+offset_top = 145.0
+offset_right = 750.0
+offset_bottom = 179.0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Value" type="Label" parent="HUD/RagdollLifetime"]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 14
+text = "Xác biến mất"
+
+[node name="Slider" type="HSlider" parent="HUD/RagdollLifetime"]
+custom_minimum_size = Vector2(162, 30)
+layout_mode = 2
+focus_mode = 0
+min_value = 1.1
+max_value = 5.0
+step = 0.1
+scrollable = false
+tooltip_text = "Mốc thử mobile là 1,2 giây. Kéo tới 5 giây để xem hết pha ngã dài. Áp dụng từ cú kết liễu tiếp theo."
+
 [node name="Defeat" type="CenterContainer" parent="HUD"]
 visible = false
 anchor_top = 0.72
@@ -321,4 +348,5 @@ text = "Thử lại (R)"
 [connection signal="toggled" from="HUD/CombatAudioToggle" to="." method="_set_combat_audio"]
 [connection signal="value_changed" from="HUD/RagdollTuning/Launch/Slider" to="." method="_set_ragdoll_launch"]
 [connection signal="value_changed" from="HUD/RagdollTuning/Gravity/Slider" to="." method="_set_ragdoll_gravity"]
+[connection signal="value_changed" from="HUD/RagdollLifetime/Slider" to="." method="_set_ragdoll_lifetime"]
 [connection signal="pressed" from="HUD/Defeat/Card/Content/Respawn" to="." method="reset_player"]

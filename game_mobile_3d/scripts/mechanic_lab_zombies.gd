@@ -138,6 +138,13 @@ var equipped_air_offset := 0.0
 var equipped_air_delay := 0.0
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
+var corpse_lifetime := 1.2:
+	set(seconds):
+		corpse_lifetime = seconds
+		# Keep the deadline of each corpse already in flight.
+		for zombie: Zombie in get_children():
+			if zombie.health > 0:
+				zombie.corpse_lifetime = seconds
 var _actions_stuff_animation := false
 var actions_stuff_available := false
 var full_actions_stuff_available := false
@@ -256,6 +263,7 @@ func _spawn_at(point: Vector3, floor_position: Vector3, player: CharacterBody3D,
 		corpse_floor, health_bars, damage_numbers, baby)
 	zombie.actions_stuff_animation = _actions_stuff_animation
 	zombie.actions_stuff_landing = _baby_landing if baby else _adult_landing
+	zombie.corpse_lifetime = corpse_lifetime
 	zombie.melee_hit.connect(player_hit.emit)
 	zombie.melee_audio.connect(baby_attack_audio.emit if baby else zombie_attack_audio.emit)
 	if baby and zombie_swing_audio.has_connections():

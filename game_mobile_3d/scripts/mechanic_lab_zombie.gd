@@ -226,6 +226,7 @@ var _attack_focus_end := LAB_ATTACK_HIT_SECTION
 var _telegraph_rate := TELEGRAPH_RATE
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
+var corpse_lifetime := CORPSE_LIFETIME
 var _feedback: Feedback
 var _mesh: MeshInstance3D
 var _walk_clip: StringName
@@ -1395,7 +1396,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 
 func _update_death(delta: float) -> void:
 	_corpse_age += delta
-	if _corpse_age >= CORPSE_LIFETIME - 0.00001:
+	if _corpse_age >= corpse_lifetime - 0.00001:
 		queue_free()
 		return
 	if not _corpse_color_finished:

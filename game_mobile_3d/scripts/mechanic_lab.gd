@@ -250,6 +250,8 @@ func _ready() -> void:
 	$HUD/CombatAudioToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/RagdollTuning.visible = not $HUD/SpawnZombie.disabled
+	$HUD/RagdollLifetime.visible = $HUD/RagdollTuning.visible
+	$HUD/RagdollLifetime/Slider.value = $Zombies.corpse_lifetime
 	$HUD/DropMedium.disabled = $HUD/SpawnZombie.disabled
 	$HUD/DropHigh.disabled = $HUD/SpawnZombie.disabled
 	$HUD/PlayerHealth.visible = not $HUD/SpawnZombie.disabled
@@ -1368,6 +1370,10 @@ func _set_ragdoll_launch(percent: float) -> void:
 func _set_ragdoll_gravity(percent: float) -> void:
 	$Zombies.ragdoll_gravity_multiplier = percent * 0.01
 	$HUD/RagdollTuning/Gravity/Value.text = "Trọng lực ragdoll · %d%%" % roundi(percent)
+
+func _set_ragdoll_lifetime(seconds: float) -> void:
+	$Zombies.corpse_lifetime = seconds
+	$HUD/RagdollLifetime/Value.text = "Xác biến mất · %.1f s" % seconds
 
 func _spawn_one_zombie(base_health: bool) -> bool:
 	var facing := Basis(Vector3.UP, player.visual.rotation.y)

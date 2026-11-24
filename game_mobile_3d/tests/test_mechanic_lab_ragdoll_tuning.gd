@@ -21,6 +21,12 @@ func run() -> void:
 	await process_frame
 	var launch := lab.get_node_or_null("HUD/RagdollTuning/Launch/Slider") as HSlider
 	var gravity := lab.get_node_or_null("HUD/RagdollTuning/Gravity/Slider") as HSlider
+	var lifetime := lab.get_node_or_null("HUD/RagdollLifetime/Slider") as HSlider
+	check(lifetime != null and lifetime.is_visible_in_tree(), "Corpse lifetime is adjustable in MechanicLab")
+	if lifetime != null:
+		await check_corpse_lifetime(lab, lifetime)
+		click_slider(lifetime, true)
+		check(lifetime.value == 5.0, "The control offers the five-second reference")
 	check(launch != null and gravity != null and launch.is_visible_in_tree() and gravity.is_visible_in_tree(),
 		"Both tuning sliders are visible in MechanicLab")
 	if launch != null and gravity != null:
@@ -65,6 +71,41 @@ func run() -> void:
 	lab.free()
 	print("MECHANIC_LAB_RAGDOLL_TUNING failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_corpse_lifetime(lab, slider: HSlider) -> void:
+	check(is_equal_approx(slider.value, 1.2), "The mobile trial starts at 1.2 seconds")
+	var group: Node = lab.get_node("Zombies")
+	lab.player.set_physics_process(false)
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
+	check(group.get_child_count() == 2, "Both zombie ages spawn through the HUD")
+	if group.get_child_count() != 2:
+		return
+	var adult := group.get_child(0) as Zombie
+	var baby := group.get_child(1) as Zombie
+	adult.take_hit(adult.health, Vector3.BACK)
+	slider.value = 5.0
+	baby.take_hit(baby.health, Vector3.BACK)
+	var ages := [0.0, 0.0]
+	adult.tree_exiting.connect(func(): ages[0] = adult._corpse_age)
+	baby.tree_exiting.connect(func(): ages[1] = baby._corpse_age)
+	for i in 2:
+		await physics_frame
+	check(adult.ragdoll.running and baby.ragdoll.running, "Both lifetimes permit the regular MD2 ragdoll handoff")
+	var tick := 1.0 / Engine.physics_ticks_per_second
+	for i in ceili(1.3 / tick):
+		await physics_frame
+	check(not is_instance_valid(adult) and is_instance_valid(baby),
+		"Changing the control applies to the next lethal hit, including on a zombie already alive")
+	check(ages[0] >= 1.2 - 0.00001 and ages[0] <= 1.2 + tick, "The short corpse releases on its lifetime tick")
+	for i in ceili(5.0 / tick):
+		if not is_instance_valid(baby):
+			break
+		await physics_frame
+	check(not is_instance_valid(baby) and ages[1] >= 5.0 - 0.00001 and ages[1] <= 5.0 + tick,
+		"The same release path supports the five-second reference")
+	print("RAGDOLL_CORPSE_LIFETIMES ", ages)
+	lab.player.set_physics_process(true)
 
 func click_slider(slider: HSlider, high: bool) -> void:
 	var rect := slider.get_global_rect()
