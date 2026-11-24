@@ -729,6 +729,7 @@ func _animate(delta:float)->void:
 	if effects!=null:
 		var active:=false
 		var edge_age := -1.0
+		var trail_style: Dictionary = {}
 		if combo.phase in [&"attack",&"air_attack"] and review_clip.is_empty():
 			var window:Array=clips[combo.clip()].vfx_window
 			var gap := Vector2.ZERO
@@ -736,6 +737,7 @@ func _animate(delta:float)->void:
 				var attack_window: Dictionary = combo.native_windows[combo.index]
 				window = attack_window.get("trail_window", window)
 				gap = attack_window.get("trail_gap", Vector2.ZERO)
+				trail_style = attack_window.get("trail_style", trail_style)
 			if sectioned_air:
 				window = [combo.SABRE_AIR_SLASH, float(window[1])]
 			var start := float(window[0])
@@ -749,7 +751,7 @@ func _animate(delta:float)->void:
 			if effects.interpolate_ground_trail_edges and combo.phase == &"attack" and active != effects._was_active:
 				var edge := start if active else end
 				edge_age = (combo.time - edge) / combo.playback_rate()
-		effects.sample(delta,active,marker_base.global_position,marker_tip.global_position,combo.serial,edge_age)
+		effects.sample(delta,active,marker_base.global_position,marker_tip.global_position,combo.serial,edge_age,trail_style)
 
 func _dispatch_locomotion_events(selected:String,before:float,advanced:float,wall_delta:float)->void:
 	# Exact stored notify keys on our selected source clock. This hook does not

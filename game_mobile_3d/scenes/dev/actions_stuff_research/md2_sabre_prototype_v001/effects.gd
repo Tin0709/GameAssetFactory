@@ -11,6 +11,8 @@ const MAX_PARTICLE_HISTORY:=16
 const RIBBON_U := [0.0, 1.0, 1.0, 0.0, 1.0, 0.0]
 const RIBBON_SAMPLE := [0, 0, 1, 0, 1, 1]
 const RIBBON_LIFETIME := 0.14
+const RIBBON_TINT := Color(1.0, 0.73, 0.23)
+const RIBBON_EDGE_TINT := Color(1.0, 0.97, 0.82)
 var samples:Array[Dictionary]=[]
 var particles:Array[Dictionary]=[]
 var clock:=0.
@@ -27,6 +29,9 @@ var _mesh:=ImmediateMesh.new()
 var _rng:=RandomNumberGenerator.new()
 var _was_active:=false
 var _ribbon_section := 0
+var _ribbon_lifetime := RIBBON_LIFETIME
+var _ribbon_tint := RIBBON_TINT
+var _ribbon_edge_tint := RIBBON_EDGE_TINT
 var _previous_base := Vector3.ZERO
 var _previous_tip:=Vector3.ZERO
 
@@ -54,7 +59,7 @@ func use_private_slash_material() -> void:
 		material.set_shader_parameter(&"use_source_slash", true)
 	ribbon.material_override = material
 
-func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,edge_age:float=-1.0)->void:
+func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,edge_age:float=-1.0,style:Dictionary={})->void:
 	clock+=delta
 	if not enabled or not blade_trail_enabled:active=false
 	if active:
@@ -63,6 +68,9 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 			serial = attack_serial
 			_was_active = false
 			_ribbon_section = 0
+			_ribbon_lifetime = style.get("lifetime", RIBBON_LIFETIME)
+			_ribbon_tint = style.get("tint", RIBBON_TINT)
+			_ribbon_edge_tint = RIBBON_EDGE_TINT if style.is_empty() else _ribbon_tint.lerp(Color.WHITE, 0.74)
 		if not _was_active:
 			_ribbon_section += 1
 			_sample_trail_edge(delta, edge_age, base, tip)
@@ -75,7 +83,7 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 	while samples.size() > MAX_SAMPLES:
 		samples.pop_front()
 	var display_lag:=1./maxf(1.,Engine.physics_ticks_per_second)
-	while not samples.is_empty() and clock-float(samples[0].time)>RIBBON_LIFETIME+display_lag:samples.pop_front()
+	while not samples.is_empty() and clock-float(samples[0].time)>_ribbon_lifetime+display_lag:samples.pop_front()
 	for particle:Dictionary in particles:
 		if float(particle.life)>0.:
 			particle.life=maxf(0.,float(particle.life)-delta);particle.velocity+=Vector3(0,-1.8,0)*delta;particle.position+=particle.velocity*delta
@@ -114,7 +122,7 @@ func contact(point: Vector3, direction: Vector3, publish_sample := false) -> voi
 func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=null)->Array:
 	var result:Array=[]
 	for point:Dictionary in samples:
-		if display_time-float(point.time)>RIBBON_LIFETIME:continue
+		if display_time-float(point.time)>_ribbon_lifetime:continue
 		if float(point.time)<=display_time:result.append(point)
 		else:
 			if not result.is_empty() and display_time>float(result[-1].time):
@@ -156,13 +164,13 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 		if not has_surface:
 			_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 			has_surface = true
-		var age_a := clampf((time - float(a.time)) / RIBBON_LIFETIME, 0.0, 1.0)
-		var age_b := clampf((time - float(b.time)) / RIBBON_LIFETIME, 0.0, 1.0)
+		var age_a := clampf((time - float(a.time)) / _ribbon_lifetime, 0.0, 1.0)
+		var age_b := clampf((time - float(b.time)) / _ribbon_lifetime, 0.0, 1.0)
 		var ages := Vector2(age_a, age_b)
 		var opacity := (1.0 - age_a) * intensity * 0.58
-		_add_ribbon_strip(a, b, 0.0, ages, Color(1.0, 0.73, 0.23, opacity))
+		_add_ribbon_strip(a, b, 0.0, ages, Color(_ribbon_tint, opacity))
 		if a.tip_u > 0.86 or b.tip_u > 0.86:
-			_add_ribbon_strip(a, b, 0.86, ages, Color(1.0, 0.97, 0.82, opacity * 0.8))
+			_add_ribbon_strip(a, b, 0.86, ages, Color(_ribbon_edge_tint, opacity * 0.8))
 	if has_surface:
 		_mesh.surface_end()
 	for i in particles.size():

@@ -110,6 +110,16 @@ const WINDOWS := [
 		Vector4(0.164172, 0.180649, 0.825099, 1.166666)],
 ]
 const RATES := [Vector3(1.43, 1.43, 1.43), Vector3(0.9, 0.9, 1.0), Vector3(1.4, 1.4, 1.2), Vector3.ONE]
+# Start at the slash notify in each montage segment. Stop following the blade
+# when its fast sweep ends in the Lab pose. The notify's Lifetime is separate
+# from that sampling window and controls the fade in real seconds.
+const GROUND_SLASHES := [
+	[Vector3(0.099451, 0.183333, 0.14), Vector3(0.143989, 0.266667, 0.17), Vector3(0.268076, 0.400000, 0.30)],
+	[Vector3(0.121726, 0.190000, 0.20), Vector3(0.175193, 0.265000, 0.18), Vector3(0.243789, 0.350000, 0.125)],
+	[Vector3(0.143855, 0.400000, 0.30), Vector3(0.395919, 0.666667, 0.30), Vector3(0.265945, 0.466667, 0.15)],
+]
+# Hue of each montage's color override, fitted to the Lab's SDR ribbon.
+const GROUND_SLASH_TINTS := [Color(0.64, 0.90, 1.0), Color(1.0, 0.28, 0.64), Color(0.78, 1.0, 0.35)]
 const AIR_LOOP := [0.139664, 0.033285, 0.428704, 0.033285]
 const AIR_RATES := [1.2, 1.0, 1.0, 1.0]
 const AIR_LANDING := [0.214319, 0.607441, 0.431681, 0.607441]
@@ -216,8 +226,12 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 		var recovery := _clip(root, RECOVERIES[tool][i], prefix + "Recovery%d" % (i + 1), "recovery")
 		var timings: Vector4 = WINDOWS[tool][i]
 		var window := Source.window(attack, recovery, RATES[tool][i], timings.x, timings.y, timings.z)
-		var trail_start := maxf(timings.x - 0.03, 0.0)
-		window.trail_window = [trail_start, minf(timings.x + 0.12, timings.w)]
+		if tool < GROUND_SLASHES.size():
+			var slash: Vector3 = GROUND_SLASHES[tool][i]
+			window.trail_window = [slash.x, slash.y]
+			window.trail_style = {"tint": GROUND_SLASH_TINTS[tool], "lifetime": slash.z}
+		else:
+			window.trail_window = [maxf(timings.x - 0.03, 0.0), minf(timings.x + 0.12, timings.w)]
 		# Keep the native movement and input gates, including those in the
 		# recovery sequence. The Lab's two states split the source composite
 		# after the queued chain gate, with one final frame on terminal links.
