@@ -754,7 +754,7 @@ func check_living_projectile_anchor(lab: Node3D) -> void:
 	var group = lab.get_node("Zombies")
 	for weapon: Node3D in [lab._crossbow, lab._bow]:
 		weapon.reset()
-		var baby := weapon == lab._bow
+		var baby: bool = weapon == lab._bow
 		var count: int = group.get_child_count()
 		if not group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, baby):
 			check(false, "The glancing projectile fixture spawns its target")
