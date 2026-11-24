@@ -175,6 +175,8 @@ func check_damage_numbers_during_render_hitch() -> void:
 		"A long frame expires the earlier number while displaying all 300 new digits")
 	check(numbers._numbers.all(func(number): return number.age == 0.0 and number.centre == number.origin),
 		"New numbers begin at the hit position before their pop and rise")
+	check(numbers._numbers.filter(func(number): return not number.layout_offset.is_zero_approx()).size() <= 48,
+		"A hundred-hit burst draws every digit and limits how many numbers are repositioned")
 	var farthest = numbers._numbers.front()
 	var nearest = numbers._numbers.back()
 	lab.camera.rotation.y += PI

@@ -14,6 +14,8 @@ const BUFFER_UPLOAD_MIN_GLYPHS := 48
 const INSTANCE_FLOATS := 16
 const LAYOUT_CELL := 0.24
 const LAYOUT_POP_SCALE := 1.16
+# Bound the work on a simultaneous burst. All glyphs still draw.
+const LAYOUT_LIMIT := 48
 const LAYOUT_STEPS := [
 	Vector2.ZERO, Vector2(0, 1.15), Vector2(-1.15, 0), Vector2(1.15, 0),
 	Vector2(-0.85, 1.15), Vector2(0.85, 1.15), Vector2(0, 2.05),
@@ -160,9 +162,13 @@ func _place_new_numbers(side: Vector3, up: Vector3) -> void:
 		_measure_cells(occupied, centre + number.layout_offset, _label_extent(number), true)
 	# The vertex buffer is sorted far to near. Give the nearest new
 	# numbers first choice so their hit anchors stay easy to associate.
+	var placed := 0
 	for index in range(_numbers.size() - 1, -1, -1):
 		var number := _numbers[index]
 		if not number.layout_pending:
+			continue
+		number.layout_pending = false
+		if placed >= LAYOUT_LIMIT:
 			continue
 		var centre := Vector2(number.centre.dot(side), number.centre.dot(up))
 		var extent := _label_extent(number)
@@ -177,7 +183,7 @@ func _place_new_numbers(side: Vector3, up: Vector3) -> void:
 			if score == 0:
 				break
 		_measure_cells(occupied, centre + number.layout_offset, extent, true)
-		number.layout_pending = false
+		placed += 1
 
 func _label_extent(number: DamageNumber) -> Vector2:
 	var size := Vector2(DIGIT_SIZE + DIGIT_ADVANCE * (number.ascii_digits.size() - 1), DIGIT_SIZE)
@@ -188,8 +194,10 @@ func _measure_cells(occupied: Dictionary, centre: Vector2, extent: Vector2, rese
 	var last := Vector2i(((centre + extent) / LAYOUT_CELL).floor())
 	var score := 0
 	for y in range(first.y, last.y + 1):
+		# One row spans far more cells than the Lab stage.
+		var row := y << 16
 		for x in range(first.x, last.x + 1):
-			var cell := Vector2i(x, y)
+			var cell := row + x
 			var count: int = occupied.get(cell, 0)
 			if reserve:
 				occupied[cell] = count + 1
