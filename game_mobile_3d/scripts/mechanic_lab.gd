@@ -209,6 +209,7 @@ var _slam_audio_surface := "grass"
 var _contact_sparks: ContactSparks
 var _grounded_impact_dispatch := false
 var _pending_melee_contact_fx: Array[Dictionary] = []
+var _pending_body_flashes: Array[Dictionary] = []
 var _combat_pose_frame := -1
 var _movement_audio: MovementAudio
 var _kai_skin: KaiSkin
@@ -453,7 +454,7 @@ func _ready() -> void:
 		player.presentation_reset.connect(_clear_camera_shake)
 		player.presentation_reset.connect(_clear_contact_light)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
-		$Zombies.ground_contact_capsule.connect(_on_ground_contact_capsule)
+		$Zombies.melee_contact_visual.connect(_on_melee_contact_visual)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
 		$Zombies.zombie_attack_audio.connect(_combat_audio.zombie_attack)
@@ -1106,6 +1107,8 @@ func _process(delta: float) -> void:
 		_combat_audio.prepare_queued_samples()
 	var focus: Vector3 = presentation.player_position()
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
+	if not _pending_body_flashes.is_empty():
+		_present_body_flashes(player.render_presenter.display_clock)
 	if not _player_overlays.is_empty():
 		if _player_flash_pending:
 			_player_flash_pending = false
@@ -1348,12 +1351,20 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	var sample_time := float(player.effects.clock) if melee_pose else -1.0
 	_show_contact_fx(point, direction, clip, serial, sample_time)
 
-func _on_ground_contact_capsule(point: Vector3, serial: int, capsule: Vector2) -> void:
-	if not _grounded_impact_dispatch or not player.effects.blade_trail_enabled or _pending_melee_contact_fx.is_empty():
+func _on_melee_contact_visual(zombie: CharacterBody3D, point: Vector3, serial: int, flash_peak: float) -> void:
+	var flash := {"zombie": zombie, "peak": flash_peak}
+	# An aerial contact can arrive after the player has published this tick.
+	if _combat_pose_frame == Engine.get_physics_frames():
+		flash.time = player.effects.clock
+		_pending_body_flashes.append(flash)
+		return
+	if _pending_melee_contact_fx.is_empty():
 		return
 	var contact: Dictionary = _pending_melee_contact_fx.back()
 	if contact.serial == serial and contact.point == point:
-		contact.capsule = capsule
+		contact.flash = flash
+		if _grounded_impact_dispatch and player.effects.blade_trail_enabled:
+			contact.capsule = zombie.contact_capsule_dimensions()
 
 func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: int, sample_time := -1.0,
 		capsule := Vector2.ZERO, blade := PackedVector3Array()) -> void:
@@ -1535,12 +1546,29 @@ func _sample_combat_fx() -> void:
 	if not _pending_melee_contact_fx.is_empty():
 		var blade := PackedVector3Array([player.marker_base.global_position, player.marker_tip.global_position])
 		for contact in _pending_melee_contact_fx:
+			if contact.has("flash"):
+				var flash: Dictionary = contact.flash
+				flash.time = sample_time
+				_pending_body_flashes.append(flash)
 			_show_contact_fx(contact.point, contact.direction, contact.clip, contact.serial,
 				sample_time, contact.get("capsule", Vector2.ZERO), blade)
 	_pending_melee_contact_fx.clear()
 	if _slam_shake_frame >= 0 and _combat_pose_frame >= _slam_shake_frame:
 		_slam_shake_frame = -1
 		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION, sample_time)
+
+func _present_body_flashes(display_time: float) -> void:
+	var presented := 0
+	for flash in _pending_body_flashes:
+		if flash.time > display_time:
+			break
+		if is_instance_valid(flash.zombie) and not flash.zombie.is_queued_for_deletion():
+			flash.zombie.show_hit_flash(flash.peak)
+		presented += 1
+	if presented == _pending_body_flashes.size():
+		_pending_body_flashes.clear()
+	elif presented > 0:
+		_pending_body_flashes = _pending_body_flashes.slice(presented)
 
 func _start_contact_light(point: Vector3, serial: int, energy: float, sample_time := -1.0) -> void:
 	if _light_serial == serial:
@@ -1556,6 +1584,7 @@ func _start_contact_light(point: Vector3, serial: int, energy: float, sample_tim
 
 func _clear_contact_light() -> void:
 	_pending_melee_contact_fx.clear()
+	_pending_body_flashes.clear()
 	_combat_pose_frame = -1
 	_slam_burst_frame = -1
 	_slam_burst_serial = -1
