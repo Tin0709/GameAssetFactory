@@ -569,8 +569,11 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 		zombie.ragdoll_launch_multiplier = ragdoll_launch_multiplier
 		zombie.ragdoll_gravity_multiplier = ragdoll_gravity_multiplier
 	var stagger := float(strike.stagger) * float(strike.get("splash_stagger", 0.0)) if splash else float(strike.stagger)
+	# Keep the bright contact on the direct target. Nearby splash hits show
+	# the same pulse at their damage fraction so the crowd remains legible.
+	var flash_peak := SPLASH_MULTIPLIER if splash else 1.0
 	zombie.take_hit(damage, direction, impulse, stagger,
-		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)))
+		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)), flash_peak)
 	var lethal := zombie.health <= 0
 	sabre_contact.emit(point, direction, clip, index, serial, lethal)
 	zombie_reaction_audio.emit(point, lethal, zombie.is_baby)

@@ -272,6 +272,7 @@ var _repeated_blocking_pair := false
 var _blocked_walk_destination := Vector3.ZERO
 var _skipped_blocked_step := false
 var _flash_left := 0.0
+var _flash_peak := 1.0
 var _flash_pending := false
 var _lab_skin: ShaderMaterial
 var _lab_flash_skin: ShaderMaterial
@@ -485,12 +486,12 @@ static func source_ragdoll_layout(skeleton: Skeleton3D, profile: Dictionary) -> 
 
 func _process(delta: float) -> void:
 	# The first render delta includes time before the hit. Start the fade
-	# after the full-strength frame that take_hit has already submitted.
+	# after the peak that take_hit has already submitted.
 	if _flash_pending:
 		_flash_pending = false
 		return
 	_flash_left = maxf(0.0, _flash_left - delta)
-	var flash := smoothstep(0.0, HIT_FLASH_DURATION * 0.65, _flash_left)
+	var flash := _flash_peak * smoothstep(0.0, HIT_FLASH_DURATION * 0.65, _flash_left)
 	_mesh.set_instance_shader_parameter("hit_flash", flash)
 	if _flash_left <= 0.0:
 		if _lab_flash_skin != null:
@@ -1365,7 +1366,7 @@ func _landing_support_plane() -> Plane:
 
 func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE,
 		stagger: float = MAX_POISE, knockback_strength: float = 500.0, death_strike := DeathStrike.GROUND,
-		push_duration := 0.0) -> void:
+		push_duration := 0.0, flash_peak := 1.0) -> void:
 	if health <= 0 or amount <= 0:
 		return
 	_blocked_walk = false
@@ -1380,7 +1381,9 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 			_mesh.set_instance_shader_parameter(&"flash_red", 3.2 if get_viewport().use_hdr_2d else 2.0)
 		else:
 			_mesh.material_overlay = _flash_material
-	_mesh.set_instance_shader_parameter("hit_flash", 1.0)
+	# Several hits can arrive before one frame. Display the strongest of them.
+	_flash_peak = maxf(_flash_peak, flash_peak) if _flash_pending else flash_peak
+	_mesh.set_instance_shader_parameter("hit_flash", _flash_peak)
 	_flash_left = HIT_FLASH_DURATION
 	_flash_pending = true
 	set_process(true)
