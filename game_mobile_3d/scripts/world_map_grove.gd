@@ -116,6 +116,7 @@ var _spruce_root: Node3D
 var _spruce_atlas: ImageTexture
 var _spruce_leaf_mips: ImageTexture
 var _spruce_leaf_filter := 0.0
+var _spruce_leaf_minification := 0.0
 var _spruce_leaf_gap_mask: ImageTexture
 var _spruce_gap_coverage_weight := 1.0
 var spruce_gap_coverage_enabled := true
@@ -309,6 +310,7 @@ func _bind_spruce_atlas(material: ShaderMaterial) -> void:
 	if material == _spruce_appearance and _spruce_leaf_mips != null:
 		material.set_shader_parameter("spruce_leaf_mips", _spruce_leaf_mips)
 		material.set_shader_parameter("spruce_leaf_filter", _spruce_leaf_filter)
+		material.set_shader_parameter("spruce_leaf_minification", _spruce_leaf_minification)
 		if _spruce_leaf_gap_mask != null:
 			material.set_shader_parameter("spruce_leaf_gap_mask", _spruce_leaf_gap_mask)
 			material.set_shader_parameter("spruce_gap_coverage", spruce_gap_coverage_enabled)
@@ -374,11 +376,16 @@ static func small_leaf_gap_mask(leaves: Image) -> Image:
 		mask.set_pixelv(gaps[index], Color(rank, rank, rank))
 	return mask
 
-func set_spruce_leaf_filter(strength: float) -> void:
-	var weight := strength if spruce_leaf_filter_available() else 0.0
-	if weight != _spruce_leaf_filter:
-		_spruce_leaf_filter = weight
-		_spruce_appearance.set_shader_parameter("spruce_leaf_filter", weight)
+func set_spruce_leaf_filter(strength: float, minification: float) -> void:
+	if not spruce_leaf_filter_available():
+		strength = 0.0
+		minification = 0.0
+	if strength != _spruce_leaf_filter:
+		_spruce_leaf_filter = strength
+		_spruce_appearance.set_shader_parameter("spruce_leaf_filter", strength)
+	if minification != _spruce_leaf_minification:
+		_spruce_leaf_minification = minification
+		_spruce_appearance.set_shader_parameter("spruce_leaf_minification", minification)
 
 func spruce_available() -> bool:
 	return is_instance_valid(_spruce_root)

@@ -2902,9 +2902,12 @@ func sync_spruce_leaf_filter() -> void:
 	if _flat_lab or level == null or not is_instance_valid(level.grove):
 		return
 	var strength := 0.0
+	var minification := 0.0
 	if not _balanced_preview and level.look.stage == 2 and _spruce_leaf_filter_editable():
 		strength = _biome_profile.spruce_leaf_filter * _lighting_scale(&"spruce_leaf_filter")
-	level.grove.set_spruce_leaf_filter(strength)
+		var phase := DayNight.sample_curve(_biome_profile.spruce_leaf_minification_by_hour, hour / 24., 0.)
+		minification = clampf(phase * strength, 0., 1.)
+	level.grove.set_spruce_leaf_filter(strength, minification)
 
 func _sync_bark_irradiance() -> void:
 	if level == null or level.grove == null:
@@ -4287,6 +4290,8 @@ func apply_time(reuse_current_forest := false) -> void:
 		_publish_path_chroma()
 		_publish_stone_twilight_color()
 		_sync_twilight_crown()
+		if _biome_profile != null and _biome_profile.spruce_leaf_minification_by_hour != null:
+			sync_spruce_leaf_filter()
 		if level.grove != null and level.grove.spruce_gap_coverage_available():
 			var amount := 1.0
 			if _biome_profile != null:

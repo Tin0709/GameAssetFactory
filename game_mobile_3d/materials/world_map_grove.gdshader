@@ -36,6 +36,7 @@ uniform bool use_source_atlas = false;
 uniform sampler2D source_atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D spruce_leaf_mips : source_color, filter_linear_mipmap, repeat_disable;
 uniform float spruce_leaf_filter = 0.0;
+uniform float spruce_leaf_minification = 0.0;
 uniform sampler2D source_leaf_weights : filter_nearest, repeat_disable;
 uniform float source_leaf_hue = 0.0;
 uniform float source_leaf_tint_mix = 0.0;
@@ -166,7 +167,11 @@ void fragment() {
 				vec4 filtered = textureGrad(spruce_leaf_mips, leaf_uv, dx, dy);
 				// Retain more of the original holes as the crown gets smaller.
 				float alpha_weight = weight * mix(0.70, 0.46, smoothstep(1.15, 2.0, footprint));
-				texel.rgb = mix(texel.a < 0.3333 ? filtered.rgb : texel.rgb, filtered.rgb, 0.65 * weight);
+				float rgb_weight = 0.65 * weight;
+				if (spruce_leaf_minification > 0.0 && distance_to_player >= 0.80) {
+					rgb_weight = mix(rgb_weight, smoothstep(0.41, 1.12, footprint), spruce_leaf_minification);
+				}
+				texel.rgb = mix(texel.a < 0.3333 ? filtered.rgb : texel.rgb, filtered.rgb, rgb_weight);
 				texel.a = mix(texel.a, filtered.a, alpha_weight);
 			}
 		}
