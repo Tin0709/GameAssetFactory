@@ -128,8 +128,10 @@ func run() -> void:
 	var quality := lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality") as OptionButton
 	impact_opacity.value = 35.0
 	impact_duration.value = 150.0
-	quality.select(1)
-	quality.item_selected.emit(1)
+	var low_index := quality.get_item_index(1)
+	check(low_index >= 0, "The previously saved reduced budget ID is still available")
+	quality.select(low_index)
+	quality.item_selected.emit(low_index)
 	select_floor(lab, 1)
 	select_action(lab, 0)
 	set_values(lab, b, 25, false, b_animation, 85)
@@ -139,8 +141,11 @@ func run() -> void:
 	mix_weapon.value = 100.0
 	impact_opacity.value = 85.0
 	impact_duration.value = 65.0
-	quality.select(0)
-	quality.item_selected.emit(0)
+	var balanced_index := quality.get_item_index(2)
+	check(balanced_index >= 0, "The balanced spark budget has its own saved ID")
+	if balanced_index >= 0:
+		quality.select(balanced_index)
+		quality.item_selected.emit(balanced_index)
 	select_floor(lab, 2)
 	select_action(lab, 2)
 	lab.free()
@@ -152,7 +157,8 @@ func run() -> void:
 	check(Engine.max_fps == 30, "Loading A restores 30 FPS")
 	check(values_match(lab, a, 150, true), "Slot A restores sliders, crowd count and live values after reopening")
 	check(lab.get_node("HUD/AudioMixPanel/Rows/Weapon/Slider").value == 35.0, "Loading A restores the weapon mix")
-	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").selected == 1, "Loading A restores reduced contact sparks")
+	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").get_selected_id() == 1,
+		"Loading A restores reduced contact sparks by the existing preset ID")
 	check_impact_values(lab, 35.0, 150.0)
 	check(lab.get_node("HUD/FloorSurface").selected == 1 and lab.get("_floor_surface") == "dirt",
 		"Loading A restores the dirt stage and its contact material")
@@ -164,7 +170,7 @@ func run() -> void:
 	check(Engine.max_fps == 60, "Loading B restores 60 FPS")
 	check(values_match(lab, b, 25, false), "Slot B restores a distinct configuration")
 	check(lab.get_node("HUD/AudioMixPanel/Rows/Weapon/Slider").value == 100.0, "Loading B restores full weapon level")
-	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").selected == 0, "Loading B restores the full spark budget")
+	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").get_selected_id() == 2, "Loading B restores the balanced spark budget")
 	check_impact_values(lab, 85.0, 65.0)
 	check(lab.get_node("HUD/FloorSurface").selected == 2 and lab.get("_floor_surface") == "stone",
 		"Loading B restores the stone stage and its contact material")
@@ -175,6 +181,8 @@ func run() -> void:
 	select_action(lab, 4)
 	check(Engine.max_fps == 75, "Restoring defaults inherits the app's cap")
 	check(values_match(lab, baseline, 100, false), "Restoring defaults updates the HUD and runtime together")
+	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").get_selected_id() == 0,
+		"Defaults restore the full spark budget")
 	select_action(lab, 1)
 	check(values_match(lab, a, 150, true), "Restoring defaults preserves a saved slot")
 	set_values(lab, b, 25, false, b_animation, 85)
