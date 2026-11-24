@@ -501,8 +501,11 @@ func check_sword_thrust_glint(lab, selector: OptionButton) -> void:
 					continue
 				seen = true
 				scope_correct = scope_correct and actor.combo.phase == &"attack" and actor.combo.index == 2
-				first_time = minf(first_time, actor.combo.time)
-				last_time = maxf(last_time, actor.combo.time)
+				# These vertices belong to the presented pose, not the latest physics pose.
+				var displayed_time: float = actor.combo.time - (actor.effects.clock
+					- actor.render_presenter.display_clock) * actor.combo.playback_rate()
+				first_time = minf(first_time, displayed_time)
+				last_time = maxf(last_time, displayed_time)
 				furthest = maxf(furthest, vertices[j].dot(forward))
 		attack(false)
 		check(scope_correct, "The directional glint belongs to the Sword thrust")
