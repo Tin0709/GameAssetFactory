@@ -1881,7 +1881,70 @@ func check_first_melee_switch_preparation() -> void:
 	await create_timer(0.12).timeout
 	lab.free()
 
+func check_special_weapon_preparation() -> void:
+	var lab := preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var audio := lab.get_node("CombatAudio") as COMBAT_AUDIO
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var menu := lab.get_node("HUD/Weapon") as OptionButton
+	for frame in 45:
+		await physics_frame
+	for index: int in [3, 4]:
+		menu.select(index)
+		menu.item_selected.emit(index)
+		check(menu.selected == index, "The first special-weapon switch uses the real HUD")
+	check(audio._voices.is_empty() and not audio._groups.has(&"crossbow_fire")
+		and not audio._groups.has(&"gauntlet_hit")
+		and audio._weapon_sample_jobs.has(&"crossbow_fire")
+		and audio._weapon_sample_jobs.has(&"gauntlet_hit"),
+		"Muted first equip queues both combat banks without decoding them")
+	toggle.button_pressed = true
+	var hits: Array = audio._groups.get(&"gauntlet_hit", [])
+	check(hits.size() == COMBAT_AUDIO.GAUNTLET_HIT_HASHES.size()
+		and audio._voices.any(func(voice): return voice.playing and voice.stream == hits[0])
+		and audio._next_choice.get(&"gauntlet_hit", 0) == 0,
+		"Enabling on the gauntlets previews the first verified hit without consuming it")
+	var point: Vector3 = lab.get("player").global_position
+	audio.reset()
+	audio.gauntlet_swung(point, 0, false)
+	check(audio._groups.get(&"gauntlet_swing_0", []).size() == COMBAT_AUDIO.GAUNTLET_SWING_HASHES.light.size()
+		and audio._voice_groups.has(&"gauntlet_swing_0") and not audio._groups.has(&"gauntlet_swing_1"),
+		"An immediate gauntlet swing drains only its complete family")
+	audio.gauntlet_slam_landed(point)
+	check(audio._groups.get(&"gauntlet_slam", []).size() == COMBAT_AUDIO.GAUNTLET_SLAM_HASHES.size()
+		and audio._groups.get(&"mauler_dive", []).size() == COMBAT_AUDIO.MAULER_DIVE_HASHES.size()
+		and audio._voice_groups.has(&"gauntlet_slam") and audio._voice_groups.has(&"mauler_dive"),
+		"The first gauntlet landing retains both source audio layers")
+	menu.select(3)
+	menu.item_selected.emit(3)
+	check(menu.selected == 3, "Crossbow can be re-equipped before preparation finishes")
+	audio.crossbow_fired(point)
+	audio.crossbow_impact(point)
+	check(audio._voice_groups.has(&"crossbow_equip") and audio._voice_groups.has(&"crossbow_fire")
+		and audio._voice_groups.has(&"crossbow_hit"), "The immediate crossbow shot keeps equip, fire and impact")
+	var bolt := Node3D.new()
+	lab.add_child(bolt)
+	audio.crossbow_flight(bolt)
+	check(audio._flight_targets.size() == 1 and audio._voice_groups.has(&"crossbow_flight"),
+		"The first flying bolt starts its own prepared spatial cue")
+	var group_count: int = audio._groups.size()
+	toggle.button_pressed = false
+	for frame in 10:
+		await process_frame
+	check(audio._groups.size() == group_count and audio._flight_targets.is_empty()
+		and not audio._voices.any(func(voice): return voice.playing),
+		"Muting pauses preparation and releases the active bolt's cue")
+	lab.free()
+	await create_timer(0.12).timeout
+
 func run() -> void:
+
+	if "--special-weapon-preparation" in OS.get_cmdline_user_args():
+		await check_special_weapon_preparation()
+		print("MECHANIC_LAB_SPECIAL_AUDIO checks=", checks, " failures=", failures)
+		quit(int(not failures.is_empty()))
+		return
 	var camera := Camera3D.new()
 	root.add_child(camera)
 	camera.make_current()
