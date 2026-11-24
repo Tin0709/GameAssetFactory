@@ -108,7 +108,7 @@ func run() -> void:
 	check(await cue_peak(lab, capture, cues.Weapon) > 0.001, "Muting zombie and surface cues leaves weapon audio audible")
 	sliders.Master.value = 0.0
 	check(await cue_peak(lab, capture, cues.Weapon) < 0.0001, "The Lab master slider can silence its whole mix")
-	# Close the scene while each combat pool still owns an active playback.
+	# Close the scene while weapon and zombie voices still have active playbacks.
 	audio.reset()
 	cues.Weapon.call()
 	cues.Zombie.call()
