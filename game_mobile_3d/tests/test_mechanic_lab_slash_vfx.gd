@@ -35,6 +35,8 @@ func run() -> void:
 		selector.item_selected.emit(slot)
 		var weapon := selector.get_item_text(slot)
 		check(selector.selected == slot, "The ground fixture equips %s" % weapon)
+		check(material.get_shader_parameter(&"sword_ribbon_head") == (slot == lab.Weapon.SWORD),
+			"%s uses the Sword ribbon head only when Sword is equipped" % weapon)
 		for i in 20:
 			await physics_frame
 		attack(true)
@@ -497,6 +499,8 @@ func check_world_map_slash() -> void:
 	current_scene = world
 	var ribbon: MeshInstance3D = world.player.effects.ribbon
 	var material := ribbon.material_override as ShaderMaterial
+	check(material != null and not material.get_shader_parameter(&"sword_ribbon_head"),
+		"WorldMap leaves the MechanicLab Sword ribbon head disabled")
 	var source: Texture2D
 	if material != null:
 		source = material.get_shader_parameter(&"source_slash") as Texture2D
