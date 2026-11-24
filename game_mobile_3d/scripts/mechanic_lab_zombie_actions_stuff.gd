@@ -162,17 +162,15 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 			library.add_animation(ALERT, _bake(skeleton, model, alert_source)))
 		steps.append(func():
 			var raise_arms: Dictionary = pack.alert.duplicate()
+			raise_arms.playback_rate = ALERT_IDLE_RATE
+			var enter := Pack.bake(bindings, [raise_arms], ALERT_TIME / ALERT_IDLE_RATE,
+				false, BAKE_RATE, true, source_clips[IDLE])
+			library.add_animation(ALERT_ENTER, _bake(skeleton, model, enter))
 			if baby:
-				# Babies use the alert layer as their default stance. Fit the raise
-				# within their existing spawn window.
-				raise_arms.playback_rate = ALERT_TIME / spawn_duration
-				source_clips[SPAWN] = Pack.bake(bindings, [raise_arms], spawn_duration,
-					false, BAKE_RATE, true, source_clips[IDLE])
+				# A baby starts raising its arms as it appears. If it stays idle,
+				# finish the same gesture after the Lab's spawn window.
+				source_clips[SPAWN] = enter
 			else:
-				raise_arms.playback_rate = ALERT_IDLE_RATE
-				var enter := Pack.bake(bindings, [raise_arms], ALERT_TIME / ALERT_IDLE_RATE,
-					false, BAKE_RATE, true, source_clips[IDLE])
-				library.add_animation(ALERT_ENTER, _bake(skeleton, model, enter))
 				var exit := Pack.bake(bindings, [pack.alert_exit], pack.alert_exit.animation_length,
 					false, BAKE_RATE, true, source_clips[IDLE])
 				library.add_animation(ALERT_EXIT, _bake(skeleton, model, exit)))
