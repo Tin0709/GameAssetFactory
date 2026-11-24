@@ -78,7 +78,7 @@ func set_budget_scale(scale: float) -> void:
 		_pending.resize(_contact_budget)
 
 func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, sample_time := -1.0,
-		capsule := Vector2.ZERO, weapon_points := PackedVector3Array()) -> void:
+		capsule := Vector2.ZERO, weapon_points := PackedVector3Array(), punch_axis := Vector3.ZERO) -> void:
 	var distance := point.distance_squared_to(viewer)
 	var index := _pending.size()
 	while index > 0 and distance < float(_pending[index - 1].distance):
@@ -86,12 +86,12 @@ func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, s
 	if index == _contact_budget:
 		return
 	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance,
-		"sample_time": sample_time, "capsule": capsule, "weapon_points": weapon_points})
+		"sample_time": sample_time, "capsule": capsule, "weapon_points": weapon_points, "punch_axis": punch_axis})
 	if _pending.size() > _contact_budget:
 		_pending.pop_back()
 	set_process(true)
 
-func _contact_surface_point(centre: Vector3, capsule: Vector2, weapon_points: PackedVector3Array, direction: Vector3) -> Vector3:
+static func contact_surface_point(centre: Vector3, capsule: Vector2, weapon_points: PackedVector3Array, direction: Vector3) -> Vector3:
 	var axis := Vector3.UP * capsule.y
 	var body_point: Vector3
 	var weapon_point: Vector3
@@ -108,9 +108,19 @@ func _contact_surface_point(centre: Vector3, capsule: Vector2, weapon_points: Pa
 		normal = -direction.normalized()
 	return body_point + normal * capsule.x
 
-func _spawn_burst(point: Vector3, attack_direction: Vector3) -> void:
+func _spawn_burst(point: Vector3, attack_direction: Vector3, punch_axis: Vector3) -> void:
 	var angle := _random.randf_range(0.0, TAU)
 	var bias := attack_direction.normalized() * 0.24
+	var speed := Vector2(2.0, 4.4)
+	var lifetime := Vector2(0.15, 0.24)
+	var length := Vector2(0.15, 0.26)
+	var width := Vector2(0.045, 0.075)
+	if not punch_axis.is_zero_approx():
+		bias = punch_axis.normalized() * 1.24
+		speed = Vector2(1.9, 3.7)
+		lifetime = Vector2(0.105, 0.16)
+		length = Vector2(0.075, 0.14)
+		width = Vector2(0.067, 0.105)
 	for i in _sparks_per_contact:
 		var yaw := angle + TAU * float(i) / _sparks_per_contact + _random.randf_range(-0.17, 0.17)
 		var outward := Vector3(cos(yaw), _random.randf_range(-0.42, 0.8), sin(yaw))
@@ -118,11 +128,11 @@ func _spawn_burst(point: Vector3, attack_direction: Vector3) -> void:
 		var spark := _particles[_next]
 		_next = (_next + 1) % _pool_limit
 		spark.origin = point + outward * 0.21
-		spark.velocity = outward * _random.randf_range(2.0, 4.4)
+		spark.velocity = outward * _random.randf_range(speed.x, speed.y)
 		spark.age = 0.0
-		spark.lifetime = _random.randf_range(0.15, 0.24)
-		spark.length = _random.randf_range(0.15, 0.26)
-		spark.width = _random.randf_range(0.045, 0.075)
+		spark.lifetime = _random.randf_range(lifetime.x, lifetime.y)
+		spark.length = _random.randf_range(length.x, length.y)
+		spark.width = _random.randf_range(width.x, width.y)
 
 func _process(delta: float) -> void:
 	# The elapsed frame only advances streaks that were already displayed.
@@ -139,8 +149,8 @@ func _process(delta: float) -> void:
 			continue
 		var point: Vector3 = contact.point
 		if contact.capsule.x > 0.0 and not contact.weapon_points.is_empty():
-			point = _contact_surface_point(point, contact.capsule, contact.weapon_points, contact.direction)
-		_spawn_burst(point, contact.direction)
+			point = contact_surface_point(point, contact.capsule, contact.weapon_points, contact.direction)
+		_spawn_burst(point, contact.direction, contact.punch_axis)
 		_pending.remove_at(pending_index)
 	var camera := get_viewport().get_camera_3d()
 	var view := camera.global_basis.orthonormalized() if camera != null else Basis.IDENTITY

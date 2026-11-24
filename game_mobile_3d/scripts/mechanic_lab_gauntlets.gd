@@ -27,6 +27,9 @@ const RATES := [2.0, 2.0, 1.1]
 # passes the target on the way up, before the raised hold at frame 12.
 const CONTACT_FRAMES := [8, 9, 24]
 const LEFT_PUNCH_INDEX := 2
+# Fit to the shared clip's knuckle displacement at the three contact poses.
+# X is lateral in the avatar's frame, +Z is forward.
+const CONTACT_AXES := [Vector3(0.48, 0.12, 0.83), Vector3(0.08, 0.97, 0.17), Vector3(-0.68, 0.02, 0.74)]
 const STRIKES := [
 	{"damage": 10, "range_m": 2.4, "strength": 250.0, "angle": 15.0, "stagger": 14.0,
 		"cone_degrees": 30.0, "cone_offset": -1.2, "cone_cutoff": 1.2, "splash_stagger": 0.5},
