@@ -242,6 +242,9 @@ var _grounded_impact_dispatch := false
 var _pending_melee_contact_fx: Array[Dictionary] = []
 var _pending_melee_feedback: Array[Dictionary] = []
 var _combat_pose_frame := -1
+var _previous_blade_serial := -1
+var _previous_blade_base := Vector3.ZERO
+var _previous_blade_tip := Vector3.ZERO
 var _movement_audio: MovementAudio
 var _kai_skin: KaiSkin
 var _md2_skin_visibility: Dictionary[MeshInstance3D, bool] = {}
@@ -1592,7 +1595,7 @@ func _on_melee_contact_visual(zombie: CharacterBody3D, point: Vector3, serial: i
 
 func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: int, sample_time := -1.0,
 		capsule := Vector2.ZERO, weapon_points := PackedVector3Array(), punch_axis := Vector3.ZERO,
-		splash := false) -> void:
+		splash := false, sweep_axis := Vector3.ZERO) -> void:
 	var effect_point := point
 	if not punch_axis.is_zero_approx():
 		# Light the same point on the target as the punch streaks.
@@ -1603,7 +1606,7 @@ func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: 
 	if not has_arrow_sparks:
 		if _contact_sparks != null:
 			_contact_sparks.queue_contact(effect_point, direction, player.global_position + Vector3.UP,
-				sample_time, capsule, weapon_points, punch_axis, clip == "AirAttack" and capsule.x > 0.0, splash)
+				sample_time, capsule, weapon_points, punch_axis, clip == "AirAttack" and capsule.x > 0.0, splash, sweep_axis)
 		else:
 			player.effects.contact(effect_point, direction, sample_time >= 0.0)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3",
@@ -1986,6 +1989,7 @@ func _sample_combat_fx() -> void:
 	if not _pending_tool_ground_cues.is_empty():
 		_show_tool_ground_cues()
 	if _pending_melee_contact_fx.is_empty() and _slam_burst_frame < 0:
+		_remember_blade_pose()
 		return
 	var sample_time: float = player.effects.clock
 	# Keep the floor flash first when both contacts request light for the same swing.
@@ -2005,6 +2009,15 @@ func _sample_combat_fx() -> void:
 				impact_axis = player.visual.global_basis * Gauntlets.CONTACT_AXES[punch_index]
 			_publish_melee_contact(contact, sample_time, weapon_points, impact_axis if is_punch else Vector3.ZERO)
 	_pending_melee_contact_fx.clear()
+	_remember_blade_pose()
+
+func _remember_blade_pose() -> void:
+	if player.combo.phase != &"attack" or not player.effects.blade_trail_enabled:
+		_previous_blade_serial = -1
+		return
+	_previous_blade_base = player.marker_base.global_position
+	_previous_blade_tip = player.marker_tip.global_position
+	_previous_blade_serial = player.combo.serial
 
 func _blade_contact_points() -> PackedVector3Array:
 	if not player.effects.blade_trail_enabled:
@@ -2018,9 +2031,23 @@ func _publish_melee_contact(contact: Dictionary, sample_time: float, weapon_poin
 		visual.time = sample_time
 		_pending_melee_feedback.append(visual)
 	var spark_center: Vector3 = contact.get("spark_center", contact.point)
+	var capsule: Vector2 = contact.get("capsule", Vector2.ZERO)
+	var splash: bool = visual.get("splash", false)
+	var sweep_axis := Vector3.ZERO
+	if contact.clip != "AirAttack" and not splash and capsule.x > 0.0 and weapon_points.size() == 2 \
+			and contact.serial == _previous_blade_serial:
+		var base := weapon_points[0]
+		var tip := weapon_points[1]
+		var cut := tip - base
+		if not cut.is_zero_approx():
+			var surface := ContactSparks.contact_surface_point(spark_center, capsule, weapon_points, contact.direction)
+			var fraction := clampf((surface - base).dot(cut) / cut.length_squared(), 0.0, 1.0)
+			var travel := base.lerp(tip, fraction) - _previous_blade_base.lerp(_previous_blade_tip, fraction)
+			# Hold the radial burst if the blade scarcely moved during this interval.
+			if travel.length_squared() >= 0.000025:
+				sweep_axis = travel.normalized()
 	_show_contact_fx(spark_center, contact.direction, contact.clip, contact.serial,
-		sample_time, contact.get("capsule", Vector2.ZERO), weapon_points, punch_axis,
-		visual.get("splash", false))
+		sample_time, capsule, weapon_points, punch_axis, splash, sweep_axis)
 
 func _present_melee_feedback(display_time: float) -> void:
 	# Tone down overlapping splash highlights by attack. A separate strike
@@ -2077,6 +2104,7 @@ func _clear_contact_light() -> void:
 	if _tool_slam_ring != null:
 		_tool_slam_ring.hide()
 	_combat_pose_frame = -1
+	_previous_blade_serial = -1
 	_slam_burst_frame = -1
 	_slam_burst_serial = -1
 	_light_serial = -1

@@ -79,7 +79,7 @@ func set_budget_scale(scale: float) -> void:
 
 func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, sample_time := -1.0,
 		capsule := Vector2.ZERO, weapon_points := PackedVector3Array(), punch_axis := Vector3.ZERO,
-		aerial_blade := false, splash := false) -> void:
+		aerial_blade := false, splash := false, sweep_axis := Vector3.ZERO) -> void:
 	var distance := point.distance_squared_to(viewer)
 	var index := _pending.size()
 	while index > 0:
@@ -92,7 +92,7 @@ func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, s
 		return
 	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance,
 		"sample_time": sample_time, "capsule": capsule, "weapon_points": weapon_points,
-		"punch_axis": punch_axis, "aerial_blade": aerial_blade, "splash": splash})
+		"punch_axis": punch_axis, "aerial_blade": aerial_blade, "splash": splash, "sweep_axis": sweep_axis})
 	if _pending.size() > _contact_budget:
 		_pending.pop_back()
 	set_process(true)
@@ -114,9 +114,10 @@ static func contact_surface_point(centre: Vector3, capsule: Vector2, weapon_poin
 		normal = -direction.normalized()
 	return body_point + normal * capsule.x
 
-func _spawn_burst(point: Vector3, attack_direction: Vector3, punch_axis: Vector3, near_feet: bool) -> void:
+func _spawn_burst(point: Vector3, attack_direction: Vector3, punch_axis: Vector3, near_feet: bool,
+		sweep_axis: Vector3) -> void:
 	var angle := _random.randf_range(0.0, TAU)
-	var bias := attack_direction.normalized() * 0.24
+	var bias := attack_direction.normalized() * 0.24 + sweep_axis * 0.82
 	var speed := Vector2(2.0, 4.4)
 	var lifetime := Vector2(0.15, 0.24)
 	var length := Vector2(0.15, 0.26)
@@ -163,7 +164,7 @@ func _process(delta: float) -> void:
 			# pointing below the feet upward so the floor does not hide them.
 			var foot_height: float = contact.point.y - contact.capsule.y - contact.capsule.x
 			near_feet = contact.aerial_blade and point.y - foot_height <= 0.10
-		_spawn_burst(point, contact.direction, contact.punch_axis, near_feet)
+		_spawn_burst(point, contact.direction, contact.punch_axis, near_feet, contact.sweep_axis)
 		_pending.remove_at(pending_index)
 	var camera := get_viewport().get_camera_3d()
 	var view := camera.global_basis.orthonormalized() if camera != null else Basis.IDENTITY
