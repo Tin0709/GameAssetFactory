@@ -1213,8 +1213,8 @@ func _floor_landing_contact_at(point: Vector3) -> Dictionary:
 	return _landing_contact
 
 func _actor_floor_support(actor: CharacterBody3D, point: Vector3, verify_snap := false) -> Dictionary:
-	# A sole outside a ledge can raycast to the grass below. Prefer the
-	# actual floor contact from this move_and_slide, including non-grass.
+	# A sole outside a ledge can raycast to the stage below. Prefer the
+	# actual floor contact from this move_and_slide, including other bodies.
 	var min_normal_y := cos(actor.floor_max_angle)
 	var closest := INF
 	var nearest := Vector3.ZERO

@@ -75,6 +75,11 @@ func select_frame_rate(lab: Node3D, fps: int) -> void:
 	check(popup.activate_item_by_event(event), "The FPS mode can be selected through the menu")
 	popup.set_item_accelerator(index, KEY_NONE)
 
+func select_floor(lab: Node3D, index: int) -> void:
+	var picker := lab.get_node("HUD/FloorSurface") as OptionButton
+	picker.select(index)
+	picker.item_selected.emit(index)
+
 func run() -> void:
 	var starting_cap := Engine.max_fps
 	var physics_hz := Engine.physics_ticks_per_second
@@ -125,6 +130,7 @@ func run() -> void:
 	impact_duration.value = 150.0
 	quality.select(1)
 	quality.item_selected.emit(1)
+	select_floor(lab, 1)
 	select_action(lab, 0)
 	set_values(lab, b, 25, false, b_animation, 85)
 	select_frame_rate(lab, 60)
@@ -135,6 +141,7 @@ func run() -> void:
 	impact_duration.value = 65.0
 	quality.select(0)
 	quality.item_selected.emit(0)
+	select_floor(lab, 2)
 	select_action(lab, 2)
 	lab.free()
 	check(Engine.max_fps == 75, "Leaving the Lab restores the app cap")
@@ -147,6 +154,8 @@ func run() -> void:
 	check(lab.get_node("HUD/AudioMixPanel/Rows/Weapon/Slider").value == 35.0, "Loading A restores the weapon mix")
 	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").selected == 1, "Loading A restores reduced contact sparks")
 	check_impact_values(lab, 35.0, 150.0)
+	check(lab.get_node("HUD/FloorSurface").selected == 1 and lab.get("_floor_surface") == "dirt",
+		"Loading A restores the dirt stage and its contact material")
 	check(lab.get_node("HUD/ZombieGait").selected == a_animation,
 		"Loading A restores the selected zombie animation")
 	if lab.get_node("HUD/RenderScale").item_count > 0:
@@ -157,6 +166,8 @@ func run() -> void:
 	check(lab.get_node("HUD/AudioMixPanel/Rows/Weapon/Slider").value == 100.0, "Loading B restores full weapon level")
 	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").selected == 0, "Loading B restores the full spark budget")
 	check_impact_values(lab, 85.0, 65.0)
+	check(lab.get_node("HUD/FloorSurface").selected == 2 and lab.get("_floor_surface") == "stone",
+		"Loading B restores the stone stage and its contact material")
 	check(lab.get_node("HUD/ZombieGait").selected == b_animation,
 		"Loading B restores its zombie animation")
 	if lab.get_node("HUD/RenderScale").item_count > 0:
@@ -185,6 +196,8 @@ func run() -> void:
 	check(Engine.max_fps == 75, "Loading a preset saved before the FPS control inherits the app cap")
 	check(values_match(lab, baseline, 100, false), "Older presets use reference physics values for the added controls")
 	check_impact_values(lab, 100.0, 100.0)
+	check(lab.get_node("HUD/FloorSurface").selected == 0 and lab.get("_floor_surface") == "grass",
+		"Older presets use the default grass stage")
 	select_frame_rate(lab, 30)
 	Engine.max_fps = 45
 	lab.free()
