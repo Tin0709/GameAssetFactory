@@ -1751,11 +1751,12 @@ func _setup_tool_slam_ring() -> void:
 	_tool_slam_ring.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_tool_slam_ring.hide()
 	$CombatEffects.add_child(_tool_slam_ring)
-	var box := BoxShape3D.new()
-	# Sample a thin slab around the rendered ring so overhead objects do
-	# not exhaust the clipping budget before the plane is checked.
-	box.size = Vector3(mesh.size.x, 0.01, mesh.size.y)
-	_tool_slam_footprint.shape = box
+	# Match the ring's maximum footprint and keep the query thin around its
+	# render plane so distant props and overhangs leave clipping slots free.
+	var disc := CylinderShape3D.new()
+	disc.radius = GROUND_SLAM_RADIUS
+	disc.height = 0.01
+	_tool_slam_footprint.shape = disc
 	_tool_slam_footprint.collision_mask = 1
 
 func _queue_tool_ground_cue(cue: Dictionary, serial: int, sample_time: float) -> void:
