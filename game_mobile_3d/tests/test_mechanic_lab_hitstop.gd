@@ -59,8 +59,10 @@ func replay(lab: Node3D, slider: HSlider, milliseconds: float, has_targets: bool
 	for actor in group.get_children():
 		actor.free()
 	lab.reset_player()
+	await ticks(12)
 	weapon.select(CurvedGreatsword)
 	weapon.item_selected.emit(CurvedGreatsword)
+	check(weapon.selected == CurvedGreatsword, "Curved Greatsword is equipped for each replay")
 	slider.value = milliseconds
 	await ticks(12)
 	for x in [-0.36, 0.36] if has_targets else []:
