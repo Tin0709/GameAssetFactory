@@ -349,7 +349,10 @@ func check_aerial_contact_pose(lab) -> void:
 	var group: Node = lab.get_node("Zombies")
 	var sparks = lab.get_node("ContactSparks")
 	sparks.process_mode = Node.PROCESS_MODE_DISABLED
-	for slot: int in [lab.Weapon.SABRE, lab.Weapon.SWORD, lab.Weapon.CURVED_GREATSWORD, lab.Weapon.AXE]:
+	for sample: Array in [[lab.Weapon.SABRE, false], [lab.Weapon.SWORD, false],
+			[lab.Weapon.CURVED_GREATSWORD, false], [lab.Weapon.AXE, false], [lab.Weapon.CURVED_GREATSWORD, true]]:
+		var slot: int = sample[0]
+		var splash: bool = sample[1]
 		lab.reset_player()
 		for i in 8:
 			await physics_frame
@@ -360,7 +363,7 @@ func check_aerial_contact_pose(lab) -> void:
 		var target = group.get_child(0)
 		target.set_physics_process(false)
 		target.collision_layer = 0
-		target.global_position = lab.player.global_position + forward * 1.5
+		target.global_position = lab.player.global_position + forward * (3.55 if splash else 1.5)
 		var contacts: Array[Vector3] = []
 		group.sabre_contact.connect(func(point, _direction, _clip, _index, _serial, _lethal):
 			contacts.append(point), CONNECT_ONE_SHOT)
@@ -403,7 +406,8 @@ func check_aerial_contact_pose(lab) -> void:
 			lab._process(0.0)
 			check(sparks._streaks.visible_instance_count == 9, "One body burst starts on the contact pose in slot %d" % slot)
 			var flash: Variant = target._mesh.get_instance_shader_parameter(&"hit_flash")
-			check(flash == 1.0, "Aerial body flash starts with the body sparks in slot %d" % slot)
+			check(is_equal_approx(float(flash), 0.3 if splash else 1.0),
+				"Aerial body flash starts with the body sparks in slot %d" % slot)
 			var center: Vector3 = target.combat_center()
 			var capsule: Vector2 = target.contact_capsule_dimensions()
 			var axis := Vector3.UP * capsule.y
@@ -415,6 +419,10 @@ func check_aerial_contact_pose(lab) -> void:
 					points += 1
 			if points > 0:
 				birth /= points
+			if splash:
+				check(points == 9 and birth.distance_to(contacts[0]) < 0.001,
+					"Splash sparks keep their impact origin even outside the blade path")
+			elif points > 0:
 				var body_point := Geometry3D.get_closest_point_to_segment(birth, center - axis, center + axis)
 				check(absf(birth.distance_to(body_point) - capsule.x) < 0.001,
 					"The direct aerial blade sparks start on the target capsule in slot %d" % slot)
@@ -434,7 +442,7 @@ func check_aerial_contact_pose(lab) -> void:
 			if slot != lab.Weapon.SABRE:
 				check(lab._impact_light.visible and is_equal_approx(lab._impact_light.light_energy, 2.3),
 					"The floor flash keeps priority over the body flash at full intensity in slot %d" % slot)
-			print("AERIAL_CONTACT_POSE slot=", slot, " early_streaks=", early_count,
+			print("AERIAL_CONTACT_POSE slot=", slot, " splash=", splash, " early_streaks=", early_count,
 				" on_pose_streaks=", sparks._streaks.visible_instance_count)
 		target.free()
 		if contacts.is_empty():
