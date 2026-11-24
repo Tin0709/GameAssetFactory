@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/mechanic_lab.gd" id="lab"]
 [ext_resource type="Script" path="res://scripts/mechanic_lab_zombies.gd" id="zombies"]
@@ -19,6 +19,9 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_left = 10
 corner_radius_bottom_right = 10
+
+[sub_resource type="ButtonGroup" id="tuning_panels"]
+allow_unpress = true
 
 [node name="MechanicLab" type="Node3D"]
 script = ExtResource("lab")
@@ -243,13 +246,74 @@ flat = false
 alignment = 0
 tooltip_text = "Lưu hoặc nạp cấu hình thử A và B."
 
-[node name="ContactSparkQuality" type="OptionButton" parent="HUD"]
+[node name="ImpactFxButton" type="Button" parent="HUD"]
 offset_left = 762.0
 offset_top = 184.0
 offset_right = 978.0
 offset_bottom = 218.0
 focus_mode = 0
-tooltip_text = "Mức nhẹ ưu tiên 3 điểm va chạm gần nhất và dùng ít tia hơn."
+toggle_mode = true
+button_group = SubResource("tuning_panels")
+text = "Tia trúng đòn ▾"
+alignment = 0
+tooltip_text = "Chỉnh độ rõ, số lượng và thời gian tồn tại của tia cận chiến và tia đạn."
+
+[node name="ImpactFxPanel" type="PanelContainer" parent="HUD"]
+visible = false
+offset_left = 866.0
+offset_top = 298.0
+offset_right = 1238.0
+offset_bottom = 420.0
+theme_override_styles/panel = SubResource("defeat_card")
+
+[node name="Rows" type="VBoxContainer" parent="HUD/ImpactFxPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ContactSparkQuality" type="OptionButton" parent="HUD/ImpactFxPanel/Rows"]
+layout_mode = 2
+focus_mode = 0
+tooltip_text = "Mức nhẹ giữ tối đa 3 điểm cận chiến gần nhất và 6 tia cho mỗi lần va chạm."
+
+[node name="Opacity" type="HBoxContainer" parent="HUD/ImpactFxPanel/Rows"]
+layout_mode = 2
+
+[node name="Value" type="Label" parent="HUD/ImpactFxPanel/Rows/Opacity"]
+custom_minimum_size = Vector2(145, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Độ rõ · 100%"
+
+[node name="Slider" type="HSlider" parent="HUD/ImpactFxPanel/Rows/Opacity"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+step = 5.0
+value = 100.0
+scrollable = false
+tooltip_text = "0% ẩn tia. Đèn va chạm và hiệu ứng sáng trên zombie hoạt động riêng."
+
+[node name="Duration" type="HBoxContainer" parent="HUD/ImpactFxPanel/Rows"]
+layout_mode = 2
+
+[node name="Value" type="Label" parent="HUD/ImpactFxPanel/Rows/Duration"]
+custom_minimum_size = Vector2(145, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Thời gian · 100%"
+
+[node name="Slider" type="HSlider" parent="HUD/ImpactFxPanel/Rows/Duration"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+min_value = 50.0
+max_value = 200.0
+step = 5.0
+value = 100.0
+scrollable = false
+tooltip_text = "200% cho tia chuyển động và mờ đi trong thời gian gấp đôi."
 
 [node name="RagdollPhysicsButton" type="Button" parent="HUD"]
 offset_left = 762.0
@@ -258,6 +322,7 @@ offset_right = 978.0
 offset_bottom = 294.0
 focus_mode = 0
 toggle_mode = true
+button_group = SubResource("tuning_panels")
 text = "Vật lý ragdoll ▾"
 alignment = 0
 tooltip_text = "Chỉnh khối lượng, độ hãm và biên độ khớp từ cú kết liễu tiếp theo."
@@ -281,6 +346,7 @@ offset_right = 1238.0
 offset_bottom = 294.0
 focus_mode = 0
 toggle_mode = true
+button_group = SubResource("tuning_panels")
 text = "Mix âm thanh ▾"
 alignment = 0
 tooltip_text = "Chỉnh âm lượng tổng và từng lớp âm thanh trong Lab."

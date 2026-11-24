@@ -27,6 +27,8 @@ var _sizes: PackedFloat32Array
 var _random := RandomNumberGenerator.new()
 var _slot := 0
 var _active_count := 0
+var duration_scale := 1.0
+var reduced_budget := false
 
 func setup(research_root: String) -> bool:
 	var path := Source.verified_path(research_root, CURVE_PATH, CURVE_HASH)
@@ -58,6 +60,11 @@ func setup(research_root: String) -> bool:
 	_random.seed = 84713
 	return true
 
+func set_opacity(opacity: float) -> void:
+	visible = opacity > 0.0
+	var material := multimesh.mesh.material as ShaderMaterial
+	material.set_shader_parameter("opacity_scale", opacity)
+
 func burst(point: Vector3, direction: Vector3, normal: Vector3, first_step: float) -> void:
 	# The engine-side impact rotation is approximated from the surface normal.
 	# Native local X points out of the surface and local Z points up.
@@ -65,11 +72,17 @@ func burst(point: Vector3, direction: Vector3, normal: Vector3, first_step: floa
 	var up := Vector3.UP if absf(axis.y) < 0.99 else Vector3.FORWARD
 	var frame := Basis.looking_at(axis, up, true)
 	var outside := point + axis * 0.003
-	for i in _random.randi_range(4, 5):
+	var forward_count := _random.randi_range(4, 5)
+	if reduced_budget:
+		forward_count = 3
+	for i in forward_count:
 		var velocity := _cone_direction(axis, 0.2) * _random.randf_range(11.0, 20.0)
 		_spawn(outside, velocity, -axis * 1.5, Vector2(_random.randf_range(0.08, 0.13), 0.08),
 			_random.randf_range(0.2, 0.4), 9.0, _forward_colors, first_step)
-	for i in _random.randi_range(4, 5):
+	var sphere_count := _random.randi_range(4, 5)
+	if reduced_budget:
+		sphere_count = 3
+	for i in sphere_count:
 		var offset := _cone_direction(Vector3.UP, 1.0) * (0.30 * pow(_random.randf(), 1.0 / 3.0))
 		var velocity := _cone_direction(frame.y, 0.8) * _random.randf_range(5.0, 12.0)
 		_spawn(outside + offset, velocity, Vector3.DOWN * 1.5, Vector2(_random.randf_range(0.09, 0.13), 0.07),
@@ -108,7 +121,7 @@ func advance(delta: float) -> bool:
 	for spark in _particles:
 		if spark.age >= spark.lifetime:
 			continue
-		var step := minf(spark.first_step, delta)
+		var step := minf(spark.first_step, delta) / duration_scale
 		spark.first_step = INF
 		spark.age += step
 		if spark.age >= spark.lifetime:

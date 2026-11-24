@@ -30,6 +30,7 @@ var _sparks_per_contact := SPARKS_PER_CONTACT
 var _pool_limit := CAPACITY
 var _random := RandomNumberGenerator.new()
 var _display_clock: Callable
+var duration_scale := 1.0
 
 func setup(display_clock := Callable()) -> bool:
 	var source := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(128, 128))
@@ -63,6 +64,11 @@ func setup(display_clock := Callable()) -> bool:
 	_random.seed = 58136
 	set_process(false)
 	return true
+
+func set_opacity(opacity: float) -> void:
+	visible = opacity > 0.0
+	var material := _streaks.mesh.material as ShaderMaterial
+	material.set_shader_parameter("opacity_scale", opacity)
 
 func set_reduced_budget(reduced: bool) -> void:
 	_contact_budget = REDUCED_CONTACTS_PER_FRAME if reduced else CONTACTS_PER_FRAME
@@ -104,9 +110,10 @@ func _spawn_burst(point: Vector3, attack_direction: Vector3) -> void:
 
 func _process(delta: float) -> void:
 	# The elapsed frame only advances streaks that were already displayed.
+	var step := delta / duration_scale
 	for spark in _particles:
 		if spark.age < spark.lifetime:
-			spark.age += delta
+			spark.age += step
 	var display_time := float(_display_clock.call()) if not _pending.is_empty() and _display_clock.is_valid() else INF
 	var pending_index := 0
 	while pending_index < _pending.size():
