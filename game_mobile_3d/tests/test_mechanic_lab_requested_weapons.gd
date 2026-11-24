@@ -141,8 +141,8 @@ func check_cold_clip_preparation() -> void:
 	check(menu.selected == 3 and player.animation_player.has_animation_library(CrossPollinator.LIBRARY)
 		and player.animation_player.has_animation_library(CrossPollinator.LOCOMOTION_LIBRARY),
 		"The actual selector installs the complete prepared crossbow libraries")
-	var rest := player.animation_player.get_animation(player.clips[CrossPollinator.RECOVERY].action)
-	var shot := player.animation_player.get_animation(player.clips[CrossPollinator.SHOT].action)
+	var rest: Animation = player.animation_player.get_animation(player.clips[CrossPollinator.RECOVERY].action)
+	var shot: Animation = player.animation_player.get_animation(player.clips[CrossPollinator.SHOT].action)
 	check(rest != null and shot != null and rest != shot,
 		"Aliases for one source keep separate mutable clip resources")
 	equip(menu, 4)
@@ -1250,3 +1250,4 @@ func check_melee_equip_audio(lab: Node3D, menu: OptionButton) -> void:
 	sound.button_pressed = false
 	lab.reset_player()
 	await ticks(12)
+
