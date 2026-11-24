@@ -195,11 +195,11 @@ func check_damage_numbers_during_render_hitch() -> void:
 	var numbers = lab.get_node("CombatEffects/ZombieDamageNumbers")
 	var origin: Vector3 = lab.player.global_position + Vector3.UP * 2.4
 	numbers.add_number(8, origin, Vector3.ZERO)
-	numbers._process(0.0)
-	numbers._process(0.50)
+	numbers.present(0.0)
+	numbers.present(0.50)
 	for i in 100:
 		numbers.add_number(100, origin + Vector3.RIGHT * i * 0.05, Vector3.ZERO)
-	numbers._process(0.22)
+	numbers.present(0.22)
 	check(numbers.multimesh.visible_instance_count == 300 and numbers._numbers.size() == 100,
 		"A long frame expires the earlier number while displaying all 300 new digits")
 	check(numbers._numbers.all(func(number): return number.age == 0.0 and number.centre == number.origin),
@@ -209,30 +209,30 @@ func check_damage_numbers_during_render_hitch() -> void:
 	var farthest = numbers._numbers.front()
 	var nearest = numbers._numbers.back()
 	lab.camera.rotation.y += PI
-	numbers._process(0.0)
+	numbers.present(0.0)
 	check(numbers._numbers.front() == nearest and numbers._numbers.back() == farthest,
 		"Damage numbers update their depth order when the camera reverses")
-	numbers._process(1.0 / 30.0)
+	numbers.present(1.0 / 30.0)
 	check(numbers._numbers.all(func(number): return number.age > 0.0 and number.centre.y > number.origin.y),
 		"New numbers rise on the next frame")
-	numbers._process(0.70)
-	check(numbers.multimesh.visible_instance_count == 0 and not numbers.is_processing(),
+	numbers.present(0.70)
+	check(numbers.multimesh.visible_instance_count == 0 and numbers._numbers.is_empty(),
 		"The last numbers expire and stop updating")
 	lab.camera.rotation = Vector3.ZERO
 	for i in 64:
 		numbers.add_number(i + 10, origin + Vector3.RIGHT * (i % 4) * 0.08, Vector3.ZERO)
 	var queued: Array = numbers._numbers.duplicate()
-	numbers._process(0.0)
+	numbers.present(0.0)
 	check(numbers._numbers == queued,
 		"Overlapping numbers at the same depth draw in hit order")
 	var first_frame: Array = numbers._numbers.duplicate()
-	numbers._process(0.0)
+	numbers.present(0.0)
 	check(numbers._numbers == first_frame and numbers.multimesh.visible_instance_count == 128,
 		"An unchanged view keeps the same ordering of stacked damage glyphs")
 	lab.camera.rotate_y(PI * 0.5)
-	numbers._process(0.0)
+	numbers.present(0.0)
 	lab.camera.rotation = Vector3.ZERO
-	numbers._process(0.0)
+	numbers.present(0.0)
 	check(numbers._numbers == queued, "Returning to equal depth restores the original hit order")
 	lab.free()
 
@@ -248,7 +248,7 @@ func check_overlapping_damage_number_positions() -> void:
 	for value in [10, 11, 12]:
 		numbers.add_number(value, origin, Vector3.ZERO)
 	numbers.add_number(13, origin + side * 3.0, Vector3.ZERO)
-	numbers._process(0.0)
+	numbers.present(0.0)
 	var born := damage_number_rectangles(numbers, camera)
 	check(numbers.multimesh.visible_instance_count == 8,
 		"Every hit retains its two damage digits")
@@ -257,16 +257,16 @@ func check_overlapping_damage_number_positions() -> void:
 	check(born.any(func(frame): return frame.get_center().distance_to(projected) < 0.0001),
 		"A separated number keeps its exact hit anchor")
 	check(damage_number_overlaps(born) == 0, "Simultaneous overlapping hits get separate positions")
-	numbers._process(0.0)
+	numbers.present(0.0)
 	check(damage_number_rectangles(numbers, camera) == born, "The same camera keeps the assigned positions")
-	numbers._process(0.09)
+	numbers.present(0.09)
 	check(damage_number_overlaps(damage_number_rectangles(numbers, camera)) == 0,
 		"The pop reaches its peak without the numbers crossing each other")
 	var assigned := {}
 	for number in numbers._numbers:
 		assigned[number.hit_order] = number.layout_offset
 	numbers.add_number(14, origin, Vector3.ZERO)
-	numbers._process(0.0)
+	numbers.present(0.0)
 	for number in numbers._numbers:
 		if assigned.has(number.hit_order):
 			check(number.layout_offset == assigned[number.hit_order], "A later hit does not move earlier numbers")

@@ -56,7 +56,6 @@ func setup(glyphs: Array[Texture2D]) -> void:
 	multimesh.use_custom_data = true
 	multimesh.instance_count = INITIAL_CAPACITY
 	multimesh.visible_instance_count = 0
-	set_process(false)
 
 func add_number(amount: int, origin: Vector3, lateral: Vector3) -> void:
 	var number := DamageNumber.new()
@@ -66,9 +65,10 @@ func add_number(amount: int, origin: Vector3, lateral: Vector3) -> void:
 	number.origin = origin + lateral * 0.12
 	number.travel = Vector3.UP * 0.74 + lateral * 0.32
 	_numbers.append(number)
-	set_process(true)
 
-func _process(delta: float) -> void:
+func present(delta: float) -> void:
+	if _numbers.is_empty():
+		return
 	var glyph_count := 0
 	var has_new_numbers := false
 	for i in range(_numbers.size() - 1, -1, -1):
@@ -85,7 +85,6 @@ func _process(delta: float) -> void:
 			glyph_count += number.ascii_digits.size()
 	if glyph_count == 0:
 		multimesh.visible_instance_count = 0
-		set_process(false)
 		return
 	if glyph_count > multimesh.instance_count:
 		multimesh.instance_count = nearest_po2(glyph_count)

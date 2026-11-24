@@ -266,6 +266,7 @@ var _player_flash_material: ShaderMaterial
 var _player_flash_meshes: Array[MeshInstance3D] = []
 var _player_overlays: Dictionary[MeshInstance3D, Material] = {}
 var _player_damage_numbers: Node3D
+var _zombie_damage_numbers: DamageNumbers
 var _pending_player_damage := 0
 var _player_damage_tick := -1
 var _player_damage_origin: Vector3
@@ -437,11 +438,11 @@ func _ready() -> void:
 			gait_picker.set_item_tooltip(1, "Cần thư viện Actions & Stuff 1.13 để dùng đủ animation.")
 		var glyphs: Array[Texture2D] = $Zombies.damage_digits()
 		if glyphs.size() == DamageNumbers.DIGIT_COUNT:
-			var numbers := DamageNumbers.new()
-			numbers.name = "ZombieDamageNumbers"
-			numbers.setup(glyphs)
-			$CombatEffects.add_child(numbers)
-			$Zombies.damage_numbers = numbers
+			_zombie_damage_numbers = DamageNumbers.new()
+			_zombie_damage_numbers.name = "ZombieDamageNumbers"
+			_zombie_damage_numbers.setup(glyphs)
+			$CombatEffects.add_child(_zombie_damage_numbers)
+			$Zombies.damage_numbers = _zombie_damage_numbers
 		player.grounded_melee_aim = $Zombies.aim_sabre
 		player.bow_target = $Zombies.bow_aim_point
 		player.bow_drawn.connect(_on_bow_drawn)
@@ -1109,6 +1110,9 @@ func _process(delta: float) -> void:
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
 	if not _pending_melee_feedback.is_empty():
 		_present_melee_feedback(player.render_presenter.display_clock)
+	# Publish glyphs even when this frame activated a previously idle batch.
+	if _zombie_damage_numbers != null:
+		_zombie_damage_numbers.present(delta)
 	if not _player_overlays.is_empty():
 		if _player_flash_pending:
 			_player_flash_pending = false
