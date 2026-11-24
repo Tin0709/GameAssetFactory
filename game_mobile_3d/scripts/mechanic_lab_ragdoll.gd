@@ -46,6 +46,8 @@ var _handoff_box_snapshot: Dictionary[PhysicalBone3D, AABB]
 var _handoff_ray_region: AABB
 var _handoff_region_floor: AABB
 var _handoff_region_wall: AABB
+var _handoff_region_wall_local: AABB
+var _handoff_wall_from_world := Transform3D.IDENTITY
 var _sample_names: Array[String]
 var _sample_bone_ids: Array[int]
 var _sample_body_offsets: Array[Transform3D]
@@ -523,6 +525,8 @@ func _blend_wall_handoff(space: PhysicsDirectSpaceState3D, collision_mask: int,
 	_handoff_ray_region = region
 	_handoff_region_floor = floor_bounds
 	_handoff_region_wall = wall_bounds
+	_handoff_region_wall_local = local_wall_bounds
+	_handoff_wall_from_world = wall_from_world
 	var source: Array[Transform3D] = []
 	for bone in skeleton.get_bone_count():
 		source.append(skeleton.get_bone_pose(bone))
@@ -792,10 +796,18 @@ func _wall_ray_crosses(space: PhysicsDirectSpaceState3D, origin: Vector3, endpoi
 	if _handoff_ray_region.has_volume():
 		# The region query excluded only the known floor and wall boxes.
 		var ray_bounds := AABB(start.min(finish), (finish - start).abs()).grow(PROJECTION_COLLISION_MARGIN)
-		if _handoff_ray_region.encloses(ray_bounds) and not _handoff_region_wall.intersects(ray_bounds) \
-				and not _handoff_region_floor.intersects(ray_bounds):
-			wall_crossings[endpoint] = false
-			return false
+		if _handoff_ray_region.encloses(ray_bounds) and not _handoff_region_floor.intersects(ray_bounds):
+			var clears_wall := not _handoff_region_wall.intersects(ray_bounds)
+			if not clears_wall and _handoff_wall_from_world != Transform3D.IDENTITY:
+				# The world-space box encloses empty space beside a rotated wall.
+				var local_start := _handoff_wall_from_world * start
+				var local_finish := _handoff_wall_from_world * finish
+				var local_bounds := AABB(local_start.min(local_finish),
+					(local_finish - local_start).abs()).grow(PROJECTION_COLLISION_MARGIN)
+				clears_wall = not _handoff_region_wall_local.intersects(local_bounds)
+			if clears_wall:
+				wall_crossings[endpoint] = false
+				return false
 	var crosses := false
 	if start.distance_squared_to(finish) > SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE:
 		_handoff_ray.from = start
@@ -811,6 +823,15 @@ func _wall_ray_crosses(space: PhysicsDirectSpaceState3D, origin: Vector3, endpoi
 func _terrain_contacts_at(body: PhysicalBone3D, space: PhysicsDirectSpaceState3D, pose: Transform3D) -> Array[Vector3]:
 	var query: PhysicsShapeQueryParameters3D = _handoff_query_snapshot.get(body)
 	if query != null:
+		if _handoff_ray_region.has_volume() and _handoff_wall_from_world != Transform3D.IDENTITY:
+			# This snapshot shares the cached query's box and identity shape offset.
+			# Test the exact candidate pose within the floor and wall-only region.
+			var part_box: AABB = _handoff_box_snapshot[body]
+			var wall_box := ((_handoff_wall_from_world * pose) * part_box).grow(PROJECTION_COLLISION_MARGIN)
+			if not _handoff_region_wall_local.intersects(wall_box):
+				var world_box := (pose * part_box).grow(PROJECTION_COLLISION_MARGIN)
+				if _handoff_ray_region.encloses(world_box) and not _handoff_region_floor.intersects(world_box):
+					return []
 		# Set the pose just before the synchronous physics query.
 		query.transform = pose
 		return space.collide_shape(query, 16)
