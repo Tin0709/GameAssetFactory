@@ -12,14 +12,18 @@ class FlashMonitor extends Node:
 	var sparks: MultiMeshInstance3D
 	var light: OmniLight3D
 	var spark_counts: Array[int] = []
+	var first_body_clock := INF
 	var first_flash_clock := INF
 	var first_streak_clock := INF
 
 	func _process(_delta: float) -> void:
 		if hit:
 			var mesh := zombie.get("_mesh") as MeshInstance3D
-			values.append(float(mesh.get_instance_shader_parameter("hit_flash")))
+			var weight := float(mesh.get_instance_shader_parameter("hit_flash"))
+			values.append(weight)
 			var clock: float = actor.render_presenter.display_clock
+			if weight > 0.0 and is_inf(first_body_clock):
+				first_body_clock = clock
 			if light.visible and light.light_energy > 0.0 and is_inf(first_flash_clock):
 				first_flash_clock = clock
 			if sparks != null:
@@ -80,7 +84,8 @@ func check_hit(fatal: bool) -> void:
 	await ticks(2)
 	attack(false)
 	await ticks(36)
-	check(not monitor.values.is_empty() and is_equal_approx(monitor.values[0], 1.0),
+	var visible: Array[float] = monitor.values.filter(func(weight: float): return weight > 0.0)
+	check(not visible.is_empty() and is_equal_approx(visible[0], 1.0),
 		"First displayed hit frame uses full body flash (fatal: %s)" % fatal)
 	check(not monitor.values.is_empty() and is_zero_approx(monitor.values.back())
 		and zombie._mesh.material_overlay == null and not zombie.is_processing(),
@@ -94,6 +99,10 @@ func check_hit(fatal: bool) -> void:
 		and monitor.first_streak_clock >= monitor.pose_time
 		and is_equal_approx(monitor.first_flash_clock, monitor.first_streak_clock),
 		"Grounded contact light and sparks begin together on the displayed contact pose (fatal: %s)" % fatal)
+	check(is_finite(monitor.first_body_clock) and is_equal_approx(monitor.first_body_clock, monitor.first_streak_clock),
+		"The body flash begins with sparks on the displayed contact pose (fatal: %s)" % fatal)
+	print("BODY_FLASH_ONSET fatal=", fatal, " body=", monitor.first_body_clock - monitor.pose_time,
+		" spark=", monitor.first_streak_clock - monitor.pose_time)
 	print("BODY_FLASH fatal=", fatal, " samples=", monitor.values.slice(0, 11))
 	lab.free()
 
