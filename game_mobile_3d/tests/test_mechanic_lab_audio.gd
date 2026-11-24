@@ -2019,23 +2019,39 @@ func check_tool_montage_audio() -> void:
 		await physics_frame
 		push_melee_attack(false)
 		var landing_group := StringName("tool_%s_4" % name)
+		var accent_group := &"tool_shovel_6"
+		var expects_accent := name == "shovel"
 		var heard_landing := false
+		var heard_accent := false
 		for i in Engine.physics_ticks_per_second * 3:
 			await physics_frame
-			if not audio._voice_groups.has(landing_group):
-				continue
 			var source_time: float = player.combo.time
 			var step: float = player.combo.playback_rate() / Engine.physics_ticks_per_second
-			var wanted: float = row[3]
-			check(player.combo.air_landing_started and source_time >= wanted - 0.000002 and source_time <= wanted + step + 0.000002,
-				"%s landing audio at %.6f within one tick of notify %.6f" % [name, source_time, wanted])
-			heard_landing = true
-			played[landing_group] = source_time
-			break
+			if not heard_landing and audio._voice_groups.has(landing_group):
+				var wanted: float = row[3]
+				check(player.combo.air_landing_started and source_time >= wanted - 0.000002 and source_time <= wanted + step + 0.000002,
+					"%s landing audio at %.6f within one tick of notify %.6f" % [name, source_time, wanted])
+				heard_landing = true
+				played[landing_group] = source_time
+			if expects_accent and not heard_accent and audio._voice_groups.has(accent_group):
+				var voice: AudioStreamPlayer3D = audio._voices[audio._voice_groups.find(accent_group)]
+				check(player.combo.air_landing_started and source_time >= 0.466193 and source_time <= 0.466197 + step,
+					"The Shovel dirt layer follows its own montage cue")
+				check(absf(voice.stream.get_length() - 0.069667) < 0.001,
+					"The Shovel dirt layer uses the pinned 70 ms source")
+				heard_accent = true
+				played[accent_group] = source_time
+			if heard_landing and (not expects_accent or heard_accent):
+				break
 		check(heard_landing, "%s plays its own landing sample" % name)
 		for i in 10:
 			await physics_frame
 		check(audio._voice_groups.count(landing_group) == 1, "%s landing plays once even after the damage gate" % name)
+		if expects_accent:
+			check(heard_accent and audio._voice_groups.count(accent_group) == 1,
+				"The Shovel dirt layer plays exactly once alongside the weapon impact")
+		else:
+			check(not audio._voice_groups.has(accent_group), "%s does not use the Shovel dirt layer" % name)
 		print("TOOL_AUDIO_TIMELINE ", name, " ", played)
 
 	lab.reset_player()
