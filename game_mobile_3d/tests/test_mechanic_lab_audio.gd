@@ -2153,7 +2153,114 @@ func check_shovel_recovery_surface_audio(lab, menu: OptionButton) -> void:
 	lab._select_floor_surface(0)
 
 
+func check_bow_impact_audio(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab._select_weapon(lab.Weapon.BOW)
+	var audio = lab._combat_audio
+	var bow = lab._bow
+	check(bow != null, "The Standard Bow is available for impact audio")
+	if bow == null:
+		lab.free()
+		return
+	lab._set_combat_audio(true)
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(1.0, 2.4, 0.12)
+	collider.shape = shape
+	wall.add_child(collider)
+	wall.position = Vector3(0.0, 1.2, 2.8)
+	lab.add_child(wall)
+	var zombies := lab.get_node("Zombies")
+	check(zombies.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects")),
+		"The Bow audio fixture has a living target")
+	if zombies.get_child_count() == 0:
+		lab.free()
+		return
+	var target := zombies.get_child(0) as CharacterBody3D
+	target.set_physics_process(false)
+	target.global_position = Vector3(3.0, 0.0, 0.0)
+	for i in 10:
+		await physics_frame
+	var stone_take: AudioStream
+	for fixture in [[0, &"bow_hit_grass"], [1, &"bow_hit_dirt"], [2, &"bow_hit_stone"],
+			[-1, &"bow_hit_stone"], [-2, &"bow_hit_target"], [0, &""]]:
+		audio.reset()
+		bow.reset()
+		var slot: int = fixture[0]
+		var cue: StringName = fixture[1]
+		var expected := lab.get_node("Ground") as Node3D
+		var origin := Vector3(-1.75, 1.6, 0.0)
+		var direction := Vector3.DOWN
+		if slot >= 0:
+			lab._select_floor_surface(slot)
+		elif slot == -1:
+			expected = wall
+			origin = Vector3(0.0, 1.2, 0.0)
+			direction = Vector3.BACK
+		else:
+			expected = target
+			origin = Vector3(0.0, 1.1, 0.0)
+			direction = Vector3.RIGHT
+		if cue.is_empty():
+			lab._set_combat_audio(false)
+		for voice: AudioStreamPlayer3D in audio._voices:
+			voice.bus = &"Master"
+		var impacts: Array[Dictionary] = []
+		var voices: Array[AudioStreamPlayer3D] = []
+		var routed := func(hit: Dictionary, _direction: Vector3, _serial: int, _strike: Dictionary):
+			impacts.append(hit)
+			for index in audio._voices.size():
+				if cue.is_empty() or audio._voice_groups[index] != cue:
+					continue
+				var voice := audio._voices[index] as AudioStreamPlayer3D
+				voice.bus = AudioServer.get_bus_name(bus)
+				voices.append(voice)
+		bow.arrow_impact.connect(routed)
+		capture.clear_buffer()
+		check(bow.fire_arrow(origin, direction, -601, origin, slot % 2 != 0),
+			"The Standard Bow fires a projectile for the %s fixture" % cue)
+		for i in 18:
+			await physics_frame
+			if not impacts.is_empty():
+				break
+		bow.arrow_impact.disconnect(routed)
+		check(impacts.size() == 1 and impacts[0].collider == expected,
+			"The intended receiver is hit once for %s" % cue)
+		check(voices.size() == int(not cue.is_empty()),
+			"The collision routes one impact voice to %s when audio is on" % cue)
+		if not voices.is_empty():
+			var voice := voices[0]
+			check(voice.global_position.distance_to(impacts[0].position) < 0.001 and voice.stream is AudioStreamWAV,
+				"The local impact take starts at the swept collision")
+			if slot == 2:
+				stone_take = voice.stream
+			elif slot == -1:
+				check(voice.stream != stone_take, "Repeated hard impacts alternate the original takes")
+		await create_timer(0.21).timeout
+		var peak := 0.0
+		for sample in capture.get_buffer(capture.get_frames_available()):
+			peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+		check(peak == 0.0 if cue.is_empty() else peak > 0.004 and peak < 0.5,
+			"The silent mixer captures the isolated %s impact with headroom" % cue)
+		print("BOW_IMPACT_MIX cue=", cue, " peak=", peak, " voices=", voices.size())
+	lab._set_combat_audio(false)
+	lab.free()
+
 func run() -> void:
+	if "--bow-impact" in OS.get_cmdline_user_args():
+		AudioServer.add_bus()
+		var index := AudioServer.bus_count - 1
+		AudioServer.set_bus_name(index, "BowImpactMonitor")
+		var bow_capture := AudioEffectCapture.new()
+		AudioServer.add_bus_effect(index, bow_capture)
+		await check_bow_impact_audio(index, bow_capture)
+		AudioServer.remove_bus(index)
+		print("BOW_IMPACT_AUDIO failures=", failures)
+		quit(int(not failures.is_empty()))
+		return
 
 	if "--tool-montage-audio" in OS.get_cmdline_user_args():
 		await check_tool_montage_audio()
@@ -2258,6 +2365,7 @@ func run() -> void:
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
 	await check_bow_fire_during_crossbow_impacts(bus, capture)
+	await check_bow_impact_audio(bus, capture)
 	await check_equipped_weapon_previews(bus, capture)
 	await check_local_hurt(bus, capture)
 	await check_movement_audio(bus, capture)
