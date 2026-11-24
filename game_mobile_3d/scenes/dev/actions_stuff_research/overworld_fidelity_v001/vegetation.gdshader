@@ -71,6 +71,9 @@ vec4 grass_ground_sky(vec2 world_position) {
 }
 #endif
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
+#ifdef GAF_FOLIAGE_COLOR_MIPS
+uniform sampler2D foliage_color_mips : filter_linear_mipmap, repeat_disable;
+#endif
 #ifdef GAF_GRASS_EDGE_SAMPLING
 uniform sampler2D edge_atlas : filter_linear, repeat_disable;
 #endif
@@ -196,6 +199,19 @@ void vertex(){
 void fragment(){
 	vec4 texel=texture(atlas,UV);
 	vec3 color=texel.rgb;
+#ifdef GAF_FOLIAGE_COLOR_MIPS
+	if (!IN_SHADOW_PASS) {
+		vec2 dx = dFdx(UV);
+		vec2 dy = dFdy(UV);
+		vec2 atlas_size = vec2(textureSize(foliage_color_mips, 0));
+		float footprint = max(length(dx * atlas_size), length(dy * atlas_size));
+		float amount = 0.5 * smoothstep(.72, 1.60, footprint);
+		if (amount > 0.0) {
+			vec4 filtered = textureGrad(foliage_color_mips, UV, dx, dy);
+			color = mix(color, filtered.rgb / max(filtered.a, .03), amount * smoothstep(.035, .15, filtered.a));
+		}
+	}
+#endif
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 	// Flowers and broad leaves use their mesh normals for direct light.
 	study_face=normalize(NORMAL);

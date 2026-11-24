@@ -5259,8 +5259,8 @@ func _build_ui()->void:
 		grass_light.focus_mode=Control.FOCUS_NONE;box.add_child(grass_light);grass_light.toggled.connect(plants.set_grass_lighting)
 		var grass_edges:=CheckButton.new()
 		grass_edges.name="GrassEdgeSampling"
-		grass_edges.text="Khử răng cưa mép cỏ"
-		grass_edges.tooltip_text="Làm mượt mép cắt của cỏ khi dùng Mobile MSAA. Giữ màu pixel và hình dạng bóng cỏ."
+		grass_edges.text="Khử răng cưa thực vật"
+		grass_edges.tooltip_text="Làm mượt mép cắt của cỏ và giảm nhấp nháy màu của hoa, bụi lá ở xa khi dùng Mobile MSAA."
 		grass_edges.button_pressed=plants.grass_edge_sampling_enabled
 		grass_edges.focus_mode=Control.FOCUS_NONE
 		box.add_child(grass_edges)

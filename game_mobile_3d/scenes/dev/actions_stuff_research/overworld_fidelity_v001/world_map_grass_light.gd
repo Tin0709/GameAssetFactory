@@ -77,19 +77,25 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 		if not turf and not material.has_meta("plains_foliage_transmission"):
 			continue
 		var source := FarShadowReceivers.authored_shader(material.shader)
+		var color_mips: Texture2D = material.get_meta("plains_foliage_color_mips", null) if edge_sampling else null
+		var features := Vector2i(int(edge_sampling), int(color_mips != null))
 		var variants:Dictionary=_variants.get_or_add(source,{})
-		if not variants.has(edge_sampling):
+		if not variants.has(features):
 			var variant:=Shader.new();variant.resource_name="Grass lighting · captured world normal"
 			var header:="shader_type spatial;\n#define GAF_REFERENCE_GRASS_LIGHTING"
 			if edge_sampling:header+="\n#define GAF_GRASS_EDGE_SAMPLING"
+			if color_mips != null:
+				header += "\n#define GAF_FOLIAGE_COLOR_MIPS"
 			if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):header+="\n#define GAF_GRASS_FORCE_LAMBERT"
 			variant.code=source.code.replace("shader_type spatial;",header)
-			variants[edge_sampling]=variant
-		var shader:Shader=variants[edge_sampling]
+			variants[features]=variant
+		var shader:Shader=variants[features]
 		_records.append({"material":material,"original":source,"variant":shader,
 			"night_turf_weight":material.get_meta("night_turf_weight",1.)})
 		material.shader=shader
 		if edge_sampling:material.set_shader_parameter("edge_atlas",material.get_shader_parameter("atlas"))
+		if color_mips != null:
+			material.set_shader_parameter("foliage_color_mips",color_mips)
 		material.set_shader_parameter("study_grass_up_weight",weight if turf else 0.)
 		material.set_shader_parameter("study_transmission",material.get_meta("plains_foliage_transmission",.1248))
 	active=not _records.is_empty()

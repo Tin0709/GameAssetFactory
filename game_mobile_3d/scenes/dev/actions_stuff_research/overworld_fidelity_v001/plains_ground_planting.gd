@@ -51,6 +51,9 @@ func _load_variant(bundle: RefCounted, directory: String, row: Dictionary, atlas
 		material.set_shader_parameter("tinted_grass", kind in ["cover", "straw"])
 		if kind == "flowers" or kind == "shrub":
 			material.set_meta("plains_foliage_transmission", .10 if kind == "flowers" else .06)
+			var color_mips := _foliage_color_mips(image)
+			if color_mips != null:
+				material.set_meta("plains_foliage_color_mips", color_mips)
 		if kind == "straw":
 			material.set_meta("night_turf_weight", .55)
 		if kind == "shrub":
@@ -64,6 +67,17 @@ func _load_variant(bundle: RefCounted, directory: String, row: Dictionary, atlas
 	var asset: String = "PlainsA1 | " + row.id
 	bundle.meshes[asset] = mesh
 	return {"asset":asset,"kind":kind,"flower":String(row.color)}
+
+func _foliage_color_mips(source: Image) -> ImageTexture:
+	# Premultiply linear RGB so discarded texels cannot bleed into small petals.
+	var mip := Image.create_empty(source.get_width(), source.get_height(), false, Image.FORMAT_RGBA8)
+	for y in source.get_height():
+		for x in source.get_width():
+			var texel := source.get_pixel(x,y).srgb_to_linear()
+			mip.set_pixel(x,y,Color(texel.r*texel.a,texel.g*texel.a,texel.b*texel.a,texel.a))
+	if mip.generate_mipmaps() != OK:
+		return null
+	return ImageTexture.create_from_image(mip)
 
 func _checked_asset(bundle: RefCounted, directory: String, row: Dictionary, extension: String) -> String:
 	var relative: String = row.relative
