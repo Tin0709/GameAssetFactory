@@ -125,7 +125,15 @@ offset_right = 1140.0
 offset_bottom = 103.0
 focus_mode = 0
 text = "Spawn 100 zombie"
-tooltip_text = "Tạo thêm 100 zombie theo từng đợt ngắn để thử hiệu năng."
+tooltip_text = "Tạo thêm zombie theo từng đợt ngắn để thử hiệu năng."
+
+[node name="CrowdSpawnCount" type="OptionButton" parent="HUD"]
+offset_left = 1152.0
+offset_top = 69.0
+offset_right = 1238.0
+offset_bottom = 103.0
+focus_mode = 0
+tooltip_text = "Số zombie cho lần spawn theo đợt."
 
 [node name="SpawnStatus" type="Label" parent="HUD"]
 offset_left = 18.0

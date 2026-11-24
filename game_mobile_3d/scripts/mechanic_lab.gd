@@ -50,7 +50,8 @@ const MAX_CAMERA_SIZE := 30.0
 const ZOOM_STEP := 1.15
 const SABRE_TAP_BUFFER := 0.16
 const MAX_PLAYER_HEALTH := 100
-const CROWD_SPAWN_COUNT := 100
+const CROWD_SPAWN_COUNTS := [1, 10, 25, 50, 100, 150, 200]
+const DEFAULT_CROWD_SPAWN_COUNT := 100
 const CROWD_SPAWN_LIMIT_PER_FRAME := 5
 const CROWD_SPAWN_BUDGET_USEC := 2500
 const PLAYER_HIT_FLASH_DURATION := 0.10
@@ -112,6 +113,7 @@ var view_mode := "gameplay"
 var spawn_position := SPAWN
 var player_health := MAX_PLAYER_HEALTH
 var _crowd_spawns_left := 0
+var _crowd_spawn_total := 0
 var _crowd_base_health := false
 var _previous_msaa: Viewport.MSAA
 var _previous_3d_scale: float
@@ -242,6 +244,14 @@ func _ready() -> void:
 	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
 	$HUD/SpawnBabyZombie.disabled = $HUD/SpawnZombie.disabled
 	$HUD/SpawnCrowd.disabled = $HUD/SpawnZombie.disabled
+	var crowd_picker: OptionButton = $HUD/CrowdSpawnCount
+	for count: int in CROWD_SPAWN_COUNTS:
+		crowd_picker.add_item(str(count), count)
+	var default_count := crowd_picker.get_item_index(DEFAULT_CROWD_SPAWN_COUNT)
+	crowd_picker.select(default_count)
+	crowd_picker.disabled = $HUD/SpawnCrowd.disabled
+	crowd_picker.item_selected.connect(_set_crowd_spawn_label)
+	_set_crowd_spawn_label(default_count)
 	var gait_picker: OptionButton = $HUD/ZombieGait
 	gait_picker.add_item("Zombie · MD2")
 	gait_picker.add_item("Zombie · Actions & Stuff")
@@ -1406,13 +1416,21 @@ func _spawn_baby_zombie() -> void:
 	else:
 		$HUD/SpawnStatus.text = "Không thể tạo Baby Zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
 
+func _set_crowd_spawn_label(index: int) -> void:
+	$HUD/SpawnCrowd.text = "Spawn %d zombie" % $HUD/CrowdSpawnCount.get_item_id(index)
+
 func _start_crowd_spawn() -> void:
 	if $HUD/SpawnCrowd.disabled or player_health == 0:
 		return
-	_crowd_spawns_left = CROWD_SPAWN_COUNT
+	var count: int = $HUD/CrowdSpawnCount.get_selected_id()
+	if count <= 0:
+		return
+	_crowd_spawn_total = count
+	_crowd_spawns_left = count
 	_crowd_base_health = $HUD/BaseZombieToggle.button_pressed
 	$HUD/SpawnCrowd.disabled = true
-	$HUD/SpawnStatus.text = "Đang tạo zombie… 0/%d" % CROWD_SPAWN_COUNT
+	$HUD/CrowdSpawnCount.disabled = true
+	$HUD/SpawnStatus.text = "Đang tạo zombie… 0/%d" % count
 
 func _spawn_crowd_frame() -> void:
 	var deadline := Time.get_ticks_usec() + CROWD_SPAWN_BUDGET_USEC
@@ -1420,22 +1438,23 @@ func _spawn_crowd_frame() -> void:
 	var limit := mini(_crowd_spawns_left, CROWD_SPAWN_LIMIT_PER_FRAME)
 	var batch: Dictionary = $Zombies.spawn_batch(player, facing, $CombatEffects, _crowd_base_health, limit, deadline)
 	_crowd_spawns_left -= int(batch.count)
+	var created := _crowd_spawn_total - _crowd_spawns_left
 	if batch.blocked:
-		var created := CROWD_SPAWN_COUNT - _crowd_spawns_left
 		_stop_crowd_spawn()
-		$HUD/SpawnStatus.text = "Đã tạo %d/%d zombie. Hãy kiểm tra chỗ trống hoặc dữ liệu MD2." % [created, CROWD_SPAWN_COUNT]
+		$HUD/SpawnStatus.text = "Đã tạo %d/%d zombie. Hãy kiểm tra chỗ trống hoặc dữ liệu MD2." % [created, _crowd_spawn_total]
 		return
 	if _crowd_spawns_left == 0:
 		_stop_crowd_spawn()
-		$HUD/SpawnStatus.text = "Đã tạo %d zombie." % CROWD_SPAWN_COUNT
+		$HUD/SpawnStatus.text = "Đã tạo %d zombie." % created
 	else:
-		$HUD/SpawnStatus.text = "Đang tạo zombie… %d/%d" % [CROWD_SPAWN_COUNT - _crowd_spawns_left, CROWD_SPAWN_COUNT]
+		$HUD/SpawnStatus.text = "Đang tạo zombie… %d/%d" % [created, _crowd_spawn_total]
 
 func _stop_crowd_spawn() -> void:
 	if _crowd_spawns_left > 0:
 		$HUD/SpawnStatus.text = ""
 	_crowd_spawns_left = 0
 	$HUD/SpawnCrowd.disabled = $HUD/SpawnZombie.disabled or player_health == 0
+	$HUD/CrowdSpawnCount.disabled = $HUD/SpawnCrowd.disabled
 
 func _drop_player(height: float) -> void:
 	if player_health == 0:
@@ -1460,6 +1479,7 @@ func _on_player_hit(amount: int) -> void:
 		# The popup captures keyboard input while it is open, including R.
 		$HUD/Weapon.get_popup().hide()
 		$HUD/PlayerSkin.get_popup().hide()
+		$HUD/CrowdSpawnCount.get_popup().hide()
 		$HUD/Weapon.disabled = true
 		$HUD/PlayerSkin.disabled = true
 		$HUD/Defeat.show()
