@@ -10,6 +10,7 @@ uniform float study_transmission=0.1248;
 uniform vec4 petal_sun = vec4(0.0);
 uniform float petal_shadow_return = 0.0;
 uniform float petal_open_return = 0.0;
+uniform float petal_overcast_return = 0.0;
 #endif
 varying vec3 study_face;
 varying float study_tip_weight;
@@ -28,6 +29,15 @@ void light(){
 	bool flower_key = LIGHT_IS_DIRECTIONAL && (petal_sun.w > 0.0 || petal_shadow_return > 0.0) &&
 		dot(mat3(INV_VIEW_MATRIX) * LIGHT, petal_sun.xyz) > .9999;
 	float head = flower_key ? smoothstep(.53, .82, study_tip_weight) : 0.0;
+	float overcast_weight = 0.0;
+	if (petal_overcast_return > 0.0 && head > 0.0) {
+		overcast_weight = petal_overcast_return * head * petal_sun.w * (1.0 - smoothstep(.35, .72, cloud));
+		// Spread part of the muted key across canted petals, with less sky visible under the canopy.
+		float sky = mix(.30, 1.0, study_canopy_sky_at_root);
+		float shelter = mix(.55, 1.0, smoothstep(.20, .80, shadow_attenuation));
+		float incident = dot(LIGHT_COLOR, vec3(.2126, .7152, .0722)) / PI;
+		DIFFUSE_LIGHT += vec3(1.076, .990, .884) * (incident * sky * shelter * .42 * overcast_weight);
+	}
 	if (petal_shadow_return > 0.0 && shadow_attenuation < .72 && head > 0.0) {
 		// The local return tapers through the geometric penumbra and under the canopy.
 		float shade = 1.0 - smoothstep(.12, .72, shadow_attenuation);
@@ -119,6 +129,9 @@ void light(){
 				DIFFUSE_LIGHT += return_tint * (dot(diffuse_color, luma) * returned * open_weight * direct_scale);
 				response = mix(response, vec3(.34 * front), open_weight);
 			}
+		}
+		if (overcast_weight > 0.0) {
+			response *= 1.0 - .65 * overcast_weight;
 		}
 #endif
 		DIFFUSE_LIGHT += response * diffuse_color * (shadow_attenuation * point_transfer * cloud * patch_scale / PI);

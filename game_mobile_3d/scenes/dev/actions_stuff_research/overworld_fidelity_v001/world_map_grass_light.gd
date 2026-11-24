@@ -30,6 +30,7 @@ var _flower_materials: Array[ShaderMaterial] = []
 var _petal_sun := Vector4.INF
 var _petal_shadow_return := -1.
 var _petal_open_return := -1.
+var _petal_overcast_return := -1.
 
 func setup(level:Node3D,reader:RefCounted)->void:
 	world=level
@@ -78,6 +79,7 @@ func restore()->void:
 	_petal_sun = Vector4.INF
 	_petal_shadow_return = -1.
 	_petal_open_return = -1.
+	_petal_overcast_return = -1.
 
 func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->void:
 	restore()
@@ -152,6 +154,11 @@ func sync()->void:
 			_petal_open_return = open_return
 			for material: ShaderMaterial in _flower_materials:
 				material.set_shader_parameter("petal_open_return", open_return)
+	var overcast_return: float = open_return * world.showcase.flower_overcast_weight()
+	if overcast_return != _petal_overcast_return:
+		_petal_overcast_return = overcast_return
+		for material: ShaderMaterial in _flower_materials:
+			material.set_shader_parameter("petal_overcast_return", overcast_return)
 	var step_coverage: float = world.showcase._lighting_scale(&"grass_step_coverage")
 	if step_coverage != _step_coverage:
 		_step_coverage = step_coverage

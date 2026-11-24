@@ -225,7 +225,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"turf_sun_chroma": ["Sắc nắng trên cỏ và mặt cỏ", 1.],
 	&"grass_step_coverage": ["Cỏ sát bậc địa hình", 1.],
 	&"flower_shadow_return": ["Ánh sáng bù cho hoa trong bóng", 1.],
-	&"flower_open_return": ["Ánh sáng dịu trên hoa ngoài nắng", 1.],
+	&"flower_open_return": ["Ánh sáng dịu trên cánh hoa", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
 	&"twilight_grass_albedo": ["Độ dịu lá cỏ chạng vạng", 1.],
 	&"lantern_grass_tone": ["Sắc đèn hông trên cỏ", 1.],
@@ -2795,6 +2795,10 @@ func flower_open_return_strength() -> float:
 	if _biome_profile == null or not is_finite(_biome_profile.flower_open_return):
 		return 0.
 	return clampf(_biome_profile.flower_open_return, 0., 1.) * _lighting_scale(&"flower_open_return")
+
+
+func flower_overcast_weight() -> float:
+	return smoothstep(.18, .82, _weather.weight)
 
 
 func flower_shadow_return_strength() -> float:
