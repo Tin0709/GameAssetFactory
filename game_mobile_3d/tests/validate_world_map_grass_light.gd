@@ -74,6 +74,40 @@ func run()->void:
 				"Grass uses captured up normals while flowers and shrubs keep mesh normals")
 			check(is_equal_approx(mat.get_shader_parameter("study_transmission"),float(mat.get_meta("plains_foliage_transmission",.1248))),
 				"Regional foliage lighting retains the material-specific transmission")
+		var petals: ShaderMaterial = p.grass_light._flower_materials[0]
+		const SHADE_RETURN := &"flower_shadow_return"
+		w.showcase.set_hour(12.)
+		p.grass_light.sync()
+		check(w.showcase._lighting_sliders.has(SHADE_RETURN), "Petal shade return has a graphics slider")
+		check(is_equal_approx(float(petals.get_shader_parameter("petal_shadow_return")), .0516),
+			"Default noon applies the mild petal shadow return")
+		var petal_source := petals.shader
+		w.showcase.set_lighting_scale(SHADE_RETURN, .5)
+		check(is_equal_approx(float(petals.get_shader_parameter("petal_shadow_return")), .0258) and petals.shader == petal_source,
+			"The slider changes only the strength of the existing flower material")
+		w.showcase.set_hour(22.)
+		p.grass_light.sync()
+		check(float(petals.get_shader_parameter("petal_shadow_return")) == 0., "Petal shade return is off at night")
+		w.showcase.set_hour(12.)
+		p.grass_light.sync()
+		var flower_preset := "user://petal_shade_%d.cfg" % OS.get_process_id()
+		check(w.showcase.save_lighting_mix(flower_preset) == OK, "Petal shade return saves with the graphics preset")
+		w.showcase.set_lighting_scale(SHADE_RETURN, 0.)
+		check(w.showcase.load_lighting_mix(flower_preset) == OK, "The petal shade preset reloads")
+		p.grass_light.sync()
+		check(is_equal_approx(float(petals.get_shader_parameter("petal_shadow_return")), .0258),
+			"The preset restores the selected petal shade strength")
+		var previous_preset := ConfigFile.new()
+		if previous_preset.load(flower_preset) == OK:
+			previous_preset.set_value("recipe", "version", 233)
+			previous_preset.erase_section_key("strengths", SHADE_RETURN)
+			check(previous_preset.save(flower_preset) == OK and w.showcase.load_lighting_mix(flower_preset) == OK,
+				"The existing lighting preset format still loads")
+			p.grass_light.sync()
+			check(float(petals.get_shader_parameter("petal_shadow_return")) == 0.,
+				"Previous saved presets keep their previous petal lighting")
+		DirAccess.remove_absolute(flower_preset)
+		w.showcase.reset_lighting_mix()
 		var foliage_filters := 0
 		var msaa_active: bool = root.msaa_3d != Viewport.MSAA_DISABLED
 		for mat: ShaderMaterial in p.materials:
