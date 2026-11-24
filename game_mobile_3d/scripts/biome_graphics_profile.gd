@@ -253,6 +253,9 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Game clock window for the final sunset fade. An empty interval disables it.
 @export var dusk_key_fade_hours := Vector2.ZERO
 @export_range(0., 1., .01) var dusk_key_fade_strength := 0.
+## Optional clock hours for fading the key, starting its turn and finishing the turn.
+## The verified afternoon track supplies the defaults when this is zero.
+@export var dusk_shadow_handoff_hours := Vector3.ZERO
 ## Ambient multiplier before weather, in normalized hours. An empty track uses 1.
 @export var ambient_energy_by_hour: Curve
 ## Signed ambient color weight in normalized hours.

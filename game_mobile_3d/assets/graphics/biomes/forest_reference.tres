@@ -164,6 +164,7 @@ projected_path_recovery_overcast_scale = 0.7
 afternoon_key_by_hour = SubResource("AfternoonKey")
 dusk_key_fade_hours = Vector2(18.9, 19.5)
 dusk_key_fade_strength = 0.7
+dusk_shadow_handoff_hours = Vector3(19.2, 19.392, 19.412)
 ambient_energy_by_hour = SubResource("ForestAmbientHours")
 ambient_tint_by_hour = SubResource("ForestAmbientTintHours")
 ambient_tint_ratio = Vector3(0.79, 1, 1.34)

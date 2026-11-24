@@ -133,11 +133,12 @@ func apply(sun: DirectionalLight3D) -> void:
 	var stock := sun.global_basis.z.normalized()
 	var direction := sin(tilt) * _noon_axis + cos(tilt) * Vector3.UP
 	var frame := Basis(_right, direction.cross(_right).normalized(), direction)
-	if hour > _sunset.x:
-		var restart := smoothstep(_sunset.z, LAST_HOUR, hour)
-		sun.light_energy *= _sunlight_fade(sun, hour) + restart
-	if hour > _sunset.y:
-		var blend := smoothstep(_sunset.y, _sunset.z, hour)
+	var handoff := sunset_handoff_hours()
+	if hour > handoff.x:
+		var restart := smoothstep(handoff.z, LAST_HOUR, hour)
+		sun.light_energy *= _sunlight_fade(sun, hour, Vector2(handoff.x, handoff.y)) + restart
+	if hour > handoff.y:
+		var blend := smoothstep(handoff.y, handoff.z, hour)
 		var yaw := lerp_angle(atan2(direction.x, direction.z), atan2(stock.x, stock.z), blend)
 		var height := lerpf(asin(direction.y), asin(stock.y), blend)
 		direction = Vector3(sin(yaw) * cos(height), sin(height), cos(yaw) * cos(height))
@@ -146,19 +147,29 @@ func apply(sun: DirectionalLight3D) -> void:
 	sun.global_basis = frame
 
 
-func _sunlight_fade(sun: DirectionalLight3D, hour: float) -> float:
-	if hour >= _sunset.y:
+func sunset_handoff_hours() -> Vector3:
+	var profile: Resource = _review._biome_profile if _review != null else null
+	if profile == null:
+		return _sunset
+	var hours: Vector3 = profile.dusk_shadow_handoff_hours
+	if not hours.is_finite() or hours.x <= 12. or hours.x >= hours.y or hours.y >= hours.z or hours.z >= LAST_HOUR:
+		return _sunset
+	return _sunset.lerp(hours, clampf(_review._lighting_scale(&"dusk_key_fade"), 0., 1.))
+
+
+func _sunlight_fade(sun: DirectionalLight3D, hour: float, window: Vector2) -> float:
+	if hour >= window.y:
 		return 0.
-	var phase := smoothstep(_sunset.x, _sunset.y, hour)
+	var phase := smoothstep(window.x, window.y, hour)
 	if not _review.key_response_active or not _review._dusk_key_fade_available():
 		return 1. - phase
 	var h: Vector2 = _review._biome_profile.dusk_key_fade_hours
 	var amount: float = _review._biome_profile.dusk_key_fade_strength * _review._lighting_scale(&"dusk_key_fade")
-	var key: Vector3 = _review.key_response.smooth_dusk_energy(_review._captured_key_rgb(_sunset.y),
-		_review._captured_key_rgb(h.x), _review._captured_key_rgb(h.y), inverse_lerp(h.x, h.y, _sunset.y), amount)
+	var key: Vector3 = _review.key_response.smooth_dusk_energy(_review._captured_key_rgb(window.y),
+		_review._captured_key_rgb(h.x), _review._captured_key_rgb(h.y), inverse_lerp(h.x, h.y, window.y), amount)
 	var color := sun.light_color.srgb_to_linear()
 	var incoming := sun.light_energy * Vector3(color.r, color.g, color.b).dot(LUMA)
-	var cutoff: float = key.dot(LUMA) * _review._lighting_scale(&"sun") * _review.noon_direct_scale(_sunset.y)
+	var cutoff: float = key.dot(LUMA) * _review._lighting_scale(&"sun") * _review.noon_direct_scale(window.y)
 	return clampf(1. - cutoff * phase / maxf(incoming, .000001), 0., 1.)
 
 
