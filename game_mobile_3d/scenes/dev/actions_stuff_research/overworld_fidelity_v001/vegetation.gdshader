@@ -141,7 +141,7 @@ void vertex(){
 	vec2 bend=vec2(0.0);
 	float cast_wind = 1.0;
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
-	if (IN_SHADOW_PASS && PROJECTION_MATRIX[3][3] > .5) {
+	if (tinted_grass && IN_SHADOW_PASS && PROJECTION_MATRIX[3][3] > .5) {
 		cast_wind = study_grass_shadow_wind;
 	}
 #endif
@@ -175,7 +175,7 @@ void vertex(){
 	VERTEX+=(inverse(MODEL_MATRIX)*vec4(world_offset,0.0)).xyz;
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 	// Only the orthographic shadow draw uses the corrected blade height.
-	if (IN_SHADOW_PASS && PROJECTION_MATRIX[3][3] > .5) {
+	if (tinted_grass && IN_SHADOW_PASS && PROJECTION_MATRIX[3][3] > .5) {
 		VERTEX.y *= study_grass_shadow_height;
 		if (study_grass_shadow_footprint < 1.0) {
 			VERTEX.xz = mix(UV2.xy, VERTEX.xz, study_grass_shadow_footprint);
@@ -196,6 +196,10 @@ void vertex(){
 void fragment(){
 	vec4 texel=texture(atlas,UV);
 	vec3 color=texel.rgb;
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+	// Flowers and broad leaves use their mesh normals for direct light.
+	study_face=normalize(NORMAL);
+#endif
 	if(tinted_grass){
 		// Preserve the authored upward grass normals on both sides, as in the
 		// existing lab. Automatic backface flipping otherwise makes dark stripes.

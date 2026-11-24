@@ -49,6 +49,8 @@ func _load_variant(bundle: RefCounted, directory: String, row: Dictionary, atlas
 			return {}
 		var material := NativePlant.plant_material(bundle, image)
 		material.set_shader_parameter("tinted_grass", kind in ["cover", "straw"])
+		if kind == "flowers" or kind == "shrub":
+			material.set_meta("plains_foliage_transmission", .10 if kind == "flowers" else .06)
 		if kind == "straw":
 			material.set_meta("night_turf_weight", .55)
 		if kind == "shrub":

@@ -61,11 +61,11 @@ void light(){
 		float gain = gaf_opening_gain(LIGHT_IS_DIRECTIONAL, shadow_attenuation * cloud);
 		vec3 diffuse_color = LIGHT_COLOR * gain;
 		float turf_sun = gaf_turf_sun_weight(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX, shadow_attenuation * cloud);
-		if (turf_sun > 0.0) {
+		if (tinted_grass && turf_sun > 0.0) {
 			diffuse_color *= gaf_diffuse_chroma_scale(ALBEDO, diffuse_color, vec3(1.25, 1.0, 1.40), turf_sun);
 		}
 		// The identity transfer is returned for non-lantern lights and other cameras.
-		if (gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && gaf_is_player_point(LIGHT_IS_DIRECTIONAL, LIGHT_COLOR.b)) {
+		if (tinted_grass && gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && gaf_is_player_point(LIGHT_IS_DIRECTIONAL, LIGHT_COLOR.b)) {
 			diffuse_color *= gaf_diffuse_chroma_scale(ALBEDO, LIGHT_COLOR, vec3(1.247, 1.0, 1.078), gaf_lantern_grass_tone);
 		}
 		float patch_scale = gaf_projected_patch_scale(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,

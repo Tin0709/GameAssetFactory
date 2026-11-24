@@ -73,7 +73,9 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 	restore()
 	if not enabled or not supported():return
 	for material:ShaderMaterial in materials:
-		if material.get_shader_parameter("tinted_grass")!=true:continue
+		var turf: bool = material.get_shader_parameter("tinted_grass") == true
+		if not turf and not material.has_meta("plains_foliage_transmission"):
+			continue
 		var source := FarShadowReceivers.authored_shader(material.shader)
 		var variants:Dictionary=_variants.get_or_add(source,{})
 		if not variants.has(edge_sampling):
@@ -88,8 +90,8 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 			"night_turf_weight":material.get_meta("night_turf_weight",1.)})
 		material.shader=shader
 		if edge_sampling:material.set_shader_parameter("edge_atlas",material.get_shader_parameter("atlas"))
-		material.set_shader_parameter("study_grass_up_weight",weight)
-		material.set_shader_parameter("study_transmission",.1248)
+		material.set_shader_parameter("study_grass_up_weight",weight if turf else 0.)
+		material.set_shader_parameter("study_transmission",material.get_meta("plains_foliage_transmission",.1248))
 	active=not _records.is_empty()
 	edge_sampling_active=active and edge_sampling
 	if world.terrain_light != null:

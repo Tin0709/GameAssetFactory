@@ -69,8 +69,16 @@ func run()->void:
 		w.showcase.reset_lighting_mix()
 		for mat:ShaderMaterial in p.materials:
 			check(mat.shader!=original[mat],"Only shader changes for reference lighting")
-			check(mat.get_shader_parameter("study_grass_up_weight")==1.,"Captured world normal uniform applied")
-		for node:Node in p.get_children():check(node.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_ON,"Grass can cast real alpha-tested shadows")
+			var turf: bool = mat.get_shader_parameter("tinted_grass") == true
+			check(mat.get_shader_parameter("study_grass_up_weight")== (1. if turf else 0.),
+				"Grass uses captured up normals while flowers and shrubs keep mesh normals")
+			check(is_equal_approx(mat.get_shader_parameter("study_transmission"),float(mat.get_meta("plains_foliage_transmission",.1248))),
+				"Regional foliage lighting retains the material-specific transmission")
+		for node:MultiMeshInstance3D in p.get_children():
+			var plant_material := node.multimesh.mesh.surface_get_material(0) as ShaderMaterial
+			var casts: bool = plant_material.get_shader_parameter("tinted_grass") == true or plant_material.get_meta("plains_shrub", false)
+			check(node.cast_shadow == (GeometryInstance3D.SHADOW_CASTING_SETTING_ON if casts else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF),
+				"Grass and shrubs cast alpha-tested shadows while flowers receive them")
 	p.set_grass_lighting(false)
 	for mat:ShaderMaterial in p.materials:check(mat.shader==original[mat],"OFF restores exact legacy shader resource")
 	p.set_grass_lighting(true)
