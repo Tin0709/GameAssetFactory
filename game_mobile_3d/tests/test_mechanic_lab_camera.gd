@@ -48,6 +48,7 @@ func run() -> void:
 	check_shake_slider(lab)
 	check_contact_render_hitch(lab)
 	await check_sabre_dive(lab)
+	await check_sabre_impact_support(lab)
 	if DisplayServer.get_name() != "headless":
 		await check_sabre_dive_presentation(lab)
 	await check_aerial_contact_pose(lab)
@@ -165,6 +166,58 @@ func check_sabre_dive(lab) -> void:
 				"Target damage keeps its own key and cannot replace the landing flash")
 			target.free()
 		print("SABRE_DIVE_SHAKE touchdown=", landings[attempt], " onset=", onset, " flash=", flash_frame, " burst=", burst_frame)
+
+func check_sabre_impact_support(lab) -> void:
+	for fixture in ["flat", "ledge", "wall"]:
+		lab.reset_player()
+		var forward: Vector3 = lab.player.visual.global_basis.z.slide(Vector3.UP).normalized()
+		var floor_height := 0.4 if fixture == "ledge" else 0.0
+		var blocker: StaticBody3D
+		if fixture != "flat":
+			blocker = StaticBody3D.new()
+			var shape := BoxShape3D.new()
+			var collision := CollisionShape3D.new()
+			collision.shape = shape
+			blocker.add_child(collision)
+			if fixture == "ledge":
+				shape.size = Vector3(1.0, floor_height, 1.0)
+				blocker.position.y = floor_height * 0.5
+				lab.player.position.y += floor_height
+			else:
+				shape.size = Vector3(2.0, 2.0, 0.2)
+				blocker.basis = Basis.looking_at(forward, Vector3.UP, true)
+				blocker.position = forward + Vector3.UP
+			lab.add_child(blocker)
+		for i in 8:
+			await physics_frame
+		var damage_centres: Array[Vector3] = []
+		lab.get_node("Zombies").sabre_landing.connect(func(point: Vector3, _serial: int):
+			damage_centres.append(point), CONNECT_ONE_SHOT)
+		await start_sabre_dive(lab)
+		for i in Engine.physics_ticks_per_second:
+			await physics_frame
+			if lab._light_sample_time >= 0.0:
+				break
+		check(damage_centres.size() == 1 and lab._light_sample_time >= 0.0,
+			"A Sabre dive emits both combat and presentation cues on %s" % fixture)
+		if not damage_centres.is_empty():
+			var light: Vector3 = lab._impact_light.global_position
+			var origin: Vector3 = lab.player.global_position
+			var reach := (light - origin).dot(forward)
+			check(absf((damage_centres[0] - origin).dot(forward) - 1.5) < 0.02,
+				"The Sabre damage centre stays 1.5 m ahead on %s" % fixture)
+			check(absf(light.y - floor_height - 0.60) < 0.02, "The flash uses the touchdown height on %s" % fixture)
+			match fixture:
+				"flat":
+					check(absf(reach - 1.5) < 0.02, "On flat ground the flash keeps its original reach")
+				"ledge":
+					check(absf(light.x) < 0.5 and absf(light.z) < 0.5, "The flash stays on the raised ledge")
+				"wall":
+					check(reach > 0.5 and reach < 0.9, "The flash stays in front of the wall")
+			print("SABRE_IMPACT_SUPPORT ", fixture, " reach=", reach, " light=", light, " damage=", damage_centres[0])
+		if blocker != null:
+			blocker.free()
+	lab.reset_player()
 
 func start_sabre_dive(lab) -> void:
 	lab.get_node("HUD/DropMedium").pressed.emit()
