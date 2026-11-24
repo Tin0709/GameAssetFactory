@@ -77,8 +77,8 @@ func run() -> void:
 	var shake_contacts: Array[int] = []
 	var sampled_contacts: Array[Dictionary] = []
 	var hit_choices: Array[int] = []
-	group.sabre_contact.connect(func(point, _direction, _clip, index, serial, _lethal):
-		if point.distance_to(target.global_position) < 2.0:
+	group.sabre_contact.connect(func(point, _direction, clip, index, serial, _lethal):
+		if clip != "AirAttack" and point.distance_to(target.global_position) < 2.0:
 			damage.append(target.health)
 			hit_choices.append(combat_audio._next_choice.get(&"curved_hit", -1))
 			sampled_contacts.append({"tick": Engine.get_physics_frames(), "index": index, "serial": serial}))
@@ -139,49 +139,80 @@ func run() -> void:
 
 func check_aerial_attack(lab: Node3D, group: Node3D, primary: Node3D, nearby: Node3D) -> void:
 	var actor = lab.player
-	lab.reset_player()
-	await ticks(12)
-	primary.health = 100
-	nearby.health = 100
-	var forward: Vector3 = actor.visual.global_basis.z
-	primary.global_position = actor.global_position + forward * 1.50
-	nearby.global_position = primary.global_position + actor.visual.global_basis.x * 2.05
-	var touchdown: Array[int] = []
-	var impacts: Array[int] = []
-	var land := func(_point, _direction, _serial, _fall):
-		touchdown.append(Engine.get_physics_frames())
-	var contact := func(_point, _direction, clip, _index, _serial, _lethal):
-		if clip == "AirAttack":
-			impacts.append(Engine.get_physics_frames())
-	actor.heavy_jump_landed.connect(land)
-	group.sabre_contact.connect(contact)
-	check(not lab.get_node("HUD/DropMedium").disabled and actor.drop_for_lab(3.0),
-		"The equipped Curved Greatsword can use the Lab's drop and aerial attack")
-	await ticks(3)
-	attack(true)
-	await ticks(3)
-	attack(false)
-	check(actor.combo.phase == &"air_attack" and actor.clips.AirAttack.source_name == "Player_2H_Medium_JumpAttack",
-		"The aerial press uses the two-handed source pose")
-	var first_ribbon := INF
-	var shake_frame := -1
-	for i in 76:
-		await physics_frame
-		if touchdown.is_empty():
-			check(primary.health == 100 and nearby.health == 100 and actor.effects.samples.is_empty(),
-				"The Curved Greatsword does not slash or damage targets before landing")
-		elif not actor.effects.samples.is_empty() and is_inf(first_ribbon):
-			first_ribbon = actor.effects.samples[0].time
-		if shake_frame < 0 and lab._shake_serial == actor.combo.serial:
-			shake_frame = Engine.get_physics_frames()
-	check(touchdown.size() == 1 and impacts.size() == 2 and impacts.all(func(tick): return tick > touchdown[0]),
-		"One landing resolves both targets after physical touchdown")
-	check(primary.health == 80 and nearby.health == 94, "The standard sword uses 20 direct and 6 splash damage")
-	check(is_finite(first_ribbon) and shake_frame > 0, "The landing shows a timed blade ribbon and camera shake")
-	check(not actor.combo.active(), "The two-handed landing finishes its recovery")
-	print("CURVED_AIR touchdown=", touchdown, " impacts=", impacts, " ribbon=", first_ribbon, " shake=", shake_frame)
-	actor.heavy_jump_landed.disconnect(land)
-	group.sabre_contact.disconnect(contact)
+	var mesh: Mesh = actor.effects.ribbon.mesh
+	for blocked: bool in [false, true]:
+		lab.reset_player()
+		await ticks(12)
+		primary.health = 100
+		nearby.health = 100
+		var origin: Vector3 = actor.global_position
+		var forward: Vector3 = actor.visual.global_basis.z
+		primary.global_position = origin + forward * 1.50
+		nearby.global_position = primary.global_position + actor.visual.global_basis.x * 2.05
+		var wall: StaticBody3D
+		if blocked:
+			wall = StaticBody3D.new()
+			wall.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true), origin + forward * 0.92 + Vector3.UP * 2.5)
+			var box := BoxShape3D.new()
+			box.size = Vector3(6.0, 5.0, 0.20)
+			var collider := CollisionShape3D.new()
+			collider.shape = box
+			wall.add_child(collider)
+			lab.add_child(wall)
+			await physics_frame
+		var touchdown: Array[int] = []
+		var impacts: Array[int] = []
+		var land := func(_point, _direction, _serial, _fall):
+			touchdown.append(Engine.get_physics_frames())
+		var contact := func(_point, _direction, clip, _index, _serial, _lethal):
+			if clip == "AirAttack":
+				impacts.append(Engine.get_physics_frames())
+		actor.heavy_jump_landed.connect(land)
+		group.sabre_contact.connect(contact)
+		check(not lab.get_node("HUD/DropMedium").disabled, "The Curved Greatsword enables the Lab drop buttons")
+		check(actor.drop_for_lab(3.0), "The Curved Greatsword fixture starts a drop")
+		await ticks(3)
+		attack(true)
+		await ticks(3)
+		attack(false)
+		check(actor.combo.phase == &"air_attack" and actor.clips.AirAttack.source_name == "Player_2H_Medium_JumpAttack",
+			"The aerial press uses the two-handed source pose")
+		var early_feedback := false
+		var first_ribbon := INF
+		var furthest := -INF
+		var shake_frame := -1
+		var resume := -1.0
+		for i in int(1.33 * Engine.physics_ticks_per_second):
+			await physics_frame
+			if touchdown.is_empty():
+				early_feedback = early_feedback or primary.health != 100 or nearby.health != 100 or not actor.effects.samples.is_empty()
+			elif not actor.effects.samples.is_empty() and is_inf(first_ribbon):
+				first_ribbon = actor.effects.samples[0].time
+			if shake_frame < 0 and lab._shake_serial == actor.combo.serial:
+				shake_frame = Engine.get_physics_frames()
+			if resume < 0.0 and actor.combo.phase == &"air_attack" and actor.combo.movement_allowed():
+				resume = actor.combo.time
+			if mesh.get_surface_count() > 0:
+				for vertex: Vector3 in mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]:
+					furthest = maxf(furthest, (vertex - origin).dot(forward))
+		check(not early_feedback, "The Curved Greatsword does not slash or damage targets before landing")
+		check(touchdown.size() == 1 and shake_frame > 0, "One landing schedules the camera shake")
+		check(resume >= 0.712 and resume <= 0.713 + 1.0 / Engine.physics_ticks_per_second
+			and not actor.combo.active(), "The two-handed landing releases movement before the end of recovery")
+		if blocked:
+			check(impacts.is_empty() and primary.health == 100 and nearby.health == 100,
+				"The landing cannot damage targets through a solid wall")
+			check(furthest <= 0.8201, "The landing ribbon cannot extend through a solid wall")
+			wall.free()
+		else:
+			check(touchdown.size() == 1 and impacts.size() == 2 and impacts.all(func(tick): return tick > touchdown[0]),
+				"One landing resolves both targets after physical touchdown")
+			check(primary.health == 80 and nearby.health == 94, "The standard sword uses 20 direct and 6 splash damage")
+			check(is_finite(first_ribbon) and furthest > 2.0, "The landing shows the forward blade ribbon")
+		print("CURVED_AIR blocked=", blocked, " touchdown=", touchdown, " impacts=", impacts,
+			" ribbon=", first_ribbon, " extent=", furthest, " shake=", shake_frame, " resume=", resume)
+		actor.heavy_jump_landed.disconnect(land)
+		group.sabre_contact.disconnect(contact)
 
 func check_locomotion(lab: Node) -> void:
 	var actor = lab.player
