@@ -187,7 +187,8 @@ func check_sabre_dive(lab, selector: OptionButton) -> void:
 func check_wall_ribbons(lab, selector: OptionButton) -> void:
 	for slot in [0, 10]:
 		for airborne in [false, true]:
-			for blocked in [false, true]:
+			var wall_faces := [INF, 0.9, 1.35] if airborne and slot == 10 else [INF, 0.9]
+			for wall_face: float in wall_faces:
 				lab.reset_player()
 				for i in 8:
 					await physics_frame
@@ -196,9 +197,10 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 				var actor: CharacterBody3D = lab.player
 				var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
 				var wall: StaticBody3D
-				if blocked:
+				if is_finite(wall_face):
 					wall = StaticBody3D.new()
-					wall.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true), forward + Vector3.UP * 2.5)
+					wall.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true),
+						forward * (wall_face + 0.1) + Vector3.UP * 2.5)
 					var shape := BoxShape3D.new()
 					shape.size = Vector3(4.0, 5.0, 0.2)
 					var collider := CollisionShape3D.new()
@@ -217,7 +219,8 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 				var frames := 0
 				var furthest := -INF
 				var nearest := INF
-				for i in Engine.physics_ticks_per_second:
+				var until := Engine.get_physics_frames() + Engine.physics_ticks_per_second
+				while Engine.get_physics_frames() < until:
 					await process_frame
 					if mesh.get_surface_count() == 0:
 						continue
@@ -225,13 +228,17 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 					for point: Vector3 in mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]:
 						furthest = maxf(furthest, point.dot(forward))
 						nearest = minf(nearest, point.dot(forward))
-				var context := "%s air=%s wall=%s" % [selector.get_item_text(slot), airborne, blocked]
-				check(frames > 0, "The unobstructed portion of the ribbon still draws for %s" % context)
-				if blocked:
-					check(furthest <= 0.9001, "The ribbon ends on the player's side of the wall for %s" % context)
+				var context := "%s air=%s wall=%s" % [selector.get_item_text(slot), airborne, wall_face]
+				if slot == 10 and airborne and wall_face == 0.9:
+					check(frames == 0, "A wall entirely in front of the Axe dive's ribbon hides it")
+				else:
+					check(frames > 0, "The unobstructed portion of the ribbon still draws for %s" % context)
+				if wall != null:
+					check(furthest <= wall_face + 0.0001, "The ribbon ends on the player's side of the wall for %s" % context)
 					wall.free()
 				elif airborne and slot == 10:
-					check(furthest > 1.1, "The clear Axe dive extends into the space occupied by the fixture wall")
+					check(nearest > 0.9 and nearest < 1.35 and furthest > 1.35,
+						"The clear Axe dive is fully beyond the near wall and straddles the distant wall")
 				print("RIBBON_WALL ", context, " frames=", frames, " nearest=", nearest, " furthest=", furthest)
 
 func check_world_map_slash() -> void:

@@ -89,7 +89,8 @@ func _sample_trail_edge(delta: float, edge_age: float, base: Vector3, tip: Vecto
 
 func _trail_sample(base: Vector3, tip: Vector3, time: float) -> Dictionary:
 	var tip_u := float(trail_end_fraction.call(base, tip)) if trail_end_fraction.is_valid() else 1.0
-	return {"base": base, "tip": base.lerp(tip, tip_u), "tip_u": tip_u, "time": time}
+	var end := tip if tip_u == 1.0 else base.lerp(tip, tip_u)
+	return {"base": base, "tip": end, "tip_u": tip_u, "time": time}
 
 func _burst(point:Vector3,direction:Vector3,publish_sample:=false)->void:
 	bursts+=1;var added:=0
