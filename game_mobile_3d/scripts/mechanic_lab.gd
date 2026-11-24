@@ -1461,6 +1461,8 @@ func _heavy_debris_delay() -> float:
 func _on_attack_accepted_timed(index: int, clip: String, serial: int, at: float) -> void:
 	if MELEE_AUDIO_NAMES.has(_equipped_weapon):
 		var airborne := clip == "AirAttack"
+		if airborne and player.clips.AirAttack.has("flight_audio_time"):
+			return
 		# Positive montage offsets are dispatched as the clip crosses the notify.
 		if not airborne and player.combo.native_enabled \
 				and player.combo.native_windows[index].get("swing_audio_time", 0.0) > 0.0:
@@ -1474,7 +1476,7 @@ func _on_attack_accepted_timed(index: int, clip: String, serial: int, at: float)
 func _on_tool_audio_cue(index: int, landing: bool, serial: int) -> void:
 	var tool: StringName = MELEE_AUDIO_NAMES[_equipped_weapon]
 	if not landing:
-		_combat_audio.tool_swung(tool, player.global_position + Vector3.UP, index, false)
+		_combat_audio.tool_swung(tool, player.global_position + Vector3.UP, index, player.combo.phase == &"air_attack")
 	elif _tool_touchdown.get("serial") == serial:
 		var point: Vector3 = _tool_touchdown.origin + _tool_touchdown.forward * $Zombies.air_centre_offset()
 		_combat_audio.tool_landed(tool, point)

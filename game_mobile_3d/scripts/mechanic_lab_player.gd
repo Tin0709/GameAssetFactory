@@ -466,6 +466,11 @@ func _animate(delta: float) -> void:
 	var previous_time: float = combo.time
 	var previous_serial: int = combo.serial
 	super._animate(delta)
+	if review_clip.is_empty() and not _grounded and combo.phase == &"air_attack":
+		var cue_start := previous_time if combo.serial == previous_serial else 0.0
+		var flight_time: float = clips.AirAttack.get("flight_audio_time", 0.0)
+		if cue_start < flight_time and flight_time <= combo.time:
+			tool_audio_cue.emit(combo.index, false, combo.serial)
 	if _grounded and review_clip.is_empty():
 		var same_attack: bool = combo.serial == previous_serial
 		var cue_start := previous_time if same_attack else 0.0

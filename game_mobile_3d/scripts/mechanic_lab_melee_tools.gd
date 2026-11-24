@@ -116,6 +116,11 @@ const GROUND_SWING_AUDIO := {
 	Tool.PICKAXE: Vector3(0.0, 0.017121, 0.186744),
 	Tool.SHOVEL: Vector3(0.175533, 0.251809, 0.0),
 }
+const FLIGHT_WEAPON_AUDIO := {
+	# The Pickaxe notify is at AttackLoop plus its cooked trigger offset.
+	Tool.PICKAXE: 0.033385,
+	Tool.SHOVEL: 0.338963,
+}
 const LANDING_WEAPON_AUDIO := {
 	Tool.CLEAVER: 0.258477,
 	Tool.PICKAXE: 0.624878,
@@ -324,6 +329,8 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 		result.windows.append(window)
 	var air := _clip(root, AIR_CLIPS[tool], air_clip(tool), "attack")
 	air.air_trails = AIR_TRAILS[tool]
+	if FLIGHT_WEAPON_AUDIO.has(tool):
+		air.flight_audio_time = FLIGHT_WEAPON_AUDIO[tool]
 	if LANDING_WEAPON_AUDIO.has(tool):
 		air.landing_audio_time = LANDING_WEAPON_AUDIO[tool]
 	if tool == Tool.SHOVEL:
