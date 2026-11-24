@@ -1193,6 +1193,8 @@ func check_local_hurt_onset(lab, audio, voice: AudioStreamPlayer, capture: Audio
 
 func check_zombie_steps(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	# Observe the inactive step channel through the full tumble and settling interval.
+	lab.get_node("Zombies").corpse_lifetime = ZOMBIE.CORPSE_LIFETIME
 	root.add_child(lab)
 	current_scene = lab
 	var group := lab.get_node("Zombies")
