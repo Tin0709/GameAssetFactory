@@ -77,11 +77,60 @@ func run() -> void:
 	lab.reset_player()
 	await physics_frame
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
+	await check_ground_ribbon_edges(lab, selector)
 	await check_sabre_dive(lab, selector)
 	lab.free()
 	await check_world_map_slash()
 	print("SABRE_SLASH_VFX failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_ground_ribbon_edges(lab, selector: OptionButton) -> void:
+	for slot in [0, 1, 2, 5, 8, 9, 10]:
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		selector.select(slot)
+		selector.item_selected.emit(slot)
+		var actor = lab.player
+		var effects = actor.effects
+		var weapon := selector.get_item_text(slot)
+		var step := 1.0 / Engine.physics_ticks_per_second
+		var seen := false
+		var ended := false
+		var start_delay := 0.0
+		var end_shortfall := 0.0
+		attack(true)
+		for i in 80:
+			await physics_frame
+			if actor.combo.phase != &"attack":
+				continue
+			var window: Array = actor.combo.native_windows[actor.combo.index].trail_window
+			var clip_time: float = actor.combo.time
+			var rate: float = actor.combo.playback_rate()
+			if not seen and effects._was_active:
+				seen = true
+				attack(false)
+				var start: float = effects.clock - (clip_time - float(window[0])) / rate
+				start_delay = float(effects.samples[0].time) - start
+				check(absf(start_delay) < 0.00001, "%s begins the ribbon at the cue inside the physics tick" % weapon)
+				check(effects.samples_at(start - 0.00001).is_empty(), "%s has no ribbon before the cue" % weapon)
+				if effects.clock - start > 0.00002:
+					effects.present((start + effects.clock) * 0.5)
+					check(effects.ribbon.mesh.get_surface_count() == 1,
+						"%s already draws a ribbon between the cue and first physics sample" % weapon)
+			elif seen and not effects._was_active:
+				ended = true
+				var end_age := (clip_time - float(window[1])) / rate
+				if end_age < step:
+					var end: float = effects.clock - end_age
+					end_shortfall = end - float(effects.samples[-1].time)
+					check(absf(end_shortfall) < 0.00001, "%s stops sampling at the end of the trail window" % weapon)
+				break
+		attack(false)
+		check(seen and ended, "%s passes both edges of its real ground trail" % weapon)
+		print("GROUND_RIBBON_EDGES weapon=", weapon, " start_delay_ms=", start_delay * 1000.0,
+			" end_shortfall_ms=", end_shortfall * 1000.0)
+	lab.reset_player()
 
 func check_sabre_dive(lab, selector: OptionButton) -> void:
 	for i in 8:
