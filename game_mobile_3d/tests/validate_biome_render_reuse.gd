@@ -380,6 +380,28 @@ func run() -> void:
 				await RenderingServer.frame_post_draw
 			check(graphics._mist.visible and graphics._mist.effect.snapshot().ready and graphics._mist.failure().is_empty(),
 				"Spatial fog runs on the second map")
+			var local_clear: PackedByteArray = graphics._mist.effect._local_mist_parameters.duplicate()
+			var secondary_clear: PackedByteArray = graphics._mist.effect._additional_mist_parameters.duplicate()
+			graphics.set_weather(.5, 0.)
+			graphics._mist._process(0.)
+			var primary_values: PackedFloat32Array = graphics._mist.effect._local_mist_parameters.to_float32_array()
+			var secondary_values: PackedFloat32Array = graphics._mist.effect._additional_mist_parameters.to_float32_array()
+			check(Vector3(primary_values[0], primary_values[1], primary_values[2]).is_equal_approx(Vector3(-2.125, 2.6, -6.625)),
+				"Cloud weight moves the western mist partway without changing its height")
+			check(Vector3(secondary_values[0], secondary_values[1], secondary_values[2]).is_equal_approx(Vector3(6.125, 2.7, -12.625)),
+				"The stone garden mist has its own half-cloud position")
+			graphics.set_weather(1., 0.)
+			graphics._mist._process(0.)
+			primary_values = graphics._mist.effect._local_mist_parameters.to_float32_array()
+			secondary_values = graphics._mist.effect._additional_mist_parameters.to_float32_array()
+			check(Vector3(primary_values[0], primary_values[1], primary_values[2]).is_equal_approx(Vector3(-4.25, 2.6, -5.25))
+				and Vector3(secondary_values[0], secondary_values[1], secondary_values[2]).is_equal_approx(Vector3(7.75, 2.7, -13.75)),
+				"Full cloud sends both imported-map mist pockets to their authored locations")
+			graphics.set_weather(0., 0.)
+			graphics._mist._process(0.)
+			check(graphics._mist.effect._local_mist_parameters == local_clear
+				and graphics._mist.effect._additional_mist_parameters == secondary_clear,
+				"Clearing the weather restores both mist payloads exactly")
 			var selected_profile = map.biome_graphics
 			check(is_equal_approx(graphics._mist_sample.scatter_energy, .483),
 				"Woodland uses its authored 07:00 scattering on opening the imported scene")
