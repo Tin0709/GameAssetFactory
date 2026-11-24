@@ -954,6 +954,41 @@ func _setup_world_look() -> void:
 	showcase.setup_flat_lab(self)
 	_update_time_label()
 
+func _setup_floor_surfaces() -> Texture2DArray:
+	var picker: OptionButton = $HUD/FloorSurface
+	for title in ["Nền thử · Cỏ", "Nền thử · Đất", "Nền thử · Đá"]:
+		picker.add_item(title)
+	picker.select(0)
+	var tiles := SourceTerrain.load_tiles()
+	picker.disabled = tiles == null
+	if tiles != null:
+		_floor_tiles["grass"] = tiles
+		var material := $Ground/Mesh.material_override as ShaderMaterial
+		material.set_shader_parameter("source_terrain_tiles", tiles)
+		material.set_shader_parameter("use_source_terrain", true)
+		picker.item_selected.connect(_select_floor_surface)
+	return tiles
+
+func _select_floor_surface(index: int) -> void:
+	var surface: String = FLOOR_SURFACES[index]
+	if surface == _floor_surface:
+		return
+	var tiles: Texture2DArray = _floor_tiles.get(surface)
+	if tiles == null:
+		tiles = SourceTerrain.load_tiles(surface)
+		if tiles == null:
+			$HUD/FloorSurface.select(FLOOR_SURFACES.find(_floor_surface))
+			$HUD/SpawnStatus.text = "Thiếu texture nền đã xác minh trong MD2 Research."
+			return
+		_floor_tiles[surface] = tiles
+	var material := $Ground/Mesh.material_override as ShaderMaterial
+	material.set_shader_parameter("source_terrain_tiles", tiles)
+	_floor_surface = surface
+	_foot_contact_tick = -1
+	_landing_contact_tick = -1
+	if _combat_audio != null:
+		_combat_audio.queue_landing_surface(WeaponSource.research_root(), surface)
+
 func _setup_render_scale() -> void:
 	var picker: OptionButton = $HUD/RenderScale
 	if RenderingServer.get_current_rendering_method() != &"mobile":
@@ -1108,7 +1143,7 @@ func _prepare_movement_audio(bundle: PrivateOverworldBundle) -> MovementAudio:
 		landing_fallback.root = source_root
 	var movement := MovementAudio.new()
 	movement.setup(player, null, bundle, _player_foot_contact_at, landing_fallback)
-	movement.landing_contact = _grass_landing_contact_at
+	movement.landing_contact = _floor_landing_contact_at
 	movement.protect_landing_voice = true
 	movement.allow_footstep_as_landing = false
 	for voice: AudioStreamPlayer3D in movement.step_voices:
@@ -1143,38 +1178,38 @@ func _player_foot_contact_at(sole: Vector3) -> Dictionary:
 		_foot_contact_tick = tick
 		_foot_contact_sole = sole
 		# Wall slides can move the capsule sideways without an advancing step.
-		_foot_contact = _grass_step_contact_at(sole, player) if player.accepts_step_during_wall_contact() else {}
+		_foot_contact = _floor_step_contact_at(sole, player) if player.accepts_step_during_wall_contact() else {}
 	return _foot_contact
 
-func _grass_step_contact_at(sole: Vector3, actor: CharacterBody3D) -> Dictionary:
-	var grass := _grass_contact_at(sole)
-	if not grass.is_empty() and actor != null:
+func _floor_step_contact_at(sole: Vector3, actor: CharacterBody3D) -> Dictionary:
+	var ground := _floor_contact_at(sole)
+	if not ground.is_empty() and actor != null:
 		# A snapped capsule can stay on a slope with no recorded floor slide.
 		# Probe when the sole ray lands at a different height from the capsule.
-		var verify_snap: bool = actor.is_on_floor() and absf(actor.global_position.y - grass.position.y) > actor.safe_margin * 2.0
+		var verify_snap: bool = actor.is_on_floor() and absf(actor.global_position.y - ground.position.y) > actor.safe_margin * 2.0
 		var support := _actor_floor_support(actor, sole, verify_snap)
-		var supported_by_grass: bool = not support.is_empty() and support.body == $Ground
-		if not supported_by_grass and (verify_snap or not support.is_empty()):
+		var supported_by_ground: bool = not support.is_empty() and support.body == $Ground
+		if not supported_by_ground and (verify_snap or not support.is_empty()):
 			return {}
-	return grass
+	return ground
 
-func _grass_contact_at(sole: Vector3) -> Dictionary:
+func _floor_contact_at(sole: Vector3) -> Dictionary:
 	var query := PhysicsRayQueryParameters3D.create(sole + Vector3.UP * 0.08, sole - Vector3.UP * 0.30, 1)
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	if hit.is_empty() or hit.collider != $Ground or hit.normal.y < cos(player.floor_max_angle):
 		return {}
-	return {"position": hit.position, "surface": "grass"}
+	return {"position": hit.position, "surface": _floor_surface}
 
-func _grass_landing_contact_at(point: Vector3) -> Dictionary:
+func _floor_landing_contact_at(point: Vector3) -> Dictionary:
 	var tick := Engine.get_physics_frames()
 	if tick != _landing_contact_tick or point != _landing_contact_point:
 		_landing_contact_tick = tick
 		_landing_contact_point = point
 		var support := _actor_floor_support(player, point)
 		if support.is_empty():
-			_landing_contact = _grass_contact_at(point)
+			_landing_contact = _floor_contact_at(point)
 		else:
-			_landing_contact = {"position": support.position, "surface": "grass"} if support.body == $Ground else {}
+			_landing_contact = {"position": support.position, "surface": _floor_surface} if support.body == $Ground else {}
 	return _landing_contact
 
 func _actor_floor_support(actor: CharacterBody3D, point: Vector3, verify_snap := false) -> Dictionary:
@@ -1213,8 +1248,8 @@ func _on_zombie_step(sole: Vector3, actor: CharacterBody3D = null) -> void:
 	if _zombie_step_dust == null and not _combat_audio.enabled:
 		return
 	# Snapshot the support now, before later physics ticks move the actor.
-	var support := _grass_step_contact_at(sole, actor)
-	if support.is_empty():
+	var support := _floor_step_contact_at(sole, actor)
+	if support.is_empty() or support.surface != "grass":
 		return
 	if _zombie_step_dust != null:
 		_zombie_step_dust.burst(support.position)
@@ -1340,7 +1375,7 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	if _equipped_weapon == Weapon.SABRE:
 		_slam_swing_serial = serial
 		_slam_swing_frame = Engine.get_physics_frames() + ceili(SABRE_LANDING_SWING_DELAY * Engine.physics_ticks_per_second)
-	var contact := _grass_landing_contact_at(point)
+	var contact := _floor_landing_contact_at(point)
 	if contact.is_empty():
 		# The Sword impact belongs to the weapon. It still has a confirmed
 		# contact on a solid floor whose material has no debris cue.
@@ -1352,9 +1387,10 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	var delay_ticks := ceili(_heavy_debris_delay() * Engine.physics_ticks_per_second)
 	if delay_ticks > 0:
 		_slam_audio_point = contact.position
+		_slam_audio_surface = contact.surface
 		_slam_audio_frame = Engine.get_physics_frames() + delay_ticks
 	else:
-		_combat_audio.slam_landed(contact.position)
+		_combat_audio.slam_landed(contact.position, contact.surface)
 
 func _on_sabre_landing(point: Vector3, serial: int) -> void:
 	if _equipped_weapon == Weapon.GAUNTLETS:
@@ -1429,7 +1465,7 @@ func _physics_process(_delta: float) -> void:
 			player.reference_audio.trigger_attack_at_notify("AirAttack", _slam_swing_serial)
 	if _slam_audio_frame >= 0 and frame >= _slam_audio_frame:
 		_cancel_slam_audio()
-		_combat_audio.slam_landed(_slam_audio_point)
+		_combat_audio.slam_landed(_slam_audio_point, _slam_audio_surface)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.physical_keycode == KEY_T and event.pressed and not event.echo:

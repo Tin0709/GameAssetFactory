@@ -928,7 +928,7 @@ func check_landing_variation_is_independent(lab, emitter_script: Script) -> void
 	for emitter in [only_landings, with_steps]:
 		var step_profile := Callable(player, "source_step_dust_size") if emitter == with_steps else func() -> float: return 0.0
 		var ready: bool = emitter.setup(player, null, lab._player_foot_contact_at,
-			Callable(), lab._grass_landing_contact_at, step_profile, true)
+			Callable(), lab._floor_landing_contact_at, step_profile, true)
 		check(ready, "The independent landing fixture loads the verified dust")
 		emitter.use_source_landing()
 		lab.add_child(emitter)
@@ -1153,7 +1153,7 @@ func check_zombie_dust_contact_clock(lab) -> void:
 func check_selected_landing_surfaces(lab, dust: Node3D) -> void:
 	var picker := lab.get_node_or_null("HUD/FloorSurface") as OptionButton
 	if picker == null:
-		check(false, "The Lab offers source grass, dirt path and stone test surfaces")
+		check(false, "The Lab offers source grass, dirt and stone test surfaces")
 		return
 	var ground := lab.get_node("Ground/Mesh") as MeshInstance3D
 	var ground_material := ground.material_override as ShaderMaterial
