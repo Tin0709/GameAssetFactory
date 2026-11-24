@@ -20,10 +20,12 @@ var ribbon:MeshInstance3D
 var sparks:MultiMeshInstance3D
 var enabled:=true
 var blade_trail_enabled := true
+var interpolate_ground_trail_edges := false
 var intensity:=.75
 var _mesh:=ImmediateMesh.new()
 var _rng:=RandomNumberGenerator.new()
 var _was_active:=false
+var _previous_base := Vector3.ZERO
 var _previous_tip:=Vector3.ZERO
 
 func _ready()->void:
@@ -50,14 +52,19 @@ func use_private_slash_material() -> void:
 		material.set_shader_parameter(&"use_source_slash", true)
 	ribbon.material_override = material
 
-func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int)->void:
+func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,edge_age:float=-1.0)->void:
 	clock+=delta
 	if not enabled or not blade_trail_enabled:active=false
 	if active:
 		if serial!=attack_serial:samples.clear();serial=attack_serial;_was_active=false
-		if not _was_active:_burst(tip,tip-_previous_tip)
+		if not _was_active:
+			_sample_trail_edge(delta, edge_age, base, tip)
+			_burst(tip,tip-_previous_tip)
 		samples.append({"base":base,"tip":tip,"time":clock})
-		if samples.size()>MAX_SAMPLES:samples.pop_front()
+	elif _was_active and serial == attack_serial and enabled and blade_trail_enabled:
+		_sample_trail_edge(delta, edge_age, base, tip)
+	while samples.size() > MAX_SAMPLES:
+		samples.pop_front()
 	var display_lag:=1./maxf(1.,Engine.physics_ticks_per_second)
 	while not samples.is_empty() and clock-float(samples[0].time)>RIBBON_LIFETIME+display_lag:samples.pop_front()
 	for particle:Dictionary in particles:
@@ -68,7 +75,16 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int)-
 			history.append({"time":clock,"position":particle.position,"life":particle.life})
 			while history.size()>2 and clock-float(history[1].time)>display_lag+1./120.:history.pop_front()
 			while history.size()>MAX_PARTICLE_HISTORY:history.pop_front()
-	_was_active=active;_previous_tip=tip
+	_was_active=active;_previous_base=base;_previous_tip=tip
+
+func _sample_trail_edge(delta: float, edge_age: float, base: Vector3, tip: Vector3) -> void:
+	# An exact tick boundary already has a regular pose sample.
+	if edge_age <= 0.000001 or edge_age >= delta - 0.000001 or clock <= delta:
+		return
+	var weight := 1.0 - edge_age / delta
+	samples.append({"base": _previous_base.lerp(base, weight), "tip": _previous_tip.lerp(tip, weight),
+		"time": clock - edge_age})
+
 func _burst(point:Vector3,direction:Vector3,publish_sample:=false)->void:
 	bursts+=1;var added:=0
 	for particle:Dictionary in particles:

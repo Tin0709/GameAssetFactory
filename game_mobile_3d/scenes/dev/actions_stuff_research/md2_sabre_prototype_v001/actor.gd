@@ -728,13 +728,17 @@ func _animate(delta:float)->void:
 				grounded_sabre_impact.emit(event.index,event.clip,event.serial)
 	if effects!=null:
 		var active:=false
+		var edge_age := -1.0
 		if combo.phase in [&"attack",&"air_attack"] and review_clip.is_empty():
 			var window:Array=clips[combo.clip()].vfx_window
 			if combo.native_enabled and combo.phase==&"attack":window=combo.native_windows[combo.index].get("trail_window",window)
 			if sectioned_air:
 				window = [combo.SABRE_AIR_SLASH, float(window[1])]
 			active=combo.time>=float(window[0]) and combo.time<=float(window[1])
-		effects.sample(delta,active,marker_base.global_position,marker_tip.global_position,combo.serial)
+			if effects.interpolate_ground_trail_edges and combo.phase == &"attack" and active != effects._was_active:
+				var edge: float = window[0] if active else window[1]
+				edge_age = (combo.time - edge) / combo.playback_rate()
+		effects.sample(delta,active,marker_base.global_position,marker_tip.global_position,combo.serial,edge_age)
 
 func _dispatch_locomotion_events(selected:String,before:float,advanced:float,wall_delta:float)->void:
 	# Exact stored notify keys on our selected source clock. This hook does not

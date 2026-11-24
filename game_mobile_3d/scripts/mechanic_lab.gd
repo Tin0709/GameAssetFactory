@@ -499,6 +499,7 @@ func _setup_weapon_selector() -> void:
 	_weapon_mesh = player.model.find_child("SabrePrototypeSabre", true, false) as MeshInstance3D
 	if _weapon_mesh == null or not player.combo.native_enabled:
 		return
+	player.effects.interpolate_ground_trail_edges = true
 	_sabre_mesh = _weapon_mesh.mesh
 	_sabre_mesh_transform = _weapon_mesh.transform
 	# The light rig stores surface overrides for the original Sabre mesh.
