@@ -295,7 +295,7 @@ func check_aerial_contact_pose(lab) -> void:
 				check(landings.size() == 1, "The weapon reports one floor contact in slot %d" % slot)
 				if landings.size() == 1:
 					var floor_count := 0
-					var floor_point := landings[0] + Vector3.UP * 0.12
+				var floor_point := Vector3(landings[0].x, 0.12, landings[0].z)
 					for i in lab.player.effects.particles.size():
 						var particle: Dictionary = lab.player.effects.particles[i]
 						if is_equal_approx(particle.born, clock) and floor_point.is_equal_approx(particle.position):
