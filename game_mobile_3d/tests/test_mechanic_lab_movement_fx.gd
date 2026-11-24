@@ -91,6 +91,7 @@ func run() -> void:
 	await check_source_dust_batch(lab, dust)
 	await check_gauntlet_debris(lab, dust)
 	await check_gauntlet_impact_marks(lab)
+	await check_tool_ground_effects(lab, dust)
 	await check_source_dust_and_wake_order(lab, dust, wind)
 	await check_running_wake_support(lab, wind)
 	await check_running_wake_render_clock(lab, wind, dust)
@@ -595,6 +596,101 @@ func check_gauntlet_impact_marks(lab) -> void:
 	lab._select_floor_surface(0)
 	lab._select_weapon(lab.Weapon.SABRE)
 	check(pool.all(func(decal: Decal): return not decal.visible), "Reset hides every retained impact decal")
+
+func check_tool_ground_effects(lab, dust: Node3D) -> void:
+	var actor = lab.player
+	var ring := lab.get_node_or_null("CombatEffects/PickaxeGroundSlam") as MeshInstance3D
+	check(ring != null and actor.has_signal(&"tool_ground_cue"), "The Lab has physical ground cues for Pickaxe and Shovel")
+	if ring == null or not actor.has_signal(&"tool_ground_cue"):
+		return
+	var cues: Array[float] = []
+	var cue_clocks: Array[float] = []
+	var record := func(cue: Dictionary, _serial: int, sample: float):
+		cues.append(actor.combo.time - (actor.effects.clock - sample) * actor.combo.playback_rate())
+		cue_clocks.append(sample)
+	actor.connect(&"tool_ground_cue", record)
+	for fixture in ["grass", "stone", "wall", "ledge", "shovel", "swapped"]:
+		lab.reset_player()
+		lab._select_floor_surface(2 if fixture == "stone" else 0)
+		lab._select_weapon(lab.Weapon.SHOVEL if fixture == "shovel" else lab.Weapon.PICKAXE)
+		var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
+		var obstacle: StaticBody3D
+		if fixture in ["wall", "ledge"]:
+			obstacle = StaticBody3D.new()
+			var shape := CollisionShape3D.new()
+			var box := BoxShape3D.new()
+			shape.shape = box
+			obstacle.add_child(shape)
+			if fixture == "wall":
+				box.size = Vector3(3.0, 2.0, 0.2)
+				obstacle.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true), forward + Vector3.UP)
+			else:
+				box.size = Vector3(1.1, 0.4, 1.1)
+				obstacle.position.y = 0.2
+				actor.position.y += 0.4
+			lab.add_child(obstacle)
+		for i in 12:
+			await physics_frame
+		cues.clear()
+		cue_clocks.clear()
+		var key := InputEventKey.new()
+		key.physical_keycode = KEY_E
+		key.pressed = true
+		root.push_input(key, true)
+		var peak := 0
+		var ring_seen := false
+		var swapped := false
+		var expected := [0.765836, 0.213588, 0.279747] if fixture == "shovel" else [0.270322, 0.273662, 0.277670, 0.298377]
+		for i in Engine.physics_ticks_per_second * 5:
+			await physics_frame
+			if fixture == "swapped" and actor.combo.index == 2 and actor.combo.time >= 0.18:
+				lab._select_weapon(lab.Weapon.SABRE)
+				swapped = true
+				break
+			peak = maxi(peak, visible_particles(dust))
+			ring_seen = ring_seen or ring.visible
+			if cues.size() >= expected.size():
+				break
+		key = InputEventKey.new()
+		key.physical_keycode = KEY_E
+		root.push_input(key, true)
+		if fixture == "swapped":
+			for i in 20:
+				await physics_frame
+			check(swapped and cues.is_empty() and not ring.visible, "Changing weapons discards pending Pickaxe cues")
+			continue
+		check(cues.size() == expected.size(), "%s emits each montage cue once" % fixture)
+		for index in mini(cues.size(), expected.size()):
+			check(absf(cues[index] - float(expected[index])) < 0.00001,
+				"%s cue %d crosses the authored source timestamp" % [fixture, index + 1])
+		check(not lab._impact_light.visible, "%s ground effects do not fake a zombie hit light" % fixture)
+		if fixture in ["grass", "stone"]:
+			check(ring_seen and peak >= 4, "%s Pickaxe finisher emits a ring, debris and dust without a target" % fixture)
+			check(absf((ring.global_position - actor.global_position).dot(forward) - 1.5) < 0.02,
+				"The Pickaxe ring uses the independent 150 cm cue offset")
+			var debris: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag > 0.0)
+			check(not debris.is_empty() and debris.all(func(p):
+				return absf((p.origin - actor.global_position).dot(forward) - 1.8) < 0.02
+					and Color(p.sprite.modulate, 1.0) == dust.SURFACE_DUST[fixture]),
+				"The Pickaxe debris uses the 180 cm cue and samples the selected surface tint")
+		elif fixture == "shovel":
+			check(peak >= 4 and not ring_seen, "Shovel emits the separate debris passes without the Pickaxe ring")
+		else:
+			check(not ring_seen and dust._particles.all(func(p):
+				return not p.sprite.visible or p.origin.dot(forward) <= 0.91 or fixture == "ledge" and p.origin.y >= 0.39),
+				"%s does not show impact geometry beyond support" % fixture)
+		check(lab._shake_duration > 0.0 and absf(lab._shake_sample_time - cue_clocks.back()) < 0.045
+			if fixture != "shovel" and not cue_clocks.is_empty() else fixture == "shovel",
+			"The Pickaxe camera pulse comes from the montage instead of enemy contact")
+		print("TOOL_GROUND_FX ", fixture, " cues=", cues, " peak=", peak, " ring=", ring_seen)
+		if obstacle != null:
+			obstacle.free()
+		lab.reset_player()
+		check(not ring.visible and visible_particles(dust) == 0, "Reset clears the tool ring and particles")
+	actor.disconnect(&"tool_ground_cue", record)
+	lab._select_floor_surface(0)
+	lab._select_weapon(lab.Weapon.SABRE)
+	await physics_frame
 
 func gauntlet_debris_position(origin: Vector3, velocity: Vector3, drag: float, age: float) -> Vector3:
 	const STEP := 1.0 / 60.0
