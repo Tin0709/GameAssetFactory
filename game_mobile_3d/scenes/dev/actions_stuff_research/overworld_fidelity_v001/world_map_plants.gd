@@ -9,6 +9,7 @@ const GRASS_LIGHT=preload("world_map_grass_light.gd")
 const GRASS_SPLAY=preload("world_map_grass_splay.gd")
 const GRASS_WIND=preload("world_map_grass_wind.gd")
 const ForestCover = preload("forest_cover_grass.gd")
+const PlainsPlanting = preload("plains_ground_planting.gd")
 var grass_wind:RefCounted
 var recovered_wind_enabled:=true
 var grass_light:RefCounted
@@ -25,6 +26,7 @@ var forest_fern_asset := ""
 var _fern_cells: Dictionary[Vector2i, String] = {}
 var fern_reserved_cells: Dictionary[Vector2i, bool] = {}
 var _wide_fern_roots: Dictionary[Vector2i, Basis] = {}
+var plains_planting := PlainsPlanting.new()
 var eligible_grass_cells:=0
 var world:Node3D
 var error:=""
@@ -57,6 +59,7 @@ func setup_world(level:Node3D)->void:
 			var cell := Vector2i(int(slot.x), int(slot.y))
 			if not _fern_cells.has(cell) and variants.has(int(slot.z)):
 				_fern_cells[cell] = variants[int(slot.z)]
+	plains_planting.setup(world,bundle)
 	for material:ShaderMaterial in bundle.materials:
 		_native_wind_intensities[material.get_instance_id()]=float(material.get_shader_parameter("wind_intensity"))
 	grass_light=GRASS_LIGHT.new();grass_light.setup(world,bundle)
@@ -104,6 +107,7 @@ func _rebuild_planting(reset_interaction := true)->void:
 		remove_child(child);child.queue_free()
 	placements.clear();_groups.clear();_plant_cells.clear();species_counts.clear();flower_colors.clear()
 	fern_reserved_cells.clear();_wide_fern_roots.clear()
+	plains_planting.reserved.clear();plains_planting.shrub_roots.clear()
 	materials.clear();_wind_intensities.clear();_flower_centers.clear()
 	forest_cover_counts.clear()
 	instance_count=0;batch_count=0;eligible_grass_cells=0;_rng.seed=110826
@@ -142,7 +146,7 @@ func _refresh_grass_lighting()->void:
 	grass_light.apply(materials,grass_lighting_enabled and world.look.stage==2,_grass_edge_sampling_wanted())
 	for node:Node in get_children():
 		if node is MultiMeshInstance3D:
-			node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_ON if grass_light.active and node.get_meta("green_grass",false) else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_ON if grass_light.active and node.get_meta("plant_shadow",false) else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 func grass_splay_active()->bool:
 	return dense_grass_review and grass_splay_enabled and grass_splay!=null and grass_splay.configured
@@ -197,6 +201,7 @@ func _build_native_patches()->void:
 
 func _build_dense_planting()->void:
 	_reserve_wide_ferns()
+	plains_planting.reserve_shrubs(world,_fern_cells,fern_reserved_cells,_off_path)
 	var keys:Array=world.columns.keys();keys.sort()
 	for column:Vector2i in keys:
 		var height:float=world.columns[column]
@@ -215,18 +220,31 @@ func _build_dense_planting()->void:
 		var transform:=Transform3D(Basis(Vector3.UP,_rng.randf()*TAU),position)
 		var phase := _rng.randf() * TAU
 		# Consume the same placement RNG before skipping the fern's support cells.
-		if fern_reserved_cells.has(cell):
+		if fern_reserved_cells.has(cell) or plains_planting.reserved.has(cell):
 			continue
 		var cover := _cover_index(cell)
 		var fern_asset: String = _fern_cells.get(cell, "") if forest_fern_enabled else ""
 		var fern := not fern_asset.is_empty() and (_wide_fern_roots.has(cell)
 			or (fern_asset == forest_fern_asset and _off_path(cell)))
 		var scale_factor := 1.
+		var flower := ""
+		var plains: Dictionary = plains_planting.cells.get(cell,{})
+		var meadow := not fern and not plains.is_empty() and _off_path_cell(cell) +			and (plains.kind != "shrub" or plains_planting.shrub_roots.has(cell))
 		if fern:
 			asset = fern_asset
 			transform.origin = Vector3(cell.x + .5, position.y, cell.y + .5)
 			if _wide_fern_roots.has(cell):
 				transform.basis = _wide_fern_roots[cell]
+		elif meadow:
+			asset = plains.asset
+			flower = plains.flower
+			if plains.kind == "shrub":
+				transform = plains_planting.shrub_roots[cell]
+			else:
+				transform = plains_planting.transform_at(cell,position.y,plains)
+			scale_factor = transform.basis.get_scale().y
+			if not flower.is_empty():
+				flower_colors[flower] = int(flower_colors.get(flower,0)) + 1
 		elif cover >= 0:
 			asset = forest_cover_species[cover]
 			var yaw := float(posmod(hash(cell + Vector2i(593, 827)), 4)) * PI * .5
@@ -234,13 +252,14 @@ func _build_dense_planting()->void:
 			forest_cover_counts[asset] = int(forest_cover_counts.get(asset, 0)) + 1
 		var bounds:AABB=transform*bundle.meshes[asset].get_aabb()
 		# Sparse plants use one batch per species. The dense carpet stays tiled.
-		var key := asset if fern or cover >= 0 else asset + "/" + str(Vector2i(floori(position.x / TILE), floori(position.z / TILE)))
+		var key := asset if fern or cover >= 0 or meadow else asset + "/" + str(Vector2i(floori(position.x / TILE), floori(position.z / TILE)))
 		if not _groups.has(key):_groups[key]={"asset":asset,"transforms":[],"custom":[]}
 		_groups[key].transforms.append(transform);_groups[key].custom.append(Color(phase,cell.x+.5,cell.y+.5,scale_factor))
-		placements.append({"cell":cell,"root":transform.origin,"asset":asset,"bounds":bounds,"flower":"","carpet":true,
-			"scale":scale_factor,"cards":0 if fern else 4 if cover < 0 else 2 if cover < 2 else 3,"ground_kind":kind,
-			"forest_cover":not fern and cover >= 0,"forest_fern":fern})
-		_add_plant_root(Vector2(transform.origin.x,transform.origin.z))
+		var root := Vector3(cell.x+.5,position.y,cell.y+.5) if meadow else transform.origin
+		placements.append({"cell":cell,"root":root,"asset":asset,"bounds":bounds,"flower":flower,"carpet":true,
+			"scale":scale_factor,"cards":0 if fern or meadow else 4 if cover < 0 else 2 if cover < 2 else 3,"ground_kind":kind,
+			"forest_cover":not fern and not meadow and cover >= 0,"forest_fern":fern,"plains_plant":meadow})
+		_add_plant_root(Vector2(root.x,root.z))
 		instance_count+=1;species_counts[asset]=int(species_counts.get(asset,0))+1
 
 func _reserve_wide_ferns() -> void:
@@ -297,6 +316,11 @@ func _off_path(cell: Vector2i) -> bool:
 		if not limits.has_point(neighbor) or (int(roundf(source.get_pixelv(neighbor).r)) & 255) != 0:
 			return false
 	return true
+
+func _off_path_cell(cell: Vector2i) -> bool:
+	var source: Image = world.look.path_map_image
+	var pixel := Vector2i(Vector2(cell) - world.look.path_map_origin)
+	return Rect2i(Vector2i.ZERO,source.get_size()).has_point(pixel) +		and (roundi(source.get_pixelv(pixel).r) & 255) == 0
 
 func _build_flower_centers()->void:
 	var colors:Array=FLOWERS.keys()
@@ -401,7 +425,9 @@ func _flush_cell_batches()->void:
 		node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		var green:bool=mm.mesh.surface_get_material(0).get_shader_parameter("tinted_grass")==true
 		node.set_meta("green_grass",green)
-		if grass_light!=null and grass_light.active and green:node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		var casts_shadow: bool = green or mm.mesh.surface_get_material(0).get_meta("plains_shrub",false)
+		node.set_meta("plant_shadow",casts_shadow)
+		if grass_light!=null and grass_light.active and casts_shadow:node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 		add_child(node);batch_count+=1
 	_groups.clear()
 
@@ -431,6 +457,8 @@ func snapshot()->Dictionary:
 	data["dense_grass_review"]=dense_grass_review;data["eligible_grass_cells"]=eligible_grass_cells
 	data["forest_cover_species"] = forest_cover_counts.duplicate()
 	data["fern_support_cells"] = fern_reserved_cells.size()
+	data["plains_support_cells"] = plains_planting.reserved.size()
+	data["plains_plant_cells"] = placements.filter(func(row:Dictionary)->bool:return row.get("plains_plant",false)).size()
 	data["grass_splay_active"]=grass_splay_active()
 	data["recovered_wind_active"]=grass_wind!=null and grass_wind.configured and recovered_wind_enabled and dense_grass_review
 	if dense_grass_review:
