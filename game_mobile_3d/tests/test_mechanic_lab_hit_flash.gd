@@ -231,6 +231,14 @@ func check_overlapping_damage_number_positions() -> void:
 	numbers._process(0.09)
 	check(damage_number_overlaps(damage_number_rectangles(numbers, camera)) == 0,
 		"The pop reaches its peak without the numbers crossing each other")
+	var assigned := {}
+	for number in numbers._numbers:
+		assigned[number.hit_order] = number.layout_offset
+	numbers.add_number(14, origin, Vector3.ZERO)
+	numbers._process(0.0)
+	for number in numbers._numbers:
+		if assigned.has(number.hit_order):
+			check(number.layout_offset == assigned[number.hit_order], "A later hit does not move earlier numbers")
 	lab.free()
 
 func damage_number_rectangles(numbers, camera: Camera3D) -> Array[Rect2]:

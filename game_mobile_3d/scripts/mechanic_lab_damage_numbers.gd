@@ -111,8 +111,11 @@ func _process(delta: float) -> void:
 	if needs_sort:
 		_numbers.sort_custom(func(a: DamageNumber, b: DamageNumber) -> bool:
 			return a.depth < b.depth or (a.depth == b.depth and a.hit_order < b.hit_order))
-	if has_new_numbers and camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
-		_place_new_numbers(camera_side, camera_up)
+	if has_new_numbers:
+		if _numbers.size() == 1:
+			_numbers[0].layout_pending = false
+		elif camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+			_place_new_numbers(camera_side, camera_up)
 	var slot := 0
 	var local_from_world := global_transform.affine_inverse()
 	for number in _numbers:
