@@ -230,7 +230,9 @@ offset_top = 184.0
 offset_right = 1238.0
 offset_bottom = 218.0
 focus_mode = 0
-text = "Preset Lab"
+text = "Preset Lab ▾"
+flat = false
+alignment = 0
 tooltip_text = "Lưu hoặc nạp cấu hình thử A và B."
 
 [node name="CrossbowAmmo" type="Label" parent="HUD"]
