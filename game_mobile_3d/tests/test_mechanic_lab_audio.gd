@@ -1927,7 +1927,7 @@ func check_special_weapon_preparation() -> void:
 		"The first crossbow fire and impact both play before preparation finishes")
 	var bolt := Node3D.new()
 	lab.add_child(bolt)
-	audio.crossbow_flight(bolt)
+	audio.start_projectile_flight(bolt, &"crossbow_flight")
 	check(audio._flight_targets.size() == 1 and audio._voice_groups.has(&"crossbow_flight"),
 		"The first flying bolt starts its own prepared spatial cue")
 	var group_count: int = audio._groups.size()

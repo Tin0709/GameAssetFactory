@@ -865,8 +865,9 @@ func _load_crossbow(root: String) -> bool:
 	_crossbow.ammo_changed.connect(_set_crossbow_ammo)
 	_crossbow.shot_fired.connect(_combat_audio.crossbow_fired)
 	_crossbow.bolt_impact.connect(_on_crossbow_impact)
-	_crossbow.bolt_launched.connect(_combat_audio.crossbow_flight)
-	_crossbow.bolt_ended.connect(_combat_audio.stop_crossbow_flight)
+	_crossbow.bolt_launched.connect(func(bolt: Node3D, _charged: bool) -> void:
+		_combat_audio.start_projectile_flight(bolt, &"crossbow_flight"))
+	_crossbow.bolt_ended.connect(_combat_audio.stop_projectile_flight)
 	$CombatEffects.add_child(_crossbow)
 	_apply_impact_fx_settings()
 	_set_crossbow_ammo(_crossbow.ammo)

@@ -43,6 +43,13 @@ const DRAW_HASHES := [
 	"769745bc1c4087777b2e44b34544dd0120dcc5305d5798ea108d59619897fdfe",
 ]
 const UNEQUIP_HASH := "239661f95e473b6fabf68a4eda7a0e2848560d22eb915c7f32d970a98ed6dcfc"
+const CHARGED_FLIGHT_AUDIO := "Items/Effects/sfx_item_arrowChargedWhoosh-%03d_soundWave.ogg"
+const CHARGED_FLIGHT_HASHES := [
+	"cfcbda59f75f1bdf1764045ff59dc3c30f018238266edb2907c8947807c132f2",
+	"a40576121f7ccf450585063064e0ff93f727918b289288f72efd2a2fb0373990",
+	"f7c499b2f38fc4b193ab6aa4d69bfc0c26e9af2bd5bf81064fc868e14e090955",
+	"df75c753563fe5c13e70fb79b90bdca31de58de5b117b1922a13d5625d8a6ed8",
+]
 const NORMAL_STRIKE := {"damage": 18, "strength": 500.0, "angle": 25.0, "stagger": 22.5}
 const CHARGED_STRIKE := {"damage": 54, "strength": 500.0, "angle": 25.0, "stagger": 22.5}
 
@@ -145,6 +152,15 @@ func setup_audio(audio: Node, root: String) -> void:
 	for i in DRAW_HASHES.size():
 		audio._load_sample(root, &"bow_draw", BOW_AUDIO + ("load-%03d.ogg" % (i + 1)), DRAW_HASHES[i])
 	audio._load_sample(root, &"bow_unequip", BOW_AUDIO + "unequip.ogg", UNEQUIP_HASH)
+	# PlayerBow's projectile switch distinguishes the charged whoosh from
+	# the ordinary and supercharged branches.
+	for i in CHARGED_FLIGHT_HASHES.size():
+		audio._queue_weapon_sample(root, &"bow_charged_flight", CHARGED_FLIGHT_AUDIO % (i + 1),
+			CHARGED_FLIGHT_HASHES[i])
+	bolt_launched.connect(func(bolt: Node3D, charged: bool) -> void:
+		if charged:
+			_combat_audio.start_projectile_flight(bolt, &"bow_charged_flight"))
+	bolt_ended.connect(audio.stop_projectile_flight)
 
 func play_charge(point: Vector3) -> void:
 	_play_audio(&"bow_draw", point, -15.0)

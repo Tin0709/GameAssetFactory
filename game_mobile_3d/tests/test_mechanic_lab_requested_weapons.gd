@@ -178,7 +178,7 @@ func run() -> void:
 	lab._crossbow.bolt_impact.connect(func(_hit: Dictionary, _direction: Vector3, _serial: int) -> void:
 		burst_sizes.append(sparks._active_count if sparks != null else 0))
 	var muzzle_errors: Array[float] = []
-	lab._crossbow.bolt_launched.connect(func(projectile: Node3D) -> void:
+	lab._crossbow.bolt_launched.connect(func(projectile: Node3D, _charged: bool) -> void:
 		muzzle_errors.append(projectile.global_position.distance_to(lab._crossbow_mount.to_global(CrossPollinator.MUZZLE))))
 	check(fire_samples.size() == 3, "Enabling audio prepares every verified crossbow firing sample")
 	check(menu.selected == 3 and ammo.visible and ammo.text.contains("25 / 25"), "Crossbow equips with full ammo")
@@ -1437,11 +1437,16 @@ func check_charged_bow_flight(lab: Node3D, menu: OptionButton) -> void:
 
 	check(bow.fire_arrow(origin, Vector3.BACK, -414, origin, true) and voices.size() == 1,
 		"The reset fixture starts one charged flight voice")
+	lab.reset_player()
+	check(voices.is_empty() and not audio.is_physics_processing() and bow._bolts.is_empty(),
+		"Reset releases the charged arrow and voice together")
+	check(bow.fire_arrow(origin, Vector3.BACK, -415, origin, true) and voices.size() == 1,
+		"The mute fixture starts one charged flight voice")
 	sound.button_pressed = false
 	check(voices.is_empty() and not audio.is_physics_processing(),
 		"Combat mute stops tracking the charged voice immediately")
 	before = audio._next_choice.get(group, 0)
-	check(bow.fire_arrow(origin, Vector3.BACK, -415, origin, true)
+	check(bow.fire_arrow(origin, Vector3.BACK, -416, origin, true)
 		and voices.is_empty() and audio._next_choice.get(group, 0) == before,
 		"A charge fired while muted does not consume a whoosh sample")
 	lab.reset_player()

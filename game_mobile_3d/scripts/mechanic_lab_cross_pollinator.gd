@@ -4,7 +4,7 @@ extends Node3D
 signal ammo_changed(amount: int)
 signal bolt_impact(hit: Dictionary, direction: Vector3, serial: int)
 signal shot_fired(origin: Vector3)
-signal bolt_launched(bolt: Node3D)
+signal bolt_launched(bolt: Node3D, charged: bool)
 signal bolt_ended(bolt: Node3D)
 
 const Source := preload("res://scripts/mechanic_lab_weapon_source.gd")
@@ -220,7 +220,7 @@ func _fire_projectile(origin: Vector3, direction: Vector3, serial: int, clearanc
 	_bolts.append({"node": bolt, "direction": direction, "speed": speed, "life": BOLT_LIFETIME,
 		"serial": serial, "trail": trail, "strike": strike})
 	set_physics_process(true)
-	bolt_launched.emit(bolt)
+	bolt_launched.emit(bolt, charged)
 	return true
 
 func reset() -> void:

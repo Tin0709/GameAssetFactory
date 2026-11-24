@@ -675,20 +675,20 @@ func crossbow_impact(point: Vector3) -> void:
 	if enabled:
 		_play_weapon_cue(&"crossbow_hit", point, HIT_GAIN_DB)
 
-func crossbow_flight(bolt: Node3D) -> void:
+func start_projectile_flight(bolt: Node3D, group: StringName) -> void:
 	if not enabled:
 		return
-	_finish_weapon_samples(&"crossbow_flight")
-	if not _groups.has(&"crossbow_flight"):
+	_finish_weapon_samples(group)
+	if not _groups.has(group):
 		return
 	if _voices.size() == FLIGHT_POOL * VOICES_PER_POOL:
 		_create_voices(VOICES_PER_POOL)
-	var voice := _play(&"crossbow_flight", bolt.global_position, FLIGHT_GAIN_DB)
+	var voice := _play(group, bolt.global_position, FLIGHT_GAIN_DB)
 	if voice != null:
 		_flight_targets[voice] = bolt
 		set_physics_process(true)
 
-func stop_crossbow_flight(bolt: Node3D) -> void:
+func stop_projectile_flight(bolt: Node3D) -> void:
 	var slot := _flight_targets.find_key(bolt) as AudioStreamPlayer3D
 	if slot == null:
 		return
@@ -1072,7 +1072,7 @@ func _play(group: StringName, point: Vector3, gain: float, event_frame := -1,
 			pool = ATTACK_POOL
 		&"zombie_step":
 			pool = STEP_POOL
-		&"crossbow_flight":
+		&"crossbow_flight", &"bow_charged_flight":
 			pool = FLIGHT_POOL
 	var first := pool * VOICES_PER_POOL
 	if first >= _voices.size():
