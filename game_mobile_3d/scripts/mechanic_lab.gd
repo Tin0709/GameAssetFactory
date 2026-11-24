@@ -37,6 +37,7 @@ const FLOOR_STEP_BANKS := {
 	]],
 }
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
+const ImpactMarks := preload("res://scripts/mechanic_lab_impact_marks.gd")
 const ZombieStepDust := preload("res://scripts/mechanic_lab_zombie_step_dust.gd")
 const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
 const PrivateOverworldBundle := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/private_bundle.gd")
@@ -91,6 +92,9 @@ const SABRE_LANDING_SHAKE_DELAY := 0.052268848
 # AM_Player_Sabre_JumpAttack: one-shot PlayNiagaraEffect minus LandingStart.
 const SABRE_LANDING_BURST_DELAY := 0.056890413
 const SABRE_LANDING_BURST_REACH := 1.5
+# The Gauntlets debris notify names the impact decal at local Y 180 cm.
+# The Lab maps that axis along the strike direction.
+const GAUNTLET_IMPACT_MARK_REACH := 1.8
 
 enum PlayerSkin { MD2, KAI }
 enum PresetAction { SAVE_A, LOAD_A, SAVE_B, LOAD_B, DEFAULTS }
@@ -186,6 +190,7 @@ var _lab_audio_mix: LabAudioMix
 var _zombie_step_dust: ZombieStepDust
 var _floor_snap_contact := KinematicCollision3D.new()
 var _floor_surface := "grass"
+var _gauntlet_impact_marks: ImpactMarks
 var _floor_tiles: Dictionary[String, Texture2DArray] = {}
 var _slam_swing_frame := -1
 var _slam_swing_serial := -1
