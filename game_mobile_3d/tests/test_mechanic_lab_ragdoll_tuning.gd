@@ -93,8 +93,8 @@ func check_corpse_lifetime(lab, slider: HSlider) -> void:
 	for i in 2:
 		await physics_frame
 	check(adult.ragdoll.running and baby.ragdoll.running, "Both lifetimes permit the regular MD2 ragdoll handoff")
-	var adult_chest := weakref(adult.ragdoll.bodies.get("Chest"))
-	var baby_chest := weakref(baby.ragdoll.bodies.get("Chest"))
+	var adult_chest: WeakRef = weakref(adult.ragdoll.bodies.get("Chest"))
+	var baby_chest: WeakRef = weakref(baby.ragdoll.bodies.get("Chest"))
 	var tick := 1.0 / Engine.physics_ticks_per_second
 	for i in ceili(1.3 / tick):
 		await physics_frame
