@@ -358,6 +358,14 @@ func _ready() -> void:
 		add_child(_combat_audio)
 		_combat_audio.queue_base_samples()
 		_setup_movement_audio()
+		var impact_marks := ImpactMarks.new()
+		if impact_marks.setup($Ground/Mesh):
+			_gauntlet_impact_marks = impact_marks
+			impact_marks.name = "GauntletImpactMarks"
+			$CombatEffects.add_child(impact_marks)
+			player.presentation_reset.connect(impact_marks.clear)
+		else:
+			impact_marks.free()
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
 		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _floor_landing_contact_at,
@@ -1008,6 +1016,8 @@ func _select_floor_surface(index: int) -> void:
 	var material := $Ground/Mesh.material_override as ShaderMaterial
 	material.set_shader_parameter("source_terrain_tiles", tiles)
 	_floor_surface = surface
+	if _gauntlet_impact_marks != null:
+		_gauntlet_impact_marks.clear()
 	_foot_contact_tick = -1
 	_landing_contact_tick = -1
 	if _combat_audio != null:
@@ -1410,6 +1420,11 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 		_slam_shake_frame = frame + ceili(SABRE_LANDING_SHAKE_DELAY * rate)
 		_slam_burst_frame = frame + ceili(SABRE_LANDING_BURST_DELAY * rate)
 	$Zombies.land_sabre(point, facing, serial, fall_height)
+	if player.gauntlets_equipped and _gauntlet_impact_marks != null:
+		var mark_surface := _floor_landing_contact_at(point)
+		if not mark_surface.is_empty():
+			var anchor := _landing_impact_anchor(mark_surface.position, facing, floor_height, GAUNTLET_IMPACT_MARK_REACH)
+			_gauntlet_impact_marks.stamp(anchor, mark_surface.surface)
 	if not _combat_audio.enabled:
 		return
 	if _equipped_weapon == Weapon.SABRE:
