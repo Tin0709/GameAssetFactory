@@ -19,6 +19,7 @@ func run() -> void:
 	root.size = Vector2i(1280, 720)
 	await process_frame
 	await process_frame
+	await check_ragdoll_physics_controls(lab)
 	var launch := lab.get_node_or_null("HUD/RagdollTuning/Launch/Slider") as HSlider
 	var gravity := lab.get_node_or_null("HUD/RagdollTuning/Gravity/Slider") as HSlider
 	var lifetime := lab.get_node_or_null("HUD/RagdollLifetime/Slider") as HSlider
@@ -71,6 +72,108 @@ func run() -> void:
 	lab.free()
 	print("MECHANIC_LAB_RAGDOLL_TUNING failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_ragdoll_physics_controls(lab: Node) -> void:
+	var drawer := lab.get_node_or_null("HUD/RagdollPhysicsButton") as Button
+	check(drawer != null, "The Lab offers advanced ragdoll controls")
+	if drawer == null:
+		return
+	var panel := lab.get_node("HUD/RagdollPhysicsPanel") as PanelContainer
+	check(not panel.visible, "The advanced controls start collapsed")
+	drawer.button_pressed = true
+	check(panel.is_visible_in_tree(), "The tuning button opens the physics controls")
+	var mass := panel.get_node("Rows/Mass/Slider") as HSlider
+	var damping := panel.get_node("Rows/Damping/Slider") as HSlider
+	var joints := panel.get_node("Rows/JointSpan/Slider") as HSlider
+	check(mass.value == 100.0 and damping.value == 100.0 and joints.value == 100.0,
+		"All three controls start at the existing physics settings")
+	await process_frame
+	click_slider(mass, true)
+	click_slider(damping, true)
+	click_slider(joints, true)
+	check(mass.value == 200.0 and damping.value == 200.0 and joints.value == 150.0,
+		"The opened controls accept mouse input")
+	drawer.button_pressed = false
+	var group := lab.get_node("Zombies")
+	var player := lab.get("player") as CharacterBody3D
+	player.set_physics_process(false)
+	var ground := lab.get_node("HUD/RagdollLifetime/Slider") as HSlider
+	ground.value = 3.0
+	for baby: bool in [false, true]:
+		var button := lab.get_node("HUD/SpawnBabyZombie" if baby else "HUD/SpawnZombie") as Button
+		var reference: Dictionary
+		for tuned: bool in [false, true]:
+			mass.value = 100.0
+			damping.value = 100.0
+			joints.value = 100.0
+			button.pressed.emit()
+			check(group.get_child_count() == 1, "The real spawn button creates one tuning subject")
+			if group.get_child_count() != 1:
+				break
+			var actor := group.get_child(0) as Zombie
+			actor.position = Vector3(16.0, 0.01, 15.0)
+			actor.animation.play(Zombie.IDLE, 0.0)
+			actor.animation.advance(0.0)
+			var original_mass: float = actor.ragdoll.bodies.Head.mass
+			if tuned:
+				mass.value = 200.0
+				damping.value = 50.0
+				joints.value = 125.0
+			check(is_equal_approx(actor.ragdoll.bodies.Head.mass, original_mass),
+				"Changing the slider keeps living mass until the lethal hit")
+			actor.take_hit(actor.health, Vector3.BACK)
+			# Editing after the hit must leave this corpse's settings latched.
+			mass.value = 50.0
+			damping.value = 200.0
+			joints.value = 50.0
+			await physics_frame
+			await physics_frame
+			check(actor.ragdoll.running, "The lethal hit launches a regular ragdoll")
+			if not actor.ragdoll.running:
+				actor.free()
+				break
+			var head := actor.ragdoll.bodies.Head as PhysicalBone3D
+			var joint: RID = actor.ragdoll.source_joint_rids[&"Head"]
+			var sample := {
+				"mass": head.mass,
+				"damping": Vector2(head.linear_damp, head.angular_damp),
+				"spans": Vector2(
+					PhysicsServer3D.cone_twist_joint_get_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_SWING_SPAN),
+					PhysicsServer3D.cone_twist_joint_get_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_TWIST_SPAN)),
+				"impulse": actor.ragdoll.total_applied_impulse,
+			}
+			check(is_equal_approx(head.mass, original_mass * (2.0 if tuned else 1.0)),
+				"The lethal hit applies the selected mass to the authored body distribution")
+			if tuned:
+				check(sample.damping.is_equal_approx(reference.damping * 0.5),
+					"The solver receives both linear and angular damping scales")
+				check(sample.spans.is_equal_approx(reference.spans * 1.25),
+					"The active native cone joint uses the selected swing and twist limits")
+				check(sample.impulse.is_equal_approx(reference.impulse),
+					"The chosen mass does not rescale the strike's launch impulse")
+				for frame in 100:
+					if actor._corpse_landed:
+						break
+					await physics_frame
+				check(actor._corpse_landed and is_instance_valid(head),
+					"The adjusted corpse reaches the ground")
+				if actor._corpse_landed and is_instance_valid(head):
+					await physics_frame
+					var blend := smoothstep(0.0, Zombie.DEATH_LANDING_BLEND_TIME, actor._landing_age)
+					var base := lerpf(reference.damping.x, Zombie.DEATH_LANDING_LINEAR_DAMP, blend)
+					check(is_equal_approx(head.linear_damp, base * 0.5),
+						"Ground contact retains the latched damping")
+			else:
+				check(sample.spans.x > 0.0 and sample.spans.y > 0.0,
+					"The baseline enables the authored cone joint")
+				reference = sample
+			print("RAGDOLL_ADVANCED baby=", baby, " tuned=", tuned, " ", sample)
+			actor.free()
+	mass.value = 100.0
+	damping.value = 100.0
+	joints.value = 100.0
+	ground.value = 1.2
+	player.set_physics_process(true)
 
 func check_corpse_lifetime(lab, slider: HSlider) -> void:
 	check(is_equal_approx(slider.value, 1.2), "The mobile trial starts at 1.2 seconds")
