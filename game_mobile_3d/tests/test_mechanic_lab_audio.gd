@@ -2033,10 +2033,25 @@ func check_tool_montage_audio() -> void:
 			played[landing_group] = source_time
 			break
 		check(heard_landing, "%s plays its own landing sample" % name)
+		for i in 10:
+			await physics_frame
+		check(audio._voice_groups.count(landing_group) == 1, "%s landing plays once even after the damage gate" % name)
 		print("TOOL_AUDIO_TIMELINE ", name, " ", played)
+
+	lab.reset_player()
+	for i in 8:
+		await physics_frame
+	push_melee_attack(true)
+	await physics_frame
+	await physics_frame
+	push_melee_attack(false)
+	lab.reset_player()
+	for i in 20:
+		await physics_frame
+	check(not audio._voice_groups.has(&"tool_shovel_0"), "Reset during the windup cancels the scheduled Shovel swing")
 	toggle.button_pressed = false
 	lab.free()
-	await process_frame
+	await create_timer(0.10).timeout
 
 func run() -> void:
 

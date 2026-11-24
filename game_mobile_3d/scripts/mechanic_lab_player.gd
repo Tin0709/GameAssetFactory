@@ -466,21 +466,22 @@ func _animate(delta: float) -> void:
 	var previous_serial: int = combo.serial
 	super._animate(delta)
 	if _grounded and review_clip.is_empty():
-		var cue_start := previous_time if combo.serial == previous_serial else 0.0
+		var same_attack := combo.serial == previous_serial
+		var cue_start := previous_time if same_attack else 0.0
 		if combo.phase == &"attack" and combo.native_enabled:
-			var swing_time: float = combo.native_windows[combo.index].get("swing_audio_time", 0.0)
+			var window: Dictionary = combo.native_windows[combo.index]
+			var swing_time: float = window.get("swing_audio_time", 0.0)
 			if cue_start < swing_time and swing_time <= combo.time:
 				tool_audio_cue.emit(combo.index, false, combo.serial)
+			if same_attack:
+				_emit_tool_ground_cues(window.get("ground_effects", []), previous_time)
 		elif combo.phase == &"air_attack" and combo.air_landing_started:
 			var landing_time: float = clips.AirAttack.get("landing_audio_time", 0.0)
 			if cue_start < landing_time and landing_time <= combo.time:
 				tool_audio_cue.emit(combo.index, true, combo.serial)
-	if _grounded and combo.serial == previous_serial and review_clip.is_empty():
-		if combo.phase == &"attack" and combo.native_enabled:
-			_emit_tool_ground_cues(combo.native_windows[combo.index].get("ground_effects", []), previous_time)
-		elif combo.phase == &"air_attack" and combo.air_landing_started:
-			var cues: Array = sabre_landing_cues if combo.use_sabre_air_sections else clips.AirAttack.get("ground_effects", [])
-			_emit_tool_ground_cues(cues, previous_time)
+			if same_attack:
+				var cues: Array = sabre_landing_cues if combo.use_sabre_air_sections else clips.AirAttack.get("ground_effects", [])
+				_emit_tool_ground_cues(cues, previous_time)
 	if release_bow:
 		combo.serial += 1
 		bow_released.emit(combo.serial, Bow.is_fully_drawn(_bow_held_seconds), target)
