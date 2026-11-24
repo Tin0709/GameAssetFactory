@@ -708,19 +708,35 @@ func check_crowd_splash_visibility() -> void:
 		var group = lab.get_node("Zombies")
 		var basis: Basis = lab.player.visual.global_basis
 		var origin: Vector3 = lab.player.global_position
+		var sparks := lab.get_node("ContactSparks") as ContactSparks
+		var crowded := size == 12
+		if crowded:
+			var quality := lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality") as OptionButton
+			quality.select(quality.get_item_index(lab.SparkBudget.LOW))
+			quality.item_selected.emit(quality.selected)
 		var zombies: Array[CharacterBody3D] = []
+		var positions := PackedVector3Array()
 		for i in size:
 			if not group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, i % 2 == 1):
 				break
 			var zombie: CharacterBody3D = group.get_child(i)
 			zombie.set_physics_process(false)
 			var offset := Vector3((i % 4 - 1.5) * 0.42, 0.0, 1.28 + (i / 4) * 0.38)
-			zombie.global_position = origin + basis * offset
+			if crowded and i == 0:
+				offset = Vector3(0, 0, 2.36)
+			positions.append(origin + basis * offset)
+			# Let the melee lock acquire the direct target before the pack
+			# moves between it and the player during windup.
+			zombie.global_position = positions[i] + basis.z * (3.0 if crowded and i > 0 else 0.0)
 			zombie.health = 100
 			zombie.max_health = 100
 			zombies.append(zombie)
 		check(zombies.size() == size, "The real sweep fixture spawns %d mixed zombies" % size)
+		if zombies.size() != size:
+			lab.free()
+			continue
 		var peaks: Array[float] = []
+		var streak_points := PackedVector3Array()
 		var capture := func():
 			if not peaks.is_empty():
 				return
@@ -731,15 +747,35 @@ func check_crowd_splash_visibility() -> void:
 					shown.append(float(weight))
 			if shown.size() == size:
 				peaks.assign(shown)
+				for spark in sparks._particles:
+					if spark.age < spark.lifetime:
+						streak_points.append(spark.origin - spark.velocity.normalized() * 0.21)
 		process_frame.connect(capture)
 		attack(true)
 		await ticks(2)
 		attack(false)
+		if crowded:
+			check(group._aim_target == zombies[0], "The crowd fixture locks the main target during windup")
+			for i in range(1, size):
+				zombies[i].global_position = positions[i]
 		await ticks(34)
 		process_frame.disconnect(capture)
 		var direct := zombies.filter(func(zombie): return zombie.health == 88)
 		var splash := zombies.filter(func(zombie): return zombie.health == 96)
 		check(direct.size() == 1 and splash.size() == size - 1, "The Sabre sweep keeps every damage amount")
+		if crowded:
+			check(direct == [zombies[0]], "The strike preserves its locked target through the crowd")
+			var primary: CharacterBody3D = zombies[0]
+			var centre: Vector3 = primary.combat_center()
+			var capsule: Vector2 = primary.contact_capsule_dimensions()
+			var axis := Vector3.UP * capsule.y
+			var at_primary := 0
+			for point in streak_points:
+				var axis_point := Geometry3D.get_closest_point_to_segment(point, centre - axis, centre + axis)
+				at_primary += int(absf(point.distance_to(axis_point) - capsule.x) < 0.001)
+			check(streak_points.size() == 18 and at_primary == 6,
+				"The light preset gives its locked target a full burst before nearer splash contacts")
+			print("CROWD_PRIMARY_SPARKS streaks=", streak_points.size(), " direct=", at_primary)
 		check(peaks.size() == size, "All %d zombies show first contact feedback" % size)
 		if peaks.size() == size:
 			check(absf(peaks.max() - 1.0) < 0.001, "The primary target keeps the full body flash")
