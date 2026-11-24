@@ -235,6 +235,15 @@ func check_overlapping_damage_number_positions() -> void:
 
 func damage_number_rectangles(numbers, camera: Camera3D) -> Array[Rect2]:
 	var rectangles: Array[Rect2] = []
+	if DisplayServer.get_name() == "headless":
+		# The dummy renderer doesn't retain per-instance transforms.
+		for number in numbers._numbers:
+			var centre := Vector2(number.centre.dot(camera.global_basis.x), number.centre.dot(camera.global_basis.y))
+			centre += number.layout_offset
+			var size := Vector2(2.0 + 24.5 / 32.0, 1.0) * 32.0 * 0.0144 * 1.16
+			size.x = (32.0 + 24.5) * 0.0144 * 1.16
+			rectangles.append(Rect2(centre - size * 0.5, size))
+		return rectangles
 	for slot in range(0, numbers.multimesh.visible_instance_count, 2):
 		var bounds := Rect2()
 		for i in 2:
