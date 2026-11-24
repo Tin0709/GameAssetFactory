@@ -8,6 +8,8 @@ const STYLED_RUN := &"Zombie_AS_Pursuit"
 const STYLED_JUMP := &"Zombie_AS_Jump"
 const STYLED_FALL := &"Zombie_AS_Fall"
 const STYLED_ALERT := &"Zombie_AS_Alert"
+const STYLED_ALERT_ENTER := &"Zombie_AS_AlertEnter"
+const STYLED_ALERT_EXIT := &"Zombie_AS_AlertExit"
 const STYLED_ATTACK := &"Zombie_AS_Attack"
 const STYLED_SPAWN := &"Zombie_AS_Spawn"
 const STYLED_STAGGER := &"Zombie_AS_Stagger"
@@ -92,15 +94,54 @@ func check_stagger_stance(actor: Zombie, resting_clip: StringName) -> void:
 	var arm := skeleton.find_bone(&"J_R_Arm")
 	var spawn_pose := skeleton.get_bone_pose(arm)
 	var playback := actor.animation
+	playback.play(STYLED_IDLE, 0.0)
+	playback.advance(0.0)
+	check(spawn_pose.is_equal_approx(skeleton.get_bone_pose(arm)),
+		"Spawn starts in the 1.13 breathing pose for both ages")
 	playback.play(resting_clip, 0.0)
 	playback.advance(0.0)
 	var resting_pose := skeleton.get_bone_pose(arm)
 	if actor.is_baby:
-		check(spawn_pose.is_equal_approx(resting_pose), "A&S baby spawn opens in its alerted resting stance")
+		playback.play(STYLED_SPAWN, 0.0)
+		playback.advance(0.0)
+		playback.seek(playback.current_animation_length, true)
+		check(skeleton.get_bone_pose_rotation(arm).angle_to(resting_pose.basis.get_rotation_quaternion()) < 0.3,
+			"Baby spawn raises its arms into its A&S resting stance")
 	playback.play(STYLED_STAGGER, 0.0)
 	playback.advance(0.0)
 	check(resting_pose.is_equal_approx(skeleton.get_bone_pose(arm)),
 		"A&S stagger preserves this age's resting stance (baby=%s)" % actor.is_baby)
+	playback.play(STYLED_SPAWN, 0.0)
+	playback.advance(0.0)
+
+func check_adult_alert(actor: Zombie) -> void:
+	var playback := actor.animation
+	var skeleton := actor.ragdoll.skeleton
+	var arm := skeleton.find_bone(&"J_R_Arm")
+	playback.play(STYLED_IDLE, 0.0)
+	playback.advance(0.0)
+	var resting := skeleton.get_bone_pose_rotation(arm)
+	actor._target_aggressive = true
+	actor._play_loop(Zombie.IDLE)
+	check(playback.current_animation == STYLED_ALERT_ENTER, "Stationary aggro uses the authored A&S raise")
+	for frame in 66:
+		actor._play_loop(Zombie.IDLE)
+		actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+	var raised := skeleton.get_bone_pose_rotation(arm)
+	check(raised.angle_to(resting) > 0.9, "The arms lift during the A&S alert transition")
+	for frame in 28:
+		actor._play_loop(Zombie.IDLE)
+		actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+	check(playback.current_animation == STYLED_ALERT, "The sourced raise rolls into its A&S breathing loop")
+	actor._target_aggressive = false
+	actor._play_loop(Zombie.IDLE)
+	check(playback.current_animation == STYLED_ALERT_EXIT, "Losing aggro uses the authored A&S arm lower")
+	for frame in 94:
+		actor._play_loop(Zombie.IDLE)
+		actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+	check(playback.current_animation == STYLED_IDLE
+		and skeleton.get_bone_pose_rotation(arm).angle_to(resting) < 0.25,
+		"The sourced arm lower finishes in the unalerted A&S stance")
 	playback.play(STYLED_SPAWN, 0.0)
 	playback.advance(0.0)
 
@@ -211,6 +252,7 @@ func run() -> void:
 			"Full A&S uses the adult 1.13 patrol cycle")
 		check_stagger_stance(adult, STYLED_IDLE)
 		check_stagger_stance(baby, STYLED_ALERT)
+		check_adult_alert(adult)
 	select(mode, 0)
 	adult.position = Vector3.ZERO
 	baby.position = Vector3(-32.0, 0.0, 0.0)
