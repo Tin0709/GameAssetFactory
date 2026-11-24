@@ -2,7 +2,7 @@ extends Node3D
 ## Spawn and hit routing for private MD2 zombies in MechanicLab.
 
 signal sabre_contact(point: Vector3, direction: Vector3, clip: String, index: int, serial: int, lethal: bool)
-signal ground_contact_capsule(point: Vector3, serial: int, capsule: Vector2)
+signal melee_contact_visual(zombie: Zombie, point: Vector3, serial: int, flash_peak: float)
 signal sabre_landing(point: Vector3, serial: int)
 signal player_hit(amount: int)
 signal zombie_attack_audio(point: Vector3, contact: bool)
@@ -472,10 +472,10 @@ func strike_sabre(index: int, clip: String, serial: int) -> void:
 		return
 	if _aim_serial == serial and is_instance_valid(_aim_target) and candidates.has(_aim_target):
 		primary = _aim_target
-	_apply_contact(primary, primary.combat_center(), clip, index, serial, strike, forward, false, origin)
+	_apply_contact(primary, primary.combat_center(), clip, index, serial, strike, forward, false, origin, false, true)
 	for zombie in candidates:
 		if zombie != primary:
-			_apply_contact(zombie, zombie.combat_center(), clip, index, serial, strike, forward, true, origin)
+			_apply_contact(zombie, zombie.combat_center(), clip, index, serial, strike, forward, true, origin, false, true)
 
 func cancel_pending_landings() -> void:
 	_pending_landings.clear()
@@ -543,10 +543,10 @@ func _resolve_landing(position: Vector3, forward: Vector3, serial: int, strike: 
 		if not space.intersect_ray(ray).is_empty():
 			continue
 		_apply_contact(zombie, contact, "AirAttack", 0, serial, strike, forward,
-			distance > float(strike.get("primary_range", AIR_PRIMARY_RANGE)), position)
+			distance > float(strike.get("primary_range", AIR_PRIMARY_RANGE)), position, false, true)
 
 func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary,
-		forward: Vector3, splash: bool, origin: Vector3, projectile := false) -> void:
+		forward: Vector3, splash: bool, origin: Vector3, projectile := false, wait_for_pose := false) -> void:
 	var air_attack := clip == "AirAttack"
 	var sabre_ground := not projectile and not sword_equipped \
 		and not curved_equipped and not gauntlets_equipped and not air_attack \
@@ -574,11 +574,11 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	# the same pulse at their damage fraction so the crowd remains legible.
 	var flash_peak := SPLASH_MULTIPLIER if splash else 1.0
 	zombie.take_hit(damage, direction, impulse, stagger,
-		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)), flash_peak)
+		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)), 0.0 if wait_for_pose else flash_peak)
 	var lethal := zombie.health <= 0
 	sabre_contact.emit(point, direction, clip, index, serial, lethal)
-	if not projectile and not air_attack:
-		ground_contact_capsule.emit(point, serial, zombie.contact_capsule_dimensions())
+	if wait_for_pose:
+		melee_contact_visual.emit(zombie, point, serial, flash_peak)
 	zombie_reaction_audio.emit(point, lethal, zombie.is_baby)
 
 func _private_research_root() -> String:

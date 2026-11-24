@@ -1377,19 +1377,8 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 	direction.y = 0.0
 	direction = direction.normalized()
 	_feedback.show_hit(amount, health, max_health)
-	if _flash_left <= 0.0:
-		if _lab_flash_skin != null:
-			_mesh.material_override = _lab_flash_skin
-			# The normalized Mobile buffer clips the old overlay before blending.
-			_mesh.set_instance_shader_parameter(&"flash_red", 3.2 if get_viewport().use_hdr_2d else 2.0)
-		else:
-			_mesh.material_overlay = _flash_material
-	# Several hits can arrive before one frame. Display the strongest of them.
-	_flash_peak = maxf(_flash_peak, flash_peak) if _flash_pending else flash_peak
-	_mesh.set_instance_shader_parameter("hit_flash", _flash_peak)
-	_flash_left = HIT_FLASH_DURATION
-	_flash_pending = true
-	set_process(true)
+	if flash_peak > 0.0:
+		show_hit_flash(flash_peak)
 	if health <= 0:
 		_death_direction = direction
 		_death_strength = knockback_strength
@@ -1435,6 +1424,21 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 				animation.play(clip, 0.0 if clip == STAGGER else 0.12, clip_duration / STAGGER_DURATION)
 		elif _knockback_control_left > 0.0 and animation.current_animation in WALK_STEP_NOTIFIES:
 			_play_loop(IDLE)
+
+func show_hit_flash(flash_peak: float) -> void:
+	if _flash_left <= 0.0:
+		if _lab_flash_skin != null:
+			_mesh.material_override = _lab_flash_skin
+			# The normalized Mobile buffer clips the old overlay before blending.
+			_mesh.set_instance_shader_parameter(&"flash_red", 3.2 if get_viewport().use_hdr_2d else 2.0)
+		else:
+			_mesh.material_overlay = _flash_material
+	# Several hits can arrive before one frame. Display the strongest of them.
+	_flash_peak = maxf(_flash_peak, flash_peak) if _flash_pending else flash_peak
+	_mesh.set_instance_shader_parameter("hit_flash", _flash_peak)
+	_flash_left = HIT_FLASH_DURATION
+	_flash_pending = true
+	set_process(true)
 
 func _update_death(delta: float) -> void:
 	_corpse_age += delta
