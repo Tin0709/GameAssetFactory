@@ -179,6 +179,8 @@ const CORPSE_TERRAIN_REST_TURN := 0.05 * CORPSE_WALL_REST_TIME
 const CORPSE_FLAT_WALL_REST_SHIFT := 0.015
 const CORPSE_FLAT_WALL_REST_TURN := 0.05
 const HIT_FLASH_DURATION := 0.083
+const HIT_FLASH_FADE_FRACTION := 0.65
+const SURVIVING_DIRECT_FLASH_FADE_FRACTION := 0.94
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
 const RAGDOLL_BONES := {
@@ -495,7 +497,12 @@ func _process(delta: float) -> void:
 		_flash_pending = false
 		return
 	_flash_left = maxf(0.0, _flash_left - delta)
-	var flash := _flash_peak * smoothstep(0.0, HIT_FLASH_DURATION * 0.65, _flash_left)
+	var fade_fraction := HIT_FLASH_FADE_FRACTION
+	# Release the bright hold on a surviving primary target while the
+	# position of the impact is still marked by light and streaks.
+	if health > 0 and _flash_peak >= 1.0 and is_instance_valid(_corpse_floor):
+		fade_fraction = SURVIVING_DIRECT_FLASH_FADE_FRACTION
+	var flash := _flash_peak * smoothstep(0.0, HIT_FLASH_DURATION * fade_fraction, _flash_left)
 	_mesh.set_instance_shader_parameter("hit_flash", flash)
 	if _flash_left <= 0.0:
 		if _lab_flash_skin != null:
