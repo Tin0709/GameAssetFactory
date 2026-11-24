@@ -670,7 +670,7 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 				"The Pickaxe ring uses the independent 150 cm cue offset")
 			var debris: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag > 0.0)
 			check(not debris.is_empty() and debris.all(func(p):
-				return absf((p.origin - actor.global_position).dot(forward) - 1.8) < 0.02
+				return absf((p.origin - actor.global_position).dot(forward) - 1.8) < 0.02 \
 					and Color(p.sprite.modulate, 1.0) == dust.SURFACE_DUST[fixture]),
 				"The Pickaxe debris uses the 180 cm cue and samples the selected surface tint")
 		elif fixture == "shovel":
