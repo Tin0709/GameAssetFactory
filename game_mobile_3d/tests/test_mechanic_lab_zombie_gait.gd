@@ -102,11 +102,20 @@ func check_stagger_stance(actor: Zombie, resting_clip: StringName) -> void:
 	playback.advance(0.0)
 	var resting_pose := skeleton.get_bone_pose(arm)
 	if actor.is_baby:
+		var rest_rotation := resting_pose.basis.get_rotation_quaternion()
 		playback.play(STYLED_SPAWN, 0.0)
 		playback.advance(0.0)
-		playback.seek(playback.current_animation_length, true)
-		check(skeleton.get_bone_pose_rotation(arm).angle_to(resting_pose.basis.get_rotation_quaternion()) < 0.3,
-			"Baby spawn raises its arms into its A&S resting stance")
+		playback.advance(playback.current_animation_length + 0.001)
+		check(skeleton.get_bone_pose_rotation(arm).angle_to(rest_rotation) > 0.9,
+			"Baby spawn retains the source anticipation during its brief spawn window")
+		actor._play_loop(Zombie.IDLE)
+		check(playback.current_animation == STYLED_ALERT_ENTER, "Baby continues the A&S arm raise from spawn")
+		for frame in 88:
+			actor._play_loop(Zombie.IDLE)
+			actor._advance_animation(1.0 / 60.0, Vector3.ZERO)
+		check(playback.current_animation == STYLED_ALERT
+			and skeleton.get_bone_pose_rotation(arm).angle_to(rest_rotation) < 0.3,
+			"Baby settles in its A&S resting stance at the source cadence")
 	playback.play(STYLED_STAGGER, 0.0)
 	playback.advance(0.0)
 	check(resting_pose.is_equal_approx(skeleton.get_bone_pose(arm)),
