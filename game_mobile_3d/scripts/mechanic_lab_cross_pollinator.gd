@@ -290,9 +290,10 @@ func _physics_process(delta: float) -> void:
 			_bolts.remove_at(index)
 			_remove_bolt(node)
 			if not hit.is_empty():
-				if _is_terrain_hit(hit):
-					trail.contact = endpoint
-					trail.contact_normal = hit.normal
+				trail.contact = endpoint
+				trail.contact_normal = hit.normal
+				trail.terrain_contact = _is_terrain_hit(hit)
+				if trail.terrain_contact:
 					_embed_on_terrain(hit, bolt.direction, render_frame)
 				_report_impact(hit, direction, bolt.serial, bolt.strike, impact_step, trail.charged)
 		else:
@@ -343,13 +344,15 @@ func _update_trails() -> void:
 			has_surface = true
 		var lateral := to_local_space.basis * sideways
 		var has_contact := trail.has("contact")
+		var clip_to_contact_plane: bool = trail.get("terrain_contact", false)
 		var contact_plane := Plane()
 		var contact_offset := Vector3.ZERO
 		var contact_side := sideways
 		if has_contact:
 			var contact: Vector3 = trail.contact
 			var normal: Vector3 = trail.contact_normal
-			contact_plane = to_local_space * Plane(normal, normal.dot(contact))
+			if clip_to_contact_plane:
+				contact_plane = to_local_space * Plane(normal, normal.dot(contact))
 			contact_offset = to_local_space.basis * (contact - head)
 			contact_side = sideways.slide(normal).normalized()
 			if contact_side.is_zero_approx():
@@ -386,7 +389,7 @@ func _update_trails() -> void:
 			var near_right := previous_point + previous_lateral * previous_width
 			var far_left := point - current_lateral * width
 			var far_right := point + current_lateral * width
-			if has_contact:
+			if clip_to_contact_plane:
 				near_left = _trail_surface_edge(near_left, contact_plane)
 				near_right = _trail_surface_edge(near_right, contact_plane)
 				far_left = _trail_surface_edge(far_left, contact_plane)
