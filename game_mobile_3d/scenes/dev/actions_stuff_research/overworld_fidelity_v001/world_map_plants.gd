@@ -229,7 +229,7 @@ func _build_dense_planting()->void:
 		var scale_factor := 1.
 		var flower := ""
 		var plains: Dictionary = plains_planting.cells.get(cell,{})
-		var meadow := (not fern and not plains.is_empty() and _off_path_cell(cell)
+		var meadow: bool = (not fern and not plains.is_empty() and _off_path_cell(cell)
 			and (plains.kind != "shrub" or plains_planting.shrub_roots.has(cell)))
 		if fern:
 			asset = fern_asset
