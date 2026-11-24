@@ -319,6 +319,10 @@ func _report_impact(hit: Dictionary, direction: Vector3, serial: int, _strike: D
 		impact_sparks.burst(hit.position, direction, hit.normal, impact_step, _is_terrain_hit(hit), charged)
 	bolt_impact.emit(hit, direction, serial)
 
+func set_trail_opacity(opacity: float) -> void:
+	var material := _trail_renderer.material_override as ShaderMaterial
+	material.set_shader_parameter(&"opacity_scale", opacity)
+
 func _update_trails() -> void:
 	_trail_mesh.clear_surfaces()
 	var camera := get_viewport().get_camera_3d()

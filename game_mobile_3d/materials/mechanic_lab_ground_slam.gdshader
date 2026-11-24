@@ -5,6 +5,7 @@ render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, shadows_disabl
 
 uniform vec4 tint : source_color = vec4(0.9, 0.79, 0.58, 1.0);
 uniform float progress = 0.0;
+uniform float opacity_scale = 1.0;
 uniform int clip_count = 0;
 uniform vec3 clip_planes[8];
 uniform int blocker_count = 0;
@@ -40,5 +41,5 @@ void fragment() {
 	float front = 1.0 - smoothstep(0.023, 0.085, abs(distance_from_front));
 	float skirt = 1.0 - smoothstep(0.0, 0.18, abs(distance_from_front + 0.08));
 	ALBEDO = tint.rgb;
-	ALPHA = max(front * 0.44, skirt * 0.20) * (1.0 - smoothstep(0.05, 1.0, progress));
+	ALPHA = max(front * 0.44, skirt * 0.20) * (1.0 - smoothstep(0.05, 1.0, progress)) * opacity_scale;
 }

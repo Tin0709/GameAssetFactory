@@ -145,6 +145,9 @@ const PRESET_RANGES := {
 	"hitstop_ms": ^"HUD/Hitstop/Slider",
 	"impact_opacity": ^"HUD/ImpactFxPanel/Rows/Opacity/Slider",
 	"impact_duration": ^"HUD/ImpactFxPanel/Rows/Duration/Slider",
+	"ribbon_opacity": ^"HUD/ImpactFxPanel/Rows/RibbonOpacity/Slider",
+	"slam_opacity": ^"HUD/ImpactFxPanel/Rows/SlamOpacity/Slider",
+	"slam_duration": ^"HUD/ImpactFxPanel/Rows/SlamDuration/Slider",
 	"sfx_master": ^"HUD/AudioMixPanel/Rows/Master/Slider",
 	"sfx_weapon": ^"HUD/AudioMixPanel/Rows/Weapon/Slider",
 	"sfx_zombie": ^"HUD/AudioMixPanel/Rows/Zombie/Slider",
@@ -221,6 +224,8 @@ var _tool_slam_ring: MeshInstance3D
 var _tool_slam_material: ShaderMaterial
 var _tool_slam_footprint := PhysicsShapeQueryParameters3D.new()
 var _tool_slam_time := -1.0
+var _tool_slam_duration := GROUND_SLAM_DURATION
+var _tool_slam_duration_scale := 1.0
 var _pending_tool_ground_cues: Array[Dictionary] = []
 var _tool_touchdown: Dictionary = {}
 var _floor_tiles: Dictionary[String, Texture2DArray] = {}
@@ -1224,11 +1229,11 @@ func _process(delta: float) -> void:
 		_present_melee_feedback(player.render_presenter.display_clock)
 	if _tool_slam_time >= 0.0:
 		var age: float = player.render_presenter.display_clock - _tool_slam_time
-		_tool_slam_ring.visible = age >= 0.0 and age < GROUND_SLAM_DURATION
-		if age >= GROUND_SLAM_DURATION:
+		_tool_slam_ring.visible = age >= 0.0 and age < _tool_slam_duration
+		if age >= _tool_slam_duration:
 			_tool_slam_time = -1.0
 		elif age >= 0.0:
-			_tool_slam_material.set_shader_parameter(&"progress", age / GROUND_SLAM_DURATION)
+			_tool_slam_material.set_shader_parameter(&"progress", age / _tool_slam_duration)
 	# Publish glyphs even when this frame activated a previously idle batch.
 	if _zombie_damage_numbers != null:
 		_zombie_damage_numbers.present(delta)
@@ -1789,6 +1794,7 @@ func _show_tool_slam_ring(point: Vector3, surface: String, sample_time: float) -
 	_tool_slam_ring.global_position = point + Vector3.UP * GROUND_SLAM_HEIGHT
 	_tool_slam_ring.hide()
 	_tool_slam_material.set_shader_parameter(&"tint", MovementDust.SURFACE_DUST[surface].lightened(0.36))
+	_tool_slam_duration = GROUND_SLAM_DURATION * _tool_slam_duration_scale
 	_tool_slam_time = sample_time
 
 func _clip_slam_to_stage(point: Vector3, planes: PackedVector3Array) -> bool:
@@ -2097,7 +2103,7 @@ func _set_hitstop(milliseconds: float) -> void:
 func _setup_impact_fx_controls() -> void:
 	var button: Button = $HUD/ImpactFxButton
 	var panel: PanelContainer = $HUD/ImpactFxPanel
-	button.visible = _contact_sparks != null
+	button.visible = _contact_sparks != null or _tool_slam_material != null
 	if not button.visible:
 		return
 	button.toggled.connect(panel.set_visible)
@@ -2113,8 +2119,8 @@ func _setup_impact_fx_controls() -> void:
 	debris.select(0)
 	debris.disabled = _movement_dust == null
 	debris.item_selected.connect(_apply_impact_fx_settings.unbind(1))
-	for path in ["Rows/Opacity/Slider", "Rows/Duration/Slider"]:
-		var slider := panel.get_node(path) as HSlider
+	for row in ["Opacity", "Duration", "RibbonOpacity", "SlamOpacity", "SlamDuration"]:
+		var slider := panel.get_node("Rows/" + row + "/Slider") as HSlider
 		slider.value_changed.connect(_apply_impact_fx_settings.unbind(1))
 	_apply_impact_fx_settings()
 
@@ -2125,8 +2131,8 @@ func _apply_impact_fx_settings() -> void:
 	var spawn_scale: float = SPARK_SPAWN_SCALES.get(budget, 1.0)
 	if _movement_dust != null:
 		_movement_dust.detailed_debris = $HUD/ImpactFxPanel/Rows/DebrisQuality.get_selected_id() == 1
-	$HUD/ImpactFxPanel/Rows/Opacity/Value.text = "Độ rõ · %d%%" % roundi(opacity)
-	$HUD/ImpactFxPanel/Rows/Duration/Value.text = "Thời gian · %d%%" % roundi(duration)
+	$HUD/ImpactFxPanel/Rows/Opacity/Value.text = "Độ rõ tia · %d%%" % roundi(opacity)
+	$HUD/ImpactFxPanel/Rows/Duration/Value.text = "Thời gian tia · %d%%" % roundi(duration)
 	if _contact_sparks != null:
 		_contact_sparks.set_opacity(opacity * 0.01)
 		_contact_sparks.duration_scale = duration * 0.01
@@ -2137,6 +2143,26 @@ func _apply_impact_fx_settings() -> void:
 			sparks.set_opacity(opacity * 0.01)
 			sparks.duration_scale = duration * 0.01
 			sparks.spawn_count_scale = spawn_scale
+	_apply_weapon_vfx_settings()
+
+func _apply_weapon_vfx_settings() -> void:
+	var rows := $HUD/ImpactFxPanel/Rows
+	var ribbon: float = rows.get_node("RibbonOpacity/Slider").value
+	var slam: float = rows.get_node("SlamOpacity/Slider").value
+	var duration: float = rows.get_node("SlamDuration/Slider").value
+	rows.get_node("RibbonOpacity/Value").text = "Vệt vũ khí · %d%%" % roundi(ribbon)
+	rows.get_node("SlamOpacity/Value").text = "Vòng xung kích · %d%%" % roundi(slam)
+	rows.get_node("SlamDuration/Value").text = "Thời gian vòng · %d%%" % roundi(duration)
+	_tool_slam_duration_scale = duration * 0.01
+	if _tool_slam_material != null:
+		_tool_slam_material.set_shader_parameter(&"opacity_scale", slam * 0.01)
+	if player.effects != null and player.effects.ribbon != null:
+		var melee_material := player.effects.ribbon.material_override as ShaderMaterial
+		if melee_material != null:
+			melee_material.set_shader_parameter(&"opacity_scale", ribbon * 0.01)
+	for projectile: CrossPollinator in [_crossbow, _bow]:
+		if projectile != null:
+			projectile.set_trail_opacity(ribbon * 0.01)
 
 func _setup_audio_mix_controls() -> void:
 	var button: Button = $HUD/AudioMixButton

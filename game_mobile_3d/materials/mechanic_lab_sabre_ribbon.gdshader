@@ -4,6 +4,7 @@ render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, shadows_disabl
 uniform sampler2D source_slash : filter_linear, repeat_disable;
 uniform bool use_source_slash = false;
 uniform bool sword_ribbon_head = false;
+uniform float opacity_scale = 1.0;
 
 void fragment() {
 	if (UV.y < 0.0) {
@@ -40,4 +41,5 @@ void fragment() {
 			ALPHA = min(ALPHA * (1.0 + head * 1.3), 0.95);
 		}
 	}
+	ALPHA *= opacity_scale;
 }

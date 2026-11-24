@@ -264,7 +264,7 @@ toggle_mode = true
 button_group = SubResource("tuning_panels")
 text = "Hiệu ứng va chạm ▾"
 alignment = 0
-tooltip_text = "Chỉnh tia trúng đòn và mức chi tiết của mảnh văng."
+tooltip_text = "Chỉnh tia trúng đòn, mảnh văng, vệt vũ khí và vòng xung kích."
 
 [node name="ImpactFxPanel" type="PanelContainer" parent="HUD"]
 visible = false
@@ -295,7 +295,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(145, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Độ rõ · 100%"
+text = "Độ rõ tia · 100%"
 
 [node name="Slider" type="HSlider" parent="HUD/ImpactFxPanel/Rows/Opacity"]
 custom_minimum_size = Vector2(0, 32)
@@ -314,7 +314,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(145, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Thời gian · 100%"
+text = "Thời gian tia · 100%"
 
 [node name="Slider" type="HSlider" parent="HUD/ImpactFxPanel/Rows/Duration"]
 custom_minimum_size = Vector2(0, 32)
@@ -327,6 +327,69 @@ step = 5.0
 value = 100.0
 scrollable = false
 tooltip_text = "200% cho tia chuyển động và mờ đi trong thời gian gấp đôi."
+
+[node name="RibbonOpacity" type="HBoxContainer" parent="HUD/ImpactFxPanel/Rows"]
+layout_mode = 2
+
+[node name="Value" type="Label" parent="HUD/ImpactFxPanel/Rows/RibbonOpacity"]
+custom_minimum_size = Vector2(145, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Vệt vũ khí · 100%"
+
+[node name="Slider" type="HSlider" parent="HUD/ImpactFxPanel/Rows/RibbonOpacity"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+min_value = 0.0
+max_value = 100.0
+step = 5.0
+value = 100.0
+scrollable = false
+tooltip_text = "Chỉnh độ rõ của vệt chém và vệt tên đang hiển thị."
+
+[node name="SlamOpacity" type="HBoxContainer" parent="HUD/ImpactFxPanel/Rows"]
+layout_mode = 2
+
+[node name="Value" type="Label" parent="HUD/ImpactFxPanel/Rows/SlamOpacity"]
+custom_minimum_size = Vector2(145, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Vòng xung kích · 100%"
+
+[node name="Slider" type="HSlider" parent="HUD/ImpactFxPanel/Rows/SlamOpacity"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+min_value = 0.0
+max_value = 100.0
+step = 5.0
+value = 100.0
+scrollable = false
+tooltip_text = "Chỉnh độ rõ của vòng khi nện xuống đất."
+
+[node name="SlamDuration" type="HBoxContainer" parent="HUD/ImpactFxPanel/Rows"]
+layout_mode = 2
+
+[node name="Value" type="Label" parent="HUD/ImpactFxPanel/Rows/SlamDuration"]
+custom_minimum_size = Vector2(145, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Thời gian vòng · 100%"
+
+[node name="Slider" type="HSlider" parent="HUD/ImpactFxPanel/Rows/SlamDuration"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+min_value = 50.0
+max_value = 200.0
+step = 5.0
+value = 100.0
+scrollable = false
+tooltip_text = "Áp dụng từ vòng xung kích tiếp theo."
 
 [node name="RagdollPhysicsButton" type="Button" parent="HUD"]
 offset_left = 762.0

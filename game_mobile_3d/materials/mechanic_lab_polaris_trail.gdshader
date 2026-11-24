@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, shadows_disabled;
 
+uniform float opacity_scale = 1.0;
+
 void fragment() {
 	// Niagara multiplies the initial RGB of 10 by the Polaris User.Color.
 	// Map that HDR color into the Lab's display range without clipping its hue.
@@ -16,5 +18,5 @@ void fragment() {
 		opacity *= smoothstep(0.0, 0.24, center) * mix(0.65, 1.0, core);
 	}
 	ALBEDO = color;
-	ALPHA = opacity;
+	ALPHA = opacity * opacity_scale;
 }
