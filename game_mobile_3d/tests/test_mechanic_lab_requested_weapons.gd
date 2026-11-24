@@ -327,6 +327,8 @@ func run() -> void:
 	await check_crossbow_impact_burst(lab, sparks)
 	await check_projectile_birth_frame(lab)
 	await check_projectile_surface_bounds(lab)
+	if DisplayServer.get_name() != "headless":
+		await check_projectile_spark_wall_fragments(lab)
 	await check_projectile_contact_anchor(lab)
 	await check_living_projectile_anchor(lab)
 	await check_embedded_surface_batch(lab)
@@ -676,6 +678,82 @@ func check_projectile_surface_bounds(lab: Node3D) -> void:
 		weapon.reset()
 	lab._select_floor_surface(0)
 	wall.queue_free()
+
+
+func check_projectile_spark_wall_fragments(lab: Node3D) -> void:
+	var camera: Camera3D = lab.camera
+	var saved_transform := camera.global_transform
+	var saved_size := camera.size
+	var processing := lab.is_processing()
+	lab.set_process(false)
+	var wall := StaticBody3D.new()
+	var size := Vector3(3.0, 2.8, 0.006)
+	var box := BoxShape3D.new()
+	box.size = size
+	var collider := CollisionShape3D.new()
+	collider.shape = box
+	wall.add_child(collider)
+	var mesh := BoxMesh.new()
+	mesh.size = size
+	var face := MeshInstance3D.new()
+	face.mesh = mesh
+	wall.add_child(face)
+	lab.add_child(wall)
+	wall.global_position = Vector3(20.0, 1.4, 2.5)
+	var target := Vector3(20.0, 1.3, 2.5)
+	camera.size = 1.95
+	camera.global_position = target + Vector3(1.7, 0.35, 0.8)
+	camera.look_at(target)
+	await ticks(2)
+	for weapon: Node3D in [lab._crossbow, lab._bow]:
+		weapon.reset()
+		var sparks: MultiMeshInstance3D = weapon.impact_sparks
+		var saved_seed: int = sparks._random.seed
+		var saved_state: int = sparks._random.state
+		sparks._random.seed = 84713
+		var hits: Array[Dictionary] = []
+		var record := func(hit: Dictionary, _direction: Vector3, _serial: int):
+			hits.append(hit)
+		weapon.bolt_impact.connect(record)
+		var origin := Vector3(20.0, 1.3, 1.7)
+		if weapon == lab._crossbow:
+			weapon.fire(origin, Vector3.BACK, 1974, origin)
+		else:
+			weapon.fire_arrow(origin, Vector3.BACK, 1974, origin, true)
+		var crossing := false
+		for i in 35:
+			await RenderingServer.frame_post_draw
+			if hits.size() != 1:
+				continue
+			var point: Vector3 = hits[0].position
+			var normal: Vector3 = hits[0].normal
+			for index in sparks.multimesh.visible_instance_count:
+				var quad := sparks.global_transform * sparks.multimesh.get_instance_transform(index)
+				var extent := (absf(quad.basis.x.dot(normal)) + absf(quad.basis.y.dot(normal))) * 0.5
+				var clearance := (quad.origin - point).dot(normal)
+				crossing = crossing or (clearance > 0.0 and clearance - extent < -size.z)
+			if crossing:
+				break
+		check(crossing and hits[0].collider == wall, "A projectile quad crosses the thin wall before fragment clipping")
+		if crossing:
+			paused = true
+			for i in 4:
+				await RenderingServer.frame_post_draw
+			var shown := root.get_texture().get_image().get_data()
+			sparks.hide()
+			for i in 4:
+				await RenderingServer.frame_post_draw
+			check(root.get_texture().get_image().get_data() == shown, "The far side of the wall shows no spark fragments")
+			sparks.show()
+			paused = false
+		weapon.bolt_impact.disconnect(record)
+		weapon.reset()
+		sparks._random.seed = saved_seed
+		sparks._random.state = saved_state
+	wall.free()
+	camera.global_transform = saved_transform
+	camera.size = saved_size
+	lab.set_process(processing)
 
 
 func check_projectile_contact_anchor(lab: Node3D) -> void:
