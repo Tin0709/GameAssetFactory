@@ -108,6 +108,7 @@ func run() -> void:
 	await check_zombie_steps_on_slab(lab)
 	await check_zombie_dust_contact_clock(lab)
 	await check_selected_landing_surfaces(lab, dust)
+	await check_axe_ground_contact_dust(lab, dust)
 	await check_selected_floor_steps(lab)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
@@ -1515,6 +1516,88 @@ func check_zombie_dust_contact_clock(lab) -> void:
 	check(dust.multimesh.visible_instance_count == 0 and not dust.is_processing(),
 		"Simultaneous expiry empties the draw batch")
 	dust.clear()
+
+func check_axe_ground_contact_dust(lab, dust: Node3D) -> void:
+	var actor: CharacterBody3D = lab.player
+	var audio: Node = lab.get_node("CombatAudio")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	for data: Array in [[0, "grass", "flat"], [1, "dirt", "flat"], [2, "stone", "wall"], [2, "stone", "ledge"]]:
+		var surface: String = data[1]
+		var fixture: String = data[2]
+		lab.reset_player()
+		for i in 8:
+			await physics_frame
+		lab._select_floor_surface(data[0])
+		lab._select_weapon(lab.Weapon.AXE)
+		check(lab._equipped_weapon == lab.Weapon.AXE, "The ground contact test equips the Axe")
+		var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
+		var stage_origin := actor.global_position
+		var obstacle: StaticBody3D
+		if fixture != "flat":
+			obstacle = StaticBody3D.new()
+			var collision := CollisionShape3D.new()
+			var box := BoxShape3D.new()
+			collision.shape = box
+			obstacle.add_child(collision)
+			if fixture == "wall":
+				box.size = Vector3(3.0, 0.25, 0.20)
+				obstacle.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true),
+					stage_origin + forward + Vector3.UP * 0.11)
+			else:
+				box.size = Vector3(1.0, 0.4, 1.0)
+				obstacle.position = Vector3(stage_origin.x, 0.20, stage_origin.z)
+				actor.position.y += 0.40
+			lab.add_child(obstacle)
+		var cue := StringName("slam_" + surface)
+		var before: int = audio._next_choice.get(cue, 0)
+		await start_heavy_drop(lab)
+		var contact_tick := -1
+		var dust_tick := -1
+		var sound_tick := -1
+		var first_particles: Array = []
+		for i in Engine.physics_ticks_per_second * 2:
+			await physics_frame
+			var tick := Engine.get_physics_frames() - 1
+			if dust_tick == -1 and visible_particles(dust) > 0:
+				dust_tick = tick
+				first_particles = dust._particles.filter(func(particle): return particle.sprite.visible)
+			if sound_tick == -1 and audio._next_choice.get(cue, 0) != before:
+				sound_tick = tick
+			if contact_tick == -1 and lab._light_serial >= 0:
+				contact_tick = tick
+			if contact_tick >= 0 and tick >= contact_tick + 5:
+				break
+		check(contact_tick >= 0, "The %s Axe dive has one blade impact cue" % fixture)
+		var point: Vector3 = lab._slam_burst_point
+		var tolerance := 0.0001
+		if fixture == "ledge":
+			check(dust_tick == -1 and sound_tick == -1, "An unclassified ledge emits no terrain dust or surface sound")
+		else:
+			check(dust_tick == contact_tick and sound_tick == contact_tick and first_particles.size() == dust.HEAVY_PARTICLE_COUNT,
+				"The %s/%s Axe dust and surface audio share the contact tick while retaining the ten particles" % [surface, fixture])
+			var tint: Color = dust.SURFACE_DUST[surface]
+			check(not first_particles.is_empty() and first_particles.all(func(p):
+				var offset: Vector3 = (p.origin - point).slide(Vector3.UP)
+				return offset.length() <= 0.42 + tolerance and Color(p.sprite.modulate, 1.0).is_equal_approx(tint)),
+				"The %s Axe dust is placed around the supported blade impact" % fixture)
+			check(audio._next_choice.get(cue, 0) == (before + 1) % 6,
+				"The %s Axe plays one surface voice" % fixture)
+			if fixture == "wall":
+				check(first_particles.all(func(p):
+					var endpoint: Vector3 = p.origin + p.velocity * p.duration * 0.6
+					return (endpoint - stage_origin).dot(forward) < 0.9),
+					"The Axe dust centres stay on the near side of the wall over their full lifetime")
+		print("AXE_GROUND_CONTACT ", surface, "/", fixture, " contact=", contact_tick, " dust=", dust_tick,
+			" sound=", sound_tick, " anchor=", point)
+		if obstacle != null:
+			obstacle.free()
+	toggle.button_pressed = false
+	lab.reset_player()
+	await physics_frame
+	lab._select_floor_surface(0)
+	lab._select_weapon(lab.Weapon.SABRE)
+	await physics_frame
 
 func check_selected_landing_surfaces(lab, dust: Node3D) -> void:
 	var picker := lab.get_node_or_null("HUD/FloorSurface") as OptionButton
