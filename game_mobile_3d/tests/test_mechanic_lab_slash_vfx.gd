@@ -432,7 +432,7 @@ func check_sabre_dive(lab, selector: OptionButton) -> void:
 func check_wall_ribbons(lab, selector: OptionButton) -> void:
 	for slot in [0, 10]:
 		for airborne in [false, true]:
-			var wall_faces := [INF, 0.9, 1.35] if airborne and slot == 10 else [INF, 0.9]
+			var wall_faces := [INF, 0.52, 0.9, 1.35] if airborne and slot == 10 else [INF, 0.9]
 			for wall_face: float in wall_faces:
 				lab.reset_player()
 				for i in 8:
@@ -474,7 +474,7 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 						furthest = maxf(furthest, point.dot(forward))
 						nearest = minf(nearest, point.dot(forward))
 				var context := "%s air=%s wall=%s" % [selector.get_item_text(slot), airborne, wall_face]
-				if slot == 10 and airborne and wall_face == 0.9:
+				if slot == 10 and airborne and wall_face == 0.52:
 					check(frames == 0, "A wall entirely in front of the Axe dive's ribbon hides it")
 				else:
 					check(frames > 0, "The unobstructed portion of the ribbon still draws for %s" % context)
@@ -482,8 +482,8 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 					check(furthest <= wall_face + 0.0001, "The ribbon ends on the player's side of the wall for %s" % context)
 					wall.free()
 				elif airborne and slot == 10:
-					check(nearest > 0.9 and nearest < 1.35 and furthest > 1.35,
-						"The clear Axe dive is fully beyond the near wall and straddles the distant wall")
+					check(nearest > 0.52 and nearest < 0.9 and furthest > 1.35,
+						"The Axe dive is beyond the closest wall and straddles the middle and distant walls")
 				print("RIBBON_WALL ", context, " frames=", frames, " nearest=", nearest, " furthest=", furthest)
 
 func check_world_map_slash() -> void:

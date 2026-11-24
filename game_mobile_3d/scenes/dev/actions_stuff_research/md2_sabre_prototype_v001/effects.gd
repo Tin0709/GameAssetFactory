@@ -95,11 +95,18 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 	_was_active=active;_previous_base=base;_previous_tip=tip
 
 func _sample_trail_edge(delta: float, edge_age: float, base: Vector3, tip: Vector3) -> void:
-	# An exact tick boundary already has a regular pose sample.
-	if edge_age <= 0.000001 or edge_age >= delta - 0.000001 or clock <= delta:
+	# Near a tick boundary the regular pose on that edge may be inactive.
+	# Deduplicate actual samples instead of discarding all near-edge cues.
+	const TIME_EPSILON := 0.000000001
+	if edge_age < 0.0 or edge_age > delta + TIME_EPSILON or clock <= delta:
 		return
-	var weight := 1.0 - edge_age / delta
-	samples.append(_trail_sample(_previous_base.lerp(base, weight), _previous_tip.lerp(tip, weight), clock - edge_age))
+	var elapsed := minf(edge_age, delta)
+	var edge_time := clock - elapsed
+	if (not _was_active and elapsed <= TIME_EPSILON) \
+			or (not samples.is_empty() and edge_time <= float(samples[-1].time) + TIME_EPSILON):
+		return
+	var weight := 1.0 - elapsed / delta
+	samples.append(_trail_sample(_previous_base.lerp(base, weight), _previous_tip.lerp(tip, weight), edge_time))
 
 func _trail_sample(base: Vector3, tip: Vector3, time: float) -> Dictionary:
 	var tip_u := float(trail_end_fraction.call(base, tip)) if trail_end_fraction.is_valid() else 1.0
