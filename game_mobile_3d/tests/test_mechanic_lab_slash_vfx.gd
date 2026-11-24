@@ -158,7 +158,7 @@ func check_curved_finisher_ribbon(lab, selector: OptionButton) -> void:
 			continue
 		var start: float = effects.clock - actor.combo.time / actor.combo.playback_rate()
 		for sample in effects.samples:
-			var source_frame := (float(sample.time) - start) * actor.combo.playback_rate() * 30.0
+			var source_frame: float = (float(sample.time) - start) * actor.combo.playback_rate() * 30.0
 			sample_frames[snappedf(source_frame, 0.0001)] = true
 		var shown: Array = effects.samples_at(effects.clock)
 		if shown.size() > 2 and shown[0].time < start + 10.001 / 33.0 and shown[-1].time > start + 14.001 / 33.0:
