@@ -91,7 +91,7 @@ func run() -> void:
 	var ribbon_opacity := impact_rows.get_node_or_null("RibbonOpacity/Slider") as HSlider
 	var slam_opacity := impact_rows.get_node_or_null("SlamOpacity/Slider") as HSlider
 	var slam_duration := impact_rows.get_node_or_null("SlamDuration/Slider") as HSlider
-	if [impact_opacity, impact_duration, ribbon_opacity, slam_opacity, slam_duration].has(null):
+	if impact_opacity == null or impact_duration == null or ribbon_opacity == null or slam_opacity == null or slam_duration == null:
 		printerr("FAIL The Lab has no independent controls for weapon trails and shockwaves")
 		lab.free()
 		Engine.max_fps = starting_cap
