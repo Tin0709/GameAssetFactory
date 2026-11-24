@@ -87,8 +87,12 @@ func run() -> void:
 	var lab := make_lab()
 	var impact_opacity := lab.get_node_or_null("HUD/ImpactFxPanel/Rows/Opacity/Slider") as HSlider
 	var impact_duration := lab.get_node_or_null("HUD/ImpactFxPanel/Rows/Duration/Slider") as HSlider
-	if impact_opacity == null or impact_duration == null:
-		printerr("FAIL The Lab has no impact streak opacity and duration controls")
+	var impact_rows := lab.get_node("HUD/ImpactFxPanel/Rows")
+	var ribbon_opacity := impact_rows.get_node_or_null("RibbonOpacity/Slider") as HSlider
+	var slam_opacity := impact_rows.get_node_or_null("SlamOpacity/Slider") as HSlider
+	var slam_duration := impact_rows.get_node_or_null("SlamDuration/Slider") as HSlider
+	if [impact_opacity, impact_duration, ribbon_opacity, slam_opacity, slam_duration].has(null):
+		printerr("FAIL The Lab has no independent controls for weapon trails and shockwaves")
 		lab.free()
 		Engine.max_fps = starting_cap
 		quit(1)
@@ -128,6 +132,9 @@ func run() -> void:
 	var quality := lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality") as OptionButton
 	impact_opacity.value = 35.0
 	impact_duration.value = 150.0
+	ribbon_opacity.value = 25.0
+	slam_opacity.value = 0.0
+	slam_duration.value = 150.0
 	var low_index := quality.get_item_index(1)
 	check(low_index >= 0, "The previously saved reduced budget ID is still available")
 	quality.select(low_index)
@@ -141,6 +148,9 @@ func run() -> void:
 	mix_weapon.value = 100.0
 	impact_opacity.value = 85.0
 	impact_duration.value = 65.0
+	ribbon_opacity.value = 80.0
+	slam_opacity.value = 40.0
+	slam_duration.value = 75.0
 	var balanced_index := quality.get_item_index(2)
 	check(balanced_index >= 0, "The balanced spark budget has its own saved ID")
 	if balanced_index >= 0:
@@ -160,6 +170,7 @@ func run() -> void:
 	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").get_selected_id() == 1,
 		"Loading A restores reduced contact sparks by the existing preset ID")
 	check_impact_values(lab, 35.0, 150.0)
+	check_weapon_vfx_values(lab, 25.0, 0.0, 150.0)
 	check(lab.get_node("HUD/FloorSurface").selected == 1 and lab.get("_floor_surface") == "dirt",
 		"Loading A restores the dirt stage and its contact material")
 	check(lab.get_node("HUD/ZombieGait").selected == a_animation,
@@ -172,6 +183,7 @@ func run() -> void:
 	check(lab.get_node("HUD/AudioMixPanel/Rows/Weapon/Slider").value == 100.0, "Loading B restores full weapon level")
 	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").get_selected_id() == 2, "Loading B restores the balanced spark budget")
 	check_impact_values(lab, 85.0, 65.0)
+	check_weapon_vfx_values(lab, 80.0, 40.0, 75.0)
 	check(lab.get_node("HUD/FloorSurface").selected == 2 and lab.get("_floor_surface") == "stone",
 		"Loading B restores the stone stage and its contact material")
 	check(lab.get_node("HUD/ZombieGait").selected == b_animation,
@@ -181,6 +193,7 @@ func run() -> void:
 	select_action(lab, 4)
 	check(Engine.max_fps == 75, "Restoring defaults inherits the app's cap")
 	check(values_match(lab, baseline, 100, false), "Restoring defaults updates the HUD and runtime together")
+	check_weapon_vfx_values(lab, 100.0, 100.0, 100.0)
 	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").get_selected_id() == 0,
 		"Defaults restore the full spark budget")
 	select_action(lab, 1)
@@ -225,3 +238,16 @@ func check_impact_values(lab: Node3D, opacity: float, duration: float) -> void:
 		and is_equal_approx(material.get_shader_parameter("opacity_scale"), opacity * 0.01)
 		and is_equal_approx(sparks.get_parent().duration_scale, duration * 0.01),
 		"Preset restores %d%% opacity and %d%% lifetime in the HUD and renderer" % [opacity, duration])
+
+func check_weapon_vfx_values(lab: Node3D, ribbon: float, slam: float, duration: float) -> void:
+	var rows := lab.get_node("HUD/ImpactFxPanel/Rows")
+	var ribbon_material := lab.player.effects.ribbon.material_override as ShaderMaterial
+	var slam_ring := lab.get_node("CombatEffects/ToolGroundSlam") as MeshInstance3D
+	var slam_material := slam_ring.material_override as ShaderMaterial
+	check(rows.get_node("RibbonOpacity/Slider").value == ribbon
+		and is_equal_approx(ribbon_material.get_shader_parameter("opacity_scale"), ribbon * 0.01),
+		"The preset applies independent weapon trail opacity")
+	check(rows.get_node("SlamOpacity/Slider").value == slam
+		and is_equal_approx(slam_material.get_shader_parameter("opacity_scale"), slam * 0.01)
+		and rows.get_node("SlamDuration/Slider").value == duration,
+		"The preset applies the shockwave controls")
