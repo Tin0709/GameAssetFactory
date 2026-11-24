@@ -112,6 +112,8 @@ func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=nul
 		else:
 			if not result.is_empty() and display_time>float(result[-1].time):
 				var a:Dictionary=result[-1]
+				if a.tip_u <= 0.0 or point.tip_u <= 0.0:
+					break
 				var weight:=clampf((display_time-float(a.time))/maxf(.000001,float(point.time)-float(a.time)),0.,1.)
 				# The presented bone pose is unclipped. Use it only when
 				# both simulated blade spans were fully visible.
