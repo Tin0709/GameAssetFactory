@@ -2054,6 +2054,8 @@ func check_tool_montage_audio() -> void:
 			check(not audio._voice_groups.has(accent_group), "%s does not use the Shovel dirt layer" % name)
 		print("TOOL_AUDIO_TIMELINE ", name, " ", played)
 
+	await check_tool_flight_audio(lab, menu, audio)
+
 	lab.reset_player()
 	for i in 8:
 		await physics_frame
@@ -2068,6 +2070,51 @@ func check_tool_montage_audio() -> void:
 	toggle.button_pressed = false
 	lab.free()
 	await create_timer(0.10).timeout
+
+func check_tool_flight_audio(lab, menu: OptionButton, audio: Node3D) -> void:
+	var actor = lab.player
+	for fixture: Array in [
+		[lab.Weapon.PICKAXE, "pickaxe", 5.0, 0.033385, 1],
+		[lab.Weapon.PICKAXE, "pickaxe", 70.0, 0.033385, 2],
+		[lab.Weapon.SHOVEL, "shovel", 70.0, 0.338963, 1],
+		[lab.Weapon.SHOVEL, "shovel", 7.0, 0.338963, 0],
+	]:
+		lab.reset_player()
+		for i in 10:
+			await physics_frame
+		menu.select(fixture[0])
+		menu.item_selected.emit(fixture[0])
+		audio.reset()
+		var label := "%s from %.0f m" % [fixture[1], fixture[2]]
+		check(actor.drop_for_lab(fixture[2]), "%s starts a real drop" % label)
+		await physics_frame
+		await physics_frame
+		push_melee_attack(true)
+		await physics_frame
+		push_melee_attack(false)
+		var frames: Dictionary[int, float] = {}
+		var group := StringName("tool_%s_3" % fixture[1])
+		var landed := false
+		for i in 3 * Engine.physics_ticks_per_second:
+			for slot in audio._voice_groups.size():
+				if audio._voice_groups[slot] != group:
+					continue
+				var frame: int = audio._started_frames[slot]
+				if frames.has(frame):
+					continue
+				var clip_time: float = actor.combo.time
+				frames[frame] = clip_time
+				var cue: float = fixture[3]
+				var step: float = actor.combo.playback_rate() / Engine.physics_ticks_per_second
+				check(not actor.combo.air_landing_started and clip_time >= cue - 0.000002
+					and clip_time <= cue + step + 0.000002, "%s whoosh uses the airborne cue" % label)
+			if actor.combo.air_landing_started:
+				landed = true
+				break
+			await physics_frame
+		check(landed and frames.size() == fixture[4], "%s plays the expected airborne cues" % label)
+		print("TOOL_FLIGHT_AUDIO ", label, " times=", frames.values())
+
 
 func run() -> void:
 
