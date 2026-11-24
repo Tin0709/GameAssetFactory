@@ -26,6 +26,7 @@ var intensity:=.75
 var _mesh:=ImmediateMesh.new()
 var _rng:=RandomNumberGenerator.new()
 var _was_active:=false
+var _ribbon_section := 0
 var _previous_base := Vector3.ZERO
 var _previous_tip:=Vector3.ZERO
 
@@ -57,12 +58,17 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 	clock+=delta
 	if not enabled or not blade_trail_enabled:active=false
 	if active:
-		if serial!=attack_serial:samples.clear();serial=attack_serial;_was_active=false
-		var point := _trail_sample(base, tip, clock)
+		if serial != attack_serial:
+			samples.clear()
+			serial = attack_serial
+			_was_active = false
+			_ribbon_section = 0
 		if not _was_active:
+			_ribbon_section += 1
 			_sample_trail_edge(delta, edge_age, base, tip)
-			if point.tip_u == 1.0:
-				_burst(tip,tip-_previous_tip)
+		var point := _trail_sample(base, tip, clock)
+		if not _was_active and _ribbon_section == 1 and point.tip_u == 1.0:
+			_burst(tip,tip-_previous_tip)
 		samples.append(point)
 	elif _was_active and serial == attack_serial and enabled and blade_trail_enabled:
 		_sample_trail_edge(delta, edge_age, base, tip)
@@ -90,7 +96,7 @@ func _sample_trail_edge(delta: float, edge_age: float, base: Vector3, tip: Vecto
 func _trail_sample(base: Vector3, tip: Vector3, time: float) -> Dictionary:
 	var tip_u := float(trail_end_fraction.call(base, tip)) if trail_end_fraction.is_valid() else 1.0
 	var end := tip if tip_u == 1.0 else base.lerp(tip, tip_u)
-	return {"base": base, "tip": end, "tip_u": tip_u, "time": time}
+	return {"base": base, "tip": end, "tip_u": tip_u, "time": time, "section": _ribbon_section}
 
 func _burst(point:Vector3,direction:Vector3,publish_sample:=false)->void:
 	bursts+=1;var added:=0
@@ -113,7 +119,7 @@ func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=nul
 		else:
 			if not result.is_empty() and display_time>float(result[-1].time):
 				var a:Dictionary=result[-1]
-				if a.tip_u <= 0.0 or point.tip_u <= 0.0:
+				if a.section != point.section or a.tip_u <= 0.0 or point.tip_u <= 0.0:
 					break
 				var weight:=clampf((display_time-float(a.time))/maxf(.000001,float(point.time)-float(a.time)),0.,1.)
 				# The presented bone pose is unclipped. Use it only when
@@ -123,6 +129,7 @@ func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=nul
 					"base": blade_base if full_span and blade_base != null else Vector3(a.base).lerp(point.base, weight),
 					"tip": blade_tip if full_span and blade_tip != null else Vector3(a.tip).lerp(point.tip, weight),
 					"tip_u": lerpf(a.tip_u, point.tip_u, weight), "time": display_time,
+					"section": point.section,
 				})
 			break
 	return result
@@ -144,7 +151,7 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 	for i in range(1, shown.size()):
 		var a: Dictionary = shown[i - 1]
 		var b: Dictionary = shown[i]
-		if a.tip_u <= 0.0 or b.tip_u <= 0.0:
+		if a.section != b.section or a.tip_u <= 0.0 or b.tip_u <= 0.0:
 			continue
 		if not has_surface:
 			_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)

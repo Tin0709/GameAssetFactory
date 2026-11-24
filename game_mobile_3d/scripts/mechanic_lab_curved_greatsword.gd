@@ -21,6 +21,8 @@ const RECOVERY_DURATION := 0.5
 # The finisher has two arcs. Use its second arc for the lab's single contact.
 const CONTACT_FRAMES := [11.0, 14.0, 17.0]
 const TRAIL_FRAMES := [Vector2(9, 13), Vector2(12, 17), Vector2(5, 21)]
+# Break between the two forward sweeps while the source blade turns behind the player.
+const FINISHER_TRAIL_GAP := Vector2(10.0, 14.0) / 30.0
 const ATTACK_HASHES := [
 	"377fb2081d1b2fabd3534138076aca4aead3dda6a81c8cd899fa8daba84b4ec9",
 	"40e40cbe902bf73e0adf961ebb3265cc26a1f3289a97281b1f97cdcfca670d2b",
@@ -113,4 +115,6 @@ static func combat_profile(research_root: String) -> Dictionary:
 			"attack_key": attack, "recovery_key": recovery,
 			"attack_source": stem, "recovery_source": stem + "Recovery",
 		})
+		if i == 2:
+			profile.windows.back().trail_gap = FINISHER_TRAIL_GAP
 	return profile
