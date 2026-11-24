@@ -256,6 +256,35 @@ func check_crowd_sparks() -> void:
 	await process_frame
 	check(renderer.multimesh.visible_instance_count == 0 and not sparks.is_processing(),
 		"Reset clears the crowd sparks and stops their frame callback")
+	var quality := lab.get_node_or_null("HUD/ContactSparkQuality") as OptionButton
+	check(quality != null, "The Lab exposes a control for the contact spark budget")
+	if quality != null:
+		check(quality.selected == 0, "The Lab starts with the approved contact spark budget")
+		quality.select(1)
+		quality.item_selected.emit(1)
+		for rank in range(100, 0, -1):
+			group.sabre_contact.emit(origin + Vector3.RIGHT * (0.8 * rank),
+				Vector3.RIGHT, "Attack3", 2, 1703, false)
+		sparks._process(0.0)
+		var counts := [0, 0, 0]
+		for particle in sparks._particles:
+			if particle.age < particle.lifetime:
+				for i in counts.size():
+					if particle.origin.distance_squared_to(nearest[i]) < 0.22 ** 2:
+						counts[i] += 1
+		check(counts == [6, 6, 6] and renderer.multimesh.visible_instance_count == 18,
+			"Reduced quality shows six sparks at each of the three nearest contacts")
+		lab.reset_player()
+		quality.select(0)
+		quality.item_selected.emit(0)
+		var future: float = lab.player.render_presenter.display_clock + 1.0
+		for point in nearest:
+			sparks.queue_contact(point, Vector3.RIGHT, origin, future)
+		quality.select(1)
+		quality.item_selected.emit(1)
+		sparks._process(0.0)
+		check(renderer.multimesh.visible_instance_count == 0 and sparks._pending.size() == 3,
+			"Reducing quality keeps future sparks deferred at the three nearest contacts")
 	lab.free()
 
 func check_flash_during_render_hitch() -> void:
