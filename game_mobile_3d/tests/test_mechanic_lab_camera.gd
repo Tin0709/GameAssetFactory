@@ -47,6 +47,7 @@ func run() -> void:
 	check(is_zero_approx(contact(lab, Vector3(1, 0, 0), 104, "Attack2", 1)), "Sword ordinary strike has zero shake")
 	check_shake_slider(lab)
 	check_contact_render_hitch(lab)
+	await check_melee_combo_shakes(lab)
 	await check_sabre_dive(lab)
 	await check_aerial_impact_support(lab)
 	if DisplayServer.get_name() != "headless":
@@ -98,6 +99,63 @@ func check_contact_render_hitch(lab) -> void:
 	check(is_equal_approx(offsets[0], offsets[1]) and offsets[1] < 0.0
 		and is_equal_approx(energies[0], energies[1]) and energies[1] > 0.0 and energies[1] < 2.3,
 		"Light decay and camera reversal follow elapsed time after the first displayed frame")
+	lab.reset_player()
+
+func check_melee_combo_shakes(lab) -> void:
+	var group := lab.get_node("Zombies") as Node3D
+	var actor: CharacterBody3D = lab.player
+	if not group.spawn(actor, Basis.IDENTITY, lab.get_node("CombatEffects")):
+		check(false, "A stationary target is available for melee camera checks")
+		return
+	var target := group.get_child(0) as CharacterBody3D
+	target.set_physics_process(false)
+	var contacts: Array[int] = []
+	var record_contact := func(_point, _direction, _clip, _index, serial: int, _lethal):
+		contacts.append(serial)
+	group.sabre_contact.connect(record_contact)
+	var menu := lab.get_node("HUD/Weapon") as OptionButton
+	var expected := {0: 0.008, 1: 0.008, 2: 0.008, 4: 0.004, 5: 0.008,
+		7: 0.004, 8: 0.0, 9: 0.0, 10: 0.008}
+	for weapon: int in expected:
+		lab.reset_player()
+		lab._select_weapon(weapon)
+		for i in 8:
+			await physics_frame
+		check(lab._equipped_weapon == weapon, "The camera fixture equips %s" % menu.get_item_text(weapon))
+		target.health = 100
+		target.global_position = actor.global_position + actor.visual.global_basis.z * 1.3
+		contacts.clear()
+		var kicks: Array[float] = []
+		var lights: Array[float] = []
+		var key := InputEventKey.new()
+		key.physical_keycode = KEY_E
+		key.pressed = true
+		root.push_input(key, true)
+		for i in Engine.physics_ticks_per_second * 5:
+			await physics_frame
+			if contacts.size() <= kicks.size():
+				continue
+			actor.render_presenter.prepare(1.0)
+			lab._process(0.0)
+			kicks.append(lab.camera.h_offset / lab.camera.size if lab._shake_serial == contacts.back() else 0.0)
+			lights.append(lab._impact_light.light_energy if lab._impact_light.visible else 0.0)
+			if kicks.size() == 3:
+				break
+		key = InputEventKey.new()
+		key.physical_keycode = KEY_E
+		root.push_input(key, true)
+		check(kicks.size() == 3, "Held E lands three real %s hits" % menu.get_item_text(weapon))
+		if kicks.size() == 3:
+			check(is_zero_approx(kicks[0]) and is_zero_approx(kicks[1])
+				and is_equal_approx(kicks[2], expected[weapon]),
+				"The %s combo uses the correct finisher camera response" % menu.get_item_text(weapon))
+			check(lights.all(func(energy: float): return energy >= 1.79)
+				and (expected[weapon] == 0.0 or is_equal_approx(lights[2], 2.3)),
+				"The %s combo keeps bright contact feedback at the impact pose" % menu.get_item_text(weapon))
+		print("MELEE_COMBO_SHAKE ", menu.get_item_text(weapon), " kicks=", kicks, " contact_lights=", lights)
+	group.sabre_contact.disconnect(record_contact)
+	target.free()
+	lab._select_weapon(lab.Weapon.SABRE)
 	lab.reset_player()
 
 func check_sabre_dive(lab) -> void:
