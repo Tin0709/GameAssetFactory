@@ -383,10 +383,27 @@ func run() -> void:
 			var selected_profile = map.biome_graphics
 			check(is_equal_approx(graphics._mist_sample.scatter_energy, .483),
 				"Woodland uses its authored 07:00 scattering on opening the imported scene")
+			var front_slider := map.find_child("PortableMistFrontTransfer", true, false) as HSlider
+			check(front_slider != null and front_slider.editable and front_slider.value == 1.,
+				"The imported map exposes the enabled midground mist setting")
+			check(is_equal_approx(graphics._mist._profile.front_scatter_advance_m, .85)
+				and graphics._mist._profile.front_transfer_m == 0.,
+				"Woodland advances only the in-scattering at 07:00")
+			if front_slider != null:
+				front_slider.value = .5
+				check(is_equal_approx(graphics._mist._profile.front_scatter_advance_m, .425),
+					"The map settings slider scales the submitted lookup")
+				front_slider.value = 1.
+			map.showcase.set_hour(12.)
+			check(graphics._mist._profile.front_scatter_advance_m == 0., "The noon lookup stays neutral")
+			map.showcase.set_hour(7.)
 			var inherited_profile = selected_profile.duplicate()
+			inherited_profile.set("mist_front_scatter_by_hour", null)
 			inherited_profile.set("mist_scatter_color_by_hour", null)
 			inherited_profile.set("mist_scatter_energy_by_hour", null)
 			graphics.set_profile(inherited_profile)
+			check(graphics._mist._profile.front_scatter_advance_m == 0. and (front_slider == null or not front_slider.editable),
+				"A different preset without front scattering clears the lookup and disables the slider")
 			await process_frame
 			await RenderingServer.frame_post_draw
 			var chromatic_profile = inherited_profile.duplicate()
