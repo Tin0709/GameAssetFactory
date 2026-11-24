@@ -27,14 +27,14 @@ func run() -> void:
 		and material.get_shader_parameter(&"use_source_slash") == true,
 		"MechanicLab loads the verified native slash texture into the ribbon material")
 	var selector := lab.get_node("HUD/Weapon") as OptionButton
-	var weapons := [&"Sabre", &"Sword", &"Curved Greatsword"]
-	for slot in weapons.size():
+	for slot in [0, 1, 2, 5, 8, 9, 10]:
 		lab.reset_player()
 		for i in 8:
 			await physics_frame
 		selector.select(slot)
 		selector.item_selected.emit(slot)
-		check(selector.selected == slot, "The ground fixture equips %s" % weapons[slot])
+		var weapon := selector.get_item_text(slot)
+		check(selector.selected == slot, "The ground fixture equips %s" % weapon)
 		for i in 20:
 			await physics_frame
 		attack(true)
@@ -52,11 +52,28 @@ func run() -> void:
 			if age_span > 0.03:
 				break
 		attack(false)
-		check(found and age_span > 0.03, "A real %s swing carries temporal UVs in its ribbon" % weapons[slot])
-		check(not lab.get_node("CombatImpactLight").visible, "A missed %s swing has no hit light" % weapons[slot])
+		check(found and age_span > 0.03, "A real %s swing carries temporal UVs in its ribbon" % weapon)
+		check(not lab.get_node("CombatImpactLight").visible, "A missed %s swing has no hit light" % weapon)
 		var sparks := lab.get_node_or_null("ContactSparks/Streaks") as MultiMeshInstance3D
 		check(sparks != null and sparks.multimesh.visible_instance_count == 0,
-			"A missed %s swing has no contact streaks" % weapons[slot])
+			"A missed %s swing has no contact streaks" % weapon)
+	for slot in [3, 4, 7]:
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		selector.select(slot)
+		selector.item_selected.emit(slot)
+		var weapon := selector.get_item_text(slot)
+		check(selector.selected == slot, "The non-blade fixture equips %s" % weapon)
+		var accepted: int = lab.player.accepted_count
+		var bursts: int = effects.bursts
+		attack(true)
+		for i in 45:
+			await physics_frame
+		attack(false)
+		check(lab.player.accepted_count > accepted, "%s accepted real attack input" % weapon)
+		check(effects.bursts == bursts and effects.samples.is_empty(),
+			"%s does not emit legacy blade sparks at the start of an attack" % weapon)
 	lab.reset_player()
 	await physics_frame
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
