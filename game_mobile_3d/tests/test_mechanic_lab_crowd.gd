@@ -47,7 +47,11 @@ func run() -> void:
 	mixed_crowd = OS.get_cmdline_user_args().has("--mixed-crowd")
 	var actions_stuff := OS.get_cmdline_user_args().has("--actions-stuff")
 	var synchronous := OS.get_cmdline_user_args().has("--sync-spawn")
+	var mobile_lifetime := OS.get_cmdline_user_args().has("--mobile-lifetime")
 	lab = LAB.instantiate()
+	if not mobile_lifetime:
+		# Exercise late settling before the reference lifetime expires.
+		lab.get_node("Zombies").corpse_lifetime = ZOMBIE.CORPSE_LIFETIME
 	root.add_child(lab)
 	current_scene = lab
 	var mode := lab.get_node("HUD/ZombieGait") as OptionButton
@@ -130,6 +134,8 @@ func run() -> void:
 	await measure("simultaneous_ragdolls", 120, group)
 	if active_peak != COUNT or first_tick_ragdolls != COUNT:
 		failures.append("Expected all 100 ragdolls to run together")
+	if mobile_lifetime and group.get_child_count() > 0:
+		failures.append("The mobile lifetime must clear the crowd during the death phase")
 	if not checked_corpse_fade:
 		failures.append("The crowd never reached the corpse fade sample")
 	var numbers := lab.get_node_or_null("CombatEffects/ZombieDamageNumbers") as MultiMeshInstance3D
@@ -956,6 +962,7 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 	render_gpu_ms.clear()
 	draws.clear()
 	active_peak = 0
+	var active_ragdoll_ticks := 0
 	var numbers := lab.get_node_or_null("CombatEffects/ZombieDamageNumbers") as MultiMeshInstance3D
 	var dust := lab.get_node_or_null("ZombieStepDust") as MultiMeshInstance3D
 	for i in ticks:
@@ -972,13 +979,15 @@ func measure(label: String, ticks: int, group: Node = null) -> void:
 			if label == "corpse_cleanup" and i == 149:
 				late_active_ragdolls = active
 			active_peak = maxi(active_peak, active)
+			active_ragdoll_ticks += active
 			if label == "simultaneous_ragdolls" and numbers != null:
 				peak_damage_glyphs = maxi(peak_damage_glyphs, numbers.multimesh.visible_instance_count)
 	print("CROWD_PHASE ", JSON.stringify({"phase": label, "frame_ms": stats(frame_ms),
 		"physics_window_ms": stats(physics_window_ms), "frame_with_physics_ms": stats(frame_with_physics_ms),
 		"frames_with_physics": frame_with_physics_ms.size(), "max_ticks_in_frame": max_ticks_in_frame,
 		"gpu_ms": stats(render_gpu_ms),
-		"draws": stats(draws), "samples": frame_ms.size(), "active_ragdolls_peak": active_peak}))
+		"draws": stats(draws), "samples": frame_ms.size(), "active_ragdolls_peak": active_peak,
+		"active_ragdoll_ticks": active_ragdoll_ticks}))
 
 func check_crowd_corpse_fade(group: Node) -> void:
 	checked_corpse_fade = true

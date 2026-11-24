@@ -1397,6 +1397,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 func _update_death(delta: float) -> void:
 	_corpse_age += delta
 	if _corpse_age >= corpse_lifetime - 0.00001:
+		set_physics_process(false)
 		queue_free()
 		return
 	if not _corpse_color_finished:
