@@ -151,8 +151,6 @@ func run() -> void:
 	sound.button_pressed = true
 	var combat_audio = lab.get_node("CombatAudio")
 	var fire_samples: Array = combat_audio._groups.get(&"crossbow_fire", [])
-	var impact_samples: Array = combat_audio._groups.get(&"crossbow_hit", [])
-	var flight_samples: Array = combat_audio._groups.get(&"crossbow_flight", [])
 	var embedded := lab._crossbow.get_node_or_null("EmbeddedArrows") as MultiMeshInstance3D
 	var sparks := lab._crossbow.get_node_or_null("ArrowImpactSparks") as MultiMeshInstance3D
 	check(sparks != null, "Polaris loads its two source impact emitters")
@@ -162,13 +160,14 @@ func run() -> void:
 	var muzzle_errors: Array[float] = []
 	lab._crossbow.bolt_launched.connect(func(projectile: Node3D) -> void:
 		muzzle_errors.append(projectile.global_position.distance_to(lab._crossbow_mount.to_global(CrossPollinator.MUZZLE))))
-	check(fire_samples.size() == 3 and impact_samples.size() == 3, "All verified crossbow firing and impact samples load")
-	check(flight_samples.size() == 4, "All verified arrow flight samples load")
+	check(fire_samples.size() == 3, "Enabling audio prepares every verified crossbow firing sample")
 	check(menu.selected == 3 and ammo.visible and ammo.text.contains("25 / 25"), "Crossbow equips with full ammo")
 	attack(true)
 	await ticks(2)
 	attack(false)
 	await ticks(3)
+	var flight_samples: Array = combat_audio._groups.get(&"crossbow_flight", [])
+	check(flight_samples.size() == 4, "Launching the bolt prepares all verified flight samples")
 	var flight_voices: Array = combat_audio._voices.filter(func(voice): return voice.stream in flight_samples)
 	var active_bolts: Array = lab._crossbow._bolts
 	var bolt := active_bolts[0].node as MeshInstance3D if not active_bolts.is_empty() else null
@@ -187,6 +186,8 @@ func run() -> void:
 		"Polaris does not double up with the generic melee sparks")
 	check(embedded != null and embedded.multimesh.visible_instance_count == 0,
 		"A living hit does not leave a terrain prop")
+	check(combat_audio._groups.get(&"crossbow_hit", []).size() == 3,
+		"The first contact prepares all verified crossbow impact samples")
 	check(combat_audio._next_choice.get(&"crossbow_hit", 0) == 1, "A living hit plays exactly one arrow impact")
 	check(ammo.text.contains("24 / 25"), "One projectile consumes one arrow")
 	await ticks(115)
@@ -1084,15 +1085,14 @@ func check_crossbow_settle(lab: Node3D, menu: OptionButton) -> void:
 func check_crossbow_equip_audio(lab: Node3D, menu: OptionButton) -> void:
 	var audio = lab.get_node("CombatAudio")
 	var sound := lab.get_node("HUD/CombatAudioToggle") as CheckButton
-	var equip_samples: Array = audio._groups.get(&"crossbow_equip", [])
-	var unequip_samples: Array = audio._groups.get(&"crossbow_unequip", [])
-	check(equip_samples.size() == 1 and unequip_samples.size() == 1, "Both MD2 crossbow switch cues load")
 	sound.button_pressed = true
 	equip(menu, 3)
-	check(audio._voices.any(func(voice): return voice.playing and voice.stream in equip_samples),
-		"Equipping the crossbow plays its source cue")
+	var equip_samples: Array = audio._groups.get(&"crossbow_equip", [])
+	check(equip_samples.size() == 1 and audio._voices.any(func(voice): return voice.playing and voice.stream in equip_samples),
+		"Equipping the crossbow loads and plays its source cue")
 	equip(menu, 0)
-	check(audio._voices.any(func(voice): return voice.playing and voice.stream in unequip_samples),
+	var unequip_samples: Array = audio._groups.get(&"crossbow_unequip", [])
+	check(unequip_samples.size() == 1 and audio._voices.any(func(voice): return voice.playing and voice.stream in unequip_samples),
 		"Switching away from the crossbow plays its source cue")
 	sound.button_pressed = false
 	equip(menu, 3)
