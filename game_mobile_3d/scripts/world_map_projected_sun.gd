@@ -122,6 +122,11 @@ func set_contrast(direction: Vector3, amount: float) -> void:
 		RenderingServer.global_shader_parameter_set(CONTRAST, applied)
 
 
+func update_contrast_direction(direction: Vector3) -> void:
+	if _contrast.w > 0.:
+		set_contrast(direction, _contrast.w)
+
+
 func set_shift(shift: Vector2) -> void:
 	var applied := shift if _weight > 0.0 and shift.is_finite() else Vector2.ZERO
 	if applied == _shift:

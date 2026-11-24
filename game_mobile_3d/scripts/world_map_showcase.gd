@@ -4260,9 +4260,27 @@ func sync_world_outline() -> void:
 		strength = 0.
 	level.look.set_terrain_outline(strength, _lighting_scale(&"world_outline_width"))
 
-func apply_time()->void:
+func _forest_time_matches(env: Environment, sun: DirectionalLight3D) -> bool:
+	if _forest_hour != hour or _applied_weather_weight != _weather.weight or _forest_expected.is_empty() \
+			or sun.light_color != _forest_sun or sun.light_energy != _forest_energy or sun.shadow_opacity != _forest_shadow_opacity:
+		return false
+	for field: String in _forest_expected:
+		if env.get(field) != _forest_expected[field]:
+			return false
+	return true
+
+func apply_time(reuse_current_forest := false) -> void:
 	if (not private_primary and not _flat_lab) or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
+	var env: Environment = level.get_node("WorldEnvironment").environment
+	var sun: DirectionalLight3D = level.get_node("Sun")
+	if reuse_current_forest and is_processing() and level.look.stage == 2 and env == _environment \
+			and forest_active() and _forest_time_matches(env, sun):
+		# These consumers need the final sun direction or camera pose for this frame.
+		projected_sun.update_contrast_direction(sun.global_basis.z)
+		_sync_distant_terrain()
+		_sync_canopy_direct()
+		return
 	refresh_daylight_shading()
 	if not _flat_lab:
 		_sync_distant_terrain()
@@ -4276,7 +4294,6 @@ func apply_time()->void:
 			level.grove.set_spruce_gap_coverage_weight(clampf(amount, 0., 1.))
 		_sync_forest_night_lights()
 		_publish_dawn_turf_color()
-	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
 		afternoon_lighting.active=false
 		_sync_canopy_direct()
@@ -4293,16 +4310,11 @@ func apply_time()->void:
 	var use_forest:=forest_active()
 	if not use_forest:
 		afternoon_lighting.active=false
-	var sun:DirectionalLight3D=level.get_node("Sun")
 	level.look.refresh_directional_shadow_blur(sun)
 	level.look.refresh_daylight_cloud_shape()
-	if use_forest and _forest_hour==hour and _applied_weather_weight == _weather.weight and not _forest_expected.is_empty() and sun.light_color==_forest_sun and sun.light_energy==_forest_energy and sun.shadow_opacity==_forest_shadow_opacity:
-		var unchanged:=true
-		for field:String in _forest_expected:
-			if env.get(field)!=_forest_expected[field]:unchanged=false;break
-		if unchanged:
-			_sync_canopy_direct()
-			return
+	if use_forest and _forest_time_matches(env, sun):
+		_sync_canopy_direct()
+		return
 	_refresh_lantern_glow()
 	if _time_applied:_restore_day()
 	if is_day_anchor() and (use_forest or _weather.weight <= 0.):

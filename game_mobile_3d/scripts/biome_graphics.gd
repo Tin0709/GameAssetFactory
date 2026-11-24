@@ -308,15 +308,19 @@ func set_weather(overcast: float, seconds: float = 2.5) -> void:
 		refresh()
 
 func _process(delta: float) -> void:
+	var weather_changed := _weather.advance(delta) and _profile.overcast != null
+	# Setting the hour refreshes lighting, mist and the finish with the latest weather.
+	if _cycle and _world.look.stage == 2:
+		_world.showcase.set_hour(DayNight.advance(_world.showcase.hour, delta, _profile.cycle_minutes * 60.))
+		return
+	if weather_changed:
+		refresh()
+		return
 	if _path_lamppost.support != null and _path_lamppost.fixture.visible and _path_lamppost.support.collision_layer == 0:
 		_update_fixture(_world.showcase.hour / 24.)
 	_update_local_diffuse()
 	_update_finish()
 	_update_spatial_mist()
-	if _cycle and _world.look.stage == 2:
-		_world.showcase.set_hour(DayNight.advance(_world.showcase.hour, delta, _profile.cycle_minutes * 60.))
-	if _weather.advance(delta) and _profile.overcast != null:
-		refresh()
 
 func _has_actor_ground_settings() -> bool:
 	if not ActorGroundLight.available() or _world.player.get("using_original_source") == true:

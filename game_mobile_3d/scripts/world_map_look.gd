@@ -1152,18 +1152,24 @@ func _process(_delta: float) -> void:
 			_apply_actor_materials(direct_clouds_active(), false)
 		_check_exposure()
 		return
+	var receivers_changed := false
 	if _private_player_material_scope() and player_effects_available()!=_player_effects_applied:
 		_apply_review_shaders()
+		receivers_changed = true
 	if ground_bounce_active() != _ground_bounce_applied:
 		_refresh_ground_bounce()
+		receivers_changed = true
 	if leaf_sampling_active() != _leaf_sampling_applied:
 		_apply_review_shaders()
+		receivers_changed = true
 	if level.grove != null and (level.grove.visible or level.grove.spruce_visible()) \
 		and grove_reveal_coverage_active() != _grove_coverage_applied:
 		refresh_grove_lighting()
+		receivers_changed = true
 	if _palette_requested != DayPalette.NONE and stage == 2:
 		_refresh_day_palette()
-	if level.get("showcase")!=null:level.showcase.apply_time()
+	if level.get("showcase") != null:
+		level.showcase.apply_time(not receivers_changed)
 	_check_exposure()
 
 func _check_exposure() -> void:
