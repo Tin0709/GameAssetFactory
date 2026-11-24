@@ -3,6 +3,7 @@ extends SceneTree
 ## Run with --audio-driver Dummy and user args --population=100 --cycles=1 --combat-audio.
 ## Add --combo=prime-gauntlets or --combo=curved-greatsword for a held-E workload.
 ## Add --render-fps=30 or --render-fps=60 to select the corresponding Lab mode.
+## Add --frame-trace=user://population-frames.json to save per-frame timing after the run.
 
 const LAB := preload("res://scenes/dev/MechanicLab.tscn")
 const MechanicLab := preload("res://scripts/mechanic_lab.gd")
@@ -49,6 +50,14 @@ var voices_peak := 0
 var player_hits := 0
 var combo_weapon := ""
 var failures: Array[String] = []
+var frame_trace_path := ""
+var frame_trace_rows: Array[Array] = []
+var pre_draw_us := -1
+var post_draw_us := -1
+var refill_us := 0
+var refills := 0
+var contacts_this_frame := 0
+var deaths_this_frame := 0
 
 func _initialize() -> void:
 	run.call_deferred()
@@ -67,6 +76,8 @@ func run() -> void:
 			combo_weapon = arg.trim_prefix("--combo=")
 		elif arg.begins_with("--render-fps="):
 			frame_rate = arg.trim_prefix("--render-fps=")
+		elif arg.begins_with("--frame-trace="):
+			frame_trace_path = arg.trim_prefix("--frame-trace=")
 	if counts[0] not in POPULATIONS or cycles < 1:
 		printerr("Use a supported population ", POPULATIONS, " and at least one cycle")
 		quit(2)
@@ -107,6 +118,9 @@ func run() -> void:
 	RenderingServer.viewport_set_measure_render_time(viewport, true)
 	physics_frame.connect(sample_physics_start)
 	process_frame.connect(sample_frame)
+	if not frame_trace_path.is_empty():
+		RenderingServer.frame_pre_draw.connect(mark_pre_draw)
+		RenderingServer.frame_post_draw.connect(mark_post_draw)
 	var label := "headless" if DisplayServer.get_name() == "headless" else "rendered"
 	await wait_ticks(90)
 	if not combo_weapon.is_empty():
@@ -138,6 +152,8 @@ func run() -> void:
 				break
 		if not failures.is_empty():
 			break
+	if not frame_trace_path.is_empty() and not save_frame_trace():
+		failures.append("Could not save frame trace to " + frame_trace_path)
 	print("POPULATION_END ", JSON.stringify({"failures": failures}))
 	quit(0 if failures.is_empty() else 1)
 
@@ -218,6 +234,8 @@ func run_held_combo() -> void:
 	var record_contact := func(_point, _direction, _clip, _index, serial, lethal):
 		contacts[serial] = contacts.get(serial, 0) + 1
 		kills[0] += int(lethal)
+		contacts_this_frame += 1
+		deaths_this_frame += int(lethal)
 		trace.append([Engine.get_physics_frames() - phase_started_tick, serial - serial_origin, lethal])
 	var refill := func(): spawned[0] += refill_crowd(population + spawned[0])
 	lab.player.attack_accepted.connect(record_attack)
@@ -266,15 +284,21 @@ func refill_crowd(spawned_total: int) -> int:
 	var missing := mini(population - group._living_count, MechanicLab.CROWD_SPAWN_LIMIT_PER_FRAME)
 	if missing <= 0:
 		return 0
+	var started := Time.get_ticks_usec() if not frame_trace_path.is_empty() else 0
 	# Refill by simulation tick so render cadence and wall-clock performance
 	# cannot alter the encounter sequence. Normal Lab spawning keeps its budget.
 	var facing := Basis(Vector3.UP, lab.player.visual.rotation.y)
 	var effects := lab.get_node("CombatEffects") as Node3D
+	var created := 0
 	for i in missing:
 		var baby := (spawned_total + i + 1) % 5 == 0
 		if not group.spawn(lab.player, facing, effects, false, baby):
-			return i
-	return missing
+			break
+		created += 1
+	if started > 0:
+		refill_us += Time.get_ticks_usec() - started
+		refills += created
+	return created
 
 func press_attack(pressed: bool) -> void:
 	var event := InputEventKey.new()
@@ -326,6 +350,8 @@ func sample_frame() -> void:
 		if ticks_in_frame > 0:
 			physics_window_ms.append((us - first_physics_us) / 1000.0)
 			max_physics_ticks_per_frame = maxi(max_physics_ticks_per_frame, ticks_in_frame)
+	if not frame_trace_path.is_empty():
+		record_frame_trace(us)
 	last_frame_us = us
 	ticks_in_frame = 0
 	if phase.is_empty():
@@ -345,6 +371,42 @@ func sample_frame() -> void:
 	for voice in audio._voices:
 		playing += int(voice.playing)
 	voices_peak = maxi(voices_peak, playing)
+
+func mark_pre_draw() -> void:
+	pre_draw_us = Time.get_ticks_usec()
+
+func mark_post_draw() -> void:
+	post_draw_us = Time.get_ticks_usec()
+
+func record_frame_trace(now_us: int) -> void:
+	if not phase.is_empty() and last_frame_us >= phase_started_us:
+		# This interval includes the previous draw, then the current physics steps.
+		# The rendering server measurements elsewhere can describe an earlier frame.
+		var physics_start := first_physics_us if ticks_in_frame > 0 else now_us
+		var draw_measured := last_frame_us <= pre_draw_us and pre_draw_us <= post_draw_us and post_draw_us <= physics_start
+		frame_trace_rows.append([cycle, population, phase, Engine.get_physics_frames() - phase_started_tick,
+			now_us - last_frame_us, pre_draw_us - last_frame_us if draw_measured else -1,
+			post_draw_us - pre_draw_us if draw_measured else -1,
+			physics_start - post_draw_us if draw_measured else -1, now_us - physics_start, ticks_in_frame,
+			refill_us, refills, contacts_this_frame, deaths_this_frame])
+	pre_draw_us = -1
+	post_draw_us = -1
+	refill_us = 0
+	refills = 0
+	contacts_this_frame = 0
+	deaths_this_frame = 0
+
+func save_frame_trace() -> bool:
+	var file := FileAccess.open(frame_trace_path, FileAccess.WRITE)
+	if file == null:
+		return false
+	file.store_string(JSON.stringify({
+		"columns": ["cycle", "population", "phase", "tick", "frame_us", "process_to_draw_us",
+			"draw_us", "between_frames_us", "physics_us", "physics_ticks",
+			"refill_us", "refills", "contacts", "deaths"],
+		"fps_cap": Engine.max_fps, "physics_hz": Engine.physics_ticks_per_second, "rows": frame_trace_rows,
+	}))
+	return file.get_error() == OK
 
 func finish_phase() -> void:
 	var seconds := (Time.get_ticks_usec() - phase_started_us) / 1000000.0
