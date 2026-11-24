@@ -181,7 +181,7 @@ func check_weapon_impact_support(lab, slot: int) -> void:
 			await physics_frame
 		lab._select_weapon(slot)
 		check(lab._equipped_weapon == slot, "The floor contact test equips slot %d" % slot)
-		var strike_reach: float = group._air_offset()
+		var strike_reach: float = group.air_centre_offset()
 		var forward: Vector3 = lab.player.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var floor_height := 0.4 if fixture == "ledge" else 0.0
 		var blocker: StaticBody3D
@@ -221,6 +221,10 @@ func check_weapon_impact_support(lab, slot: int) -> void:
 			check(absf((damage_centres[0] - origin).dot(forward) - strike_reach) < 0.02,
 				"The damage centre keeps its weapon offset for %s" % context)
 			check(absf(light.y - floor_height - 0.60) < 0.02, "The flash uses the touchdown height for %s" % context)
+			var particle_origin := light - Vector3.UP * 0.48
+			var floor_sparks: int = lab.player.effects.particles.filter(func(particle):
+				return particle.life > 0.0 and particle.position.is_equal_approx(particle_origin)).size()
+			check(floor_sparks == 8, "The flash and the eight floor sparks share an origin for %s" % context)
 			match fixture:
 				"flat":
 					check(absf(reach - strike_reach) < 0.02, "On flat ground the flash keeps its original reach for %s" % context)

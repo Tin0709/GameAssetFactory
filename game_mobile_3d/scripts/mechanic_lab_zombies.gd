@@ -492,7 +492,7 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 		return
 	_landing_serial = serial
 	var forward := Vector3(facing.x, 0.0, facing.z).normalized()
-	var offset := _air_offset()
+	var offset := air_centre_offset()
 	if equipped_air_delay <= 0.0:
 		sabre_landing.emit(position + forward * offset, serial)
 	var strike := AIR_STRIKE.duplicate()
@@ -520,7 +520,7 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 	_pending_landings.append({"frame": Engine.get_physics_frames() + delay_ticks,
 		"origin": position, "forward": forward, "serial": serial, "strike": strike, "offset": offset})
 
-func _air_offset() -> float:
+func air_centre_offset() -> float:
 	if not equipped_air_strike.is_empty():
 		return equipped_air_offset
 	return Gauntlets.AIR_OFFSET if gauntlets_equipped else AIR_CENTRE_OFFSET
