@@ -217,6 +217,7 @@ func run() -> void:
 	check(Engine.max_fps == 75, "Loading a preset saved before the FPS control inherits the app cap")
 	check(values_match(lab, baseline, 100, false), "Older presets use reference physics values for the added controls")
 	check_impact_values(lab, 100.0, 100.0)
+	check_weapon_vfx_values(lab, 100.0, 100.0, 100.0)
 	check(lab.get_node("HUD/FloorSurface").selected == 0 and lab.get("_floor_surface") == "grass",
 		"Older presets use the default grass stage")
 	select_frame_rate(lab, 30)

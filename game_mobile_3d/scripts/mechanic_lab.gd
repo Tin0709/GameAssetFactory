@@ -226,6 +226,7 @@ var _tool_slam_footprint := PhysicsShapeQueryParameters3D.new()
 var _tool_slam_time := -1.0
 var _tool_slam_duration := GROUND_SLAM_DURATION
 var _tool_slam_duration_scale := 1.0
+var _tool_slam_opacity := 1.0
 var _pending_tool_ground_cues: Array[Dictionary] = []
 var _tool_touchdown: Dictionary = {}
 var _floor_tiles: Dictionary[String, Texture2DArray] = {}
@@ -1229,7 +1230,7 @@ func _process(delta: float) -> void:
 		_present_melee_feedback(player.render_presenter.display_clock)
 	if _tool_slam_time >= 0.0:
 		var age: float = player.render_presenter.display_clock - _tool_slam_time
-		_tool_slam_ring.visible = age >= 0.0 and age < _tool_slam_duration
+		_tool_slam_ring.visible = _tool_slam_opacity > 0.0 and age >= 0.0 and age < _tool_slam_duration
 		if age >= _tool_slam_duration:
 			_tool_slam_time = -1.0
 		elif age >= 0.0:
@@ -2154,15 +2155,23 @@ func _apply_weapon_vfx_settings() -> void:
 	rows.get_node("SlamOpacity/Value").text = "Vòng xung kích · %d%%" % roundi(slam)
 	rows.get_node("SlamDuration/Value").text = "Thời gian vòng · %d%%" % roundi(duration)
 	_tool_slam_duration_scale = duration * 0.01
+	_tool_slam_opacity = slam * 0.01
 	if _tool_slam_material != null:
-		_tool_slam_material.set_shader_parameter(&"opacity_scale", slam * 0.01)
+		_tool_slam_material.set_shader_parameter(&"opacity_scale", _tool_slam_opacity)
+		if _tool_slam_opacity == 0.0:
+			_tool_slam_ring.hide()
+	var trail_opacity := ribbon * 0.01
 	if player.effects != null and player.effects.ribbon != null:
-		var melee_material := player.effects.ribbon.material_override as ShaderMaterial
-		if melee_material != null:
-			melee_material.set_shader_parameter(&"opacity_scale", ribbon * 0.01)
+		var blade_ribbon: MeshInstance3D = player.effects.ribbon
+		blade_ribbon.visible = trail_opacity > 0.0
+		var melee_material := blade_ribbon.material_override
+		if melee_material is ShaderMaterial:
+			melee_material.set_shader_parameter(&"opacity_scale", trail_opacity)
+		elif melee_material is StandardMaterial3D:
+			melee_material.albedo_color = Color(melee_material.albedo_color, trail_opacity)
 	for projectile: CrossPollinator in [_crossbow, _bow]:
 		if projectile != null:
-			projectile.set_trail_opacity(ribbon * 0.01)
+			projectile.set_trail_opacity(trail_opacity)
 
 func _setup_audio_mix_controls() -> void:
 	var button: Button = $HUD/AudioMixButton
