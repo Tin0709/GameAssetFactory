@@ -101,6 +101,7 @@ func run() -> void:
 	await check_hit(false)
 	await check_hit(true)
 	await check_crowd_sparks()
+	await check_blade_contact_spark_origin()
 	await check_flash_during_render_hitch()
 	await check_splash_flash_strength()
 	await check_damage_numbers_during_render_hitch()
@@ -370,6 +371,55 @@ func check_crowd_sparks() -> void:
 	opacity.value = 55.0
 	check(sparks.visible and is_equal_approx(renderer.multimesh.mesh.material.get_shader_parameter("opacity_scale"), 0.55),
 		"Live opacity restores visibility without respawning streaks")
+	lab.free()
+
+func check_blade_contact_spark_origin() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group = lab.get_node("Zombies")
+	var sparks := lab.get_node("ContactSparks") as ContactSparks
+	for baby in [false, true]:
+		lab.reset_player()
+		await ticks(12)
+		lab._select_weapon(lab.Weapon.SWORD if baby else lab.Weapon.SABRE)
+		if not group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, baby):
+			check(false, "The blade-contact fixture spawns a source zombie")
+			break
+		var zombie = group.get_child(0)
+		zombie.set_physics_process(false)
+		var forward: Vector3 = lab.player.visual.global_basis.z
+		zombie.global_position = lab.player.global_position + forward * 1.4
+		var centres: Array[Vector3] = []
+		group.sabre_contact.connect(func(point, _direction, _clip, _index, _serial, _lethal):
+			centres.append(point), CONNECT_ONE_SHOT)
+		attack(true)
+		await ticks(2)
+		attack(false)
+		for i in 36:
+			await physics_frame
+			if not centres.is_empty() and sparks._streaks.visible_instance_count > 0:
+				break
+		check(centres.size() == 1 and sparks._streaks.visible_instance_count == 9,
+			"A real grounded blade strike emits one nine-streak burst (baby: %s)" % baby)
+		if not centres.is_empty():
+			var capsule: CapsuleShape3D = zombie._live_capsule
+			var centre := centres[0]
+			var axis := Vector3.UP * (capsule.height * 0.5 - capsule.radius)
+			var spark_origin := Vector3.ZERO
+			var count := 0
+			for spark in sparks._particles:
+				if spark.age < spark.lifetime:
+					spark_origin += spark.origin - spark.velocity.normalized() * 0.21
+					count += 1
+			if count > 0:
+				spark_origin /= count
+				var axis_point := Geometry3D.get_closest_point_to_segment(spark_origin, centre - axis, centre + axis)
+				var distance := spark_origin.distance_to(axis_point)
+				check(absf(distance - capsule.radius) < 0.001,
+					"The spark origin is on the victim capsule (baby: %s)" % baby)
+				print("BLADE_SPARK_ORIGIN baby=", baby, " radius=", capsule.radius, " distance=", distance)
+		zombie.free()
 	lab.free()
 
 func check_splash_flash_strength() -> void:
