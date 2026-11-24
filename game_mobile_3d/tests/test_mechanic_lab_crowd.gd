@@ -54,6 +54,12 @@ func run() -> void:
 		lab.get_node("Zombies").corpse_lifetime = ZOMBIE.CORPSE_LIFETIME
 	root.add_child(lab)
 	current_scene = lab
+	if OS.get_cmdline_user_args().has("--crowd-counts"):
+		await check_crowd_counts(lab.get_node("Zombies"))
+		print("CROWD_COUNT_PRESETS failures=", failures)
+		lab.free()
+		quit(0 if failures.is_empty() else 1)
+		return
 	var mode := lab.get_node("HUD/ZombieGait") as OptionButton
 	if actions_stuff and mode.is_item_disabled(1):
 		printerr("The crowd needs the verified Actions & Stuff animation library")
@@ -914,8 +920,53 @@ func check_crowd_windup_focus(group: Node) -> void:
 	for member in group.get_children():
 		member.set_physics_process(true)
 
+func check_crowd_counts(group: Node) -> void:
+	var picker := lab.get_node_or_null("HUD/CrowdSpawnCount") as OptionButton
+	if picker == null or picker.disabled or picker.get_selected_id() != COUNT:
+		failures.append("Crowd count is selectable and defaults to 100")
+		return
+	var button := lab.get_node("HUD/SpawnCrowd") as Button
+	var status := lab.get_node("HUD/SpawnStatus") as Label
+	var counts := [1, 10, 25, 50, 100, 150, 200]
+	for count: int in counts:
+		var index := picker.get_item_index(count)
+		if index < 0:
+			failures.append("The HUD offers a %d-zombie batch" % count)
+			continue
+		lab.reset_player()
+		lab.player_health = FIXTURE_HP
+		picker.select(index)
+		picker.item_selected.emit(index)
+		if button.text != "Spawn %d zombie" % count:
+			failures.append("The spawn button names the selected batch size")
+		button.pressed.emit()
+		if group.get_child_count() != 0 or not picker.disabled or not button.disabled:
+			failures.append("The requested batch locks the controls and spawns on later frames")
+		var largest_batch := 0
+		var previous := 0
+		var frames := 0
+		while button.disabled and frames < 240:
+			await process_frame
+			var spawned := group.get_child_count()
+			largest_batch = maxi(largest_batch, spawned - previous)
+			previous = spawned
+			frames += 1
+		if previous != count or picker.disabled or largest_batch > 5 \
+				or status.text != "Đã tạo %d zombie." % count:
+			failures.append("The paced request creates exactly %d zombies and unlocks the controls" % count)
+		for zombie: ZOMBIE in group.get_children():
+			zombie.free()
+		print("CROWD_COUNT ", JSON.stringify({"count": count, "spawned": previous,
+			"frames": frames, "largest_batch": largest_batch}))
+	lab.reset_player()
+	check_reset_during_spawn_after_frames(group)
+
+func check_reset_during_spawn_after_frames(group: Node) -> void:
+	await check_reset_during_spawn(group)
+
 func check_reset_during_spawn(group: Node) -> void:
 	var button := lab.get_node("HUD/SpawnCrowd") as Button
+	var picker := lab.get_node_or_null("HUD/CrowdSpawnCount") as OptionButton
 	button.pressed.emit()
 	for i in 3:
 		await process_frame
@@ -923,7 +974,8 @@ func check_reset_during_spawn(group: Node) -> void:
 	lab.reset_player()
 	for i in 5:
 		await process_frame
-	if partial <= 0 or partial >= COUNT or group.get_child_count() != partial or button.disabled:
+	if partial <= 0 or partial >= COUNT or group.get_child_count() != partial or button.disabled \
+			or (picker != null and picker.disabled):
 		failures.append("Reset cancels pending spawns and preserves zombies already created")
 	button.pressed.emit()
 	for i in 3:
@@ -932,10 +984,10 @@ func check_reset_during_spawn(group: Node) -> void:
 	lab._on_player_hit(100)
 	for i in 5:
 		await process_frame
-	if group.get_child_count() != partial or not button.disabled:
+	if group.get_child_count() != partial or not button.disabled or (picker != null and not picker.disabled):
 		failures.append("Defeat stops the crowd and disables spawning another crowd")
 	lab.reset_player()
-	if button.disabled:
+	if button.disabled or (picker != null and picker.disabled):
 		failures.append("Retry re-enables crowd spawning")
 	var single := lab.get_node("HUD/SpawnZombie") as Button
 	single.pressed.emit()
