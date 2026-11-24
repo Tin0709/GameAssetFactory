@@ -274,6 +274,7 @@ func run() -> void:
 	await check_crossbow_impact_burst(lab, sparks)
 	await check_projectile_birth_frame(lab)
 	await check_projectile_surface_bounds(lab)
+	await check_bow_impact_charge_tint(lab)
 	await ticks(12)
 	target.position = Vector3(2.5, 0.0, 3.0)
 	lab.player._q = true
@@ -617,6 +618,64 @@ func check_projectile_surface_bounds(lab: Node3D) -> void:
 			print("PROJECTILE_SURFACE_BOUNDS bow=", weapon == lab._bow, " surface=", surface_slot, " minimum=", minimum)
 		weapon.reset()
 	lab._select_floor_surface(0)
+	wall.queue_free()
+
+
+func check_bow_impact_charge_tint(lab: Node3D) -> void:
+	var bow = lab._bow
+	var sparks = bow.impact_sparks
+	if sparks == null:
+		check(false, "The charge tint fixture has its impact emitters")
+		return
+	var wall := StaticBody3D.new()
+	wall.position = Vector3(17.0, 1.5, 3.0)
+	var box := BoxShape3D.new()
+	box.size = Vector3(7.0, 3.0, 0.14)
+	var collider := CollisionShape3D.new()
+	collider.shape = box
+	wall.add_child(collider)
+	lab.add_child(wall)
+	await ticks(2)
+	for obstructed in [false, true]:
+		bow.reset()
+		var contact_serials: Array[int] = []
+		var record := func(hit: Dictionary, _direction: Vector3, serial: int):
+			if hit.collider == wall:
+				contact_serials.append(serial)
+		bow.bolt_impact.connect(record)
+		for charged in [false, true]:
+			var origin := Vector3(18.5, 1.15, -0.32) if charged else Vector3(15.5, 1.15, 1.25)
+			var clearance := origin
+			if obstructed:
+				clearance.z = 2.0
+				origin.z = 3.3
+			check(bow.fire_arrow(origin, Vector3.BACK, 2000 + int(charged), clearance, charged),
+				"The mixed impact fixture accepts both shots")
+		for i in 10:
+			await physics_frame
+			if contact_serials.size() == 2 and sparks.multimesh.visible_instance_count > 0:
+				break
+		var core_counts := [0, 0]
+		var sphere_count := 0
+		var colors_match := true
+		for spark in sparks._particles:
+			if spark.age >= spark.lifetime:
+				continue
+			var colors: PackedFloat32Array = spark.colors
+			if spark.drag == 9.0:
+				var charged: bool = spark.point.x > 17.0
+				core_counts[int(charged)] += 1
+				colors_match = colors_match and ((colors[2] > colors[0]) if charged else (colors[0] > colors[2]))
+				colors_match = colors_match and colors[128] > colors[130] and colors[3] == 1.0
+			else:
+				sphere_count += 1
+				colors_match = colors_match and colors[0] > colors[2]
+		check(2000 in contact_serials and 2001 in contact_serials and core_counts.min() >= 4 and sphere_count >= 8,
+			"The normal and charged impact retain both emitters in the same pool")
+		check(colors_match, "Only the charged forward sparks begin blue, including an obstructed muzzle")
+		print("BOW_IMPACT_CHARGE obstructed=", obstructed, " forward=", core_counts, " scatter=", sphere_count)
+		bow.bolt_impact.disconnect(record)
+	bow.reset()
 	wall.queue_free()
 
 func check_projectile_birth_frame(lab: Node3D) -> void:
