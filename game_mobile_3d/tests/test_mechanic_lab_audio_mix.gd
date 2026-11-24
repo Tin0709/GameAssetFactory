@@ -108,11 +108,25 @@ func run() -> void:
 	check(await cue_peak(lab, capture, cues.Weapon) > 0.001, "Muting zombie and surface cues leaves weapon audio audible")
 	sliders.Master.value = 0.0
 	check(await cue_peak(lab, capture, cues.Weapon) < 0.0001, "The Lab master slider can silence its whole mix")
-	lab.get_node("HUD/CombatAudioToggle").button_pressed = false
+	# Close the scene while each combat pool still owns an active playback.
+	audio.reset()
+	cues.Weapon.call()
+	cues.Zombie.call()
+	await physics_frame
+	await physics_frame
+	var playbacks: Array[WeakRef] = []
+	for voice: AudioStreamPlayer3D in audio._voices:
+		if voice.has_stream_playback():
+			playbacks.append(weakref(voice.get_stream_playback()))
+	check(playbacks.size() >= 2, "Weapon and zombie playbacks are active at scene close")
 	AudioServer.remove_bus_effect(0, effect_index)
 	lab.free()
 	check(AudioServer.get_bus_count() == bus_count and AudioServer.is_bus_mute(0) == master_muted,
 		"Closing the Lab releases its mix buses and restores the prior master state")
-	await create_timer(0.15).timeout
+	var deadline := Time.get_ticks_usec() + 250000
+	while Time.get_ticks_usec() < deadline and playbacks.any(func(ref): return ref.get_ref() != null):
+		OS.delay_msec(1)
+		await process_frame
+	check(playbacks.all(func(ref): return ref.get_ref() == null), "The mixer releases playbacks from the closed Lab")
 	print("MECHANIC_LAB_AUDIO_MIX ", JSON.stringify({"failures": failures}))
 	quit(int(not failures.is_empty()))
