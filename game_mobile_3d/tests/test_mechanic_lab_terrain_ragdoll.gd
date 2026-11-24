@@ -936,12 +936,6 @@ func run() -> void:
 	await check_wall_brace_impact(69, 45.0, -85.0, "AirAttack", false, Zombie.IDLE)
 	await check_wall_brace_impact(74, 45.0, -85.0, "Attack", false, Zombie.ATTACK)
 	await check_wall_brace_impact(29, 27.0, -58.0, "Attack", false, Zombie.ATTACK, 100.0, 2)
-	await check_corner_ragdoll(101, 2.0, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER,
-		1150.0, false, CornerFixture.NONE, Vector2.ONE, 0.0, Zombie.ActionsStuff.MOVE)
-	await check_corner_ragdoll(238, 2.0, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER,
-		1150.0, false, CornerFixture.NONE, Vector2.ONE, 0.0, Zombie.ActionsStuff.ATTACK)
-	await check_wall_brace_impact(20, 27.0, -58.0, "Attack", true, Zombie.ActionsStuff.ATTACK)
-	await check_wall_brace_impact(29, 27.0, -58.0, "Attack", false, Zombie.ActionsStuff.ATTACK, 100.0, 2)
 	await check_stacked_wall_handoff(1.08, 24, 1150.0, [&"Zombie_ExpressiveWalk", &"Zombie_ExpressiveRun"])
 	await check_stacked_wall_handoff(1.35, 24, 1150.0, [&"Zombie_Walk"])
 	await check_stacked_wall_handoff(1.35, 130, 800.0, [&"Zombie_Walk_Variant1"])
@@ -951,5 +945,11 @@ func run() -> void:
 	await check_wall_shoulder_rebound(1.08, 73, &"Zombie_ExpressiveWalk", 0.145)
 	await check_wall_shoulder_rebound(1.35, 73, &"Zombie_ExpressiveWalk", 0.145)
 	await check_wall_shoulder_rebound(1.08, 73, &"Zombie_Walk_Variant1", 0.26)
+	await check_corner_ragdoll(101, 2.0, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER,
+		1150.0, false, CornerFixture.NONE, Vector2.ONE, 0.0, Zombie.ActionsStuff.MOVE)
+	await check_corner_ragdoll(238, 2.0, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER,
+		1150.0, false, CornerFixture.NONE, Vector2.ONE, 0.0, Zombie.ActionsStuff.ATTACK)
+	await check_wall_brace_impact(20, 27.0, -58.0, "Attack", true, Zombie.ActionsStuff.ATTACK)
+	await check_wall_brace_impact(29, 27.0, -58.0, "Attack", false, Zombie.ActionsStuff.ATTACK, 100.0, 2)
 	print("MECHANIC_LAB_TERRAIN_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
