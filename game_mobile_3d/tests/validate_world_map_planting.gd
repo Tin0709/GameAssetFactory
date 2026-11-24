@@ -34,7 +34,9 @@ func run()->void:
 				plains_count += 1
 				if plants.plains_planting.shrub_roots.has(row.cell):
 					shrub_count += 1
-					check(row.bounds.size.y <= 1.551,"Ground shrubs keep a low silhouette")
+					var native_shrub_height: float = plants.bundle.meshes[row.asset].get_aabb().size.y
+					check(is_equal_approx(row.scale,.85) and is_equal_approx(row.bounds.size.y,.85*native_shrub_height),
+						"Shrubs retain their relative native heights at the calibrated uniform scale")
 				else:
 					check(maxf(row.bounds.size.x,row.bounds.size.z) <= .881,"Flowers and grasses fit their root cell")
 			elif not row.get("forest_cover", false) and not row.get("forest_fern", false):

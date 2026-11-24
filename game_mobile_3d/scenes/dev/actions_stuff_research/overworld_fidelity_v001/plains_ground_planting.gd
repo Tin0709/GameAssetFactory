@@ -3,6 +3,7 @@ extends RefCounted
 const NativePlant := preload("forest_cover_grass.gd")
 const MANIFEST := "godot_lab/world_map_unified_showcase_v001/plains_ground_planting_v001/sources.private.json"
 const MANIFEST_SHA := "2e8f5e4d8f796a052be23155f2ae668c9bb527cc0efb2d8280ea76492547a837"
+const SHRUB_SCALE := .85
 
 var cells: Dictionary[Vector2i, Dictionary] = {}
 var reserved: Dictionary[Vector2i, bool] = {}
@@ -127,7 +128,8 @@ func transform_at(cell: Vector2i, height: float, row: Dictionary) -> Transform3D
 	var rotated := Transform3D(rotation,Vector3.ZERO)*bounds
 	var scale := minf(1.,.88/maxf(rotated.size.x,rotated.size.z))
 	if row.kind == "shrub":
-		scale = minf(.78,1.55/bounds.size.y)
+		# Use the same reference scale for every shrub and retain the native size differences.
+		scale = SHRUB_SCALE
 	elif row.kind == "flowers":
 		scale = minf(scale,.74/bounds.size.y)
 	var basis := rotation.scaled(Vector3.ONE*scale)
