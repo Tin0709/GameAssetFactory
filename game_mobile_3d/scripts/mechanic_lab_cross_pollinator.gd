@@ -202,7 +202,7 @@ func _fire_projectile(origin: Vector3, direction: Vector3, serial: int, clearanc
 	shot_fired.emit(origin)
 	var obstruction := _sweep_bolt(get_world_3d().direct_space_state, clearance_start, origin, WORLD_MASK)
 	if not obstruction.is_empty():
-		_report_impact(obstruction, direction, serial, strike)
+		_report_impact(obstruction, direction, serial, strike, 0.0, charged)
 		set_physics_process(true)
 		return true
 	var bolt := MeshInstance3D.new()
@@ -278,7 +278,7 @@ func _physics_process(delta: float) -> void:
 			_remove_bolt(node)
 			if not hit.is_empty():
 				_embed_on_terrain(hit, bolt.direction, render_frame)
-				_report_impact(hit, direction, bolt.serial, bolt.strike, impact_step)
+				_report_impact(hit, direction, bolt.serial, bolt.strike, impact_step, trail.charged)
 		else:
 			node.global_position = end
 			trail.distance += start.distance_to(end)
@@ -297,9 +297,9 @@ func _ammo_recharge_period() -> float:
 	return RECHARGE_PERIOD
 
 func _report_impact(hit: Dictionary, direction: Vector3, serial: int, _strike: Dictionary,
-		impact_step := 0.0) -> void:
+		impact_step := 0.0, charged := false) -> void:
 	if impact_sparks != null:
-		impact_sparks.burst(hit.position, direction, hit.normal, impact_step, _is_terrain_hit(hit))
+		impact_sparks.burst(hit.position, direction, hit.normal, impact_step, _is_terrain_hit(hit), charged)
 	bolt_impact.emit(hit, direction, serial)
 
 func _update_trails() -> void:

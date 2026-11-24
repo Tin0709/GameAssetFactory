@@ -8,6 +8,9 @@ const CURVE_HASH := "015f9dceb8c6f2527dc79b457d296164135839fb4db3a15ad588deb9d05
 # 25 bolts in a full magazine, with at most ten sprites per bolt.
 const CAPACITY := 250
 const COLOR_DIVISOR := 250.0
+# Linear User.Color on the saved PlayerChargedArrow component. The Lab
+# uses that tint for an opening accent, with the existing warm fade.
+const CHARGED_ACCENT_RGB := Vector3(0.058977, 0.587809, 1.0)
 const SURFACE_GAP := 0.003
 
 class Spark:
@@ -25,6 +28,7 @@ class Spark:
 
 var _particles: Array[Spark] = []
 var _forward_colors: PackedFloat32Array
+var _charged_forward_colors: PackedFloat32Array
 var _sphere_colors: PackedFloat32Array
 var _sizes: PackedFloat32Array
 var _random := RandomNumberGenerator.new()
@@ -45,6 +49,16 @@ func setup(research_root: String) -> bool:
 	_sizes = PackedFloat32Array(data.size_xy)
 	if _forward_colors.size() != 512 or _sphere_colors.size() != 512 or _sizes.size() != 206:
 		return false
+	_charged_forward_colors = _forward_colors.duplicate()
+	var charge_tint := CHARGED_ACCENT_RGB.lerp(Vector3.ONE, 0.22)
+	for sample in 128:
+		var offset := sample * 4
+		var warm := Vector3(_forward_colors[offset], _forward_colors[offset + 1], _forward_colors[offset + 2])
+		var mix_weight := 1.0 - smoothstep(0.08, 0.27, sample / 127.0)
+		var rgb := warm.lerp(charge_tint * warm.x, mix_weight)
+		_charged_forward_colors[offset] = rgb.x
+		_charged_forward_colors[offset + 1] = rgb.y
+		_charged_forward_colors[offset + 2] = rgb.z
 	var material := ShaderMaterial.new()
 	material.shader = SHADER
 	var quad := QuadMesh.new()
@@ -68,7 +82,8 @@ func set_opacity(opacity: float) -> void:
 	var material := multimesh.mesh.material as ShaderMaterial
 	material.set_shader_parameter("opacity_scale", opacity)
 
-func burst(point: Vector3, direction: Vector3, normal: Vector3, first_step: float, on_terrain := false) -> void:
+func burst(point: Vector3, direction: Vector3, normal: Vector3, first_step: float,
+		on_terrain := false, charged := false) -> void:
 	# The engine-side impact rotation is approximated from the surface normal.
 	# Native local X points out of the surface and local Z points up.
 	var axis := normal.normalized() if not normal.is_zero_approx() else -direction.normalized()
@@ -85,10 +100,11 @@ func burst(point: Vector3, direction: Vector3, normal: Vector3, first_step: floa
 	var birth_frame := Engine.get_process_frames()
 	# Niagara's system update truncates the independently scaled burst counts.
 	var forward_count := int(_random.randi_range(4, 5) * spawn_count_scale)
+	var forward_colors := _charged_forward_colors if charged else _forward_colors
 	for i in forward_count:
 		var velocity := _cone_direction(axis, 0.2) * _random.randf_range(11.0, 20.0)
 		_spawn(outside, velocity, -axis * 1.5, Vector2(_random.randf_range(0.08, 0.13), 0.08),
-			_random.randf_range(0.2, 0.4), 9.0, _forward_colors, first_step, birth_frame, surface)
+			_random.randf_range(0.2, 0.4), 9.0, forward_colors, first_step, birth_frame, surface)
 	var sphere_count := int(_random.randi_range(4, 5) * spawn_count_scale)
 	for i in sphere_count:
 		var offset := _cone_direction(Vector3.UP, 1.0) * (0.30 * pow(_random.randf(), 1.0 / 3.0))
