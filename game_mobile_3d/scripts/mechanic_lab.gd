@@ -98,6 +98,13 @@ const GAUNTLET_IMPACT_MARK_REACH := 1.8
 
 enum PlayerSkin { MD2, KAI }
 enum PresetAction { SAVE_A, LOAD_A, SAVE_B, LOAD_B, DEFAULTS }
+enum SparkBudget { FULL, LOW, BALANCED }
+
+const SPARK_SPAWN_SCALES := {
+	SparkBudget.FULL: 1.0,
+	SparkBudget.LOW: 0.6,
+	SparkBudget.BALANCED: 0.8,
+}
 
 const MIX_ROWS := {
 	LabAudioMix.Layer.MASTER: [&"Master", "Tổng"],
@@ -1599,8 +1606,9 @@ func _setup_impact_fx_controls() -> void:
 		return
 	button.toggled.connect(panel.set_visible)
 	var picker := panel.get_node("Rows/ContactSparkQuality") as OptionButton
-	picker.add_item("Số tia · Đầy đủ")
-	picker.add_item("Số tia · Nhẹ")
+	picker.add_item("Số tia · Đầy đủ", SparkBudget.FULL)
+	picker.add_item("Số tia · Cân bằng", SparkBudget.BALANCED)
+	picker.add_item("Số tia · Nhẹ", SparkBudget.LOW)
 	picker.select(0)
 	picker.item_selected.connect(_apply_impact_fx_settings.unbind(1))
 	for path in ["Rows/Opacity/Slider", "Rows/Duration/Slider"]:
@@ -1611,19 +1619,20 @@ func _setup_impact_fx_controls() -> void:
 func _apply_impact_fx_settings() -> void:
 	var opacity: float = $HUD/ImpactFxPanel/Rows/Opacity/Slider.value
 	var duration: float = $HUD/ImpactFxPanel/Rows/Duration/Slider.value
-	var reduced: bool = $HUD/ImpactFxPanel/Rows/ContactSparkQuality.selected == 1
+	var budget: int = $HUD/ImpactFxPanel/Rows/ContactSparkQuality.get_selected_id()
+	var spawn_scale: float = SPARK_SPAWN_SCALES.get(budget, 1.0)
 	$HUD/ImpactFxPanel/Rows/Opacity/Value.text = "Độ rõ · %d%%" % roundi(opacity)
 	$HUD/ImpactFxPanel/Rows/Duration/Value.text = "Thời gian · %d%%" % roundi(duration)
 	if _contact_sparks != null:
 		_contact_sparks.set_opacity(opacity * 0.01)
 		_contact_sparks.duration_scale = duration * 0.01
-		_contact_sparks.set_reduced_budget(reduced)
+		_contact_sparks.set_budget_scale(spawn_scale)
 	for projectile: CrossPollinator in [_crossbow, _bow]:
 		if projectile != null and projectile.impact_sparks != null:
 			var sparks := projectile.impact_sparks
 			sparks.set_opacity(opacity * 0.01)
 			sparks.duration_scale = duration * 0.01
-			sparks.reduced_budget = reduced
+			sparks.spawn_count_scale = spawn_scale
 
 func _setup_audio_mix_controls() -> void:
 	var button: Button = $HUD/AudioMixButton

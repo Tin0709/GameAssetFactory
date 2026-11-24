@@ -28,7 +28,7 @@ var _random := RandomNumberGenerator.new()
 var _slot := 0
 var _active_count := 0
 var duration_scale := 1.0
-var reduced_budget := false
+var spawn_count_scale := 1.0
 
 func setup(research_root: String) -> bool:
 	var path := Source.verified_path(research_root, CURVE_PATH, CURVE_HASH)
@@ -72,16 +72,13 @@ func burst(point: Vector3, direction: Vector3, normal: Vector3, first_step: floa
 	var up := Vector3.UP if absf(axis.y) < 0.99 else Vector3.FORWARD
 	var frame := Basis.looking_at(axis, up, true)
 	var outside := point + axis * 0.003
-	var forward_count := _random.randi_range(4, 5)
-	if reduced_budget:
-		forward_count = 3
+	# Niagara's system update truncates the independently scaled burst counts.
+	var forward_count := int(_random.randi_range(4, 5) * spawn_count_scale)
 	for i in forward_count:
 		var velocity := _cone_direction(axis, 0.2) * _random.randf_range(11.0, 20.0)
 		_spawn(outside, velocity, -axis * 1.5, Vector2(_random.randf_range(0.08, 0.13), 0.08),
 			_random.randf_range(0.2, 0.4), 9.0, _forward_colors, first_step)
-	var sphere_count := _random.randi_range(4, 5)
-	if reduced_budget:
-		sphere_count = 3
+	var sphere_count := int(_random.randi_range(4, 5) * spawn_count_scale)
 	for i in sphere_count:
 		var offset := _cone_direction(Vector3.UP, 1.0) * (0.30 * pow(_random.randf(), 1.0 / 3.0))
 		var velocity := _cone_direction(frame.y, 0.8) * _random.randf_range(5.0, 12.0)

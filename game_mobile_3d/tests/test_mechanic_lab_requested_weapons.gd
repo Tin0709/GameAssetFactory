@@ -503,6 +503,7 @@ func check_crossbow_impact_burst(lab: Node3D, sparks: MultiMeshInstance3D) -> vo
 		print("PROJECTILE_SPARK_BUDGET id=", budget_id, " forward=", forward_count, " sphere=", sphere_count)
 	opacity.value = 100.0
 	check(sparks.visible and lab._bow.impact_sparks.visible
+		and is_equal_approx(lab._bow.impact_sparks.spawn_count_scale, 0.8)
 		and lab._bow.impact_sparks.duration_scale == 2.0,
 		"Revealing sparks immediately updates the flying weapon batches together")
 	duration.value = 100.0

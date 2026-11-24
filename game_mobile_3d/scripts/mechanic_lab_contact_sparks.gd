@@ -8,8 +8,6 @@ const SOURCE_REGION := Rect2i(101, 8, 5, 14)
 const SPARKS_PER_CONTACT := 9
 const CONTACTS_PER_FRAME := 5
 const CAPACITY := CONTACTS_PER_FRAME * SPARKS_PER_CONTACT
-const REDUCED_SPARKS_PER_CONTACT := 6
-const REDUCED_CONTACTS_PER_FRAME := 3
 const HOT := Color(1.0, 0.89, 0.54)
 const COOL := Color(1.0, 0.44, 0.10)
 
@@ -70,9 +68,9 @@ func set_opacity(opacity: float) -> void:
 	var material := _streaks.mesh.material as ShaderMaterial
 	material.set_shader_parameter("opacity_scale", opacity)
 
-func set_reduced_budget(reduced: bool) -> void:
-	_contact_budget = REDUCED_CONTACTS_PER_FRAME if reduced else CONTACTS_PER_FRAME
-	_sparks_per_contact = REDUCED_SPARKS_PER_CONTACT if reduced else SPARKS_PER_CONTACT
+func set_budget_scale(scale: float) -> void:
+	_contact_budget = ceili(CONTACTS_PER_FRAME * scale)
+	_sparks_per_contact = ceili(SPARKS_PER_CONTACT * scale)
 	_pool_limit = _contact_budget * _sparks_per_contact
 	_next %= _pool_limit
 	# Preserve the nearest scheduled contacts and let visible sparks finish fading.
