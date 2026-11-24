@@ -14,6 +14,9 @@ const INITIAL_CAPACITY := 64
 const BUFFER_UPLOAD_MIN_GLYPHS := 48
 const INSTANCE_FLOATS := 16
 const LAYOUT_CELL := 0.24
+# A coarser grid puts each wide bar in fewer buckets. Bar clearance still
+# tests its exact rectangle, while label spacing uses the finer grid.
+const BAR_LAYOUT_CELL := 1.2
 const LAYOUT_POP_SCALE := 1.16
 const POP_TRAVEL := 1.0 - (1.0 - POP_DURATION / NUMBER_DURATION) ** 2
 # Bound the work on a simultaneous burst. All glyphs still draw.
@@ -214,8 +217,8 @@ func _damage_bar_cells(side: Vector3, up: Vector3) -> Dictionary:
 	for point in health_bars.positions_for_damage_layout():
 		var centre := Vector2(point.dot(side), point.dot(up))
 		var bounds := Rect2(centre - size * 0.5, size)
-		var first := Vector2i((bounds.position / LAYOUT_CELL).floor())
-		var last := Vector2i((bounds.end / LAYOUT_CELL).floor())
+		var first := Vector2i((bounds.position / BAR_LAYOUT_CELL).floor())
+		var last := Vector2i((bounds.end / BAR_LAYOUT_CELL).floor())
 		for y in range(first.y, last.y + 1):
 			var row := y << 16
 			for x in range(first.x, last.x + 1):
@@ -226,8 +229,8 @@ func _damage_bar_cells(side: Vector3, up: Vector3) -> Dictionary:
 	return cells
 
 static func _hits_bar(cells: Dictionary, bounds: Rect2) -> bool:
-	var first := Vector2i((bounds.position / LAYOUT_CELL).floor())
-	var last := Vector2i((bounds.end / LAYOUT_CELL).floor())
+	var first := Vector2i((bounds.position / BAR_LAYOUT_CELL).floor())
+	var last := Vector2i((bounds.end / BAR_LAYOUT_CELL).floor())
 	for y in range(first.y, last.y + 1):
 		var row := y << 16
 		for x in range(first.x, last.x + 1):
