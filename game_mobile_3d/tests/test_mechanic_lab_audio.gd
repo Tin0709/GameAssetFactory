@@ -2055,6 +2055,7 @@ func check_tool_montage_audio() -> void:
 		print("TOOL_AUDIO_TIMELINE ", name, " ", played)
 
 	await check_tool_flight_audio(lab, menu, audio)
+	await check_shovel_recovery_surface_audio(lab, menu)
 
 	lab.reset_player()
 	for i in 8:
@@ -2114,6 +2115,42 @@ func check_tool_flight_audio(lab, menu: OptionButton, audio: Node3D) -> void:
 			await physics_frame
 		check(landed and frames.size() == fixture[4], "%s plays the expected airborne cues" % label)
 		print("TOOL_FLIGHT_AUDIO ", label, " times=", frames.values())
+
+
+func check_shovel_recovery_surface_audio(lab, menu: OptionButton) -> void:
+	var actor = lab.player
+	var movement = lab.get_node("MovementAudio")
+	for fixture: Array in [[0, "grass"], [1, "dirt"], [2, "stone"]]:
+		lab.reset_player()
+		lab._select_floor_surface(fixture[0])
+		for i in 10:
+			await physics_frame
+		menu.select(lab.Weapon.SHOVEL)
+		menu.item_selected.emit(lab.Weapon.SHOVEL)
+		var baseline: int = movement.event_count.landing
+		check(actor.drop_for_lab(7.0), "The Shovel recovery test starts on %s" % fixture[1])
+		await physics_frame
+		await physics_frame
+		push_melee_attack(true)
+		await physics_frame
+		push_melee_attack(false)
+		var shown := INF
+		var sampled_soles: Array[float] = []
+		for i in 2 * Engine.physics_ticks_per_second:
+			await physics_frame
+			if sampled_soles.is_empty() and actor.combo.air_landing_started and actor.combo.time >= 1.07145:
+				for sole: Dictionary in actor.direction_adapter.observe_soles(actor.global_position.y, true):
+					sampled_soles.append(sole.height)
+			if movement.event_count.landing > baseline and is_inf(shown):
+				shown = actor.combo.time
+				var event: Dictionary = movement.events.back()
+				check(event.key == "land_" + fixture[1] and absf(float(event.at[1])) < 0.03,
+					"The Shovel recovery cue uses the supported %s bank" % fixture[1])
+		check(movement.event_count.landing == baseline + 1 and shown >= 1.071448
+			and shown <= 1.071452 + 1.0 / Engine.physics_ticks_per_second,
+			"The Shovel plays exactly one %s recovery landing at the montage cue" % fixture[1])
+		print("SHOVEL_RECOVERY_LANDING surface=", fixture[1], " clip=", shown, " soles=", sampled_soles)
+	lab._select_floor_surface(0)
 
 
 func run() -> void:
