@@ -38,6 +38,10 @@ const FLOOR_STEP_BANKS := {
 }
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
 const ImpactMarks := preload("res://scripts/mechanic_lab_impact_marks.gd")
+const GROUND_SLAM_SHADER := preload("res://materials/mechanic_lab_ground_slam.gdshader")
+const GROUND_SLAM_RADIUS := 0.68
+const GROUND_SLAM_DURATION := 0.23
+const TOOL_SHAKE_HEIGHT_FRACTION := 0.0056
 const ZombieStepDust := preload("res://scripts/mechanic_lab_zombie_step_dust.gd")
 const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
 const PrivateOverworldBundle := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/private_bundle.gd")
@@ -200,6 +204,12 @@ var _zombie_step_dust: ZombieStepDust
 var _floor_snap_contact := KinematicCollision3D.new()
 var _floor_surface := "grass"
 var _gauntlet_impact_marks: ImpactMarks
+var _movement_dust: MovementDust
+var _tool_slam_ring: MeshInstance3D
+var _tool_slam_material: ShaderMaterial
+var _tool_slam_footprint := PhysicsShapeQueryParameters3D.new()
+var _tool_slam_time := -1.0
+var _pending_tool_ground_cues: Array[Dictionary] = []
 var _floor_tiles: Dictionary[String, Texture2DArray] = {}
 var _slam_swing_frame := -1
 var _slam_swing_serial := -1
@@ -384,6 +394,7 @@ func _ready() -> void:
 			dust.use_source_landing(true)
 			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped, _gauntlet_impact_anchor)
 			add_child(dust)
+			_movement_dust = dust
 			var zombie_dust := ZombieStepDust.new()
 			zombie_dust.name = "ZombieStepDust"
 			if dust.setup_zombie_steps(zombie_dust):
@@ -449,6 +460,8 @@ func _ready() -> void:
 		player.bow_released.connect(_on_bow_released)
 		player.connect("grounded_sabre_impact", _on_grounded_attack)
 		player.connect("heavy_jump_landed", _on_heavy_jump_landed)
+		_setup_tool_slam_ring()
+		player.tool_ground_cue.connect(_queue_tool_ground_cue)
 		player.physics_pose_ready.connect(_sample_combat_fx)
 		player.presentation_reset.connect($Zombies.cancel_pending_landings)
 		player.presentation_reset.connect(_cancel_slam_audio)
@@ -1126,6 +1139,13 @@ func _process(delta: float) -> void:
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
 	if not _pending_melee_feedback.is_empty():
 		_present_melee_feedback(player.render_presenter.display_clock)
+	if _tool_slam_time >= 0.0:
+		var age: float = player.render_presenter.display_clock - _tool_slam_time
+		_tool_slam_ring.visible = age >= 0.0 and age < GROUND_SLAM_DURATION
+		if age >= GROUND_SLAM_DURATION:
+			_tool_slam_time = -1.0
+		elif age >= 0.0:
+			_tool_slam_material.set_shader_parameter(&"progress", age / GROUND_SLAM_DURATION)
 	# Publish glyphs even when this frame activated a previously idle batch.
 	if _zombie_damage_numbers != null:
 		_zombie_damage_numbers.present(delta)
@@ -1552,10 +1572,95 @@ func _show_landing_burst(point: Vector3, serial: int, sample_time: float) -> voi
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP, true)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3, sample_time)
 
+func _setup_tool_slam_ring() -> void:
+	var mesh := PlaneMesh.new()
+	mesh.size = Vector2.ONE * GROUND_SLAM_RADIUS * 2.0
+	_tool_slam_material = ShaderMaterial.new()
+	_tool_slam_material.shader = GROUND_SLAM_SHADER
+	_tool_slam_ring = MeshInstance3D.new()
+	_tool_slam_ring.name = "PickaxeGroundSlam"
+	_tool_slam_ring.mesh = mesh
+	_tool_slam_ring.material_override = _tool_slam_material
+	_tool_slam_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_tool_slam_ring.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	_tool_slam_ring.hide()
+	$CombatEffects.add_child(_tool_slam_ring)
+	var box := BoxShape3D.new()
+	box.size = Vector3(mesh.size.x, 0.08, mesh.size.y)
+	_tool_slam_footprint.shape = box
+	_tool_slam_footprint.collision_mask = 1
+
+func _queue_tool_ground_cue(cue: Dictionary, serial: int, sample_time: float) -> void:
+	_pending_tool_ground_cues.append({"cue": cue, "serial": serial, "sample_time": sample_time})
+
+func _tool_ground_contact(offset: Vector2, forward: Vector3) -> Dictionary:
+	var origin: Vector3 = player.global_position
+	var support := _floor_landing_contact_at(origin)
+	if support.is_empty():
+		return {}
+	origin.y = support.position.y
+	var lateral := Vector3.UP.cross(forward)
+	var path := lateral * offset.x + forward * offset.y
+	# The offset must be supported at the same height and on this side of
+	# the wall. An interrupted swing cannot stamp a lower floor or a wall.
+	var start := origin + Vector3.UP * 0.12
+	var ray := PhysicsRayQueryParameters3D.create(start, start + path + path.normalized() * 0.08, 1)
+	if not get_world_3d().direct_space_state.intersect_ray(ray).is_empty():
+		return {}
+	var contact := _floor_contact_at(origin + path)
+	if contact.is_empty() or absf(contact.position.y - origin.y) > 0.06:
+		return {}
+	return contact
+
+func _show_tool_slam_ring(point: Vector3, surface: String, sample_time: float) -> void:
+	_tool_slam_footprint.transform = Transform3D(Basis.IDENTITY, point + Vector3.UP * 0.06)
+	if not get_world_3d().direct_space_state.intersect_shape(_tool_slam_footprint, 1).is_empty():
+		return
+	for corner in [Vector3(1, 0, 1), Vector3(-1, 0, 1), Vector3(1, 0, -1), Vector3(-1, 0, -1)]:
+		if _floor_contact_at(point + corner * GROUND_SLAM_RADIUS).is_empty():
+			return
+	_tool_slam_ring.global_position = point + Vector3.UP * 0.025
+	_tool_slam_ring.hide()
+	_tool_slam_material.set_shader_parameter(&"tint", MovementDust.SURFACE_DUST[surface].lightened(0.36))
+	_tool_slam_time = sample_time
+
+func _show_tool_ground_cues() -> void:
+	var forward: Vector3 = player.visual.global_basis.z.slide(Vector3.UP).normalized()
+	for event in _pending_tool_ground_cues:
+		var cue: Dictionary = event.cue
+		var sample_time: float = event.sample_time
+		if cue.effect == MeleeTools.GroundEffect.SHAKE:
+			_shake_serial = event.serial
+			_start_camera_shake(TOOL_SHAKE_HEIGHT_FRACTION, sample_time)
+			continue
+		var contact := _tool_ground_contact(cue.offset, forward)
+		if contact.is_empty():
+			continue
+		var elapsed_ticks: float = (player.effects.clock - sample_time) / get_physics_process_delta_time()
+		var tick := Engine.get_physics_frames() - elapsed_ticks
+		match cue.effect:
+			MeleeTools.GroundEffect.SHOCKWAVE:
+				_show_tool_slam_ring(contact.position, contact.surface, sample_time)
+			MeleeTools.GroundEffect.DEBRIS:
+				if _movement_dust != null:
+					var basis := Basis.looking_at(forward, Vector3.UP, true) \
+						* Basis(Vector3.UP, deg_to_rad(cue.get("yaw", 0.0))) \
+						* Basis(Vector3.RIGHT, deg_to_rad(cue.get("roll", 0.0)))
+					_movement_dust.emit_combat_debris(contact.position, contact.surface, tick, cue.get("medium", false), basis)
+				if cue.get("mark", false) and _gauntlet_impact_marks != null:
+					_gauntlet_impact_marks.stamp(contact.position, contact.position, contact.surface, elapsed_ticks)
+				_combat_audio.slam_landed(contact.position, contact.surface)
+			MeleeTools.GroundEffect.DUST:
+				if _movement_dust != null:
+					_movement_dust.emit_combat_puff(contact.position, contact.surface, tick)
+	_pending_tool_ground_cues.clear()
+
 func _sample_combat_fx() -> void:
 	# Immediate melee can be dispatched before this sample. Delayed air contacts
 	# can also arrive after it and use the pose already sampled in this tick.
 	_combat_pose_frame = Engine.get_physics_frames()
+	if not _pending_tool_ground_cues.is_empty():
+		_show_tool_ground_cues()
 	if _pending_melee_contact_fx.is_empty() and _slam_shake_frame < 0 and _slam_burst_frame < 0:
 		return
 	var sample_time: float = player.effects.clock
@@ -1616,6 +1721,10 @@ func _clear_contact_light() -> void:
 			zombie.sync_hit_health()
 	_pending_melee_contact_fx.clear()
 	_pending_melee_feedback.clear()
+	_pending_tool_ground_cues.clear()
+	_tool_slam_time = -1.0
+	if _tool_slam_ring != null:
+		_tool_slam_ring.hide()
 	_combat_pose_frame = -1
 	_slam_burst_frame = -1
 	_slam_burst_serial = -1
