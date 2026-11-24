@@ -12,6 +12,12 @@ const INITIAL_CAPACITY := 64
 # A full buffer upload is cheaper for bursts. Sparse hits can write just the live slots.
 const BUFFER_UPLOAD_MIN_GLYPHS := 48
 const INSTANCE_FLOATS := 16
+const LAYOUT_CELL := 0.24
+const LAYOUT_POP_SCALE := 1.16
+const LAYOUT_STEPS := [
+	Vector2.ZERO, Vector2(0, 1.15), Vector2(-1.15, 0), Vector2(1.15, 0),
+	Vector2(-0.85, 1.15), Vector2(0.85, 1.15), Vector2(0, 2.05),
+]
 
 class DamageNumber:
 	var ascii_digits: PackedByteArray
@@ -22,6 +28,8 @@ class DamageNumber:
 	var centre: Vector3
 	var depth: float
 	var hit_order: int
+	var layout_offset := Vector2.ZERO
+	var layout_pending := true
 
 var _numbers: Array[DamageNumber] = []
 var _instance_buffer := PackedFloat32Array()
@@ -60,11 +68,13 @@ func add_number(amount: int, origin: Vector3, lateral: Vector3) -> void:
 
 func _process(delta: float) -> void:
 	var glyph_count := 0
+	var has_new_numbers := false
 	for i in range(_numbers.size() - 1, -1, -1):
 		var number := _numbers[i]
 		# The first render delta can include time before this hit.
 		if number.pending:
 			number.pending = false
+			has_new_numbers = true
 		else:
 			number.age += delta
 		if number.age >= NUMBER_DURATION:
@@ -82,6 +92,7 @@ func _process(delta: float) -> void:
 		_instance_buffer.resize(multimesh.instance_count * INSTANCE_FLOATS)
 	var camera := get_viewport().get_camera_3d()
 	var camera_side := camera.global_basis.x if camera != null else Vector3.RIGHT
+	var camera_up := camera.global_basis.y if camera != null else Vector3.UP
 	var camera_back := camera.global_basis.z if camera != null else Vector3.BACK
 	var previous_depth := -INF
 	var previous_hit_order := -1
@@ -100,17 +111,20 @@ func _process(delta: float) -> void:
 	if needs_sort:
 		_numbers.sort_custom(func(a: DamageNumber, b: DamageNumber) -> bool:
 			return a.depth < b.depth or (a.depth == b.depth and a.hit_order < b.hit_order))
+	if has_new_numbers and camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		_place_new_numbers(camera_side, camera_up)
 	var slot := 0
 	var local_from_world := global_transform.affine_inverse()
 	for number in _numbers:
 		var scale: float = Tween.interpolate_value(0.85, 0.28, minf(number.age, POP_DURATION),
 			POP_DURATION, Tween.TRANS_BACK, Tween.EASE_OUT)
 		var alpha := minf(1.0, (NUMBER_DURATION - number.age) / FADE_DURATION)
+		var centre := number.centre + camera_side * number.layout_offset.x + camera_up * number.layout_offset.y
 		var spacing := camera_side * (DIGIT_ADVANCE * NUMBER_PIXEL_SIZE * scale)
 		var digits := number.ascii_digits
 		var middle := (digits.size() - 1) * 0.5
 		for i in digits.size():
-			var origin := number.centre + spacing * (i - middle)
+			var origin := centre + spacing * (i - middle)
 			var point := local_from_world * origin
 			var digit := digits[i] - 48
 			if upload_buffer:
@@ -131,3 +145,51 @@ func _process(delta: float) -> void:
 	if upload_buffer:
 		multimesh.buffer = _instance_buffer
 	multimesh.visible_instance_count = glyph_count
+
+func _place_new_numbers(side: Vector3, up: Vector3) -> void:
+	var occupied := {}
+	# Reserve the numbers already on screen. Layout happens at birth so
+	# an older number continues to float without snapping to a new lane.
+	for number in _numbers:
+		if number.layout_pending:
+			continue
+		var centre := Vector2(number.centre.dot(side), number.centre.dot(up))
+		_measure_cells(occupied, centre + number.layout_offset, _label_extent(number), true)
+	# The vertex buffer is sorted far to near. Give the nearest new
+	# numbers first choice so their hit anchors stay easy to associate.
+	for index in range(_numbers.size() - 1, -1, -1):
+		var number := _numbers[index]
+		if not number.layout_pending:
+			continue
+		var centre := Vector2(number.centre.dot(side), number.centre.dot(up))
+		var extent := _label_extent(number)
+		var reach := Vector2(minf(extent.x * 2.0, 1.0), extent.y * 2.0)
+		var best := 0x7fffffff
+		for step: Vector2 in LAYOUT_STEPS:
+			var offset := step * reach
+			var score := _measure_cells(occupied, centre + offset, extent, false)
+			if score < best:
+				best = score
+				number.layout_offset = offset
+			if score == 0:
+				break
+		_measure_cells(occupied, centre + number.layout_offset, extent, true)
+		number.layout_pending = false
+
+func _label_extent(number: DamageNumber) -> Vector2:
+	var size := Vector2(DIGIT_SIZE + DIGIT_ADVANCE * (number.ascii_digits.size() - 1), DIGIT_SIZE)
+	return size * (0.5 * NUMBER_PIXEL_SIZE * LAYOUT_POP_SCALE) + Vector2(0.035, 0.035)
+
+func _measure_cells(occupied: Dictionary, centre: Vector2, extent: Vector2, reserve: bool) -> int:
+	var first := Vector2i(((centre - extent) / LAYOUT_CELL).floor())
+	var last := Vector2i(((centre + extent) / LAYOUT_CELL).floor())
+	var score := 0
+	for y in range(first.y, last.y + 1):
+		for x in range(first.x, last.x + 1):
+			var cell := Vector2i(x, y)
+			var count: int = occupied.get(cell, 0)
+			if reserve:
+				occupied[cell] = count + 1
+			else:
+				score += count
+	return score
