@@ -409,6 +409,7 @@ func run() -> void:
 				clearance_slider.value = 1.
 			map.showcase.set_hour(12.)
 			await process_frame
+			await RenderingServer.frame_post_draw
 			check(graphics._mist._profile.front_scatter_advance_m == 0.
 				and graphics._mist.effect._near_clearance_parameters.decode_float(0) == 0.,
 				"The noon lookups stay neutral")
@@ -420,6 +421,7 @@ func run() -> void:
 			inherited_profile.set("mist_scatter_energy_by_hour", null)
 			graphics.set_profile(inherited_profile)
 			await process_frame
+			await RenderingServer.frame_post_draw
 			check(graphics._mist._profile.front_scatter_advance_m == 0. and (front_slider == null or not front_slider.editable),
 				"A different preset without front scattering clears the lookup and disables the slider")
 			check(graphics._mist.effect._near_clearance_parameters.decode_float(0) == 0.
