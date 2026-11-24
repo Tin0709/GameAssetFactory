@@ -41,6 +41,10 @@ const ImpactMarks := preload("res://scripts/mechanic_lab_impact_marks.gd")
 const GROUND_SLAM_SHADER := preload("res://materials/mechanic_lab_ground_slam.gdshader")
 const GROUND_SLAM_RADIUS := 0.68
 const GROUND_SLAM_DURATION := 0.23
+const GROUND_SLAM_MAX_CLIPS := 8
+const GROUND_SLAM_HEIGHT := 0.025
+const GROUND_SLAM_CORNERS := [Vector3(1, 0, 1), Vector3(-1, 0, 1), Vector3(1, 0, -1), Vector3(-1, 0, -1)]
+const GROUND_SLAM_SIDES := [Vector3.FORWARD, Vector3.BACK, Vector3.LEFT, Vector3.RIGHT]
 const TOOL_SHAKE_HEIGHT_FRACTION := 0.0056
 const ZombieStepDust := preload("res://scripts/mechanic_lab_zombie_step_dust.gd")
 const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
@@ -1657,16 +1661,71 @@ func _tool_ground_contact(offset: Vector2, forward: Vector3, origin: Vector3, su
 	return contact
 
 func _show_tool_slam_ring(point: Vector3, surface: String, sample_time: float) -> void:
-	_tool_slam_footprint.transform = Transform3D(Basis.IDENTITY, point + Vector3.UP * 0.06)
-	if not get_world_3d().direct_space_state.intersect_shape(_tool_slam_footprint, 1).is_empty():
+	var planes := PackedVector3Array()
+	if not _clip_slam_to_stage(point, planes) or not _clip_slam_at_walls(point, planes):
 		return
-	for corner in [Vector3(1, 0, 1), Vector3(-1, 0, 1), Vector3(1, 0, -1), Vector3(-1, 0, -1)]:
-		if _floor_contact_at(point + corner * GROUND_SLAM_RADIUS).is_empty():
-			return
-	_tool_slam_ring.global_position = point + Vector3.UP * 0.025
+	_tool_slam_material.set_shader_parameter(&"clip_count", planes.size())
+	if not planes.is_empty():
+		planes.resize(GROUND_SLAM_MAX_CLIPS)
+		_tool_slam_material.set_shader_parameter(&"clip_planes", planes)
+	_tool_slam_ring.global_position = point + Vector3.UP * GROUND_SLAM_HEIGHT
 	_tool_slam_ring.hide()
 	_tool_slam_material.set_shader_parameter(&"tint", MovementDust.SURFACE_DUST[surface].lightened(0.36))
 	_tool_slam_time = sample_time
+
+func _clip_slam_to_stage(point: Vector3, planes: PackedVector3Array) -> bool:
+	var floor: CollisionShape3D = $Ground/Collision
+	var box := floor.shape as BoxShape3D
+	if box == null or not floor.global_basis.y.normalized().is_equal_approx(Vector3.UP):
+		for corner: Vector3 in GROUND_SLAM_CORNERS:
+			if _floor_contact_at(point + corner * GROUND_SLAM_RADIUS).is_empty():
+				return false
+		return true
+	var to_floor := floor.global_transform.affine_inverse()
+	var centre := to_floor * point
+	var half := box.size * 0.5
+	# Express the inside of the receiver box in coordinates relative to
+	# the ring, so the shader can cut the same plane on a rotated stage.
+	var floor_x := Vector2(to_floor.basis.x.x, to_floor.basis.z.x)
+	var floor_z := Vector2(to_floor.basis.x.z, to_floor.basis.z.z)
+	for plane in [Vector3(floor_x.x, floor_x.y, half.x + centre.x),
+			Vector3(-floor_x.x, -floor_x.y, half.x - centre.x),
+			Vector3(floor_z.x, floor_z.y, half.z + centre.z),
+			Vector3(-floor_z.x, -floor_z.y, half.z - centre.z)]:
+		if plane.z < GROUND_SLAM_RADIUS * (absf(plane.x) + absf(plane.y)):
+			planes.append(plane)
+	return true
+
+func _clip_slam_at_walls(point: Vector3, planes: PackedVector3Array) -> bool:
+	var space := get_world_3d().direct_space_state
+	_tool_slam_footprint.transform = Transform3D(Basis.IDENTITY, point + Vector3.UP * 0.06)
+	var available := GROUND_SLAM_MAX_CLIPS - planes.size()
+	var blockers := space.intersect_shape(_tool_slam_footprint, available + 1)
+	if blockers.size() > available:
+		return false
+	if blockers.is_empty():
+		return true
+	var start := point + Vector3.UP * GROUND_SLAM_HEIGHT
+	var ray := PhysicsRayQueryParameters3D.create(start, start, 1)
+	for direction: Vector3 in GROUND_SLAM_SIDES + GROUND_SLAM_CORNERS:
+		ray.to = start + direction * GROUND_SLAM_RADIUS
+		var hit := space.intersect_ray(ray)
+		if hit.is_empty():
+			continue
+		var index := blockers.find_custom(func(blocker): return blocker.rid == hit.rid and blocker.shape == hit.shape)
+		if index < 0:
+			continue
+		var normal: Vector3 = Vector3(hit.normal).slide(Vector3.UP).normalized()
+		if normal.is_zero_approx():
+			continue
+		var distance := (start - Vector3(hit.position)).dot(normal)
+		planes.append(Vector3(normal.x, normal.z, distance - 0.004))
+		blockers.remove_at(index)
+		if blockers.is_empty():
+			return true
+	# Preserve the conservative behavior for obstructions without a sampled
+	# face at the ring height.
+	return false
 
 func _show_tool_ground_cues() -> void:
 	for event in _pending_tool_ground_cues:

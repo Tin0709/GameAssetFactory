@@ -3,8 +3,21 @@ render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, shadows_disabl
 
 uniform vec4 tint : source_color = vec4(0.9, 0.79, 0.58, 1.0);
 uniform float progress = 0.0;
+uniform int clip_count = 0;
+uniform vec3 clip_planes[8];
+
+varying vec2 floor_position;
+
+void vertex() {
+	floor_position = VERTEX.xz;
+}
 
 void fragment() {
+	for (int i = 0; i < clip_count; i++) {
+		if (dot(floor_position, clip_planes[i].xy) + clip_planes[i].z < 0.0) {
+			discard;
+		}
+	}
 	vec2 offset = UV * 2.0 - 1.0;
 	float sector = floor(atan(offset.y, offset.x) * 3.81972);
 	float step_edge = mod(sector * sector + 3.0 * sector, 5.0) * 0.012;
