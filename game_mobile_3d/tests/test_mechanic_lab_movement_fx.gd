@@ -718,21 +718,25 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 		cues.append(actor.combo.time - (actor.effects.clock - sample) * actor.combo.playback_rate())
 		cue_clocks.append(sample)
 	actor.connect(&"tool_ground_cue", record)
-	for fixture in ["grass", "stone", "wall", "ledge", "shovel", "reset_during_windup"]:
+	for fixture in ["grass", "stone", "wall", "near_wall", "arena_edge", "ledge", "shovel", "reset_during_windup"]:
 		lab.reset_player()
 		lab._select_floor_surface(2 if fixture == "stone" else 0)
 		lab._select_weapon(lab.Weapon.SHOVEL if fixture == "shovel" else lab.Weapon.PICKAXE)
 		var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var obstacle: StaticBody3D
-		if fixture in ["wall", "ledge"]:
+		if fixture == "arena_edge":
+			actor._reset_map_actor_at(Vector3(48.18, 0.015, 0), PI * 0.5)
+		if fixture in ["wall", "near_wall", "ledge"]:
 			obstacle = StaticBody3D.new()
 			var shape := CollisionShape3D.new()
 			var box := BoxShape3D.new()
 			shape.shape = box
 			obstacle.add_child(shape)
-			if fixture == "wall":
+			if fixture in ["wall", "near_wall"]:
 				box.size = Vector3(3.0, 2.0, 0.2)
-				obstacle.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true), forward + Vector3.UP)
+				var wall_normal := forward.rotated(Vector3.UP, deg_to_rad(25.0)) if fixture == "near_wall" else forward
+				var front := forward * 1.99 + wall_normal * 0.1 if fixture == "near_wall" else forward
+				obstacle.transform = Transform3D(Basis.looking_at(wall_normal, Vector3.UP, true), front + Vector3.UP)
 			else:
 				box.size = Vector3(1.1, 0.4, 1.1)
 				obstacle.position.y = 0.2
@@ -788,6 +792,21 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 				return absf((p.origin - actor.global_position).dot(forward) - 1.8) < 0.02 \
 					and Color(p.sprite.modulate, 1.0) == dust.SURFACE_DUST[fixture]),
 				"The Pickaxe debris uses the 180 cm cue and samples the selected surface tint")
+		elif fixture in ["near_wall", "arena_edge"]:
+			check(ring_seen, "The %s keeps the supported part of the Pickaxe shockwave" % fixture)
+			if ring_seen:
+				var material := ring.material_override as ShaderMaterial
+				check(material.get_shader_parameter("clip_count") == 1,
+					"The %s ring uses one boundary plane" % fixture)
+				var planes: PackedVector3Array = material.get_shader_parameter("clip_planes")
+				var normal := Vector2(planes[0].x, planes[0].y)
+				var expected_forward := Vector3.RIGHT if fixture == "arena_edge" else forward
+				var inward := -expected_forward.rotated(Vector3.UP, deg_to_rad(25.0)) if fixture == "near_wall" else -expected_forward
+				var edge := forward * 1.99 if fixture == "near_wall" else Vector3(50.0, 0.0, 0.0)
+				var ring_offset := edge - ring.global_position
+				check(normal.dot(Vector2(inward.x, inward.z)) > 0.999
+					and absf(normal.dot(Vector2(ring_offset.x, ring_offset.z)) + planes[0].z) < 0.015,
+					"The %s boundary matches the actual terrain plane within 1.5 cm" % fixture)
 		elif fixture == "shovel":
 			check(peak >= 4 and not ring_seen, "Shovel emits the separate debris passes without the Pickaxe ring")
 		else:
