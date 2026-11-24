@@ -192,8 +192,8 @@ func _ready() -> void:
 		renderer.name = "EmbeddedArrows"
 		renderer.multimesh = _embedded
 		renderer.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		var source := bolt_mesh.surface_get_material(0) as BaseMaterial3D
-		if source != null and source.albedo_texture != null and bolt_mesh.get_surface_count() == 1:
+		var source := bolt_mesh.surface_get_material(0) as BaseMaterial3D if bolt_mesh.get_surface_count() == 1 else null
+		if source != null and source.albedo_texture != null:
 			var embedded_material := ShaderMaterial.new()
 			embedded_material.shader = EMBEDDED_SHADER
 			embedded_material.set_shader_parameter(&"arrow_texture", source.albedo_texture)
