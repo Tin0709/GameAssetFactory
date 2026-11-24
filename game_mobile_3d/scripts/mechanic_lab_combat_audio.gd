@@ -336,6 +336,18 @@ const DEATH_HASHES := [
 	"0396d7f66dd11827ac94b1384b9a8ecf55127d9072363ec259ad01f8bb32e1e4",
 	"578017fb1cc8213e1b15f39f8208a6c947fa705bb8e603c242c5091e6377ee72",
 ]
+# Optional local PCM16 derivatives for the Curved hit and zombie reaction families.
+const PCM_DIRECTORY := "combat_audio_cache/pcm16-v1"
+const PCM_HASHES := {
+	CURVED_HIT_HASHES[0]: "6bcd1a7a5b4ff4432ef4d066717cb1c996590117694f41f529b7415c34a0f76f",
+	CURVED_HIT_HASHES[1]: "499465dd5f9e5843a2bda005b2fff68334bfed913a1c944daae24222b8341d15",
+	CURVED_HIT_HASHES[2]: "fd76067fe6c95c967481874eb186e57a3da73bd4c04bdc0dc0ef7b3377264ded",
+	HURT_HASHES[0]: "46c02616f7d7c5e541c3aa04e4d719a25ccf1ff172350f811f5c5dcbd0098a6e",
+	HURT_HASHES[1]: "d391d922540107087e03ab374555d5cab3fc5f47bfb33b1ea8f5d37e01a11206",
+	DEATH_HASHES[0]: "e1452a3ef1875029a699f7e36a4a3432d9e4f34640f755bbf4592caa54c272fa",
+	DEATH_HASHES[1]: "48b2e379b63a48bb9fab13861fe71c4edf84959c3b5ba0a7812cfa2a0e825f57",
+	DEATH_HASHES[2]: "9591c942816da38e52b96ea9b3a9f30ab930fd54a54184f8af47d0fa9f73426e",
+}
 const ZOMBIE_HIT_HASHES := [
 	"5dbc65f67fcd3336628c7a35a4576b237735cb17d209205a8d94e642708be59c",
 	"ae4008449f238d65576d53c99f9dff67fb51151e48df94669a8dedf55bb6e32e",
@@ -970,24 +982,38 @@ func _load_surface_landing(root: String, surface: String, group: StringName, has
 		_load_sample(root, group, SURFACE_LANDING % [surface, i + 1], hashes[i])
 
 func _load_sample(root: String, group: StringName, relative: String, checksum: String) -> void:
-	var path := SourceFilePath.resolve_private_file(root, SOURCE.path_join(relative))
-	if path.is_empty():
+	var data := _read_verified_sample(root, SOURCE.path_join(relative), checksum)
+	if data.is_empty():
 		return
+	var stream: AudioStream
+	var pcm_checksum: String = PCM_HASHES.get(checksum, "")
+	if not pcm_checksum.is_empty():
+		var pcm := _read_verified_sample(root, PCM_DIRECTORY.path_join(checksum + ".wav"), pcm_checksum)
+		if not pcm.is_empty():
+			stream = AudioStreamWAV.load_from_buffer(pcm)
+	if stream == null:
+		var encoded := AudioStreamOggVorbis.load_from_buffer(data)
+		if encoded == null:
+			return
+		encoded.loop = false
+		stream = encoded
+	if not _groups.has(group):
+		_groups[group] = []
+	_groups[group].append(stream)
+
+static func _read_verified_sample(root: String, relative: String, checksum: String) -> PackedByteArray:
+	var path := SourceFilePath.resolve_private_file(root, relative)
+	if path.is_empty():
+		return PackedByteArray()
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
-		return
+		return PackedByteArray()
 	var data := file.get_buffer(file.get_length())
 	var digest := HashingContext.new()
 	if (digest.start(HashingContext.HASH_SHA256) != OK or digest.update(data) != OK
 			or digest.finish().hex_encode() != checksum):
-		return
-	# Decode the exact bytes that passed verification.
-	var stream := AudioStreamOggVorbis.load_from_buffer(data)
-	if stream != null:
-		stream.loop = false
-		if not _groups.has(group):
-			_groups[group] = []
-		_groups[group].append(stream)
+		return PackedByteArray()
+	return data
 
 func _next_stream(group: StringName, advance := true) -> AudioStream:
 	var choices: Array = _groups.get(group, [])
