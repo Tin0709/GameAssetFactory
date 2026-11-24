@@ -1267,6 +1267,7 @@ func check_selected_floor_steps(lab) -> void:
 			and audio._step_points.size() == queued + 1,
 			"Zombie feet keep the ground tint and supported generic step on %s" % surface)
 		print("MECHANIC_LAB_FLOOR_STEPS ", surface, " steps=", steps, " dust=", count,
+			" cell=", dust.multimesh.get_instance_custom_data(0).r, " queued=", audio._step_points.size() - queued,
 			" landing=", movement.last_sources.get(landing_key, "missing"))
 	menu.select(0)
 	menu.item_selected.emit(0)
