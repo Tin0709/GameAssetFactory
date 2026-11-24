@@ -235,6 +235,14 @@ flat = false
 alignment = 0
 tooltip_text = "Lưu hoặc nạp cấu hình thử A và B."
 
+[node name="ContactSparkQuality" type="OptionButton" parent="HUD"]
+offset_left = 762.0
+offset_top = 184.0
+offset_right = 978.0
+offset_bottom = 218.0
+focus_mode = 0
+tooltip_text = "Mức nhẹ ưu tiên 3 điểm va chạm gần nhất và dùng ít tia hơn."
+
 [node name="CrossbowAmmo" type="Label" parent="HUD"]
 visible = false
 offset_left = 794.0

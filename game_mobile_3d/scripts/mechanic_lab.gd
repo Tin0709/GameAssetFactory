@@ -85,6 +85,7 @@ const PRESET_OPTIONS := {
 	"crowd_count": ^"HUD/CrowdSpawnCount",
 	"zombie_animation": ^"HUD/ZombieGait",
 	"render_scale": ^"HUD/RenderScale",
+	"contact_spark_quality": ^"HUD/ContactSparkQuality",
 }
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD, CROSS_POLLINATOR, GAUNTLETS,
@@ -389,6 +390,7 @@ func _ready() -> void:
 		$Zombies.zombie_idle_audio.connect(_combat_audio.queue_zombie_idle)
 		_setup_weapon_selector()
 	_setup_skin_selector(using_private and player_ready)
+	_setup_contact_spark_quality()
 	_setup_tuning_presets()
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
@@ -1410,6 +1412,16 @@ func _set_camera_shake_intensity(percent: float) -> void:
 	$HUD/CameraShake/Value.text = "Rung camera · %d%%" % roundi(percent)
 	if _shake_intensity == 0.0:
 		camera.h_offset = 0.0
+
+func _setup_contact_spark_quality() -> void:
+	var picker: OptionButton = $HUD/ContactSparkQuality
+	picker.visible = _contact_sparks != null
+	if not picker.visible:
+		return
+	picker.add_item("Tia va chạm · Đầy đủ")
+	picker.add_item("Tia va chạm · Nhẹ")
+	picker.select(0)
+	picker.item_selected.connect(func(index: int): _contact_sparks.set_reduced_budget(index == 1))
 
 func _setup_tuning_presets() -> void:
 	var button: MenuButton = $HUD/TuningPresets

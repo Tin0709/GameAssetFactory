@@ -8,6 +8,8 @@ const SOURCE_REGION := Rect2i(101, 8, 5, 14)
 const SPARKS_PER_CONTACT := 9
 const CONTACTS_PER_FRAME := 5
 const CAPACITY := CONTACTS_PER_FRAME * SPARKS_PER_CONTACT
+const REDUCED_SPARKS_PER_CONTACT := 6
+const REDUCED_CONTACTS_PER_FRAME := 3
 const HOT := Color(1.0, 0.89, 0.54)
 const COOL := Color(1.0, 0.44, 0.10)
 
@@ -23,6 +25,9 @@ var _streaks: MultiMesh
 var _particles: Array[Spark] = []
 var _pending: Array[Dictionary] = []
 var _next := 0
+var _contact_budget := CONTACTS_PER_FRAME
+var _sparks_per_contact := SPARKS_PER_CONTACT
+var _pool_limit := CAPACITY
 var _random := RandomNumberGenerator.new()
 var _display_clock: Callable
 
@@ -59,28 +64,37 @@ func setup(display_clock := Callable()) -> bool:
 	set_process(false)
 	return true
 
+func set_reduced_budget(reduced: bool) -> void:
+	_contact_budget = REDUCED_CONTACTS_PER_FRAME if reduced else CONTACTS_PER_FRAME
+	_sparks_per_contact = REDUCED_SPARKS_PER_CONTACT if reduced else SPARKS_PER_CONTACT
+	_pool_limit = _contact_budget * _sparks_per_contact
+	_next %= _pool_limit
+	# Preserve the nearest scheduled contacts and let visible sparks finish fading.
+	if _pending.size() > _contact_budget:
+		_pending.resize(_contact_budget)
+
 func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, sample_time := -1.0) -> void:
 	var distance := point.distance_squared_to(viewer)
 	var index := _pending.size()
 	while index > 0 and distance < float(_pending[index - 1].distance):
 		index -= 1
-	if index == CONTACTS_PER_FRAME:
+	if index == _contact_budget:
 		return
 	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance,
 		"sample_time": sample_time})
-	if _pending.size() > CONTACTS_PER_FRAME:
+	if _pending.size() > _contact_budget:
 		_pending.pop_back()
 	set_process(true)
 
 func _spawn_burst(point: Vector3, attack_direction: Vector3) -> void:
 	var angle := _random.randf_range(0.0, TAU)
 	var bias := attack_direction.normalized() * 0.24
-	for i in SPARKS_PER_CONTACT:
-		var yaw := angle + TAU * float(i) / SPARKS_PER_CONTACT + _random.randf_range(-0.17, 0.17)
+	for i in _sparks_per_contact:
+		var yaw := angle + TAU * float(i) / _sparks_per_contact + _random.randf_range(-0.17, 0.17)
 		var outward := Vector3(cos(yaw), _random.randf_range(-0.42, 0.8), sin(yaw))
 		outward = (outward + bias).normalized()
 		var spark := _particles[_next]
-		_next = (_next + 1) % _particles.size()
+		_next = (_next + 1) % _pool_limit
 		spark.origin = point + outward * 0.21
 		spark.velocity = outward * _random.randf_range(2.0, 4.4)
 		spark.age = 0.0

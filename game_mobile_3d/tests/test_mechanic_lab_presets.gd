@@ -71,8 +71,13 @@ func run() -> void:
 	var a_animation := 0
 	var b_animation := default_animation
 	set_values(lab, a, 150, true, a_animation, 75)
+	var quality := lab.get_node("HUD/ContactSparkQuality") as OptionButton
+	quality.select(1)
+	quality.item_selected.emit(1)
 	select_action(lab, 0)
 	set_values(lab, b, 25, false, b_animation, 85)
+	quality.select(0)
+	quality.item_selected.emit(0)
 	select_action(lab, 2)
 	lab.free()
 	lab = make_lab()
@@ -80,12 +85,14 @@ func run() -> void:
 	check(values_match(lab, baseline, 100, false), "The Lab starts with its normal settings")
 	select_action(lab, 1)
 	check(values_match(lab, a, 150, true), "Slot A restores sliders, crowd count and live values after reopening")
+	check(lab.get_node("HUD/ContactSparkQuality").selected == 1, "Loading A restores reduced contact sparks")
 	check(lab.get_node("HUD/ZombieGait").selected == a_animation,
 		"Loading A restores the selected zombie animation")
 	if lab.get_node("HUD/RenderScale").item_count > 0:
 		check(is_equal_approx(root.scaling_3d_scale, 0.75), "Loading A applies its 3D render scale")
 	select_action(lab, 3)
 	check(values_match(lab, b, 25, false), "Slot B restores a distinct configuration")
+	check(lab.get_node("HUD/ContactSparkQuality").selected == 0, "Loading B restores the full spark budget")
 	check(lab.get_node("HUD/ZombieGait").selected == b_animation,
 		"Loading B restores its zombie animation")
 	if lab.get_node("HUD/RenderScale").item_count > 0:
