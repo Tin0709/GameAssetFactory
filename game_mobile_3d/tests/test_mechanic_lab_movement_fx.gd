@@ -520,26 +520,28 @@ func check_gauntlet_impact_marks(lab) -> void:
 		check(decal != null and decal.texture_albedo.get_size() == Vector2(16, 16)
 			and (decal.cull_mask & camera_ground.layers) != 0 and (decal.cull_mask & player_mesh.layers) == 0,
 			"The mark uses one atlas tile and projects only onto the stage")
-	for fixture in ["grass", "dirt", "stone_wall", "slab"]:
+	for fixture in ["grass", "dirt", "stone_wall", "stone_wall_far", "slab"]:
 		lab.reset_player()
 		for i in 8:
 			await physics_frame
 		lab._select_weapon(lab.Weapon.BASIC_GAUNTLETS if fixture == "grass" else lab.Weapon.GAUNTLETS)
 		if fixture == "dirt":
 			lab._select_floor_surface(1)
-		elif fixture == "stone_wall":
+		elif fixture.begins_with("stone_wall"):
 			lab._select_floor_surface(2)
 		var forward: Vector3 = lab.player.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var obstacle: StaticBody3D
-		if fixture in ["stone_wall", "slab"]:
+		var wall_face := 0.90 if fixture == "stone_wall" else 1.35
+		if fixture.begins_with("stone_wall") or fixture == "slab":
 			obstacle = StaticBody3D.new()
 			var box := BoxShape3D.new()
 			var shape := CollisionShape3D.new()
 			shape.shape = box
 			obstacle.add_child(shape)
-			if fixture == "stone_wall":
+			if fixture.begins_with("stone_wall"):
 				box.size = Vector3(2.0, 2.0, 0.2)
-				obstacle.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true), forward + Vector3.UP)
+				obstacle.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true),
+					forward * (wall_face + 0.1) + Vector3.UP)
 			else:
 				box.size = Vector3(2.0, 0.4, 2.0)
 				obstacle.position = Vector3.UP * 0.2
@@ -565,15 +567,19 @@ func check_gauntlet_impact_marks(lab) -> void:
 			check(appeared != null and lab.player.is_on_floor(), "The %s Gauntlets dive leaves its mark on touchdown" % fixture)
 			if appeared != null:
 				var reach := appeared.global_position.dot(forward)
-				var expected := 0.0 if fixture == "stone_wall" else 1.8
+				var expected := 0.0 if fixture.begins_with("stone_wall") else 1.8
 				check(absf(reach - expected) < 0.02 and absf(appeared.global_position.y) < 0.03,
 					"The %s crack stays on the supported side of the stage" % fixture)
-				if fixture == "stone_wall":
-					check(reach + appeared.size.x * 0.5 < 0.9, "The entire mark fits in front of the wall")
-					var particles: Array = dust._particles.filter(func(p): return p.sprite.visible)
-					check(particles.size() >= 4 and particles.all(func(p):
+				var particles: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag > 0.0)
+				check(particles.size() in [3, 4, 5] and particles.all(func(p):
 						return p.origin.slide(Vector3.UP).distance_to(appeared.global_position.slide(Vector3.UP)) < 0.02),
-						"Both Gauntlets particle layers fall back in front of a wall that blocks their offsets")
+					"The crack and debris share the support point in the %s fixture" % fixture)
+				if fixture.begins_with("stone_wall"):
+					check(reach + appeared.size.x * 0.5 < wall_face, "The entire mark fits in front of the wall")
+					var puffs: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag == 0.0)
+					var expected_puff := 0.0 if fixture == "stone_wall" else 0.90
+					check(puffs.size() == 1 and absf(puffs[0].origin.dot(forward) - expected_puff) < 0.02,
+						"The puff keeps its 90 cm offset when it fits before the wall")
 				print("GAUNTLET_IMPACT_MARK ", fixture, " reach=", reach, " tint=", appeared.modulate)
 				if fixture == "grass":
 					lab.reset_player()
