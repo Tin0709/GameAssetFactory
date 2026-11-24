@@ -4,9 +4,16 @@ const MANIFEST := "godot_lab/world_map_unified_showcase_v001/terrain_source_atla
 const TILE_KEYS := ["grass_top", "grass_side", "dirt", "path", "stone"]
 const TILE_SIZE := 16
 
-static func load_tiles(top_tile := "grass_top") -> Texture2DArray:
-	if not OS.has_feature("editor") or top_tile not in TILE_KEYS:
-		return null
+static func load_tiles() -> Texture2DArray:
+	return _load_surface_arrays(false).get("grass")
+
+static func load_lab_tiles() -> Dictionary[String, Texture2DArray]:
+	return _load_surface_arrays(true)
+
+static func _load_surface_arrays(include_lab_surfaces: bool) -> Dictionary[String, Texture2DArray]:
+	var surfaces: Dictionary[String, Texture2DArray] = {}
+	if not OS.has_feature("editor"):
+		return surfaces
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	if root.is_empty():
 		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
@@ -14,34 +21,34 @@ static func load_tiles(top_tile := "grass_top") -> Texture2DArray:
 	var project := ProjectSettings.globalize_path("res://").simplify_path().replace("\\", "/").trim_suffix("/").to_lower()
 	if not root.is_absolute_path() or root.begins_with("res://") or root.begins_with("user://") \
 		or root.to_lower() == project or root.to_lower().begins_with(project + "/"):
-		return null
+		return surfaces
 	var path := root.path_join(MANIFEST)
 	if not FileAccess.file_exists(path):
-		return null
+		return surfaces
 	var manifest: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not manifest is Dictionary or manifest.get("schema") != "private_world_map_terrain_atlas_v1" \
 		or not manifest.get("atlas") is String or not manifest.get("sha256") is String or not manifest.get("tiles") is Dictionary:
-		return null
+		return surfaces
 	var relative: String = manifest.atlas
 	if relative.is_absolute_path() or relative.get_extension().to_lower() != "png":
-		return null
+		return surfaces
 	var atlas_path := root.path_join(relative.replace("\\", "/")).simplify_path()
 	if not atlas_path.begins_with(root + "/extracted/") or not FileAccess.file_exists(atlas_path) \
 		or FileAccess.get_sha256(atlas_path) != manifest.sha256:
-		return null
+		return surfaces
 	var atlas := Image.load_from_file(atlas_path)
 	if atlas == null or atlas.is_empty():
-		return null
+		return surfaces
 	var images: Array[Image] = []
 	var surface_reflectance := PackedVector3Array()
 	for key in TILE_KEYS:
-		var offset: Variant = manifest.tiles.get(top_tile if key == "grass_top" else key)
+		var offset: Variant = manifest.tiles.get(key)
 		if not offset is Array or offset.size() != 2 or not (offset[0] is float or offset[0] is int) \
 			or not (offset[1] is float or offset[1] is int):
-			return null
+			return surfaces
 		var tile := Rect2i(int(offset[0]), int(offset[1]), TILE_SIZE, TILE_SIZE)
 		if not Rect2i(Vector2i.ZERO, atlas.get_size()).encloses(tile):
-			return null
+			return surfaces
 		var image := atlas.get_region(tile)
 		var sum := Vector3.ZERO
 		for y in TILE_SIZE:
@@ -51,6 +58,24 @@ static func load_tiles(top_tile := "grass_top") -> Texture2DArray:
 		surface_reflectance.append(sum / float(TILE_SIZE * TILE_SIZE))
 		image.generate_mipmaps()
 		images.append(image)
+	var grass := _create_texture(images, surface_reflectance)
+	if grass == null:
+		return surfaces
+	surfaces["grass"] = grass
+	if include_lab_surfaces:
+		# All three flat stages share the same verified atlas read and decode.
+		for surface in ["dirt", "stone"]:
+			var layer := TILE_KEYS.find(surface)
+			var variant := images.duplicate()
+			var reflectance := surface_reflectance.duplicate()
+			variant[0] = images[layer]
+			reflectance[0] = surface_reflectance[layer]
+			var texture := _create_texture(variant, reflectance)
+			if texture != null:
+				surfaces[surface] = texture
+	return surfaces
+
+static func _create_texture(images: Array[Image], surface_reflectance: PackedVector3Array) -> Texture2DArray:
 	var texture := Texture2DArray.new()
 	if texture.create_from_images(images) != OK:
 		return null

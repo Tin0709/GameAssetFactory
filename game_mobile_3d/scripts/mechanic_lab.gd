@@ -977,10 +977,12 @@ func _setup_floor_surfaces() -> Texture2DArray:
 	for title in ["Nền thử · Cỏ", "Nền thử · Đất", "Nền thử · Đá"]:
 		picker.add_item(title)
 	picker.select(0)
-	var tiles := SourceTerrain.load_tiles()
+	_floor_tiles = SourceTerrain.load_lab_tiles()
+	for index in range(1, FLOOR_SURFACES.size()):
+		picker.set_item_disabled(index, not _floor_tiles.has(FLOOR_SURFACES[index]))
+	var tiles: Texture2DArray = _floor_tiles.get("grass")
 	picker.disabled = tiles == null
 	if tiles != null:
-		_floor_tiles["grass"] = tiles
 		var material := $Ground/Mesh.material_override as ShaderMaterial
 		material.set_shader_parameter("source_terrain_tiles", tiles)
 		material.set_shader_parameter("use_source_terrain", true)
@@ -993,12 +995,9 @@ func _select_floor_surface(index: int) -> void:
 		return
 	var tiles: Texture2DArray = _floor_tiles.get(surface)
 	if tiles == null:
-		tiles = SourceTerrain.load_tiles(surface)
-		if tiles == null:
-			$HUD/FloorSurface.select(FLOOR_SURFACES.find(_floor_surface))
-			$HUD/SpawnStatus.text = "Thiếu texture nền đã xác minh trong MD2 Research."
-			return
-		_floor_tiles[surface] = tiles
+		$HUD/FloorSurface.select(FLOOR_SURFACES.find(_floor_surface))
+		$HUD/SpawnStatus.text = "Thiếu texture nền đã xác minh trong MD2 Research."
+		return
 	var material := $Ground/Mesh.material_override as ShaderMaterial
 	material.set_shader_parameter("source_terrain_tiles", tiles)
 	_floor_surface = surface
