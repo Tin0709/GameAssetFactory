@@ -266,7 +266,11 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		_emit_gauntlet_impact_dust(ground_point, surface, _heavy_landing_forward)
 		return
 	if heavy and _heavy_delay.is_valid():
-		var delay_ticks := ceili(float(_heavy_delay.call()) * Engine.physics_ticks_per_second)
+		var delay := float(_heavy_delay.call())
+		# A montage with explicit debris cues owns the complete heavy burst.
+		if delay < 0.0:
+			return
+		var delay_ticks := ceili(delay * Engine.physics_ticks_per_second)
 		if delay_ticks > 0:
 			_burst_frame = Engine.get_physics_frames() + delay_ticks
 			_burst_point = ground_point

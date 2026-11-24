@@ -599,7 +599,7 @@ func check_gauntlet_impact_marks(lab) -> void:
 
 func check_tool_ground_effects(lab, dust: Node3D) -> void:
 	var actor = lab.player
-	var ring := lab.get_node_or_null("CombatEffects/PickaxeGroundSlam") as MeshInstance3D
+	var ring := lab.get_node_or_null("CombatEffects/ToolGroundSlam") as MeshInstance3D
 	check(ring != null and actor.has_signal(&"tool_ground_cue"), "The Lab has physical ground cues for Pickaxe and Shovel")
 	if ring == null or not actor.has_signal(&"tool_ground_cue"):
 		return

@@ -155,7 +155,7 @@ func particle_at(index:int,display_time:float)->Dictionary:
 	return {"position":previous.position,"life":previous.life}
 func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=null)->void:
 	var time:=clock if display_time<0. else minf(display_time,clock)
-	var shown := samples_at(time, blade_base, blade_tip)
+	var shown: Array = samples if display_time < 0.0 else samples_at(time, blade_base, blade_tip)
 	_mesh.clear_surfaces()
 	var has_surface := false
 	for i in range(1, shown.size()):

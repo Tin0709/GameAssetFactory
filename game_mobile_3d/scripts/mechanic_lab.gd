@@ -210,6 +210,7 @@ var _tool_slam_material: ShaderMaterial
 var _tool_slam_footprint := PhysicsShapeQueryParameters3D.new()
 var _tool_slam_time := -1.0
 var _pending_tool_ground_cues: Array[Dictionary] = []
+var _tool_touchdown: Dictionary = {}
 var _floor_tiles: Dictionary[String, Texture2DArray] = {}
 var _slam_swing_frame := -1
 var _slam_swing_serial := -1
@@ -1348,6 +1349,10 @@ func _on_zombie_step(sole: Vector3, actor: CharacterBody3D = null) -> void:
 	_combat_audio.queue_zombie_step(support.position)
 
 func _heavy_debris_delay() -> float:
+	# These montages emit their own ground debris, independently of the
+	# physical touchdown and the hit event that resolves zombie damage.
+	if player.clips.get("AirAttack", {}).has("ground_effects"):
+		return -1.0
 	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
 
 func _on_attack_accepted_timed(index: int, clip: String, serial: int, at: float) -> void:
@@ -1476,6 +1481,10 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 		player.begin_gauntlet_landing()
 	elif TOOL_TYPES.has(_equipped_weapon):
 		player.begin_tool_landing()
+	var debris_delay := _heavy_debris_delay()
+	if debris_delay < 0.0:
+		_tool_touchdown = {"origin": point, "forward": facing.slide(Vector3.UP).normalized(),
+			"surface_contact": _floor_landing_contact_at(point), "serial": serial}
 	# Evaluate the height tiers against the support rather than the capsule origin.
 	var floor_height := _landing_floor_height(point)
 	fall_height = maxf(0.0, fall_height + point.y - floor_height)
@@ -1495,7 +1504,7 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 		if not mark_surface.is_empty():
 			var anchor := _gauntlet_impact_anchor(mark_surface.position, facing, MovementDust.GAUNTLET_DEBRIS_FORWARD)
 			_gauntlet_impact_marks.stamp(anchor, mark_surface.position, mark_surface.surface)
-	if not _combat_audio.enabled:
+	if not _combat_audio.enabled or debris_delay < 0.0:
 		return
 	if _equipped_weapon == Weapon.SABRE:
 		_slam_swing_serial = serial
@@ -1509,7 +1518,7 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 			if not support.is_empty():
 				_combat_audio.slam_landed(support.position, "")
 		return
-	var delay_ticks := ceili(_heavy_debris_delay() * Engine.physics_ticks_per_second)
+	var delay_ticks := ceili(debris_delay * Engine.physics_ticks_per_second)
 	if delay_ticks > 0:
 		_slam_audio_point = contact.position
 		_slam_audio_surface = contact.surface
@@ -1578,7 +1587,7 @@ func _setup_tool_slam_ring() -> void:
 	_tool_slam_material = ShaderMaterial.new()
 	_tool_slam_material.shader = GROUND_SLAM_SHADER
 	_tool_slam_ring = MeshInstance3D.new()
-	_tool_slam_ring.name = "PickaxeGroundSlam"
+	_tool_slam_ring.name = "ToolGroundSlam"
 	_tool_slam_ring.mesh = mesh
 	_tool_slam_ring.material_override = _tool_slam_material
 	_tool_slam_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -1591,11 +1600,10 @@ func _setup_tool_slam_ring() -> void:
 	_tool_slam_footprint.collision_mask = 1
 
 func _queue_tool_ground_cue(cue: Dictionary, serial: int, sample_time: float) -> void:
-	_pending_tool_ground_cues.append({"cue": cue, "serial": serial, "sample_time": sample_time})
+	_pending_tool_ground_cues.append({"cue": cue, "serial": serial, "sample_time": sample_time,
+		"landing": player.combo.phase == &"air_attack"})
 
-func _tool_ground_contact(offset: Vector2, forward: Vector3) -> Dictionary:
-	var origin: Vector3 = player.global_position
-	var support := _floor_landing_contact_at(origin)
+func _tool_ground_contact(offset: Vector2, forward: Vector3, origin: Vector3, support: Dictionary) -> Dictionary:
 	if support.is_empty():
 		return {}
 	origin.y = support.position.y
@@ -1625,15 +1633,20 @@ func _show_tool_slam_ring(point: Vector3, surface: String, sample_time: float) -
 	_tool_slam_time = sample_time
 
 func _show_tool_ground_cues() -> void:
-	var forward: Vector3 = player.visual.global_basis.z.slide(Vector3.UP).normalized()
 	for event in _pending_tool_ground_cues:
 		var cue: Dictionary = event.cue
 		var sample_time: float = event.sample_time
+		if event.landing and _tool_touchdown.get("serial") != event.serial:
+			continue
 		if cue.effect == MeleeTools.GroundEffect.SHAKE:
 			_shake_serial = event.serial
-			_start_camera_shake(TOOL_SHAKE_HEIGHT_FRACTION, sample_time)
+			var strength := FINISHER_SHAKE_HEIGHT_FRACTION if cue.get("medium", false) else TOOL_SHAKE_HEIGHT_FRACTION
+			_start_camera_shake(strength, sample_time)
 			continue
-		var contact := _tool_ground_contact(cue.offset, forward)
+		var origin: Vector3 = _tool_touchdown.origin if event.landing else player.global_position
+		var forward: Vector3 = _tool_touchdown.forward if event.landing else player.visual.global_basis.z.slide(Vector3.UP).normalized()
+		var support: Dictionary = _tool_touchdown.surface_contact if event.landing else _floor_landing_contact_at(origin)
+		var contact := _tool_ground_contact(cue.offset, forward, origin, support)
 		if contact.is_empty():
 			continue
 		var elapsed_ticks: float = (player.effects.clock - sample_time) / get_physics_process_delta_time()
@@ -1722,6 +1735,7 @@ func _clear_contact_light() -> void:
 	_pending_melee_contact_fx.clear()
 	_pending_melee_feedback.clear()
 	_pending_tool_ground_cues.clear()
+	_tool_touchdown.clear()
 	_tool_slam_time = -1.0
 	if _tool_slam_ring != null:
 		_tool_slam_ring.hide()
