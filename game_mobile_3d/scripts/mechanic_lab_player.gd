@@ -47,8 +47,9 @@ var _bow_recovery := 0.0
 var _bow_action_time := 0.0
 var _bow_aim_tick := -1
 var _bow_aim: Variant
-var _share_bow_clip_import := false
-var _bow_clip_copy: Node3D
+var _share_ranged_clip_import := false
+var _ranged_clip_copy: Node3D
+var _prepared_crossbow_clips: Dictionary[String, Node3D] = {}
 var hitstop_seconds := 0.0:
 	set(value):
 		hitstop_seconds = value
@@ -167,26 +168,47 @@ func _refresh_markers() -> void:
 func _create_hybrid_motion() -> RefCounted:
 	return LabLocomotion.new()
 
+func prepare_crossbow_clip(entry: Dictionary) -> void:
+	var path: String = entry.path
+	if path.is_empty() or _prepared_crossbow_clips.has(path) or FileAccess.get_sha256(path) != entry.sha256:
+		return
+	var scene := load_private_model(path, GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS)
+	if scene != null:
+		_prepared_crossbow_clips[path] = scene
+
+func clear_prepared_crossbow_clips() -> void:
+	for scene: Node3D in _prepared_crossbow_clips.values():
+		scene.free()
+	_prepared_crossbow_clips.clear()
+
+func _exit_tree() -> void:
+	clear_prepared_crossbow_clips()
+
 func _load_private_clip_library(entries: Array, library_name: StringName, combat_config: Variant = null) -> bool:
-	# Bow gives the same source clip separate attack and recovery entries.
+	# Both ranged weapons give the same source clip separate shot and recovery entries.
 	# The inherited loader validates both, retargets them, and owns each scene.
-	_share_bow_clip_import = library_name == Bow.BOW_LIBRARY and entries.size() == 2 \
+	_share_ranged_clip_import = library_name in [Bow.BOW_LIBRARY, CrossPollinator.LIBRARY] and entries.size() == 2 \
 		and entries[0] is Dictionary and entries[1] is Dictionary and entries[0].get("path") == entries[1].get("path")
 	var loaded := super._load_private_clip_library(entries, library_name, combat_config)
-	_share_bow_clip_import = false
-	if _bow_clip_copy != null:
-		_bow_clip_copy.free()
-		_bow_clip_copy = null
+	_share_ranged_clip_import = false
+	if _ranged_clip_copy != null:
+		_ranged_clip_copy.free()
+		_ranged_clip_copy = null
 	return loaded
 
 func _import_private_clip_scene(path: String) -> Node3D:
-	if _bow_clip_copy != null:
-		var copy := _bow_clip_copy
-		_bow_clip_copy = null
+	if _ranged_clip_copy != null:
+		var copy := _ranged_clip_copy
+		_ranged_clip_copy = null
 		return copy
+	# The calling loader rechecks the source checksum before reaching here.
+	if _prepared_crossbow_clips.has(path):
+		var prepared: Node3D = _prepared_crossbow_clips[path]
+		_prepared_crossbow_clips.erase(path)
+		return prepared
 	var scene := load_private_model(path, GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS)
-	if _share_bow_clip_import and scene != null:
-		_bow_clip_copy = scene.duplicate(0) as Node3D
+	if _share_ranged_clip_import and scene != null:
+		_ranged_clip_copy = scene.duplicate(0) as Node3D
 	return scene
 
 func _post_landing_step_interval() -> float:

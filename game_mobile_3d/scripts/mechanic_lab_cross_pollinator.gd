@@ -123,10 +123,7 @@ static func interpolate_shot_poses(actor: CharacterBody3D) -> void:
 					animation.track_remove_key(track, index)
 			animation.track_set_interpolation_type(track, Animation.INTERPOLATION_LINEAR)
 
-static func load_locomotion(actor: CharacterBody3D, root: String) -> Dictionary:
-	if not OS.has_feature("editor") or not ResourceLoader.exists(SOURCE_GAIT_PATH):
-		return {}
-	var gait_source := load(SOURCE_GAIT_PATH) as Script
+static func locomotion_entries(root: String) -> Array[Dictionary]:
 	var entries: Array[Dictionary] = []
 	for slot: String in LOCOMOTION:
 		var source: Array = LOCOMOTION[slot]
@@ -134,7 +131,13 @@ static func load_locomotion(actor: CharacterBody3D, root: String) -> Dictionary:
 		var category := "jump" if is_jump else ("idle" if slot == "Idle" else "locomotion")
 		entries.append(Source.clip(root, CLIPS, source[0], "NativeCrossPollinator" + slot, source[1],
 			source[2], category, not is_jump or slot == "JumpAirborne"))
-	if not actor._load_private_clip_library(entries, LOCOMOTION_LIBRARY):
+	return entries
+
+static func load_locomotion(actor: CharacterBody3D, root: String) -> Dictionary:
+	if not OS.has_feature("editor") or not ResourceLoader.exists(SOURCE_GAIT_PATH):
+		return {}
+	var gait_source := load(SOURCE_GAIT_PATH) as Script
+	if not actor._load_private_clip_library(locomotion_entries(root), LOCOMOTION_LIBRARY):
 		return {}
 	var slots := {}
 	for slot: String in LOCOMOTION:

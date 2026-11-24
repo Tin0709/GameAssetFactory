@@ -260,7 +260,8 @@ var _bow_mount: MeshInstance3D
 var _bow_display_mesh_index := -1
 var _bow_profile: Dictionary
 var _next_projectile_shader := 0
-var _last_projectile_shader_frame_us := 0
+var _last_ranged_preparation_frame_us := 0
+var _pending_crossbow_clips: Array[Dictionary]
 var _sabre_air_clip: Dictionary
 var _default_idle_novelty: Dictionary
 var _sabre_air_rate := 1.0
@@ -389,6 +390,8 @@ func _ready() -> void:
 		_combat_audio.lab_mix = _lab_audio_mix
 		add_child(_combat_audio)
 		_combat_audio.queue_base_samples()
+		if OS.has_feature("editor"):
+			_pending_crossbow_clips = CrossPollinator.locomotion_entries(WeaponSource.research_root())
 		_setup_movement_audio()
 		_gauntlet_impact_marks = ImpactMarks.new()
 		_gauntlet_impact_marks.setup($Ground/Mesh)
@@ -807,7 +810,10 @@ func _load_weapon(index: int) -> bool:
 		return true
 	var research_root := WeaponSource.research_root()
 	if index == Weapon.CROSS_POLLINATOR:
-		return _load_crossbow(research_root)
+		_pending_crossbow_clips.clear()
+		var loaded := _load_crossbow(research_root)
+		player.clear_prepared_crossbow_clips()
+		return loaded
 	if index == Weapon.BOW:
 		return _load_bow(research_root)
 	if index == Weapon.GAUNTLETS:
@@ -1159,7 +1165,7 @@ func _process(delta: float) -> void:
 		_spawn_crowd_frame()
 	elif _combat_audio != null:
 		_combat_audio.prepare_queued_samples()
-		_prepare_projectile_shader()
+		_prepare_ranged_resource()
 	if _bow != null:
 		# The player presenter has already sampled the interpolated grip.
 		var presenter = player.render_presenter
@@ -1226,21 +1232,25 @@ func _process(delta: float) -> void:
 		_impact_light.light_energy = _light_peak * decay * decay
 		_impact_light.visible = _light_remaining > 0.0
 
-func _prepare_projectile_shader() -> void:
-	if _next_projectile_shader >= PROJECTILE_SHADERS.size():
+func _prepare_ranged_resource() -> void:
+	var has_shader := _next_projectile_shader < PROJECTILE_SHADERS.size()
+	if not has_shader and _pending_crossbow_clips.is_empty():
 		return
 	var now := Time.get_ticks_usec()
-	var previous := _last_projectile_shader_frame_us
-	_last_projectile_shader_frame_us = now
+	var previous := _last_ranged_preparation_frame_us
+	_last_ranged_preparation_frame_us = now
 	var frame_rate := Engine.max_fps if Engine.max_fps > 0 else Engine.physics_ticks_per_second
 	# Let the first rendered frame and any already-slow frame finish
 	# before adding optional renderer work to the next idle update.
 	if previous == 0 or now - previous > 1500000.0 / frame_rate or not player.is_on_floor() \
 			or player.combat_requested or player.combo.active() or player.bow_busy():
 		return
-	# The preloaded resources submit their code on first RID access.
-	PROJECTILE_SHADERS[_next_projectile_shader].get_rid()
-	_next_projectile_shader += 1
+	if has_shader:
+		# The preloaded resources submit their code on first RID access.
+		PROJECTILE_SHADERS[_next_projectile_shader].get_rid()
+		_next_projectile_shader += 1
+	else:
+		player.prepare_crossbow_clip(_pending_crossbow_clips.pop_front())
 
 func _setup_movement_audio() -> void:
 	var configured_manifest := OS.get_environment("MD2_OVERWORLD_BUNDLE")
