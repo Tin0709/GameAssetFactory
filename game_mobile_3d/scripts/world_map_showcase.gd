@@ -2264,7 +2264,7 @@ func _refresh_direct_shadow_opacity() -> void:
 
 func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"display_edge_strength":
-		if level != null and level.biome_controller != null:
+		if not _flat_lab and level != null and level.biome_controller != null:
 			return level.biome_controller.display_edge_default()
 		return _biome_profile.display_edge_strength if _biome_profile != null else 0.
 	if effect == &"twilight_ground_ambient" and _biome_profile != null:
