@@ -578,6 +578,7 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	var lethal := zombie.health <= 0
 	sabre_contact.emit(point, direction, clip, index, serial, lethal)
 	if not visual.is_empty():
+		visual.splash = splash
 		melee_contact_visual.emit(zombie, point, serial, visual)
 	zombie_reaction_audio.emit(point, lethal, zombie.is_baby)
 

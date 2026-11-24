@@ -1414,27 +1414,32 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, index: 
 		player.confirm_melee_hitstop(serial)
 	var tool_hit: StringName = MELEE_AUDIO_NAMES.get(_equipped_weapon, &"") if clip != Bow.ACTION and clip != CrossPollinator.SHOT else &""
 	_combat_audio.weapon_contact(point, serial, clip, tool_hit)
-	var melee_pose := _grounded_impact_dispatch or clip == "AirAttack"
-	if melee_pose and _combat_pose_frame != Engine.get_physics_frames():
+	if _grounded_impact_dispatch or clip == "AirAttack":
 		_pending_melee_contact_fx.append({"point": point, "direction": direction, "clip": clip, "serial": serial, "index": index})
 		return
-	var sample_time := float(player.effects.clock) if melee_pose else -1.0
-	_show_contact_fx(point, direction, clip, serial, sample_time)
+	_show_contact_fx(point, direction, clip, serial)
 
 func _on_melee_contact_visual(zombie: CharacterBody3D, point: Vector3, serial: int, visual: Dictionary) -> void:
 	visual.zombie = zombie
-	# An aerial contact can arrive after the player has published this tick.
-	if _combat_pose_frame == Engine.get_physics_frames():
+	var pose_ready := _combat_pose_frame == Engine.get_physics_frames()
+	if not _pending_melee_contact_fx.is_empty():
+		var contact: Dictionary = _pending_melee_contact_fx.back()
+		if contact.serial == serial and contact.point == point:
+			contact.feedback = visual
+			if _grounded_impact_dispatch and (player.effects.blade_trail_enabled or player.gauntlets_equipped):
+				contact.capsule = zombie.contact_capsule_dimensions()
+			elif contact.clip == "AirAttack" and not visual.splash and player.effects.blade_trail_enabled:
+				# Damage uses a lower visibility probe. The body spark instead
+				# uses the actual capsule and this strike's blade pose.
+				contact.spark_center = zombie.combat_center()
+				contact.capsule = zombie.contact_capsule_dimensions()
+			if pose_ready:
+				_pending_melee_contact_fx.pop_back()
+				_publish_melee_contact(contact, player.effects.clock, _blade_contact_points())
+			return
+	if pose_ready:
 		visual.time = player.effects.clock
 		_pending_melee_feedback.append(visual)
-		return
-	if _pending_melee_contact_fx.is_empty():
-		return
-	var contact: Dictionary = _pending_melee_contact_fx.back()
-	if contact.serial == serial and contact.point == point:
-		contact.feedback = visual
-		if _grounded_impact_dispatch and (player.effects.blade_trail_enabled or player.gauntlets_equipped):
-			contact.capsule = zombie.contact_capsule_dimensions()
 
 func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: int, sample_time := -1.0,
 		capsule := Vector2.ZERO, weapon_points := PackedVector3Array(), punch_axis := Vector3.ZERO) -> void:
@@ -1709,25 +1714,33 @@ func _sample_combat_fx() -> void:
 		_slam_burst_frame = -1
 		_show_landing_burst(_slam_burst_point, _slam_burst_serial, sample_time)
 	if not _pending_melee_contact_fx.is_empty():
-		var weapon_points := PackedVector3Array()
-		if player.effects.blade_trail_enabled:
-			weapon_points = PackedVector3Array([player.marker_base.global_position, player.marker_tip.global_position])
+		var weapon_points := _blade_contact_points()
 		var punch_index := -1
 		var impact_axis := Vector3.ZERO
 		for contact in _pending_melee_contact_fx:
-			if contact.has("feedback"):
-				var visual: Dictionary = contact.feedback
-				visual.time = sample_time
-				_pending_melee_feedback.append(visual)
 			var capsule: Vector2 = contact.get("capsule", Vector2.ZERO)
 			var is_punch: bool = player.gauntlets_equipped and capsule.x > 0.0
 			if is_punch and contact.index != punch_index:
 				punch_index = contact.index
 				weapon_points = PackedVector3Array([_gauntlet_knuckle(punch_index)])
 				impact_axis = player.visual.global_basis * Gauntlets.CONTACT_AXES[punch_index]
-			_show_contact_fx(contact.point, contact.direction, contact.clip, contact.serial,
-				sample_time, capsule, weapon_points, impact_axis if is_punch else Vector3.ZERO)
+			_publish_melee_contact(contact, sample_time, weapon_points, impact_axis if is_punch else Vector3.ZERO)
 	_pending_melee_contact_fx.clear()
+
+func _blade_contact_points() -> PackedVector3Array:
+	if not player.effects.blade_trail_enabled:
+		return PackedVector3Array()
+	return PackedVector3Array([player.marker_base.global_position, player.marker_tip.global_position])
+
+func _publish_melee_contact(contact: Dictionary, sample_time: float, weapon_points: PackedVector3Array,
+		punch_axis := Vector3.ZERO) -> void:
+	if contact.has("feedback"):
+		var visual: Dictionary = contact.feedback
+		visual.time = sample_time
+		_pending_melee_feedback.append(visual)
+	var spark_center: Vector3 = contact.get("spark_center", contact.point)
+	_show_contact_fx(spark_center, contact.direction, contact.clip, contact.serial,
+		sample_time, contact.get("capsule", Vector2.ZERO), weapon_points, punch_axis)
 
 func _present_melee_feedback(display_time: float) -> void:
 	var presented := 0
