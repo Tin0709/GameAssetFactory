@@ -520,16 +520,19 @@ func check_blade_contact_spark_origin() -> void:
 		var forward: Vector3 = lab.player.visual.global_basis.z
 		zombie.global_position = lab.player.global_position + forward * 1.4
 		var centres: Array[Vector3] = []
+		var hit_frames: Array[int] = []
 		var blade_poses: Array[PackedVector3Array] = []
 		var sample_blade := func():
+			if not hit_frames.is_empty() and Engine.get_physics_frames() > hit_frames[0]:
+				return
 			if blade_poses.size() == 2:
 				blade_poses.pop_front()
 			blade_poses.append(PackedVector3Array([
 				lab.player.marker_base.global_position, lab.player.marker_tip.global_position]))
-			if not centres.is_empty():
-				lab.player.physics_pose_ready.disconnect(sample_blade)
+		lab.player.physics_pose_ready.connect(sample_blade)
 		group.sabre_contact.connect(func(point, _direction, _clip, _index, _serial, _lethal):
-			centres.append(point), CONNECT_ONE_SHOT)
+			centres.append(point)
+			hit_frames.append(Engine.get_physics_frames()), CONNECT_ONE_SHOT)
 		attack(true)
 		await ticks(2)
 		attack(false)
@@ -539,15 +542,18 @@ func check_blade_contact_spark_origin() -> void:
 				break
 		check(centres.size() == 1 and sparks._streaks.visible_instance_count == 9,
 			"A real grounded blade strike emits one nine-streak burst (baby: %s)" % baby)
+		lab.player.physics_pose_ready.disconnect(sample_blade)
 		if not centres.is_empty():
 			var capsule: CapsuleShape3D = zombie._live_capsule
 			var centre := centres[0]
 			var axis := Vector3.UP * (capsule.height * 0.5 - capsule.radius)
 			var spark_origin := Vector3.ZERO
+			var mean_heading := Vector3.ZERO
 			var count := 0
 			for spark in sparks._particles:
 				if spark.age < spark.lifetime:
 					spark_origin += spark.origin - spark.velocity.normalized() * 0.21
+					mean_heading += spark.velocity.normalized()
 					count += 1
 			if count > 0:
 				spark_origin /= count
@@ -559,6 +565,16 @@ func check_blade_contact_spark_origin() -> void:
 				var light_error := light.global_position.distance_to(spark_origin)
 				check(light.visible and light_error < 0.001,
 					"The grounded blade lights the same capsule point as its streaks (baby: %s)" % baby)
+				check(blade_poses.size() == 2, "The strike has a sampled blade pose on each side of the physics interval")
+				if blade_poses.size() == 2:
+					var before := blade_poses[0]
+					var hit := blade_poses[1]
+					var span := hit[1] - hit[0]
+					var fraction := clampf((spark_origin - hit[0]).dot(span) / span.length_squared(), 0.0, 1.0)
+					var cut := hit[0].lerp(hit[1], fraction) - before[0].lerp(before[1], fraction)
+					var alignment := (mean_heading / count).dot(cut.normalized())
+					check(alignment > 0.38, "The burst follows the blade through its contact point (baby: %s)" % baby)
+					print("BLADE_SPARK_AXIS baby=", baby, " swing=", cut.normalized(), " alignment=", alignment)
 				print("BLADE_SPARK_ORIGIN baby=", baby, " radius=", capsule.radius, " distance=", distance,
 					" light_error_m=", light_error)
 		zombie.free()
