@@ -415,6 +415,7 @@ func run() -> void:
 	check(menu.selected == 0 and lab.player.clips.AirAttack == original_air,
 		"Switching back restores the original Sabre")
 	await check_crossbow_flight_on_switch(lab, menu)
+	await check_charged_bow_flight(lab, menu)
 	equip(menu, 10)
 	var tool_mount := lab._weapon_mesh as MeshInstance3D
 	check(menu.selected == 10 and tool_mount.material_override != null,
@@ -1376,6 +1377,75 @@ func check_crossbow_flight_on_switch(lab: Node3D, menu: OptionButton) -> void:
 	wall.queue_free()
 	sound.button_pressed = false
 	lab.reset_player()
+	await ticks(12)
+
+func check_charged_bow_flight(lab: Node3D, menu: OptionButton) -> void:
+	var audio = lab.get_node("CombatAudio")
+	var sound := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var group := &"bow_charged_flight"
+	lab.reset_player()
+	await ticks(12)
+	equip(menu, 6)
+	sound.button_pressed = true
+	var bow = lab._bow
+	var origin := Vector3(12.0, 1.0, 0.0)
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(4.0, 2.0, 0.2)
+	collider.shape = box
+	wall.add_child(collider)
+	lab.add_child(wall)
+	wall.position = origin + Vector3.BACK * 8.0
+	await ticks(2)
+
+	var before: int = audio._next_choice.get(group, 0)
+	check(bow.fire_arrow(origin, Vector3.BACK, -411, origin, false)
+		and bow._bolts.size() == 1 and audio._flight_targets.is_empty(),
+		"A normal Bow shot flies without the charged whoosh")
+	check(bow.fire_arrow(origin + Vector3.RIGHT, Vector3.BACK, -412, origin, true),
+		"The flight fixture also launches a charged Bow arrow")
+	var samples: Array = audio._groups.get(group, [])
+	var voices: Dictionary = audio._flight_targets
+	var voice := voices.keys().front() as AudioStreamPlayer3D if voices.size() == 1 else null
+	check(samples.size() == 4 and voice != null and voice.playing and voice.stream in samples
+		and audio._next_choice.get(group, 0) == (before + 1) % 4,
+		"Only the charged arrow starts a verified spatial whoosh at launch")
+	if voice != null:
+		var stream := voice.stream
+		var bolt := voices[voice] as Node3D
+		check(bolt == bow._bolts.back().node and voice.global_position.distance_to(bolt.global_position) < 0.01,
+			"The audio source starts on the actual charged arrow")
+		await ticks(2)
+		equip(menu, 0)
+		await ticks(2)
+		check(menu.selected == 0 and voice.playing and voice.stream == stream
+			and is_instance_valid(bolt) and voices.get(voice) == bolt
+			and voice.global_position.distance_to(bolt.global_position) < 0.01,
+			"A weapon switch leaves the charged whoosh following its arrow")
+		await ticks(4)
+		check(not voice.playing and voices.is_empty() and bow._bolts.size() == 1,
+			"The charged whoosh stops at its wall contact while the normal arrow is still flying")
+		print("BOW_CHARGED_FLIGHT voices=", audio._voices.size(), " samples=", samples.size(),
+			" crossbow_variants=", audio._groups.get(&"crossbow_flight", []).size())
+	await ticks(16)
+
+	before = audio._next_choice.get(group, 0)
+	check(bow.fire_arrow(origin + Vector3.BACK * 8.5, Vector3.BACK, -413, origin, true)
+		and bow._bolts.is_empty() and voices.is_empty() and audio._next_choice.get(group, 0) == before,
+		"A charged arrow blocked inside muzzle clearance starts no flight voice")
+
+	check(bow.fire_arrow(origin, Vector3.BACK, -414, origin, true) and voices.size() == 1,
+		"The reset fixture starts one charged flight voice")
+	sound.button_pressed = false
+	check(voices.is_empty() and not audio.is_physics_processing(),
+		"Combat mute stops tracking the charged voice immediately")
+	before = audio._next_choice.get(group, 0)
+	check(bow.fire_arrow(origin, Vector3.BACK, -415, origin, true)
+		and voices.is_empty() and audio._next_choice.get(group, 0) == before,
+		"A charge fired while muted does not consume a whoosh sample")
+	lab.reset_player()
+	wall.queue_free()
 	await ticks(12)
 
 func switch_cue_is_playing(audio: Node, group: StringName, count: int) -> bool:
