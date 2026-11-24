@@ -240,8 +240,7 @@ func damage_number_rectangles(numbers, camera: Camera3D) -> Array[Rect2]:
 		for number in numbers._numbers:
 			var centre := Vector2(number.centre.dot(camera.global_basis.x), number.centre.dot(camera.global_basis.y))
 			centre += number.layout_offset
-			var size := Vector2(2.0 + 24.5 / 32.0, 1.0) * 32.0 * 0.0144 * 1.16
-			size.x = (32.0 + 24.5) * 0.0144 * 1.16
+			var size := Vector2(32.0 + 24.5, 32.0) * 0.0144 * 1.16
 			rectangles.append(Rect2(centre - size * 0.5, size))
 		return rectangles
 	for slot in range(0, numbers.multimesh.visible_instance_count, 2):
