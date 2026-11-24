@@ -1544,8 +1544,11 @@ func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: 
 			player.effects.contact(effect_point, direction, sample_time >= 0.0)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3",
 		"NativeCleaverAttack3", "NativeAxeAttack3"]
-	if clip != "AirAttack" or _equipped_weapon != Weapon.SABRE:
-		_start_contact_light(effect_point, serial, 2.3 if finisher else 1.8, sample_time)
+	if _light_serial != serial and (clip != "AirAttack" or _equipped_weapon != Weapon.SABRE):
+		var light_point := effect_point
+		if capsule.x > 0.0 and not weapon_points.is_empty():
+			light_point = ContactSparks.contact_surface_point(point, capsule, weapon_points, direction)
+		_start_contact_light(light_point, serial, 2.3 if finisher else 1.8, sample_time)
 	# These finishers share the source radii and non-oriented shake.
 	# Approximate StartMatineeCameraShakeAtPawn using the capsule center.
 	if not finisher or _shake_serial == serial or _player_body == null:
