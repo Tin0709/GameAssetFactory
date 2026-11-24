@@ -241,7 +241,7 @@ func damage_number_rectangles(numbers, camera: Camera3D) -> Array[Rect2]:
 			var pose: Transform3D = numbers.multimesh.get_instance_transform(slot + i)
 			var point: Vector3 = numbers.to_global(pose.origin)
 			var centre := Vector2(point.dot(camera.global_basis.x), point.dot(camera.global_basis.y))
-			var size := Vector2.ONE * numbers.DIGIT_SIZE * numbers.NUMBER_PIXEL_SIZE * pose.basis.x.length()
+			var size: Vector2 = Vector2.ONE * numbers.DIGIT_SIZE * numbers.NUMBER_PIXEL_SIZE * pose.basis.x.length()
 			var quad := Rect2(centre - size * 0.5, size)
 			bounds = quad if i == 0 else bounds.merge(quad)
 		rectangles.append(bounds)
