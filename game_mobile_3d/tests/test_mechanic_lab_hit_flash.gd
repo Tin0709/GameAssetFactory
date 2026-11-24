@@ -380,8 +380,9 @@ func check_splash_flash_strength() -> void:
 	var group = lab.get_node("Zombies")
 	var strike := {"damage": 10, "range_m": 2.5, "angle": 20.0, "strength": 500.0, "stagger": 12.0}
 	for baby in [false, true]:
-		check(group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, baby),
-			"The hit flash fixture spawns a source zombie")
+		if not group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, baby):
+			check(false, "The hit flash fixture spawns a source zombie")
+			break
 		var zombie = group.get_child(group.get_child_count() - 1)
 		var point: Vector3 = zombie.combat_center()
 		var health: int = zombie.health
@@ -392,6 +393,9 @@ func check_splash_flash_strength() -> void:
 		zombie._process(0.12)
 		check(is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 0.3),
 			"A delayed first render keeps the splash peak (baby: %s)" % baby)
+		zombie._process(0.02)
+		check(is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 0.3),
+			"Splash keeps its weaker amplitude as the clock advances (baby: %s)" % baby)
 		group._apply_contact(zombie, point, "Attack1", 0, 1706, strike, Vector3.RIGHT, false, point)
 		group._apply_contact(zombie, point, "Attack1", 0, 1707, strike, Vector3.RIGHT, true, point)
 		check(is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 1.0),
