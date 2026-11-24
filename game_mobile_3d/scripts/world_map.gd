@@ -81,6 +81,8 @@ var biome_controller: BiomeGraphics
 @export var forest_fern_cells: PackedVector2Array
 ## World grass cell X/Z and the index of a verified fern variant.
 @export var forest_fern_variants: PackedVector3Array
+## Optional authored PlainsA1 meadow cells for this terrain layout.
+@export_file("*.json") var plains_planting_path := ""
 ## Optional ForestA1 wall vine anchors, stored as world X, Z, and outward yaw in degrees.
 @export var forest_wall_vine_placements: PackedVector3Array
 ## Metres of render-only foothills beyond the map, with an optional private Forest shape.

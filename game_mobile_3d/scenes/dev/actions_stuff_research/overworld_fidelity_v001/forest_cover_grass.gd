@@ -121,7 +121,8 @@ static func checked_file(bundle: RefCounted, directory: String, entry: Variant, 
 		return path
 	return ""
 
-static func load_mesh(path: String, material: ShaderMaterial, seat_at_ground := false) -> ArrayMesh:
+static func load_mesh(path: String, material: ShaderMaterial, seat_at_ground := false,
+		height_range := Vector2(.9, 2.1)) -> ArrayMesh:
 	if path.is_empty():
 		return null
 	var document := GLTFDocument.new()
@@ -142,7 +143,7 @@ static func load_mesh(path: String, material: ShaderMaterial, seat_at_ground := 
 	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
 	var bounds := source.get_aabb()
 	var size := bounds.size
-	if vertices.size() < 3 or size.y < .9 or size.y > 2.1:
+	if vertices.size() < 3 or size.y < height_range.x or size.y > height_range.y:
 		return null
 	if seat_at_ground:
 		# Translate from the exported pivot to ground level without resizing the mesh.
