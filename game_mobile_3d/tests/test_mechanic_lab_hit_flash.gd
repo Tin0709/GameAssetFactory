@@ -103,6 +103,7 @@ func run() -> void:
 	await check_crowd_sparks()
 	await check_flash_during_render_hitch()
 	await check_damage_numbers_during_render_hitch()
+	await check_overlapping_damage_number_positions()
 	if DisplayServer.get_name() != "headless":
 		await check_health_bar_visibility()
 	print("MECHANIC_LAB_HIT_FLASH failures=", failures)
@@ -204,6 +205,55 @@ func check_damage_numbers_during_render_hitch() -> void:
 	check(numbers._numbers == queued, "Returning to equal depth restores the original hit order")
 	lab.free()
 
+func check_overlapping_damage_number_positions() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	await ticks(12)
+	var numbers = lab.get_node("CombatEffects/ZombieDamageNumbers")
+	var camera: Camera3D = lab.camera
+	var origin: Vector3 = lab.player.global_position + Vector3.UP * 2.4
+	var side := camera.global_basis.x
+	for value in [10, 11, 12]:
+		numbers.add_number(value, origin, Vector3.ZERO)
+	numbers.add_number(13, origin + side * 3.0, Vector3.ZERO)
+	numbers._process(0.0)
+	var born := damage_number_rectangles(numbers, camera)
+	check(numbers.multimesh.visible_instance_count == 8,
+		"Every hit retains its two damage digits")
+	var separated: Vector3 = origin + side * 3.0
+	check(born[-1].get_center().is_equal_approx(
+		Vector2(separated.dot(side), separated.dot(camera.global_basis.y))),
+		"A separated number keeps its exact hit anchor")
+	check(damage_number_overlaps(born) == 0, "Simultaneous overlapping hits get separate positions")
+	numbers._process(0.0)
+	check(damage_number_rectangles(numbers, camera) == born, "The same camera keeps the assigned positions")
+	numbers._process(0.09)
+	check(damage_number_overlaps(damage_number_rectangles(numbers, camera)) == 0,
+		"The pop reaches its peak without the numbers crossing each other")
+	lab.free()
+
+func damage_number_rectangles(numbers, camera: Camera3D) -> Array[Rect2]:
+	var rectangles: Array[Rect2] = []
+	for slot in range(0, numbers.multimesh.visible_instance_count, 2):
+		var bounds := Rect2()
+		for i in 2:
+			var pose: Transform3D = numbers.multimesh.get_instance_transform(slot + i)
+			var point: Vector3 = numbers.to_global(pose.origin)
+			var centre := Vector2(point.dot(camera.global_basis.x), point.dot(camera.global_basis.y))
+			var size := Vector2.ONE * numbers.DIGIT_SIZE * numbers.NUMBER_PIXEL_SIZE * pose.basis.x.length()
+			var quad := Rect2(centre - size * 0.5, size)
+			bounds = quad if i == 0 else bounds.merge(quad)
+		rectangles.append(bounds)
+	return rectangles
+
+func damage_number_overlaps(rectangles: Array[Rect2]) -> int:
+	var overlaps := 0
+	for i in rectangles.size():
+		for j in range(i):
+			overlaps += int(rectangles[i].intersects(rectangles[j]))
+	return overlaps
+
 func check_crowd_sparks() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -260,8 +310,9 @@ func check_crowd_sparks() -> void:
 	check(quality != null, "The Lab exposes a control for the contact spark budget")
 	if quality != null:
 		check(quality.selected == 0, "The Lab starts with the approved contact spark budget")
-		quality.select(1)
-		quality.item_selected.emit(1)
+		var low := quality.get_item_index(1)
+		quality.select(low)
+		quality.item_selected.emit(low)
 		for rank in range(100, 0, -1):
 			group.sabre_contact.emit(origin + Vector3.RIGHT * (0.8 * rank),
 				Vector3.RIGHT, "Attack3", 2, 1703, false)
@@ -280,8 +331,8 @@ func check_crowd_sparks() -> void:
 		var future: float = lab.player.render_presenter.display_clock + 1.0
 		for point in nearest:
 			sparks.queue_contact(point, Vector3.RIGHT, origin, future)
-		quality.select(1)
-		quality.item_selected.emit(1)
+		quality.select(low)
+		quality.item_selected.emit(low)
 		sparks._process(0.0)
 		check(renderer.multimesh.visible_instance_count == 0 and sparks._pending.size() == 3,
 			"Reducing quality keeps future sparks deferred at the three nearest contacts")
