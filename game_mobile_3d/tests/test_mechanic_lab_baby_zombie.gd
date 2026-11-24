@@ -7,6 +7,11 @@ const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 
 var failures: Array[String] = []
 
+func reference_lab() -> Node3D:
+	var lab := preload("res://scenes/dev/MechanicLab.tscn").instantiate() as Node3D
+	lab.get_node("Zombies").corpse_lifetime = Zombie.CORPSE_LIFETIME
+	return lab
+
 func _initialize() -> void:
 	run.call_deferred()
 
@@ -24,7 +29,7 @@ func run() -> void:
 		return
 	# Start this corner replay with a prewarmed rig, as in the live Lab.
 	await check_tuned_contact(9, 13.0, 0.80, Strike.AIR, -44.0, Vector2(1000.0, 100.0), true)
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
@@ -154,7 +159,7 @@ func run() -> void:
 
 func check_source_attack_wall_crossing(serial: int, start: Vector3, yaw: float,
 		attack_time: float, direction: Vector3) -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var group: Node = lab.get_node("Zombies")
@@ -189,7 +194,7 @@ func check_source_attack_wall_crossing(serial: int, start: Vector3, yaw: float,
 	lab.free()
 
 func check_source_attack_corner_anchors() -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var group: Node = lab.get_node("Zombies")
@@ -245,7 +250,7 @@ func start_source_attack_death(group: Node, serial: int, start: Vector3, yaw: fl
 	return baby
 
 func check_prewarmed_spawn() -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var group: Node = lab.get_node("Zombies")
@@ -278,7 +283,7 @@ func check_prewarmed_spawn() -> void:
 	lab.free()
 
 func check_spawn_during_prewarm() -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var group: Node = lab.get_node("Zombies")
@@ -302,7 +307,7 @@ func check_spawn_during_prewarm() -> void:
 	lab.free()
 
 func check_exit_during_prewarm() -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var group: Node = lab.get_node("Zombies")
@@ -346,7 +351,7 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, strike_k
 		strike_yaw := INF, tuning := Vector2(1000.0, 1000.0), prewarm := false, death_pose := DeathPose.MD2) -> void:
 	var launch_percent := tuning.x
 	var gravity_percent := tuning.y
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
@@ -431,7 +436,7 @@ func check_tuned_contact(seed: int, wall_yaw := INF, gap_limit := 0.20, strike_k
 	lab.free()
 
 func check_first_wall_neck_contact(frozen := false) -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
@@ -570,7 +575,7 @@ func check_lower_wall_edge(lab: Node3D, group: Node, wall: PhysicsBody3D) -> voi
 
 
 func check_floor_then_wall() -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)

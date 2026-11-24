@@ -17,6 +17,7 @@ func add_face(wall: StaticBody3D, center: Vector3, size: Vector3) -> void:
 func launch_corner_zombie(serial: int, origin: Vector3, yaw: float, clip: StringName,
 		phase: float, direction: Vector3, strength: float) -> Zombie:
 	var lab := Lab.instantiate()
+	lab.get_node("Zombies").corpse_lifetime = Zombie.CORPSE_LIFETIME
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)

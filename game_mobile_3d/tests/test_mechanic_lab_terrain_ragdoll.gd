@@ -7,6 +7,11 @@ const MeleeTools := preload("res://scripts/mechanic_lab_melee_tools.gd")
 
 var failures: Array[String] = []
 
+func reference_lab() -> Node3D:
+	var lab := preload("res://scenes/dev/MechanicLab.tscn").instantiate() as Node3D
+	lab.get_node("Zombies").corpse_lifetime = Zombie.CORPSE_LIFETIME
+	return lab
+
 func _initialize() -> void:
 	call_deferred("run")
 
@@ -38,7 +43,7 @@ func terrain(lab: Node3D, at: Vector3, size: Vector3, angle: float, frozen := fa
 	return body
 
 func run_case(wall_case: bool) -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var collider: StaticBody3D
@@ -93,7 +98,7 @@ func run_case(wall_case: bool) -> void:
 	lab.free()
 
 func check_wall_handoff(repositioned: bool = false, overlaps_floor: bool = false) -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var wall := terrain(lab, Vector3(0, 1.0, -0.655), Vector3(6.0, 3.0, 0.4), 0.0)
@@ -142,7 +147,7 @@ func check_wall_handoff(repositioned: bool = false, overlaps_floor: bool = false
 	lab.free()
 
 func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame: int, part: String) -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var wall := terrain(lab, Vector3(0.60, 1.5, 0), Vector3(0.30, 3.0, 20.0), 0.0)
@@ -214,7 +219,7 @@ func check_straddled_wall_handoff(clip: StringName, facing: float, source_frame:
 	lab.free()
 
 func check_wall_pinned_joint(floor_contact := false) -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	await ticks(12)
@@ -267,7 +272,7 @@ func check_wall_pinned_joint(floor_contact := false) -> void:
 	lab.free()
 
 func check_edge_landing_gravity() -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
@@ -328,7 +333,7 @@ func check_edge_landing_gravity() -> void:
 func check_wall_rebound(serial: int, origin: Vector3, facing: float, clip: StringName, phase: float,
 		part := "Head", peak_limit := 0.115, first_contact := false, overlap_limit := INF,
 		during_landing := false) -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	await ticks(12)
@@ -404,7 +409,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		max_anchor_gap := INF, strike: Zombie.DeathStrike = Zombie.DeathStrike.SABRE_FINISHER,
 		strength := 1150.0, shared_wall := false, fixture := CornerFixture.NONE, tuning := Vector2.ONE,
 		wall_yaw := 0.0, pose := &"") -> void:
-	var lab: Node3D = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab: Node3D = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var frozen := fixture in [CornerFixture.PINCHED_ARM_FROZEN_WALLS, CornerFixture.FROZEN_WALLS]
@@ -524,7 +529,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 
 func check_wall_brace_impact(seed: int, wall_angle: float, strike_angle: float, attack: String,
 		sword: bool, clip: StringName, launch_percent := 1000.0, combo_index := 0) -> void:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
@@ -586,7 +591,7 @@ func check_wall_brace_impact(seed: int, wall_angle: float, strike_angle: float, 
 
 
 func stacked_wall_lab(seam: float) -> Node3D:
-	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
@@ -772,7 +777,7 @@ func check_wall_entry_rays() -> void:
 	fixture.free()
 
 func check_free_arm_at_compound_wall() -> void:
-	var lab: Node3D = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	var lab: Node3D = reference_lab()
 	root.add_child(lab)
 	current_scene = lab
 	var wall := terrain(lab, Vector3(0, 1.5, 4.50), Vector3(12, 3, 0.30), 0.0)

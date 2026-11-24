@@ -18,6 +18,7 @@ func ticks(count: int) -> void:
 
 func check_sabre_sliding_down_one_wall() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	lab.get_node("Zombies").corpse_lifetime = Zombie.CORPSE_LIFETIME
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)

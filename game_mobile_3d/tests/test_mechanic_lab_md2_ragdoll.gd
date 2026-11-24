@@ -20,6 +20,7 @@ func ticks(count: int) -> void:
 
 func run() -> void:
 	var lab = load("res://scenes/dev/MechanicLab.tscn").instantiate()
+	lab.get_node("Zombies").corpse_lifetime = ZOMBIE.CORPSE_LIFETIME
 	root.add_child(lab)
 	current_scene = lab
 	lab.get_node("Zombies").set_actions_stuff_animation(false) # Reproduce the original MD2 launch poses.
