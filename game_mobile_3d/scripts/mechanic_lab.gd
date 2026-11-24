@@ -967,6 +967,7 @@ func _setup_axe_wall_material(mesh: Mesh) -> void:
 	_axe_wall_material = ShaderMaterial.new()
 	_axe_wall_material.shader = AXE_WALL_SHADER
 	_axe_wall_material.set_shader_parameter(&"blade_texture", source.albedo_texture)
+	_axe_wall_material.set_shader_parameter(&"axe_blocker_count", 0)
 	mesh.surface_set_material(0, _axe_wall_material)
 	var bounds := BoxShape3D.new()
 	bounds.size = Vector3(4.8, 5.0, 4.8)
