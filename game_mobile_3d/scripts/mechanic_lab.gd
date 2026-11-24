@@ -146,6 +146,7 @@ const PRESET_OPTIONS := {
 	"render_scale": ^"HUD/RenderScale",
 	"frame_rate": ^"HUD/FrameRate",
 	"contact_spark_quality": ^"HUD/ImpactFxPanel/Rows/ContactSparkQuality",
+	"debris_quality": ^"HUD/ImpactFxPanel/Rows/DebrisQuality",
 	"floor_surface": ^"HUD/FloorSurface",
 }
 const FLOOR_SURFACES := ["grass", "dirt", "stone"]
@@ -1816,6 +1817,12 @@ func _setup_impact_fx_controls() -> void:
 	picker.add_item("Số tia · Nhẹ", SparkBudget.LOW)
 	picker.select(0)
 	picker.item_selected.connect(_apply_impact_fx_settings.unbind(1))
+	var debris := panel.get_node("Rows/DebrisQuality") as OptionButton
+	debris.add_item("Mảnh văng · Gọn", 0)
+	debris.add_item("Mảnh văng · Có va chạm", 1)
+	debris.select(0)
+	debris.disabled = _movement_dust == null
+	debris.item_selected.connect(_apply_impact_fx_settings.unbind(1))
 	for path in ["Rows/Opacity/Slider", "Rows/Duration/Slider"]:
 		var slider := panel.get_node(path) as HSlider
 		slider.value_changed.connect(_apply_impact_fx_settings.unbind(1))
@@ -1826,6 +1833,8 @@ func _apply_impact_fx_settings() -> void:
 	var duration: float = $HUD/ImpactFxPanel/Rows/Duration/Slider.value
 	var budget: int = $HUD/ImpactFxPanel/Rows/ContactSparkQuality.get_selected_id()
 	var spawn_scale: float = SPARK_SPAWN_SCALES.get(budget, 1.0)
+	if _movement_dust != null:
+		_movement_dust.detailed_debris = $HUD/ImpactFxPanel/Rows/DebrisQuality.get_selected_id() == 1
 	$HUD/ImpactFxPanel/Rows/Opacity/Value.text = "Độ rõ · %d%%" % roundi(opacity)
 	$HUD/ImpactFxPanel/Rows/Duration/Value.text = "Thời gian · %d%%" % roundi(duration)
 	if _contact_sparks != null:

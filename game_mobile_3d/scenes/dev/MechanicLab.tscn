@@ -262,9 +262,9 @@ offset_bottom = 218.0
 focus_mode = 0
 toggle_mode = true
 button_group = SubResource("tuning_panels")
-text = "Tia trúng đòn ▾"
+text = "Hiệu ứng va chạm ▾"
 alignment = 0
-tooltip_text = "Chỉnh độ rõ, số lượng và thời gian tồn tại của tia cận chiến và tia đạn."
+tooltip_text = "Chỉnh tia trúng đòn và mức chi tiết của mảnh văng."
 
 [node name="ImpactFxPanel" type="PanelContainer" parent="HUD"]
 visible = false
@@ -282,6 +282,11 @@ theme_override_constants/separation = 4
 layout_mode = 2
 focus_mode = 0
 tooltip_text = "Mức nhẹ giữ tối đa 3 điểm cận chiến gần nhất và 6 tia cho mỗi lần va chạm."
+
+[node name="DebrisQuality" type="OptionButton" parent="HUD/ImpactFxPanel/Rows"]
+layout_mode = 2
+focus_mode = 0
+tooltip_text = "Mức có va chạm cho mảnh văng nảy trên mặt sàn và tường. Áp dụng từ lần va chạm tiếp theo."
 
 [node name="Opacity" type="HBoxContainer" parent="HUD/ImpactFxPanel/Rows"]
 layout_mode = 2

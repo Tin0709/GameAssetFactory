@@ -7,6 +7,9 @@ const SOURCE_SHA256 := "78d326787c4065d70e227ec386a7330f53621c8733ad114bc80eaea7
 const GAUNTLET_DEBRIS_SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Explosion/Materials/Debris/T_GenericDebris.png"
 const GAUNTLET_DEBRIS_HASH := "b700bc41b85fd6afb00a76bdf7966d708557ac11b01b54eeab4330932e3639f4"
 const GAUNTLET_DEBRIS_GRAVITY := 14.7
+const DEBRIS_RESTITUTION := 0.60
+const DEBRIS_SURFACE_DAMPING := 0.25
+const DEBRIS_CONTACT_SKIN := 0.002
 # Project the two authored mesh-local offsets along the Lab's strike direction.
 const GAUNTLET_DEBRIS_FORWARD := 1.80
 const GAUNTLET_IMPACT_DUST_FORWARD := 0.90
@@ -44,6 +47,14 @@ class Particle:
 	var opacity := 0.0
 	var run_drag := 0.0
 	var debris_drag := 0.0
+	var debris_radius := 0.0
+	var debris_previous := Vector3.ZERO
+	var debris_position := Vector3.ZERO
+	var debris_velocity := Vector3.ZERO
+	var debris_previous_age := 0.0
+	var debris_age := 0.0
+	var debris_contacts := 0
+	var debris_resting := false
 	var landing_tick := -1
 	var landing_position: Vector3
 
@@ -76,8 +87,13 @@ var _smoke_texture: Texture2D
 var _gauntlet_debris_texture: Texture2D
 var _using_gauntlets: Callable
 var _gauntlet_impact_anchor: Callable
+var detailed_debris := false
+var _debris_sphere := SphereShape3D.new()
+var _debris_query := PhysicsShapeQueryParameters3D.new()
 
 func _ready() -> void:
+	_debris_query.shape = _debris_sphere
+	_debris_query.collision_mask = 1
 	set_physics_process(false)
 
 func setup(actor: CharacterBody3D, ground: CollisionShape3D = null, terrain_contact := Callable(),
@@ -284,12 +300,20 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	else:
 		_emit_dust(ground_point, surface, landed, heavy)
 
-func _physics_process(_delta: float) -> void:
-	if _burst_frame < 0 or Engine.get_physics_frames() < _burst_frame:
-		return
-	_burst_frame = -1
-	set_physics_process(false)
-	_emit_dust(_burst_point, _burst_surface, true, true)
+func _physics_process(delta: float) -> void:
+	var tick := Engine.get_physics_frames()
+	if _burst_frame >= 0 and tick >= _burst_frame:
+		_burst_frame = -1
+		_emit_dust(_burst_point, _burst_surface, true, true)
+	var moving_debris := false
+	for particle in _particles:
+		if particle.debris_radius <= 0.0 or particle.debris_resting or not particle.sprite.visible:
+			continue
+		var age := (tick - particle.contact_tick) * delta
+		if age < particle.duration:
+			_advance_colliding_debris(particle, age)
+			moving_debris = moving_debris or not particle.debris_resting
+	set_physics_process(_burst_frame >= 0 or moving_debris)
 
 func _next_particle(texture: Texture2D, camera_range := 0.0) -> Particle:
 	if _contact_clock and _particles[_next].sprite.visible:
@@ -306,6 +330,7 @@ func _next_particle(texture: Texture2D, camera_range := 0.0) -> Particle:
 	if particle.sprite.layers != layers:
 		particle.sprite.layers = layers
 	particle.debris_drag = 0.0
+	particle.debris_radius = 0.0
 	particle.sprite.visibility_range_end = camera_range
 	return particle
 
@@ -313,6 +338,7 @@ func _reusable_particle_slot() -> int:
 	var tick := Engine.get_physics_frames()
 	var step := get_physics_process_delta_time()
 	var soonest := _next
+	var settled := -1
 	var shortest_remaining := INF
 	for offset in _particles.size():
 		var index := (_next + offset) % _particles.size()
@@ -322,10 +348,12 @@ func _reusable_particle_slot() -> int:
 		var remaining := particle.duration - (tick - particle.contact_tick) * step
 		if remaining <= 0.0:
 			return index
+		if settled < 0 and particle.debris_radius > 0.0 and particle.debris_resting:
+			settled = index
 		if remaining < shortest_remaining:
 			soonest = index
 			shortest_remaining = remaining
-	return soonest
+	return settled if settled >= 0 else soonest
 
 func _emit_gauntlet_debris(ground_point: Vector3, surface: String) -> void:
 	emit_combat_debris(ground_point, surface, Engine.get_physics_frames())
@@ -338,7 +366,7 @@ func emit_combat_debris(ground_point: Vector3, surface: String, tick: float, med
 	# 3–5 sprites, 15 cm, 1–1.5 s, and 350–650 cm/s in an upward cone.
 	# The Shovel's medium cue uses a larger version of the same pool.
 	var tint: Color = SURFACE_DUST.get(surface, SURFACE_DUST.grass)
-	var count := _random.randi_range(5, 7) if medium else _random.randi_range(3, 5)
+	var count := _random.randi_range(5, 7) if medium or detailed_debris else _random.randi_range(3, 5)
 	var size := 0.21 if medium else 0.15
 	for i in count:
 		var particle := _next_particle(_gauntlet_debris_texture, SOURCE_CAMERA_RANGE)
@@ -351,14 +379,66 @@ func emit_combat_debris(ground_point: Vector3, surface: String, tick: float, med
 		particle.origin = ground_point
 		particle.age = 0.0
 		particle.contact_tick = tick
-		particle.duration = _random.randf_range(1.0, 1.5)
+		particle.duration = _random.randf_range(5.0, 6.0) if detailed_debris else _random.randf_range(1.0, 1.5)
 		particle.debris_drag = _random.randf_range(0.8, 1.2)
 		particle.sprite.global_position = ground_point
 		particle.sprite.pixel_size = size / 16.0
 		particle.sprite.scale = Vector3.ONE
 		particle.sprite.modulate = tint
+		if detailed_debris:
+			particle.debris_radius = Vector2(size, size).length() * 0.5
+			particle.debris_position = ground_point + Vector3.UP * (particle.debris_radius + DEBRIS_CONTACT_SKIN)
+			particle.debris_previous = particle.debris_position
+			particle.debris_velocity = particle.velocity
+			particle.debris_age = 0.0
+			particle.debris_previous_age = 0.0
+			particle.debris_contacts = 0
+			particle.debris_resting = false
+			particle.sprite.global_position = particle.debris_position
 		particle.sprite.show()
+	if detailed_debris:
+		set_physics_process(true)
 	set_process(true)
+
+func _advance_colliding_debris(particle: Particle, age: float) -> void:
+	var step := age - particle.debris_age
+	if step <= 0.0:
+		return
+	particle.debris_previous = particle.debris_position
+	particle.debris_previous_age = particle.debris_age
+	particle.debris_age = age
+	var velocity := (particle.debris_velocity + Vector3.DOWN * GAUNTLET_DEBRIS_GRAVITY * step) / (1.0 + particle.debris_drag * step)
+	var motion := velocity * step
+	var distance := motion.length()
+	if distance <= 0.000001:
+		particle.debris_velocity = velocity
+		return
+	_debris_sphere.radius = particle.debris_radius
+	_debris_query.transform.origin = particle.debris_position
+	_debris_query.motion = motion
+	var space := get_world_3d().direct_space_state
+	var fractions := space.cast_motion(_debris_query)
+	particle.debris_position += motion * fractions[0]
+	particle.debris_velocity = velocity
+	if fractions[0] >= 1.0:
+		return
+	# Query just inside the unsafe fraction for the receiver normal. Render
+	# at the safe centre, away from the receiver by a small contact margin.
+	_debris_query.transform.origin = particle.debris_previous + motion * (fractions[1] + DEBRIS_CONTACT_SKIN / distance)
+	_debris_query.motion = Vector3.ZERO
+	var contact := space.get_rest_info(_debris_query)
+	if contact.is_empty():
+		# Some edge contacts return no stable normal. Keep the last safe point.
+		particle.debris_resting = true
+		return
+	var normal: Vector3 = contact.normal
+	particle.debris_position += normal * DEBRIS_CONTACT_SKIN
+	particle.debris_contacts += 1
+	var approach := maxf(0.0, -velocity.dot(normal))
+	var tangent := velocity.slide(normal) * (1.0 - DEBRIS_SURFACE_DAMPING)
+	var resting_contact := normal.y > 0.55 and particle.debris_contacts >= 3 and approach < 0.85
+	particle.debris_velocity = tangent if resting_contact else tangent + normal * (approach * DEBRIS_RESTITUTION)
+	particle.debris_resting = resting_contact and tangent.length_squared() < 0.16
 
 func _emit_gauntlet_impact_dust(ground_point: Vector3, surface: String, forward: Vector3) -> void:
 	ground_point = _gauntlet_impact_anchor.call(ground_point, forward, GAUNTLET_IMPACT_DUST_FORWARD)
@@ -525,8 +605,13 @@ func _process(delta: float) -> void:
 			continue
 		var progress := particle.age / particle.duration
 		if particle.debris_drag > 0.0:
-			var offset := _source_debris_offset(particle.velocity, particle.debris_drag, particle.age)
-			particle.sprite.global_position = particle.origin + offset
+			if particle.debris_radius > 0.0:
+				var interval := particle.debris_age - particle.debris_previous_age
+				var weight := clampf((particle.age - particle.debris_previous_age) / interval, 0.0, 1.0) if interval > 0.0 else 1.0
+				particle.sprite.global_position = particle.debris_previous.lerp(particle.debris_position, weight)
+			else:
+				var offset := _source_debris_offset(particle.velocity, particle.debris_drag, particle.age)
+				particle.sprite.global_position = particle.origin + offset
 			particle.sprite.modulate.a = 1.0 - smoothstep(0.8, 1.0, progress)
 			active = true
 			continue
