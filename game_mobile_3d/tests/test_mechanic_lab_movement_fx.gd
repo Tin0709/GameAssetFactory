@@ -93,6 +93,7 @@ func run() -> void:
 	await check_colliding_debris(lab, dust)
 	await check_gauntlet_impact_marks(lab)
 	await check_tool_ground_effects(lab, dust)
+	await check_ground_cue_render_hitch(lab, dust)
 	await check_source_dust_and_wake_order(lab, dust, wind)
 	await check_running_wake_support(lab, wind)
 	await check_running_wake_render_clock(lab, wind, dust)
@@ -897,6 +898,63 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 	lab._select_floor_surface(0)
 	lab._select_weapon(lab.Weapon.SABRE)
 	await physics_frame
+
+func check_ground_cue_render_hitch(lab, dust: Node3D) -> void:
+	var dust_mode := dust.process_mode
+	var dust_counts := {lab.Weapon.PICKAXE: 1, lab.Weapon.MEAT_CLEAVER: 2, lab.Weapon.AXE: 10}
+	var active_smoke := func() -> Array:
+		return dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag == 0.0)
+	for weapon: int in dust_counts:
+		lab.reset_player()
+		lab._select_weapon(weapon)
+		for i in 12:
+			await physics_frame
+		dust.process_mode = Node.PROCESS_MODE_DISABLED
+		lab.set_process(false)
+		var airborne: bool = weapon != lab.Weapon.PICKAXE
+		if airborne:
+			check(lab.player.drop_for_lab(5.0), "A real dive starts the delayed ground cue fixture")
+			for i in 2:
+				await physics_frame
+		var attack := InputEventKey.new()
+		attack.physical_keycode = KEY_E
+		attack.pressed = true
+		root.push_input(attack, true)
+		for i in Engine.physics_ticks_per_second * 4:
+			await physics_frame
+			if active_smoke.call().size() >= dust_counts[weapon]:
+				break
+		attack = InputEventKey.new()
+		attack.physical_keycode = KEY_E
+		root.push_input(attack, true)
+		var born: Array = active_smoke.call()
+		check(born.size() == dust_counts[weapon], "The attack emits its authored ground dust layers")
+		check(born.all(func(p): return p.sprite.layers == 0), "The pending dust is off screen")
+		for i in ceili(0.45 * Engine.physics_ticks_per_second):
+			await physics_frame
+		dust._process(0.45)
+		lab._process(0.45)
+		var drawn := born.filter(func(p): return p.sprite.visible and p.sprite.layers == 1)
+		var step := dust.get_physics_process_delta_time()
+		check(drawn.size() == dust_counts[weapon]
+			and drawn.all(func(p): return p.age <= step + 0.0001),
+			"The first displayed combat dust begins near its launch age after a hitch")
+		if weapon != lab.Weapon.AXE:
+			check(lab._tool_slam_ring.visible and absf(lab.camera.h_offset) > 0.001,
+				"The delayed ground dust, shockwave and camera kick start on the same frame")
+		print("GROUND_CUE_HITCH weapon=", weapon, " born=", born.size(), " drawn=", drawn.size(),
+			" ring=", lab._tool_slam_ring.visible, " camera=", lab.camera.h_offset)
+		for i in 4:
+			await physics_frame
+		dust._process(4.0 * step)
+		check(drawn.all(func(p): return p.age > step * 3.0), "After the first image, the burst advances normally")
+		for i in ceili(0.45 * Engine.physics_ticks_per_second):
+			await physics_frame
+		dust._process(0.45)
+		check(active_smoke.call().is_empty(), "An already displayed puff expires after a later hitch")
+		dust.process_mode = dust_mode
+		lab.set_process(true)
+	lab.reset_player()
 
 func gauntlet_debris_position(origin: Vector3, velocity: Vector3, drag: float, age: float) -> Vector3:
 	const STEP := 1.0 / 60.0
