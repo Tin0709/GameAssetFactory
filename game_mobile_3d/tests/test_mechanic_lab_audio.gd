@@ -1941,6 +1941,7 @@ func check_special_weapon_preparation() -> void:
 	check(audio._groups.size() == group_count and audio._flight_targets.is_empty()
 		and not audio._voices.any(func(voice): return voice.playing),
 		"Muting pauses preparation and releases the active bolt's cue")
+	toggle.button_pressed = true
 	menu.select(6)
 	menu.item_selected.emit(6)
 	audio.reset()
