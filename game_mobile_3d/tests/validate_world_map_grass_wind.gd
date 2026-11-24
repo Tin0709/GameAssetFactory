@@ -13,9 +13,14 @@ func run()->void:
 	var roots:Array=[]
 	for row:Dictionary in p.placements:roots.append(row.root)
 	for m:ShaderMaterial in p.materials:
-		check(m.get_shader_parameter("review_source_wind")==true,"Recovered background path selected")
-		check(is_equal_approx(m.get_shader_parameter("review_wind_gain"),p.grass_wind.data.background_wind.gain),"Captured gain transferred without arbitrary amplification")
-	for node:Node in p.get_children():check(node.extra_cull_margin>.8,"Culling reserves recovered rotation plus contact")
+		var turf: bool = m.get_shader_parameter("tinted_grass") == true
+		check(m.get_shader_parameter("review_source_wind")==turf,"Grass uses recovered gusts while other foliage keeps its own sway")
+		if turf:
+			check(is_equal_approx(float(m.get_shader_parameter("review_wind_gain")),p.grass_wind.data.background_wind.gain),
+				"Captured gain transferred without arbitrary amplification")
+	for node:Node in p.get_children():
+		var margin_ok: bool = node.extra_cull_margin > .8 if node.get_meta("green_grass",false) else is_equal_approx(node.extra_cull_margin,.8)
+		check(margin_ok,"Culling accounts for the active wind path")
 	p.set_recovered_wind(false)
 	for m:ShaderMaterial in p.materials:check(m.get_shader_parameter("review_source_wind")==false,"Previous motion available for exact comparison")
 	for node:Node in p.get_children():check(is_equal_approx(node.extra_cull_margin,.8),"Old culling margin restored")
