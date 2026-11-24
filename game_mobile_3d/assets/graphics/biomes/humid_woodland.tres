@@ -119,4 +119,5 @@ key_energy_by_hour = SubResource("WoodlandKey")
 ambient_energy_by_hour = SubResource("WoodlandAmbientHours")
 fog_density_by_hour = SubResource("WoodlandFog")
 path_fixture_by_hour = SubResource("FixtureDusk")
+path_fixture_scatter = 0.25
 overcast = ExtResource("weather")
