@@ -301,6 +301,9 @@ func check_weapon_impact_support(lab, slot: int) -> void:
 		var context := "slot %d on %s" % [slot, fixture]
 		check(damage_centres.size() == 1 and lab._light_sample_time >= 0.0,
 			"An aerial attack emits both combat and presentation cues for %s" % context)
+		if slot == lab.Weapon.SABRE:
+			check((lab._tool_slam_time >= 0.0) == (fixture == "flat"),
+				"The Sabre shockwave appears only when the full ring is supported for %s" % context)
 		if not damage_centres.is_empty():
 			var light: Vector3 = lab._impact_light.global_position
 			var origin: Vector3 = lab.player.global_position
