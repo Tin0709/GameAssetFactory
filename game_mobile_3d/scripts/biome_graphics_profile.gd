@@ -79,6 +79,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export var stone_ledge_occlusion_by_hour: Curve
 ## Linear sky luminance at the center of the stone shelf fill response, morning and afternoon.
 @export var stone_top_shadow_fill_pivot := Vector2.ZERO
+## Redistribute the existing shadow fill across stone shelves that provide a corner field.
+@export_range(0.0, 1.0, 0.01) var stone_shelf_redistribution := 0.0
 ## Reduction of the path's supplemental shadow fill and gain for moderately lit dirt.
 @export var path_sun_response := Vector2.ZERO
 ## Diffuse gain and warmth in the illuminated core of a dirt path.

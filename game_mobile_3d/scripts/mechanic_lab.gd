@@ -1973,6 +1973,9 @@ func _start_contact_light(point: Vector3, serial: int, energy: float, sample_tim
 	_impact_light.visible = _light_pending
 
 func _clear_contact_light() -> void:
+	if _axe_blocker_count > 0:
+		_axe_blocker_count = 0
+		_axe_wall_material.set_shader_parameter(&"axe_blocker_count", 0)
 	if not _pending_melee_contact_fx.is_empty() or not _pending_melee_feedback.is_empty():
 		# A reset discards the old pose and transient effects. Show the health
 		# already committed by simulation, even if its last cue was pending.

@@ -559,6 +559,10 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 					check(nearest > 0.52 and nearest < 0.9 and furthest > 1.35,
 						"The Axe dive is beyond the closest wall and straddles the middle and distant walls")
 				print("RIBBON_WALL ", context, " frames=", frames, " nearest=", nearest, " furthest=", furthest)
+				if axe_wall_material != null:
+					lab.reset_player()
+					check(axe_wall_material.get_shader_parameter("axe_blocker_count") == 0,
+						"Reset immediately removes any stale wall mask from the displayed Axe")
 
 func check_world_map_slash() -> void:
 	var world := (load("res://scenes/WorldMap.tscn") as PackedScene).instantiate()

@@ -10,6 +10,8 @@ varying float canopy_direct_coverage;
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 global uniform float gaf_stone_shade_reach;
 global uniform vec2 gaf_stone_top_shadow_fill;
+global uniform vec3 gaf_stone_shelf_state;
+global uniform sampler2D gaf_stone_shelf_field : filter_nearest, repeat_disable;
 global uniform float gaf_stone_wall_shadow_fill;
 global uniform float gaf_stone_wall_return;
 global uniform vec4 gaf_stone_sunset_region;
@@ -29,6 +31,20 @@ global uniform float gaf_canopy_terrain_contrast;
 // Warm paths set it to -1 minus the red chroma delta and store blue in terrain_canopy_ground_ev.
 // Their RGB incident light remains the excess used by the cast-shadow correction.
 varying vec4 terrain_canopy_incident;
+
+float gaf_stone_shelf_multiplier(vec2 world_xz) {
+	if (gaf_stone_shelf_state.z <= 0.0) return 1.0;
+	vec2 grid_position = world_xz - gaf_stone_shelf_state.xy;
+	ivec2 cell = ivec2(floor(grid_position));
+	ivec2 size = textureSize(gaf_stone_shelf_field, 0);
+	if (any(lessThan(cell, ivec2(0))) || any(greaterThanEqual(cell, size))) return 1.0;
+
+	// Each texel keeps four corner values. Adjacent shelves at the same height share their edge values.
+	vec4 corners = texelFetch(gaf_stone_shelf_field, cell, 0);
+	vec2 t = fract(grid_position);
+	float weight = mix(mix(corners.r, corners.g, t.x), mix(corners.b, corners.a, t.x), t.y);
+	return 1.0 + gaf_stone_shelf_state.z * ((255.0 * weight - 128.0) / 127.0);
+}
 #endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
 #define GAF_WORLD_FOLIAGE_LOBE_ONLY
@@ -215,6 +231,9 @@ void light() {
 			vec3 sky_return = terrain_opening_incident * (.46 * min(gaf_stone_top_shadow_fill.x, 1.0));
 			vec3 direct_room = key_color * (.27 * nl * cloud_transmission * terrain_direct_contact / PI);
 			float cast_shade = 1.0 - smoothstep(.08, .66, shadow_attenuation);
+			if (cast_shade > 0.0) {
+				sky_return *= gaf_stone_shelf_multiplier(stone_sunset_position);
+			}
 			DIFFUSE_LIGHT += min(sky_return, direct_room) * cast_shade;
 		}
 		if (gaf_stone_shade_fill.w > 0.0) {

@@ -125,6 +125,8 @@ var _near_wall_bound := false
 var _near_wall_fill_state := Vector4.ZERO
 var _stone_foot_fill := 0.0
 var _stone_top_shadow_fill := Vector2.ZERO
+var _stone_shelf_field_ready := false
+var _stone_shelf_state := Vector3.ZERO
 var _stone_wall_shadow_fill := 0.0
 var _path_sun_response := Vector2.ZERO
 var _path_sun_core := Vector2.ZERO
@@ -536,6 +538,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_stone_top_shadow_fill", Vector2.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_stone_shelf_state", Vector3.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_stone_wall_shadow_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_state", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_near_wall_fill", Vector4.ZERO)
@@ -1090,6 +1093,8 @@ func _exit_tree()->void:
 			RenderingServer.global_shader_parameter_set("gaf_ground_shadow_fill_reduction", Vector2.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_stone_foot_fill", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_stone_top_shadow_fill", Vector2.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_stone_shelf_state", Vector3.ZERO)
+			RenderingServer.global_shader_parameter_set("gaf_stone_shelf_field", null)
 			RenderingServer.global_shader_parameter_set("gaf_stone_wall_shadow_fill", 0.)
 			RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_state", Vector4.ZERO)
 			RenderingServer.global_shader_parameter_set("gaf_grass_terrace_shadow_field", null)
@@ -1751,6 +1756,7 @@ func _sync_shadow_diffuse() -> void:
 	if stone_top != _stone_top_shadow_fill:
 		_stone_top_shadow_fill = stone_top
 		RenderingServer.global_shader_parameter_set("gaf_stone_top_shadow_fill", stone_top)
+	_sync_stone_shelf_lighting(stone_top.x)
 	var stone_wall := 0.
 	if state.w > 0. and _stone_wall_shadow_fill_available():
 		stone_wall = clampf(_biome_profile.stone_wall_shadow_fill, 0., .56)
@@ -1913,6 +1919,26 @@ func _path_shade_sky_available() -> bool:
 		return false
 	var sky := level.get_node_or_null("SpruceSkyVisibility")
 	return sky != null and sky.proof_ready
+
+func prepare_stone_shelf_lighting() -> void:
+	var field: Texture2D = level.stone_shelf_corners
+	_stone_shelf_field_ready = (_path_sun_available() and field != null
+		and field.get_size() == level.look.path_map_size
+		and level.stone_shelf_layout_sha256.length() == 64
+		and FileAccess.get_sha256(level.map_layout_path) == level.stone_shelf_layout_sha256)
+	RenderingServer.global_shader_parameter_set("gaf_stone_shelf_field", field if _stone_shelf_field_ready else null)
+	_sync_stone_shelf_lighting(_stone_top_shadow_fill.x)
+
+func _sync_stone_shelf_lighting(stone_top_amount: float) -> void:
+	var state := Vector3.ZERO
+	if _stone_shelf_field_ready and stone_top_amount > 0.0 and is_finite(_biome_profile.stone_shelf_redistribution):
+		var strength := clampf(_biome_profile.stone_shelf_redistribution, 0.0, 1.0)
+		if strength > 0.0:
+			var origin: Vector2 = level.look.path_map_origin
+			state = Vector3(origin.x, origin.y, strength)
+	if state != _stone_shelf_state:
+		_stone_shelf_state = state
+		RenderingServer.global_shader_parameter_set("gaf_stone_shelf_state", state)
 
 func _stone_top_shadow_fill_available() -> bool:
 	return _path_sun_available() and _biome_profile.stone_top_shadow_fill_pivot.is_finite() \

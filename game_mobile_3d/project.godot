@@ -123,6 +123,14 @@ gaf_stone_top_shadow_fill={
 "type": "vec2",
 "value": Vector2(0, 0)
 }
+gaf_stone_shelf_state={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+gaf_stone_shelf_field={
+"type": "sampler2D",
+"value": ""
+}
 gaf_stone_wall_shadow_fill={
 "type": "float",
 "value": 0.0

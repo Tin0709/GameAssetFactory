@@ -29,6 +29,9 @@ const CanopyPlayerCue = preload("res://scripts/world_map_canopy_player_cue.gd")
 ## Optional ground-level sky coverage baked from the selected block layout.
 @export var near_wall_coverage: Texture2D
 @export var near_wall_layout_sha256 := ""
+## Four corner weights per ground cell, baked from stone surfaces in this layout.
+@export var stone_shelf_corners: Texture2D
+@export var stone_shelf_layout_sha256 := ""
 ## Optional sky-occlusion lattice baked for this layout.
 @export var mist_sky_field: MistSkyField
 ## Optional world XZ centre and inner/outer radii of one rear mist lighting region.
@@ -329,6 +332,7 @@ func _ready() -> void:
 	showcase.afternoon_lighting.setup(self, spruce_sky)
 	showcase.prepare_grass_terrace_shadow()
 	showcase.prepare_near_wall_lighting()
+	showcase.prepare_stone_shelf_lighting()
 	_setup_far_shadow_review()
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
