@@ -94,11 +94,12 @@ const TIME_PRESETS := [2.5, 7.0, 12.0, 16.5, 18.5, 19.5, 22.0]
 const SABRE_LANDING_SWING_DELAY := 0.033083633
 # AM_Player_Sabre_JumpAttack: PlayDebrisEffect minus LandingStart.
 const SABRE_LANDING_DEBRIS_DELAY := 0.045126423
-# AM_Player_Sabre_JumpAttack: CameraShakeNotify_C minus LandingStart.
-const SABRE_LANDING_SHAKE_DELAY := 0.052268848
-# AM_Player_Sabre_JumpAttack: one-shot PlayNiagaraEffect minus LandingStart.
-const SABRE_LANDING_BURST_DELAY := 0.056890413
 const SABRE_LANDING_BURST_REACH := 1.5
+const SABRE_LANDING_CUES := [
+	{"time": 0.281534761, "effect": MeleeTools.GroundEffect.DUST, "offset": Vector2(0.0, 0.90)},
+	{"time": 0.285736203, "effect": MeleeTools.GroundEffect.SHAKE, "medium": true},
+	{"time": 0.290357769, "effect": MeleeTools.GroundEffect.SHOCKWAVE, "offset": Vector2(0.0, 1.75), "impact_burst": true},
+]
 # The Gauntlets debris notify names the impact decal at local Y 180 cm.
 # The Lab maps that axis along the strike direction.
 
@@ -262,7 +263,6 @@ var _shake_strength := 0.0
 var _shake_intensity := 1.0
 var _shake_pending := false
 var _shake_sample_time := -1.0
-var _slam_shake_frame := -1
 var _slam_burst_frame := -1
 var _slam_burst_point: Vector3
 var _slam_burst_serial := -1
@@ -546,7 +546,9 @@ func _setup_weapon_selector() -> void:
 	_sabre_blade_base = player.marker_base.position
 	_sabre_blade_tip = player.marker_tip.position
 	_sabre_profile = player.runtime_locomotion_profile.combat
-	_sabre_air_clip = player.clips.AirAttack
+	_sabre_air_clip = player.clips.AirAttack.duplicate()
+	_sabre_air_clip.ground_effects = SABRE_LANDING_CUES
+	player.clips.AirAttack = _sabre_air_clip
 	_default_idle_novelty = player.clips.InspectWeapon
 	_sabre_air_rate = player.combo.air_attack_play_rate
 	_sword_profile = Sword.combat_profile(_sabre_profile, player.clips)
@@ -1349,11 +1351,13 @@ func _on_zombie_step(sole: Vector3, actor: CharacterBody3D = null) -> void:
 	_combat_audio.queue_zombie_step(support.position)
 
 func _heavy_debris_delay() -> float:
+	if _equipped_weapon == Weapon.SABRE:
+		return SABRE_LANDING_DEBRIS_DELAY
 	# These montages emit their own ground debris, independently of the
 	# physical touchdown and the hit event that resolves zombie damage.
 	if player.clips.get("AirAttack", {}).has("ground_effects"):
 		return -1.0
-	return SABRE_LANDING_DEBRIS_DELAY if _equipped_weapon == Weapon.SABRE else 0.0
+	return 0.0
 
 func _on_attack_accepted_timed(index: int, clip: String, serial: int, at: float) -> void:
 	# The Sabre aerial montage loops until support, so its cue follows the
@@ -1444,7 +1448,6 @@ func _start_camera_shake(strength: float, sample_time := -1.0) -> void:
 	_shake_sample_time = sample_time
 
 func _clear_camera_shake() -> void:
-	_slam_shake_frame = -1
 	_shake_serial = -1
 	_shake_duration = 0.0
 	_shake_pending = false
@@ -1482,7 +1485,7 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	elif TOOL_TYPES.has(_equipped_weapon):
 		player.begin_tool_landing()
 	var debris_delay := _heavy_debris_delay()
-	if debris_delay < 0.0:
+	if debris_delay < 0.0 or _equipped_weapon == Weapon.SABRE:
 		_tool_touchdown = {"origin": point, "forward": facing.slide(Vector3.UP).normalized(),
 			"surface_contact": _floor_landing_contact_at(point), "serial": serial}
 	# Evaluate the height tiers against the support rather than the capsule origin.
@@ -1493,11 +1496,6 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	# contacts may already be gone.
 	_slam_burst_point = _landing_impact_anchor(point, facing, floor_height, burst_reach)
 	_slam_burst_serial = serial
-	if _equipped_weapon == Weapon.SABRE:
-		var frame := Engine.get_physics_frames()
-		var rate := Engine.physics_ticks_per_second
-		_slam_shake_frame = frame + ceili(SABRE_LANDING_SHAKE_DELAY * rate)
-		_slam_burst_frame = frame + ceili(SABRE_LANDING_BURST_DELAY * rate)
 	$Zombies.land_sabre(point, facing, serial, fall_height)
 	if player.gauntlets_equipped and _gauntlet_impact_marks != null:
 		var mark_surface := _floor_landing_contact_at(point)
@@ -1578,7 +1576,7 @@ func _on_sabre_landing(point: Vector3, serial: int) -> void:
 	_slam_burst_frame = frame
 
 func _show_landing_burst(point: Vector3, serial: int, sample_time: float) -> void:
-	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP, true)
+	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP, true, sample_time)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3, sample_time)
 
 func _setup_tool_slam_ring() -> void:
@@ -1638,6 +1636,8 @@ func _show_tool_ground_cues() -> void:
 		var sample_time: float = event.sample_time
 		if event.landing and _tool_touchdown.get("serial") != event.serial:
 			continue
+		if cue.get("impact_burst", false):
+			_show_landing_burst(_slam_burst_point, event.serial, sample_time)
 		if cue.effect == MeleeTools.GroundEffect.SHAKE:
 			_shake_serial = event.serial
 			var strength := FINISHER_SHAKE_HEIGHT_FRACTION if cue.get("medium", false) else TOOL_SHAKE_HEIGHT_FRACTION
@@ -1674,7 +1674,7 @@ func _sample_combat_fx() -> void:
 	_combat_pose_frame = Engine.get_physics_frames()
 	if not _pending_tool_ground_cues.is_empty():
 		_show_tool_ground_cues()
-	if _pending_melee_contact_fx.is_empty() and _slam_shake_frame < 0 and _slam_burst_frame < 0:
+	if _pending_melee_contact_fx.is_empty() and _slam_burst_frame < 0:
 		return
 	var sample_time: float = player.effects.clock
 	# Keep the floor flash first when both contacts request light for the same swing.
@@ -1697,9 +1697,6 @@ func _sample_combat_fx() -> void:
 			_show_contact_fx(contact.point, contact.direction, contact.clip, contact.serial,
 				sample_time, contact.get("capsule", Vector2.ZERO), weapon_points)
 	_pending_melee_contact_fx.clear()
-	if _slam_shake_frame >= 0 and _combat_pose_frame >= _slam_shake_frame:
-		_slam_shake_frame = -1
-		_start_camera_shake(FINISHER_SHAKE_HEIGHT_FRACTION, sample_time)
 
 func _present_melee_feedback(display_time: float) -> void:
 	var presented := 0

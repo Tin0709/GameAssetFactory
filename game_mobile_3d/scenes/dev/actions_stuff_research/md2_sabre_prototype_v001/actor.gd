@@ -747,6 +747,7 @@ func _animate(delta:float)->void:
 				exact_edges = not trail.is_empty()
 			if sectioned_air:
 				window = [combo.SABRE_AIR_SLASH, float(window[1])]
+				exact_edges = effects.interpolate_ground_trail_edges
 			var start := float(window[0])
 			var end := float(window[1])
 			if gap.x < gap.y:

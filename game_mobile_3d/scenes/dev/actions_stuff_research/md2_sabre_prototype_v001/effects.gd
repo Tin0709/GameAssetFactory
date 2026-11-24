@@ -114,19 +114,27 @@ func _trail_sample(base: Vector3, tip: Vector3, time: float) -> Dictionary:
 	return {"base": base, "tip": end, "tip_u": tip_u, "time": time, "section": _ribbon_section,
 		"lifetime": _ribbon_lifetime, "tint": _ribbon_tint, "edge_tint": _ribbon_edge_tint}
 
-func _burst(point:Vector3,direction:Vector3,publish_sample:=false)->void:
+func _burst(point:Vector3,direction:Vector3,publish_sample:=false,sample_time:=-1.0)->void:
 	bursts+=1;var added:=0
+	var born := clock if sample_time < 0.0 else minf(sample_time, clock)
+	var age := clock - born
 	for particle:Dictionary in particles:
 		if particle.life>0. or clock<float(particle.born)+float(particle.duration)+1./maxf(1.,Engine.physics_ticks_per_second):continue
 		var duration:=_rng.randf_range(.13,.3)
 		particle.position=point;particle.velocity=direction.normalized()*_rng.randf_range(.2,.8)+Vector3(_rng.randf_range(-.7,.7),_rng.randf_range(.1,.7),_rng.randf_range(-.7,.7))
-		particle.duration=duration;particle.life=duration;particle.born=clock;particle.history.clear();added+=1
+		particle.duration=duration;particle.life=duration;particle.born=born;particle.history.clear();added+=1
 		if publish_sample:
-			particle.history.append({"time":clock,"position":point,"life":duration})
+			particle.history.append({"time":born,"position":point,"life":duration})
+		if age > 0.0:
+			particle.life = maxf(0.0, duration - age)
+			particle.velocity += Vector3.DOWN * 1.8 * age
+			particle.position += particle.velocity * age
+			if publish_sample:
+				particle.history.append({"time":clock,"position":particle.position,"life":particle.life})
 		if added>=8:break
-func contact(point: Vector3, direction: Vector3, publish_sample := false) -> void:
+func contact(point: Vector3, direction: Vector3, publish_sample := false, sample_time := -1.0) -> void:
 	if enabled:
-		_burst(point, direction, publish_sample)
+		_burst(point, direction, publish_sample, sample_time)
 func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=null)->Array:
 	var result:Array=[]
 	for point:Dictionary in samples:
