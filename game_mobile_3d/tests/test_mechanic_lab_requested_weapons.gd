@@ -690,8 +690,8 @@ func check_projectile_contact_anchor(lab: Node3D) -> void:
 			var hits: Array[Dictionary] = []
 			weapon.bolt_impact.connect(func(hit: Dictionary, _direction: Vector3, _serial: int):
 				hits.append(hit), CONNECT_ONE_SHOT)
-			var origin := Vector3(16.0, 1.22, 2.15)
-			var direction := Vector3(0.94, -0.03, 0.18).normalized()
+			var origin := Vector3(16.0, 1.22, 2.74)
+			var direction := Vector3(0.94, -0.03, 0.10).normalized()
 			var expected: StaticBody3D = wall
 			if onto_floor:
 				origin = Vector3(27.0, 0.7, 0.0)
@@ -735,7 +735,7 @@ func check_projectile_contact_anchor(lab: Node3D) -> void:
 				var first: Transform3D = weapon._embedded.get_instance_transform(0)
 				for i in 24:
 					var visible_pose: Transform3D = weapon._embedded.get_instance_transform(0)
-					var pivot := visible_pose * (Vector3.RIGHT * weapon.EMBEDDED_OFFSET / weapon.EMBEDDED_SCALE)
+					var pivot: Vector3 = visible_pose * (Vector3.RIGHT * weapon.EMBEDDED_OFFSET / weapon.EMBEDDED_SCALE)
 					worst_gap = maxf(worst_gap, weapon.to_global(pivot).distance_to(hit.position))
 					minimum_entry = minf(minimum_entry, -visible_pose.basis.x.normalized().dot(hit.normal))
 					turning = turning or not visible_pose.basis.is_equal_approx(first.basis)
