@@ -108,10 +108,10 @@ func replay(lab: Node3D, slider: HSlider, milliseconds: float, has_targets: bool
 		var zombie = group.get_children().back()
 		zombie.set_physics_process(false)
 		zombie.health = 200
-		zombie.position = Vector3(x, 0.0, 1.25)
+		zombie.position = Vector3(x, 0.0, 1.3 if x > 0.0 else 1.2)
 		if x > 0.0:
 			victim = zombie
-			victim.health = 55
+			victim.health = 20
 
 	var contacts := {}
 	var clips: Array[String] = []
