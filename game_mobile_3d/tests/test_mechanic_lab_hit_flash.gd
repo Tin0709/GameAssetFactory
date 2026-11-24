@@ -527,6 +527,9 @@ func check_gauntlet_contact_spark_origins() -> void:
 		var frames: Array[int] = []
 		var expected: Array[Vector3] = []
 		var shown: Array[Vector3] = []
+		var directions: Array[Vector3] = []
+		var light_positions: Array[Vector3] = []
+		var short_bursts: Array[bool] = []
 		var record_hit := func(point: Vector3, _direction, _clip, index: int, _serial, _lethal):
 			if index == centres.size():
 				centres.append(point)
@@ -562,13 +565,22 @@ func check_gauntlet_contact_spark_origins() -> void:
 			if shown.size() >= expected.size():
 				return
 			var origin := Vector3.ZERO
+			var axis := Vector3.ZERO
+			var compact := true
 			var count := 0
 			for spark in sparks._particles:
 				if spark.age < spark.lifetime and is_zero_approx(spark.age):
-					origin += spark.origin - spark.velocity.normalized() * 0.21
+					var direction: Vector3 = spark.velocity.normalized()
+					origin += spark.origin - direction * 0.21
+					axis += direction
+					compact = compact and spark.length < 0.15 and spark.lifetime < 0.165
 					count += 1
 			if count == 9:
 				shown.append(origin / count)
+				var facing: Basis = lab.player.visual.global_basis.orthonormalized()
+				directions.append(facing.inverse() * axis.normalized())
+				light_positions.append(lab.get_node("CombatImpactLight").global_position)
+				short_bursts.append(compact)
 		process_frame.connect(measure_birth)
 		attack(true)
 		for i in 160:
@@ -580,7 +592,18 @@ func check_gauntlet_contact_spark_origins() -> void:
 		for i in mini(expected.size(), shown.size()):
 			var error := shown[i].distance_to(expected[i])
 			check(error < 0.001, "Gauntlets hit %s emits from the capsule surface nearest the punching hand" % (i + 1))
-			print("GAUNTLET_SPARK_ORIGIN basic=", basic, " attack=", i + 1, " error_m=", error)
+			check(short_bursts[i], "Gauntlets hit %d uses short, compact contact streaks" % (i + 1))
+			check(light_positions[i].distance_to(expected[i]) < 0.001,
+				"Gauntlets hit %d lights the same surface point as its streaks" % (i + 1))
+			var direction := directions[i]
+			match i:
+				0:
+					check(direction.z > 0.60 and direction.x > 0.17, "The jab streaks fan forward with the right fist")
+				1:
+					check(direction.y > 0.85, "The uppercut streaks fan upward with the right fist")
+				2:
+					check(direction.x < -0.50 and direction.z > 0.40, "The finisher streaks fan across the body with the left fist")
+			print("GAUNTLET_SPARK_ORIGIN basic=", basic, " attack=", i + 1, " error_m=", error, " direction=", direction)
 		process_frame.disconnect(measure_birth)
 		lab.player.physics_pose_ready.disconnect(measure_pose)
 		group.sabre_contact.disconnect(record_hit)
