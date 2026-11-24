@@ -17,6 +17,7 @@ import math
 from pathlib import Path
 import re
 import shutil
+from tempfile import TemporaryDirectory
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -404,20 +405,29 @@ def validate_biome_dependencies(preset, declarations, project):
                 raise ValueError(f"Cannot read {preset.name} dependency {dependency} (from {owner.name})") from error
 
 
-def map_scene_source(scene_name, runtime_path, biome, comparison, overrides):
-    runtime_resource = "res://" + runtime_path.relative_to(GODOT_PROJECT).as_posix()
+def map_scene_source(scene_name, runtime_path, biome, comparison, overrides, shelf=None):
+    map_resource = "res://" + runtime_path.parent.relative_to(GODOT_PROJECT).as_posix()
+    shelf_resource = ""
+    shelf_properties = ""
+    if shelf is not None and shelf["active_cells"]:
+        texture_path = json.dumps(f"{map_resource}/stone_shelf/stone_shelf_corners.png", ensure_ascii=False)
+        shelf_resource = f'[ext_resource type="Texture2D" path={texture_path} id="stone_shelf"]\n'
+        shelf_properties = ('stone_shelf_corners = ExtResource("stone_shelf")\n'
+                            f'stone_shelf_layout_sha256 = {json.dumps(shelf["layout_sha256"])}\n')
     return (
-        '[gd_scene load_steps=6 format=3]\n\n'
+        f'[gd_scene load_steps={7 if shelf_resource else 6} format=3]\n\n'
         '[ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]\n'
         '[ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]\n'
         '[ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]\n'
         f'[ext_resource type="Resource" path="res://{BIOME_DIRECTORY}/{biome}.tres" id="biome"]\n'
-        f'[ext_resource type="Resource" path="res://{BIOME_DIRECTORY}/{comparison}.tres" id="comparison"]\n\n'
+        f'[ext_resource type="Resource" path="res://{BIOME_DIRECTORY}/{comparison}.tres" id="comparison"]\n'
+        f'{shelf_resource}\n'
         f'[node name="{scene_name}" instance=ExtResource("base")]\n'
         'script = ExtResource("map")\n'
-        f'map_layout_path = {json.dumps(runtime_resource, ensure_ascii=False)}\n'
+        f'map_layout_path = {json.dumps(map_resource + "/runtime.json", ensure_ascii=False)}\n'
         'biome_graphics = ExtResource("biome")\n'
         'comparison_biomes = Array[ExtResource("profile")]([ExtResource("comparison")])\n'
+        + shelf_properties
         + "".join(f"{name} = {value}\n" for name, value in overrides.items())
     )
 
@@ -428,6 +438,7 @@ def main():
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--border", choices=("markers", "bounds"), default="markers")
     parser.add_argument("--scene", type=Path, help="Create a new playable Godot scene under game_mobile_3d/scenes/maps")
+    parser.add_argument("--stone-shelf", action="store_true", help="Bake a layout-bound stone shelf texture for the new scene")
     parser.add_argument("--biome", metavar="PRESET", help=f"Portable .tres file name in {BIOME_DIRECTORY} (default: meadow)")
     parser.add_argument("--quality", choices=BIOME_QUALITY, help="Override Biome Quality on the new scene")
     parser.add_argument("--start-hour", type=float, help="Override the starting hour from 0 to 24")
@@ -456,6 +467,8 @@ def main():
         parser.error("--border bounds requires a separate map --output")
     if args.biome is not None and not args.scene:
         parser.error("--biome requires --scene")
+    if args.stone_shelf and not args.scene:
+        parser.error("--stone-shelf requires --scene")
     scene_info = {}
     if args.scene:
         scene = args.scene.resolve()
@@ -475,12 +488,26 @@ def main():
             require_portable_biome(comparison)
         except ValueError as error:
             parser.error(str(error))
-        scene_source = map_scene_source(scene.stem, output / "runtime.json", biome, comparison, overrides)
         scene_info = {"scene": str(scene), "biome": biome}
         if overrides:
             scene_info["graphics_overrides"] = overrides
-    runtime, manifest = import_source(args.source, output, border_mode=args.border, new_output=bool(args.scene))
+    shelf = None
+    if args.stone_shelf:
+        try:
+            from graphics.stone_shelf import bake
+        except ModuleNotFoundError as error:
+            parser.error(f"--stone-shelf requires the graphics baker and its NumPy, Pillow and SciPy dependencies ({error})")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        with TemporaryDirectory(prefix=".shelf-import-", dir=output.parent) as temporary:
+            staging = Path(temporary) / output.name
+            runtime, manifest = import_source(args.source, staging, border_mode=args.border, new_output=True)
+            shelf = bake(staging / "runtime.json", staging / "stone_shelf")
+            staging.rename(output)
+        scene_info["stone_shelf"] = shelf
+    else:
+        runtime, manifest = import_source(args.source, output, border_mode=args.border, new_output=bool(args.scene))
     if args.scene:
+        scene_source = map_scene_source(scene.stem, output / "runtime.json", biome, comparison, overrides, shelf)
         scene.parent.mkdir(parents=True, exist_ok=True)
         with scene.open("x", encoding="utf-8", newline="\n") as handle:
             handle.write(scene_source)
