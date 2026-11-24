@@ -105,6 +105,7 @@ func run() -> void:
 	await check_zombie_steps_on_slab(lab)
 	await check_zombie_dust_contact_clock(lab)
 	await check_selected_landing_surfaces(lab, dust)
+	await check_selected_floor_steps(lab)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
 	lab.free()
@@ -1212,6 +1213,63 @@ func check_selected_landing_surfaces(lab, dust: Node3D) -> void:
 	picker.item_selected.emit(0)
 	check(ground_material.get_shader_parameter("source_terrain_tiles") == default_texture,
 		"Returning to grass restores the default texture object")
+	toggle.button_pressed = false
+	lab.reset_player()
+
+func check_selected_floor_steps(lab) -> void:
+	var menu := lab.get_node("HUD/FloorSurface") as OptionButton
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var movement: Node = lab.get_node("MovementAudio")
+	var dust: MultiMeshInstance3D = lab.get_node("ZombieStepDust")
+	var audio: Node = lab.get_node("CombatAudio")
+	var grass_steps: int = movement.event_count.grass
+	for fixture in [[1, "dirt", "sfx_player_step_carapaceDryDirt-"], [2, "stone", "sfx_player_stepStone-"]]:
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		toggle.button_pressed = false
+		menu.select(fixture[0])
+		menu.item_selected.emit(fixture[0])
+		var surface: String = fixture[1]
+		var landing_key := "land_" + surface
+		check(movement.groups.get(surface, []).size() == 6 and movement.groups.get(landing_key, []).size() == 4,
+			"The selected floor loads all six step and four normal landing samples for %s" % surface)
+		check(not movement.step_voices.any(func(voice): return voice.playing),
+			"Changing floor while muted starts no voice")
+		toggle.button_pressed = true
+		var before: int = movement.event_count[surface]
+		Input.action_press("move_forward")
+		for i in 66:
+			await physics_frame
+		Input.action_release("move_forward")
+		var steps: int = movement.event_count[surface] - before
+		check(steps >= 3 and movement.event_count.grass == grass_steps
+			and movement.last_sources.get(surface, "").begins_with(fixture[2]),
+			"Real steps use the selected %s family" % surface)
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		var landings: int = movement.event_count.landing
+		var footfalls: int = movement.event_count[surface]
+		check(lab.player.drop_for_lab(0.35), "The selected floor receives a normal drop")
+		for i in 48:
+			await physics_frame
+			if movement.event_count.landing > landings:
+				break
+		check(movement.event_count.landing == landings + 1 and movement.event_count[surface] == footfalls
+			and movement.last_sources.get(landing_key, "").begins_with("sfx_player_land_" + surface + "_"),
+			"Ordinary landing uses the %s event without an extra step" % surface)
+		var queued: int = audio._step_points.size()
+		lab._on_zombie_step(Vector3.RIGHT)
+		dust._process(0.0)
+		var count := dust.multimesh.visible_instance_count
+		check(count == 1 and int(dust.multimesh.get_instance_custom_data(0).r) / 32 == fixture[0]
+			and audio._step_points.size() == queued + 1,
+			"Zombie feet keep the ground tint and supported generic step on %s" % surface)
+		print("MECHANIC_LAB_FLOOR_STEPS ", surface, " steps=", steps, " dust=", count,
+			" landing=", movement.last_sources.get(landing_key, "missing"))
+	menu.select(0)
+	menu.item_selected.emit(0)
 	toggle.button_pressed = false
 	lab.reset_player()
 
