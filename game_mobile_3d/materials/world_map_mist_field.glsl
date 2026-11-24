@@ -260,9 +260,18 @@ void main(){
  vec3 local_light=p.scatter.rgb*p.scatter.w*p.local_scatter_multiplier.xyz;
  vec3 additional_light=p.scatter.rgb*p.scatter.w*p.additional_scatter_multiplier.xyz;
  vec3 scattered=vec3(0.0);float optical=0.0;float previous=0.0;
+ // Nothing contributes before the earliest possible medium interval.
+ float empty_until=min(entry,near_z);
+ if(local_chord.z>0.)empty_until=min(empty_until,local_chord.x-local_chord.w);
+ if(additional_chord.z>0.)empty_until=min(empty_until,additional_chord.x-additional_chord.w);
  imageStore(volume,ivec3(pixel,0),vec4(0.0,0.0,0.0,1.0));
  for(int i=1;i<32;i++){
   float d=pow(float(i)/31.0,2.0)*p.integration.y;
+  if(d<empty_until){
+   imageStore(volume,ivec3(pixel,i),vec4(0.0,0.0,0.0,1.0));
+   previous=d;
+   continue;
+  }
   float early=local_optical(local_chord,previous,min(d,entry),ray_length,p.local_center_strength.w);
   float additional_early=local_optical(additional_chord,previous,min(d,entry),ray_length,p.additional_center_strength.w);
   vec3 early_light=local_light;
