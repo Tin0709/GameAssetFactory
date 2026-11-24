@@ -76,7 +76,7 @@ var _bolts: Array[Dictionary] = []
 var _trails: Array[Dictionary] = []
 var _trail_mesh := ImmediateMesh.new()
 var _trail_renderer: MeshInstance3D
-var _trail_opacity := 1.0
+var _trail_alpha_scale := 1.0
 var impact_sparks: ImpactSparks
 var _sweep_query := PhysicsShapeQueryParameters3D.new()
 var _embedded: MultiMesh
@@ -321,8 +321,8 @@ func _report_impact(hit: Dictionary, direction: Vector3, serial: int, _strike: D
 	bolt_impact.emit(hit, direction, serial)
 
 func set_trail_opacity(opacity: float) -> void:
-	var was_hidden := _trail_opacity == 0.0
-	_trail_opacity = opacity
+	var was_hidden := _trail_alpha_scale == 0.0
+	_trail_alpha_scale = opacity
 	var material := _trail_renderer.material_override as ShaderMaterial
 	material.set_shader_parameter(&"opacity_scale", opacity)
 	if opacity == 0.0:
@@ -343,7 +343,7 @@ func _update_trails() -> void:
 			continue
 		var speed: float = trail.speed
 		var duration := minf(float(trail.distance) / speed, TRAIL_FADE_END_AGE - age)
-		if _trail_opacity == 0.0 or camera == null or duration <= 0.00001:
+		if _trail_alpha_scale == 0.0 or camera == null or duration <= 0.00001:
 			continue
 		var direction: Vector3 = trail.direction
 		var head := Vector3(trail.origin) + direction * float(trail.distance)
