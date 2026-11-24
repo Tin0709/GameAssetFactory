@@ -136,6 +136,7 @@ func run() -> void:
 	await check_flash_during_render_hitch()
 	await check_body_flash_release()
 	await check_splash_flash_strength()
+	await check_crowd_splash_visibility()
 	await check_damage_numbers_during_render_hitch()
 	await check_overlapping_damage_number_positions()
 	await check_damage_number_bar_clearance()
@@ -696,6 +697,57 @@ func check_splash_flash_strength() -> void:
 			"A lethal splash retains the weaker flash during the ragdoll handoff (baby: %s)" % baby)
 		zombie.free()
 	lab.free()
+
+
+func check_crowd_splash_visibility() -> void:
+	for size: int in [4, 12]:
+		var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+		root.add_child(lab)
+		current_scene = lab
+		await ticks(12)
+		var group = lab.get_node("Zombies")
+		var basis: Basis = lab.player.visual.global_basis
+		var origin: Vector3 = lab.player.global_position
+		var zombies: Array[CharacterBody3D] = []
+		for i in size:
+			if not group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, i % 2 == 1):
+				break
+			var zombie: CharacterBody3D = group.get_child(i)
+			zombie.set_physics_process(false)
+			var offset := Vector3((i % 4 - 1.5) * 0.42, 0.0, 1.28 + (i / 4) * 0.38)
+			zombie.global_position = origin + basis * offset
+			zombie.health = 100
+			zombie.max_health = 100
+			zombies.append(zombie)
+		check(zombies.size() == size, "The real sweep fixture spawns %d mixed zombies" % size)
+		var peaks: Array[float] = []
+		var capture := func():
+			if not peaks.is_empty():
+				return
+			var shown: Array[float] = []
+			for zombie in zombies:
+				var weight := float(zombie._mesh.get_instance_shader_parameter(&"hit_flash"))
+				if weight > 0.0:
+					shown.append(weight)
+			if shown.size() == size:
+				peaks.assign(shown)
+		process_frame.connect(capture)
+		attack(true)
+		await ticks(2)
+		attack(false)
+		await ticks(34)
+		process_frame.disconnect(capture)
+		var direct := zombies.filter(func(zombie): return zombie.health == 88)
+		var splash := zombies.filter(func(zombie): return zombie.health == 96)
+		check(direct.size() == 1 and splash.size() == size - 1, "The Sabre sweep keeps every damage amount")
+		check(peaks.size() == size, "All %d zombies show first contact feedback" % size)
+		if peaks.size() == size:
+			check(absf(peaks.max() - 1.0) < 0.001, "The primary target keeps the full body flash")
+			var expected := 0.30 if size == 4 else 0.22
+			check(absf(peaks.min() - expected) < 0.008,
+				"The %d-target sweep has a legible secondary flash" % size)
+			print("CROWD_FLASH_PEAK actors=", size, " direct=", peaks.max(), " splash=", peaks.min())
+		lab.free()
 
 
 func check_body_flash_release() -> void:
