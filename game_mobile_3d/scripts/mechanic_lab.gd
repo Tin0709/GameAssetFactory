@@ -56,6 +56,7 @@ const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd
 const Gauntlets := preload("res://scripts/mechanic_lab_gauntlets.gd")
 const MeleeTools := preload("res://scripts/mechanic_lab_melee_tools.gd")
 const Bow := preload("res://scripts/mechanic_lab_bow.gd")
+const PROJECTILE_SHADERS := [CrossPollinator.TRAIL_SHADER, CrossPollinator.ImpactSparks.SHADER, Bow.CHARGE_CUE_SHADER]
 const KaiSkin := preload("res://scripts/mechanic_lab_kai_skin.gd")
 const IDLE_NOVELTIES := {
 	"NativeLabBowLook": ["Player_Idle_Novelty_LookAround",
@@ -258,6 +259,7 @@ var _bow: Bow
 var _bow_mount: MeshInstance3D
 var _bow_display_mesh_index := -1
 var _bow_profile: Dictionary
+var _next_projectile_shader := 0
 var _sabre_air_clip: Dictionary
 var _default_idle_novelty: Dictionary
 var _sabre_air_rate := 1.0
@@ -1156,6 +1158,7 @@ func _process(delta: float) -> void:
 		_spawn_crowd_frame()
 	elif _combat_audio != null:
 		_combat_audio.prepare_queued_samples()
+		_prepare_projectile_shader()
 	if _bow != null:
 		# The player presenter has already sampled the interpolated grip.
 		var presenter = player.render_presenter
@@ -1221,6 +1224,15 @@ func _process(delta: float) -> void:
 		var decay := _light_remaining / CONTACT_LIGHT_DURATION
 		_impact_light.light_energy = _light_peak * decay * decay
 		_impact_light.visible = _light_remaining > 0.0
+
+func _prepare_projectile_shader() -> void:
+	if _next_projectile_shader >= PROJECTILE_SHADERS.size() or not player.is_on_floor() \
+			or player.combat_requested or player.combo.active() or player.bow_busy():
+		return
+	# Shader resources are preloaded, but Godot submits their code to the
+	# renderer on first RID access. Prepare one on each eligible frame.
+	PROJECTILE_SHADERS[_next_projectile_shader].get_rid()
+	_next_projectile_shader += 1
 
 func _setup_movement_audio() -> void:
 	var configured_manifest := OS.get_environment("MD2_OVERWORLD_BUNDLE")
