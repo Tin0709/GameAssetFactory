@@ -90,6 +90,7 @@ func run() -> void:
 	await check_overlapping_landing_dust(lab, dust)
 	await check_source_dust_batch(lab, dust)
 	await check_gauntlet_debris(lab, dust)
+	await check_colliding_debris(lab, dust)
 	await check_gauntlet_impact_marks(lab)
 	await check_tool_ground_effects(lab, dust)
 	await check_source_dust_and_wake_order(lab, dust, wind)
@@ -507,6 +508,85 @@ func check_gauntlet_debris(lab, dust: Node3D) -> void:
 	check(edge_position.slide(Vector3.UP).distance_to(edge) < 0.01,
 		"An impact offset beyond the floor falls back to the actual landing contact")
 	dust.clear()
+	lab._select_weapon(lab.Weapon.SABRE)
+
+func check_colliding_debris(lab, dust: Node3D) -> void:
+	var detail := lab.get_node_or_null("HUD/ImpactFxPanel/Rows/DebrisQuality") as OptionButton
+	check(detail != null, "The impact panel provides the detailed debris profile")
+	if detail == null:
+		return
+	var actor = lab.player
+	check(detail.selected == 0, "MechanicLab starts with the existing light debris")
+	detail.select(1)
+	detail.item_selected.emit(1)
+	for fixture in ["flat", "wall", "ledge"]:
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		lab._select_weapon(lab.Weapon.BASIC_GAUNTLETS)
+		if fixture == "ledge":
+			actor._reset_map_actor_at(Vector3(48.05, 0.015, 0), PI * 0.5)
+		var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
+		var wall: StaticBody3D
+		var wall_face := 2.04
+		if fixture == "wall":
+			wall = StaticBody3D.new()
+			var collision := CollisionShape3D.new()
+			var shape := BoxShape3D.new()
+			shape.size = Vector3(8.0, 4.0, 0.18)
+			collision.shape = shape
+			wall.add_child(collision)
+			wall.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true),
+				forward * (wall_face + 0.09) + Vector3.UP * 2.0)
+			lab.add_child(wall)
+		for i in 12:
+			await physics_frame
+		dust._random.seed = 27625
+		await start_heavy_drop(lab)
+		var fragments: Array = []
+		for i in 70:
+			await physics_frame
+			fragments = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag > 0.0)
+			if not fragments.is_empty():
+				break
+		check(fragments.size() in [5, 6, 7] and fragments.all(func(p): return p.duration >= 5.0 and p.duration <= 6.0),
+			"%s uses the source count and lifetime of the detailed profile" % fixture)
+		var closest_floor := INF
+		var furthest := -INF
+		var fell_beyond_edge := false
+		var rebounded := false
+		var fell: Dictionary = {}
+		var previous: Dictionary = {}
+		for i in 150:
+			await physics_frame
+			for particle in fragments:
+				var point: Vector3 = particle.sprite.global_position
+				closest_floor = minf(closest_floor, point.y)
+				furthest = maxf(furthest, point.dot(forward))
+				fell_beyond_edge = fell_beyond_edge or (point.x > 50.2 and point.y < -0.06)
+				if previous.has(particle):
+					var before: Vector3 = previous[particle]
+					if before.y > point.y + 0.003:
+						fell[particle] = true
+					rebounded = rebounded or (fell.has(particle) and point.y > before.y + 0.003)
+				previous[particle] = point
+		if fixture == "ledge":
+			check(fell_beyond_edge, "Fragments can fall off the actual floor edge")
+		else:
+			check(closest_floor > 0.07 and rebounded, "%s fragments rebound above the real floor" % fixture)
+		if fixture == "wall":
+			check(furthest <= wall_face - 0.095 and furthest >= wall_face - 0.18,
+				"The swept fragments reach the wall without crossing it")
+		print("DEBRIS_CONTACT fixture=", fixture, " count=", fragments.size(), " floor_m=", closest_floor,
+			" furthest_m=", furthest, " bounce=", rebounded, " fall=", fell_beyond_edge)
+		if wall != null:
+			wall.free()
+		lab.reset_player()
+		await physics_frame
+		check(visible_particles(dust) == 0 and not dust.is_physics_processing(),
+			"Reset releases every moving or settled debris slot")
+	detail.select(0)
+	detail.item_selected.emit(0)
 	lab._select_weapon(lab.Weapon.SABRE)
 
 func check_gauntlet_impact_marks(lab) -> void:
