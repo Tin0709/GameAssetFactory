@@ -216,6 +216,7 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 				var mesh: Mesh = actor.effects.ribbon.mesh
 				var frames := 0
 				var furthest := -INF
+				var nearest := INF
 				for i in Engine.physics_ticks_per_second:
 					await process_frame
 					if mesh.get_surface_count() == 0:
@@ -223,6 +224,7 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 					frames += 1
 					for point: Vector3 in mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]:
 						furthest = maxf(furthest, point.dot(forward))
+						nearest = minf(nearest, point.dot(forward))
 				var context := "%s air=%s wall=%s" % [selector.get_item_text(slot), airborne, blocked]
 				check(frames > 0, "The unobstructed portion of the ribbon still draws for %s" % context)
 				if blocked:
@@ -230,7 +232,7 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 					wall.free()
 				elif airborne and slot == 10:
 					check(furthest > 1.1, "The clear Axe dive extends into the space occupied by the fixture wall")
-				print("RIBBON_WALL ", context, " frames=", frames, " furthest=", furthest)
+				print("RIBBON_WALL ", context, " frames=", frames, " nearest=", nearest, " furthest=", furthest)
 
 func check_world_map_slash() -> void:
 	var world := (load("res://scenes/WorldMap.tscn") as PackedScene).instantiate()
