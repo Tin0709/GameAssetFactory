@@ -528,7 +528,8 @@ func check_colliding_debris(lab, dust: Node3D) -> void:
 			actor._reset_map_actor_at(Vector3(48.05, 0.015, 0), PI * 0.5)
 		var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var wall: StaticBody3D
-		var wall_face := 2.04
+		# Leave room for the 1.10 m mark so the debris launches near the wall.
+		var wall_face := 2.40
 		if fixture == "wall":
 			wall = StaticBody3D.new()
 			var collision := CollisionShape3D.new()
