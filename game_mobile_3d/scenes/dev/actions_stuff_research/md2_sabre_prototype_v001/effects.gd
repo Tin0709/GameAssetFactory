@@ -33,7 +33,7 @@ var _ribbon_section := 0
 var _ribbon_lifetime := RIBBON_LIFETIME
 var _ribbon_tint := RIBBON_TINT
 var _ribbon_edge_tint := RIBBON_EDGE_TINT
-var _ribbon_thrust_glint := false
+var _thrust_glint_started := INF
 var _previous_base := Vector3.ZERO
 var _previous_tip:=Vector3.ZERO
 
@@ -75,7 +75,7 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 			_ribbon_lifetime = style.get("lifetime", RIBBON_LIFETIME)
 			_ribbon_tint = style.get("tint", RIBBON_TINT)
 			_ribbon_edge_tint = _ribbon_tint.lerp(Color.WHITE, 0.74) if style.has("tint") else RIBBON_EDGE_TINT
-			_ribbon_thrust_glint = style.get("thrust_glint", false)
+			_thrust_glint_started = clock - clampf(edge_age, 0.0, delta) if style.get("thrust_glint", false) else INF
 			_sample_trail_edge(delta, edge_age, base, tip)
 		var point := _trail_sample(base, tip, clock)
 		if not _was_active and _ribbon_section == 1 and point.tip_u == 1.0:
@@ -116,7 +116,7 @@ func _trail_sample(base: Vector3, tip: Vector3, time: float) -> Dictionary:
 	var end := tip if tip_u == 1.0 else base.lerp(tip, tip_u)
 	return {"base": base, "tip": end, "tip_u": tip_u, "time": time, "section": _ribbon_section,
 		"lifetime": _ribbon_lifetime, "tint": _ribbon_tint, "edge_tint": _ribbon_edge_tint,
-		"thrust_glint": _ribbon_thrust_glint}
+		"thrust_glint_started": _thrust_glint_started}
 
 func _burst(point:Vector3,direction:Vector3,publish_sample:=false,sample_time:=-1.0)->void:
 	bursts+=1;var added:=0
@@ -159,7 +159,7 @@ func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=nul
 					"tip_u": lerpf(a.tip_u, point.tip_u, weight), "time": display_time,
 					"section": point.section,
 					"lifetime": point.lifetime, "tint": point.tint, "edge_tint": point.edge_tint,
-					"thrust_glint": point.thrust_glint,
+					"thrust_glint_started": point.thrust_glint_started,
 				})
 			break
 	return result
@@ -195,8 +195,8 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 			_add_ribbon_strip(a, b, 0.86, ages, Color(a.edge_tint, opacity * 0.8))
 	if has_surface:
 		var latest: Dictionary = shown[-1]
-		if latest.thrust_glint:
-			var glint_age := time - float(shown[0].time)
+		if is_finite(float(latest.thrust_glint_started)):
+			var glint_age := time - float(latest.thrust_glint_started)
 			var envelope := smoothstep(0.0, 0.022, glint_age) * (1.0 - smoothstep(0.042, 0.113, glint_age))
 			var exposed := smoothstep(0.60, 0.92, float(latest.tip_u))
 			var opacity := intensity * envelope * exposed
