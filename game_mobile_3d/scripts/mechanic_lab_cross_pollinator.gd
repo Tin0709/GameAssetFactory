@@ -447,9 +447,9 @@ func _update_embedded_arrows(delta: float, render_frame: int) -> void:
 		var phase := float(arrow.age) / EMBEDDED_WOBBLE_SECONDS
 		# The native component supplies the duration and scale. This damped
 		# motion and one-second prop display are MechanicLab approximations.
-		var angle := deg_to_rad(EMBEDDED_WOBBLE_SCALE) * sin(TAU * 6.0 * phase) * pow(1.0 - phase, 2.0)
-		var limit: float = arrow.wobble_limit
-		pose.basis *= Basis(Vector3.UP, clampf(angle, -limit, limit))
+		var amplitude := minf(deg_to_rad(EMBEDDED_WOBBLE_SCALE), arrow.wobble_limit)
+		var angle := amplitude * sin(TAU * 6.0 * phase) * pow(1.0 - phase, 2.0)
+		pose.basis *= Basis(Vector3.UP, angle)
 		pose.origin -= pose.basis.x * EMBEDDED_OFFSET
 		pose.basis *= Basis.from_scale(Vector3.ONE * EMBEDDED_SCALE)
 		_embedded.set_instance_transform(index, pose)
