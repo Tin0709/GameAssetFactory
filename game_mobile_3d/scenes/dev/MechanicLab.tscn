@@ -224,6 +224,15 @@ offset_bottom = 179.0
 focus_mode = 0
 tooltip_text = "Giảm độ phân giải cảnh 3D để thử hiệu năng. Chữ và nút HUD giữ độ phân giải gốc."
 
+[node name="TuningPresets" type="MenuButton" parent="HUD"]
+offset_left = 990.0
+offset_top = 184.0
+offset_right = 1238.0
+offset_bottom = 218.0
+focus_mode = 0
+text = "Preset Lab"
+tooltip_text = "Lưu hoặc nạp cấu hình thử A và B."
+
 [node name="CrossbowAmmo" type="Label" parent="HUD"]
 visible = false
 offset_left = 794.0

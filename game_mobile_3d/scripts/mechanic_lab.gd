@@ -73,6 +73,19 @@ const SABRE_LANDING_SHAKE_DELAY := 0.052268848
 const SABRE_LANDING_BURST_DELAY := 0.056890413
 
 enum PlayerSkin { MD2, KAI }
+enum PresetAction { SAVE_A, LOAD_A, SAVE_B, LOAD_B, DEFAULTS }
+
+const PRESET_RANGES := {
+	"launch": ^"HUD/RagdollTuning/Launch/Slider",
+	"gravity": ^"HUD/RagdollTuning/Gravity/Slider",
+	"corpse_seconds": ^"HUD/RagdollLifetime/Slider",
+	"camera_shake": ^"HUD/CameraShake/Slider",
+}
+const PRESET_OPTIONS := {
+	"crowd_count": ^"HUD/CrowdSpawnCount",
+	"zombie_animation": ^"HUD/ZombieGait",
+	"render_scale": ^"HUD/RenderScale",
+}
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD, CROSS_POLLINATOR, GAUNTLETS,
 	CLEAVER, BOW, BASIC_GAUNTLETS, PICKAXE, SHOVEL, AXE }
@@ -115,6 +128,8 @@ var player_health := MAX_PLAYER_HEALTH
 var _crowd_spawns_left := 0
 var _crowd_spawn_total := 0
 var _crowd_base_health := false
+var tuning_preset_directory := "user://mechanic_lab_presets"
+var _default_tuning := {}
 var _previous_msaa: Viewport.MSAA
 var _previous_3d_scale: float
 var _previous_3d_scaling_mode: Viewport.Scaling3DMode
@@ -374,6 +389,7 @@ func _ready() -> void:
 		$Zombies.zombie_idle_audio.connect(_combat_audio.queue_zombie_idle)
 		_setup_weapon_selector()
 	_setup_skin_selector(using_private and player_ready)
+	_setup_tuning_presets()
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
 func _setup_skin_selector(player_ready: bool) -> void:
@@ -1394,6 +1410,75 @@ func _set_camera_shake_intensity(percent: float) -> void:
 	$HUD/CameraShake/Value.text = "Rung camera · %d%%" % roundi(percent)
 	if _shake_intensity == 0.0:
 		camera.h_offset = 0.0
+
+func _setup_tuning_presets() -> void:
+	var button: MenuButton = $HUD/TuningPresets
+	button.visible = $HUD/RagdollTuning.visible
+	if not button.visible:
+		return
+	_default_tuning = _capture_tuning()
+	var menu := button.get_popup()
+	menu.add_item("Lưu ô A", PresetAction.SAVE_A)
+	menu.add_item("Nạp ô A", PresetAction.LOAD_A)
+	menu.add_item("Lưu ô B", PresetAction.SAVE_B)
+	menu.add_item("Nạp ô B", PresetAction.LOAD_B)
+	menu.add_item("Khôi phục mặc định", PresetAction.DEFAULTS)
+	menu.id_pressed.connect(_apply_preset_action)
+
+func _capture_tuning() -> Dictionary:
+	var settings := {"base_zombie": $HUD/BaseZombieToggle.button_pressed}
+	for key: String in PRESET_RANGES:
+		settings[key] = (get_node(PRESET_RANGES[key]) as Range).value
+	for key: String in PRESET_OPTIONS:
+		settings[key] = (get_node(PRESET_OPTIONS[key]) as OptionButton).get_selected_id()
+	return settings
+
+func _apply_tuning(settings: Dictionary) -> void:
+	var values := _default_tuning.merged(settings, true)
+	for key: String in PRESET_RANGES:
+		var value: Variant = values[key]
+		if (value is float or value is int) and is_finite(float(value)):
+			(get_node(PRESET_RANGES[key]) as Range).value = float(value)
+	for key: String in PRESET_OPTIONS:
+		var id: Variant = values[key]
+		if id is int:
+			var picker := get_node(PRESET_OPTIONS[key]) as OptionButton
+			var index := picker.get_item_index(id)
+			if index >= 0 and not picker.is_item_disabled(index):
+				picker.select(index)
+				picker.item_selected.emit(index)
+	var base_zombie: Variant = values.base_zombie
+	if base_zombie is bool:
+		$HUD/BaseZombieToggle.button_pressed = base_zombie
+
+func _apply_preset_action(action: int) -> void:
+	if action == PresetAction.DEFAULTS:
+		_apply_tuning(_default_tuning)
+		$HUD/SpawnStatus.text = "Đã khôi phục thiết lập mặc định."
+		return
+	var slot := "A" if action in [PresetAction.SAVE_A, PresetAction.LOAD_A] else "B"
+	var path := tuning_preset_directory.path_join(slot.to_lower() + ".cfg")
+	var config := ConfigFile.new()
+	if action in [PresetAction.SAVE_A, PresetAction.SAVE_B]:
+		config.set_value("preset", "settings", _capture_tuning())
+		var error := DirAccess.make_dir_recursive_absolute(tuning_preset_directory)
+		var staging := path + ".tmp"
+		if error == OK:
+			error = config.save(staging)
+		if error == OK:
+			error = DirAccess.rename_absolute(staging, path)
+		$HUD/SpawnStatus.text = ("Đã lưu cấu hình %s." if error == OK else "Không thể lưu cấu hình %s.") % slot
+		return
+	if not FileAccess.file_exists(path):
+		$HUD/SpawnStatus.text = "Ô %s chưa có cấu hình." % slot
+		return
+	var error := config.load(path)
+	var settings: Variant = config.get_value("preset", "settings", null) if error == OK else null
+	if settings is Dictionary:
+		_apply_tuning(settings)
+		$HUD/SpawnStatus.text = "Đã nạp cấu hình %s." % slot
+	else:
+		$HUD/SpawnStatus.text = "Không thể đọc cấu hình %s." % slot
 
 func _spawn_one_zombie(base_health: bool) -> bool:
 	var facing := Basis(Vector3.UP, player.visual.rotation.y)
