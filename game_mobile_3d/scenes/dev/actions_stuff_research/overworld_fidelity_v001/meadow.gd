@@ -247,8 +247,11 @@ func _process(delta:float)->void:
 		materials[i].set_shader_parameter("wind_intensity",_wind_intensities[i] if wind_enabled else 0.)
 
 func present(alpha:float)->void:
-	interaction.upload()
+	var rebind := interaction.upload()
 	for material:ShaderMaterial in materials:
+		if rebind:
+			material.set_shader_parameter("interaction_field",interaction.texture)
+			material.set_shader_parameter("interaction_previous",interaction.previous_texture)
 		material.set_shader_parameter("interaction_alpha",clampf(alpha,0.,1.));material.set_shader_parameter("interaction_strength",1. if interactions_enabled else 0.)
 
 func reset()->void:interaction.reset()

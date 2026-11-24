@@ -26,6 +26,7 @@ var previous_image:Image
 var previous_texture:ImageTexture
 var revision:=0
 var uploaded_revision:=-1
+var reuse_previous_upload := false
 var accumulator:=0.
 var previous:=Vector3.ZERO
 var initialized:=false
@@ -51,7 +52,7 @@ func reset()->void:
 	x.fill(0.);z.fill(0.);vx.fill(0.);vz.fill(0.);contact_weights.fill(0.);marked.fill(0);pixels.fill(0);active.clear()
 	previous_pixels=pixels.duplicate();revision+=1
 	accumulator=0.;initialized=false
-	upload()
+	upload(true)
 
 func _stamp(point:Vector3)->void:
 	if point.y>1.25 and not surface_height_provider.is_valid():return
@@ -123,11 +124,26 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 	revision+=steps
 	previous=point;update_usec=Time.get_ticks_usec()-start
 
-func upload()->void:
-	if uploaded_revision==revision:return
-	previous_image.set_data(size,size,false,Image.FORMAT_RGBAH,previous_pixels);previous_texture.update(previous_image)
-	image.set_data(size,size,false,Image.FORMAT_RGBAH,pixels);texture.update(image)
-	uploaded_revision=revision
+## True means the caller must rebind the current and previous texture handles.
+func upload(force_pair := false) -> bool:
+	if uploaded_revision == revision:
+		return false
+	# After one fixed tick, the uploaded current texture is already our previous tick.
+	var reuse := reuse_previous_upload and not force_pair and uploaded_revision >= 0 and revision == uploaded_revision + 1
+	if reuse:
+		var recycled_texture := previous_texture
+		previous_texture = texture
+		texture = recycled_texture
+		var recycled_image := previous_image
+		previous_image = image
+		image = recycled_image
+	else:
+		previous_image.set_data(size, size, false, Image.FORMAT_RGBAH, previous_pixels)
+		previous_texture.update(previous_image)
+	image.set_data(size, size, false, Image.FORMAT_RGBAH, pixels)
+	texture.update(image)
+	uploaded_revision = revision
+	return reuse
 
 func sample_at(point:Vector2)->Vector2:
 	var coordinate:=(point+Vector2.ONE*extent*.5)/cell-Vector2.ONE*.5
