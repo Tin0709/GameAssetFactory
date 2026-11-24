@@ -79,6 +79,7 @@ func run() -> void:
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
 	await check_ground_ribbon_edges(lab, selector)
 	await check_tool_slash_cues(lab, selector)
+	await check_axe_sweep_windows(lab, selector)
 	await check_aerial_tool_effects(lab, selector)
 	await check_curved_finisher_ribbon(lab, selector)
 	await check_sabre_dive(lab, selector)
@@ -172,6 +173,50 @@ func check_tool_slash_cues(lab, selector: OptionButton) -> void:
 		attack(false)
 		check(recorded.size() == 3, "%s reaches all three slash cues during held attack input" % weapon)
 		print("TOOL_SLASH_CUES weapon=", weapon, " source_seconds=", recorded)
+	lab.reset_player()
+
+func check_axe_sweep_windows(lab, selector: OptionButton) -> void:
+	var actor = lab.player
+	var effects = actor.effects
+	var expected := [Vector2(0.083333, 0.175), Vector2(0.141667, 0.266667),
+		Vector2(0.150, 0.333333), Vector2(0.622641, 0.675)]
+	for aerial in [false, true]:
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		selector.select(lab.Weapon.AXE)
+		selector.item_selected.emit(lab.Weapon.AXE)
+		if aerial:
+			lab._drop_player(5.0)
+			for i in 2:
+				await physics_frame
+		attack(true)
+		var recorded := {}
+		for i in Engine.physics_ticks_per_second * 4:
+			await physics_frame
+			if aerial:
+				attack(false)
+				if actor.combo.phase != &"air_attack" or not actor.combo.air_landing_started:
+					continue
+			elif actor.combo.phase != &"attack":
+				continue
+			var index: int = 3 if aerial else actor.combo.index
+			if effects.serial == actor.combo.serial:
+				var range_seen: Vector2 = recorded.get(index, Vector2(INF, -INF))
+				for point: Dictionary in effects.samples:
+					var time: float = actor.combo.time - (effects.clock - float(point.time)) * actor.combo.playback_rate()
+					range_seen.x = minf(range_seen.x, time)
+					range_seen.y = maxf(range_seen.y, time)
+				recorded[index] = range_seen
+			if index == (3 if aerial else 2) and actor.combo.time > float(expected[index].y) + 0.08:
+				break
+		attack(false)
+		var indices := [3] if aerial else [0, 1, 2]
+		for index: int in indices:
+			var range_seen: Vector2 = recorded.get(index, Vector2.ZERO)
+			check(range_seen.distance_to(expected[index]) < 0.00002,
+				"Axe swing %d samples its full measured sweep and stops before recovery" % (index + 1))
+		print("AXE_SWEEP_WINDOWS aerial=", aerial, " ranges=", recorded)
 	lab.reset_player()
 
 func check_aerial_tool_effects(lab, selector: OptionButton) -> void:
