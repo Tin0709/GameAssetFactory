@@ -719,12 +719,28 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 		cues.append(actor.combo.time - (actor.effects.clock - sample) * actor.combo.playback_rate())
 		cue_clocks.append(sample)
 	actor.connect(&"tool_ground_cue", record)
-	for fixture in ["grass", "stone", "wall", "near_wall", "post", "arena_edge", "ledge", "shovel", "reset_during_windup"]:
+	for fixture in ["grass", "stone", "wall", "near_wall", "post", "arena_edge", "overhang", "ledge", "shovel", "reset_during_windup"]:
 		lab.reset_player()
 		lab._select_floor_surface(2 if fixture == "stone" else 0)
 		lab._select_weapon(lab.Weapon.SHOVEL if fixture == "shovel" else lab.Weapon.PICKAXE)
 		var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var obstacle: StaticBody3D
+		var overhang: Node3D
+		if fixture == "overhang":
+			overhang = Node3D.new()
+			lab.add_child(overhang)
+			var side := Vector3.UP.cross(forward)
+			# Ten boxes touch the old query volume but sit wholly above the
+			# ring plane and off the ray that places the impact on grass.
+			var box := BoxShape3D.new()
+			box.size = Vector3(0.10, 0.025, 0.085)
+			for i in 10:
+				var shelf := StaticBody3D.new()
+				var collision := CollisionShape3D.new()
+				collision.shape = box
+				shelf.add_child(collision)
+				shelf.position = forward * (1.24 + (i % 5) * 0.12) 					+ side * (0.26 if i < 5 else -0.26) + Vector3.UP * 0.069
+				overhang.add_child(shelf)
 		if fixture == "arena_edge":
 			actor._reset_map_actor_at(Vector3(48.18, 0.015, 0), PI * 0.5)
 		if fixture in ["wall", "near_wall", "post", "ledge"]:
@@ -823,6 +839,13 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 						and is_equal_approx(axes[0].w * 2.0, box_shape.size.x)
 						and is_equal_approx(axes[1].w * 2.0, box_shape.size.z),
 						"The %s projection uses the actual collider size and position" % fixture)
+		elif fixture == "overhang":
+			check(ring_seen and peak >= 4, "Ten boxes above the reaction plane leave the Pickaxe ring visible")
+			var material := ring.material_override as ShaderMaterial
+			check(material.get_shader_parameter("clip_count") == 0
+				and material.get_shader_parameter("blocker_count") == 0,
+				"Overhanging boxes contribute no clipping planes")
+			print("TOOL_RING_OVERHANG visible=", ring_seen, " peak=", peak)
 		elif fixture == "shovel":
 			check(peak >= 4 and not ring_seen, "Shovel emits the separate debris passes without the Pickaxe ring")
 		else:
@@ -835,6 +858,8 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 		print("TOOL_GROUND_FX ", fixture, " cues=", cues, " peak=", peak, " ring=", ring_seen)
 		if obstacle != null:
 			obstacle.free()
+		if overhang != null:
+			overhang.free()
 		lab.reset_player()
 		check(not ring.visible and visible_particles(dust) == 0, "Reset clears the tool ring and particles")
 	actor.disconnect(&"tool_ground_cue", record)
