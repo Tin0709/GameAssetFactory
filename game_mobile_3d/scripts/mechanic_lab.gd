@@ -97,6 +97,7 @@ const PRESET_OPTIONS := {
 	"crowd_count": ^"HUD/CrowdSpawnCount",
 	"zombie_animation": ^"HUD/ZombieGait",
 	"render_scale": ^"HUD/RenderScale",
+	"frame_rate": ^"HUD/FrameRate",
 	"contact_spark_quality": ^"HUD/ContactSparkQuality",
 }
 
@@ -147,6 +148,8 @@ var _previous_msaa: Viewport.MSAA
 var _previous_3d_scale: float
 var _previous_3d_scaling_mode: Viewport.Scaling3DMode
 var _render_scale_overridden := false
+var _previous_max_fps := 0
+var _frame_rate_override := 0
 var _combat_audio: CombatAudio
 var _lab_audio_mix: LabAudioMix
 var _zombie_step_dust: ZombieStepDust
@@ -250,6 +253,7 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	_setup_world_look()
 	_setup_render_scale()
+	_setup_frame_rate()
 	var material := $Ground/Mesh.material_override as ShaderMaterial
 	var tiles := SourceTerrain.load_tiles()
 	if tiles != null:
@@ -960,7 +964,25 @@ func _set_render_scale(index: int) -> void:
 		viewport.scaling_3d_mode = _previous_3d_scaling_mode
 		viewport.scaling_3d_scale = _previous_3d_scale
 
+func _setup_frame_rate() -> void:
+	var picker: OptionButton = $HUD/FrameRate
+	picker.add_item("FPS · Theo ứng dụng", 0)
+	for fps in [60, 30]:
+		picker.add_item("FPS · %d" % fps, fps)
+	picker.select(0)
+	picker.item_selected.connect(_set_frame_rate)
+
+func _set_frame_rate(index: int) -> void:
+	# The cap belongs to the process. Snapshot it when this Lab begins an
+	# override, and respect any newer change made outside the Lab.
+	if _frame_rate_override == 0 or Engine.max_fps != _frame_rate_override:
+		_previous_max_fps = Engine.max_fps
+	_frame_rate_override = $HUD/FrameRate.get_item_id(index)
+	Engine.max_fps = _previous_max_fps if _frame_rate_override == 0 else _frame_rate_override
+
 func _exit_tree() -> void:
+	if _frame_rate_override > 0 and Engine.max_fps == _frame_rate_override:
+		Engine.max_fps = _previous_max_fps
 	# Drop the tool override before Forward Mobile tears down the mount's dependencies.
 	if is_instance_valid(_weapon_mesh) and _weapon_mesh.material_override != null:
 		_weapon_mesh.material_override = null

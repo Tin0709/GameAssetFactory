@@ -224,11 +224,19 @@ offset_bottom = 179.0
 focus_mode = 0
 tooltip_text = "Giảm độ phân giải cảnh 3D để thử hiệu năng. Chữ và nút HUD giữ độ phân giải gốc."
 
-[node name="TuningPresets" type="MenuButton" parent="HUD"]
+[node name="FrameRate" type="OptionButton" parent="HUD"]
 offset_left = 990.0
 offset_top = 184.0
 offset_right = 1238.0
 offset_bottom = 218.0
+focus_mode = 0
+tooltip_text = "Giới hạn tốc độ vẽ ở 30 hoặc 60 FPS. Vật lý và nhịp chiến đấu giữ nguyên."
+
+[node name="TuningPresets" type="MenuButton" parent="HUD"]
+offset_left = 990.0
+offset_top = 222.0
+offset_right = 1238.0
+offset_bottom = 256.0
 focus_mode = 0
 text = "Preset Lab ▾"
 flat = false
@@ -245,9 +253,9 @@ tooltip_text = "Mức nhẹ ưu tiên 3 điểm va chạm gần nhất và dùng
 
 [node name="AudioMixButton" type="Button" parent="HUD"]
 offset_left = 990.0
-offset_top = 222.0
+offset_top = 260.0
 offset_right = 1238.0
-offset_bottom = 256.0
+offset_bottom = 294.0
 focus_mode = 0
 toggle_mode = true
 text = "Mix âm thanh ▾"
@@ -257,9 +265,9 @@ tooltip_text = "Chỉnh âm lượng tổng và từng lớp âm thanh trong Lab
 [node name="AudioMixPanel" type="PanelContainer" parent="HUD"]
 visible = false
 offset_left = 866.0
-offset_top = 260.0
+offset_top = 298.0
 offset_right = 1238.0
-offset_bottom = 430.0
+offset_bottom = 468.0
 theme_override_styles/panel = SubResource("defeat_card")
 
 [node name="Rows" type="VBoxContainer" parent="HUD/AudioMixPanel"]

@@ -2,6 +2,7 @@ extends SceneTree
 ## Repeatable population benchmark for the existing MechanicLab scene.
 ## Run with --audio-driver Dummy and user args --population=100 --cycles=1 --combat-audio.
 ## Add --combo=prime-gauntlets or --combo=curved-greatsword for a held-E workload.
+## Add --render-fps=30 or --render-fps=60 to select the corresponding Lab mode.
 
 const LAB := preload("res://scenes/dev/MechanicLab.tscn")
 const MechanicLab := preload("res://scripts/mechanic_lab.gd")
@@ -12,6 +13,7 @@ const POPULATIONS := [1, 10, 25, 50, 100, 150, 200]
 const RENDER_SIZE := Vector2i(960, 540)
 const FIXTURE_HP := 10000
 const COMBO_SECONDS := 15.0
+const FRAME_RATES := {"app": 0, "30": 30, "60": 60}
 const COMBO_WEAPONS := {
 	"prime-gauntlets": MechanicLab.Weapon.GAUNTLETS,
 	"curved-greatsword": MechanicLab.Weapon.CURVED_GREATSWORD,
@@ -55,6 +57,7 @@ func run() -> void:
 	var args := OS.get_cmdline_user_args()
 	var counts := POPULATIONS.duplicate()
 	var cycles := 1
+	var frame_rate := "app"
 	for arg in args:
 		if arg.begins_with("--population="):
 			counts = [arg.trim_prefix("--population=").to_int()]
@@ -62,12 +65,18 @@ func run() -> void:
 			cycles = arg.trim_prefix("--cycles=").to_int()
 		elif arg.begins_with("--combo="):
 			combo_weapon = arg.trim_prefix("--combo=")
+		elif arg.begins_with("--render-fps="):
+			frame_rate = arg.trim_prefix("--render-fps=")
 	if counts[0] not in POPULATIONS or cycles < 1:
 		printerr("Use a supported population ", POPULATIONS, " and at least one cycle")
 		quit(2)
 		return
 	if not combo_weapon.is_empty() and not COMBO_WEAPONS.has(combo_weapon):
 		printerr("Choose a combo workload from ", COMBO_WEAPONS.keys())
+		quit(2)
+		return
+	if not FRAME_RATES.has(frame_rate):
+		printerr("Choose --render-fps=app, 30 or 60")
 		quit(2)
 		return
 	var audio_enabled := "--combat-audio" in args
@@ -79,6 +88,10 @@ func run() -> void:
 	root.add_child(lab)
 	current_scene = lab
 	root.size = RENDER_SIZE
+	var fps_picker := lab.get_node("HUD/FrameRate") as OptionButton
+	var fps_index := fps_picker.get_item_index(FRAME_RATES[frame_rate])
+	fps_picker.select(fps_index)
+	fps_picker.item_selected.emit(fps_index)
 	group = lab.get_node("Zombies")
 	if not group.full_actions_stuff_available or (lab.get_node("HUD/SpawnZombie") as Button).disabled:
 		printerr("The population benchmark requires the verified private Lab assets and A&S 1.13")
@@ -110,6 +123,7 @@ func run() -> void:
 		"populations": counts, "cycles": cycles, "output": label,
 		"viewport": [root.size.x, root.size.y], "physics_hz": Engine.physics_ticks_per_second,
 		"fps_cap": Engine.max_fps,
+		"fps_mode": frame_rate,
 		"renderer": RenderingServer.get_current_rendering_method(),
 		"adapter": RenderingServer.get_video_adapter_name(), "audio_driver": AudioServer.get_driver_name(),
 		"combat_audio": audio_enabled, "corpse_seconds": group.corpse_lifetime,
@@ -196,14 +210,19 @@ func run_held_combo() -> void:
 	var contacts: Dictionary[int, int] = {}
 	var kills := [0]
 	var spawned := [0]
-	var record_attack := func(_index, clip, serial): attacks[serial] = clip
+	var trace: Array[Array] = []
+	var serial_origin: int = lab.player.combo.serial
+	var record_attack := func(_index, clip, serial):
+		attacks[serial] = clip
+		trace.append([Engine.get_physics_frames() - phase_started_tick, serial - serial_origin, clip])
 	var record_contact := func(_point, _direction, _clip, _index, serial, lethal):
 		contacts[serial] = contacts.get(serial, 0) + 1
 		kills[0] += int(lethal)
+		trace.append([Engine.get_physics_frames() - phase_started_tick, serial - serial_origin, lethal])
 	var refill := func(): spawned[0] += refill_crowd(population + spawned[0])
 	lab.player.attack_accepted.connect(record_attack)
 	group.sabre_contact.connect(record_contact)
-	process_frame.connect(refill)
+	physics_frame.connect(refill)
 	player_hits = 0
 	var fewest_living := population
 	var peak_ragdolls := 0
@@ -216,7 +235,7 @@ func run_held_combo() -> void:
 			peak_ragdolls = maxi(peak_ragdolls, count_active_ragdolls())
 	press_attack(false)
 	finish_phase()
-	process_frame.disconnect(refill)
+	physics_frame.disconnect(refill)
 	lab.player.attack_accepted.disconnect(record_attack)
 	group.sabre_contact.disconnect(record_contact)
 	var damage_contacts := 0
@@ -232,6 +251,7 @@ func run_held_combo() -> void:
 		"multi_target_attacks": splash_strikes, "max_targets_per_attack": peak_contacts,
 		"kills": kills[0], "reinforcements": spawned[0], "fewest_living": fewest_living,
 		"peak_ragdolls": peak_ragdolls, "incoming_hits": player_hits,
+		"attack_contact_sha256": JSON.stringify(trace).sha256_text(),
 	}))
 	if attacks.size() < 5 or damage_contacts == 0 or kills[0] == 0:
 		failures.append("%d: Held %s should produce repeated real attacks, hits and deaths" % [population, combo_weapon])
@@ -246,15 +266,14 @@ func refill_crowd(spawned_total: int) -> int:
 	var missing := mini(population - group._living_count, MechanicLab.CROWD_SPAWN_LIMIT_PER_FRAME)
 	if missing <= 0:
 		return 0
-	var deadline := Time.get_ticks_usec() + MechanicLab.CROWD_SPAWN_BUDGET_USEC
+	# Refill by simulation tick so render cadence and wall-clock performance
+	# cannot alter the encounter sequence. Normal Lab spawning keeps its budget.
 	var facing := Basis(Vector3.UP, lab.player.visual.rotation.y)
 	var effects := lab.get_node("CombatEffects") as Node3D
 	for i in missing:
 		var baby := (spawned_total + i + 1) % 5 == 0
 		if not group.spawn(lab.player, facing, effects, false, baby):
 			return i
-		if Time.get_ticks_usec() >= deadline:
-			return i + 1
 	return missing
 
 func press_attack(pressed: bool) -> void:
@@ -333,6 +352,7 @@ func finish_phase() -> void:
 	print("POPULATION_PHASE ", JSON.stringify({
 		"cycle": cycle, "population": population, "phase": phase,
 		"samples": frame_ms.size(), "wall_seconds": seconds, "physics_ticks": ticks,
+		"render_fps": frame_ms.size() / maxf(seconds, 0.000001),
 		"frame_ms": stats(frame_ms), "physics_window_ms": stats(physics_window_ms),
 		"max_physics_ticks_per_frame": max_physics_ticks_per_frame,
 		"render_cpu_ms": stats(render_cpu_ms), "render_gpu_ms": stats(render_gpu_ms),
