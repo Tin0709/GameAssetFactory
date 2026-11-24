@@ -463,6 +463,7 @@ func check_sword_thrust_glint(lab, selector: OptionButton) -> void:
 		var scope_correct := true
 		var furthest := -INF
 		var first_time := INF
+		var last_time := -INF
 		var mesh: Mesh = actor.effects.ribbon.mesh
 		for i in int(5.0 * Engine.physics_ticks_per_second):
 			await physics_frame
@@ -479,18 +480,20 @@ func check_sword_thrust_glint(lab, selector: OptionButton) -> void:
 				seen = true
 				scope_correct = scope_correct and actor.combo.phase == &"attack" and actor.combo.index == 2
 				first_time = minf(first_time, actor.combo.time)
+				last_time = maxf(last_time, actor.combo.time)
 				furthest = maxf(furthest, vertices[j].dot(forward))
 		attack(false)
 		check(scope_correct, "The directional glint belongs to the Sword thrust")
 		if wall == null:
 			check(seen and first_time >= 11.0 / 30.0 and first_time < 0.45 and furthest > 2.2,
 				"A real Sword finisher shows its directional glint just before and during full extension")
+			check(last_time < 0.58, "The Sword glint fades before the thrust recovers")
 		else:
 			check(furthest <= wall_face + 0.0001, "The Sword glint cannot extend through the wall")
 			wall.free()
 		check(not lab.get_node("CombatImpactLight").visible and lab._contact_sparks._streaks.visible_instance_count == 0,
 			"The whiffed Sword thrust does not display enemy contact feedback")
-		print("SWORD_THRUST wall=", wall_face, " seen=", seen, " first=", first_time, " furthest=", furthest)
+		print("SWORD_THRUST wall=", wall_face, " seen=", seen, " first=", first_time, " last=", last_time, " furthest=", furthest)
 
 func check_wall_ribbons(lab, selector: OptionButton) -> void:
 	for slot in [0, 10]:

@@ -11,7 +11,7 @@ const MAX_PARTICLE_HISTORY:=16
 const RIBBON_U := [0.0, 1.0, 1.0, 0.0, 1.0, 0.0]
 const RIBBON_SAMPLE := [0, 0, 1, 0, 1, 1]
 const RIBBON_LIFETIME := 0.14
-const THRUST_GLINT_HALF_HEIGHT := 0.15
+const THRUST_GLINT_HALF_HEIGHT := 0.20
 const RIBBON_TINT := Color(1.0, 0.73, 0.23)
 const RIBBON_EDGE_TINT := Color(1.0, 0.97, 0.82)
 var samples:Array[Dictionary]=[]
@@ -196,10 +196,10 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 	if has_surface:
 		var latest: Dictionary = shown[-1]
 		if latest.thrust_glint:
-			var fade_in := smoothstep(0.0, 0.029, float(latest.time) - float(shown[0].time))
-			var fade_out := 1.0 - smoothstep(0.0, 0.045, time - float(latest.time))
+			var glint_age := time - float(shown[0].time)
+			var envelope := smoothstep(0.0, 0.022, glint_age) * (1.0 - smoothstep(0.042, 0.113, glint_age))
 			var exposed := smoothstep(0.60, 0.92, float(latest.tip_u))
-			var opacity := intensity * fade_in * fade_out * exposed
+			var opacity := intensity * envelope * exposed
 			if opacity > 0.01:
 				_add_thrust_glint(latest, opacity)
 		_mesh.surface_end()

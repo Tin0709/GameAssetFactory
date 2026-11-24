@@ -10,7 +10,7 @@ void fragment() {
 		float across = abs(UV.y + 1.0) * 2.0;
 		float tip = UV.x;
 		float bowed_tip = tip + 0.21 * across * across;
-		float width = mix(0.10, 0.82, smoothstep(0.08, 0.76, tip));
+		float width = mix(0.12, 0.87, smoothstep(0.08, 0.76, tip));
 		float profile = smoothstep(0.06, 0.73, tip) * (1.0 - smoothstep(0.87, 1.0, bowed_tip));
 		profile *= 1.0 - smoothstep(width * 0.30, width, across);
 		float core = (1.0 - smoothstep(0.0, width * 0.53, across)) * smoothstep(0.44, 0.85, tip);
