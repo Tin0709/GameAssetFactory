@@ -78,6 +78,7 @@ func run() -> void:
 	await physics_frame
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
 	await check_ground_ribbon_edges(lab, selector)
+	await check_curved_finisher_ribbon(lab, selector)
 	await check_sabre_dive(lab, selector)
 	await check_wall_ribbons(lab, selector)
 	lab.free()
@@ -131,6 +132,60 @@ func check_ground_ribbon_edges(lab, selector: OptionButton) -> void:
 		check(seen and ended, "%s passes both edges of its real ground trail" % weapon)
 		print("GROUND_RIBBON_EDGES weapon=", weapon, " start_delay_ms=", start_delay * 1000.0,
 			" end_shortfall_ms=", end_shortfall * 1000.0)
+	lab.reset_player()
+
+func check_curved_finisher_ribbon(lab, selector: OptionButton) -> void:
+	lab.reset_player()
+	for i in 12:
+		await physics_frame
+	selector.select(lab.Weapon.CURVED_GREATSWORD)
+	selector.item_selected.emit(lab.Weapon.CURVED_GREATSWORD)
+	var actor = lab.player
+	var effects = actor.effects
+	var sample_frames: Dictionary = {}
+	var bridged := false
+	var observed_changeover := false
+	var burst_count := -1
+	attack(true)
+	for i in Engine.physics_ticks_per_second * 5:
+		await physics_frame
+		if actor.combo.phase != &"attack" or actor.combo.index != 2:
+			continue
+		var frame: float = actor.combo.time * 30.0
+		if frame < 4.0:
+			burst_count = effects.bursts
+		if effects.serial != actor.combo.serial:
+			continue
+		var start: float = effects.clock - actor.combo.time / actor.combo.playback_rate()
+		for sample in effects.samples:
+			var source_frame := (float(sample.time) - start) * actor.combo.playback_rate() * 30.0
+			sample_frames[snappedf(source_frame, 0.0001)] = true
+		var shown: Array = effects.samples_at(effects.clock)
+		if shown.size() > 2 and shown[0].time < start + 10.001 / 33.0 and shown[-1].time > start + 14.001 / 33.0:
+			observed_changeover = true
+			var mesh: Mesh = effects.ribbon.mesh
+			effects.present(effects.clock)
+			var vertex_count := 0
+			if mesh.get_surface_count() > 0:
+				var vertices: PackedVector3Array = mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+				vertex_count = vertices.size()
+			# Two strips (body and bright edge) per span on the clear floor.
+			# One adjacent pair straddles the gap and must contribute no vertices.
+			bridged = bridged or vertex_count != (shown.size() - 2) * 12
+		if frame >= 23.0:
+			break
+	attack(false)
+	var frames := sample_frames.keys()
+	frames.sort()
+	check(frames.has(5.0) and frames.has(10.0) and frames.has(14.0) and frames.has(21.0),
+		"The two Curved Greatsword arcs sample their four authored edges")
+	check(not frames.any(func(frame: float): return frame > 10.001 and frame < 13.999),
+		"The blade does not paint a ribbon during the rear turn")
+	check(observed_changeover and not bridged, "Visible pieces of the two arcs have no connecting triangle strip")
+	check(burst_count >= 0 and effects.bursts - burst_count == 1,
+		"The dual arc keeps one legacy blade burst per swing")
+	print("CURVED_FINISHER_TRAIL gap_samples=", frames.filter(func(frame: float): return frame > 10.001 and frame < 13.999).size(),
+		" overlap=", observed_changeover, " bridge=", bridged)
 	lab.reset_player()
 
 func check_sabre_dive(lab, selector: OptionButton) -> void:
