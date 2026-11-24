@@ -167,10 +167,17 @@ func check_melee_combo_shakes(lab) -> void:
 
 func check_sabre_dive(lab) -> void:
 	var landings: Array[int] = []
+	var actor = lab.player
+	var ground_layers: Array[Dictionary] = []
+	var record_ground_layer := func(_cue: Dictionary, _serial: int, sample: float):
+		var source: float = actor.combo.time - (actor.effects.clock - sample) * actor.combo.playback_rate()
+		ground_layers.append({"sample": sample, "source": source})
+	actor.tool_ground_cue.connect(record_ground_layer)
 	lab.player.heavy_jump_landed.connect(func(_point, _forward, _serial, _height):
 		landings.append(Engine.get_physics_frames()))
 	for attempt in 4:
 		lab.reset_player()
+		ground_layers.clear()
 		for i in 8:
 			await physics_frame
 		var target: CharacterBody3D
@@ -217,7 +224,21 @@ func check_sabre_dive(lab) -> void:
 		if attempt in [1, 2]:
 			check(onset < 0 and flash_frame < 0 and burst_frame < 0 and is_zero_approx(lab.camera.h_offset),
 				"Reset and defeat discard the queued aerial shake, flash and burst")
+			check(ground_layers.is_empty() and not lab._tool_slam_ring.visible,
+				"Reset and defeat discard the matching dust and shockwave")
 			continue
+		var authored_keys := [0.281534761, 0.285736203, 0.290357769]
+		check(ground_layers.size() == authored_keys.size(), "Sabre plays its three separately authored landing layers")
+		if ground_layers.size() == authored_keys.size():
+			for i in authored_keys.size():
+				check(absf(float(ground_layers[i].source) - float(authored_keys[i])) < 0.00001,
+					"Sabre landing layer %d retains its montage time" % i)
+			var impact: float = ground_layers.back().sample
+			var sparks: int = actor.effects.particles.filter(func(p): return absf(float(p.born) - impact) < 0.00001).size()
+			var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
+			var reach: float = (lab._tool_slam_ring.global_position - actor.global_position).dot(forward)
+			check(is_equal_approx(lab._tool_slam_time, impact) and sparks == 8 and absf(reach - 1.75) < 0.02,
+				"The ring uses its 175 cm reach and shares an exact birth time with floor sparks")
 		var flash_delay := ceili(0.056890413 * Engine.physics_ticks_per_second)
 		check(flash_frame == landings[attempt] + flash_delay and burst_frame == flash_frame,
 			"The aerial light and sparks are sampled at the authored one-shot VFX key")
@@ -231,6 +252,7 @@ func check_sabre_dive(lab) -> void:
 				"Target damage keeps its own key and cannot replace the landing flash")
 			target.free()
 		print("SABRE_DIVE_SHAKE touchdown=", landings[attempt], " onset=", onset, " flash=", flash_frame, " burst=", burst_frame)
+	actor.tool_ground_cue.disconnect(record_ground_layer)
 
 func check_aerial_impact_support(lab) -> void:
 	for slot: int in [lab.Weapon.SABRE, lab.Weapon.SWORD, lab.Weapon.GAUNTLETS, lab.Weapon.BASIC_GAUNTLETS,
