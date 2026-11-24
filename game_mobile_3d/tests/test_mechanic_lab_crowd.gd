@@ -20,6 +20,7 @@ const AS_BABY_WALL_POSE := [ZOMBIE.ActionsStuff.ATTACK, 6, 9]
 const AS_BABY_113_WALL_POSE := [ZOMBIE.ActionsStuff.ATTACK, 2, 10]
 const ACTIONS_STUFF_CLIPS := [ZOMBIE.ActionsStuff.SPAWN, ZOMBIE.ActionsStuff.IDLE,
 	ZOMBIE.ActionsStuff.MOVE, ZOMBIE.ActionsStuff.PURSUIT, ZOMBIE.ActionsStuff.ALERT,
+	ZOMBIE.ActionsStuff.ALERT_ENTER, ZOMBIE.ActionsStuff.ALERT_EXIT,
 	ZOMBIE.ActionsStuff.JUMP, ZOMBIE.ActionsStuff.FALL, ZOMBIE.ActionsStuff.ATTACK, ZOMBIE.ActionsStuff.STAGGER]
 var lab: Node3D
 var mixed_crowd := false
