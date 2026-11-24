@@ -39,6 +39,12 @@ Preset **Rìa rừng ẩm** dùng hai track này mặc định trên map thử v
 
 Nếu map có hai khoảng mở, đặt thêm **Additional Local Diffuse Region** trong Inspector với tâm, bán kính và vị trí nguồn riêng. Hai vùng dùng chung shader. Tại chỗ chồng lấn, shader hòa trộn theo độ ảnh hưởng của từng vùng. Với map import, cả hai cùng dùng **Local Diffuse Strength**, đường cong giờ và thời tiết của preset. Trong WorldMap, **Địa hình & cây cỏ → Đá và mặt đất → Ánh hắt ở bậc đá** cho phép so sánh riêng vùng thứ hai. Điểm dễ quan sát nằm gần X = −22,5, Z = −40,5 lúc 07:00 hoặc 16:30.
 
+### Chiều sâu bóng trên bậc đá trong Forest
+
+Trong **WorldMap**, vào **L → Cài đặt → Địa hình & cây cỏ → Đá và mặt đất → Chiều sâu bóng trên bậc đá**. So 0% và 100% ở bậc bắc gần X = −24,5, Z = −40,5 hoặc thềm đông gần X = 42,5, Z = 33,5 lúc 07:00 hay 16:30. Phần ánh bù dùng bốn hệ số góc của mặt đá và hòa trộn trong cùng lượt nắng. Hai ô đá liền kề cùng cao độ dùng chung giá trị trên cạnh.
+
+Scene cung cấp **Stone Shelf Corners** cùng **Stone Shelf Layout Sha256**. Mỗi texel RGBA8 giữ bốn góc theo thứ tự XZ 00, 10, 01, 11. Mã 128 là trung tính. Kích thước và gốc tọa độ khớp bản đồ địa hình XZ. **Stone Shelf Redistribution** trong preset quy định biên độ, mặc định Forest là 0,78. Map dùng đường vật liệu nâng cao của Forest sẽ dùng trường này khi resource khớp layout. Map thiếu trường hoặc dùng đường vật liệu portable tiếp tục dùng cách chiếu sáng của preset hiện tại.
+
 ### Ánh trời trong sương rìa tán
 
 Forest bật mặc định mức 100% trong **L → Cài đặt → Sương & hiệu ứng → Sương theo khoảng cách → Ánh trời trong sương rìa tán**. Đứng ở lối rừng lúc 07:00 hoặc 16:30 và so 0% với 100%. Nguồn này lấy ánh môi trường đang chạy nên hoạt động khi trời nhiều mây. Độ truyền sáng giữ nguyên, giữa trưa và ban đêm giữ cấu hình đã duyệt. Preset lưu trước v176 dùng 0% khi thiếu mục này.

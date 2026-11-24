@@ -32,6 +32,7 @@ const TRAIL_SHADER := preload("res://materials/mechanic_lab_polaris_trail.gdshad
 const ImpactSparks := preload("res://scripts/mechanic_lab_polaris_impact.gd")
 const TRAIL_LIFETIME := 0.30
 const TRAIL_WIDTH := 0.08
+const TRAIL_CONTACT_BLEND_DISTANCE := 2.0 * BOLT_RADIUS
 const CHARGED_TRAIL_WIDTH := 0.16
 const TRAIL_ALPHA_END := 0.60
 const TRAIL_FADE_END_AGE := TRAIL_ALPHA_END * TRAIL_LIFETIME
@@ -280,7 +281,10 @@ func _physics_process(delta: float) -> void:
 			_bolts.remove_at(index)
 			_remove_bolt(node)
 			if not hit.is_empty():
-				_embed_on_terrain(hit, bolt.direction, render_frame)
+				if _is_terrain_hit(hit):
+					trail.contact = endpoint
+					trail.contact_normal = hit.normal
+					_embed_on_terrain(hit, bolt.direction, render_frame)
 				_report_impact(hit, direction, bolt.serial, bolt.strike, impact_step, trail.charged)
 		else:
 			node.global_position = end
@@ -328,8 +332,21 @@ func _update_trails() -> void:
 		if not has_surface:
 			_trail_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 			has_surface = true
-		var previous_point := to_local_space * head
 		var lateral := to_local_space.basis * sideways
+		var has_contact := trail.has("contact")
+		var contact_plane := Plane()
+		var contact_offset := Vector3.ZERO
+		var contact_side := sideways
+		if has_contact:
+			var contact: Vector3 = trail.contact
+			var normal: Vector3 = trail.contact_normal
+			contact_plane = to_local_space * Plane(normal, normal.dot(contact))
+			contact_offset = to_local_space.basis * (contact - head)
+			contact_side = sideways.slide(normal).normalized()
+			if contact_side.is_zero_approx():
+				contact_side = normal.cross(direction).normalized()
+		var previous_point := to_local_space * head + contact_offset
+		var previous_lateral := to_local_space.basis * contact_side
 		var charged: bool = trail.get("charged", false)
 		var half_width := (CHARGED_TRAIL_WIDTH if charged else TRAIL_WIDTH) * 0.5
 		var previous_width := half_width * (1.0 - 0.5 * age / TRAIL_LIFETIME)
@@ -337,17 +354,34 @@ func _update_trails() -> void:
 		var blend_start := clampf(TRAIL_ALPHA_BLEND_START * TRAIL_LIFETIME - age, 0.0, duration)
 		var blend_end := clampf(TRAIL_ALPHA_BLEND_END * TRAIL_LIFETIME - age, 0.0, duration)
 		var previous_seconds_back := 0.0
-		for seconds_back: float in [blend_start, blend_end, duration]:
+		var sections: Array[float] = [blend_start, blend_end, duration]
+		var contact_blend := TRAIL_CONTACT_BLEND_DISTANCE / speed
+		if has_contact and contact_blend < duration and (not contact_offset.is_zero_approx() or not contact_side.is_equal_approx(sideways)):
+			sections.append(contact_blend)
+			sections.sort()
+		for seconds_back: float in sections:
 			if seconds_back <= previous_seconds_back:
 				continue
 			var normalized_age := (age + seconds_back) / TRAIL_LIFETIME
 			var width := half_width * (1.0 - 0.5 * normalized_age)
 			var opacity := _trail_opacity(normalized_age)
 			var point := to_local_space * (head - direction * speed * seconds_back)
-			var near_left := previous_point - lateral * previous_width
-			var near_right := previous_point + lateral * previous_width
-			var far_left := point - lateral * width
-			var far_right := point + lateral * width
+			var current_lateral := lateral
+			if has_contact and seconds_back < contact_blend:
+				# The detached ribbon stays on its original flight line
+				# beyond this last short join to the swept surface point.
+				var weight := 1.0 - seconds_back / contact_blend
+				point += contact_offset * weight
+				current_lateral = to_local_space.basis * sideways.lerp(contact_side, weight).normalized()
+			var near_left := previous_point - previous_lateral * previous_width
+			var near_right := previous_point + previous_lateral * previous_width
+			var far_left := point - current_lateral * width
+			var far_right := point + current_lateral * width
+			if has_contact:
+				near_left = _trail_surface_edge(near_left, contact_plane)
+				near_right = _trail_surface_edge(near_right, contact_plane)
+				far_left = _trail_surface_edge(far_left, contact_plane)
+				far_right = _trail_surface_edge(far_right, contact_plane)
 			_add_trail_vertex(near_left, 0.0, previous_alpha, charged)
 			_add_trail_vertex(near_right, 1.0, previous_alpha, charged)
 			_add_trail_vertex(far_left, 0.0, opacity, charged)
@@ -355,12 +389,16 @@ func _update_trails() -> void:
 			_add_trail_vertex(far_right, 1.0, opacity, charged)
 			_add_trail_vertex(far_left, 0.0, opacity, charged)
 			previous_point = point
+			previous_lateral = current_lateral
 			previous_width = width
 			previous_alpha = opacity
 			previous_seconds_back = seconds_back
 	if has_surface:
 		_trail_mesh.surface_end()
 	_trail_renderer.visible = has_surface
+
+static func _trail_surface_edge(point: Vector3, surface: Plane) -> Vector3:
+	return point - surface.normal * minf(surface.distance_to(point), 0.0)
 
 func _add_trail_vertex(point: Vector3, across: float, opacity: float, charged: bool) -> void:
 	_trail_mesh.surface_set_uv(Vector2(across, 0.0))
@@ -380,15 +418,16 @@ func _is_terrain_hit(hit: Dictionary) -> bool:
 	return collider != null and (collider.collision_layer & WORLD_MASK) != 0
 
 func _embed_on_terrain(hit: Dictionary, direction: Vector3, render_frame: int) -> void:
-	if _embedded == null or not _is_terrain_hit(hit):
+	if _embedded == null:
 		return
 	if _embedded_arrows.size() == EMBEDDED_CAPACITY:
 		_embedded_arrows.pop_front()
 	var up := Vector3.UP if absf(direction.y) < 0.999 else Vector3.FORWARD
 	var basis := Basis.looking_at(direction, up, true) * Basis(Vector3.UP, -PI * 0.5)
-	var pose := Transform3D(basis, Vector3(hit.position) - direction * EMBEDDED_OFFSET)
+	var pose := Transform3D(basis, hit.position)
 	_embedded_arrows.append({
 		"pose": global_transform.affine_inverse() * pose,
+		"wobble_limit": asin(clampf(-direction.dot(hit.normal), 0.0, 1.0)),
 		"age": 0.0,
 		"contact_frame": render_frame,
 	})
@@ -409,7 +448,10 @@ func _update_embedded_arrows(delta: float, render_frame: int) -> void:
 		# The native component supplies the duration and scale. This damped
 		# motion and one-second prop display are MechanicLab approximations.
 		var angle := deg_to_rad(EMBEDDED_WOBBLE_SCALE) * sin(TAU * 6.0 * phase) * pow(1.0 - phase, 2.0)
-		pose.basis = pose.basis * Basis(Vector3.UP, angle) * Basis.from_scale(Vector3.ONE * EMBEDDED_SCALE)
+		var limit: float = arrow.wobble_limit
+		pose.basis *= Basis(Vector3.UP, clampf(angle, -limit, limit))
+		pose.origin -= pose.basis.x * EMBEDDED_OFFSET
+		pose.basis *= Basis.from_scale(Vector3.ONE * EMBEDDED_SCALE)
 		_embedded.set_instance_transform(index, pose)
 		index += 1
 	_embedded.visible_instance_count = _embedded_arrows.size()

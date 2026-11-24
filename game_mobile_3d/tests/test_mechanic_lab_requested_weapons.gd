@@ -274,7 +274,9 @@ func run() -> void:
 		check(first_pose.basis.get_scale().is_equal_approx(Vector3.ONE * 0.6)
 			and absf(first_pose.origin.z - 2.365) < 0.06,
 			"The wall prop uses the source mesh scale and impact offset")
-		check(first_pose.basis != second_pose.basis and first_pose.origin.is_equal_approx(second_pose.origin),
+		var shaft_pivot := Vector3.RIGHT * CrossPollinator.EMBEDDED_OFFSET / CrossPollinator.EMBEDDED_SCALE
+		check(first_pose.basis != second_pose.basis
+			and (first_pose * shaft_pivot).is_equal_approx(second_pose * shaft_pivot),
 			"The embedded arrow rotates around a fixed contact")
 		await ticks(49)
 	else:
