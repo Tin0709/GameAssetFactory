@@ -403,6 +403,7 @@ func check_sabre_dive(lab, selector: OptionButton) -> void:
 		await physics_frame
 		attack(false)
 		var slash_frame := -1
+		var slash_source_time := -1.0
 		var last_air_time := 0.0
 		var air_loops := 0
 		var ribbon_rendered := false
@@ -417,6 +418,8 @@ func check_sabre_dive(lab, selector: OptionButton) -> void:
 				landing_pose_time = actor.animation_player.current_animation_position
 			if not actor.effects.samples.is_empty() and slash_frame < 0:
 				slash_frame = Engine.get_physics_frames() - 1
+				var first: float = actor.effects.samples[0].time
+				slash_source_time = actor.combo.time - (actor.effects.clock - first) * actor.combo.playback_rate()
 			if slash_frame >= 0 and actor.effects.ribbon.mesh.get_surface_count() > 0:
 				ribbon_rendered = true
 		check(landings.size() == 1 and air_loops >= 1,
@@ -425,9 +428,11 @@ func check_sabre_dive(lab, selector: OptionButton) -> void:
 			"%d m drop enters the landing section on touchdown" % height)
 		check(not landings.is_empty() and slash_frame == landings[0] + ceili(0.055629984 * Engine.physics_ticks_per_second),
 			"%d m drop creates the first blade ribbon sample at the montage slash cue" % height)
+		check(absf(slash_source_time - 0.289097339) < 0.00001,
+			"%d m drop interpolates the blade ribbon to the exact slash cue inside the tick" % height)
 		check(ribbon_rendered, "The samples produce blade ribbon geometry during the landing slash")
 		print("SABRE_DIVE_SLASH height=", height, " loops=", air_loops,
-			" landing=", landings, " pose=", landing_pose_time, " slash=", slash_frame)
+			" landing=", landings, " pose=", landing_pose_time, " slash=", slash_frame, " source=", slash_source_time)
 
 func check_wall_ribbons(lab, selector: OptionButton) -> void:
 	for slot in [0, 10]:
