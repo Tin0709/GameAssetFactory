@@ -3,6 +3,8 @@ extends SceneTree
 ## Run with --audio-driver Dummy and user args --population=100 --cycles=1 --combat-audio.
 ## Add --combo=prime-gauntlets or --combo=curved-greatsword for a held-E workload.
 ## Add --render-fps=30 or --render-fps=60 to select the corresponding Lab mode.
+## Add --spark-budget=full, balanced or low to compare the live VFX presets.
+## Add --hide-contact-sparks to measure the same simulated bursts without drawing them.
 ## Add --frame-trace=user://population-frames.json to save per-frame timing after the run.
 
 const LAB := preload("res://scenes/dev/MechanicLab.tscn")
@@ -15,6 +17,11 @@ const RENDER_SIZE := Vector2i(960, 540)
 const FIXTURE_HP := 10000
 const COMBO_SECONDS := 15.0
 const FRAME_RATES := {"app": 0, "30": 30, "60": 60}
+const SPARK_BUDGETS := {
+	"full": MechanicLab.SparkBudget.FULL,
+	"balanced": MechanicLab.SparkBudget.BALANCED,
+	"low": MechanicLab.SparkBudget.LOW,
+}
 const COMBO_WEAPONS := {
 	"prime-gauntlets": MechanicLab.Weapon.GAUNTLETS,
 	"curved-greatsword": MechanicLab.Weapon.CURVED_GREATSWORD,
@@ -67,6 +74,7 @@ func run() -> void:
 	var counts := POPULATIONS.duplicate()
 	var cycles := 1
 	var frame_rate := "app"
+	var spark_budget := "full"
 	for arg in args:
 		if arg.begins_with("--population="):
 			counts = [arg.trim_prefix("--population=").to_int()]
@@ -76,6 +84,8 @@ func run() -> void:
 			combo_weapon = arg.trim_prefix("--combo=")
 		elif arg.begins_with("--render-fps="):
 			frame_rate = arg.trim_prefix("--render-fps=")
+		elif arg.begins_with("--spark-budget="):
+			spark_budget = arg.trim_prefix("--spark-budget=")
 		elif arg.begins_with("--frame-trace="):
 			frame_trace_path = arg.trim_prefix("--frame-trace=")
 	if counts[0] not in POPULATIONS or cycles < 1:
@@ -90,7 +100,12 @@ func run() -> void:
 		printerr("Choose --render-fps=app, 30 or 60")
 		quit(2)
 		return
+	if not SPARK_BUDGETS.has(spark_budget):
+		printerr("Choose --spark-budget=full, balanced or low")
+		quit(2)
+		return
 	var audio_enabled := "--combat-audio" in args
+	var hide_contact_sparks := "--hide-contact-sparks" in args
 	if audio_enabled and AudioServer.get_driver_name() != "Dummy":
 		printerr("The audio workload requires --audio-driver Dummy")
 		quit(2)
@@ -112,6 +127,18 @@ func run() -> void:
 	numbers = lab.get_node_or_null("CombatEffects/ZombieDamageNumbers")
 	dust = lab.get_node_or_null("ZombieStepDust")
 	sparks = lab.get_node_or_null("ContactSparks/Streaks")
+	var spark_settings := lab.get_node("HUD/ImpactFxPanel/Rows")
+	var spark_picker := spark_settings.get_node("ContactSparkQuality") as OptionButton
+	var spark_index := spark_picker.get_item_index(SPARK_BUDGETS[spark_budget])
+	if spark_index < 0:
+		printerr("The benchmark could not select the Lab spark budget")
+		await release_lab(audio_enabled)
+		quit(2)
+		return
+	spark_picker.select(spark_index)
+	spark_picker.item_selected.emit(spark_index)
+	if hide_contact_sparks:
+		spark_settings.get_node("Opacity/Slider").value = 0.0
 	(lab.get_node("HUD/CombatAudioToggle") as CheckButton).button_pressed = audio_enabled
 	group.player_hit.connect(func(_damage: int): player_hits += 1)
 	viewport = root.get_viewport_rid()
@@ -143,6 +170,7 @@ func run() -> void:
 		"adapter": RenderingServer.get_video_adapter_name(), "audio_driver": AudioServer.get_driver_name(),
 		"combat_audio": audio_enabled, "corpse_seconds": group.corpse_lifetime,
 		"combo_weapon": combo_weapon,
+		"spark_budget": spark_budget, "contact_sparks_visible": not hide_contact_sparks,
 	}))
 	for pass_index in cycles:
 		cycle = pass_index + 1
