@@ -118,6 +118,9 @@ const GROUND_SLASHES := [
 	[Vector3(0.121726, 0.190000, 0.20), Vector3(0.175193, 0.265000, 0.18), Vector3(0.243789, 0.350000, 0.125)],
 	[Vector3(0.143855, 0.400000, 0.30), Vector3(0.395919, 0.666667, 0.30), Vector3(0.265945, 0.466667, 0.15)],
 ]
+# The Axe montage's notify data is unavailable. These bounds follow the
+# committed blade sweeps in the equipped Lab poses at 120 Hz.
+const AXE_SWEEP_WINDOWS := [[0.083333, 0.175000], [0.141667, 0.266667], [0.150000, 0.333333]]
 # Hue of each montage's color override, fitted to the Lab's SDR ribbon.
 const GROUND_SLASH_TINTS := [Color(0.64, 0.90, 1.0), Color(1.0, 0.28, 0.64), Color(0.78, 1.0, 0.35)]
 enum GroundEffect { SHOCKWAVE, DEBRIS, DUST, SHAKE }
@@ -154,6 +157,10 @@ const AIR_TRAILS := {
 		"landing": {"window": [0.622641, 0.675000], "style": {"tint": Color(1.0, 0.32, 0.48), "lifetime": 0.15}},
 	},
 	Tool.SHOVEL: {},
+	Tool.AXE: {
+		# Shares the same heavy landing clip as Pickaxe. Keep the Lab tint.
+		"landing": {"window": [0.622641, 0.675000]},
+	},
 }
 const AIR_EFFECTS := {
 	Tool.CLEAVER: [
@@ -282,7 +289,7 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 			window.trail_window = [slash.x, slash.y]
 			window.trail_style = {"tint": GROUND_SLASH_TINTS[tool], "lifetime": slash.z}
 		else:
-			window.trail_window = [maxf(timings.x - 0.03, 0.0), minf(timings.x + 0.12, timings.w)]
+			window.trail_window = AXE_SWEEP_WINDOWS[i]
 		if GROUND_EFFECTS.has(tool) and GROUND_EFFECTS[tool].has(i):
 			window.ground_effects = GROUND_EFFECTS[tool][i]
 		# Keep the native movement and input gates, including those in the
@@ -293,11 +300,9 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 		result.additional_clips.append_array([attack, recovery])
 		result.windows.append(window)
 	var air := _clip(root, AIR_CLIPS[tool], air_clip(tool), "attack")
+	air.air_trails = AIR_TRAILS[tool]
 	if AIR_EFFECTS.has(tool):
-		air.air_trails = AIR_TRAILS[tool]
 		air.ground_effects = AIR_EFFECTS[tool]
-	else:
-		air.vfx_window = [AIR_CONTACT[tool], minf(AIR_CONTACT[tool] + 0.12, AIR_END[tool])]
 	result.additional_clips.append(air)
 	return result
 
