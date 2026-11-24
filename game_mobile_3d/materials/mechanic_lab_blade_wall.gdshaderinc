@@ -1,16 +1,17 @@
 #include "res://materials/mechanic_lab_box_occlusion.gdshaderinc"
 
-uniform sampler2D blade_texture : source_color, filter_nearest;
+#ifdef SABRE_PACKED_SURFACE
+uniform sampler2D blade_texture : source_color, filter_nearest, repeat_disable;
+uniform sampler2D metallic_map : filter_nearest, repeat_disable;
+uniform sampler2D roughness_map : filter_nearest, repeat_disable;
+uniform sampler2D emission_map : source_color, filter_nearest, repeat_disable;
+#else
+uniform sampler2D blade_texture : source_color, filter_nearest, repeat_enable;
+#endif
 uniform int blade_blocker_count = 0;
 uniform vec4 blocker_axes[12];
 uniform vec2 actor_xz;
 varying vec3 blade_world;
-
-#ifdef SABRE_PACKED_SURFACE
-uniform sampler2D metallic_map : filter_nearest;
-uniform sampler2D roughness_map : filter_nearest;
-uniform sampler2D emission_map : source_color, filter_nearest;
-#endif
 
 void vertex() {
 	blade_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;

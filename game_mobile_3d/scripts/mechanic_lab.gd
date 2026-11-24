@@ -658,10 +658,11 @@ func _select_weapon(index: int) -> void:
 		blade_tip = _weapon_mesh.transform * MeleeTools.blade_tip(tool)
 		aliases = {}
 		rates = {}
-	# The original mount is tracked by the player lighting rig, which keeps
-	# a Sabre surface override. Use the equipped tool's own texture instead.
+	# The lighting rig binds Sabre's atlas to this shared mount. Other blades
+	# need their own material in both open terrain and the near-wall pass.
 	_clear_blade_wall_mask()
-	_weapon_mesh.material_override = mesh.surface_get_material(0) if tool >= 0 else null
+	var own_blade_material := tool >= 0 or index in [Weapon.SWORD, Weapon.CURVED_GREATSWORD]
+	_weapon_mesh.material_override = mesh.surface_get_material(0) if own_blade_material else null
 	_weapon_mesh.visible = index != Weapon.CROSS_POLLINATOR and not bow_equipped and not gauntlets_equipped
 	if _weapon_mesh.visible:
 		_weapon_mesh.mesh = mesh
