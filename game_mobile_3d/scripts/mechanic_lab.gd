@@ -87,6 +87,7 @@ const PRESET_RANGES := {
 	"gravity": ^"HUD/RagdollTuning/Gravity/Slider",
 	"corpse_seconds": ^"HUD/RagdollLifetime/Slider",
 	"camera_shake": ^"HUD/CameraShake/Slider",
+	"hitstop_ms": ^"HUD/Hitstop/Slider",
 	"sfx_master": ^"HUD/AudioMixPanel/Rows/Master/Slider",
 	"sfx_weapon": ^"HUD/AudioMixPanel/Rows/Weapon/Slider",
 	"sfx_zombie": ^"HUD/AudioMixPanel/Rows/Zombie/Slider",
@@ -1215,6 +1216,8 @@ func _set_combat_audio(enabled: bool) -> void:
 	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP, melee_tool, preview)
 
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, _lethal: bool) -> void:
+	if _grounded_impact_dispatch:
+		player.confirm_melee_hitstop(serial)
 	var tool_hit: StringName = MELEE_AUDIO_NAMES.get(_equipped_weapon, &"") if clip != Bow.ACTION and clip != CrossPollinator.SHOT else &""
 	_combat_audio.weapon_contact(point, serial, clip, tool_hit)
 	var melee_pose := _grounded_impact_dispatch or clip == "AirAttack"
@@ -1431,6 +1434,11 @@ func _set_camera_shake_intensity(percent: float) -> void:
 	$HUD/CameraShake/Value.text = "Rung camera · %d%%" % roundi(percent)
 	if _shake_intensity == 0.0:
 		camera.h_offset = 0.0
+
+func _set_hitstop(milliseconds: float) -> void:
+	$HUD/Hitstop/Value.text = "Hitstop thử · %d ms" % roundi(milliseconds)
+	if is_instance_valid(player):
+		player.hitstop_seconds = milliseconds / 1000.0
 
 func _setup_contact_spark_quality() -> void:
 	var picker: OptionButton = $HUD/ContactSparkQuality

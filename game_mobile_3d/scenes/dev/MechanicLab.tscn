@@ -390,6 +390,32 @@ value = 100.0
 scrollable = false
 tooltip_text = "Chỉnh độ rung của đòn kết thúc và cú bổ Sabre. 0% tắt rung."
 
+[node name="Hitstop" type="HBoxContainer" parent="HUD"]
+offset_left = 762.0
+offset_top = 222.0
+offset_right = 978.0
+offset_bottom = 256.0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Value" type="Label" parent="HUD/Hitstop"]
+custom_minimum_size = Vector2(124, 0)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 14
+text = "Hitstop thử · 0 ms"
+
+[node name="Slider" type="HSlider" parent="HUD/Hitstop"]
+custom_minimum_size = Vector2(84, 30)
+layout_mode = 2
+focus_mode = 0
+max_value = 60.0
+step = 5.0
+scrollable = false
+tooltip_text = "Giữ nhịp đòn cận chiến khi trúng trên mặt đất. 0 ms tắt thử nghiệm."
+
 [node name="Defeat" type="CenterContainer" parent="HUD"]
 visible = false
 anchor_top = 0.72
@@ -428,4 +454,5 @@ text = "Thử lại (R)"
 [connection signal="value_changed" from="HUD/RagdollTuning/Gravity/Slider" to="." method="_set_ragdoll_gravity"]
 [connection signal="value_changed" from="HUD/RagdollLifetime/Slider" to="." method="_set_ragdoll_lifetime"]
 [connection signal="value_changed" from="HUD/CameraShake/Slider" to="." method="_set_camera_shake_intensity"]
+[connection signal="value_changed" from="HUD/Hitstop/Slider" to="." method="_set_hitstop"]
 [connection signal="pressed" from="HUD/Defeat/Card/Content/Respawn" to="." method="reset_player"]

@@ -5,6 +5,7 @@ const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd
 const Gauntlets := preload("res://scripts/mechanic_lab_gauntlets.gd")
 const LabLocomotion := preload("res://scripts/mechanic_lab_locomotion.gd")
 const Bow := preload("res://scripts/mechanic_lab_bow.gd")
+const LabCombo := preload("res://scripts/mechanic_lab_combo.gd")
 
 signal bow_drawn
 signal bow_released(serial: int, charged: bool, target: Variant)
@@ -43,6 +44,20 @@ var _bow_recovery := 0.0
 var _bow_action_time := 0.0
 var _bow_aim_tick := -1
 var _bow_aim: Variant
+var hitstop_seconds := 0.0:
+	set(value):
+		hitstop_seconds = value
+		if value <= 0.0:
+			_pending_hitstop_serial = -1
+			combo.impact_pause_left = 0.0
+var _pending_hitstop_serial := -1
+
+func _init() -> void:
+	combo = LabCombo.new()
+
+func confirm_melee_hitstop(serial: int) -> void:
+	if hitstop_seconds > 0.0 and _grounded and review_clip.is_empty():
+		_pending_hitstop_serial = serial
 
 func source_step_dust_size() -> float:
 	# Shot and recovery replace the upper body clip while crossbow steps
@@ -133,6 +148,12 @@ func _physics_process(delta: float) -> void:
 		velocity.x = 0.0
 		velocity.z = 0.0
 	super._physics_process(delta)
+	if _pending_hitstop_serial >= 0:
+		# Movement was already forecast for the contact tick. Start the hold
+		# on the next tick so capsule, montage and buffered input stay in sync.
+		if not is_dead and _grounded:
+			combo.pause_after_contact(_pending_hitstop_serial, hitstop_seconds)
+		_pending_hitstop_serial = -1
 	if planted_bow:
 		requested_direction = direction_before
 		requested_jump = jump_before
@@ -309,6 +330,14 @@ func begin_gauntlet_landing() -> void:
 		animation_player.seek(combo.time, true)
 
 func _animate(delta: float) -> void:
+	if combo.impact_pause_left > 0.0:
+		simulation_clock += delta
+		combo.advance(delta)
+		_refresh_markers()
+		if effects != null:
+			effects.sample(delta, effects._was_active,
+				marker_base.global_position, marker_tip.global_position, combo.serial)
+		return
 	var release_bow := false
 	var target: Variant = null
 	if bow_equipped and review_clip.is_empty():
