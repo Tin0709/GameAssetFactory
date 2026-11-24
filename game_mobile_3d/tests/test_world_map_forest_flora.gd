@@ -24,12 +24,44 @@ func run() -> void:
 		check(vine != null and vine.button_pressed and wall != null, "F5 enables verified Forest wall vines by default")
 		if fern != null:
 			test_carpet(world, fern)
+			test_shrub_sky(world)
 		if wall != null and vine != null:
 			test_wall(world, wall, vine)
 	world.free()
 	await process_frame
 	print("FOREST_FLORA failures=", JSON.stringify(failures))
 	quit(0 if failures.is_empty() else 1)
+
+func test_shrub_sky(world: Node3D) -> void:
+	var sky: Node = world.get_node("SpruceSkyVisibility")
+	var root_path: String = world.showcase.directional_air.research_root
+	var has_profile := FileAccess.file_exists(root_path.path_join(world.plains_shrub_sky_profile))
+	if not has_profile:
+		check(sky.applied_shrub_sky_strength == 0., "Missing shrub sky data preserves the tree field")
+		return
+	check(sky._shrub_sky != null, "The verified shrub sky field loads with matching foliage")
+	if sky._shrub_sky == null:
+		return
+	var before_hour: float = world.showcase.hour
+	var mist_grid: Texture3D = world.showcase.mist.effect.sky_grid
+	for hour: float in [7., 12., 16.5, 19.5, 22.]:
+		world.showcase.set_hour(hour)
+		sky.refresh()
+		check((sky.applied_shrub_sky_strength > .99) == (hour in [7., 16.5]),
+			"Shrub sky follows the protected daylight schedule")
+		check(world.showcase.mist.effect.sky_grid == mist_grid, "The shrub field is scoped to surface lighting")
+	world.showcase.set_hour(7.)
+	var plants: Node3D = world.showcase.plants
+	plants.hide()
+	sky.refresh()
+	check(sky.applied_shrub_sky_strength == 0., "Hiding the plants removes their sky occlusion")
+	plants.show()
+	sky.refresh()
+	check(sky.applied_shrub_sky_strength > .99, "Showing the plants restores their sky occlusion")
+	check(not sky.load_shrub_sky(world.plains_shrub_sky_profile, "wrong_hash", world.forest_canopy_extension_sha256),
+		"Unverified shrub sky data cannot replace the field")
+	world.showcase.set_hour(before_hour)
+	sky.refresh()
 
 func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 	var plants: Node3D = world.showcase.plants
