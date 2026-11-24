@@ -43,6 +43,8 @@ class Particle:
 	var age := 0.0
 	var contact_tick := -1.0
 	var draw_pending := false
+	var awaiting_ground_draw := false
+	var presentation_delay_ticks := 0.0
 	var duration := 0.0
 	var opacity := 0.0
 	var run_drag := 0.0
@@ -320,6 +322,8 @@ func _next_particle(texture: Texture2D, camera_range := 0.0) -> Particle:
 		particle.sprite.vframes = 4 if texture == _smoke_texture else 1
 		particle.sprite.texture = texture
 	particle.draw_pending = _contact_clock
+	particle.awaiting_ground_draw = false
+	particle.presentation_delay_ticks = 0.0
 	var layers := 0 if particle.draw_pending else 1
 	if particle.sprite.layers != layers:
 		particle.sprite.layers = layers
@@ -339,7 +343,10 @@ func _reusable_particle_slot() -> int:
 		var particle := _particles[index]
 		if not particle.sprite.visible:
 			return index
-		var remaining := particle.duration - (tick - particle.contact_tick) * step
+		var age_ticks := tick - particle.contact_tick - particle.presentation_delay_ticks
+		if particle.awaiting_ground_draw:
+			age_ticks = minf(age_ticks, 1.0)
+		var remaining := particle.duration - age_ticks * step
 		if remaining <= 0.0:
 			return index
 		if settled < 0 and particle.debris_radius > 0.0 and particle.debris_resting:
@@ -441,6 +448,7 @@ func _advance_colliding_debris(particle: Particle, age: float) -> void:
 
 func emit_combat_puff(ground_point: Vector3, surface: String, tick: float) -> void:
 	var particle := _next_particle(_smoke_texture, SOURCE_CAMERA_RANGE)
+	particle.awaiting_ground_draw = _contact_clock
 	particle.origin = ground_point + Vector3.UP * 0.16
 	particle.velocity = Vector3.UP * 0.33
 	particle.age = 0.0
@@ -490,6 +498,7 @@ func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: boo
 		particle.sprite.frame = FRAMES[_random.randi_range(0, FRAMES.size() - 1)]
 		particle.sprite.pixel_size = _random.randf_range(0.010, 0.016) if landed else _random.randf_range(0.007, 0.013)
 		if heavy:
+			particle.awaiting_ground_draw = _contact_clock
 			particle.velocity = radial * _random.randf_range(0.65, 1.45) + Vector3.UP * _random.randf_range(0.45, 0.85)
 			particle.duration = _random.randf_range(0.28, 0.40)
 			particle.opacity = 0.72
@@ -614,7 +623,13 @@ func _process(delta: float) -> void:
 			if pending != particle.draw_pending:
 				particle.draw_pending = pending
 				particle.sprite.layers = 0 if pending else 1
-			particle.age = maxf(render_tick - particle.contact_tick, 0.0) * step
+			var age_ticks := render_tick - particle.contact_tick
+			if not pending and particle.awaiting_ground_draw:
+				# Start short combat puffs with the rest of the impact even
+				# if the first eligible frame arrived after their lifetime.
+				particle.awaiting_ground_draw = false
+				particle.presentation_delay_ticks = maxf(age_ticks - 1.0, 0.0)
+			particle.age = maxf(age_ticks - particle.presentation_delay_ticks, 0.0) * step
 		else:
 			particle.age += delta
 		if particle.age >= particle.duration:

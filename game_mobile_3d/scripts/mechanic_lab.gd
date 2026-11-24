@@ -1301,7 +1301,7 @@ func _process(delta: float) -> void:
 		if _shake_sample_time >= 0.0:
 			var display_time: float = player.render_presenter.display_clock
 			_shake_age = minf(display_time - _shake_sample_time, _shake_duration)
-			if _shake_pending and _shake_age >= 0.0 and _shake_age < _shake_duration:
+			if _shake_pending and _shake_age >= 0.0:
 				_shake_sample_time = display_time
 				_shake_age = 0.0
 				_shake_pending = false
