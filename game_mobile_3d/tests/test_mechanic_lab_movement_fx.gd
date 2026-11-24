@@ -1263,12 +1263,34 @@ func check_selected_floor_steps(lab) -> void:
 		lab._on_zombie_step(Vector3.RIGHT)
 		dust._process(0.0)
 		var count := dust.multimesh.visible_instance_count
-		check(count == 1 and floori(dust.multimesh.get_instance_custom_data(0).r / 32.0) == fixture[0]
+		var encoded: int = dust._puffs[0].encoded_cell if count == 1 else -1
+		check(count == 1 and floori(encoded / 32.0) == fixture[0]
 			and audio._step_points.size() == queued + 1,
 			"Zombie feet keep the ground tint and supported generic step on %s" % surface)
+		if DisplayServer.get_name() != "headless":
+			check(is_equal_approx(dust.multimesh.get_instance_custom_data(0).r, encoded),
+				"The rendered zombie instance receives the original surface and atlas cell")
 		print("MECHANIC_LAB_FLOOR_STEPS ", surface, " steps=", steps, " dust=", count,
-			" cell=", dust.multimesh.get_instance_custom_data(0).r, " queued=", audio._step_points.size() - queued,
+			" cell=", encoded, " queued=", audio._step_points.size() - queued,
 			" landing=", movement.last_sources.get(landing_key, "missing"))
+	dust.clear()
+	var surfaces := ["grass", "dirt", "stone"]
+	for i in 128:
+		dust.burst(Vector3.RIGHT * i * 0.1, surfaces[i % surfaces.size()])
+	dust._process(0.0)
+	for i in 70:
+		dust._puffs[i].lifetime = 0.0
+	dust._process(0.0)
+	var palette_matches := dust.multimesh.visible_instance_count == 58
+	for i in dust._puffs.size():
+		var puff = dust._puffs[i]
+		palette_matches = (palette_matches and floori(puff.encoded_cell / 32.0) == (i + 70) % 3
+			and is_equal_approx(dust._instance_buffer[i * dust.INSTANCE_FLOATS + 12], puff.encoded_cell))
+		if DisplayServer.get_name() != "headless":
+			palette_matches = palette_matches and is_equal_approx(
+				dust.multimesh.get_instance_custom_data(i).r, puff.encoded_cell)
+	check(palette_matches, "Bulk compaction preserves all 58 surviving dust cells and surface colors")
+	dust.clear()
 	menu.select(0)
 	menu.item_selected.emit(0)
 	toggle.button_pressed = false
