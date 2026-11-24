@@ -22,6 +22,7 @@ const LAB_FLASH_SKIN_META := &"lab_flash_skin"
 const HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_zombie_hit_flash.gdshader")
 const IDLE := &"Zombie_Idle"
 const ActionsStuff := preload("res://scripts/mechanic_lab_zombie_actions_stuff.gd")
+const GROUND_CLIP_BLEND := 0.13
 const IDLE_AUDIO_NOTIFY_TIME := 0.066887535
 const IDLE_AUDIO_CHANCE := 0.5
 const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Variant2"]
@@ -1267,7 +1268,7 @@ func _play_loop(clip: StringName) -> void:
 		return
 	clip = _living_clip(clip)
 	if animation.current_animation != clip:
-		animation.play(clip, 0.13)
+		animation.play(clip, GROUND_CLIP_BLEND)
 
 func _play_gait() -> void:
 	var clip := _walk_clip
@@ -1284,7 +1285,7 @@ func _play_gait() -> void:
 			or (clip == ActionsStuff.PURSUIT and previous == ActionsStuff.MOVE)):
 		# The source walk and pursuit have the same leg keys every 0.75 s.
 		var phase := fposmod(animation.current_animation_position, ActionsStuff.STRIDE_SECONDS)
-		animation.play(clip, 0.13)
+		animation.play(clip, GROUND_CLIP_BLEND)
 		animation.seek(phase)
 		return
 	if (clip in [ActionsStuff.MOVE, ActionsStuff.PURSUIT] or previous in [ActionsStuff.MOVE, ActionsStuff.PURSUIT]
@@ -1294,7 +1295,7 @@ func _play_gait() -> void:
 	# Match the leading foot on live switches and on patrol/pursuit transitions.
 	var progress := animation.current_animation_position / animation.current_animation_length
 	var phase := fposmod(progress - Gait.plant_phase(previous) + Gait.plant_phase(clip), 1.0)
-	animation.play(clip, 0.13)
+	animation.play(clip, GROUND_CLIP_BLEND)
 	animation.seek(phase * animation.current_animation_length)
 
 func _is_air_clip(clip: StringName) -> bool:
@@ -1329,6 +1330,8 @@ func _advance_landing(delta: float) -> void:
 	if not actions_stuff_animation or not is_on_floor():
 		_actions_landing_time = -1.0
 		return
+	if _actions_landing_time < GROUND_CLIP_BLEND:
+		actions_stuff_landing.clear_floor(ragdoll.skeleton, global_position.y)
 	_actions_landing_time += delta
 	var time := _actions_landing_time - ActionsStuff.LANDING_DELAY
 	if time >= actions_stuff_landing.duration:

@@ -42,12 +42,25 @@ const BONE_MAP := [
 class LandingPose:
 	var duration: float
 	var _rig_scale: float
+	var _hip: int
+	var _hip_parent: int
+	var _leg_bones := PackedInt32Array()
+	var _soles: Array[Transform3D] = []
 	var _joints: Array[Dictionary] = []
 
 	func _init(skeleton: Skeleton3D, source: Dictionary) -> void:
 		duration = source.animation_length
-		var hip := skeleton.find_bone(&"J_Hip")
-		_rig_scale = skeleton.get_bone_global_rest(hip).origin.y / SOURCE_LEG_HEIGHT
+		_hip = skeleton.find_bone(&"J_Hip")
+		_hip_parent = skeleton.get_bone_parent(_hip)
+		var leg_length := skeleton.get_bone_global_rest(_hip).origin.y
+		_rig_scale = leg_length / SOURCE_LEG_HEIGHT
+		for name: StringName in [&"J_L_Leg", &"J_R_Leg"]:
+			var bone := skeleton.find_bone(name)
+			var rest := skeleton.get_bone_global_rest(bone)
+			var sole := Transform3D(Basis.from_scale(Vector3(leg_length / 6.0, 1.0, leg_length / 6.0)),
+				rest.origin + Vector3.DOWN * leg_length)
+			_leg_bones.append(bone)
+			_soles.append(rest.affine_inverse() * sole)
 		# Put the waist compression above the hips so the planted legs keep their stride.
 		# Leave out the pack's whole-body squash to retain rigid blocks.
 		for binding: Array in [[&"J_Spine", "waist"], [&"J_Neck", "head"],
@@ -61,6 +74,19 @@ class LandingPose:
 				"position": Pack.Channel.new(channels.position) if channels.has("position") else null,
 				"rotation": Pack.Channel.new(channels.rotation) if channels.has("rotation") else null,
 			})
+
+	func clear_floor(skeleton: Skeleton3D, floor_y: float) -> void:
+		# During the blend from fall, the outgoing pose can still put a sole
+		# below the floor. Lift the pose just enough to keep contact.
+		var world := skeleton.global_transform
+		var lowest := INF
+		for i in _leg_bones.size():
+			var sole := world * skeleton.get_bone_global_pose(_leg_bones[i]) * _soles[i]
+			lowest = minf(lowest, sole.origin.y - absf(sole.basis.x.y) - absf(sole.basis.z.y))
+		if lowest < floor_y:
+			var parent_basis := world.basis * skeleton.get_bone_global_pose(_hip_parent).basis
+			var lift := parent_basis.inverse() * (Vector3.UP * (floor_y - lowest))
+			skeleton.set_bone_pose_position(_hip, skeleton.get_bone_pose_position(_hip) + lift)
 
 	func apply(skeleton: Skeleton3D, time: float) -> void:
 		for joint: Dictionary in _joints:
