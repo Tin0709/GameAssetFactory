@@ -411,20 +411,25 @@ func _animate(delta: float) -> void:
 		combo.time = tool_air_loop if tool_air_hold - tool_air_loop > 1.0 / 30.0 \
 			else tool_air_hold - delta * combo.playback_rate()
 		animation_player.seek(combo.time, true)
-	var previous_ground_time: float = combo.time
+	var previous_time: float = combo.time
 	var previous_serial: int = combo.serial
 	super._animate(delta)
-	if _grounded and combo.phase == &"attack" and combo.native_enabled and combo.serial == previous_serial \
-			and review_clip.is_empty():
-		var window: Dictionary = combo.native_windows[combo.index]
-		if window.has("ground_effects"):
-			for cue: Dictionary in window.ground_effects:
-				if previous_ground_time < cue.time and cue.time <= combo.time:
-					var sample_time: float = effects.clock - (combo.time - float(cue.time)) / combo.playback_rate()
-					tool_ground_cue.emit(cue, combo.serial, sample_time)
+	if _grounded and combo.serial == previous_serial and review_clip.is_empty():
+		if combo.phase == &"attack" and combo.native_enabled:
+			_emit_tool_ground_cues(combo.native_windows[combo.index], previous_time)
+		elif combo.phase == &"air_attack" and combo.air_landing_started:
+			_emit_tool_ground_cues(clips.AirAttack, previous_time)
 	if release_bow:
 		combo.serial += 1
 		bow_released.emit(combo.serial, _bow_held_seconds >= Bow.CHARGE_TIME - 0.00001, target)
+
+func _emit_tool_ground_cues(profile: Dictionary, previous_time: float) -> void:
+	if not profile.has("ground_effects"):
+		return
+	for cue: Dictionary in profile.ground_effects:
+		if previous_time < cue.time and cue.time <= combo.time:
+			var sample_time: float = effects.clock - (combo.time - float(cue.time)) / combo.playback_rate()
+			tool_ground_cue.emit(cue, combo.serial, sample_time)
 
 func begin_tool_landing() -> void:
 	if tool_air_landing < 0.0 or combo.phase != &"air_attack":

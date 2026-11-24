@@ -731,13 +731,20 @@ func _animate(delta:float)->void:
 		var edge_age := -1.0
 		var trail_style: Dictionary = {}
 		if combo.phase in [&"attack",&"air_attack"] and review_clip.is_empty():
-			var window:Array=clips[combo.clip()].vfx_window
+			var cue_clip: Dictionary = clips[combo.clip()]
+			var window: Array = cue_clip.vfx_window
 			var gap := Vector2.ZERO
+			var exact_edges: bool = effects.interpolate_ground_trail_edges and combo.phase == &"attack"
 			if combo.native_enabled and combo.phase == &"attack":
 				var attack_window: Dictionary = combo.native_windows[combo.index]
 				window = attack_window.get("trail_window", window)
 				gap = attack_window.get("trail_gap", Vector2.ZERO)
 				trail_style = attack_window.get("trail_style", trail_style)
+			elif combo.phase == &"air_attack" and cue_clip.has("air_trails"):
+				var trail: Dictionary = cue_clip.air_trails.get("landing" if combo.air_landing_started else "flight", {})
+				window = trail.get("window", [INF, -INF])
+				trail_style = trail.get("style", trail_style)
+				exact_edges = not trail.is_empty()
 			if sectioned_air:
 				window = [combo.SABRE_AIR_SLASH, float(window[1])]
 			var start := float(window[0])
@@ -748,7 +755,7 @@ func _animate(delta:float)->void:
 				else:
 					start = gap.y
 			active = combo.time >= start and combo.time <= end
-			if effects.interpolate_ground_trail_edges and combo.phase == &"attack" and active != effects._was_active:
+			if exact_edges and active != effects._was_active:
 				var edge := start if active else end
 				edge_age = (combo.time - edge) / combo.playback_rate()
 		effects.sample(delta,active,marker_base.global_position,marker_tip.global_position,combo.serial,edge_age,trail_style)

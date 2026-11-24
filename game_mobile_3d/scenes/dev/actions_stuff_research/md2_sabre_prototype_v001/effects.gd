@@ -68,11 +68,11 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 			serial = attack_serial
 			_was_active = false
 			_ribbon_section = 0
+		if not _was_active:
+			_ribbon_section += 1
 			_ribbon_lifetime = style.get("lifetime", RIBBON_LIFETIME)
 			_ribbon_tint = style.get("tint", RIBBON_TINT)
 			_ribbon_edge_tint = RIBBON_EDGE_TINT if style.is_empty() else _ribbon_tint.lerp(Color.WHITE, 0.74)
-		if not _was_active:
-			_ribbon_section += 1
 			_sample_trail_edge(delta, edge_age, base, tip)
 		var point := _trail_sample(base, tip, clock)
 		if not _was_active and _ribbon_section == 1 and point.tip_u == 1.0:
@@ -83,7 +83,7 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 	while samples.size() > MAX_SAMPLES:
 		samples.pop_front()
 	var display_lag:=1./maxf(1.,Engine.physics_ticks_per_second)
-	while not samples.is_empty() and clock-float(samples[0].time)>_ribbon_lifetime+display_lag:samples.pop_front()
+	while not samples.is_empty() and clock-float(samples[0].time)>float(samples[0].lifetime)+display_lag:samples.pop_front()
 	for particle:Dictionary in particles:
 		if float(particle.life)>0.:
 			particle.life=maxf(0.,float(particle.life)-delta);particle.velocity+=Vector3(0,-1.8,0)*delta;particle.position+=particle.velocity*delta
@@ -104,7 +104,8 @@ func _sample_trail_edge(delta: float, edge_age: float, base: Vector3, tip: Vecto
 func _trail_sample(base: Vector3, tip: Vector3, time: float) -> Dictionary:
 	var tip_u := float(trail_end_fraction.call(base, tip)) if trail_end_fraction.is_valid() else 1.0
 	var end := tip if tip_u == 1.0 else base.lerp(tip, tip_u)
-	return {"base": base, "tip": end, "tip_u": tip_u, "time": time, "section": _ribbon_section}
+	return {"base": base, "tip": end, "tip_u": tip_u, "time": time, "section": _ribbon_section,
+		"lifetime": _ribbon_lifetime, "tint": _ribbon_tint, "edge_tint": _ribbon_edge_tint}
 
 func _burst(point:Vector3,direction:Vector3,publish_sample:=false)->void:
 	bursts+=1;var added:=0
@@ -122,7 +123,7 @@ func contact(point: Vector3, direction: Vector3, publish_sample := false) -> voi
 func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=null)->Array:
 	var result:Array=[]
 	for point:Dictionary in samples:
-		if display_time-float(point.time)>_ribbon_lifetime:continue
+		if display_time-float(point.time)>float(point.lifetime):continue
 		if float(point.time)<=display_time:result.append(point)
 		else:
 			if not result.is_empty() and display_time>float(result[-1].time):
@@ -138,6 +139,7 @@ func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=nul
 					"tip": blade_tip if full_span and blade_tip != null else Vector3(a.tip).lerp(point.tip, weight),
 					"tip_u": lerpf(a.tip_u, point.tip_u, weight), "time": display_time,
 					"section": point.section,
+				"lifetime": point.lifetime, "tint": point.tint, "edge_tint": point.edge_tint,
 				})
 			break
 	return result
@@ -153,7 +155,7 @@ func particle_at(index:int,display_time:float)->Dictionary:
 	return {"position":previous.position,"life":previous.life}
 func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=null)->void:
 	var time:=clock if display_time<0. else minf(display_time,clock)
-	var shown:Array=samples if display_time<0. else samples_at(time,blade_base,blade_tip)
+	var shown := samples_at(time, blade_base, blade_tip)
 	_mesh.clear_surfaces()
 	var has_surface := false
 	for i in range(1, shown.size()):
@@ -164,13 +166,13 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 		if not has_surface:
 			_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 			has_surface = true
-		var age_a := clampf((time - float(a.time)) / _ribbon_lifetime, 0.0, 1.0)
-		var age_b := clampf((time - float(b.time)) / _ribbon_lifetime, 0.0, 1.0)
+		var age_a := clampf((time - float(a.time)) / float(a.lifetime), 0.0, 1.0)
+		var age_b := clampf((time - float(b.time)) / float(b.lifetime), 0.0, 1.0)
 		var ages := Vector2(age_a, age_b)
 		var opacity := (1.0 - age_a) * intensity * 0.58
-		_add_ribbon_strip(a, b, 0.0, ages, Color(_ribbon_tint, opacity))
+		_add_ribbon_strip(a, b, 0.0, ages, Color(a.tint, opacity))
 		if a.tip_u > 0.86 or b.tip_u > 0.86:
-			_add_ribbon_strip(a, b, 0.86, ages, Color(_ribbon_edge_tint, opacity * 0.8))
+			_add_ribbon_strip(a, b, 0.86, ages, Color(a.edge_tint, opacity * 0.8))
 	if has_surface:
 		_mesh.surface_end()
 	for i in particles.size():

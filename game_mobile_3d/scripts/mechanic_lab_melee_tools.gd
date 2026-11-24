@@ -145,6 +145,37 @@ const AIR_RATES := [1.2, 1.0, 1.0, 1.0]
 const AIR_LANDING := [0.214319, 0.607441, 0.431681, 0.607441]
 const AIR_CONTACT := [0.279693, 0.628606, 0.444457, 0.628606]
 const AIR_END := [0.866667, 1.302315, 1.290120, 1.302315]
+const AIR_TRAILS := {
+	Tool.CLEAVER: {
+		"landing": {"window": [0.257850, 0.316667], "style": {"tint": Color(0.33, 0.78, 1.0), "lifetime": 0.15}},
+	},
+	Tool.PICKAXE: {
+		"flight": {"window": [0.091948, 0.183333], "style": {"tint": Color(0.43, 0.68, 1.0), "lifetime": 0.30}},
+		"landing": {"window": [0.622641, 0.675000], "style": {"tint": Color(1.0, 0.32, 0.48), "lifetime": 0.15}},
+	},
+	Tool.SHOVEL: {},
+}
+const AIR_EFFECTS := {
+	Tool.CLEAVER: [
+		{"time": 0.258916, "effect": GroundEffect.SHOCKWAVE, "offset": Vector2(0.0, 1.75)},
+		{"time": 0.262468, "effect": GroundEffect.SHAKE},
+		{"time": 0.262824, "effect": GroundEffect.DUST, "offset": Vector2(0.0, 0.90)},
+		{"time": 0.264515, "effect": GroundEffect.DEBRIS, "offset": Vector2(0.0, 1.80), "mark": true},
+		{"time": 0.271219, "effect": GroundEffect.DUST, "offset": Vector2(0.0, 0.90)},
+	],
+	Tool.PICKAXE: [
+		{"time": 0.619433, "effect": GroundEffect.DEBRIS, "offset": Vector2(0.0, 1.80), "mark": true},
+		{"time": 0.623386, "effect": GroundEffect.SHOCKWAVE, "offset": Vector2(0.0, 1.75)},
+		{"time": 0.626369, "effect": GroundEffect.SHAKE},
+		{"time": 0.633079, "effect": GroundEffect.DUST, "offset": Vector2(0.0, 0.90)},
+	],
+	Tool.SHOVEL: [
+		{"time": 0.454490, "effect": GroundEffect.DEBRIS, "offset": Vector2(0.0, 0.50), "medium": true},
+		{"time": 0.460621, "effect": GroundEffect.DUST, "offset": Vector2(0.0, 0.90)},
+		{"time": 0.463408, "effect": GroundEffect.SHAKE, "medium": true},
+		{"time": 0.467310, "effect": GroundEffect.SHOCKWAVE, "offset": Vector2(0.0, 0.40)},
+	],
+}
 const STRIKES := [
 	[
 		{"damage": 13, "stagger": 15.0, "range_m": 2.5, "cone_degrees": 100.0, "cone_cutoff": 1.2, "cone_offset": -1.2, "strength": 500.0, "angle": 15.0},
@@ -262,7 +293,11 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 		result.additional_clips.append_array([attack, recovery])
 		result.windows.append(window)
 	var air := _clip(root, AIR_CLIPS[tool], air_clip(tool), "attack")
-	air.vfx_window = [AIR_CONTACT[tool], minf(AIR_CONTACT[tool] + 0.12, AIR_END[tool])]
+	if AIR_EFFECTS.has(tool):
+		air.air_trails = AIR_TRAILS[tool]
+		air.ground_effects = AIR_EFFECTS[tool]
+	else:
+		air.vfx_window = [AIR_CONTACT[tool], minf(AIR_CONTACT[tool] + 0.12, AIR_END[tool])]
 	result.additional_clips.append(air)
 	return result
 
