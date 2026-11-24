@@ -130,8 +130,7 @@ void fragment() {
 	SPECULAR = native_specular;
 	EMISSION = vec3(0.0);
 #else
-	float geometry_occlusion;
-	float receiver_contact=terrain_contact_shade(surface_world,surface_normal,geometry_occlusion);
+	float receiver_contact=terrain_contact_shade(surface_world,surface_normal);
 	vec2 packed_pbr=terrain_pbr(UV);
 	ROUGHNESS = native_roughness*packed_pbr.y;
 	METALLIC = native_metallic*packed_pbr.x;
@@ -151,7 +150,7 @@ void fragment() {
 	}
 	vec3 path_sky_excess;
 	vec2 path_sky_chroma_delta;
-	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD,surface_world,geometry_occlusion,path_sky_excess,path_sky_chroma_delta)*sole;
+	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD,surface_world,receiver_contact,path_sky_excess,path_sky_chroma_delta)*sole;
 	vec3 local_diffuse = gaf_local_diffuse(diffuse_fill, surface_world, surface_normal);
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	terrain_canopy_ground_ev = 0.0;

@@ -76,7 +76,7 @@ global uniform sampler2D gaf_directional_ground_sky : filter_linear, repeat_disa
 global uniform vec4 gaf_directional_ground_rect;
 global uniform vec2 gaf_directional_ground_height;
 
-vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec3 receiver_visibility,float face_y,vec3 camera_position,vec3 world_position,float geometry_occlusion,out vec3 path_sky_excess,out vec2 path_sky_chroma_delta){
+vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec3 receiver_visibility,float face_y,vec3 camera_position,vec3 world_position,float receiver_contact,out vec3 path_sky_excess,out vec2 path_sky_chroma_delta){
 	vec3 sky = terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
@@ -102,8 +102,8 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec
 	}
 	vec3 diffuse_sky = gaf_pre_twilight_diffuse(sky_fill, camera_position);
 	if (gaf_stone_foot_fill > 0.0 && use_source_terrain && ground_grade == 3 && face_y > .998) {
-		// A raised neighbour blocks some diffuse sky just above the stone floor.
-		float floor_contact = smoothstep(.015, .19, geometry_occlusion);
+		// Reuse the local contact estimate to reduce only the diffuse sky on stone floors.
+		float floor_contact = smoothstep(.015, .19, 1.0 - receiver_contact);
 		float strength = .40 * min(2.0 * gaf_stone_foot_fill, 1.0);
 		diffuse_sky *= 1.0 - strength * floor_contact;
 	}
