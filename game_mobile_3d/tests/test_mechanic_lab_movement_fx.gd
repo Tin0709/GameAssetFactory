@@ -509,16 +509,18 @@ func check_gauntlet_impact_marks(lab) -> void:
 		check(decal != null and decal.texture_albedo.get_size() == Vector2(16, 16)
 			and (decal.cull_mask & camera_ground.layers) != 0 and (decal.cull_mask & player_mesh.layers) == 0,
 			"The mark uses one atlas tile and projects only onto the stage")
-	for fixture in ["grass", "stone_wall", "slab"]:
+	for fixture in ["grass", "dirt", "stone_wall", "slab"]:
 		lab.reset_player()
 		for i in 8:
 			await physics_frame
 		lab._select_weapon(lab.Weapon.BASIC_GAUNTLETS if fixture == "grass" else lab.Weapon.GAUNTLETS)
-		if fixture == "stone_wall":
+		if fixture == "dirt":
+			lab._select_floor_surface(1)
+		elif fixture == "stone_wall":
 			lab._select_floor_surface(2)
 		var forward: Vector3 = lab.player.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var obstacle: StaticBody3D
-		if fixture != "grass":
+		if fixture in ["stone_wall", "slab"]:
 			obstacle = StaticBody3D.new()
 			var box := BoxShape3D.new()
 			var shape := CollisionShape3D.new()
@@ -551,7 +553,7 @@ func check_gauntlet_impact_marks(lab) -> void:
 			check(appeared != null and lab.player.is_on_floor(), "The %s Gauntlets dive leaves its mark on touchdown" % fixture)
 			if appeared != null:
 				var reach := appeared.global_position.dot(forward)
-				var expected := 1.8 if fixture == "grass" else 0.82
+				var expected := 0.82 if fixture == "stone_wall" else 1.8
 				check(absf(reach - expected) < 0.02 and absf(appeared.global_position.y) < 0.03,
 					"The %s crack stays on the supported side of the stage" % fixture)
 				print("GAUNTLET_IMPACT_MARK ", fixture, " reach=", reach, " tint=", appeared.modulate)
