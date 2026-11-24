@@ -209,6 +209,16 @@ void light() {
 		dot(mat3(INV_VIEW_MATRIX) * LIGHT, gaf_stone_shade_fill.xyz) > 0.9999 &&
 		distance(INV_VIEW_MATRIX[3].xyz, gaf_point_kernel_camera) <= 0.005) {
 		float shade = 1.0 - smoothstep(.04, .68, shadow_attenuation);
+		if (use_source_terrain && surface_top > .998 && gaf_stone_top_shadow_fill.x > 0.0) {
+			// Open treads retain more diffuse sky than their neighboring risers.
+			// Cap the return against the direct beam so it fades smoothly out of cast shade.
+			const vec3 luma = vec3(.2126, .7152, .0722);
+			vec3 sky_return = terrain_opening_incident * (.46 * min(gaf_stone_top_shadow_fill.x, 1.0));
+			float direct_room = .27 * dot(key_color, luma) * (nl * cloud_transmission * terrain_direct_contact / PI);
+			float gain = min(1.0, direct_room / max(dot(sky_return, luma), .00001));
+			float cast_shade = 1.0 - smoothstep(.08, .66, shadow_attenuation);
+			DIFFUSE_LIGHT += sky_return * (gain * cast_shade);
+		}
 		if (gaf_stone_shade_fill.w > 0.0) {
 			// Use the receiver's existing sky and contact terms on sun-facing rock in shadow.
 			float facing = smoothstep(.03, .38, nl);
