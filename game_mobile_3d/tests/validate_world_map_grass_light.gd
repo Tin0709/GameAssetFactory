@@ -88,12 +88,26 @@ func run()->void:
 		var petal_source := petals.shader
 		const OPEN_RETURN := &"flower_open_return"
 		const OPEN_UNIFORM := "petal_open_return"
+		const OVERCAST_UNIFORM := "petal_overcast_return"
 		check(w.showcase._lighting_sliders.has(OPEN_RETURN), "The sunlit petal balance has a graphics slider")
 		check(is_equal_approx(_petal_return(petals, OPEN_UNIFORM), .55),
 			"Default noon rebalances direct and returned light on the flower heads")
+		w.showcase.set_weather(0., 0.)
+		p.grass_light.sync()
+		check(_petal_return(petals, OVERCAST_UNIFORM) == 0., "Clear weather keeps the approved petal balance")
+		w.showcase.set_weather(.5, 0.)
+		p.grass_light.sync()
+		check(is_equal_approx(_petal_return(petals, OVERCAST_UNIFORM), .275),
+			"Petal overcast response blends with the current weather")
+		w.showcase.set_weather(1., 0.)
+		p.grass_light.sync()
+		check(is_equal_approx(_petal_return(petals, OVERCAST_UNIFORM), .55),
+			"Default overcast noon returns diffuse light to petal faces")
 		w.showcase.set_lighting_scale(OPEN_RETURN, .5)
 		check(is_equal_approx(_petal_return(petals, OPEN_UNIFORM), .275) and petals.shader == petal_source,
 			"The sunlit petal slider changes strength on the same shader")
+		check(is_equal_approx(_petal_return(petals, OVERCAST_UNIFORM), .275),
+			"The same slider scales the overcast response")
 		w.showcase.set_lighting_scale(SHADE_RETURN, .5)
 		check(is_equal_approx(_petal_return(petals), .0258) and petals.shader == petal_source,
 			"The slider changes only the strength of the existing flower material")
@@ -101,6 +115,8 @@ func run()->void:
 		p.grass_light.sync()
 		check(_petal_return(petals) == 0., "Petal shade return is off at night")
 		check(_petal_return(petals, OPEN_UNIFORM) == 0., "Sunlit petal return is off at night")
+		check(_petal_return(petals, OVERCAST_UNIFORM) == 0., "Petal overcast response is off at night")
+		w.showcase.set_weather(0., 0.)
 		w.showcase.set_hour(12.)
 		p.grass_light.sync()
 		var flower_preset := "user://petal_shade_%d.cfg" % OS.get_process_id()
