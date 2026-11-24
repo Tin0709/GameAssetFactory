@@ -83,7 +83,7 @@ var biome_controller: BiomeGraphics
 @export var forest_fern_variants: PackedVector3Array
 ## Optional ForestA1 wall vine anchors, stored as world X, Z, and outward yaw in degrees.
 @export var forest_wall_vine_placements: PackedVector3Array
-## Metres of visual foothills beyond the positive X/Z edge in the private showcase.
+## Metres of render-only foothills beyond the map, with an optional private Forest shape.
 @export_range(0, 48) var exterior_ground_reach := 0
 
 @export var local_mist_region: LocalMistRegion

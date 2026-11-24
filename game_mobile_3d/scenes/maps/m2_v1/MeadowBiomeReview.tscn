@@ -33,6 +33,7 @@ opening_world = Vector3(1, 6, -6.5)
 [node name="MeadowBiomeReview" instance=ExtResource("base")]
 script = ExtResource("map")
 map_layout_path = "res://assets/maps/meadow_biome_review/runtime.json"
+exterior_ground_reach = 46
 local_mist_region = SubResource("LowWesternMist")
 additional_mist_region = SubResource("StoneGardenMist")
 local_diffuse_region = SubResource("StoneGardenDiffuse")

@@ -7,7 +7,12 @@ render_mode diffuse_lambert, specular_disabled;
 #include "res://materials/world_map_mist.gdshaderinc"
 #endif
 
+#ifdef GAF_PORTABLE_FOOTHILLS
+uniform sampler2D portable_stone : source_color, filter_linear_mipmap, repeat_enable;
+uniform vec4 portable_stone_tint : source_color = vec4(1.0);
+#else
 uniform sampler2DArray source_terrain_tiles : source_color, filter_linear_mipmap, repeat_enable;
+#endif
 varying vec3 foothill_world;
 varying vec3 foothill_normal;
 
@@ -20,7 +25,11 @@ void fragment() {
 	vec2 stone_uv = abs(foothill_normal.y) > .9 ? vec2(foothill_world.x, -foothill_world.z) :
 		vec2(abs(foothill_normal.x) > .9 ? -foothill_world.z * sign(foothill_normal.x) :
 			foothill_world.x * sign(foothill_normal.z), foothill_world.y);
+#ifdef GAF_PORTABLE_FOOTHILLS
+	ALBEDO = texture(portable_stone, stone_uv).rgb * portable_stone_tint.rgb;
+#else
 	ALBEDO = texture(source_terrain_tiles, vec3(stone_uv, 4.0)).rgb;
+#endif
 	cloud_transmission = world_cloud_shade(foothill_world);
 	// The ledges sit below the authored irradiance cache. Use the live biome sky here.
 	AO = mix(0.66, 0.90, max(0.0, foothill_normal.y));

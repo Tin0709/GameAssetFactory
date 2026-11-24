@@ -13,6 +13,7 @@ const TerrainMistVisibility = preload("res://scripts/terrain_mist_visibility.gd"
 const LocalExposure = preload("res://scripts/world_map_local_exposure.gd")
 const PathFixture = preload("res://scripts/world_map_forest_path_light.gd")
 const PathLamppost = preload("res://scripts/world_map_path_lamppost.gd")
+const ExteriorGround = preload("res://scripts/world_map_exterior_ground.gd")
 const HOURS := [7., 12., 16.5, 18.5, 22.]
 const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 enum Quality { ESSENTIAL, BALANCED, FULL }
@@ -51,6 +52,7 @@ var _allow_spatial_mist := true
 var _path_fixture := PathFixture.new()
 var _path_lamppost := PathLamppost.new()
 var _allow_fixture_scatter := true
+var _exterior_ground: ExteriorGround
 var _mist_sample: Dictionary
 var _allow_adaptive_bloom := true
 var _finish_effect: LocalExposure
@@ -73,6 +75,14 @@ func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> voi
 		if choice != null and not choice.use_forest_reference and not _choices.has(choice):
 			_choices.append(choice)
 	_load_terrain_mist_visibility()
+	if world.exterior_ground_reach > 0:
+		var foothills := ExteriorGround.new()
+		if foothills.build_portable(world, world.exterior_ground_reach):
+			_exterior_ground = foothills
+			foothills.name = "PortableExteriorGround"
+			world.add_child(foothills)
+		else:
+			foothills.free()
 	set_profile(profile)
 	var start_overcast: float = world.biome_start_overcast
 	var start_hour: float = world.biome_start_hour
@@ -363,6 +373,9 @@ func refresh() -> void:
 	_refresh_settings()
 	_update_stone_ledge()
 	_update_mist_visibility()
+	if is_instance_valid(_exterior_ground):
+		_exterior_ground.visible = (quality != Quality.ESSENTIAL and _world.look.stage == 2
+			and _world.view_mode == "gameplay")
 	if _world.look.stage != 2:
 		_world.showcase.sync_cliff_vista(false)
 		_update_local_diffuse()
@@ -521,6 +534,8 @@ func _ensure_compositor(camera: Camera3D) -> void:
 	camera.compositor = _finish_compositor
 
 func _exit_tree() -> void:
+	if is_instance_valid(_exterior_ground):
+		_exterior_ground.queue_free()
 	if DiffuseRegion.owns(self):
 		RenderingServer.global_shader_parameter_set("gaf_portable_ledge_occlusion", 0.)
 	DiffuseRegion.release(self)

@@ -3,6 +3,8 @@ extends Node3D
 
 const SIDES := [Vector3i.LEFT, Vector3i.RIGHT, Vector3i.FORWARD, Vector3i.BACK]
 const TOP_SPAN := 8
+const PORTABLE_GRID_M := 3.
+const PORTABLE_MATERIAL_KEY := "exterior-ground:portable-stone"
 const SHADER := preload("res://materials/world_map_exterior_ground.gdshader")
 
 var material: ShaderMaterial
@@ -62,6 +64,69 @@ func build(world: Node3D, reach: int) -> bool:
 				world.geometry._emit_triangles(tool, stone.faces[direction].whole, top - Vector3.UP * step, false)
 	_finish_strip(east_strip, &"EastFoothills")
 	_finish_strip(south_strip, &"SouthFoothills")
+	return true
+
+func build_portable(world: Node3D, reach: int) -> bool:
+	var source: Array = world.geometry._terrain_sources.get("stone_block", [])
+	if source.size() != 1 or reach <= 0 or reach > 48:
+		return false
+	var stone: BaseMaterial3D = source[0].material as BaseMaterial3D
+	var faces: Dictionary = source[0].faces
+	if stone == null or stone.albedo_texture == null or not faces.has_all(SIDES + [Vector3i.UP]):
+		return false
+	var bounds: Dictionary = world.runtime.border
+	var low := Vector2(bounds.min[0], bounds.min[2])
+	var high := Vector2(bounds.max[0], bounds.max[2])
+	var span := high - low
+	if not low.is_finite() or not high.is_finite() or span.x <= 0. or span.y <= 0. or maxf(span.x, span.y) > 270.:
+		return false
+	var outer := Vector2.ONE * reach
+	var first := Vector2i(((low - outer) / PORTABLE_GRID_M).floor())
+	var last := Vector2i(((high + outer) / PORTABLE_GRID_M).ceil())
+	var floor_y := floori(float(bounds.min[1])) - 1
+	var noise := FastNoiseLite.new()
+	noise.seed = 622
+	noise.frequency = .037
+	var heights: Dictionary[Vector2i, int] = {}
+	for z in range(first.y, last.y):
+		for x in range(first.x, last.x):
+			var point := (Vector2(x, z) + Vector2.ONE * .5) * PORTABLE_GRID_M
+			var displacement := (low - point).max(point - high)
+			var outside := maxf(displacement.x, displacement.y)
+			# Extend a few metres under the map, entirely below its base.
+			if outside < -7.:
+				continue
+			var relief := smoothstep(-2., 21., outside) * 4. * noise.get_noise_2d(point.x, point.y)
+			var fall := 3. * smoothstep(0., 28., outside)
+			heights[Vector2i(x, z)] = floor_y + mini(0, roundi(relief - fall))
+	var shader := Shader.new()
+	shader.code = SHADER.code.replace("shader_type spatial;", "shader_type spatial;\n#define GAF_PORTABLE_FOOTHILLS")
+	material = ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter("portable_stone", stone.albedo_texture)
+	material.set_shader_parameter("portable_stone_tint", stone.albedo_color)
+	material.set_shader_parameter("cloud_field", world.look.cloud_texture)
+	material.set_shader_parameter("cloud_shape", world.look._cloud_shape)
+	material.set_shader_parameter("clouds_enabled", true)
+	var strip := _surface(material)
+	var merged := {}
+	for cell: Vector2i in heights:
+		var height: int = heights[cell]
+		if not merged.has(cell):
+			var top_span := _merge_top(heights, merged, cell, height, last.y)
+			_emit_top(strip, faces[Vector3i.UP].whole, cell, height, top_span, PORTABLE_GRID_M)
+		for direction: Vector3i in SIDES:
+			var other := cell + Vector2i(direction.x, direction.z)
+			var side_height := height - int(heights.get(other, height))
+			if side_height <= 0:
+				continue
+			var scale := Vector3(PORTABLE_GRID_M, side_height, PORTABLE_GRID_M)
+			var center := Vector3((cell.x + .5) * PORTABLE_GRID_M, height - side_height, (cell.y + .5) * PORTABLE_GRID_M)
+			for vertex: Array in faces[direction].whole:
+				strip.set_normal(vertex[1])
+				strip.add_vertex(Vector3(vertex[0]) * scale + center)
+	_finish_strip(strip, &"Foothills")
+	world.look.materials[PORTABLE_MATERIAL_KEY] = material
 	return true
 
 func _merge_top(heights: Dictionary, merged: Dictionary, cell: Vector2i, height: int, end_z: int) -> Vector2i:
