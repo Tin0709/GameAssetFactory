@@ -188,6 +188,9 @@ func _play(key:String,voice:AudioStreamPlayer3D,point:Vector3,db:float,pitch:flo
 	events.append({"time":clock,"key":key,"name":row.name,"at":[point.x,point.y,point.z]})
 	if events.size()>256:events.pop_front()
 
+func play_landing_at(point: Vector3) -> void:
+	_on_surface_contact(point, true)
+
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	if not footsteps_enabled and not rustle_enabled:
 		return
