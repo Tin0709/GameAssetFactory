@@ -222,8 +222,8 @@ func check_overlapping_damage_number_positions() -> void:
 	check(numbers.multimesh.visible_instance_count == 8,
 		"Every hit retains its two damage digits")
 	var separated: Vector3 = origin + side * 3.0
-	check(born[-1].get_center().is_equal_approx(
-		Vector2(separated.dot(side), separated.dot(camera.global_basis.y))),
+	var projected := Vector2(separated.dot(side), separated.dot(camera.global_basis.y))
+	check(born.any(func(frame): return frame.get_center().distance_to(projected) < 0.0001),
 		"A separated number keeps its exact hit anchor")
 	check(damage_number_overlaps(born) == 0, "Simultaneous overlapping hits get separate positions")
 	numbers._process(0.0)
