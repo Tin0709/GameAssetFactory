@@ -188,12 +188,23 @@ func check_aerial_tool_effects(lab, selector: OptionButton) -> void:
 		lab.Weapon.PICKAXE: [0.619433, 0.623386, 0.626369, 0.633079],
 		lab.Weapon.SHOVEL: [0.454490, 0.460621, 0.463408, 0.467310],
 	}
-	for fixture: Vector2 in [Vector2(lab.Weapon.CLEAVER, 5), Vector2(lab.Weapon.PICKAXE, 5),
-			Vector2(lab.Weapon.PICKAXE, 70), Vector2(lab.Weapon.SHOVEL, 5)]:
+	for fixture: Vector3i in [Vector3i(lab.Weapon.CLEAVER, 5, 0), Vector3i(lab.Weapon.PICKAXE, 5, 0),
+			Vector3i(lab.Weapon.PICKAXE, 70, 0), Vector3i(lab.Weapon.SHOVEL, 5, 0), Vector3i(lab.Weapon.PICKAXE, 5, 1)]:
 		lab.reset_player()
 		for i in 8:
 			await physics_frame
-		var slot := int(fixture.x)
+		var slot := fixture.x
+		var wall: StaticBody3D
+		if fixture.z == 1:
+			wall = StaticBody3D.new()
+			var collision := CollisionShape3D.new()
+			var wall_shape := BoxShape3D.new()
+			wall_shape.size = Vector3(2.0, 3.0, 0.2)
+			collision.shape = wall_shape
+			wall.add_child(collision)
+			var facing: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
+			wall.transform = Transform3D(Basis.looking_at(facing, Vector3.UP, true), facing + Vector3.UP)
+			lab.add_child(wall)
 		selector.select(slot)
 		selector.item_selected.emit(slot)
 		cue_times.clear()
@@ -208,6 +219,7 @@ func check_aerial_tool_effects(lab, selector: OptionButton) -> void:
 		var flight_count := 0
 		var landing_count := 0
 		var ring_seen := false
+		var mixed_palette_seen := false
 		for i in Engine.physics_ticks_per_second * 3:
 			await physics_frame
 			for point: Dictionary in effects.samples:
@@ -219,25 +231,44 @@ func check_aerial_tool_effects(lab, selector: OptionButton) -> void:
 					landing_count += 1
 					var start := 0.257850 if slot == lab.Weapon.CLEAVER else 0.622641
 					check(absf(start_time - start) < 0.00001, "The landing trail starts at the montage cue")
+					check(is_equal_approx(point.lifetime, 0.15), "The landing trail keeps its own shorter fade")
 				else:
 					flight_count += 1
 					check(slot == lab.Weapon.PICKAXE and absf(start_time - 0.091948) < 0.00001,
 						"Only Pickaxe draws a falling trail, at its own montage cue")
+					check(is_equal_approx(point.lifetime, 0.30), "The falling trail keeps its longer fade")
+			if not mixed_palette_seen and slot == lab.Weapon.PICKAXE and actor.combo.air_landing_started:
+				effects.present(effects.clock)
+				var mesh: Mesh = effects.ribbon.mesh
+				if mesh.get_surface_count() > 0:
+					var colors: PackedColorArray = mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR]
+					var blue := false
+					var rose := false
+					for color in colors:
+						blue = blue or color.b > color.r
+						rose = rose or color.r > color.b and color.b > color.g
+					mixed_palette_seen = blue and rose
 			ring_seen = ring_seen or lab._tool_slam_ring.visible
 			if actor.combo.air_landing_started and actor.combo.phase != &"air_attack":
 				break
 		var context := "%s from %.0f m" % [selector.get_item_text(slot), fixture.y]
+		if wall != null:
+			context += " in front of a wall"
 		check(cue_times.size() == expected[slot].size() and not early_ground_cue.has(true),
 			"%s plays each ground layer once after landing" % context)
 		for index in mini(cue_times.size(), expected[slot].size()):
 			check(absf(cue_times[index] - float(expected[slot][index])) < 0.00001,
 				"%s layer %d uses the authored source timestamp" % [context, index + 1])
-		check(ring_seen, "%s shows the supported shockwave" % context)
+		check(ring_seen == (wall == null), "%s shows the shockwave only on unobstructed ground" % context)
 		check(landing_count == (0 if slot == lab.Weapon.SHOVEL else 1),
 			"%s has the correct number of landing strips" % context)
 		check(flight_count >= (2 if fixture.y > 5 else 1) if slot == lab.Weapon.PICKAXE else flight_count == 0,
 			"%s uses the appropriate falling slash on each loop" % context)
+		if slot == lab.Weapon.PICKAXE and fixture.y == 5 and wall == null:
+			check(mixed_palette_seen, "An overlapping blue falling strip and rose landing strip keep distinct colors")
 		print("TOOL_AERIAL_FX ", context, " ground=", cue_times, " flight=", flight_count, " landing=", landing_count)
+		if wall != null:
+			wall.free()
 	actor.tool_ground_cue.disconnect(record)
 	lab.reset_player()
 
