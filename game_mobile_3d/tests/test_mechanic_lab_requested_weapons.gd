@@ -89,12 +89,18 @@ func check_new_weapons(lab: Node3D, menu: OptionButton, target: Node3D) -> void:
 		check(bow.ammo == 15 and target.health == 100 and mounted.mesh != relaxed,
 			"Holding Bow draws its mesh and spends no ammo")
 		attack(false)
-		await ticks(22)
+		await ticks(5)
+		check(bow._trails.size() == 1 and bow._trails[0].get("charged", false),
+			"Release through normal input marks a fully drawn Bow trail as charged")
+		await ticks(17)
 		check(bow.ammo == 14 and target.health == 46 and mounted.mesh == relaxed,
 			"Releasing a fully drawn Bow fires one charged arrow for 54 damage")
 		await ticks(12)
 		await tap_attack()
-		await ticks(28)
+		await ticks(7)
+		check(bow._trails.size() == 1 and not bow._trails[0].get("charged", true),
+			"A short tap keeps the normal visual trail")
+		await ticks(21)
 		check(bow.ammo == 13 and target.health == 28, "A short Bow tap fires one regular arrow for 18 damage")
 		await ticks(12)
 		attack(true)
@@ -583,7 +589,9 @@ func check_arrow_ribbon_sections(projectile: Node3D, spans: int, fixture: String
 			section_counts[section] += 1
 			var t := expected_age / 0.3
 			var expected_alpha := maxf(0.0, 1.0 - 4.0 * t if t <= 0.2 else 0.3 - 0.5 * t)
-			var half_width := 0.04 * (1.0 - 0.5 * t)
+			var charged := fixture.begins_with("charged Bow")
+			var half_width := (0.08 if charged else 0.04) * (1.0 - 0.5 * t)
+			geometry_matches = geometry_matches and colors[i].r == (1.0 if charged else 0.0)
 			geometry_matches = geometry_matches and absf(colors[i].a - expected_alpha) < 0.004
 			geometry_matches = geometry_matches and absf(offset.slide(direction).length() - half_width) < 0.00005
 			break
