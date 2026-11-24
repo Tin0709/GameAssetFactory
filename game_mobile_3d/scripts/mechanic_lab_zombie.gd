@@ -1329,13 +1329,22 @@ func _advance_landing(delta: float) -> void:
 	if not actions_stuff_animation or not is_on_floor():
 		_actions_landing_time = -1.0
 		return
-	actions_stuff_landing.clear_floor(ragdoll.skeleton, global_position.y)
+	actions_stuff_landing.clear_floor(ragdoll.skeleton, _landing_support_plane())
 	_actions_landing_time += delta
 	var time := _actions_landing_time - ActionsStuff.LANDING_DELAY
 	if time >= actions_stuff_landing.duration:
 		_actions_landing_time = -1.0
 	elif time >= 0.0:
 		actions_stuff_landing.apply(ragdoll.skeleton, time)
+
+func _landing_support_plane() -> Plane:
+	var normal := get_floor_normal()
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		for contact in collision.get_collision_count():
+			if collision.get_normal(contact).dot(normal) > 0.999:
+				return Plane(normal, collision.get_position(contact))
+	return Plane(normal, global_position)
 
 func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE,
 		stagger: float = MAX_POISE, knockback_strength: float = 500.0, death_strike := DeathStrike.GROUND,

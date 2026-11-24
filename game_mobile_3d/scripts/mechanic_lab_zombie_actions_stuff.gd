@@ -75,17 +75,18 @@ class LandingPose:
 				"rotation": Pack.Channel.new(channels.rotation) if channels.has("rotation") else null,
 			})
 
-	func clear_floor(skeleton: Skeleton3D, floor_y: float) -> void:
+	func clear_floor(skeleton: Skeleton3D, floor_plane: Plane) -> void:
 		# During the blend from fall, the outgoing pose can still put a sole
 		# below the floor. Lift the pose just enough to keep contact.
 		var world := skeleton.global_transform
 		var lowest := INF
 		for i in _leg_bones.size():
 			var sole := world * skeleton.get_bone_global_pose(_leg_bones[i]) * _soles[i]
-			lowest = minf(lowest, sole.origin.y - absf(sole.basis.x.y) - absf(sole.basis.z.y))
-		if lowest < floor_y:
+			var extent := absf(floor_plane.normal.dot(sole.basis.x)) + absf(floor_plane.normal.dot(sole.basis.z))
+			lowest = minf(lowest, floor_plane.distance_to(sole.origin) - extent)
+		if lowest < 0.0:
 			var parent_basis := world.basis * skeleton.get_bone_global_pose(_hip_parent).basis
-			var lift := parent_basis.inverse() * (Vector3.UP * (floor_y - lowest))
+			var lift := parent_basis.inverse() * (Vector3.UP * (-lowest / floor_plane.normal.y))
 			skeleton.set_bone_pose_position(_hip, skeleton.get_bone_pose_position(_hip) + lift)
 
 	func apply(skeleton: Skeleton3D, time: float) -> void:
