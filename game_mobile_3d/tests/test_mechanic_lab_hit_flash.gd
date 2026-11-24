@@ -19,7 +19,8 @@ class FlashMonitor extends Node:
 	func _process(_delta: float) -> void:
 		if hit:
 			var mesh := zombie.get("_mesh") as MeshInstance3D
-			var weight := float(mesh.get_instance_shader_parameter("hit_flash"))
+			var parameter: Variant = mesh.get_instance_shader_parameter("hit_flash")
+			var weight := float(parameter) if parameter != null else 0.0
 			values.append(weight)
 			var clock: float = actor.render_presenter.display_clock
 			if weight > 0.0 and is_inf(first_body_clock):

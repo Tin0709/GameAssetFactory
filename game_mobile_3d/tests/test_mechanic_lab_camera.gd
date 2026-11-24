@@ -349,6 +349,9 @@ func check_aerial_contact_pose(lab) -> void:
 			lab._process(0.0)
 			var early_count: int = sparks._streaks.visible_instance_count
 			check(early_count == 0, "Aerial body sparks wait for the contact pose in slot %d" % slot)
+			var early_flash: Variant = target._mesh.get_instance_shader_parameter(&"hit_flash")
+			check(early_flash in [null, 0.0] and target.health < target.max_health,
+				"Aerial body flash waits for the contact pose after damage in slot %d" % slot)
 			if slot != lab.Weapon.SABRE:
 				check(not lab._impact_light.visible, "The landing light waits for the contact pose in slot %d" % slot)
 				check(is_equal_approx(lab._light_sample_time, clock),
@@ -369,6 +372,8 @@ func check_aerial_contact_pose(lab) -> void:
 			sparks._process(0.0)
 			lab._process(0.0)
 			check(sparks._streaks.visible_instance_count == 9, "One body burst starts on the contact pose in slot %d" % slot)
+			var flash: Variant = target._mesh.get_instance_shader_parameter(&"hit_flash")
+			check(flash == 1.0, "Aerial body flash starts with the body sparks in slot %d" % slot)
 			for spark in sparks._particles:
 				if spark.age < spark.lifetime:
 					check(is_equal_approx(spark.origin.distance_to(contacts[0]), 0.21), "Body sparks start at their struck target")
