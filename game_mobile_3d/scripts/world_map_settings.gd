@@ -33,6 +33,7 @@ const NAMED := {
 	"DisplayEdgeStrength": "display_edge_strength",
 	"PortableNightBloom": "night_soft_bloom",
 	"StoneLedgeOcclusion": "stone_foot_fill",
+	"StoneShelfRedistribution": "stone_top_shadow_fill",
 	"TerrainMistVisibility": "terrain_mist_visibility",
 	"PortableMistFrontTransfer": "mist_front_transfer",
 	"PortableMistMidgroundClearance": "mist_midground_clearance",

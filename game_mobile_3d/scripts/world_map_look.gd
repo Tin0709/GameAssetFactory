@@ -669,9 +669,13 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 	var bounce := ground_bounce_active() and original in [PRESET.ground_shader, PRESET.cutaway_shader]
 	var terrain_sky := stage == 2 and _terrain_sky_enabled and not spatial and original in [PRESET.ground_shader, PRESET.cutaway_shader]
 	var tree_sky: bool = not _flat_lab and stage == 2 and level.showcase.private_primary and level.grove != null and original == level.grove.REVEAL_SHADER
-	if not (direct or canopy or foliage or filtered_leaves or bounce or terrain_sky or grove_coverage or tree_sky or grove_cue): return original
+	var portable_shelf: bool = not _flat_lab and not spatial and stage == 2 \
+		and level._uses_portable_biome() and level.stone_shelf_corners != null \
+		and RenderingServer.get_current_rendering_method() == "mobile" \
+		and original in [PRESET.ground_shader, PRESET.cutaway_shader]
+	if not (direct or canopy or foliage or filtered_leaves or bounce or terrain_sky or grove_coverage or tree_sky or grove_cue or portable_shelf): return original
 	var flat_turf := _flat_lab and direct and original == PRESET.ground_shader
-	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1) | (int(terrain_sky) << 2) | (int(spatial)<<3) | (int(grove_coverage) << 4) | (int(tree_sky) << 5) | (int(grove_cue) << 6) | (int(flat_turf) << 7))
+	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1) | (int(terrain_sky) << 2) | (int(spatial)<<3) | (int(grove_coverage) << 4) | (int(tree_sky) << 5) | (int(grove_cue) << 6) | (int(flat_turf) << 7) | (int(portable_shelf) << 8))
 	var variants: Dictionary = _shader_variants.get_or_add(original, {})
 	if not variants.has(key):
 		var shader := Shader.new()
@@ -698,6 +702,8 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 			defines += "\n#define GAF_WORLD_TERRAIN_SKY"
 		if spatial:defines+="\n#define GAF_WORLD_SPATIAL_TERRAIN"
 		if flat_turf:defines+="\n#define GAF_WORLD_FLAT_TURF"
+		if portable_shelf:
+			defines += "\n#define GAF_PORTABLE_STONE_SHELF"
 		if (direct or foliage) and ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
 			defines += "\n#define GAF_WORLD_FORCE_LAMBERT"
 		var code := original.code.replace("shader_type spatial;", defines)

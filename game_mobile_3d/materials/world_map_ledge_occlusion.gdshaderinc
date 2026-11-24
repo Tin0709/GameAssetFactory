@@ -1,6 +1,15 @@
 global uniform float gaf_portable_ledge_occlusion;
 
+#ifdef GAF_PORTABLE_STONE_SHELF
+#include "res://materials/world_map_stone_shelf.gdshaderinc"
+#endif
+
 float portable_ledge_visibility(vec3 position, vec3 normal) {
+#ifdef GAF_PORTABLE_STONE_SHELF
+	if (path_blending && ground_grade == 3 && normal.y > .998) {
+		return gaf_stone_shelf_multiplier(position.xz);
+	}
+#endif
 	if (gaf_portable_ledge_occlusion <= 0.0 || !path_blending || ground_grade != 3 || abs(normal.y) >= .1) {
 		return 1.0;
 	}

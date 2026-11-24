@@ -44,6 +44,10 @@ var _night_bloom_drag_before := 1.
 var _stone_ledge_slider: HSlider
 var _stone_ledge_drag_before := 1.
 var _stone_ledge_occlusion := 0.
+var _stone_shelf_field: Texture2D
+var _stone_shelf_state := Vector3.ZERO
+var _stone_shelf_slider: HSlider
+var _stone_shelf_drag_before := 1.
 var _mist: MistVolume
 var _mist_light_binding: Dictionary = {}
 var _mist_visibility_slider: HSlider
@@ -73,6 +77,10 @@ func setup(world: Node3D, profile: Profile, alternatives: Array[Profile]) -> voi
 	_world = world
 	DiffuseRegion.claim(self)
 	RenderingServer.global_shader_parameter_set("gaf_portable_ledge_occlusion", 0.)
+	RenderingServer.global_shader_parameter_set("gaf_stone_shelf_state", Vector3.ZERO)
+	if RenderingServer.get_current_rendering_method() == "mobile":
+		_stone_shelf_field = _world.validated_stone_shelf_corners()
+	RenderingServer.global_shader_parameter_set("gaf_stone_shelf_field", _stone_shelf_field)
 	quality = world.biome_quality
 	_choices.append(profile)
 	for choice in alternatives:
@@ -171,6 +179,21 @@ func add_settings_controls(parent: VBoxContainer) -> Label:
 					&"stone_foot_fill", _stone_ledge_drag_before)))
 		parent.add_child(_stone_ledge_slider)
 
+	if _stone_shelf_field != null and _choices.any(func(profile: Profile) -> bool: return profile.stone_shelf_redistribution_by_hour != null):
+		_stone_shelf_slider = HSlider.new()
+		_stone_shelf_slider.name = "StoneShelfRedistribution"
+		_stone_shelf_slider.max_value = 1.
+		_stone_shelf_slider.step = .05
+		_stone_shelf_slider.value_changed.connect(func(value: float):
+			_world.showcase.set_lighting_scale(&"stone_top_shadow_fill", value))
+		_stone_shelf_slider.drag_started.connect(func():
+			_stone_shelf_drag_before = _world.showcase._lighting_scale(&"stone_top_shadow_fill"))
+		_stone_shelf_slider.drag_ended.connect(func(changed: bool):
+			if changed:
+				_world.showcase._settings.remember_edit(_world.showcase.set_lighting_scale.bind(
+					&"stone_top_shadow_fill", _stone_shelf_drag_before)))
+		parent.add_child(_stone_shelf_slider)
+
 	if not _mist_light_binding.is_empty():
 		_mist_visibility_slider = HSlider.new()
 		_mist_visibility_slider.name = "TerrainMistVisibility"
@@ -252,6 +275,10 @@ func _refresh_settings() -> void:
 		_stone_ledge_slider.set_value_no_signal(_world.showcase._lighting_scale(&"stone_foot_fill"))
 		_stone_ledge_slider.editable = _stone_ledge_available()
 
+	if _stone_shelf_slider != null:
+		_stone_shelf_slider.set_value_no_signal(_world.showcase._lighting_scale(&"stone_top_shadow_fill"))
+		_stone_shelf_slider.editable = _stone_shelf_available()
+
 	if _mist_visibility_slider != null:
 		_mist_visibility_slider.set_value_no_signal(_world.showcase._lighting_scale(&"terrain_mist_visibility"))
 		_mist_visibility_slider.editable = _mist_visibility_available()
@@ -304,9 +331,10 @@ func _stone_ledge_available() -> bool:
 	return (_profile.stone_ledge_occlusion_by_hour != null and quality != Quality.ESSENTIAL
 		and _world.look.stage == 2 and RenderingServer.get_current_rendering_method() == "mobile")
 
-func refresh_stone_ledge() -> void:
+func refresh_stone_lighting() -> void:
 	_refresh_settings()
 	_update_stone_ledge()
+	_update_stone_shelf()
 
 func _update_stone_ledge() -> void:
 	if not DiffuseRegion.owns(self):
@@ -319,6 +347,28 @@ func _update_stone_ledge() -> void:
 	if strength != _stone_ledge_occlusion:
 		_stone_ledge_occlusion = strength
 		RenderingServer.global_shader_parameter_set("gaf_portable_ledge_occlusion", strength)
+
+func _stone_shelf_available() -> bool:
+	return (_stone_shelf_field != null and _profile.stone_shelf_redistribution_by_hour != null
+		and _profile.stone_shelf_redistribution > 0. and quality != Quality.ESSENTIAL
+		and _world.look.stage == 2 and _world.view_mode == "gameplay")
+
+
+func _update_stone_shelf() -> void:
+	if not DiffuseRegion.owns(self):
+		return
+	var state := Vector3.ZERO
+	if _stone_shelf_available():
+		var origin: Vector2 = _world.look.path_map_origin
+		var phase: float = _world.showcase.hour / 24.
+		var strength := DayNight.sample_curve(_profile.stone_shelf_redistribution_by_hour, phase, 0.)
+		strength *= _profile.stone_shelf_redistribution * _world.showcase._lighting_scale(&"stone_top_shadow_fill")
+		if is_finite(strength) and strength > 0.:
+			state = Vector3(origin.x, origin.y, clampf(strength, 0., 1.))
+	if state != _stone_shelf_state:
+		_stone_shelf_state = state
+		RenderingServer.global_shader_parameter_set("gaf_stone_shelf_state", state)
+
 
 func display_edge_default() -> float:
 	return _profile.display_edge_strength if _profile != null else 0.
@@ -421,6 +471,7 @@ func refresh() -> void:
 	_update_actor_ground_light(hour)
 	_refresh_settings()
 	_update_stone_ledge()
+	_update_stone_shelf()
 	_update_mist_visibility()
 	if is_instance_valid(_exterior_ground):
 		_exterior_ground.visible = (quality != Quality.ESSENTIAL and _world.look.stage == 2
@@ -587,6 +638,8 @@ func _exit_tree() -> void:
 		_exterior_ground.queue_free()
 	if DiffuseRegion.owns(self):
 		RenderingServer.global_shader_parameter_set("gaf_portable_ledge_occlusion", 0.)
+		RenderingServer.global_shader_parameter_set("gaf_stone_shelf_state", Vector3.ZERO)
+		RenderingServer.global_shader_parameter_set("gaf_stone_shelf_field", null)
 	DiffuseRegion.release(self)
 	if is_instance_valid(_mist):
 		_mist.suspend()

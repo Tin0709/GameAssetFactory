@@ -332,7 +332,8 @@ func _ready() -> void:
 	showcase.afternoon_lighting.setup(self, spruce_sky)
 	showcase.prepare_grass_terrace_shadow()
 	showcase.prepare_near_wall_lighting()
-	showcase.prepare_stone_shelf_lighting()
+	if biome_controller == null:
+		showcase.prepare_stone_shelf_lighting()
 	_setup_far_shadow_review()
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
@@ -357,6 +358,14 @@ func _setup_far_shadow_review() -> void:
 		$HUD/Help.text += "\nCtrl+J so bóng địa hình xa"
 	else:
 		review.free()
+
+func validated_stone_shelf_corners() -> Texture2D:
+	if stone_shelf_corners == null or stone_shelf_corners.get_size() != look.path_map_size:
+		return null
+	if stone_shelf_layout_sha256.length() != 64 or FileAccess.get_sha256(map_layout_path) != stone_shelf_layout_sha256:
+		return null
+	return stone_shelf_corners
+
 
 func _uses_portable_biome() -> bool:
 	return is_device_review() or map_layout_path != DATA or (biome_graphics != null and not biome_graphics.use_forest_reference)

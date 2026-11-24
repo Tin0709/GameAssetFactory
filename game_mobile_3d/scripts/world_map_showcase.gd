@@ -1922,12 +1922,9 @@ func _path_shade_sky_available() -> bool:
 	return sky != null and sky.proof_ready
 
 func prepare_stone_shelf_lighting() -> void:
-	var field: Texture2D = level.stone_shelf_corners
-	_stone_shelf_field_ready = (_path_sun_available() and field != null
-		and field.get_size() == level.look.path_map_size
-		and level.stone_shelf_layout_sha256.length() == 64
-		and FileAccess.get_sha256(level.map_layout_path) == level.stone_shelf_layout_sha256)
-	RenderingServer.global_shader_parameter_set("gaf_stone_shelf_field", field if _stone_shelf_field_ready else null)
+	var field: Texture2D = level.validated_stone_shelf_corners() if _path_sun_available() else null
+	_stone_shelf_field_ready = field != null
+	RenderingServer.global_shader_parameter_set("gaf_stone_shelf_field", field)
 	_sync_stone_shelf_lighting(_stone_top_shadow_fill.x)
 
 func _sync_stone_shelf_lighting(stone_top_amount: float) -> void:
@@ -3548,9 +3545,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		level.biome_controller.refresh_mist_visibility()
 		if changed_effect == &"terrain_mist_visibility":
 			return
-	if changed_effect in [&"", &"stone_foot_fill"] and level.biome_controller != null:
-		level.biome_controller.refresh_stone_ledge()
-		if changed_effect == &"stone_foot_fill":
+	if changed_effect in [&"", &"stone_foot_fill", &"stone_top_shadow_fill"] and level.biome_controller != null:
+		level.biome_controller.refresh_stone_lighting()
+		if changed_effect != &"":
 			return
 	if changed_effect in [&"", &"display_edge_strength", &"night_soft_bloom"] \
 			and level != null and level.biome_controller != null:

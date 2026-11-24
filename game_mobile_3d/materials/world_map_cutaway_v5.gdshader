@@ -180,7 +180,7 @@ void fragment() {
 	}
 #else
 	float ledge_visibility = portable_ledge_visibility(cutaway_world, surface_normal);
-	if (ledge_visibility < 1.0) AO_LIGHT_AFFECT = 0.0;
+	if (ledge_visibility != 1.0) AO_LIGHT_AFFECT = 0.0;
 	AO *= ledge_visibility;
 	EMISSION += gaf_local_environment_delta(ALBEDO, METALLIC, cutaway_world, surface_normal) * AO;
 #endif

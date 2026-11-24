@@ -180,7 +180,7 @@ void fragment() {
 #ifndef GAF_LAB_FLAT_TERRAIN_SPECIALIZED
 	ALBEDO*=receiver_contact;
 	float ledge_visibility = portable_ledge_visibility(surface_world, surface_normal);
-	if (ledge_visibility < 1.0) AO_LIGHT_AFFECT = 0.0;
+	if (ledge_visibility != 1.0) AO_LIGHT_AFFECT = 0.0;
 	AO *= ledge_visibility;
 #endif
 	EMISSION += gaf_local_environment_delta(ALBEDO, METALLIC, surface_world, surface_normal) * AO;

@@ -81,6 +81,8 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 @export var stone_top_shadow_fill_pivot := Vector2.ZERO
 ## Redistribute the existing shadow fill across stone shelves that provide a corner field.
 @export_range(0.0, 1.0, 0.01) var stone_shelf_redistribution := 0.0
+## Hours at which imported stone shelves redistribute local ambient light.
+@export var stone_shelf_redistribution_by_hour: Curve
 ## Reduction of the path's supplemental shadow fill and gain for moderately lit dirt.
 @export var path_sun_response := Vector2.ZERO
 ## Diffuse gain and warmth in the illuminated core of a dirt path.
