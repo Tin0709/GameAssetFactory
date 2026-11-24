@@ -527,12 +527,18 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 				await physics_frame
 				attack(false)
 				var mesh: Mesh = actor.effects.ribbon.mesh
+				var axe_wall_material := lab._weapon_mesh.get_active_material(0) as ShaderMaterial if slot == 10 else null
+				var boxes_seen := 0
+				if slot == 10:
+					check(axe_wall_material != null, "The Axe draw supports a terrain mask")
 				var frames := 0
 				var furthest := -INF
 				var nearest := INF
 				var until := Engine.get_physics_frames() + Engine.physics_ticks_per_second
 				while Engine.get_physics_frames() < until:
 					await process_frame
+					if axe_wall_material != null:
+						boxes_seen = maxi(boxes_seen, int(axe_wall_material.get_shader_parameter("axe_blocker_count")))
 					if mesh.get_surface_count() == 0:
 						continue
 					frames += 1
@@ -540,6 +546,8 @@ func check_wall_ribbons(lab, selector: OptionButton) -> void:
 						furthest = maxf(furthest, point.dot(forward))
 						nearest = minf(nearest, point.dot(forward))
 				var context := "%s air=%s wall=%s" % [selector.get_item_text(slot), airborne, wall_face]
+				if slot == 10:
+					check(boxes_seen == int(wall != null), "The Axe mesh receives only the overlapping weapon wall in %s" % context)
 				if slot == 10 and airborne and wall_face == 0.52:
 					check(frames == 0, "A wall entirely in front of the Axe dive's ribbon hides it")
 				else:
