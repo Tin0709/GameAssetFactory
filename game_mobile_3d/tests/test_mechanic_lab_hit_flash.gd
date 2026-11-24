@@ -114,6 +114,8 @@ func check_hit(fatal: bool) -> void:
 		"The body flash begins with sparks on the displayed contact pose (fatal: %s)" % fatal)
 	check(is_finite(monitor.first_health_clock) and is_equal_approx(monitor.first_health_clock, monitor.first_streak_clock),
 		"The overhead health updates on the displayed contact pose (fatal: %s)" % fatal)
+	check((zombie._feedback.bar_slot < 0) == fatal,
+		"The contact presentation removes the bar only for a lethal hit")
 	check(is_finite(monitor.first_number_clock) and is_equal_approx(monitor.first_number_clock, monitor.first_streak_clock)
 		and is_zero_approx(monitor.first_number_age),
 		"The damage number starts at age zero on the displayed contact pose (fatal: %s)" % fatal)
@@ -127,6 +129,7 @@ func check_hit(fatal: bool) -> void:
 func run() -> void:
 	await check_hit(false)
 	await check_hit(true)
+	await check_melee_feedback_order()
 	await check_crowd_sparks()
 	await check_blade_contact_spark_origin()
 	await check_flash_during_render_hitch()
@@ -137,6 +140,59 @@ func run() -> void:
 		await check_health_bar_visibility()
 	print("MECHANIC_LAB_HIT_FLASH failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_melee_feedback_order() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	lab.set_process(false)
+	var group := lab.get_node("Zombies")
+	var numbers = lab.get_node("CombatEffects/ZombieDamageNumbers")
+	for cancel_pending: bool in [true, false]:
+		lab.reset_player()
+		await ticks(12)
+		lab.get_node("HUD/SpawnZombie").pressed.emit()
+		var target = group.get_child(0)
+		target.set_physics_process(false)
+		target.global_position = lab.player.global_position + lab.player.visual.global_basis.z * 1.3
+		attack(true)
+		await ticks(2)
+		attack(false)
+		for i in 35:
+			await physics_frame
+			if not lab._pending_melee_feedback.is_empty():
+				break
+		if lab._pending_melee_feedback.is_empty():
+			check(false, "A real Sabre hit queues feedback for the displayed pose")
+			lab.free()
+			return
+		var visual: Dictionary = lab._pending_melee_feedback.front()
+		check(target.health == target.max_health - 12 and target._feedback._health_ratio == 1.0
+			and numbers._numbers.is_empty(),
+			"The simulation takes damage before the overhead cues are eligible")
+		if cancel_pending:
+			lab.reset_player()
+			lab._process(0.0)
+			check(is_equal_approx(target._feedback._health_ratio, float(target.health) / target.max_health)
+				and numbers._numbers.is_empty() and lab._pending_melee_feedback.is_empty(),
+				"Reset reconciles already committed HP without emitting an old damage number")
+		else:
+			var struck_origin: Vector3 = visual.origin
+			target.global_position += Vector3.RIGHT * 0.8
+			group.strike_bolt({"collider": target, "position": target.combat_center()}, Vector3.BACK, 1801)
+			var remaining: int = target.health
+			check(remaining == target.max_health - 20 and numbers._numbers.size() == 1,
+				"A later projectile presents its confirmed damage immediately")
+			lab.player.render_presenter.prepare(1.0)
+			lab._process(0.0)
+			check(is_equal_approx(target._feedback._health_ratio, float(remaining) / target.max_health),
+				"A pending older melee cue cannot restore health removed by a later projectile")
+			var melee_numbers: Array = numbers._numbers.filter(func(number): return number.ascii_digits.get_string_from_ascii() == "12")
+			check(numbers._numbers.size() == 2 and melee_numbers.size() == 1
+				and Vector3(melee_numbers[0].origin).distance_to(struck_origin) < 0.13,
+				"Both numbers draw and the deferred one stays anchored where the melee hit landed")
+		target.free()
+	lab.free()
 
 func check_health_bar_visibility() -> void:
 	var viewport := SubViewport.new()
