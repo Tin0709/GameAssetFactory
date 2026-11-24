@@ -9,6 +9,7 @@ uniform float study_transmission=0.1248;
 #ifdef GAF_FLOWER_DAYLIGHT_RESPONSE
 uniform vec4 petal_sun = vec4(0.0);
 uniform float petal_shadow_return = 0.0;
+uniform float petal_open_return = 0.0;
 #endif
 varying vec3 study_face;
 varying float study_tip_weight;
@@ -103,6 +104,23 @@ void light(){
 		}
 		float patch_scale = gaf_projected_patch_scale(LIGHT_IS_DIRECTIONAL, LIGHT, INV_VIEW_MATRIX,
 			cloud, shadow_attenuation, .58);
+#ifdef GAF_FLOWER_DAYLIGHT_RESPONSE
+		if (flower_key && petal_open_return > 0.0 && head > 0.0) {
+			float open_weight = petal_open_return * head * petal_sun.w *
+				smoothstep(.55, .93, shadow_attenuation) * smoothstep(.30, .80, cloud);
+			if (open_weight > 0.0) {
+				// Match the old diffuse energy at a representative sun-facing angle.
+				// The transferred energy keeps the sky/ground tint on tilted petals.
+				const vec3 luma = vec3(.2126, .7152, .0722);
+				const vec3 return_tint = vec3(1.098, .985, .829);
+				float previous_at_anchor = .65 * .70 + .35 * max(petal_sun.y, 0.0);
+				float returned = previous_at_anchor - .34 * .70;
+				float direct_scale = shadow_attenuation * cloud * patch_scale / PI;
+				DIFFUSE_LIGHT += return_tint * (dot(diffuse_color, luma) * returned * open_weight * direct_scale);
+				response = mix(response, vec3(.34 * front), open_weight);
+			}
+		}
+#endif
 		DIFFUSE_LIGHT += response * diffuse_color * (shadow_attenuation * point_transfer * cloud * patch_scale / PI);
 	}
 }
