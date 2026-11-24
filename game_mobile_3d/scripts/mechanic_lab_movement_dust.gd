@@ -420,19 +420,20 @@ func _advance_colliding_debris(particle: Particle, age: float) -> void:
 	var fractions := space.cast_motion(_debris_query)
 	particle.debris_position += motion * fractions[0]
 	particle.debris_velocity = velocity
-	if fractions[0] >= 1.0:
-		return
-	# Query just inside the unsafe fraction for the receiver normal. Render
-	# at the safe centre, away from the receiver by a small contact margin.
-	_debris_query.transform.origin = particle.debris_previous + motion * (fractions[1] + DEBRIS_CONTACT_SKIN / distance)
+	# Probe just inside the swept contact for its normal. Also test the end
+	# of a clear sweep: small overlaps can be missed by the motion query,
+	# which then ignores that receiver on the following tick.
+	var probe := fractions[1] + DEBRIS_CONTACT_SKIN / distance if fractions[0] < 1.0 else 1.0
+	_debris_query.transform.origin = particle.debris_previous + motion * probe
 	_debris_query.motion = Vector3.ZERO
 	var contact := space.get_rest_info(_debris_query)
 	if contact.is_empty():
 		# Some edge contacts return no stable normal. Keep the last safe point.
-		particle.debris_resting = true
+		particle.debris_resting = fractions[0] < 1.0
 		return
 	var normal: Vector3 = contact.normal
-	particle.debris_position += normal * DEBRIS_CONTACT_SKIN
+	var separation := (particle.debris_position - Vector3(contact.point)).dot(normal)
+	particle.debris_position += normal * maxf(DEBRIS_CONTACT_SKIN, particle.debris_radius + DEBRIS_CONTACT_SKIN - separation)
 	particle.debris_contacts += 1
 	var approach := maxf(0.0, -velocity.dot(normal))
 	var tangent := velocity.slide(normal) * (1.0 - DEBRIS_SURFACE_DAMPING)
