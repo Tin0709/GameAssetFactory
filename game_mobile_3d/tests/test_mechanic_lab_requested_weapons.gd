@@ -127,10 +127,30 @@ func check_new_weapons(lab: Node3D, menu: OptionButton, target: Node3D) -> void:
 	target.health = 100
 	target.position = Vector3(0.0, 0.0, 5.0)
 
+func check_projectile_shader_preparation(lab: Node3D) -> void:
+	lab.set_process(false)
+	await ticks(4)
+	var actor: CharacterBody3D = lab.get("player")
+	check(lab.get("_next_projectile_shader") == 0, "Ranged shader preparation starts on idle frames")
+	actor.set("combat_requested", true)
+	lab._process(0.0)
+	check(lab.get("_next_projectile_shader") == 0, "Shader preparation yields to combat input")
+	actor.set("combat_requested", false)
+
+	var prepared: Array = []
+	for i in 4:
+		lab._process(0.0)
+		prepared.append(lab.get("_next_projectile_shader"))
+	check(prepared == [1, 2, 3, 3], "The Lab prepares one existing ranged shader per idle update and then stops")
+	check(lab.get("_bow") == null and lab.get("_crossbow") == null and lab.get("_equipped_weapon") == 0,
+		"Preloading the shaders does not equip or instantiate either ranged weapon")
+	lab.set_process(true)
+
 func run() -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
+	await check_projectile_shader_preparation(lab)
 	await ticks(12)
 	var menu := lab.get_node("HUD/Weapon") as OptionButton
 	var original_air: Dictionary = lab.player.clips.AirAttack
