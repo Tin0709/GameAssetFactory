@@ -402,6 +402,7 @@ func run() -> void:
 			if clearance_slider != null:
 				clearance_slider.value = .5
 				await process_frame
+				await RenderingServer.frame_post_draw
 				check(is_equal_approx(graphics._mist.effect._near_clearance_parameters.decode_float(0), .275)
 					and is_equal_approx(graphics._mist._profile.front_scatter_advance_m, .85),
 					"Changing the extinction preserves the in-scattering lookup")
