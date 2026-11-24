@@ -10,11 +10,15 @@ class FlashMonitor extends Node:
 	var pose_time := -1.0
 	var values: Array[float] = []
 	var sparks: MultiMeshInstance3D
+	var numbers: MultiMeshInstance3D
 	var light: OmniLight3D
 	var spark_counts: Array[int] = []
 	var first_body_clock := INF
 	var first_flash_clock := INF
 	var first_streak_clock := INF
+	var first_health_clock := INF
+	var first_number_clock := INF
+	var first_number_age := INF
 
 	func _process(_delta: float) -> void:
 		if hit:
@@ -25,6 +29,11 @@ class FlashMonitor extends Node:
 			var clock: float = actor.render_presenter.display_clock
 			if weight > 0.0 and is_inf(first_body_clock):
 				first_body_clock = clock
+			if is_inf(first_health_clock) and zombie._feedback._health_ratio < 1.0:
+				first_health_clock = clock
+			if is_inf(first_number_clock) and numbers.multimesh.visible_instance_count > 0:
+				first_number_clock = clock
+				first_number_age = numbers._numbers.front().age
 			if light.visible and light.light_energy > 0.0 and is_inf(first_flash_clock):
 				first_flash_clock = clock
 			if sparks != null:
@@ -74,6 +83,7 @@ func check_hit(fatal: bool) -> void:
 	monitor.zombie = zombie
 	monitor.actor = lab.player
 	monitor.sparks = lab.get_node_or_null("ContactSparks/Streaks") as MultiMeshInstance3D
+	monitor.numbers = lab.get_node("CombatEffects/ZombieDamageNumbers") as MultiMeshInstance3D
 	monitor.light = lab.get_node("CombatImpactLight")
 	check(monitor.sparks != null, "Lab initializes the private source spark renderer")
 	monitor.process_priority = 100
@@ -102,6 +112,13 @@ func check_hit(fatal: bool) -> void:
 		"Grounded contact light and sparks begin together on the displayed contact pose (fatal: %s)" % fatal)
 	check(is_finite(monitor.first_body_clock) and is_equal_approx(monitor.first_body_clock, monitor.first_streak_clock),
 		"The body flash begins with sparks on the displayed contact pose (fatal: %s)" % fatal)
+	check(is_finite(monitor.first_health_clock) and is_equal_approx(monitor.first_health_clock, monitor.first_streak_clock),
+		"The overhead health updates on the displayed contact pose (fatal: %s)" % fatal)
+	check(is_finite(monitor.first_number_clock) and is_equal_approx(monitor.first_number_clock, monitor.first_streak_clock)
+		and is_zero_approx(monitor.first_number_age),
+		"The damage number starts at age zero on the displayed contact pose (fatal: %s)" % fatal)
+	print("MELEE_FEEDBACK_ONSET fatal=", fatal, " bar=", monitor.first_health_clock - monitor.pose_time,
+		" glyphs=", monitor.first_number_clock - monitor.pose_time, " spark=", monitor.first_streak_clock - monitor.pose_time)
 	print("BODY_FLASH_ONSET fatal=", fatal, " body=", monitor.first_body_clock - monitor.pose_time,
 		" spark=", monitor.first_streak_clock - monitor.pose_time)
 	print("BODY_FLASH fatal=", fatal, " samples=", monitor.values.slice(0, 11))
