@@ -285,6 +285,21 @@ func check_crowd_sparks() -> void:
 		sparks._process(0.0)
 		check(renderer.multimesh.visible_instance_count == 0 and sparks._pending.size() == 3,
 			"Reducing quality keeps future sparks deferred at the three nearest contacts")
+	lab.reset_player()
+	var rows := lab.get_node("HUD/ImpactFxPanel/Rows")
+	var opacity := rows.get_node("Opacity/Slider") as HSlider
+	var duration := rows.get_node("Duration/Slider") as HSlider
+	opacity.value = 0.0
+	duration.value = 50.0
+	group.sabre_contact.emit(origin, Vector3.RIGHT, "Attack3", 2, 1704, false)
+	sparks._process(0.0)
+	sparks._process(0.04)
+	var active := sparks._particles.filter(func(particle): return particle.age < particle.lifetime)
+	check(not sparks.visible and active.size() == 6 and active.all(func(particle): return is_equal_approx(particle.age, 0.08)),
+		"Hidden melee streaks still age twice as fast at half duration")
+	opacity.value = 55.0
+	check(sparks.visible and is_equal_approx(renderer.multimesh.mesh.material.get_shader_parameter("opacity_scale"), 0.55),
+		"Live opacity restores visibility without respawning streaks")
 	lab.free()
 
 func check_flash_during_render_hitch() -> void:

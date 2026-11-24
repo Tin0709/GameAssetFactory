@@ -88,6 +88,14 @@ func run() -> void:
 		Engine.max_fps = starting_cap
 		quit(1)
 		return
+	var impact_button := lab.get_node("HUD/ImpactFxButton") as Button
+	var audio_button := lab.get_node("HUD/AudioMixButton") as Button
+	impact_button.button_pressed = true
+	check(lab.get_node("HUD/ImpactFxPanel").visible, "The new button opens the impact controls")
+	audio_button.button_pressed = true
+	check(not lab.get_node("HUD/ImpactFxPanel").visible and lab.get_node("HUD/AudioMixPanel").visible,
+		"Opening the audio controls closes the overlapping impact panel")
+	audio_button.button_pressed = false
 	var frame_rate := lab.get_node_or_null("HUD/FrameRate") as OptionButton
 	if frame_rate == null:
 		printerr("FAIL The Lab has no FPS mode selector")
