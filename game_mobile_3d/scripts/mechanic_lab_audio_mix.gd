@@ -6,12 +6,12 @@ var _buses: Array[StringName] = []
 
 func _ready() -> void:
 	for layer in Layer.size():
-		var name := StringName("MechanicLab_%d_%d" % [get_instance_id(), layer])
+		var bus := StringName("MechanicLab_%d_%d" % [get_instance_id(), layer])
 		AudioServer.add_bus()
 		var index := AudioServer.get_bus_count() - 1
-		AudioServer.set_bus_name(index, name)
+		AudioServer.set_bus_name(index, bus)
 		AudioServer.set_bus_send(index, &"Master" if layer == Layer.MASTER else _buses[Layer.MASTER])
-		_buses.append(name)
+		_buses.append(bus)
 
 func bus_name(layer: int) -> StringName:
 	return _buses[layer]

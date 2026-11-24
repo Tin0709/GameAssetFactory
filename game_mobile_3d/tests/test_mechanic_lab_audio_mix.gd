@@ -18,6 +18,9 @@ func cue_peak(lab: Node3D, capture: AudioEffectCapture, cue: Callable) -> float:
 	capture.clear_buffer()
 	cue.call()
 	await create_timer(0.42).timeout
+	return read_peak(capture)
+
+func read_peak(capture: AudioEffectCapture) -> float:
 	var peak := 0.0
 	for frame in capture.get_buffer(capture.get_frames_available()):
 		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
@@ -52,6 +55,14 @@ func run() -> void:
 	lab.get_node("HUD/CombatAudioToggle").button_pressed = true
 	var audio = lab.get_node("CombatAudio")
 	var movement = lab.get_node("MovementAudio")
+	var mix = lab.get_node("LabAudioMix")
+	var weapon_bus: StringName = mix.bus_name(1)
+	var surface_bus: StringName = mix.bus_name(3)
+	check(lab.get("player").reference_audio.voices.all(func(voice): return voice.bus == weapon_bus),
+		"Scheduled weapon swings share the same mix as impact sounds")
+	check(audio._surface_landing_voices.size() > 0
+		and audio._surface_landing_voices.all(func(voice): return voice.bus == surface_bus),
+		"Heavy ground-contact sounds use the surface mix")
 	await physics_frame
 	await physics_frame
 	var feet: Vector3 = lab.get("player").global_position
@@ -80,14 +91,28 @@ func run() -> void:
 		check(muted < 0.0001, "The %s slider silences its own audio layer" % layer)
 		sliders[layer].value = 100.0
 		print("LAB_AUDIO_MIX ", layer, " baseline=", baseline, " half=", softened, " muted=", muted)
+	audio.reset()
+	audio.zombie_reaction(point, true)
+	audio.flush_zombie_combat_cues()
+	await create_timer(0.15).timeout
+	var tail: AudioStreamPlayer3D = audio._voices[3]
+	var tail_stream := tail.stream
+	check(tail.playing, "The zombie cue is playing before the live volume change")
 	sliders.Zombie.value = 0.0
+	await create_timer(0.08).timeout
+	capture.clear_buffer()
+	await create_timer(0.15).timeout
+	check(tail.playing and tail.stream == tail_stream and read_peak(capture) < 0.0001,
+		"The live slider silences a playing cue without restarting or stopping its stream")
 	sliders.Surface.value = 0.0
 	check(await cue_peak(lab, capture, cues.Weapon) > 0.001, "Muting zombie and surface cues leaves weapon audio audible")
 	sliders.Master.value = 0.0
 	check(await cue_peak(lab, capture, cues.Weapon) < 0.0001, "The Lab master slider can silence its whole mix")
+	lab.get_node("HUD/CombatAudioToggle").button_pressed = false
 	AudioServer.remove_bus_effect(0, effect_index)
 	lab.free()
 	check(AudioServer.get_bus_count() == bus_count and AudioServer.is_bus_mute(0) == master_muted,
 		"Closing the Lab releases its mix buses and restores the prior master state")
+	await create_timer(0.15).timeout
 	print("MECHANIC_LAB_AUDIO_MIX ", JSON.stringify({"failures": failures}))
 	quit(int(not failures.is_empty()))
