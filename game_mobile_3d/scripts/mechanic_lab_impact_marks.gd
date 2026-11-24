@@ -5,6 +5,7 @@ const ATLAS := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Explosion/Materi
 const ATLAS_HASH := "cb94172543bf1bd4a0e8343f7ceb4304e738ec9463e21d18d25dd37964eeb55b"
 const TILE_SIZE := 16
 const TERRAIN_LAYER := 1 << 12
+const PROJECTION_SIZE := Vector3(1.10, 0.06, 1.10)
 const DURATION := 0.95
 const FADE_START := 0.34
 const SURFACE_TINT := {
@@ -17,6 +18,7 @@ var _decals: Array[Decal] = []
 var _ticks: Array[int] = []
 var _tints: Array[Color] = []
 var _next := 0
+var _footprint := PhysicsShapeQueryParameters3D.new()
 
 func setup(terrain: MeshInstance3D) -> bool:
 	if RenderingServer.get_current_rendering_method() == &"gl_compatibility":
@@ -24,6 +26,10 @@ func setup(terrain: MeshInstance3D) -> bool:
 	var atlas := EffectSource.load_image(ATLAS, ATLAS_HASH, Vector2i(32, 32))
 	if atlas == null:
 		return false
+	var volume := BoxShape3D.new()
+	volume.size = PROJECTION_SIZE
+	_footprint.shape = volume
+	_footprint.collision_mask = 1
 	atlas.convert(Image.FORMAT_RGBA8)
 	for y in 2:
 		for x in 2:
@@ -40,7 +46,7 @@ func setup(terrain: MeshInstance3D) -> bool:
 			var decal := Decal.new()
 			decal.texture_albedo = ImageTexture.create_from_image(mask)
 			decal.cull_mask = TERRAIN_LAYER
-			decal.size = Vector3(1.10, 0.06, 1.10)
+			decal.size = PROJECTION_SIZE
 			decal.normal_fade = 0.8
 			decal.upper_fade = 0.0
 			decal.lower_fade = 0.0
@@ -53,7 +59,17 @@ func setup(terrain: MeshInstance3D) -> bool:
 	set_process(false)
 	return true
 
-func stamp(point: Vector3, surface: String) -> void:
+func stamp(point: Vector3, touchdown: Vector3, surface: String) -> void:
+	var space := get_world_3d().direct_space_state
+	# A projected mark can reach the floor on both sides of a narrow wall.
+	# Test its whole footprint, just above the receiver surface.
+	var lift := Vector3.UP * (PROJECTION_SIZE.y + 0.01)
+	_footprint.transform = Transform3D(Basis.IDENTITY, point + lift)
+	if not space.intersect_shape(_footprint, 1).is_empty():
+		point = touchdown
+		_footprint.transform.origin = point + lift
+		if not space.intersect_shape(_footprint, 1).is_empty():
+			return
 	var decal := _decals[_next]
 	decal.hide()
 	decal.global_position = point

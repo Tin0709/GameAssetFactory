@@ -1424,7 +1424,7 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 		var mark_surface := _floor_landing_contact_at(point)
 		if not mark_surface.is_empty():
 			var anchor := _landing_impact_anchor(mark_surface.position, facing, floor_height, GAUNTLET_IMPACT_MARK_REACH)
-			_gauntlet_impact_marks.stamp(anchor, mark_surface.surface)
+			_gauntlet_impact_marks.stamp(anchor, mark_surface.position, mark_surface.surface)
 	if not _combat_audio.enabled:
 		return
 	if _equipped_weapon == Weapon.SABRE:

@@ -553,9 +553,11 @@ func check_gauntlet_impact_marks(lab) -> void:
 			check(appeared != null and lab.player.is_on_floor(), "The %s Gauntlets dive leaves its mark on touchdown" % fixture)
 			if appeared != null:
 				var reach := appeared.global_position.dot(forward)
-				var expected := 0.82 if fixture == "stone_wall" else 1.8
+				var expected := 0.0 if fixture == "stone_wall" else 1.8
 				check(absf(reach - expected) < 0.02 and absf(appeared.global_position.y) < 0.03,
 					"The %s crack stays on the supported side of the stage" % fixture)
+				if fixture == "stone_wall":
+					check(reach + appeared.size.x * 0.5 < 0.9, "The entire mark fits in front of the wall")
 				print("GAUNTLET_IMPACT_MARK ", fixture, " reach=", reach, " tint=", appeared.modulate)
 				if fixture == "grass":
 					lab.reset_player()
