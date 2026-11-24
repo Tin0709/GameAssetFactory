@@ -249,8 +249,9 @@ func _physics_process(delta: float) -> void:
 			ammo += 1
 			ammo_changed.emit(ammo)
 	var space := get_world_3d().direct_space_state
+	var render_frame := Engine.get_process_frames()
 	for trail in _trails:
-		if trail.stopped:
+		if trail.stopped and trail.stop_frame != render_frame:
 			trail.tail_age += delta
 	for index in range(_bolts.size() - 1, -1, -1):
 		var bolt := _bolts[index]
@@ -268,6 +269,7 @@ func _physics_process(delta: float) -> void:
 			var travel := (endpoint - start).dot(direction)
 			trail.distance += clampf(travel, 0.0, start.distance_to(end) + BOLT_RADIUS)
 			trail.stopped = true
+			trail.stop_frame = render_frame
 			# Time the impact from the swept sphere, which reaches a surface
 			# before its centre reaches the returned surface point.
 			var impact_step := delta - travel_time * float(hit.get("motion_fraction", 1.0))
@@ -275,13 +277,13 @@ func _physics_process(delta: float) -> void:
 			_bolts.remove_at(index)
 			_remove_bolt(node)
 			if not hit.is_empty():
-				_embed_on_terrain(hit, bolt.direction)
+				_embed_on_terrain(hit, bolt.direction, render_frame)
 				_report_impact(hit, direction, bolt.serial, bolt.strike, impact_step)
 		else:
 			node.global_position = end
 			trail.distance += start.distance_to(end)
 	if not _embedded_arrows.is_empty():
-		_update_embedded_arrows(delta)
+		_update_embedded_arrows(delta, render_frame)
 	if not _trails.is_empty():
 		_update_trails()
 	var sparks_active := impact_sparks != null and impact_sparks.advance(delta)
@@ -370,7 +372,7 @@ static func _trail_opacity(normalized_age: float) -> float:
 		return lerpf(1.0 - 4.0 * TRAIL_ALPHA_BLEND_START, 0.3 - 0.5 * TRAIL_ALPHA_BLEND_END, blend)
 	return maxf(0.0, 0.3 - 0.5 * normalized_age)
 
-func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
+func _embed_on_terrain(hit: Dictionary, direction: Vector3, render_frame: int) -> void:
 	var collider := hit.collider as StaticBody3D
 	if _embedded == null or collider == null or (collider.collision_layer & WORLD_MASK) == 0:
 		return
@@ -382,16 +384,16 @@ func _embed_on_terrain(hit: Dictionary, direction: Vector3) -> void:
 	_embedded_arrows.append({
 		"pose": global_transform.affine_inverse() * pose,
 		"age": 0.0,
-		"contact_tick": Engine.get_physics_frames(),
+		"contact_frame": render_frame,
 	})
 
-func _update_embedded_arrows(delta: float) -> void:
-	# Publish wall props with the other impact effects, starting at zero wobble age.
-	var tick := Engine.get_physics_frames()
+func _update_embedded_arrows(delta: float, render_frame: int) -> void:
+	# A render frame can contain several physics ticks. Keep the prop at the
+	# start of its wobble until the first frame that can show the impact.
 	var index := 0
 	while index < _embedded_arrows.size():
 		var arrow := _embedded_arrows[index]
-		if arrow.contact_tick != tick:
+		if arrow.contact_frame != render_frame:
 			arrow.age += delta
 		if arrow.age >= EMBEDDED_WOBBLE_SECONDS:
 			_embedded_arrows.remove_at(index)

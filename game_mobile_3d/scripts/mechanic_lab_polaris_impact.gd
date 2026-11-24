@@ -16,6 +16,7 @@ class Spark:
 	var size: Vector2
 	var age := 0.0
 	var first_step := 0.0
+	var birth_frame := -1
 	var lifetime: float
 	var drag: float
 	var colors: PackedFloat32Array
@@ -72,18 +73,19 @@ func burst(point: Vector3, direction: Vector3, normal: Vector3, first_step: floa
 	var up := Vector3.UP if absf(axis.y) < 0.99 else Vector3.FORWARD
 	var frame := Basis.looking_at(axis, up, true)
 	var outside := point + axis * 0.003
+	var birth_frame := Engine.get_process_frames()
 	# Niagara's system update truncates the independently scaled burst counts.
 	var forward_count := int(_random.randi_range(4, 5) * spawn_count_scale)
 	for i in forward_count:
 		var velocity := _cone_direction(axis, 0.2) * _random.randf_range(11.0, 20.0)
 		_spawn(outside, velocity, -axis * 1.5, Vector2(_random.randf_range(0.08, 0.13), 0.08),
-			_random.randf_range(0.2, 0.4), 9.0, _forward_colors, first_step)
+			_random.randf_range(0.2, 0.4), 9.0, _forward_colors, first_step, birth_frame)
 	var sphere_count := int(_random.randi_range(4, 5) * spawn_count_scale)
 	for i in sphere_count:
 		var offset := _cone_direction(Vector3.UP, 1.0) * (0.30 * pow(_random.randf(), 1.0 / 3.0))
 		var velocity := _cone_direction(frame.y, 0.8) * _random.randf_range(5.0, 12.0)
 		_spawn(outside + offset, velocity, Vector3.DOWN * 1.5, Vector2(_random.randf_range(0.09, 0.13), 0.07),
-			_random.randf_range(0.2, 0.3), 4.0, _sphere_colors, first_step)
+			_random.randf_range(0.2, 0.3), 4.0, _sphere_colors, first_step, birth_frame)
 
 func _cone_direction(axis: Vector3, spread: float) -> Vector3:
 	var minimum := cos(PI * _random.randf() * spread) if spread < 1.0 else -1.0
@@ -94,7 +96,7 @@ func _cone_direction(axis: Vector3, spread: float) -> Vector3:
 	return Basis.looking_at(axis, up, true) * Vector3(radial * cos(azimuth), radial * sin(azimuth), axial)
 
 func _spawn(point: Vector3, velocity: Vector3, acceleration: Vector3, size: Vector2,
-		lifetime: float, drag: float, colors: PackedFloat32Array, first_step: float) -> void:
+		lifetime: float, drag: float, colors: PackedFloat32Array, first_step: float, birth_frame: int) -> void:
 	var spark := _particles[_slot]
 	_slot = (_slot + 1) % CAPACITY
 	spark.point = point
@@ -103,6 +105,7 @@ func _spawn(point: Vector3, velocity: Vector3, acceleration: Vector3, size: Vect
 	spark.size = size
 	spark.age = 0.0
 	spark.first_step = first_step
+	spark.birth_frame = birth_frame
 	spark.lifetime = lifetime
 	spark.drag = drag
 	spark.colors = colors
@@ -114,18 +117,24 @@ func advance(delta: float) -> bool:
 	var camera := get_viewport().get_camera_3d()
 	var view := camera.global_basis if camera != null else Basis.IDENTITY
 	var inverse := global_transform.affine_inverse()
+	var render_frame := Engine.get_process_frames()
 	var count := 0
 	for spark in _particles:
 		if spark.age >= spark.lifetime:
 			continue
-		var step := minf(spark.first_step, delta) / duration_scale
+		# Use the real partial collision tick, then retain that sample across
+		# any other physics steps preceding the first rendered impact.
+		var step := 0.0
+		if spark.first_step < INF or spark.birth_frame != render_frame:
+			step = minf(spark.first_step, delta) / duration_scale
 		spark.first_step = INF
 		spark.age += step
 		if spark.age >= spark.lifetime:
 			continue
 		# The cooked Niagara update divides the updated velocity by 1 + drag * dt.
-		spark.velocity = (spark.velocity + spark.acceleration * step) / (1.0 + spark.drag * step)
-		spark.point += spark.velocity * step
+		if step > 0.0:
+			spark.velocity = (spark.velocity + spark.acceleration * step) / (1.0 + spark.drag * step)
+			spark.point += spark.velocity * step
 		var life_fraction := spark.age / spark.lifetime
 		var size_cursor := life_fraction * 102.0
 		var size := spark.size * Vector2(_sample(_sizes, size_cursor, 2, 0), _sample(_sizes, size_cursor, 2, 1))
