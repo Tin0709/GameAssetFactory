@@ -1,5 +1,6 @@
 """Bake the stone-shelf corner field from a map's runtime.json."""
 import argparse
+from base64 import b64encode
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -97,7 +98,24 @@ def redistribute(shelves, cover, shape, overlapping, minimum):
     return field
 
 
-def bake(source, destination):
+def write_godot_texture(path, texels, width, height):
+    # An ImageTexture preserves all four data channels without the image importer.
+    encoded = b64encode(texels).decode("ascii")
+    text = (
+        '[gd_resource type="ImageTexture" format=4]\n\n'
+        '[sub_resource type="Image" id="corners"]\n'
+        'data = {\n'
+        f'"data": PackedByteArray("{encoded}"),\n'
+        '"format": "RGBA8",\n'
+        f'"height": {height},\n'
+        '"mipmaps": false,\n'
+        f'"width": {width}\n'
+        '}\n\n[resource]\nimage = SubResource("corners")\n'
+    )
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+
+def bake(source, destination, *, godot_texture=False):
     payload = source.read_bytes()
     layout = json.loads(payload)
     minimum = np.asarray(layout["source_bounds"]["min"], dtype=int)[[0, 2]]
@@ -111,16 +129,20 @@ def bake(source, destination):
         raise ValueError("Stone surface lies outside the layout bounds")
     cover = cover_at_corners(Scene(solids, offset, np.zeros_like(solids)), shelves) if len(shelves) else np.empty((0, 4))
     field = redistribute(shelves, cover, tuple(extent[::-1]), overlapping, minimum)
+    texels = field.tobytes()
     data = {
         "layout_sha256": sha256(payload).hexdigest(),
         "origin_xz": (minimum + offset[[0, 2]]).tolist(),
         "extent": extent.tolist(),
         "stone_shelves": len(shelves),
         "active_cells": int(np.any(field != NEUTRAL, axis=-1).sum()),
-        "texture_sha256": sha256(field.tobytes()).hexdigest(),
+        "texture_sha256": sha256(texels).hexdigest(),
     }
     destination.mkdir(parents=True, exist_ok=False)
-    Image.fromarray(field).save(destination / "stone_shelf_corners.png")
+    if godot_texture:
+        write_godot_texture(destination / "stone_shelf_corners.tres", texels, *extent)
+    else:
+        Image.fromarray(field).save(destination / "stone_shelf_corners.png")
     (destination / "stone_shelf.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     return data
 

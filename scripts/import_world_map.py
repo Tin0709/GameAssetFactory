@@ -406,11 +406,12 @@ def validate_biome_dependencies(preset, declarations, project):
 
 
 def map_scene_source(scene_name, runtime_path, biome, comparison, overrides, shelf=None):
-    map_resource = "res://" + runtime_path.parent.relative_to(GODOT_PROJECT).as_posix()
+    runtime_resource = "res://" + runtime_path.relative_to(GODOT_PROJECT).as_posix()
     shelf_resource = ""
     shelf_properties = ""
     if shelf is not None and shelf["active_cells"]:
-        texture_path = json.dumps(f"{map_resource}/stone_shelf/stone_shelf_corners.png", ensure_ascii=False)
+        texture = runtime_path.parent / "stone_shelf/stone_shelf_corners.tres"
+        texture_path = json.dumps("res://" + texture.relative_to(GODOT_PROJECT).as_posix(), ensure_ascii=False)
         shelf_resource = f'[ext_resource type="Texture2D" path={texture_path} id="stone_shelf"]\n'
         shelf_properties = ('stone_shelf_corners = ExtResource("stone_shelf")\n'
                             f'stone_shelf_layout_sha256 = {json.dumps(shelf["layout_sha256"])}\n')
@@ -424,7 +425,7 @@ def map_scene_source(scene_name, runtime_path, biome, comparison, overrides, she
         f'{shelf_resource}\n'
         f'[node name="{scene_name}" instance=ExtResource("base")]\n'
         'script = ExtResource("map")\n'
-        f'map_layout_path = {json.dumps(map_resource + "/runtime.json", ensure_ascii=False)}\n'
+        f'map_layout_path = {json.dumps(runtime_resource, ensure_ascii=False)}\n'
         'biome_graphics = ExtResource("biome")\n'
         'comparison_biomes = Array[ExtResource("profile")]([ExtResource("comparison")])\n'
         + shelf_properties
@@ -501,7 +502,7 @@ def main():
         with TemporaryDirectory(prefix=".shelf-import-", dir=output.parent) as temporary:
             staging = Path(temporary) / output.name
             runtime, manifest = import_source(args.source, staging, border_mode=args.border, new_output=True)
-            shelf = bake(staging / "runtime.json", staging / "stone_shelf")
+            shelf = bake(staging / "runtime.json", staging / "stone_shelf", godot_texture=True)
             staging.rename(output)
         scene_info["stone_shelf"] = shelf
     else:
