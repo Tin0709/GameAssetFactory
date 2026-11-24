@@ -2157,6 +2157,8 @@ func check_bow_impact_audio(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
+	for i in 12:
+		await physics_frame
 	lab._select_weapon(lab.Weapon.BOW)
 	var audio = lab._combat_audio
 	var bow = lab._bow
