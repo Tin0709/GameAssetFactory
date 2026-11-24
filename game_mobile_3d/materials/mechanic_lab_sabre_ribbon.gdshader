@@ -3,6 +3,7 @@ render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, shadows_disabl
 
 uniform sampler2D source_slash : filter_linear, repeat_disable;
 uniform bool use_source_slash = false;
+uniform bool sword_ribbon_head = false;
 
 void fragment() {
 	float hot = smoothstep(0.09, 0.34, COLOR.a);
@@ -19,4 +20,12 @@ void fragment() {
 	}
 	ALBEDO = COLOR.rgb * (1.0 + hot * edge * 5.0);
 	ALPHA = COLOR.a * opacity;
+	if (sword_ribbon_head) {
+		// UV.y is sample age; keep the brightest part on the moving edge.
+		float fresh = 1.0 - smoothstep(0.025, 0.26, UV.y);
+		float blade_edge = smoothstep(0.32, 0.76, UV.x);
+		float head = fresh * blade_edge * smoothstep(0.02, 0.54, edge);
+		ALBEDO += vec3(1.0, 0.78, 0.34) * head * 2.4;
+		ALPHA = min(ALPHA * (1.0 + head * 1.3), 0.95);
+	}
 }

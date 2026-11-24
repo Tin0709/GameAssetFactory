@@ -655,6 +655,9 @@ func _select_weapon(index: int) -> void:
 	var was_bow := previous == Weapon.BOW
 	_equipped_weapon = index as Weapon
 	var sword_equipped := index == Weapon.SWORD
+	var ribbon_material := player.effects.ribbon.material_override as ShaderMaterial
+	if ribbon_material != null:
+		ribbon_material.set_shader_parameter(&"sword_ribbon_head", sword_equipped)
 	var curved_equipped := index == Weapon.CURVED_GREATSWORD
 	var crossbow_equipped := index == Weapon.CROSS_POLLINATOR
 	var switch_point := player.global_position + Vector3.UP
