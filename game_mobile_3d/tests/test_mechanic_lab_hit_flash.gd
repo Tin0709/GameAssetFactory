@@ -520,6 +520,14 @@ func check_blade_contact_spark_origin() -> void:
 		var forward: Vector3 = lab.player.visual.global_basis.z
 		zombie.global_position = lab.player.global_position + forward * 1.4
 		var centres: Array[Vector3] = []
+		var blade_poses: Array[PackedVector3Array] = []
+		var sample_blade := func():
+			if blade_poses.size() == 2:
+				blade_poses.pop_front()
+			blade_poses.append(PackedVector3Array([
+				lab.player.marker_base.global_position, lab.player.marker_tip.global_position]))
+			if not centres.is_empty():
+				lab.player.physics_pose_ready.disconnect(sample_blade)
 		group.sabre_contact.connect(func(point, _direction, _clip, _index, _serial, _lethal):
 			centres.append(point), CONNECT_ONE_SHOT)
 		attack(true)
