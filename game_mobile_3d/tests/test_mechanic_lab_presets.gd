@@ -80,6 +80,14 @@ func run() -> void:
 	var physics_hz := Engine.physics_ticks_per_second
 	Engine.max_fps = 75
 	var lab := make_lab()
+	var impact_opacity := lab.get_node_or_null("HUD/ImpactFxPanel/Rows/Opacity/Slider") as HSlider
+	var impact_duration := lab.get_node_or_null("HUD/ImpactFxPanel/Rows/Duration/Slider") as HSlider
+	if impact_opacity == null or impact_duration == null:
+		printerr("FAIL The Lab has no impact streak opacity and duration controls")
+		lab.free()
+		Engine.max_fps = starting_cap
+		quit(1)
+		return
 	var frame_rate := lab.get_node_or_null("HUD/FrameRate") as OptionButton
 	if frame_rate == null:
 		printerr("FAIL The Lab has no FPS mode selector")
@@ -104,7 +112,9 @@ func run() -> void:
 		"30 FPS caps rendering without changing the physics tick rate")
 	var mix_weapon := lab.get_node("HUD/AudioMixPanel/Rows/Weapon/Slider") as HSlider
 	mix_weapon.value = 35.0
-	var quality := lab.get_node("HUD/ContactSparkQuality") as OptionButton
+	var quality := lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality") as OptionButton
+	impact_opacity.value = 35.0
+	impact_duration.value = 150.0
 	quality.select(1)
 	quality.item_selected.emit(1)
 	select_action(lab, 0)
@@ -113,6 +123,8 @@ func run() -> void:
 	check(Engine.max_fps == 60 and Engine.physics_ticks_per_second == physics_hz,
 		"60 FPS caps rendering without changing the physics tick rate")
 	mix_weapon.value = 100.0
+	impact_opacity.value = 85.0
+	impact_duration.value = 65.0
 	quality.select(0)
 	quality.item_selected.emit(0)
 	select_action(lab, 2)
@@ -125,7 +137,8 @@ func run() -> void:
 	check(Engine.max_fps == 30, "Loading A restores 30 FPS")
 	check(values_match(lab, a, 150, true), "Slot A restores sliders, crowd count and live values after reopening")
 	check(lab.get_node("HUD/AudioMixPanel/Rows/Weapon/Slider").value == 35.0, "Loading A restores the weapon mix")
-	check(lab.get_node("HUD/ContactSparkQuality").selected == 1, "Loading A restores reduced contact sparks")
+	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").selected == 1, "Loading A restores reduced contact sparks")
+	check_impact_values(lab, 35.0, 150.0)
 	check(lab.get_node("HUD/ZombieGait").selected == a_animation,
 		"Loading A restores the selected zombie animation")
 	if lab.get_node("HUD/RenderScale").item_count > 0:
@@ -134,7 +147,8 @@ func run() -> void:
 	check(Engine.max_fps == 60, "Loading B restores 60 FPS")
 	check(values_match(lab, b, 25, false), "Slot B restores a distinct configuration")
 	check(lab.get_node("HUD/AudioMixPanel/Rows/Weapon/Slider").value == 100.0, "Loading B restores full weapon level")
-	check(lab.get_node("HUD/ContactSparkQuality").selected == 0, "Loading B restores the full spark budget")
+	check(lab.get_node("HUD/ImpactFxPanel/Rows/ContactSparkQuality").selected == 0, "Loading B restores the full spark budget")
+	check_impact_values(lab, 85.0, 65.0)
 	check(lab.get_node("HUD/ZombieGait").selected == b_animation,
 		"Loading B restores its zombie animation")
 	if lab.get_node("HUD/RenderScale").item_count > 0:
@@ -162,6 +176,7 @@ func run() -> void:
 	select_action(lab, 3)
 	check(Engine.max_fps == 75, "Loading a preset saved before the FPS control inherits the app cap")
 	check(values_match(lab, baseline, 100, false), "Older presets use reference physics values for the added controls")
+	check_impact_values(lab, 100.0, 100.0)
 	select_frame_rate(lab, 30)
 	Engine.max_fps = 45
 	lab.free()
@@ -172,3 +187,12 @@ func run() -> void:
 	DirAccess.remove_absolute(folder)
 	print("MECHANIC_LAB_PRESETS ", JSON.stringify({"failures": failures}))
 	quit(int(not failures.is_empty()))
+
+func check_impact_values(lab: Node3D, opacity: float, duration: float) -> void:
+	var rows := lab.get_node("HUD/ImpactFxPanel/Rows")
+	var sparks := lab.get_node("ContactSparks/Streaks") as MultiMeshInstance3D
+	var material := sparks.multimesh.mesh.material as ShaderMaterial
+	check(rows.get_node("Opacity/Slider").value == opacity and rows.get_node("Duration/Slider").value == duration
+		and is_equal_approx(material.get_shader_parameter("opacity_scale"), opacity * 0.01)
+		and is_equal_approx(sparks.get_parent().duration_scale, duration * 0.01),
+		"Preset restores %d%% opacity and %d%% lifetime in the HUD and renderer" % [opacity, duration])
