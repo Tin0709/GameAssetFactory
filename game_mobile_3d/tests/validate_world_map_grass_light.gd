@@ -12,6 +12,7 @@ func run()->void:
 	check(p.grass_light.configured,"Hash-verified captured normal parameter available")
 	check(is_equal_approx(p.grass_light.weight,1.),"Source captured Day normal weight recovered")
 	var count:int=p.instance_count
+	var flower_colors:Dictionary=p.flower_colors.duplicate()
 	var native:bool=RenderingServer.get_rendering_device()!=null and RenderingServer.get_current_rendering_method()=="mobile"
 	check(p.grass_light.active==native,"Reference lighting respects renderer support")
 	var original:Dictionary={}
@@ -73,7 +74,7 @@ func run()->void:
 	p.set_grass_lighting(false)
 	for mat:ShaderMaterial in p.materials:check(mat.shader==original[mat],"OFF restores exact legacy shader resource")
 	p.set_grass_lighting(true)
-	check(p.instance_count==count and p.flower_colors.is_empty(),"Density, source scale and grass-only mode unchanged")
+	check(p.instance_count==count and p.flower_colors==flower_colors,"Lighting preserves planting density and flower selection")
 	check(AudioServer.is_bus_mute(0) and w.player.active_clip=="Idle","Quiet grounded startup preserved")
 	print("GRASS_LIGHT_RESULT ",JSON.stringify({"failures":failures,"lighting":p.grass_light.snapshot()}))
 	w.free();await process_frame;await create_timer(.2).timeout

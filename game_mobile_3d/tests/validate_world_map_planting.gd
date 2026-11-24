@@ -12,20 +12,38 @@ func run()->void:
 	check(plants.error.is_empty(),"Existing external Blender bundle loads without extraction")
 	var grove_visible: bool = w.grove != null and w.grove.visible
 	var canopy_contact: bool = w.look.canopy_contact_active()
-	check(plants.get("dense_grass_review")==true,"Dense grass-only review is the current default")
+	check(plants.get("dense_grass_review")==true,"Dense meadow review is the current default")
 	if plants.get("dense_grass_review")==true:
-		check(plants.flower_colors.is_empty(),"No flowers in dense review")
-		check(plants.placements.size()+plants.fern_reserved_cells.size()==plants.eligible_grass_cells,
-			"Every grass block either has a plant or supports a wide fern; dirt excluded")
+		check(plants.flower_colors == {"pink":79, "blue":62, "white":21, "yellow":34, "orange":21},
+			"Default dense meadow includes the five authored flower groups")
+		var shrub_support: Dictionary = plants.plains_planting.reserved
+		check(plants.placements.size()+plants.fern_reserved_cells.size()+shrub_support.size()==plants.eligible_grass_cells,
+			"Every eligible block has a plant or supports a wide fern or shrub")
 		var roots:Dictionary={};var full_scale:=true;var supported:=true
+		var plains_species := {}
+		var plains_count := 0
+		var shrub_count := 0
 		for row:Dictionary in plants.placements:
 			check(not roots.has(row.cell),"One dense patch root per block")
+			check(not shrub_support.has(row.cell),"Shrub support cells have clear roots")
 			roots[row.cell]=true
 			var native_height:float=plants.bundle.meshes[plants.MEDIUM[1]].get_aabb().size.y
 			var height_ok:bool=row.bounds.size.y>0. and row.bounds.size.y<=native_height+.001 if plants.grass_splay_active() else absf(row.bounds.size.y-native_height)<.001
-			if not row.get("forest_cover", false) and not row.get("forest_fern", false):
+			if row.get("plains_plant", false):
+				plains_species[row.asset] = true
+				plains_count += 1
+				if plants.plains_planting.shrub_roots.has(row.cell):
+					shrub_count += 1
+					check(row.bounds.size.y <= 1.551,"Ground shrubs keep a low silhouette")
+				else:
+					check(maxf(row.bounds.size.x,row.bounds.size.z) <= .881,"Flowers and grasses fit their root cell")
+			elif not row.get("forest_cover", false) and not row.get("forest_fern", false):
 				full_scale=full_scale and is_equal_approx(row.scale,1.) and height_ok
 			supported=supported and row.ground_kind.begins_with("grass_") and absf(row.bounds.position.y-w.surface_height(row.root.x,row.root.z))<.002
+		check(plains_count == 455 and plains_species.size() == 22 and shrub_count == 14,
+			"All authored Plains variants are planted on the current layout")
+		for cell: Vector2i in shrub_support:
+			check(not plants.fern_reserved_cells.has(cell),"Ferns and shrubs reserve different support cells")
 		check(full_scale,"Source-scale patches preserve upright height or its pitched projection")
 		check(supported,"Dense grass is grounded and never rooted on dirt paths")
 		for material:ShaderMaterial in plants.materials:

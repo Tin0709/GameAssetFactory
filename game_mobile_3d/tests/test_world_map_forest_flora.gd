@@ -69,8 +69,8 @@ func test_carpet(world: Node3D, toggle: CheckButton) -> void:
 			"Fern roots rest on the terrain")
 	check(count == 88 and assets.size() == 3 and sectors.size() == 4,
 		"Three fern shapes occupy 88 authored cells across all four sectors")
-	check(reserved.size() > 300 and rooted.size() + reserved.size() == plants.eligible_grass_cells,
-		"Only the clearings under source-sized fronds are removed from the carpet")
+	check(reserved.size() > 300 and rooted.size() + reserved.size() + plants.plains_planting.reserved.size() == plants.eligible_grass_cells,
+		"Fern and shrub clearings account for the gaps in the carpet")
 	for asset: String in assets:
 		check(assets[asset].size() == 4, "Each fern shape grows in all four sectors")
 		var material: ShaderMaterial = plants.bundle.meshes[asset].surface_get_material(0)
