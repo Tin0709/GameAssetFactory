@@ -18,6 +18,7 @@ var _last_stone_softness := -1.0
 var _last_dawn_stone_color := -1.0
 var _last_stone_day_sky := -1.0
 var _last_stone_wall_sky := -1.0
+var _last_stone_top_sky := Vector2(-1., -1.)
 var _last_response:Variant=null
 var _last_dielectric:Variant=null
 var _world_transforms:Dictionary={}
@@ -446,6 +447,7 @@ func bind(force:bool=false)->void:
 	var dawn_stone_color: float = level.showcase.dawn_stone_sky_color()
 	var stone_day_sky: float = level.showcase.stone_day_sky_weight()
 	var stone_wall_sky: float = level.showcase.stone_wall_sky_weight()
+	var stone_top_sky: Vector2 = level.showcase.stone_top_sky_gain()
 	var response:bool=level.look.terrain_visibility_response
 	var dielectric:bool=level.look.terrain_dielectric_response and level.look.terrain_review=="combined"
 	var transport_unchanged: bool = (key == _last_key and scale == _last_scale and tint == _last_tint
@@ -453,7 +455,8 @@ func bind(force:bool=false)->void:
 			and dawn_stone_color == _last_dawn_stone_color and stone_day_sky == _last_stone_day_sky
 			and response == _last_response and dielectric == _last_dielectric)
 	var wall_sky_changed := force or stone_wall_sky != _last_stone_wall_sky
-	if not force and transport_unchanged and not wall_sky_changed:
+	var top_sky_changed := force or stone_top_sky != _last_stone_top_sky
+	if not force and transport_unchanged and not wall_sky_changed and not top_sky_changed:
 		return
 	_last_key=key;_last_scale=scale;_last_tint=tint;_last_response=response
 	_last_dielectric=dielectric
@@ -462,14 +465,17 @@ func bind(force:bool=false)->void:
 	_last_dawn_stone_color = dawn_stone_color
 	_last_stone_day_sky = stone_day_sky
 	_last_stone_wall_sky = stone_wall_sky
+	_last_stone_top_sky = stone_top_sky
 	var materials={}
 	for row in level.look.terrain_materials:materials[row[3]]=true
 	for chunk in level.geometry._cutaway_chunks:
 		for m in chunk.materials:materials[m]=true
 	for m:ShaderMaterial in materials:
-		# Changing only the wall slider should leave the other receiver bindings alone.
-		if wall_sky_changed and m.get_shader_parameter("ground_grade") == 3:
-			m.set_shader_parameter("stone_wall_sky", stone_wall_sky)
+		if (wall_sky_changed or top_sky_changed) and m.get_shader_parameter("ground_grade") == 3:
+			if wall_sky_changed:
+				m.set_shader_parameter("stone_wall_sky", stone_wall_sky)
+			if top_sky_changed:
+				m.set_shader_parameter("stone_top_sky_gain", stone_top_sky)
 		if not force and transport_unchanged:
 			continue
 		m.set_shader_parameter("terrain_key_radiance",key);m.set_shader_parameter("terrain_ambient_scale",scale);m.set_shader_parameter("terrain_ambient_tint",tint)

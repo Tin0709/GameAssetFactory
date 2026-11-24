@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=37 format=3]
+[gd_resource type="Resource" load_steps=38 format=3]
 
 [ext_resource type="Script" path="res://scripts/biome_graphics_profile.gd" id="profile"]
 
@@ -97,6 +97,10 @@ point_count = 8
 [sub_resource type="Curve" id="ForestWallSky"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.75), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.75), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 8
+
+[sub_resource type="Curve" id="ForestStoneTopSky"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.3125, 0), 0.0, 0.0, 0, 0, Vector2(0.375, 1), 0.0, 0.0, 0, 0, Vector2(0.447916667, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
 
 [sub_resource type="Curve" id="ForestActorShadeSky"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.229166667, 0), 0.0, 0.0, 0, 0, Vector2(0.291666667, 0.68), 0.0, 0.0, 0, 0, Vector2(0.4375, 0), 0.0, 0.0, 0, 0, Vector2(0.583333333, 0), 0.0, 0.0, 0, 0, Vector2(0.6875, 0.68), 0.0, 0.0, 0, 0, Vector2(0.78125, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -214,6 +218,8 @@ night_zoom_exposure_blur_by_hour = SubResource("NightExposureZoom")
 shadowed_wall_return_scale = 1.5
 sheltered_stone_return_scale = 1.6
 stone_wall_sky_by_hour = SubResource("ForestWallSky")
+stone_top_sky_chroma_ev = Vector2(0.23, -0.253)
+stone_top_sky_by_hour = SubResource("ForestStoneTopSky")
 shadow_diffuse_by_hour = SubResource("ForestShadowDiffuse")
 ground_shadow_fill_reduction = Vector2(0.25, 0.45)
 stone_wall_shadow_fill = 0.42

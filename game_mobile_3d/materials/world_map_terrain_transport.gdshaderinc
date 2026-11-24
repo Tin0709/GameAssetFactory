@@ -40,6 +40,7 @@ uniform float night_stone_top_cool = 0.0;
 uniform float night_stone_blue_softness = 0.0;
 uniform float dawn_stone_sky_color = 0.0;
 uniform float stone_day_sky = 0.0;
+uniform vec2 stone_top_sky_gain = vec2(0.0);
 uniform float stone_wall_sky = 0.0;
 uniform float stone_bounce_focus = 0.0;
 
@@ -140,6 +141,12 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,vec
 		float weak_sky = 1.0 - smoothstep(.045, .14, diffuse_y);
 		float side = 1.0 - smoothstep(.2, .85, abs(face_y));
 		diffuse_sky += mix(vec3(diffuse_y), diffuse_sky, .37) * (stone_wall_sky * side * weak_sky);
+	}
+	if (stone_top_sky_gain.x > 0.0 && ground_grade == 3 && use_source_terrain && face_y > .998) {
+		// Match sky luminance after the receiver's albedo and colored visibility.
+		vec3 weights = color * receiver_visibility * vec3(.2126, .7152, .0722);
+		vec3 shifted = diffuse_sky * vec3(stone_top_sky_gain.x, 1.0, stone_top_sky_gain.y);
+		diffuse_sky = shifted * (dot(diffuse_sky, weights) / max(dot(shifted, weights), .000001));
 	}
 #endif
 	path_sky_chroma_delta = vec2(0.0);

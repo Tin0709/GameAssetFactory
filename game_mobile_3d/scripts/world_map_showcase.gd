@@ -212,6 +212,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"dawn_stone_sky_color": ["Sắc ánh trời trên đá rạng sáng", 1.],
 	&"stone_day_sky": ["Sắc xanh của đá ban ngày", 1.],
 	&"stone_wall_sky": ["Ánh khuếch tán trên mặt đứng đá", 1.],
+	&"stone_top_sky_color": ["Sắc ánh trời trên mặt đá", 1.],
 	&"night_stone_fill_balance": ["Cân bằng sắc đá ban đêm", 1.],
 	&"night_stone_top_cool": ["Sắc xanh trên mặt đá", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
@@ -373,7 +374,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 235
+const LIGHTING_MIX_VERSION := 236
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2725,6 +2726,16 @@ func stone_wall_sky_weight() -> float:
 	var gain := DayNight.sample_curve(_biome_profile.stone_wall_sky_by_hour, hour / 24., 0.)
 	return clampf(gain, 0., 1.) * _lighting_scale(&"stone_wall_sky")
 
+func stone_top_sky_gain() -> Vector2:
+	if _biome_profile == null or _biome_profile.stone_top_sky_by_hour == null +			or atmosphere_review != "combined" or not _stone_day_sky_editable() +			or level.view_mode != "gameplay" or level.look.terrain_review != "combined":
+		return Vector2.ZERO
+	var strength := clampf(DayNight.sample_curve(_biome_profile.stone_top_sky_by_hour, hour / 24., 0.), 0., 1.) +		* _lighting_scale(&"stone_top_sky_color")
+	var chroma := _biome_profile.stone_top_sky_chroma_ev
+	if strength <= 0. or not chroma.is_finite() or chroma == Vector2.ZERO:
+		return Vector2.ZERO
+	chroma = chroma.clamp(Vector2(-1., -1.), Vector2.ONE) * strength
+	return Vector2(pow(2., chroma.x), pow(2., chroma.y))
+
 func _dawn_shadow_weight() -> float:
 	return smoothstep(0.0, 2.5, hour) * (1.0 - smoothstep(2.5, 4.5, hour))
 
@@ -3527,6 +3538,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 235 and effect == &"flower_open_return":
 			missing_value = 0.
+		if version < 236 and effect == &"stone_top_sky_color":
+			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -3793,6 +3806,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _stone_day_sky_editable()
 		if effect == &"stone_wall_sky":
 			slider.editable = _stone_day_sky_editable() and _biome_profile != null and _biome_profile.stone_wall_sky_by_hour != null
+		if effect == &"stone_top_sky_color":
+			slider.editable = _stone_day_sky_editable() and _biome_profile != null and _biome_profile.stone_top_sky_by_hour != null
 		if effect in [&"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
 			slider.editable = _night_sky_editable()
 		if effect == &"cliff_mist":
@@ -3829,7 +3844,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"diffuse_openings", &"stone_shade_fill", &"stone_shade_reach", &"stone_wall_return", &"sheltered_stone_return", &"local_diffuse_return", &"basin_diffuse_return"]:
 		return # Published with the final camera and sun before drawing.
-	if changed_effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color", &"stone_day_sky", &"stone_wall_sky"]:
+	if changed_effect in [&"night_stone_blue_softness", &"dawn_stone_sky_color", &"stone_day_sky", &"stone_wall_sky", &"stone_top_sky_color"]:
 		level.terrain_light.bind()
 		return
 	if changed_effect in [&"", &"stone_twilight_sky", &"stone_dusk_sky_chroma"]:

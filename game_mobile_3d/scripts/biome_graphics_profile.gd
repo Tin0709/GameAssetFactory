@@ -59,6 +59,9 @@ const LINEAR_LUMA := Vector3(.2126, .7152, .0722)
 ## Additional diffuse sky on dark stone sides using the map's existing transport.
 ## Curve X is normalized hour and Y is a gain from 0 to 1.
 @export var stone_wall_sky_by_hour: Curve
+## Red/green and blue/green shifts in stops for diffuse sky on the upper faces of stone.
+@export var stone_top_sky_chroma_ev := Vector2.ZERO
+@export var stone_top_sky_by_hour: Curve
 ## Diffuse return on receivers in weak directional light. X is normalized hour.
 @export var shadow_diffuse_by_hour: Curve
 ## Reduction of supplemental fill in deep shadows, on grass and on stone tops respectively.

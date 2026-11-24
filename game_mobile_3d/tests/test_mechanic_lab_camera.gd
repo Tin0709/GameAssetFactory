@@ -99,7 +99,29 @@ func check_contact_render_hitch(lab) -> void:
 	check(is_equal_approx(offsets[0], offsets[1]) and offsets[1] < 0.0
 		and is_equal_approx(energies[0], energies[1]) and energies[1] > 0.0 and energies[1] < 2.3,
 		"Light decay and camera reversal follow elapsed time after the first displayed frame")
+	var presenter = lab.player.render_presenter
+	var original_clock: float = presenter.display_clock
+	for age in [0.0, 1.0 / 30.0, 0.22]:
+		lab.reset_player()
+		var contact_time: float = presenter.display_clock + 0.05
+		lab._start_contact_light(body.global_position + Vector3.RIGHT, 106, 2.3, contact_time)
+		lab._process(0.0)
+		check(not lab._impact_light.visible, "The sampled light waits for the contact pose")
+		presenter.display_clock = contact_time + age
+		lab._process(age)
+		var initial_energy: float = lab._impact_light.light_energy
+		check(lab._impact_light.visible and is_equal_approx(initial_energy, 2.3),
+			"The sampled light starts at full energy on the first frame after a %.3f s delay" % age)
+		presenter.display_clock += 1.0 / 30.0
+		lab._process(1.0 / 30.0)
+		check(lab._impact_light.visible and is_equal_approx(lab._impact_light.light_energy, energies[0]),
+			"The sampled flash decays from its visible onset")
+		presenter.display_clock += 0.22
+		lab._process(0.22)
+		check(not lab._impact_light.visible, "An already displayed flash expires after a slow frame")
+		print("SAMPLED_LIGHT_HITCH delay=", age, " first_energy=", initial_energy)
 	lab.reset_player()
+	presenter.display_clock = original_clock
 
 func check_melee_combo_shakes(lab) -> void:
 	var group := lab.get_node("Zombies") as Node3D
