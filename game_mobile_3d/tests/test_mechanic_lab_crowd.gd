@@ -939,6 +939,7 @@ func check_crowd_counts(group: Node) -> void:
 		picker.item_selected.emit(index)
 		if button.text != "Spawn %d zombie" % count:
 			failures.append("The spawn button names the selected batch size")
+		var request_started := Time.get_ticks_usec()
 		button.pressed.emit()
 		if group.get_child_count() != 0 or not picker.disabled or not button.disabled:
 			failures.append("The requested batch locks the controls and spawns on later frames")
@@ -954,10 +955,11 @@ func check_crowd_counts(group: Node) -> void:
 		if previous != count or picker.disabled or largest_batch > 5 \
 				or status.text != "Đã tạo %d zombie." % count:
 			failures.append("The paced request creates exactly %d zombies and unlocks the controls" % count)
+		var request_ms := (Time.get_ticks_usec() - request_started) / 1000.0
 		for zombie: ZOMBIE in group.get_children():
 			zombie.free()
 		print("CROWD_COUNT ", JSON.stringify({"count": count, "spawned": previous,
-			"frames": frames, "largest_batch": largest_batch}))
+			"frames": frames, "largest_batch": largest_batch, "request_ms": request_ms}))
 	lab.reset_player()
 	await check_reset_during_spawn(group)
 
