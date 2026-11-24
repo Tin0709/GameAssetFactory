@@ -1453,7 +1453,7 @@ func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: 
 	if not has_arrow_sparks:
 		if _contact_sparks != null:
 			_contact_sparks.queue_contact(effect_point, direction, player.global_position + Vector3.UP,
-				sample_time, capsule, weapon_points, punch_axis)
+				sample_time, capsule, weapon_points, punch_axis, clip == "AirAttack" and capsule.x > 0.0)
 		else:
 			player.effects.contact(effect_point, direction, sample_time >= 0.0)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3",

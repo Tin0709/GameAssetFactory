@@ -78,7 +78,8 @@ func set_budget_scale(scale: float) -> void:
 		_pending.resize(_contact_budget)
 
 func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, sample_time := -1.0,
-		capsule := Vector2.ZERO, weapon_points := PackedVector3Array(), punch_axis := Vector3.ZERO) -> void:
+		capsule := Vector2.ZERO, weapon_points := PackedVector3Array(), punch_axis := Vector3.ZERO,
+		aerial_blade := false) -> void:
 	var distance := point.distance_squared_to(viewer)
 	var index := _pending.size()
 	while index > 0 and distance < float(_pending[index - 1].distance):
@@ -86,7 +87,8 @@ func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, s
 	if index == _contact_budget:
 		return
 	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance,
-		"sample_time": sample_time, "capsule": capsule, "weapon_points": weapon_points, "punch_axis": punch_axis})
+		"sample_time": sample_time, "capsule": capsule, "weapon_points": weapon_points,
+		"punch_axis": punch_axis, "aerial_blade": aerial_blade})
 	if _pending.size() > _contact_budget:
 		_pending.pop_back()
 	set_process(true)
@@ -108,7 +110,7 @@ static func contact_surface_point(centre: Vector3, capsule: Vector2, weapon_poin
 		normal = -direction.normalized()
 	return body_point + normal * capsule.x
 
-func _spawn_burst(point: Vector3, attack_direction: Vector3, punch_axis: Vector3) -> void:
+func _spawn_burst(point: Vector3, attack_direction: Vector3, punch_axis: Vector3, near_feet: bool) -> void:
 	var angle := _random.randf_range(0.0, TAU)
 	var bias := attack_direction.normalized() * 0.24
 	var speed := Vector2(2.0, 4.4)
@@ -124,6 +126,8 @@ func _spawn_burst(point: Vector3, attack_direction: Vector3, punch_axis: Vector3
 	for i in _sparks_per_contact:
 		var yaw := angle + TAU * float(i) / _sparks_per_contact + _random.randf_range(-0.17, 0.17)
 		var outward := Vector3(cos(yaw), _random.randf_range(-0.42, 0.8), sin(yaw))
+		if near_feet:
+			outward.y = absf(outward.y)
 		outward = (outward + bias).normalized()
 		var spark := _particles[_next]
 		_next = (_next + 1) % _pool_limit
@@ -148,9 +152,14 @@ func _process(delta: float) -> void:
 			pending_index += 1
 			continue
 		var point: Vector3 = contact.point
+		var near_feet := false
 		if contact.capsule.x > 0.0 and not contact.weapon_points.is_empty():
 			point = contact_surface_point(point, contact.capsule, contact.weapon_points, contact.direction)
-		_spawn_burst(point, contact.direction, contact.punch_axis)
+			# Low blade contacts remain on the capsule. Send any streaks
+			# pointing below the feet upward so the floor does not hide them.
+			var foot_height: float = contact.point.y - contact.capsule.y - contact.capsule.x
+			near_feet = contact.aerial_blade and point.y - foot_height <= 0.10
+		_spawn_burst(point, contact.direction, contact.punch_axis, near_feet)
 		_pending.remove_at(pending_index)
 	var camera := get_viewport().get_camera_3d()
 	var view := camera.global_basis.orthonormalized() if camera != null else Basis.IDENTITY
