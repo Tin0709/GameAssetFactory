@@ -328,6 +328,7 @@ func run() -> void:
 	await check_projectile_birth_frame(lab)
 	await check_projectile_surface_bounds(lab)
 	await check_projectile_contact_anchor(lab)
+	await check_living_projectile_anchor(lab)
 	await check_embedded_surface_batch(lab)
 	await check_bow_impact_charge_tint(lab)
 	await ticks(12)
@@ -748,6 +749,52 @@ func check_projectile_contact_anchor(lab: Node3D) -> void:
 				print("PROJECTILE_PROP_PIVOT worst_gap=", worst_gap, " minimum_entry=", minimum_entry)
 		weapon.reset()
 	wall.free()
+
+func check_living_projectile_anchor(lab: Node3D) -> void:
+	var group = lab.get_node("Zombies")
+	for weapon: Node3D in [lab._crossbow, lab._bow]:
+		weapon.reset()
+		var baby := weapon == lab._bow
+		var count: int = group.get_child_count()
+		if not group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, baby):
+			check(false, "The glancing projectile fixture spawns its target")
+			continue
+		var target = group.get_child(count)
+		target.set_physics_process(false)
+		target.global_position = Vector3(18.0, 0.0, 3.6)
+		target.health = 100
+		target.max_health = 100
+		await ticks(2)
+		var capsule: Vector2 = target.contact_capsule_dimensions()
+		var centre: Vector3 = target.combat_center()
+		var origin := centre + Vector3(capsule.x + 0.05, 0.0, -3.0)
+		var hits: Array[Dictionary] = []
+		var record := func(hit: Dictionary, _direction: Vector3, _serial: int): hits.append(hit)
+		weapon.bolt_impact.connect(record)
+		if baby:
+			weapon.fire_arrow(origin, Vector3.BACK, 1977, origin, true)
+		else:
+			weapon.fire(origin, Vector3.BACK, 1976, origin)
+		for i in 22:
+			await physics_frame
+			if not hits.is_empty():
+				break
+		weapon.bolt_impact.disconnect(record)
+		var trail := weapon.get_node("ArrowTrail") as MeshInstance3D
+		check(hits.size() == 1 and hits[0].collider == target and trail.mesh.get_surface_count() == 1,
+			"A real glancing hit has one detached ribbon on its living target (baby: %s)" % baby)
+		if hits.size() == 1 and trail.mesh.get_surface_count() == 1:
+			var points: PackedVector3Array = trail.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+			var head := trail.to_global((points[0] + points[1]) * 0.5)
+			var gap := head.distance_to(hits[0].position)
+			var expected_health := 46 if baby else 92
+			check(gap < 0.005, "The ribbon reaches the living impact and its sparks (baby: %s)" % baby)
+			check(target.health == expected_health and weapon._embedded_arrows.is_empty(),
+				"The living impact keeps damage and leaves no terrain prop")
+			print("PROJECTILE_LIVING_ANCHOR baby=", baby, " gap_m=", gap, " health=", target.health)
+		weapon.reset()
+		target.free()
+
 
 func check_embedded_surface_batch(lab: Node3D) -> void:
 	var wall := StaticBody3D.new()
