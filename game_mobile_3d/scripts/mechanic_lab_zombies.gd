@@ -578,7 +578,7 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	var lethal := zombie.health <= 0
 	sabre_contact.emit(point, direction, clip, index, serial, lethal)
 	if not projectile and not air_attack:
-		ground_contact_capsule.emit(point, serial, zombie.contact_capsule())
+		ground_contact_capsule.emit(point, serial, zombie.contact_capsule_dimensions())
 	zombie_reaction_audio.emit(point, lethal, zombie.is_baby)
 
 func _private_research_root() -> String:

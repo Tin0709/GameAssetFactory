@@ -394,7 +394,7 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 func combat_center() -> Vector3:
 	return global_position + Vector3.UP * (_body_height * 0.5)
 
-func contact_capsule() -> Vector2:
+func contact_capsule_dimensions() -> Vector2:
 	return Vector2(_live_capsule.radius, _live_capsule.mid_height * 0.5)
 
 func _ready() -> void:
