@@ -606,25 +606,28 @@ func check_gauntlet_impact_marks(lab) -> void:
 		check(decal != null and decal.texture_albedo.get_size() == Vector2(16, 16)
 			and (decal.cull_mask & camera_ground.layers) != 0 and (decal.cull_mask & player_mesh.layers) == 0,
 			"The mark uses one atlas tile and projects only onto the stage")
-	for fixture in ["grass", "dirt", "stone_wall", "stone_wall_far", "slab"]:
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var audio: Node = lab.get_node("CombatAudio")
+	toggle.button_pressed = true
+	for fixture in ["grass", "dirt", "stone_wall", "stone_wall_far", "stone_footprint", "slab"]:
 		lab.reset_player()
 		for i in 8:
 			await physics_frame
 		lab._select_weapon(lab.Weapon.BASIC_GAUNTLETS if fixture == "grass" else lab.Weapon.GAUNTLETS)
-		if fixture == "dirt":
-			lab._select_floor_surface(1)
-		elif fixture.begins_with("stone_wall"):
-			lab._select_floor_surface(2)
+		var surface := "stone" if fixture.begins_with("stone") else ("dirt" if fixture == "dirt" else "grass")
+		lab._select_floor_surface(["grass", "dirt", "stone"].find(surface))
 		var forward: Vector3 = lab.player.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var obstacle: StaticBody3D
 		var wall_face := 0.90 if fixture == "stone_wall" else 1.35
-		if fixture.begins_with("stone_wall") or fixture == "slab":
+		if fixture == "stone_footprint":
+			wall_face = 2.10
+		if fixture.begins_with("stone") or fixture == "slab":
 			obstacle = StaticBody3D.new()
 			var box := BoxShape3D.new()
 			var shape := CollisionShape3D.new()
 			shape.shape = box
 			obstacle.add_child(shape)
-			if fixture.begins_with("stone_wall"):
+			if fixture.begins_with("stone"):
 				box.size = Vector3(2.0, 2.0, 0.2)
 				obstacle.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true),
 					forward * (wall_face + 0.1) + Vector3.UP)
@@ -635,6 +638,8 @@ func check_gauntlet_impact_marks(lab) -> void:
 			lab.add_child(obstacle)
 		for i in 8:
 			await physics_frame
+		var cue := StringName("slam_" + surface)
+		var initial_cue: int = audio._next_choice.get(cue, 0)
 		await start_heavy_drop(lab)
 		var appeared: Decal
 		for i in 65:
@@ -648,25 +653,34 @@ func check_gauntlet_impact_marks(lab) -> void:
 		if fixture == "slab":
 			check(appeared == null and lab.player.is_on_floor() and lab.player.global_position.y > 0.39,
 				"An unsupported slab material cannot imprint the stage below")
-			check(visible_particles(dust) == 0, "An unsupported slab does not emit stage debris or dust below")
+			check(visible_particles(dust) == 0 and audio._next_choice.get(cue, 0) == initial_cue,
+				"An unsupported slab emits no stage debris, dust or debris audio below")
 		else:
 			check(appeared != null and lab.player.is_on_floor(), "The %s Gauntlets dive leaves its mark on touchdown" % fixture)
 			if appeared != null:
 				var reach := appeared.global_position.dot(forward)
-				var expected := 0.0 if fixture.begins_with("stone_wall") else 1.8
+				var expected := 0.0 if fixture.begins_with("stone") else 1.8
 				check(absf(reach - expected) < 0.02 and absf(appeared.global_position.y) < 0.03,
 					"The %s crack stays on the supported side of the stage" % fixture)
 				var particles: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag > 0.0)
 				check(particles.size() in [3, 4, 5] and particles.all(func(p):
 						return p.origin.slide(Vector3.UP).distance_to(appeared.global_position.slide(Vector3.UP)) < 0.02),
 					"The crack and debris share the support point in the %s fixture" % fixture)
-				if fixture.begins_with("stone_wall"):
+				if fixture.begins_with("stone"):
 					check(reach + appeared.size.x * 0.5 < wall_face, "The entire mark fits in front of the wall")
 					var puffs: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag == 0.0)
 					var expected_puff := 0.0 if fixture == "stone_wall" else 0.90
 					check(puffs.size() == 1 and absf(puffs[0].origin.dot(forward) - expected_puff) < 0.02,
 						"The puff keeps its 90 cm offset when it fits before the wall")
-				print("GAUNTLET_IMPACT_MARK ", fixture, " reach=", reach, " tint=", appeared.modulate)
+				var voices: Array = audio._surface_landing_voices.filter(func(voice):
+					return voice.playing and voice.stream in audio._groups[cue])
+				check(audio._next_choice.get(cue, 0) == (initial_cue + 1) % audio._groups[cue].size()
+					and voices.size() == 1 and voices[0].global_position.distance_to(appeared.global_position) < 0.02,
+					"The %s Gauntlets debris sound plays once at the mark" % fixture)
+				var debris_reach: float = particles[0].origin.dot(forward) if not particles.is_empty() else -1.0
+				var audio_reach: float = voices[0].global_position.dot(forward) if not voices.is_empty() else -1.0
+				print("GAUNTLET_IMPACT_MARK ", fixture, " mark_m=", reach,
+					" debris_m=", debris_reach, " audio_m=", audio_reach)
 				if fixture == "grass":
 					lab.reset_player()
 					check(not appeared.visible and not marks.is_processing(), "Reset clears an active mark immediately")
@@ -676,6 +690,7 @@ func check_gauntlet_impact_marks(lab) -> void:
 					check(not appeared.visible and not marks.is_processing(), "The mark expires and stops processing")
 		if obstacle != null:
 			obstacle.free()
+	toggle.button_pressed = false
 	lab.reset_player()
 	await physics_frame
 	lab._select_floor_surface(0)
