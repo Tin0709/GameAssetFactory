@@ -722,7 +722,7 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 	for fixture in ["grass", "dirt", "stone", "wall", "near_wall", "post", "arena_edge",
 			"overhang", "outside_disc", "ledge", "shovel", "reset_during_windup"]:
 		lab.reset_player()
-		lab._select_floor_surface(["grass", "dirt", "stone"].find(fixture) if fixture in ["dirt", "stone"] else 0)
+		lab._select_floor_surface(maxi(lab.FLOOR_SURFACES.find(fixture), 0))
 		lab._select_weapon(lab.Weapon.SHOVEL if fixture == "shovel" else lab.Weapon.PICKAXE)
 		var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var obstacle: StaticBody3D
