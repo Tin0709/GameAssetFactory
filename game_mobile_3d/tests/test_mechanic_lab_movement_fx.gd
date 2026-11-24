@@ -1160,7 +1160,7 @@ func check_selected_landing_surfaces(lab, dust: Node3D) -> void:
 	var default_texture: Texture2DArray = ground_material.get_shader_parameter("source_terrain_tiles")
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
 	toggle.button_pressed = true
-	var audio := lab.get_node("CombatAudio")
+	var audio: Node = lab.get_node("CombatAudio")
 	for fixture in [[1, "dirt", lab.Weapon.SABRE], [2, "stone", lab.Weapon.GAUNTLETS],
 			[2, "stone", lab.Weapon.BASIC_GAUNTLETS]]:
 		var surface: String = fixture[1]
