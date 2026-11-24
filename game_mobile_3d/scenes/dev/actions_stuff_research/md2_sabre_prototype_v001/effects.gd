@@ -20,6 +20,7 @@ var ribbon:MeshInstance3D
 var sparks:MultiMeshInstance3D
 var enabled:=true
 var blade_trail_enabled := true
+var trail_end_fraction: Callable
 var interpolate_ground_trail_edges := false
 var intensity:=.75
 var _mesh:=ImmediateMesh.new()
@@ -57,10 +58,12 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 	if not enabled or not blade_trail_enabled:active=false
 	if active:
 		if serial!=attack_serial:samples.clear();serial=attack_serial;_was_active=false
+		var point := _trail_sample(base, tip, clock)
 		if not _was_active:
 			_sample_trail_edge(delta, edge_age, base, tip)
-			_burst(tip,tip-_previous_tip)
-		samples.append({"base":base,"tip":tip,"time":clock})
+			if point.tip_u == 1.0:
+				_burst(tip,tip-_previous_tip)
+		samples.append(point)
 	elif _was_active and serial == attack_serial and enabled and blade_trail_enabled:
 		_sample_trail_edge(delta, edge_age, base, tip)
 	while samples.size() > MAX_SAMPLES:
@@ -82,8 +85,11 @@ func _sample_trail_edge(delta: float, edge_age: float, base: Vector3, tip: Vecto
 	if edge_age <= 0.000001 or edge_age >= delta - 0.000001 or clock <= delta:
 		return
 	var weight := 1.0 - edge_age / delta
-	samples.append({"base": _previous_base.lerp(base, weight), "tip": _previous_tip.lerp(tip, weight),
-		"time": clock - edge_age})
+	samples.append(_trail_sample(_previous_base.lerp(base, weight), _previous_tip.lerp(tip, weight), clock - edge_age))
+
+func _trail_sample(base: Vector3, tip: Vector3, time: float) -> Dictionary:
+	var tip_u := float(trail_end_fraction.call(base, tip)) if trail_end_fraction.is_valid() else 1.0
+	return {"base": base, "tip": base.lerp(tip, tip_u), "tip_u": tip_u, "time": time}
 
 func _burst(point:Vector3,direction:Vector3,publish_sample:=false)->void:
 	bursts+=1;var added:=0
@@ -107,7 +113,14 @@ func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=nul
 			if not result.is_empty() and display_time>float(result[-1].time):
 				var a:Dictionary=result[-1]
 				var weight:=clampf((display_time-float(a.time))/maxf(.000001,float(point.time)-float(a.time)),0.,1.)
-				result.append({"base":blade_base if blade_base!=null else Vector3(a.base).lerp(point.base,weight),"tip":blade_tip if blade_tip!=null else Vector3(a.tip).lerp(point.tip,weight),"time":display_time})
+				# The presented bone pose is unclipped. Use it only when
+				# both simulated blade spans were fully visible.
+				var full_span: bool = a.tip_u == 1.0 and point.tip_u == 1.0
+				result.append({
+					"base": blade_base if full_span and blade_base != null else Vector3(a.base).lerp(point.base, weight),
+					"tip": blade_tip if full_span and blade_tip != null else Vector3(a.tip).lerp(point.tip, weight),
+					"tip_u": lerpf(a.tip_u, point.tip_u, weight), "time": display_time,
+				})
 			break
 	return result
 func particle_at(index:int,display_time:float)->Dictionary:
@@ -124,23 +137,23 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 	var time:=clock if display_time<0. else minf(display_time,clock)
 	var shown:Array=samples if display_time<0. else samples_at(time,blade_base,blade_tip)
 	_mesh.clear_surfaces()
-	if shown.size()>1:
-		_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
-		for i in range(1,shown.size()):
-			var a:Dictionary=shown[i-1];var b:Dictionary=shown[i]
-			var age_a := clampf((time - float(a.time)) / RIBBON_LIFETIME, 0.0, 1.0)
-			var age_b := clampf((time - float(b.time)) / RIBBON_LIFETIME, 0.0, 1.0)
-			var ages := Vector2(age_a, age_b)
-			var opacity := (1.0 - age_a) * intensity * 0.58
-			var ribbon_points := [a.base, a.tip, b.tip, a.base, b.tip, b.base]
-			for corner in ribbon_points.size():
-				_mesh.surface_set_uv(Vector2(RIBBON_U[corner], ages[RIBBON_SAMPLE[corner]]))
-				_mesh.surface_set_color(Color(1.,.73,.23,opacity));_mesh.surface_add_vertex(ribbon_points[corner])
-			var a_inner:Vector3=Vector3(a.base).lerp(a.tip,.86);var b_inner:Vector3=Vector3(b.base).lerp(b.tip,.86)
-			var edge_points := [a_inner, a.tip, b.tip, a_inner, b.tip, b_inner]
-			for corner in edge_points.size():
-				_mesh.surface_set_uv(Vector2(lerpf(0.86, 1.0, RIBBON_U[corner]), ages[RIBBON_SAMPLE[corner]]))
-				_mesh.surface_set_color(Color(1.,.97,.82,opacity*.8));_mesh.surface_add_vertex(edge_points[corner])
+	var has_surface := false
+	for i in range(1, shown.size()):
+		var a: Dictionary = shown[i - 1]
+		var b: Dictionary = shown[i]
+		if a.tip_u <= 0.0 or b.tip_u <= 0.0:
+			continue
+		if not has_surface:
+			_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
+			has_surface = true
+		var age_a := clampf((time - float(a.time)) / RIBBON_LIFETIME, 0.0, 1.0)
+		var age_b := clampf((time - float(b.time)) / RIBBON_LIFETIME, 0.0, 1.0)
+		var ages := Vector2(age_a, age_b)
+		var opacity := (1.0 - age_a) * intensity * 0.58
+		_add_ribbon_strip(a, b, 0.0, ages, Color(1.0, 0.73, 0.23, opacity))
+		if a.tip_u > 0.86 or b.tip_u > 0.86:
+			_add_ribbon_strip(a, b, 0.86, ages, Color(1.0, 0.97, 0.82, opacity * 0.8))
+	if has_surface:
 		_mesh.surface_end()
 	for i in particles.size():
 		var particle:Dictionary=particles[i]
@@ -150,6 +163,19 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 		var position:Vector3=shown_particle.position
 		sparks.multimesh.set_instance_transform(i,Transform3D(Basis.IDENTITY.scaled(scale),position))
 		sparks.multimesh.set_instance_color(i,Color(1.,.87,.4,fade*intensity if enabled else 0.))
+
+func _add_ribbon_strip(a: Dictionary, b: Dictionary, inner_u: float, ages: Vector2, tint: Color) -> void:
+	var inner := Vector2(minf(inner_u, a.tip_u), minf(inner_u, b.tip_u))
+	var outer := Vector2(a.tip_u, b.tip_u)
+	var start_a := Vector3(a.base).lerp(a.tip, inner.x / outer.x)
+	var start_b := Vector3(b.base).lerp(b.tip, inner.y / outer.y)
+	var points := [start_a, a.tip, b.tip, start_a, b.tip, start_b]
+	for corner in points.size():
+		var sample_index: int = RIBBON_SAMPLE[corner]
+		_mesh.surface_set_uv(Vector2(lerpf(inner[sample_index], outer[sample_index], RIBBON_U[corner]), ages[sample_index]))
+		_mesh.surface_set_color(tint)
+		_mesh.surface_add_vertex(points[corner])
+
 func reset()->void:
 	samples.clear();_was_active=false;serial=-1;clock=0.;_mesh.clear_surfaces()
 	for particle:Dictionary in particles:particle.life=0.;particle.born=-INF;particle.history.clear()

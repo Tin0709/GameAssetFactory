@@ -15,6 +15,7 @@ const BOW_DRAW_BLEND_SECONDS := 0.12
 const IDLE_GESTURE_BLEND_SECONDS := 0.18
 const MIN_WALL_STEP_PROGRESS := 0.10
 const POST_LANDING_STEP_INTERVAL := 0.10
+const BLADE_TRAIL_WALL_GAP := 0.012
 
 var crossbow_equipped := false
 var gauntlets_equipped := false
@@ -54,6 +55,31 @@ var _pending_hitstop_serial := -1
 
 func _init() -> void:
 	combo = LabCombo.new()
+
+func _ready() -> void:
+	super._ready()
+	effects.trail_end_fraction = _blade_trail_end_fraction
+
+func _blade_trail_end_fraction(base: Vector3, tip: Vector3) -> float:
+	var span := base.distance_to(tip)
+	if span <= 0.000001:
+		return 1.0
+	var space := get_world_3d().direct_space_state
+	var ray := PhysicsRayQueryParameters3D.create(base, tip, 1, [get_rid()])
+	var wall_normal_limit := cos(floor_max_angle)
+	var wall := space.intersect_ray(ray)
+	var blade_fraction := 1.0
+	if not wall.is_empty() and absf(wall.normal.y) < wall_normal_limit:
+		blade_fraction = maxf(0.0, (base.distance_to(wall.position) - BLADE_TRAIL_WALL_GAP) / span)
+	# An exaggerated swing can carry both blade markers through a wall in
+	# one pose. Keep that disconnected segment out of the ribbon.
+	ray.from = Vector3(global_position.x, base.y, global_position.z)
+	ray.to = base
+	if not ray.from.is_equal_approx(ray.to):
+		wall = space.intersect_ray(ray)
+		if not wall.is_empty() and absf(wall.normal.y) < wall_normal_limit:
+			return 0.0
+	return blade_fraction
 
 func confirm_melee_hitstop(serial: int) -> void:
 	if hitstop_seconds > 0.0 and _grounded and review_clip.is_empty():
