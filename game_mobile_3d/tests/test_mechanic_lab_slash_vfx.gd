@@ -79,6 +79,7 @@ func run() -> void:
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
 	await check_ground_ribbon_edges(lab, selector)
 	await check_tool_slash_cues(lab, selector)
+	await check_aerial_tool_effects(lab, selector)
 	await check_curved_finisher_ribbon(lab, selector)
 	await check_sabre_dive(lab, selector)
 	await check_wall_ribbons(lab, selector)
@@ -171,6 +172,73 @@ func check_tool_slash_cues(lab, selector: OptionButton) -> void:
 		attack(false)
 		check(recorded.size() == 3, "%s reaches all three slash cues during held attack input" % weapon)
 		print("TOOL_SLASH_CUES weapon=", weapon, " source_seconds=", recorded)
+	lab.reset_player()
+
+func check_aerial_tool_effects(lab, selector: OptionButton) -> void:
+	var actor = lab.player
+	var effects = actor.effects
+	var cue_times: Array[float] = []
+	var early_ground_cue: Array[bool] = []
+	var record := func(_cue: Dictionary, _serial: int, at: float):
+		cue_times.append(actor.combo.time - (effects.clock - at) * actor.combo.playback_rate())
+		early_ground_cue.append(not actor.combo.air_landing_started)
+	actor.tool_ground_cue.connect(record)
+	var expected := {
+		lab.Weapon.CLEAVER: [0.258916, 0.262468, 0.262824, 0.264515, 0.271219],
+		lab.Weapon.PICKAXE: [0.619433, 0.623386, 0.626369, 0.633079],
+		lab.Weapon.SHOVEL: [0.454490, 0.460621, 0.463408, 0.467310],
+	}
+	for fixture: Vector2 in [Vector2(lab.Weapon.CLEAVER, 5), Vector2(lab.Weapon.PICKAXE, 5),
+			Vector2(lab.Weapon.PICKAXE, 70), Vector2(lab.Weapon.SHOVEL, 5)]:
+		lab.reset_player()
+		for i in 8:
+			await physics_frame
+		var slot := int(fixture.x)
+		selector.select(slot)
+		selector.item_selected.emit(slot)
+		cue_times.clear()
+		early_ground_cue.clear()
+		lab._drop_player(fixture.y)
+		for i in 2:
+			await physics_frame
+		attack(true)
+		await physics_frame
+		attack(false)
+		var sections := {}
+		var flight_count := 0
+		var landing_count := 0
+		var ring_seen := false
+		for i in Engine.physics_ticks_per_second * 3:
+			await physics_frame
+			for point: Dictionary in effects.samples:
+				if sections.has(point.section):
+					continue
+				var start_time: float = actor.combo.time - (effects.clock - float(point.time)) * actor.combo.playback_rate()
+				sections[point.section] = start_time
+				if actor.combo.air_landing_started:
+					landing_count += 1
+					var start := 0.257850 if slot == lab.Weapon.CLEAVER else 0.622641
+					check(absf(start_time - start) < 0.00001, "The landing trail starts at the montage cue")
+				else:
+					flight_count += 1
+					check(slot == lab.Weapon.PICKAXE and absf(start_time - 0.091948) < 0.00001,
+						"Only Pickaxe draws a falling trail, at its own montage cue")
+			ring_seen = ring_seen or lab._tool_slam_ring.visible
+			if actor.combo.air_landing_started and actor.combo.phase != &"air_attack":
+				break
+		var context := "%s from %.0f m" % [selector.get_item_text(slot), fixture.y]
+		check(cue_times.size() == expected[slot].size() and not early_ground_cue.has(true),
+			"%s plays each ground layer once after landing" % context)
+		for index in mini(cue_times.size(), expected[slot].size()):
+			check(absf(cue_times[index] - float(expected[slot][index])) < 0.00001,
+				"%s layer %d uses the authored source timestamp" % [context, index + 1])
+		check(ring_seen, "%s shows the supported shockwave" % context)
+		check(landing_count == (0 if slot == lab.Weapon.SHOVEL else 1),
+			"%s has the correct number of landing strips" % context)
+		check(flight_count >= (2 if fixture.y > 5 else 1) if slot == lab.Weapon.PICKAXE else flight_count == 0,
+			"%s uses the appropriate falling slash on each loop" % context)
+		print("TOOL_AERIAL_FX ", context, " ground=", cue_times, " flight=", flight_count, " landing=", landing_count)
+	actor.tool_ground_cue.disconnect(record)
 	lab.reset_player()
 
 func check_curved_finisher_ribbon(lab, selector: OptionButton) -> void:
