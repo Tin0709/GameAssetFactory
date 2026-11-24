@@ -3,6 +3,7 @@ extends MultiMeshInstance3D
 const HEALTH_SHADER := preload("res://materials/mechanic_lab_zombie_health.gdshader")
 const BATCH_SHADER := preload("res://materials/mechanic_lab_health_bars.gdshader")
 const BAR_HEIGHT := 2.16
+const BAR_SIZE := Vector2(0.86, 0.165)
 const INITIAL_CAPACITY := 128
 
 var _owners: Array[Node3D] = []
@@ -11,7 +12,7 @@ var _fills := PackedColorArray()
 
 static func make_quad() -> QuadMesh:
 	var quad := QuadMesh.new()
-	quad.size = Vector2(0.86, 0.165)
+	quad.size = BAR_SIZE
 	return quad
 
 func _ready() -> void:
@@ -72,6 +73,15 @@ func _process(_delta: float) -> void:
 		if point != _positions[slot]:
 			_positions[slot] = point
 			multimesh.set_instance_transform(slot, Transform3D(Basis.IDENTITY, point))
+
+func positions_for_damage_layout() -> PackedVector3Array:
+	var positions := PackedVector3Array()
+	positions.resize(_owners.size())
+	# Read the current poses. The Lab places numbers before this node
+	# uploads the bar instances for the same render frame.
+	for i in _owners.size():
+		positions[i] = _owners[i].to_global(Vector3.UP * BAR_HEIGHT)
+	return positions
 
 func _bar_position(owner_node: Node3D) -> Vector3:
 	return to_local(owner_node.to_global(Vector3.UP * BAR_HEIGHT))

@@ -1,6 +1,7 @@
 extends MultiMeshInstance3D
 
 const SHADER := preload("res://materials/mechanic_lab_damage_numbers.gdshader")
+const HealthBars := preload("res://scripts/mechanic_lab_health_bars.gd")
 const DIGIT_SIZE := 32
 const DIGIT_COUNT := 10
 const DIGIT_ADVANCE := 24.5
@@ -14,6 +15,7 @@ const BUFFER_UPLOAD_MIN_GLYPHS := 48
 const INSTANCE_FLOATS := 16
 const LAYOUT_CELL := 0.24
 const LAYOUT_POP_SCALE := 1.16
+const POP_TRAVEL := 1.0 - (1.0 - POP_DURATION / NUMBER_DURATION) ** 2
 # Bound the work on a simultaneous burst. All glyphs still draw.
 const LAYOUT_LIMIT := 48
 const LAYOUT_STEPS := [
@@ -33,6 +35,7 @@ class DamageNumber:
 	var layout_offset := Vector2.ZERO
 	var layout_pending := true
 
+var health_bars: HealthBars
 var _numbers: Array[DamageNumber] = []
 var _instance_buffer := PackedFloat32Array()
 var _next_hit_order := 0
@@ -113,10 +116,10 @@ func present(delta: float) -> void:
 		_numbers.sort_custom(func(a: DamageNumber, b: DamageNumber) -> bool:
 			return a.depth < b.depth or (a.depth == b.depth and a.hit_order < b.hit_order))
 	if has_new_numbers:
-		if _numbers.size() == 1:
-			_numbers[0].layout_pending = false
-		elif camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		if camera != null and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
 			_place_new_numbers(camera_side, camera_up)
+		elif _numbers.size() == 1:
+			_numbers[0].layout_pending = false
 	var slot := 0
 	var local_from_world := global_transform.affine_inverse()
 	for number in _numbers:
@@ -151,6 +154,10 @@ func present(delta: float) -> void:
 	multimesh.visible_instance_count = glyph_count
 
 func _place_new_numbers(side: Vector3, up: Vector3) -> void:
+	var bar_cells := _damage_bar_cells(side, up)
+	if _numbers.size() == 1 and bar_cells.is_empty():
+		_numbers[0].layout_pending = false
+		return
 	var occupied := {}
 	# Reserve the numbers already on screen. Layout happens at birth so
 	# an older number continues to float without snapping to a new lane.
@@ -172,17 +179,61 @@ func _place_new_numbers(side: Vector3, up: Vector3) -> void:
 		var centre := Vector2(number.centre.dot(side), number.centre.dot(up))
 		var extent := _label_extent(number)
 		var reach := Vector2(minf(extent.x * 2.0, 1.0), extent.y * 2.0)
+		var travel := Vector2(number.travel.dot(side), number.travel.dot(up)) * POP_TRAVEL
+		var best_blocked := true
 		var best := 0x7fffffff
 		for step: Vector2 in LAYOUT_STEPS:
 			var offset := step * reach
-			var score := _measure_cells(occupied, centre + offset, extent, false)
-			if score < best:
+			var point := centre + offset
+			var blocked := false
+			if not bar_cells.is_empty():
+				var face := Rect2(point - extent, extent * 2.0)
+				var during_pop := face.merge(Rect2(face.position + travel, face.size))
+				blocked = _hits_bar(bar_cells, during_pop)
+			if blocked and not best_blocked:
+				continue
+			var score := _measure_cells(occupied, point, extent, false)
+			if score < best or (best_blocked and not blocked):
 				best = score
+				best_blocked = blocked
 				number.layout_offset = offset
-			if score == 0:
+			if not blocked and score == 0:
 				break
 		_measure_cells(occupied, centre + number.layout_offset, extent, true)
 		placed += 1
+
+func _damage_bar_cells(side: Vector3, up: Vector3) -> Dictionary:
+	var cells := {}
+	if health_bars == null:
+		return cells
+	var size := HealthBars.BAR_SIZE
+	for point in health_bars.positions_for_damage_layout():
+		var centre := Vector2(point.dot(side), point.dot(up))
+		var bounds := Rect2(centre - size * 0.5, size)
+		var first := Vector2i((bounds.position / LAYOUT_CELL).floor())
+		var last := Vector2i((bounds.end / LAYOUT_CELL).floor())
+		for y in range(first.y, last.y + 1):
+			var row := y << 16
+			for x in range(first.x, last.x + 1):
+				var cell := row + x
+				if not cells.has(cell):
+					cells[cell] = []
+				cells[cell].append(bounds)
+	return cells
+
+static func _hits_bar(cells: Dictionary, bounds: Rect2) -> bool:
+	var first := Vector2i((bounds.position / LAYOUT_CELL).floor())
+	var last := Vector2i((bounds.end / LAYOUT_CELL).floor())
+	for y in range(first.y, last.y + 1):
+		var row := y << 16
+		for x in range(first.x, last.x + 1):
+			var cell := row + x
+			if not cells.has(cell):
+				continue
+			for bar: Rect2 in cells[cell]:
+				if bar.intersects(bounds):
+					return true
+	return false
 
 func _label_extent(number: DamageNumber) -> Vector2:
 	var size := Vector2(DIGIT_SIZE + DIGIT_ADVANCE * (number.ascii_digits.size() - 1), DIGIT_SIZE)

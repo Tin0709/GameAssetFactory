@@ -469,6 +469,7 @@ func _ready() -> void:
 			_zombie_damage_numbers = DamageNumbers.new()
 			_zombie_damage_numbers.name = "ZombieDamageNumbers"
 			_zombie_damage_numbers.setup(glyphs)
+			_zombie_damage_numbers.health_bars = bars
 			$CombatEffects.add_child(_zombie_damage_numbers)
 			$Zombies.damage_numbers = _zombie_damage_numbers
 		player.grounded_melee_aim = $Zombies.aim_sabre
