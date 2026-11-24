@@ -1981,11 +1981,12 @@ func check_tool_montage_audio() -> void:
 		var slot: int = row[0]
 		var name: String = row[1]
 		var times: Array = row[2]
-		menu.select(slot)
-		menu.item_selected.emit(slot)
 		lab.reset_player()
 		for i in 8:
 			await physics_frame
+		menu.select(slot)
+		menu.item_selected.emit(slot)
+		audio.reset()
 		check(lab._equipped_weapon == slot, "%s is equipped for the montage audio test" % name)
 		push_melee_attack(true)
 		var played := {}
