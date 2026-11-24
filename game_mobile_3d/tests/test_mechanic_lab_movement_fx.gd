@@ -600,22 +600,26 @@ func check_colliding_debris(lab, dust: Node3D) -> void:
 	lab._select_weapon(lab.Weapon.SABRE)
 
 func check_gauntlet_impact_marks(lab) -> void:
-	if RenderingServer.get_current_rendering_method() == &"gl_compatibility":
-		return
 	var marks := lab.get_node_or_null("CombatEffects/GauntletImpactMarks") as Node3D
 	check(marks != null, "The Lab has a pooled receiver for the verified Gauntlets impact atlas")
 	if marks == null:
 		return
 	var pool := marks.get_children()
 	var dust: Node3D = lab.get_node("MovementDust")
-	check(pool.size() == 4, "The impact mark renderer has four reusable decal slots")
+	check(pool.size() == 4, "The impact mark renderer has four reusable slots")
 	var camera_ground: MeshInstance3D = lab.get_node("Ground/Mesh")
 	var player_mesh: MeshInstance3D = lab._basic_gauntlet_mounts[0]
 	for slot: Node in pool:
-		var decal := slot as Decal
-		check(decal != null and decal.texture_albedo.get_size() == Vector2(16, 16)
-			and (decal.cull_mask & camera_ground.layers) != 0 and (decal.cull_mask & player_mesh.layers) == 0,
-			"The mark uses one atlas tile and projects only onto the stage")
+		if RenderingServer.get_current_rendering_method() == &"gl_compatibility":
+			var flat := slot as MeshInstance3D
+			check(flat != null and flat.mesh is PlaneMesh and flat.mesh.size == Vector2(1.10, 1.10)
+				and flat.material_override.get_shader_parameter(&"mark_mask").get_size() == Vector2(16, 16),
+				"The flat mark uses the same dimensions and one atlas tile")
+		else:
+			var decal := slot as Decal
+			check(decal != null and decal.texture_albedo.get_size() == Vector2(16, 16)
+				and (decal.cull_mask & camera_ground.layers) != 0 and (decal.cull_mask & player_mesh.layers) == 0,
+				"The decal uses one atlas tile and projects only onto the stage")
 	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
 	var audio: Node = lab.get_node("CombatAudio")
 	toggle.button_pressed = true
@@ -651,12 +655,12 @@ func check_gauntlet_impact_marks(lab) -> void:
 		var cue := StringName("slam_" + surface)
 		var initial_cue: int = audio._next_choice.get(cue, 0)
 		await start_heavy_drop(lab)
-		var appeared: Decal
+		var appeared: Node3D
 		for i in 65:
 			await physics_frame
-			for decal: Decal in pool:
-				if decal.visible:
-					appeared = decal
+			for mark: Node3D in pool:
+				if mark.visible:
+					appeared = mark
 					break
 			if appeared != null:
 				break
@@ -677,7 +681,7 @@ func check_gauntlet_impact_marks(lab) -> void:
 						return p.origin.slide(Vector3.UP).distance_to(appeared.global_position.slide(Vector3.UP)) < 0.02),
 					"The crack and debris share the support point in the %s fixture" % fixture)
 				if fixture.begins_with("stone"):
-					check(reach + appeared.size.x * 0.5 < wall_face, "The entire mark fits in front of the wall")
+					check(reach + marks.PROJECTION_SIZE.x * 0.5 < wall_face, "The entire mark fits in front of the wall")
 					var puffs: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag == 0.0)
 					var expected_puff := 0.0 if fixture == "stone_wall" else 0.90
 					check(puffs.size() == 1 and absf(puffs[0].origin.dot(forward) - expected_puff) < 0.02,
@@ -705,7 +709,7 @@ func check_gauntlet_impact_marks(lab) -> void:
 	await physics_frame
 	lab._select_floor_surface(0)
 	lab._select_weapon(lab.Weapon.SABRE)
-	check(pool.all(func(decal: Decal): return not decal.visible), "Reset hides every retained impact decal")
+	check(pool.all(func(mark: Node3D): return not mark.visible), "Reset hides every retained impact mark")
 
 func check_tool_ground_effects(lab, dust: Node3D) -> void:
 	var actor = lab.player
