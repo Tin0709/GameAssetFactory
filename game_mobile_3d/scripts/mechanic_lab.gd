@@ -1972,14 +1972,14 @@ func _blade_contact_points() -> PackedVector3Array:
 
 func _publish_melee_contact(contact: Dictionary, sample_time: float, weapon_points: PackedVector3Array,
 		punch_axis := Vector3.ZERO) -> void:
-	if contact.has("feedback"):
-		var visual: Dictionary = contact.feedback
+	var visual: Dictionary = contact.get("feedback", {})
+	if not visual.is_empty():
 		visual.time = sample_time
 		_pending_melee_feedback.append(visual)
 	var spark_center: Vector3 = contact.get("spark_center", contact.point)
 	_show_contact_fx(spark_center, contact.direction, contact.clip, contact.serial,
 		sample_time, contact.get("capsule", Vector2.ZERO), weapon_points, punch_axis,
-		contact.get("feedback", {}).get("splash", false))
+		visual.get("splash", false))
 
 func _present_melee_feedback(display_time: float) -> void:
 	# Tone down overlapping splash highlights by attack. A separate strike
