@@ -163,6 +163,14 @@ offset_bottom = 179.0
 focus_mode = 0
 tooltip_text = "Đổi animation khi còn sống cho Zombie và Baby Zombie. Ragdoll khi chết dùng MD2."
 
+[node name="FloorSurface" type="OptionButton" parent="HUD"]
+offset_left = 18.0
+offset_top = 184.0
+offset_right = 182.0
+offset_bottom = 218.0
+focus_mode = 0
+tooltip_text = "Đổi bề mặt để thử bụi, mảnh văng và tiếng chạm đất của đòn bổ."
+
 [node name="CombatAudioToggle" type="CheckButton" parent="HUD"]
 offset_left = 158.0
 offset_top = 69.0

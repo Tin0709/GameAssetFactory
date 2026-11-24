@@ -4,8 +4,8 @@ const MANIFEST := "godot_lab/world_map_unified_showcase_v001/terrain_source_atla
 const TILE_KEYS := ["grass_top", "grass_side", "dirt", "path", "stone"]
 const TILE_SIZE := 16
 
-static func load_tiles() -> Texture2DArray:
-	if not OS.has_feature("editor"):
+static func load_tiles(top_tile := "grass_top") -> Texture2DArray:
+	if not OS.has_feature("editor") or top_tile not in TILE_KEYS:
 		return null
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	if root.is_empty():
@@ -35,7 +35,7 @@ static func load_tiles() -> Texture2DArray:
 	var images: Array[Image] = []
 	var surface_reflectance := PackedVector3Array()
 	for key in TILE_KEYS:
-		var offset: Variant = manifest.tiles.get(key)
+		var offset: Variant = manifest.tiles.get(top_tile if key == "grass_top" else key)
 		if not offset is Array or offset.size() != 2 or not (offset[0] is float or offset[0] is int) \
 			or not (offset[1] is float or offset[1] is int):
 			return null

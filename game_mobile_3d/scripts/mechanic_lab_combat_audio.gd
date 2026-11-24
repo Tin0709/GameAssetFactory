@@ -560,6 +560,22 @@ func queue_crossbow_samples(root: String) -> void:
 	for i in CROSSBOW_FLIGHT_HASHES.size():
 		_queue_weapon_sample(root, &"crossbow_flight", CROSSBOW + ("arrow_whoosh_%02d.ogg" % (i + 1)), CROSSBOW_FLIGHT_HASHES[i])
 
+func queue_landing_surface(root: String, surface: String) -> void:
+	var group := StringName("slam_" + surface)
+	if _groups.has(group) or _weapon_sample_jobs.has(group):
+		return
+	var hashes: Array
+	match surface:
+		"dirt":
+			hashes = DIRT_LANDING_HASHES
+		"stone":
+			hashes = STONE_LANDING_HASHES
+		_:
+			return
+	var pattern := SURFACE_LANDING.replace("%s", surface.capitalize())
+	for index in hashes.size():
+		_queue_weapon_sample(root, group, pattern % (index + 1), hashes[index])
+
 func queue_gauntlet_samples(root: String) -> void:
 	var weights := ["light", "medium", "heavy"]
 	for i in weights.size():
@@ -709,6 +725,7 @@ func slam_landed(point: Vector3, surface: String = "grass") -> void:
 	if surface.is_empty():
 		return
 	var group := StringName("slam_" + surface)
+	_finish_weapon_samples(group)
 	if _surface_landing_voices.is_empty():
 		_play(group, point, SURFACE_LANDING_GAIN_DB)
 		return

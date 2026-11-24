@@ -109,7 +109,9 @@ const PRESET_OPTIONS := {
 	"render_scale": ^"HUD/RenderScale",
 	"frame_rate": ^"HUD/FrameRate",
 	"contact_spark_quality": ^"HUD/ImpactFxPanel/Rows/ContactSparkQuality",
+	"floor_surface": ^"HUD/FloorSurface",
 }
+const FLOOR_SURFACES := ["grass", "dirt", "stone"]
 
 enum Weapon { SABRE, SWORD, CURVED_GREATSWORD, CROSS_POLLINATOR, GAUNTLETS,
 	CLEAVER, BOW, BASIC_GAUNTLETS, PICKAXE, SHOVEL, AXE }
@@ -164,10 +166,13 @@ var _combat_audio: CombatAudio
 var _lab_audio_mix: LabAudioMix
 var _zombie_step_dust: ZombieStepDust
 var _floor_snap_contact := KinematicCollision3D.new()
+var _floor_surface := "grass"
+var _floor_tiles: Dictionary[String, Texture2DArray] = {}
 var _slam_swing_frame := -1
 var _slam_swing_serial := -1
 var _slam_audio_frame := -1
 var _slam_audio_point: Vector3
+var _slam_audio_surface := "grass"
 var _contact_sparks: ContactSparks
 var _grounded_impact_dispatch := false
 var _pending_melee_contact_fx: Array[Dictionary] = []
@@ -264,11 +269,7 @@ func _ready() -> void:
 	_setup_world_look()
 	_setup_render_scale()
 	_setup_frame_rate()
-	var material := $Ground/Mesh.material_override as ShaderMaterial
-	var tiles := SourceTerrain.load_tiles()
-	if tiles != null:
-		material.set_shader_parameter("source_terrain_tiles", tiles)
-		material.set_shader_parameter("use_source_terrain", true)
+	var tiles := _setup_floor_surfaces()
 
 	presentation.setup()
 	reset_player()
@@ -335,10 +336,10 @@ func _ready() -> void:
 		_setup_movement_audio()
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
-		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _grass_landing_contact_at,
+		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _floor_landing_contact_at,
 				player.source_step_dust_size, true):
 			dust.use_source_landing(true)
-			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped, _grass_contact_at)
+			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped, _floor_contact_at)
 			add_child(dust)
 			var zombie_dust := ZombieStepDust.new()
 			zombie_dust.name = "ZombieStepDust"
