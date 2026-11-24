@@ -2,6 +2,10 @@ extends SceneTree
 var failures:Array[String]=[]
 func check(ok:bool,message:String)->void:
 	if not ok:failures.append(message);push_error(message)
+func _petal_return(material: ShaderMaterial) -> float:
+	var value: Variant = material.get_shader_parameter("petal_shadow_return")
+	return value if value is float else NAN
+
 func _initialize()->void:call_deferred("run")
 func run()->void:
 	var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w)
@@ -79,15 +83,15 @@ func run()->void:
 		w.showcase.set_hour(12.)
 		p.grass_light.sync()
 		check(w.showcase._lighting_sliders.has(SHADE_RETURN), "Petal shade return has a graphics slider")
-		check(is_equal_approx(float(petals.get_shader_parameter("petal_shadow_return")), .0516),
+		check(is_equal_approx(_petal_return(petals), .0516),
 			"Default noon applies the mild petal shadow return")
 		var petal_source := petals.shader
 		w.showcase.set_lighting_scale(SHADE_RETURN, .5)
-		check(is_equal_approx(float(petals.get_shader_parameter("petal_shadow_return")), .0258) and petals.shader == petal_source,
+		check(is_equal_approx(_petal_return(petals), .0258) and petals.shader == petal_source,
 			"The slider changes only the strength of the existing flower material")
 		w.showcase.set_hour(22.)
 		p.grass_light.sync()
-		check(float(petals.get_shader_parameter("petal_shadow_return")) == 0., "Petal shade return is off at night")
+		check(_petal_return(petals) == 0., "Petal shade return is off at night")
 		w.showcase.set_hour(12.)
 		p.grass_light.sync()
 		var flower_preset := "user://petal_shade_%d.cfg" % OS.get_process_id()
@@ -95,7 +99,7 @@ func run()->void:
 		w.showcase.set_lighting_scale(SHADE_RETURN, 0.)
 		check(w.showcase.load_lighting_mix(flower_preset) == OK, "The petal shade preset reloads")
 		p.grass_light.sync()
-		check(is_equal_approx(float(petals.get_shader_parameter("petal_shadow_return")), .0258),
+		check(is_equal_approx(_petal_return(petals), .0258),
 			"The preset restores the selected petal shade strength")
 		var previous_preset := ConfigFile.new()
 		if previous_preset.load(flower_preset) == OK:
@@ -104,7 +108,7 @@ func run()->void:
 			check(previous_preset.save(flower_preset) == OK and w.showcase.load_lighting_mix(flower_preset) == OK,
 				"The existing lighting preset format still loads")
 			p.grass_light.sync()
-			check(float(petals.get_shader_parameter("petal_shadow_return")) == 0.,
+			check(_petal_return(petals) == 0.,
 				"Previous saved presets keep their previous petal lighting")
 		DirAccess.remove_absolute(flower_preset)
 		w.showcase.reset_lighting_mix()
