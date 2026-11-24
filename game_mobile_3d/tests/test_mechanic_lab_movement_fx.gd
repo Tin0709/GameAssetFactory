@@ -104,6 +104,7 @@ func run() -> void:
 	await check_dust_contact_clock(lab, dust)
 	await check_zombie_steps_on_slab(lab)
 	await check_zombie_dust_contact_clock(lab)
+	await check_selected_landing_surfaces(lab, dust)
 	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
 	lab.free()
@@ -1148,6 +1149,55 @@ func check_zombie_dust_contact_clock(lab) -> void:
 	check(dust.multimesh.visible_instance_count == 0 and not dust.is_processing(),
 		"Simultaneous expiry empties the draw batch")
 	dust.clear()
+
+func check_selected_landing_surfaces(lab, dust: Node3D) -> void:
+	var picker := lab.get_node_or_null("HUD/FloorSurface") as OptionButton
+	if picker == null:
+		check(false, "The Lab offers source grass, dirt path and stone test surfaces")
+		return
+	var ground := lab.get_node("Ground/Mesh") as MeshInstance3D
+	var ground_material := ground.material_override as ShaderMaterial
+	var default_texture: Texture2DArray = ground_material.get_shader_parameter("source_terrain_tiles")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	var audio := lab.get_node("CombatAudio")
+	for fixture in [[1, "dirt", lab.Weapon.SABRE], [2, "stone", lab.Weapon.GAUNTLETS],
+			[2, "stone", lab.Weapon.BASIC_GAUNTLETS]]:
+		var surface: String = fixture[1]
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		picker.select(fixture[0])
+		picker.item_selected.emit(fixture[0])
+		lab._select_weapon(fixture[2])
+		check(lab._equipped_weapon == fixture[2], "The surface fixture equips the correct weapon")
+		var texture: Texture2DArray = ground_material.get_shader_parameter("source_terrain_tiles")
+		check(texture != null and texture != default_texture
+			and ground.mesh.get_aabb().size.is_equal_approx(Vector3(100.0, 1.0, 100.0)),
+			"The selected source texture reuses the same 100×100 floor")
+		var cue := StringName("slam_" + surface)
+		var before: int = audio._next_choice.get(cue, 0)
+		var grass_before: int = audio._next_choice.get(&"slam_grass", 0)
+		await start_heavy_drop(lab)
+		for i in 65:
+			await physics_frame
+			if visible_particles(dust) > 0 and audio._next_choice.get(cue, 0) != before:
+				break
+		var particles: Array = dust._particles.filter(func(particle): return particle.sprite.visible)
+		var tint: Color = dust.SURFACE_DUST[surface]
+		check(not particles.is_empty() and particles.all(func(particle):
+				return Color(particle.sprite.modulate, 1.0).is_equal_approx(tint)),
+			"The real E dive uses %s tint for every visible ground particle" % surface)
+		check(audio._next_choice.get(cue, 0) == (before + 1) % 6
+			and audio._next_choice.get(&"slam_grass", 0) == grass_before,
+			"The E dive plays exactly one matching surface layer")
+		print("MECHANIC_LAB_IMPACT_SURFACE ", surface, " weapon=", fixture[2], " particles=", particles.size())
+	picker.select(0)
+	picker.item_selected.emit(0)
+	check(ground_material.get_shader_parameter("source_terrain_tiles") == default_texture,
+		"Returning to grass restores the default texture object")
+	toggle.button_pressed = false
+	lab.reset_player()
 
 func start_heavy_drop(lab) -> void:
 	lab.get_node("HUD/DropMedium").pressed.emit()
