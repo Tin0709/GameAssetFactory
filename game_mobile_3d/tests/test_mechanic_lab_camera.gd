@@ -248,7 +248,7 @@ func check_sabre_dive(lab) -> void:
 		if target != null:
 			var damage_delay := ceili(0.054369554 * Engine.physics_ticks_per_second)
 			check(target_hits == [landings[attempt] + damage_delay] and target.health == 8
-				and is_equal_approx(lab._impact_light.light_energy, 2.3),
+				and is_equal_approx(lab._light_peak, 2.3),
 				"Target damage keeps its own key and cannot replace the landing flash")
 			target.free()
 		print("SABRE_DIVE_SHAKE touchdown=", landings[attempt], " onset=", onset, " flash=", flash_frame, " burst=", burst_frame)
@@ -310,7 +310,8 @@ func check_weapon_impact_support(lab, slot: int) -> void:
 			check(absf(light.y - floor_height - 0.60) < 0.02, "The flash uses the touchdown height for %s" % context)
 			var particle_origin := light - Vector3.UP * 0.48
 			var floor_sparks: int = lab.player.effects.particles.filter(func(particle):
-				return particle.life > 0.0 and particle.position.is_equal_approx(particle_origin)).size()
+				return particle.life > 0.0 and not particle.history.is_empty() \
+					and particle.history[0].position.is_equal_approx(particle_origin)).size()
 			check(floor_sparks == 8, "The flash and the eight floor sparks share an origin for %s" % context)
 			match fixture:
 				"flat":
@@ -430,6 +431,8 @@ func check_sabre_dive_presentation(lab) -> void:
 		var light: OmniLight3D = lab._impact_light
 		if not first_draw.has("light") and light.is_visible_in_tree() and light.light_energy > 0.0:
 			first_draw.light = elapsed
+		if not first_draw.has("ring") and lab._tool_slam_ring.visible:
+			first_draw.ring = elapsed
 		if first_draw.has("sparks"):
 			return
 		var sparks: MultiMesh = lab.player.effects.sparks.multimesh
@@ -443,14 +446,15 @@ func check_sabre_dive_presentation(lab) -> void:
 	await start_sabre_dive(lab)
 	for i in Engine.physics_ticks_per_second:
 		await physics_frame
-		if first_draw.size() == 4:
+		if first_draw.size() == 5:
 			break
 	RenderingServer.frame_pre_draw.disconnect(sample)
-	var cue := ceili(0.056890413 * Engine.physics_ticks_per_second)
+	var cue := 0.056890413 * Engine.physics_ticks_per_second
 	check(first_draw.get("light", -1.0) >= cue - 0.000001
-		and is_equal_approx(first_draw.get("light", -1.0), first_draw.get("sparks", -2.0)),
-		"The rendered floor flash and sparks start together on or after the authored pose")
-	var shake_cue := ceili(0.052268848 * Engine.physics_ticks_per_second)
+		and is_equal_approx(first_draw.get("light", -1.0), first_draw.get("sparks", -2.0))
+		and is_equal_approx(first_draw.get("light", -1.0), first_draw.get("ring", -2.0)),
+		"The rendered floor flash, ring and sparks start together on or after the authored pose")
+	var shake_cue := 0.052268848 * Engine.physics_ticks_per_second
 	check(first_draw.get("camera", -1.0) >= shake_cue - 0.000001
 		and is_equal_approx(first_draw.get("kick", 0.0), 0.008),
 		"The displayed camera waits for its authored pose and begins at full strength")

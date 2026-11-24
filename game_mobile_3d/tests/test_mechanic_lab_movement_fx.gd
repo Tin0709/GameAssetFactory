@@ -352,10 +352,15 @@ func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 	await start_heavy_drop(lab)
 	var burst_frame := -1
 	var counts: Array[int] = []
+	var puff_slots: Dictionary = {}
+	var forward: Vector3 = lab.player.visual.global_basis.z.slide(Vector3.UP).normalized()
 	for i in Engine.physics_ticks_per_second:
 		await physics_frame
 		var visible := visible_particles(dust)
 		if not landings.is_empty() and visible > 0:
+			for particle in dust._particles:
+				if particle.sprite.visible and is_equal_approx(particle.sprite.pixel_size * 16.0, 0.88):
+					puff_slots[particle] = particle.origin
 			if burst_frame < 0:
 				burst_frame = Engine.get_physics_frames() - 1
 			if counts.is_empty() or counts.back() != visible:
@@ -365,9 +370,9 @@ func check_heavy_dust_timing(lab, dust: Node3D) -> void:
 	var delay_ticks := ceili(0.045126423 * Engine.physics_ticks_per_second)
 	check(not landings.is_empty() and burst_frame == int(landings[0].frame) + delay_ticks,
 		"The first visible heavy dust appears at the Sabre debris notify")
-	check(not counts.is_empty() and counts[0] == 10, "The first burst is the ten heavy puffs")
-	for i in range(1, counts.size()):
-		check(counts[i] < counts[i - 1], "The dive emits a single burst")
+	check(not counts.is_empty() and counts.max() == 11, "The two Sabre notifies show ten heavy puffs plus one small puff")
+	check(puff_slots.size() == 1 and absf(Vector3(puff_slots.values()[0]).dot(forward) - 0.90) < 0.02,
+		"The separate Sabre puff appears once at the 90 cm source offset")
 	print("MECHANIC_LAB_HEAVY_DUST landings=", landings, " burst_frame=", burst_frame, " counts=", counts)
 	landings.clear()
 	await start_heavy_drop(lab)
@@ -430,7 +435,7 @@ func check_overlapping_landing_dust(lab, dust: Node3D) -> void:
 	Input.action_release("move_forward")
 	Input.action_release("jump")
 	lab.player.surface_contact.disconnect(record)
-	check(landing_ticks.size() == 2 and heavy_peak == 10,
+	check(landing_ticks.size() == 2 and heavy_peak == 11,
 		"The running jump and follow-up Sabre dive both complete their landings")
 	check(lost == 0, "The Sabre landing and later footsteps preserve visible dust from the ordinary landing")
 	print("MECHANIC_LAB_OVERLAPPING_DUST lost=", lost, " heavy=", heavy_peak)

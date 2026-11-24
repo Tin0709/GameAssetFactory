@@ -546,9 +546,8 @@ func _setup_weapon_selector() -> void:
 	_sabre_blade_base = player.marker_base.position
 	_sabre_blade_tip = player.marker_tip.position
 	_sabre_profile = player.runtime_locomotion_profile.combat
-	_sabre_air_clip = player.clips.AirAttack.duplicate()
-	_sabre_air_clip.ground_effects = SABRE_LANDING_CUES
-	player.clips.AirAttack = _sabre_air_clip
+	_sabre_air_clip = player.clips.AirAttack
+	player.sabre_landing_cues = SABRE_LANDING_CUES
 	_default_idle_novelty = player.clips.InspectWeapon
 	_sabre_air_rate = player.combo.air_attack_play_rate
 	_sword_profile = Sword.combat_profile(_sabre_profile, player.clips)

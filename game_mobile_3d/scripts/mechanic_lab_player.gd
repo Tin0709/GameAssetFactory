@@ -31,6 +31,7 @@ var _crossbow_recoil_bone := -1
 var tool_air_hold := -1.0
 var tool_air_loop := -1.0
 var tool_air_landing := -1.0
+var sabre_landing_cues: Array = []
 var bow_equipped := false
 var bow_target: Callable
 var bow_can_draw: Callable
@@ -416,17 +417,16 @@ func _animate(delta: float) -> void:
 	super._animate(delta)
 	if _grounded and combo.serial == previous_serial and review_clip.is_empty():
 		if combo.phase == &"attack" and combo.native_enabled:
-			_emit_tool_ground_cues(combo.native_windows[combo.index], previous_time)
+			_emit_tool_ground_cues(combo.native_windows[combo.index].get("ground_effects", []), previous_time)
 		elif combo.phase == &"air_attack" and combo.air_landing_started:
-			_emit_tool_ground_cues(clips.AirAttack, previous_time)
+			var cues: Array = sabre_landing_cues if combo.use_sabre_air_sections else clips.AirAttack.get("ground_effects", [])
+			_emit_tool_ground_cues(cues, previous_time)
 	if release_bow:
 		combo.serial += 1
 		bow_released.emit(combo.serial, _bow_held_seconds >= Bow.CHARGE_TIME - 0.00001, target)
 
-func _emit_tool_ground_cues(profile: Dictionary, previous_time: float) -> void:
-	if not profile.has("ground_effects"):
-		return
-	for cue: Dictionary in profile.ground_effects:
+func _emit_tool_ground_cues(cues: Array, previous_time: float) -> void:
+	for cue: Dictionary in cues:
 		if previous_time < cue.time and cue.time <= combo.time:
 			var sample_time: float = effects.clock - (combo.time - float(cue.time)) / combo.playback_rate()
 			tool_ground_cue.emit(cue, combo.serial, sample_time)
