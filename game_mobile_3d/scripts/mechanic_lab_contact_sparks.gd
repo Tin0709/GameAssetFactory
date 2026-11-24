@@ -78,7 +78,7 @@ func set_budget_scale(scale: float) -> void:
 		_pending.resize(_contact_budget)
 
 func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, sample_time := -1.0,
-		capsule := Vector2.ZERO, blade := PackedVector3Array()) -> void:
+		capsule := Vector2.ZERO, weapon_points := PackedVector3Array()) -> void:
 	var distance := point.distance_squared_to(viewer)
 	var index := _pending.size()
 	while index > 0 and distance < float(_pending[index - 1].distance):
@@ -86,18 +86,27 @@ func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, s
 	if index == _contact_budget:
 		return
 	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance,
-		"sample_time": sample_time, "capsule": capsule, "blade": blade})
+		"sample_time": sample_time, "capsule": capsule, "weapon_points": weapon_points})
 	if _pending.size() > _contact_budget:
 		_pending.pop_back()
 	set_process(true)
 
-func _blade_surface_point(centre: Vector3, capsule: Vector2, blade: PackedVector3Array, direction: Vector3) -> Vector3:
+func _contact_surface_point(centre: Vector3, capsule: Vector2, weapon_points: PackedVector3Array, direction: Vector3) -> Vector3:
 	var axis := Vector3.UP * capsule.y
-	var closest := Geometry3D.get_closest_points_between_segments(centre - axis, centre + axis, blade[0], blade[1])
-	var normal := (closest[1] - closest[0]).normalized()
+	var body_point: Vector3
+	var weapon_point: Vector3
+	if weapon_points.size() == 1:
+		weapon_point = weapon_points[0]
+		body_point = Geometry3D.get_closest_point_to_segment(weapon_point, centre - axis, centre + axis)
+	else:
+		var closest := Geometry3D.get_closest_points_between_segments(
+			centre - axis, centre + axis, weapon_points[0], weapon_points[1])
+		body_point = closest[0]
+		weapon_point = closest[1]
+	var normal := (weapon_point - body_point).normalized()
 	if normal.is_zero_approx():
 		normal = -direction.normalized()
-	return closest[0] + normal * capsule.x
+	return body_point + normal * capsule.x
 
 func _spawn_burst(point: Vector3, attack_direction: Vector3) -> void:
 	var angle := _random.randf_range(0.0, TAU)
@@ -129,8 +138,8 @@ func _process(delta: float) -> void:
 			pending_index += 1
 			continue
 		var point: Vector3 = contact.point
-		if contact.capsule.x > 0.0 and contact.blade.size() == 2:
-			point = _blade_surface_point(point, contact.capsule, contact.blade, contact.direction)
+		if contact.capsule.x > 0.0 and not contact.weapon_points.is_empty():
+			point = _contact_surface_point(point, contact.capsule, contact.weapon_points, contact.direction)
 		_spawn_burst(point, contact.direction)
 		_pending.remove_at(pending_index)
 	var camera := get_viewport().get_camera_3d()

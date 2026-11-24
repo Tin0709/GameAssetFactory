@@ -878,6 +878,22 @@ func _mount_gauntlet(mesh: Mesh, left: bool, basic := false) -> MeshInstance3D:
 	return _mount_weapon(mesh if basic else Gauntlets.with_edge_color(mesh, color), socket, mesh_name,
 		Gauntlets.mount_transform(left, basic))
 
+func _gauntlet_knuckle(attack_index: int) -> Vector3:
+	var left := attack_index == Gauntlets.LEFT_PUNCH_INDEX
+	var glove: MeshInstance3D
+	if player.basic_gauntlets_equipped:
+		glove = _basic_gauntlet_mounts[0 if left else 1]
+	else:
+		glove = _left_gauntlet if left else _right_gauntlet
+	var socket := glove.get_parent() as BoneAttachment3D
+	var bounds := glove.get_aabb()
+	var knuckle := bounds.get_center()
+	knuckle.z = bounds.end.z
+	# BoneAttachment transforms update later. Use the pose just sampled
+	# by the player, matching the transform used for the rendered glove.
+	var skeleton: Skeleton3D = player.skeleton
+	return skeleton.global_transform * skeleton.get_bone_global_pose(socket.bone_idx) * glove.transform * knuckle
+
 func _load_tool(index: int, root: String) -> bool:
 	if _tools.has(index):
 		return true
@@ -1343,14 +1359,14 @@ func _set_combat_audio(enabled: bool) -> void:
 	var preview: StringName = WEAPON_AUDIO_PREVIEWS.get(_equipped_weapon, &"")
 	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP, melee_tool, preview)
 
-func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, _lethal: bool) -> void:
+func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, index: int, serial: int, _lethal: bool) -> void:
 	if _grounded_impact_dispatch:
 		player.confirm_melee_hitstop(serial)
 	var tool_hit: StringName = MELEE_AUDIO_NAMES.get(_equipped_weapon, &"") if clip != Bow.ACTION and clip != CrossPollinator.SHOT else &""
 	_combat_audio.weapon_contact(point, serial, clip, tool_hit)
 	var melee_pose := _grounded_impact_dispatch or clip == "AirAttack"
 	if melee_pose and _combat_pose_frame != Engine.get_physics_frames():
-		_pending_melee_contact_fx.append({"point": point, "direction": direction, "clip": clip, "serial": serial})
+		_pending_melee_contact_fx.append({"point": point, "direction": direction, "clip": clip, "serial": serial, "index": index})
 		return
 	var sample_time := float(player.effects.clock) if melee_pose else -1.0
 	_show_contact_fx(point, direction, clip, serial, sample_time)
@@ -1367,16 +1383,16 @@ func _on_melee_contact_visual(zombie: CharacterBody3D, point: Vector3, serial: i
 	var contact: Dictionary = _pending_melee_contact_fx.back()
 	if contact.serial == serial and contact.point == point:
 		contact.feedback = visual
-		if _grounded_impact_dispatch and player.effects.blade_trail_enabled:
+		if _grounded_impact_dispatch and (player.effects.blade_trail_enabled or player.gauntlets_equipped):
 			contact.capsule = zombie.contact_capsule_dimensions()
 
 func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: int, sample_time := -1.0,
-		capsule := Vector2.ZERO, blade := PackedVector3Array()) -> void:
+		capsule := Vector2.ZERO, weapon_points := PackedVector3Array()) -> void:
 	var has_arrow_sparks := clip == CrossPollinator.SHOT and _crossbow != null and _crossbow.impact_sparks != null
 	has_arrow_sparks = has_arrow_sparks or (clip == Bow.ACTION and _bow != null and _bow.impact_sparks != null)
 	if not has_arrow_sparks:
 		if _contact_sparks != null:
-			_contact_sparks.queue_contact(point, direction, player.global_position + Vector3.UP, sample_time, capsule, blade)
+			_contact_sparks.queue_contact(point, direction, player.global_position + Vector3.UP, sample_time, capsule, weapon_points)
 		else:
 			player.effects.contact(point, direction, sample_time >= 0.0)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3",
@@ -1548,14 +1564,20 @@ func _sample_combat_fx() -> void:
 		_slam_burst_frame = -1
 		_show_landing_burst(_slam_burst_point, _slam_burst_serial, sample_time)
 	if not _pending_melee_contact_fx.is_empty():
-		var blade := PackedVector3Array([player.marker_base.global_position, player.marker_tip.global_position])
+		var weapon_points := PackedVector3Array()
+		if player.effects.blade_trail_enabled:
+			weapon_points = PackedVector3Array([player.marker_base.global_position, player.marker_tip.global_position])
+		var punch_index := -1
 		for contact in _pending_melee_contact_fx:
 			if contact.has("feedback"):
 				var visual: Dictionary = contact.feedback
 				visual.time = sample_time
 				_pending_melee_feedback.append(visual)
+			if player.gauntlets_equipped and contact.has("capsule") and contact.index != punch_index:
+				punch_index = contact.index
+				weapon_points = PackedVector3Array([_gauntlet_knuckle(punch_index)])
 			_show_contact_fx(contact.point, contact.direction, contact.clip, contact.serial,
-				sample_time, contact.get("capsule", Vector2.ZERO), blade)
+				sample_time, contact.get("capsule", Vector2.ZERO), weapon_points)
 	_pending_melee_contact_fx.clear()
 	if _slam_shake_frame >= 0 and _combat_pose_frame >= _slam_shake_frame:
 		_slam_shake_frame = -1

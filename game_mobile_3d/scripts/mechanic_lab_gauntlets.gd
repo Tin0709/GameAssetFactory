@@ -23,8 +23,10 @@ const RECOVERY_HASHES := [
 const ATTACK_FRAMES := [30, 33, 31]
 const RECOVERY_FRAMES := [20, 19, 17]
 const RATES := [2.0, 2.0, 1.1]
-# First extension of each punching hand, sampled on the exported 30 Hz clips.
-const CONTACT_FRAMES := [8, 12, 24]
+# Contact poses sampled on the exported 30 Hz clips. The right uppercut
+# passes the target on the way up, before the raised hold at frame 12.
+const CONTACT_FRAMES := [8, 9, 24]
+const LEFT_PUNCH_INDEX := 2
 const STRIKES := [
 	{"damage": 10, "range_m": 2.4, "strength": 250.0, "angle": 15.0, "stagger": 14.0,
 		"cone_degrees": 30.0, "cone_offset": -1.2, "cone_cutoff": 1.2, "splash_stagger": 0.5},
