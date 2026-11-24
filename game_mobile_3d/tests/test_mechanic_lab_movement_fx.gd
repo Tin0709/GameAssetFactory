@@ -557,9 +557,13 @@ func check_gauntlet_impact_marks(lab) -> void:
 				check(absf(reach - expected) < 0.02 and absf(appeared.global_position.y) < 0.03,
 					"The %s crack stays on the supported side of the stage" % fixture)
 				print("GAUNTLET_IMPACT_MARK ", fixture, " reach=", reach, " tint=", appeared.modulate)
-				for i in 75:
-					await physics_frame
-				check(not appeared.visible and not marks.is_processing(), "The mark expires and stops processing")
+				if fixture == "grass":
+					lab.reset_player()
+					check(not appeared.visible and not marks.is_processing(), "Reset clears an active mark immediately")
+				else:
+					for i in 75:
+						await physics_frame
+					check(not appeared.visible and not marks.is_processing(), "The mark expires and stops processing")
 		if obstacle != null:
 			obstacle.free()
 	lab.reset_player()
