@@ -369,7 +369,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 232
+const LIGHTING_MIX_VERSION := 233
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -3477,6 +3477,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = _lighting_scale_default(effect)
 		if version < 232 and effect == &"mist_rear_ambient":
 			missing_value = 0.
+		if version < 233 and effect == &"mist_midground_clearance":
+			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -4674,7 +4676,7 @@ func _build_lighting_presets(box: VBoxContainer, include_scene_presets: bool) ->
 func _build_lighting_mix(box: VBoxContainer) -> void:
 	_build_lighting_presets(box, true)
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
-		if effect == &"actor_ground_light":
+		if effect in [&"actor_ground_light", &"mist_midground_clearance"]:
 			continue
 		var spec: Array = LIGHTING_MIX_CONTROLS[effect]
 		var row := HBoxContainer.new()
