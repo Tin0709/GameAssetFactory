@@ -466,7 +466,7 @@ func _animate(delta: float) -> void:
 	var previous_serial: int = combo.serial
 	super._animate(delta)
 	if _grounded and review_clip.is_empty():
-		var same_attack := combo.serial == previous_serial
+		var same_attack: bool = combo.serial == previous_serial
 		var cue_start := previous_time if same_attack else 0.0
 		if combo.phase == &"attack" and combo.native_enabled:
 			var window: Dictionary = combo.native_windows[combo.index]
