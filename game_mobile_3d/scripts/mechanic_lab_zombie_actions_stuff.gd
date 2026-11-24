@@ -121,10 +121,10 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 	var model := player.get_parent()
 	var source_clips: Dictionary[StringName, Animation] = {}
 	var steps: Array[Callable] = []
+	var preview: AnimationLibrary
+	if (pack.is_empty() or not baby) and ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary"):
+		preview = ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary
 	if pack.is_empty():
-		if not ResourceLoader.exists(SOURCE_PATH, "AnimationLibrary"):
-			return []
-		var preview := ResourceLoader.load(SOURCE_PATH, "AnimationLibrary") as AnimationLibrary
 		if (preview == null or not preview.has_animation(&"Idle") or not preview.has_animation(&"Walk")
 				or not preview.has_animation(&"Attack")):
 			return []
@@ -132,6 +132,10 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 		source_clips[MOVE] = preview.get_animation(&"Walk")
 		source_clips[ATTACK] = preview.get_animation(&"Attack")
 	else:
+		# The evaluated A&S idle entrance also seeds the dormant adult
+		# colliders. Retain that pose for stable wall and corner settling.
+		if not baby and preview != null and preview.has_animation(&"Idle"):
+			source_clips[SPAWN] = preview.get_animation(&"Idle")
 		var bindings := BONE_MAP + [[&"", &"Head", Vector3.ZERO]]
 		var idle_layer: Dictionary = pack.baby_idle if baby else pack.adult_idle
 		var idle_period := BABY_IDLE_PERIOD if baby else ADULT_IDLE_PERIOD
