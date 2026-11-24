@@ -45,6 +45,7 @@ func run() -> void:
 	check(lab._shake_age > age, "A second target in the same swing does not restart the camera pulse")
 	lab.reset_player()
 	check(is_zero_approx(contact(lab, Vector3(1, 0, 0), 104, "Attack2", 1)), "Sword ordinary strike has zero shake")
+	check_shake_slider(lab)
 	check_contact_render_hitch(lab)
 	await check_sabre_dive(lab)
 	if DisplayServer.get_name() != "headless":
@@ -53,6 +54,28 @@ func run() -> void:
 	lab.free()
 	print("PAWN_SHAKE_RANGE failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_shake_slider(lab) -> void:
+	var slider := lab.get_node_or_null("HUD/CameraShake/Slider") as HSlider
+	check(slider != null and slider.is_visible_in_tree(), "Camera shake has a visible live control")
+	if slider == null:
+		return
+	check(slider.value == 100.0, "Camera shake starts at the reference strength")
+	lab.reset_player()
+	slider.value = 50.0
+	check(is_equal_approx(contact(lab, Vector3.RIGHT, 106, "NativeCurvedAttack3"), 0.004),
+		"The 50 percent setting halves the first displayed kick")
+	slider.value = 0.0
+	check(is_zero_approx(lab.camera.h_offset), "Turning shake off immediately clears an active kick")
+	lab.reset_player()
+	check(is_zero_approx(contact(lab, Vector3.RIGHT, 107, "NativeCurvedAttack3"))
+		and lab._impact_light.visible and is_equal_approx(lab._impact_light.light_energy, 2.3),
+		"The zero setting keeps the camera steady and still shows the contact light")
+	slider.value = 100.0
+	lab.reset_player()
+	check(is_equal_approx(contact(lab, Vector3.RIGHT, 108, "NativeCurvedAttack3"), 0.008),
+		"Returning to full strength restores the reference kick")
+	lab.reset_player()
 
 func check_contact_render_hitch(lab) -> void:
 	var offsets: Array[float] = []

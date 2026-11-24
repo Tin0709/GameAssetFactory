@@ -75,13 +75,27 @@ func run() -> void:
 	var swing_count: int = swing_audio.played_count
 	var hit_count: int = combat_audio._next_choice.get(&"curved_hit", 0)
 	var shake_contacts: Array[int] = []
+	var sampled_contacts: Array[Dictionary] = []
 	var hit_choices: Array[int] = []
 	group.sabre_contact.connect(func(point, _direction, _clip, index, serial, _lethal):
 		if point.distance_to(target.global_position) < 2.0:
 			damage.append(target.health)
 			hit_choices.append(combat_audio._next_choice.get(&"curved_hit", -1))
-			if lab._shake_serial == serial:
-				shake_contacts.append(index))
+			sampled_contacts.append({"tick": Engine.get_physics_frames(), "index": index, "serial": serial}))
+	lab.player.physics_pose_ready.connect(func():
+		if sampled_contacts.is_empty() or sampled_contacts[-1].tick != Engine.get_physics_frames():
+			return
+		var contact := sampled_contacts[-1]
+		if lab._shake_serial == contact.serial:
+			shake_contacts.append(contact.index)
+			check(is_equal_approx(lab._shake_sample_time, lab.player.effects.clock),
+				"The finisher queues its pulse on the contact pose clock"))
+	var displayed_kicks: Array[float] = []
+	var sample_camera := func():
+		var kick: float = lab.camera.h_offset / lab.camera.size
+		if not is_zero_approx(kick):
+			displayed_kicks.append(kick)
+	process_frame.connect(sample_camera)
 	attack(true)
 	for i in 140:
 		await physics_frame
@@ -96,12 +110,18 @@ func run() -> void:
 		"Held E plays the three source attacks in order")
 	check(damage == [80, 60, 30], "The three contacts deal 20, 20 and 30 damage")
 	check(distant_target.health == 91, "Only the finisher reaches the distant target for 30% splash")
-	check(shake_contacts == [2], "Only the finisher triggers a nearby camera shake")
+	process_frame.disconnect(sample_camera)
+	check(shake_contacts == [2], "Only the finisher queues a nearby camera shake")
+	check(not displayed_kicks.is_empty() and is_equal_approx(displayed_kicks[0], 0.008)
+		and displayed_kicks.any(func(kick: float): return kick < 0.0)
+		and is_zero_approx(lab.camera.h_offset),
+		"The first displayed kick has full strength, reverses and returns to rest")
 	check(swing_audio.played_count == swing_count + 3, "Three source swing samples reach the audio voices")
 	check(combat_audio._groups.get(&"curved_hit", []).size() == 3
 		and hit_choices == [(hit_count + 1) % 3, (hit_count + 2) % 3, hit_count]
 		and combat_audio._next_choice.get(&"curved_hit", -1) == hit_count,
 		"Three contacts play the Curved Greatsword hitmarker once per strike")
+	print("CURVED_SHAKE contacts=", shake_contacts, " first_kick=", displayed_kicks[0] if not displayed_kicks.is_empty() else 0.0)
 	toggle.button_pressed = false
 	check(recovered and not lab.player.combo.active(), "Release plays the source finisher recovery")
 	check(lab.player.drop_for_lab(5.0), "Airborne fixture starts a drop")
