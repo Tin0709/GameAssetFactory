@@ -105,6 +105,7 @@ func run()->void:
 		check(w.look.terrain_materials[0][3].get_shader_parameter("terrain_key_radiance")==Vector3.ZERO,"Shift F1 also gates new reflected sunlight")
 		w.look.set_ground_bounce(true)
 		check(w.terrain_light.error.is_empty(),"Cache validates all source data")
+		await check_stone_top_sky_color(w)
 		await check_noon_bounce(w)
 		await check_caster_matched_bounce(w)
 		for energy in [0.,NAN,INF]:
@@ -131,3 +132,34 @@ func run()->void:
 	check(w.player.run_speed==7. and AudioServer.is_bus_mute(0),"Gameplay speed and mute retained")
 	check(w.geometry.cells.size()==42996 and w.geometry.terrain_triangles==67694,"Map topology retained")
 	w.free();print("TERRAIN_LIGHT checks=",checks," failures=",JSON.stringify(failures));quit(0 if failures.is_empty() else 1)
+
+func check_stone_top_sky_color(w: Node) -> void:
+	const CONTROL := &"stone_top_sky_color"
+	const UNIFORM := "stone_top_sky_gain"
+	var stone: ShaderMaterial
+	for row in w.look.terrain_materials:
+		if row[3].get_shader_parameter("ground_grade") == 3:
+			stone = row[3]
+			break
+	check(stone != null and w.showcase._lighting_sliders.has(CONTROL), "WorldMap exposes upward stone sky color")
+	if stone == null:
+		return
+	var expected := Vector2(pow(2., .23), pow(2., -.253))
+	for hour in [7., 9., 12., 16.5, 19.5, 22.]:
+		w.showcase.set_hour(hour)
+		await process_frame
+		var gain: Variant = stone.get_shader_parameter(UNIFORM)
+		check(gain is Vector2 and gain.is_equal_approx(expected if hour == 9. else Vector2.ZERO),
+			"Stone sky color follows the Forest curve at %s" % hour)
+	w.showcase.set_hour(9.)
+	await process_frame
+	w.showcase.set_lighting_scale(CONTROL, 0.)
+	check(stone.get_shader_parameter(UNIFORM) == Vector2.ZERO, "The live slider disables the stone color adjustment")
+	w.showcase.set_lighting_scale(CONTROL, .5)
+	var half_gain: Variant = stone.get_shader_parameter(UNIFORM)
+	check(half_gain is Vector2 and half_gain.is_equal_approx(Vector2(sqrt(expected.x), sqrt(expected.y))),
+		"The slider interpolates the stone color in stops")
+	w.showcase.reset_lighting_mix()
+	check(stone.get_shader_parameter(UNIFORM) == expected, "Reset restores the biome stone color")
+	w.showcase.set_hour(12.)
+	await process_frame
