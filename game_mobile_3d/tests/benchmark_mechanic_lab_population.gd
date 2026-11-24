@@ -130,6 +130,7 @@ func run() -> void:
 		picker.item_selected.emit(weapon)
 		if picker.selected != weapon:
 			printerr("Could not equip the verified weapon for ", combo_weapon)
+			await release_lab(audio_enabled)
 			quit(2)
 			return
 		await wait_ticks(90)
@@ -154,8 +155,33 @@ func run() -> void:
 			break
 	if not frame_trace_path.is_empty() and not save_frame_trace():
 		failures.append("Could not save frame trace to " + frame_trace_path)
+	await release_lab(audio_enabled)
 	print("POPULATION_END ", JSON.stringify({"failures": failures}))
 	quit(0 if failures.is_empty() else 1)
+
+func release_lab(audio_enabled: bool) -> void:
+	lab.free()
+	if not audio_enabled:
+		return
+	# Godot fades stopped playbacks on the mixer thread and releases their
+	# references on a subsequent main-loop update. Fixed-FPS sim time can
+	# finish the benchmark before the real-time mixer gets another turn.
+	var started := Time.get_ticks_usec()
+	var deadline := started + 250000
+	var last_mix := started
+	var mixes := 0
+	while mixes < 2 and Time.get_ticks_usec() < deadline:
+		OS.delay_msec(1)
+		await process_frame
+		var mixed_at := Time.get_ticks_usec() - roundi(AudioServer.get_time_since_last_mix() * 1000000.0)
+		if mixed_at > last_mix + 1000:
+			last_mix = mixed_at
+			mixes += 1
+	await process_frame
+	if mixes < 2:
+		failures.append("The real-time audio mixer did not advance after the Lab was freed")
+	print("POPULATION_AUDIO_DRAIN ", JSON.stringify({"mixes": mixes,
+		"elapsed_ms": (Time.get_ticks_usec() - started) / 1000.0}))
 
 func run_population() -> void:
 	lab.reset_player()
