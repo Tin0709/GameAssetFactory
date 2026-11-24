@@ -3,7 +3,7 @@ extends SceneTree
 const Lab := preload("res://scenes/dev/MechanicLab.tscn")
 const VALUES := [
 	"RagdollTuning/Launch/Slider", "RagdollTuning/Gravity/Slider",
-	"RagdollLifetime/Slider", "CameraShake/Slider",
+	"RagdollLifetime/Slider", "CameraShake/Slider", "Hitstop/Slider",
 ]
 
 var failures: Array[String] = []
@@ -55,6 +55,7 @@ func values_match(lab: Node3D, values: Array, crowd: int, base_health: bool) -> 
 		and is_equal_approx(group.ragdoll_gravity_multiplier, values[1] / 100.0)
 		and is_equal_approx(group.corpse_lifetime, values[2])
 		and is_equal_approx(lab.get("_shake_intensity"), values[3] / 100.0)
+		and is_equal_approx(lab.get("player").hitstop_seconds, values[4] / 1000.0)
 		and lab.get_node("HUD/SpawnCrowd").text == "Spawn %d zombie" % crowd
 		and lab.get_node("HUD/BaseZombieToggle").button_pressed == base_health)
 
@@ -65,8 +66,8 @@ func run() -> void:
 		printerr("The Lab has no preset menu")
 		quit(1)
 		return
-	var a := [450.0, 275.0, 2.4, 30.0]
-	var b := [85.0, 1000.0, 4.5, 0.0]
+	var a := [450.0, 275.0, 2.4, 30.0, 45.0]
+	var b := [85.0, 1000.0, 4.5, 0.0, 20.0]
 	var default_animation: int = lab.get_node("HUD/ZombieGait").selected
 	var a_animation := 0
 	var b_animation := default_animation
@@ -84,7 +85,7 @@ func run() -> void:
 	select_action(lab, 2)
 	lab.free()
 	lab = make_lab()
-	var baseline := [100.0, 100.0, 1.2, 100.0]
+	var baseline := [100.0, 100.0, 1.2, 100.0, 0.0]
 	check(values_match(lab, baseline, 100, false), "The Lab starts with its normal settings")
 	select_action(lab, 1)
 	check(values_match(lab, a, 150, true), "Slot A restores sliders, crowd count and live values after reopening")
