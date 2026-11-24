@@ -130,15 +130,16 @@ func run() -> void:
 	var spark_settings := lab.get_node("HUD/ImpactFxPanel/Rows")
 	var spark_picker := spark_settings.get_node("ContactSparkQuality") as OptionButton
 	var spark_index := spark_picker.get_item_index(SPARK_BUDGETS[spark_budget])
-	if spark_index < 0:
+	if spark_index >= 0:
+		spark_picker.select(spark_index)
+		spark_picker.item_selected.emit(spark_index)
+		if hide_contact_sparks:
+			spark_settings.get_node("Opacity/Slider").value = 0.0
+	elif spark_budget != "full" or hide_contact_sparks:
 		printerr("The benchmark could not select the Lab spark budget")
 		await release_lab(audio_enabled)
 		quit(2)
 		return
-	spark_picker.select(spark_index)
-	spark_picker.item_selected.emit(spark_index)
-	if hide_contact_sparks:
-		spark_settings.get_node("Opacity/Slider").value = 0.0
 	(lab.get_node("HUD/CombatAudioToggle") as CheckButton).button_pressed = audio_enabled
 	group.player_hit.connect(func(_damage: int): player_hits += 1)
 	viewport = root.get_viewport_rid()
@@ -170,7 +171,7 @@ func run() -> void:
 		"adapter": RenderingServer.get_video_adapter_name(), "audio_driver": AudioServer.get_driver_name(),
 		"combat_audio": audio_enabled, "corpse_seconds": group.corpse_lifetime,
 		"combo_weapon": combo_weapon,
-		"spark_budget": spark_budget, "contact_sparks_visible": not hide_contact_sparks,
+		"spark_budget": spark_budget, "contact_sparks_visible": sparks != null and not hide_contact_sparks,
 	}))
 	for pass_index in cycles:
 		cycle = pass_index + 1
