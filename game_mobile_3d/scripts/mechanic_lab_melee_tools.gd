@@ -134,6 +134,12 @@ const GROUND_SLASHES := [
 const AXE_SWEEP_WINDOWS := [[0.083333, 0.175000], [0.141667, 0.266667], [0.150000, 0.333333]]
 # Hue of each montage's color override, fitted to the Lab's SDR ribbon.
 const GROUND_SLASH_TINTS := [Color(0.64, 0.90, 1.0), Color(1.0, 0.28, 0.64), Color(0.78, 1.0, 0.35)]
+# Relative peak linear RGB in each montage's three slash notify exports.
+const GROUND_SLASH_POWER := [
+	Vector3(1.0, 1.0, 0.30),
+	Vector3(1.0, 1.0, 4.0),
+	Vector3(1.0, 1.0, 15.0),
+]
 enum GroundEffect { SHOCKWAVE, DEBRIS, DUST, SHAKE }
 # Times use the same clip clock as WINDOWS. Offsets are expressed in metres
 # relative to the actor's lateral and forward axes.
@@ -300,7 +306,11 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 		if tool < GROUND_SLASHES.size():
 			var slash: Vector3 = GROUND_SLASHES[tool][i]
 			window.trail_window = [slash.x, slash.y]
-			window.trail_style = {"tint": GROUND_SLASH_TINTS[tool], "lifetime": slash.z}
+			var power: float = GROUND_SLASH_POWER[tool][i]
+			# Compress the authored HDR range for the Lab's translucent SDR trail.
+			var opacity_scale := 1.0 + 0.34 * (power - 1.0) / (power + 1.0)
+			window.trail_style = {"tint": GROUND_SLASH_TINTS[tool], "lifetime": slash.z,
+				"opacity_scale": opacity_scale}
 		else:
 			window.trail_window = AXE_SWEEP_WINDOWS[i]
 		if GROUND_EFFECTS.has(tool) and GROUND_EFFECTS[tool].has(i):

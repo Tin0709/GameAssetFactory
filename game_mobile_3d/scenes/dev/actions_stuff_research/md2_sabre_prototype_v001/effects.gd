@@ -31,6 +31,7 @@ var _rng:=RandomNumberGenerator.new()
 var _was_active:=false
 var _ribbon_section := 0
 var _ribbon_lifetime := RIBBON_LIFETIME
+var _ribbon_opacity_scale := 1.0
 var _ribbon_tint := RIBBON_TINT
 var _ribbon_edge_tint := RIBBON_EDGE_TINT
 var _thrust_glint_started := INF
@@ -73,6 +74,7 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 		if not _was_active:
 			_ribbon_section += 1
 			_ribbon_lifetime = style.get("lifetime", RIBBON_LIFETIME)
+			_ribbon_opacity_scale = style.get("opacity_scale", 1.0)
 			_ribbon_tint = style.get("tint", RIBBON_TINT)
 			_ribbon_edge_tint = _ribbon_tint.lerp(Color.WHITE, 0.74) if style.has("tint") else RIBBON_EDGE_TINT
 			_thrust_glint_started = clock - clampf(edge_age, 0.0, delta) if style.get("thrust_glint", false) else INF
@@ -115,7 +117,8 @@ func _trail_sample(base: Vector3, tip: Vector3, time: float) -> Dictionary:
 	var tip_u := float(trail_end_fraction.call(base, tip)) if trail_end_fraction.is_valid() else 1.0
 	var end := tip if tip_u == 1.0 else base.lerp(tip, tip_u)
 	return {"base": base, "tip": end, "tip_u": tip_u, "time": time, "section": _ribbon_section,
-		"lifetime": _ribbon_lifetime, "tint": _ribbon_tint, "edge_tint": _ribbon_edge_tint,
+		"lifetime": _ribbon_lifetime, "opacity_scale": _ribbon_opacity_scale,
+		"tint": _ribbon_tint, "edge_tint": _ribbon_edge_tint,
 		"thrust_glint_started": _thrust_glint_started}
 
 func _burst(point:Vector3,direction:Vector3,publish_sample:=false,sample_time:=-1.0)->void:
@@ -158,7 +161,8 @@ func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=nul
 					"tip": blade_tip if full_span and blade_tip != null else Vector3(a.tip).lerp(point.tip, weight),
 					"tip_u": lerpf(a.tip_u, point.tip_u, weight), "time": display_time,
 					"section": point.section,
-					"lifetime": point.lifetime, "tint": point.tint, "edge_tint": point.edge_tint,
+					"lifetime": point.lifetime, "opacity_scale": point.opacity_scale,
+					"tint": point.tint, "edge_tint": point.edge_tint,
 					"thrust_glint_started": point.thrust_glint_started,
 				})
 			break
@@ -189,7 +193,7 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 		var age_a := clampf((time - float(a.time)) / float(a.lifetime), 0.0, 1.0)
 		var age_b := clampf((time - float(b.time)) / float(b.lifetime), 0.0, 1.0)
 		var ages := Vector2(age_a, age_b)
-		var opacity := (1.0 - age_a) * intensity * 0.58
+		var opacity := (1.0 - age_a) * intensity * 0.58 * float(a.opacity_scale)
 		_add_ribbon_strip(a, b, 0.0, ages, Color(a.tint, opacity))
 		if a.tip_u > 0.86 or b.tip_u > 0.86:
 			_add_ribbon_strip(a, b, 0.86, ages, Color(a.edge_tint, opacity * 0.8))
