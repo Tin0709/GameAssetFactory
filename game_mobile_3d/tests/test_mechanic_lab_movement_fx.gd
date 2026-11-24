@@ -796,23 +796,32 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 				return absf((p.origin - actor.global_position).dot(forward) - 1.8) < 0.02 \
 					and Color(p.sprite.modulate, 1.0) == dust.SURFACE_DUST[fixture]),
 				"The Pickaxe debris uses the 180 cm cue and samples the selected surface tint")
-		elif fixture == "post":
-			check(ring_seen, "A small post between the sampled directions keeps the visible parts of the ground ring")
-		elif fixture in ["near_wall", "arena_edge"]:
+		elif fixture in ["near_wall", "post", "arena_edge"]:
 			check(ring_seen, "The %s keeps the supported part of the Pickaxe shockwave" % fixture)
 			if ring_seen:
 				var material := ring.material_override as ShaderMaterial
-				check(material.get_shader_parameter("clip_count") == 1,
-					"The %s ring uses one boundary plane" % fixture)
-				var planes: PackedVector3Array = material.get_shader_parameter("clip_planes")
-				var normal := Vector2(planes[0].x, planes[0].y)
-				var expected_forward := Vector3.RIGHT if fixture == "arena_edge" else forward
-				var inward := -expected_forward.rotated(Vector3.UP, deg_to_rad(25.0)) if fixture == "near_wall" else -expected_forward
-				var edge := forward * 1.99 if fixture == "near_wall" else Vector3(50.0, 0.0, 0.0)
-				var ring_offset := edge - ring.global_position
-				check(normal.dot(Vector2(inward.x, inward.z)) > 0.999
-					and absf(normal.dot(Vector2(ring_offset.x, ring_offset.z)) + planes[0].z) < 0.015,
-					"The %s boundary matches the actual terrain plane within 1.5 cm" % fixture)
+				if fixture == "arena_edge":
+					check(material.get_shader_parameter("clip_count") == 1
+						and material.get_shader_parameter("blocker_count") == 0,
+						"The edge of the arena uses one boundary plane and no obstacles")
+					var planes: PackedVector3Array = material.get_shader_parameter("clip_planes")
+					var normal := Vector2(planes[0].x, planes[0].y)
+					var edge_offset := Vector3(50.0, 0.0, 0.0) - ring.global_position
+					check(normal.dot(Vector2.LEFT) > 0.999
+						and absf(normal.dot(Vector2(edge_offset.x, edge_offset.z)) + planes[0].z) < 0.015,
+						"The clipping plane matches the arena edge within 1.5 cm")
+				else:
+					check(material.get_shader_parameter("clip_count") == 0
+						and material.get_shader_parameter("blocker_count") == 1,
+						"The %s uses the finite box instead of a plane across the ring" % fixture)
+					var axes: PackedVector4Array = material.get_shader_parameter("blocker_axes")
+					var box_shape := (obstacle.get_child(0) as CollisionShape3D).shape as BoxShape3D
+					var local := obstacle.to_local(ring.global_position)
+					check(axes.size() >= 2 and absf(axes[0].z - local.x) < 0.001
+						and absf(axes[1].z - local.z) < 0.001
+						and is_equal_approx(axes[0].w * 2.0, box_shape.size.x)
+						and is_equal_approx(axes[1].w * 2.0, box_shape.size.z),
+						"The %s projection uses the actual collider size and position" % fixture)
 		elif fixture == "shovel":
 			check(peak >= 4 and not ring_seen, "Shovel emits the separate debris passes without the Pickaxe ring")
 		else:

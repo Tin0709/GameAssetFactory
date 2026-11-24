@@ -5,6 +5,8 @@ uniform vec4 tint : source_color = vec4(0.9, 0.79, 0.58, 1.0);
 uniform float progress = 0.0;
 uniform int clip_count = 0;
 uniform vec3 clip_planes[8];
+uniform int blocker_count = 0;
+uniform vec4 blocker_axes[16];
 
 varying vec2 floor_position;
 
@@ -15,6 +17,23 @@ void vertex() {
 void fragment() {
 	for (int i = 0; i < clip_count; i++) {
 		if (dot(floor_position, clip_planes[i].xy) + clip_planes[i].z < 0.0) {
+			discard;
+		}
+	}
+	// In each box's local XZ plane, intersect the segment from the
+	// impact centre to this fragment with the two intervals of the box.
+	for (int unit = 0; unit < blocker_count; unit++) {
+		vec4 x = blocker_axes[2 * unit];
+		vec4 z = blocker_axes[2 * unit + 1];
+		vec2 direction = vec2(dot(floor_position, x.xy), dot(floor_position, z.xy));
+		vec2 inverse_direction = (step(vec2(0.0), direction) * 2.0 - 1.0) / max(abs(direction), vec2(0.000001));
+		vec2 centre = vec2(x.z, z.z);
+		vec2 extent = vec2(x.w, z.w);
+		vec2 lower = (-extent - centre) * inverse_direction;
+		vec2 upper = (extent - centre) * inverse_direction;
+		vec2 entry = min(lower, upper);
+		vec2 exit = max(lower, upper);
+		if (max(0.0, max(entry.x, entry.y)) <= min(1.0, min(exit.x, exit.y))) {
 			discard;
 		}
 	}

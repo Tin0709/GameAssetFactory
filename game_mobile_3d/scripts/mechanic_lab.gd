@@ -1705,8 +1705,13 @@ func _tool_ground_contact(offset: Vector2, forward: Vector3, origin: Vector3, su
 
 func _show_tool_slam_ring(point: Vector3, surface: String, sample_time: float) -> void:
 	var planes := PackedVector3Array()
-	if not _clip_slam_to_stage(point, planes) or not _clip_slam_at_walls(point, planes):
+	var blocker_axes := PackedVector4Array()
+	if not _clip_slam_to_stage(point, planes) or not _clip_slam_at_walls(point, planes, blocker_axes):
 		return
+	_tool_slam_material.set_shader_parameter(&"blocker_count", blocker_axes.size() / 2)
+	if not blocker_axes.is_empty():
+		blocker_axes.resize(2 * GROUND_SLAM_MAX_CLIPS)
+		_tool_slam_material.set_shader_parameter(&"blocker_axes", blocker_axes)
 	_tool_slam_material.set_shader_parameter(&"clip_count", planes.size())
 	if not planes.is_empty():
 		planes.resize(GROUND_SLAM_MAX_CLIPS)
@@ -1739,7 +1744,7 @@ func _clip_slam_to_stage(point: Vector3, planes: PackedVector3Array) -> bool:
 			planes.append(plane)
 	return true
 
-func _clip_slam_at_walls(point: Vector3, planes: PackedVector3Array) -> bool:
+func _clip_slam_at_walls(point: Vector3, planes: PackedVector3Array, blocker_axes: PackedVector4Array) -> bool:
 	var space := get_world_3d().direct_space_state
 	_tool_slam_footprint.transform = Transform3D(Basis.IDENTITY, point + Vector3.UP * 0.06)
 	var available := GROUND_SLAM_MAX_CLIPS - planes.size()
@@ -1749,6 +1754,11 @@ func _clip_slam_at_walls(point: Vector3, planes: PackedVector3Array) -> bool:
 	if blockers.is_empty():
 		return true
 	var start := point + Vector3.UP * GROUND_SLAM_HEIGHT
+	for i in range(blockers.size() - 1, -1, -1):
+		if _append_slam_box(blockers[i], start, blocker_axes):
+			blockers.remove_at(i)
+	if blockers.is_empty():
+		return true
 	var ray := PhysicsRayQueryParameters3D.create(start, start, 1)
 	for direction: Vector3 in GROUND_SLAM_SIDES + GROUND_SLAM_CORNERS:
 		ray.to = start + direction * GROUND_SLAM_RADIUS
@@ -1768,6 +1778,32 @@ func _clip_slam_at_walls(point: Vector3, planes: PackedVector3Array) -> bool:
 			return true
 	# Preserve the conservative behavior for obstructions without a sampled
 	# face at the ring height.
+	return false
+
+func _append_slam_box(blocker: Dictionary, origin: Vector3, axes: PackedVector4Array) -> bool:
+	var body := blocker.collider as CollisionObject3D
+	if body == null:
+		return false
+	var shape_index: int = blocker.shape
+	var owner := body.shape_find_owner(shape_index)
+	for local_index in body.shape_owner_get_shape_count(owner):
+		if body.shape_owner_get_shape_index(owner, local_index) != shape_index:
+			continue
+		var box := body.shape_owner_get_shape(owner, local_index) as BoxShape3D
+		if box == null:
+			return false
+		var shape_to_world := body.global_transform * body.shape_owner_get_transform(owner)
+		var to_shape := shape_to_world.affine_inverse()
+		if not is_zero_approx(to_shape.basis.x.y) or not is_zero_approx(to_shape.basis.z.y):
+			return false
+		var centre := to_shape * origin
+		var half_size := box.size * 0.5
+		# The overlap queries a band above the floor. A box above or below
+		# the ring itself does not cross its render plane.
+		if absf(centre.y) <= half_size.y:
+			axes.append(Vector4(to_shape.basis.x.x, to_shape.basis.z.x, centre.x, half_size.x))
+			axes.append(Vector4(to_shape.basis.x.z, to_shape.basis.z.z, centre.z, half_size.z))
+		return true
 	return false
 
 func _show_tool_ground_cues() -> void:
