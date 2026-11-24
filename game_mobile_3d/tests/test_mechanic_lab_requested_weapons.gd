@@ -454,9 +454,10 @@ func check_crossbow_impact_burst(lab: Node3D, sparks: MultiMeshInstance3D) -> vo
 		var before_age: float = spark.age
 		var next_velocity: Vector3 = (spark.velocity + spark.acceleration * delta) / (1.0 + spark.drag * delta)
 		var next_point: Vector3 = spark.point + next_velocity * delta
-		await ticks(1)
+		await process_frame
+		await ticks(2)
 		check(is_equal_approx(spark.age - before_age, delta) and spark.point.is_equal_approx(next_point),
-			"Existing Polaris sparks use a full source integration step on the next tick")
+			"Existing Polaris sparks use a full source integration step after their first render")
 		print("MECHANIC_LAB_POLARIS_WALL_AGE expected=", expected_age, " actual=", before_age)
 	crossbow.reset()
 	check(sparks.multimesh.visible_instance_count == 0,
@@ -551,9 +552,11 @@ func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
 			"A charged Bow wall collision uses its own collision time for the sparks")
 		if not particles.is_empty():
 			print("MECHANIC_LAB_BOW_WALL_AGE expected=", expected_age, " actual=", particles[0].age)
-	await ticks(1)
+	await process_frame
+	await ticks(2)
 	if not bow._embedded_arrows.is_empty():
-		check(bow._embedded_arrows[0].age > 0.0, "The Bow wall prop ages from the next physics tick")
+		check(is_equal_approx(bow._embedded_arrows[0].age, delta),
+			"The Bow wall prop advances by one physics step after its first render")
 	print("MECHANIC_LAB_BOW_WALL_CONTACT hits=", hits.size(), " props_on_contact=", props_on_contact)
 	bow.arrow_impact.disconnect(record)
 	bow.reset()
