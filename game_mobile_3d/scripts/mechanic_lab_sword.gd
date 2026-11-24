@@ -48,6 +48,7 @@ static func combat_profile(sabre: Dictionary, clips: Dictionary) -> Dictionary:
 	result.windows[2] = {
 		"rate": 1.4, "resume": 13.0 / 30.0, "chain": 19.0 / 30.0,
 		"melee": 12.0 / 30.0, "trail_window": [11.0 / 30.0, 15.0 / 30.0],
+		"trail_style": {"thrust_glint": true},
 		"attack_duration": clips.Attack3.duration, "recovery_duration": clips.Recovery3.duration,
 		"attack_source": clips.Attack3.source_name, "recovery_source": clips.Recovery3.source_name,
 		"attack_key": "Attack3", "recovery_key": "Recovery3",

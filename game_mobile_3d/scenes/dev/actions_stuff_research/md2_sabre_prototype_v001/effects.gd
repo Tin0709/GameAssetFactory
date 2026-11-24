@@ -11,6 +11,7 @@ const MAX_PARTICLE_HISTORY:=16
 const RIBBON_U := [0.0, 1.0, 1.0, 0.0, 1.0, 0.0]
 const RIBBON_SAMPLE := [0, 0, 1, 0, 1, 1]
 const RIBBON_LIFETIME := 0.14
+const THRUST_GLINT_HALF_HEIGHT := 0.15
 const RIBBON_TINT := Color(1.0, 0.73, 0.23)
 const RIBBON_EDGE_TINT := Color(1.0, 0.97, 0.82)
 var samples:Array[Dictionary]=[]
@@ -32,6 +33,7 @@ var _ribbon_section := 0
 var _ribbon_lifetime := RIBBON_LIFETIME
 var _ribbon_tint := RIBBON_TINT
 var _ribbon_edge_tint := RIBBON_EDGE_TINT
+var _ribbon_thrust_glint := false
 var _previous_base := Vector3.ZERO
 var _previous_tip:=Vector3.ZERO
 
@@ -72,7 +74,8 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int,e
 			_ribbon_section += 1
 			_ribbon_lifetime = style.get("lifetime", RIBBON_LIFETIME)
 			_ribbon_tint = style.get("tint", RIBBON_TINT)
-			_ribbon_edge_tint = RIBBON_EDGE_TINT if style.is_empty() else _ribbon_tint.lerp(Color.WHITE, 0.74)
+			_ribbon_edge_tint = _ribbon_tint.lerp(Color.WHITE, 0.74) if style.has("tint") else RIBBON_EDGE_TINT
+			_ribbon_thrust_glint = style.get("thrust_glint", false)
 			_sample_trail_edge(delta, edge_age, base, tip)
 		var point := _trail_sample(base, tip, clock)
 		if not _was_active and _ribbon_section == 1 and point.tip_u == 1.0:
@@ -112,7 +115,8 @@ func _trail_sample(base: Vector3, tip: Vector3, time: float) -> Dictionary:
 	var tip_u := float(trail_end_fraction.call(base, tip)) if trail_end_fraction.is_valid() else 1.0
 	var end := tip if tip_u == 1.0 else base.lerp(tip, tip_u)
 	return {"base": base, "tip": end, "tip_u": tip_u, "time": time, "section": _ribbon_section,
-		"lifetime": _ribbon_lifetime, "tint": _ribbon_tint, "edge_tint": _ribbon_edge_tint}
+		"lifetime": _ribbon_lifetime, "tint": _ribbon_tint, "edge_tint": _ribbon_edge_tint,
+		"thrust_glint": _ribbon_thrust_glint}
 
 func _burst(point:Vector3,direction:Vector3,publish_sample:=false,sample_time:=-1.0)->void:
 	bursts+=1;var added:=0
@@ -154,7 +158,8 @@ func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=nul
 					"tip": blade_tip if full_span and blade_tip != null else Vector3(a.tip).lerp(point.tip, weight),
 					"tip_u": lerpf(a.tip_u, point.tip_u, weight), "time": display_time,
 					"section": point.section,
-				"lifetime": point.lifetime, "tint": point.tint, "edge_tint": point.edge_tint,
+					"lifetime": point.lifetime, "tint": point.tint, "edge_tint": point.edge_tint,
+					"thrust_glint": point.thrust_glint,
 				})
 			break
 	return result
@@ -189,6 +194,14 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 		if a.tip_u > 0.86 or b.tip_u > 0.86:
 			_add_ribbon_strip(a, b, 0.86, ages, Color(a.edge_tint, opacity * 0.8))
 	if has_surface:
+		var latest: Dictionary = shown[-1]
+		if latest.thrust_glint:
+			var fade_in := smoothstep(0.0, 0.029, float(latest.time) - float(shown[0].time))
+			var fade_out := 1.0 - smoothstep(0.0, 0.045, time - float(latest.time))
+			var exposed := smoothstep(0.60, 0.92, float(latest.tip_u))
+			var opacity := intensity * fade_in * fade_out * exposed
+			if opacity > 0.01:
+				_add_thrust_glint(latest, opacity)
 		_mesh.surface_end()
 	for i in particles.size():
 		var particle:Dictionary=particles[i]
@@ -210,6 +223,20 @@ func _add_ribbon_strip(a: Dictionary, b: Dictionary, inner_u: float, ages: Vecto
 		_mesh.surface_set_uv(Vector2(lerpf(inner[sample_index], outer[sample_index], RIBBON_U[corner]), ages[sample_index]))
 		_mesh.surface_set_color(tint)
 		_mesh.surface_add_vertex(points[corner])
+
+func _add_thrust_glint(point: Dictionary, opacity: float) -> void:
+	# The thrust can sweep nearly zero area. Span its outer blade length
+	# vertically so the accent adds no horizontal reach past the clipped tip.
+	var end: Vector3 = point.tip
+	var start := Vector3(point.base).lerp(end, 0.42)
+	for corner in RIBBON_SAMPLE.size():
+		var along: float = float(RIBBON_SAMPLE[corner])
+		var across: float = RIBBON_U[corner]
+		# Negative V lets the glint share this mesh's one slash material.
+		_mesh.surface_set_uv(Vector2(along, across - 1.5))
+		_mesh.surface_set_color(Color(1.0, 1.0, 1.0, opacity))
+		var height := (across * 2.0 - 1.0) * THRUST_GLINT_HALF_HEIGHT
+		_mesh.surface_add_vertex(start.lerp(end, along) + Vector3.UP * height)
 
 func reset()->void:
 	samples.clear();_was_active=false;_ribbon_section=0;serial=-1;clock=0.;_mesh.clear_surfaces()
