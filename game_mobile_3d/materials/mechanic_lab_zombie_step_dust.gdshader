@@ -3,6 +3,8 @@ render_mode unshaded, depth_draw_never, cull_disabled, shadows_disabled;
 
 uniform sampler2D smoke_mask : filter_nearest, repeat_disable;
 uniform vec4 dust_tint : source_color;
+uniform vec4 dirt_tint : source_color;
+uniform vec4 stone_tint : source_color;
 uniform float alpha_curve[54];
 uniform float alpha_duration;
 uniform float camera_range_squared;
@@ -12,10 +14,13 @@ uniform vec4 cell_bounds[32];
 // Integer physics tick modulo 2048, interpolation offset in ticks, seconds per tick.
 uniform vec3 contact_clock;
 varying flat vec3 sprite_data;
+varying flat vec3 sprite_tint;
 
 void vertex() {
-	// Cell, contact tick modulo 2048, lifetime and drag are fixed for each puff.
-	float cell = INSTANCE_CUSTOM.x;
+	// Cell and surface share one attribute. Other values are tick, lifetime and drag.
+	float cell = mod(INSTANCE_CUSTOM.x, 32.0);
+	int surface = int(INSTANCE_CUSTOM.x / 32.0);
+	sprite_tint = surface == 2 ? stone_tint.rgb : (surface == 1 ? dirt_tint.rgb : dust_tint.rgb);
 	float lifetime = INSTANCE_CUSTOM.z;
 	float drag = INSTANCE_CUSTOM.w;
 	float age = max(mod(contact_clock.x - INSTANCE_CUSTOM.y, 2048.0) + contact_clock.y, 0.0) * contact_clock.z;
@@ -50,6 +55,6 @@ void vertex() {
 
 void fragment() {
 	vec2 uv = (UV + sprite_data.xy) / vec2(8.0, 4.0);
-	ALBEDO = dust_tint.rgb;
+	ALBEDO = sprite_tint;
 	ALPHA = texture(smoke_mask, uv).a * sprite_data.z;
 }

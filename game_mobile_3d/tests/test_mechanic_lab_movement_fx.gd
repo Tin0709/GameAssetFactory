@@ -1263,7 +1263,7 @@ func check_selected_floor_steps(lab) -> void:
 		lab._on_zombie_step(Vector3.RIGHT)
 		dust._process(0.0)
 		var count := dust.multimesh.visible_instance_count
-		check(count == 1 and int(dust.multimesh.get_instance_custom_data(0).r) / 32 == fixture[0]
+		check(count == 1 and floori(dust.multimesh.get_instance_custom_data(0).r / 32.0) == fixture[0]
 			and audio._step_points.size() == queued + 1,
 			"Zombie feet keep the ground tint and supported generic step on %s" % surface)
 		print("MECHANIC_LAB_FLOOR_STEPS ", surface, " steps=", steps, " dust=", count,

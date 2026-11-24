@@ -7,6 +7,8 @@ const ALPHA_SAMPLES := 54
 const TICK_WRAP := 2048
 const INSTANCE_FLOATS := 16
 const BUFFER_UPLOAD_MIN := 48
+const ATLAS_CELLS := 32
+const SURFACE_PALETTE_INDEX := {"grass": 0, "dirt": 1, "stone": 2}
 # Half-open pixel bounds of the nonzero alpha in the verified smoke atlas.
 const SMOKE_CELL_BOUNDS := {
 	0: Vector4(4, 5, 12, 14),
@@ -23,7 +25,7 @@ class Puff:
 	var age := 0.0
 	var lifetime: float
 	var drag: float
-	var cell: int
+	var encoded_cell: int
 	var slot := -1
 
 # Spawn order handles eviction. The draw slots can move independently.
@@ -43,7 +45,7 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float,
 	_material.set_shader_parameter("smoke_mask", texture)
 	if verified_smoke_atlas and RenderingServer.get_current_rendering_method() == "mobile":
 		var cell_bounds := PackedVector4Array()
-		cell_bounds.resize(32)
+		cell_bounds.resize(ATLAS_CELLS)
 		cell_bounds.fill(Vector4(0, 0, 1, 1))
 		for cell: int in SMOKE_CELL_BOUNDS:
 			# Keep one transparent texel around the original alpha support.
@@ -51,6 +53,8 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float,
 		_material.set_shader_parameter("cell_bounds", cell_bounds)
 		_material.set_shader_parameter("crop_smoke_atlas", true)
 	_material.set_shader_parameter("dust_tint", MovementDust.SURFACE_DUST.grass)
+	_material.set_shader_parameter("dirt_tint", MovementDust.SURFACE_DUST.dirt)
+	_material.set_shader_parameter("stone_tint", MovementDust.SURFACE_DUST.stone)
 	_material.set_shader_parameter("alpha_curve", alpha)
 	_material.set_shader_parameter("alpha_duration", alpha_duration)
 	_material.set_shader_parameter("source_step_seconds", MovementDust.SOURCE_PHYSICS_STEP)
@@ -73,7 +77,7 @@ func setup(texture: Texture2D, alpha: PackedFloat32Array, alpha_duration: float,
 	set_process(false)
 	return true
 
-func burst(ground_point: Vector3) -> void:
+func burst(ground_point: Vector3, surface := "grass") -> void:
 	if _puffs.size() == CAPACITY:
 		var oldest: Puff = _puffs.pop_front()
 		if oldest.slot >= 0:
@@ -84,7 +88,10 @@ func burst(ground_point: Vector3) -> void:
 	puff.contact_tick = Engine.get_physics_frames()
 	puff.lifetime = _random.randf_range(0.80, 1.75)
 	puff.drag = _random.randf_range(4.0, 10.0)
-	puff.cell = MovementDust.FRAMES[_random.randi_range(0, MovementDust.FRAMES.size() - 1)]
+	var cell: int = MovementDust.FRAMES[_random.randi_range(0, MovementDust.FRAMES.size() - 1)]
+	var palette_index: int = SURFACE_PALETTE_INDEX.get(surface, 0)
+	# The atlas cell uses five bits, leaving room for the tint in the same value.
+	puff.encoded_cell = cell + palette_index * ATLAS_CELLS
 	_puffs.append(puff)
 	set_process(true)
 
@@ -145,7 +152,7 @@ func _rebuild_slots(count: int) -> void:
 			_instance_buffer[offset + 3] = puff.origin.x
 			_instance_buffer[offset + 7] = puff.origin.y
 			_instance_buffer[offset + 11] = puff.origin.z
-			_instance_buffer[offset + 12] = puff.cell
+			_instance_buffer[offset + 12] = puff.encoded_cell
 			_instance_buffer[offset + 13] = puff.contact_tick % TICK_WRAP
 			_instance_buffer[offset + 14] = puff.lifetime
 			_instance_buffer[offset + 15] = puff.drag
@@ -158,7 +165,7 @@ func _rebuild_slots(count: int) -> void:
 	_rendered.assign(_puffs)
 
 func _fill_vacant_slots() -> void:
-	# All dust billboards use the same tint, so a survivor can fill a hole.
+	# Move the surviving billboard together with its original surface data.
 	for slot in _vacant_slots:
 		while not _rendered.is_empty() and _rendered.back().slot < 0:
 			_rendered.pop_back()
@@ -171,7 +178,7 @@ func _upload(puff: Puff, slot: int) -> void:
 	puff.slot = slot
 	multimesh.set_instance_transform(slot, Transform3D(Basis.IDENTITY, puff.origin))
 	multimesh.set_instance_custom_data(slot,
-		Color(puff.cell, puff.contact_tick % TICK_WRAP, puff.lifetime, puff.drag))
+		Color(puff.encoded_cell, puff.contact_tick % TICK_WRAP, puff.lifetime, puff.drag))
 
 func clear() -> void:
 	_puffs.clear()

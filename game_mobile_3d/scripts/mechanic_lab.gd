@@ -1272,10 +1272,10 @@ func _on_zombie_step(sole: Vector3, actor: CharacterBody3D = null) -> void:
 		return
 	# Snapshot the support now, before later physics ticks move the actor.
 	var support := _floor_step_contact_at(sole, actor)
-	if support.is_empty() or support.surface != "grass":
+	if support.is_empty():
 		return
 	if _zombie_step_dust != null:
-		_zombie_step_dust.burst(support.position)
+		_zombie_step_dust.burst(support.position, support.surface)
 	_combat_audio.queue_zombie_step(support.position)
 
 func _heavy_debris_delay() -> float:
