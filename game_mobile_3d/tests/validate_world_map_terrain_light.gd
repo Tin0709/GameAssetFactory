@@ -159,6 +159,19 @@ func check_stone_top_sky_color(w: Node) -> void:
 	var half_gain: Variant = stone.get_shader_parameter(UNIFORM)
 	check(half_gain is Vector2 and half_gain.is_equal_approx(Vector2(sqrt(expected.x), sqrt(expected.y))),
 		"The slider interpolates the stone color in stops")
+	var path := "user://stone_sky_color_%d.cfg" % OS.get_process_id()
+	check(w.showcase.save_lighting_mix(path) == OK, "The stone sky color is saved in the preset")
+	w.showcase.set_lighting_scale(CONTROL, 0.)
+	check(w.showcase.load_lighting_mix(path) == OK and stone.get_shader_parameter(UNIFORM) == half_gain,
+		"The preset restores the same stone sky color")
+	var config := ConfigFile.new()
+	if config.load(path) == OK:
+		config.set_value("recipe", "version", 235)
+		config.erase_section_key("strengths", CONTROL)
+		check(config.save(path) == OK and w.showcase.load_lighting_mix(path) == OK
+			and stone.get_shader_parameter(UNIFORM) == Vector2.ZERO,
+			"Prior presets preserve their original stone sky color")
+	DirAccess.remove_absolute(path)
 	w.showcase.reset_lighting_mix()
 	check(stone.get_shader_parameter(UNIFORM) == expected, "Reset restores the biome stone color")
 	w.showcase.set_hour(12.)
