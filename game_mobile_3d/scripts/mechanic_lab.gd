@@ -224,6 +224,7 @@ var _tool_slam_ring: MeshInstance3D
 var _tool_slam_material: ShaderMaterial
 var _tool_slam_footprint := PhysicsShapeQueryParameters3D.new()
 var _tool_slam_time := -1.0
+var _tool_slam_pending := false
 var _tool_slam_duration := GROUND_SLAM_DURATION
 var _tool_slam_duration_scale := 1.0
 var _tool_slam_opacity := 1.0
@@ -1229,7 +1230,16 @@ func _process(delta: float) -> void:
 	if not _pending_melee_feedback.is_empty():
 		_present_melee_feedback(player.render_presenter.display_clock)
 	if _tool_slam_time >= 0.0:
-		var age: float = player.render_presenter.display_clock - _tool_slam_time
+		var display_time: float = player.render_presenter.display_clock
+		var age := display_time - _tool_slam_time
+		if _tool_slam_pending and age >= 0.0:
+			_tool_slam_pending = false
+			# Preserve interpolation on normal frames. After a hitch, the
+			# first visible wave should still expand from the impact point.
+			var first_step := get_physics_process_delta_time()
+			if age > first_step:
+				age = first_step
+				_tool_slam_time = display_time - age
 		_tool_slam_ring.visible = _tool_slam_opacity > 0.0 and age >= 0.0 and age < _tool_slam_duration
 		if age >= _tool_slam_duration:
 			_tool_slam_time = -1.0
@@ -1795,6 +1805,7 @@ func _show_tool_slam_ring(point: Vector3, surface: String, sample_time: float) -
 	_tool_slam_material.set_shader_parameter(&"tint", MovementDust.SURFACE_DUST[surface].lightened(0.36))
 	_tool_slam_duration = GROUND_SLAM_DURATION * _tool_slam_duration_scale
 	_tool_slam_time = sample_time
+	_tool_slam_pending = true
 
 func _clip_slam_to_stage(point: Vector3, planes: PackedVector3Array) -> bool:
 	var floor: CollisionShape3D = $Ground/Collision
@@ -2030,6 +2041,7 @@ func _clear_contact_light() -> void:
 	_pending_tool_ground_cues.clear()
 	_tool_touchdown.clear()
 	_tool_slam_time = -1.0
+	_tool_slam_pending = false
 	if _tool_slam_ring != null:
 		_tool_slam_ring.hide()
 	_combat_pose_frame = -1
