@@ -471,13 +471,13 @@ func check_bow_fire_during_crossbow_impacts(bus: int, capture: AudioEffectCaptur
 		menu.select(weapon)
 		menu.item_selected.emit(weapon)
 	var audio = lab.get_node("CombatAudio")
+	lab.get_node("HUD/CombatAudioToggle").button_pressed = true
 	var samples: Array = audio._groups.get(&"bow_fire", [])
 	check(lab._bow != null and samples.size() == 3, "Standard Bow loads its three source firing samples")
 	if lab._bow == null or samples.is_empty():
 		lab.free()
 		return
 	var point: Vector3 = lab.player.global_position + Vector3.UP
-	audio.set_enabled(true, point)
 	audio.reset()
 	# Reset selects the first weapon voice. Route it before playback starts
 	# so its short firing onset reaches the capture bus from the first mix.

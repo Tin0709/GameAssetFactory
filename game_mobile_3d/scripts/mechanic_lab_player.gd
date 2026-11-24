@@ -47,6 +47,8 @@ var _bow_recovery := 0.0
 var _bow_action_time := 0.0
 var _bow_aim_tick := -1
 var _bow_aim: Variant
+var _share_bow_clip_import := false
+var _bow_clip_copy: Node3D
 var hitstop_seconds := 0.0:
 	set(value):
 		hitstop_seconds = value
@@ -165,8 +167,27 @@ func _refresh_markers() -> void:
 func _create_hybrid_motion() -> RefCounted:
 	return LabLocomotion.new()
 
+func _load_private_clip_library(entries: Array, library_name: StringName, combat_config: Variant = null) -> bool:
+	# Bow gives the same source clip separate attack and recovery entries.
+	# The inherited loader validates both, retargets them, and owns each scene.
+	_share_bow_clip_import = library_name == Bow.BOW_LIBRARY and entries.size() == 2 \
+		and entries[0] is Dictionary and entries[1] is Dictionary and entries[0].get("path") == entries[1].get("path")
+	var loaded := super._load_private_clip_library(entries, library_name, combat_config)
+	_share_bow_clip_import = false
+	if _bow_clip_copy != null:
+		_bow_clip_copy.free()
+		_bow_clip_copy = null
+	return loaded
+
 func _import_private_clip_scene(path: String) -> Node3D:
-	return load_private_model(path, GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS)
+	if _bow_clip_copy != null:
+		var copy := _bow_clip_copy
+		_bow_clip_copy = null
+		return copy
+	var scene := load_private_model(path, GLTFDocument.IMPORT_FLAG_DISCARD_MESHES_AND_MATERIALS)
+	if _share_bow_clip_import and scene != null:
+		_bow_clip_copy = scene.duplicate(0) as Node3D
+	return scene
 
 func _post_landing_step_interval() -> float:
 	# Absorb the touchdown settling pose and admit the first running stride.

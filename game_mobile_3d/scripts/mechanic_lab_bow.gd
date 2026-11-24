@@ -148,10 +148,10 @@ func _report_impact(hit: Dictionary, direction: Vector3, serial: int, strike: Di
 func setup_audio(audio: Node, root: String) -> void:
 	_combat_audio = audio
 	for i in FIRE_HASHES.size():
-		audio._load_sample(root, &"bow_fire", BOW_AUDIO + ("fire-%03d.ogg" % (i + 1)), FIRE_HASHES[i])
+		audio._queue_weapon_sample(root, &"bow_fire", BOW_AUDIO + ("fire-%03d.ogg" % (i + 1)), FIRE_HASHES[i])
 	for i in DRAW_HASHES.size():
-		audio._load_sample(root, &"bow_draw", BOW_AUDIO + ("load-%03d.ogg" % (i + 1)), DRAW_HASHES[i])
-	audio._load_sample(root, &"bow_unequip", BOW_AUDIO + "unequip.ogg", UNEQUIP_HASH)
+		audio._queue_weapon_sample(root, &"bow_draw", BOW_AUDIO + ("load-%03d.ogg" % (i + 1)), DRAW_HASHES[i])
+	audio._queue_weapon_sample(root, &"bow_unequip", BOW_AUDIO + "unequip.ogg", UNEQUIP_HASH)
 	# PlayerBow's projectile switch distinguishes the charged whoosh from
 	# the ordinary and supercharged branches.
 	for i in CHARGED_FLIGHT_HASHES.size():
@@ -171,4 +171,4 @@ func play_switch(equipped: bool, point: Vector3) -> void:
 
 func _play_audio(group: StringName, point: Vector3, gain: float) -> void:
 	if is_instance_valid(_combat_audio) and _combat_audio.enabled:
-		_combat_audio._play(group, point, gain)
+		_combat_audio._play_weapon_cue(group, point, gain)
