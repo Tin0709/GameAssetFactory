@@ -39,8 +39,8 @@ const FLOOR_STEP_BANKS := {
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
 const ImpactMarks := preload("res://scripts/mechanic_lab_impact_marks.gd")
 const GROUND_SLAM_SHADER := preload("res://materials/mechanic_lab_ground_slam.gdshader")
-const AXE_WALL_SHADER := preload("res://materials/mechanic_lab_axe_wall.gdshader")
-const AXE_WALL_LIMIT := 4
+const BLADE_WALL_SHADER := preload("res://materials/mechanic_lab_axe_wall.gdshader")
+const BLADE_WALL_LIMIT := 4
 const SPLASH_FLASH_UNDIMMED_COUNT := 6
 const SPLASH_FLASH_MIN_SCALE := 0.45
 const GROUND_SLAM_RADIUS := 0.68
@@ -245,9 +245,11 @@ var _movement_audio: MovementAudio
 var _kai_skin: KaiSkin
 var _md2_skin_visibility: Dictionary[MeshInstance3D, bool] = {}
 var _weapon_mesh: MeshInstance3D
-var _axe_wall_material: ShaderMaterial
-var _axe_wall_probe: PhysicsShapeQueryParameters3D
-var _axe_blocker_count := 0
+var _blade_wall_material: ShaderMaterial
+var _blade_wall_materials: Dictionary[Mesh, ShaderMaterial] = {}
+var _blade_wall_probe: PhysicsShapeQueryParameters3D
+var _blade_base_override: Material
+var _blade_blocker_count := 0
 var _equipped_weapon := Weapon.SABRE
 var _sabre_mesh: Mesh
 var _sabre_mesh_transform: Transform3D
@@ -571,6 +573,8 @@ func _setup_weapon_selector() -> void:
 	player.effects.interpolate_ground_trail_edges = true
 	_sabre_mesh = _weapon_mesh.mesh
 	_sabre_mesh_transform = _weapon_mesh.transform
+	_setup_blade_wall_probe()
+	_blade_wall_material = _blade_mask_for(_sabre_mesh)
 	# The light rig stores surface overrides for the original Sabre mesh.
 	_sabre_blade_base = player.marker_base.position
 	_sabre_blade_tip = player.marker_tip.position
@@ -655,6 +659,7 @@ func _select_weapon(index: int) -> void:
 		rates = {}
 	# The original mount is tracked by the player lighting rig, which keeps
 	# a Sabre surface override. Use the equipped tool's own texture instead.
+	_clear_blade_wall_mask()
 	_weapon_mesh.material_override = mesh.surface_get_material(0) if tool >= 0 else null
 	_weapon_mesh.visible = index != Weapon.CROSS_POLLINATOR and not bow_equipped and not gauntlets_equipped
 	if _weapon_mesh.visible:
@@ -671,6 +676,7 @@ func _select_weapon(index: int) -> void:
 	player.marker_base.position = blade_base
 	player.marker_tip.position = blade_tip
 	player.effects.blade_trail_enabled = not blade_base.is_equal_approx(blade_tip)
+	_blade_wall_material = _blade_mask_for(mesh) if _weapon_mesh.visible and player.effects.blade_trail_enabled else null
 	player.reference_audio.reset()
 	player.reference_audio.clip_aliases = aliases
 	player.reference_audio.clip_play_rates = rates
@@ -969,40 +975,67 @@ func _load_tool(index: int, root: String) -> bool:
 	if index == Weapon.SHOVEL and locomotion.is_empty():
 		return false
 	if index == Weapon.AXE:
-		_setup_axe_wall_material(mesh)
+		mesh.surface_set_material(0, _blade_mask_for(mesh))
 	_tools[index] = {"mesh": mesh, "profile": profile, "locomotion": locomotion}
 	return true
 
-func _setup_axe_wall_material(mesh: Mesh) -> void:
-	var source := mesh.surface_get_material(0) as BaseMaterial3D
-	# SM_Axe is an opaque, nearest-filtered material with an albedo map
-	# and constant roughness/specular. Keep those values in the mask pass.
-	_axe_wall_material = ShaderMaterial.new()
-	_axe_wall_material.shader = AXE_WALL_SHADER
-	_axe_wall_material.set_shader_parameter(&"blade_texture", source.albedo_texture)
-	_axe_wall_material.set_shader_parameter(&"axe_blocker_count", 0)
-	mesh.surface_set_material(0, _axe_wall_material)
+func _setup_blade_wall_probe() -> void:
 	var bounds := BoxShape3D.new()
 	bounds.size = Vector3(4.8, 5.0, 4.8)
-	_axe_wall_probe = PhysicsShapeQueryParameters3D.new()
-	_axe_wall_probe.shape = bounds
-	_axe_wall_probe.collision_mask = 1
-	_axe_wall_probe.exclude = [$Ground.get_rid(), player.get_rid()]
+	_blade_wall_probe = PhysicsShapeQueryParameters3D.new()
+	_blade_wall_probe.shape = bounds
+	_blade_wall_probe.collision_mask = 1
+	_blade_wall_probe.exclude = [$Ground.get_rid(), player.get_rid()]
 
-func _sample_axe_wall_boxes() -> void:
+func _blade_mask_for(mesh: Mesh) -> ShaderMaterial:
+	if _blade_wall_materials.has(mesh):
+		return _blade_wall_materials[mesh]
+	var source := mesh.surface_get_material(0) as BaseMaterial3D if mesh.get_surface_count() == 1 else null
+	if source == null or source.albedo_texture == null:
+		return null
+	var material := ShaderMaterial.new()
+	material.shader = BLADE_WALL_SHADER
+	material.set_shader_parameter(&"blade_texture", source.albedo_texture)
+	material.set_shader_parameter(&"double_sided", source.cull_mode == BaseMaterial3D.CULL_DISABLED)
+	if mesh == _sabre_mesh:
+		# Sabre packs roughness into green and metal into blue, and multiplies
+		# its white emission by a separate texture.
+		material.set_shader_parameter(&"use_packed_surface", true)
+		material.set_shader_parameter(&"metallic_map", source.metallic_texture)
+		material.set_shader_parameter(&"roughness_map", source.roughness_texture)
+		material.set_shader_parameter(&"emission_map", source.emission_texture)
+	_blade_wall_materials[mesh] = material
+	return material
+
+func _sample_blade_wall_boxes() -> void:
+	if not player.combo.active() or not player.review_clip.is_empty():
+		_clear_blade_wall_mask()
+		return
+	_blade_wall_probe.transform = Transform3D(Basis.IDENTITY, player.global_position + Vector3.UP)
+	var hits := get_world_3d().direct_space_state.intersect_shape(_blade_wall_probe, BLADE_WALL_LIMIT)
 	var axes := PackedVector4Array()
-	if _equipped_weapon == Weapon.AXE and player.combo.active() and player.review_clip.is_empty():
-		_axe_wall_probe.transform = Transform3D(Basis.IDENTITY, player.global_position + Vector3.UP)
-		var hits := get_world_3d().direct_space_state.intersect_shape(_axe_wall_probe, AXE_WALL_LIMIT)
-		for hit in hits:
-			axes.append_array(_upright_box_axes(hit))
+	for hit in hits:
+		axes.append_array(_upright_box_axes(hit))
+	if axes.is_empty():
+		_clear_blade_wall_mask()
+		return
+	if _blade_blocker_count == 0:
+		_blade_base_override = _weapon_mesh.material_override
+		_weapon_mesh.material_override = _blade_wall_material
 	var count := floori(axes.size() / 3.0)
-	if count != _axe_blocker_count:
-		_axe_blocker_count = count
-		_axe_wall_material.set_shader_parameter(&"axe_blocker_count", count)
-	if count > 0:
-		axes.resize(3 * AXE_WALL_LIMIT)
-		_axe_wall_material.set_shader_parameter(&"blocker_axes", axes)
+	if count != _blade_blocker_count:
+		_blade_blocker_count = count
+		_blade_wall_material.set_shader_parameter(&"blade_blocker_count", count)
+	axes.resize(3 * BLADE_WALL_LIMIT)
+	_blade_wall_material.set_shader_parameter(&"blocker_axes", axes)
+
+func _clear_blade_wall_mask() -> void:
+	if _blade_blocker_count == 0:
+		return
+	_blade_blocker_count = 0
+	_blade_wall_material.set_shader_parameter(&"blade_blocker_count", 0)
+	_weapon_mesh.material_override = _blade_base_override
+	_blade_base_override = null
 
 func _load_bow(root: String) -> bool:
 	if _bow != null:
@@ -1224,8 +1257,8 @@ func _process(delta: float) -> void:
 		var charge_age: float = player.bow_charge_cue_age(presenter.display_clock) if _bow_mount.is_visible_in_tree() else -1.0
 		_bow.present_charge_cue(charge_age, presenter.display_meshes[_bow_display_mesh_index])
 	var focus: Vector3 = presentation.player_position()
-	if _axe_blocker_count > 0:
-		_axe_wall_material.set_shader_parameter(&"actor_xz", Vector2(focus.x, focus.z))
+	if _blade_blocker_count > 0:
+		_blade_wall_material.set_shader_parameter(&"actor_xz", Vector2(focus.x, focus.z))
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
 	if not _pending_melee_feedback.is_empty():
 		_present_melee_feedback(player.render_presenter.display_clock)
@@ -1947,8 +1980,8 @@ func _sample_combat_fx() -> void:
 	# Immediate melee can be dispatched before this sample. Delayed air contacts
 	# can also arrive after it and use the pose already sampled in this tick.
 	_combat_pose_frame = Engine.get_physics_frames()
-	if _axe_wall_material != null and (_equipped_weapon == Weapon.AXE or _axe_blocker_count > 0):
-		_sample_axe_wall_boxes()
+	if _blade_wall_material != null:
+		_sample_blade_wall_boxes()
 	if not _pending_tool_ground_cues.is_empty():
 		_show_tool_ground_cues()
 	if _pending_melee_contact_fx.is_empty() and _slam_burst_frame < 0:
@@ -2028,9 +2061,7 @@ func _start_contact_light(point: Vector3, serial: int, energy: float, sample_tim
 	_impact_light.visible = sample_time < 0.0
 
 func _clear_contact_light() -> void:
-	if _axe_blocker_count > 0:
-		_axe_blocker_count = 0
-		_axe_wall_material.set_shader_parameter(&"axe_blocker_count", 0)
+	_clear_blade_wall_mask()
 	if not _pending_melee_contact_fx.is_empty() or not _pending_melee_feedback.is_empty():
 		# A reset discards the old pose and transient effects. Show the health
 		# already committed by simulation, even if its last cue was pending.
