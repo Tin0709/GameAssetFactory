@@ -104,12 +104,28 @@ func check_stagger_stance(actor: Zombie, resting_clip: StringName) -> void:
 	playback.play(STYLED_SPAWN, 0.0)
 	playback.advance(0.0)
 
+func check_fall_root(actor: Zombie) -> void:
+	var skeleton := actor.ragdoll.skeleton
+	var hips := skeleton.find_bone(&"J_Hip")
+	var fall := actor.animation.get_animation(STYLED_FALL)
+	var path := NodePath("%s:J_Hip" % actor.animation.get_parent().get_path_to(skeleton))
+	var track := fall.find_track(path, Animation.TYPE_POSITION_3D)
+	var local_offset := fall.position_track_interpolate(track, 0.5) - skeleton.get_bone_rest(hips).origin
+	var parent := skeleton.get_bone_global_rest(skeleton.get_bone_parent(hips))
+	var offset_in_leg_lengths := (parent.basis * local_offset).y / skeleton.get_bone_global_rest(hips).origin.y
+	# At 0.5 s the source fall lowers the whole pose by 3 pixels on a 12-pixel leg.
+	# The adult and baby idle breath contribute different additional offsets.
+	var breathing_pixels := -0.4788168 if actor.is_baby else -1.0897114
+	check(is_equal_approx(offset_in_leg_lengths, (breathing_pixels - 3.0) / 12.0),
+		"The A&S fall retains its source whole-body drop (baby=%s, offset=%f)" % [actor.is_baby, offset_in_leg_lengths])
+
 func check_airborne(lab: Node, group: Node) -> void:
 	for baby: bool in [false, true]:
 		var count := group.get_child_count()
 		group._spawn_at(Vector3(33.0, 3.0, 25.0), Vector3(33.0, 3.0, 29.0),
 			lab.player, lab.get_node("CombatEffects"), true, baby)
 		var actor := group.get_child(count) as Zombie
+		check_fall_root(actor)
 		actor.animation.play(STYLED_IDLE)
 		actor.velocity.y = 3.0
 		check(await await_clip(actor, [STYLED_JUMP], 12), "Each age uses source jump during upward travel")
