@@ -35,6 +35,7 @@ const NAMED := {
 	"StoneLedgeOcclusion": "stone_foot_fill",
 	"TerrainMistVisibility": "terrain_mist_visibility",
 	"PortableMistFrontTransfer": "mist_front_transfer",
+	"PortableMistMidgroundClearance": "mist_midground_clearance",
 	"SettingsPresetMessage": "preset-message",
 }
 const PHASES := ["morning", "day", "golden", "night"]

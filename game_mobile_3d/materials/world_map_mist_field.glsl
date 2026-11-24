@@ -63,6 +63,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 sky_air_origin;
  vec4 sky_air_spacing;
 #endif
+ vec4 near_clearance; // Reduction of the base layer's accumulated extinction.
 } p;
 const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
 const float FOREST_SCATTER_END_RADIUS_M = 15.0;
@@ -260,6 +261,7 @@ void main(){
  vec3 local_light=p.scatter.rgb*p.scatter.w*p.local_scatter_multiplier.xyz;
  vec3 additional_light=p.scatter.rgb*p.scatter.w*p.additional_scatter_multiplier.xyz;
  vec3 scattered=vec3(0.0);float optical=0.0;float previous=0.0;
+ float near_base_optical=0.0;
  // Nothing contributes before the earliest possible medium interval.
  float empty_until=min(entry,near_z);
  if(local_chord.z>0.)empty_until=min(empty_until,local_chord.x-local_chord.w);
@@ -287,6 +289,7 @@ void main(){
   if(nearby>0.){
    float middle=(max(previous,entry)+min(d,near_z))*.5;
    nearby*=distant_optical_gain(middle*ray_length);
+   if(p.near_clearance.x>0.0)near_base_optical+=nearby;
    vec3 point=origin+ray*middle;
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
    vec3 light=ambient_depth_source(middle*ray_length,middle,point)+p.warm.rgb*(warmth*.25);
@@ -336,6 +339,12 @@ void main(){
    }
    scattered+=exp(-optical)*(1.0-exp(-tau))*light;optical+=tau;
   }
-  imageStore(volume,ivec3(pixel,i),vec4(scattered,exp(-optical)));previous=d;
+  float stored_optical=optical;
+  if(near_base_optical>0.0){
+   // Restore the existing rear layer gradually and keep the integrated light.
+   float range_weight=1.0-smoothstep(3.0,9.0,(d-entry)*ray_length);
+   stored_optical-=p.near_clearance.x*range_weight*near_base_optical;
+  }
+  imageStore(volume,ivec3(pixel,i),vec4(scattered,exp(-stored_optical)));previous=d;
  }
 }

@@ -13,6 +13,8 @@ const DEPTH_SCATTER_BYTES := 32
 const GROUND_HAZE_BYTES := 32
 const REAR_AMBIENT_BYTES := 32
 const SKY_AIR_BYTES := 48
+const NEAR_CLEARANCE_BYTES := 16
+const MAX_NEAR_CLEARANCE := .85
 const MAX_DEPTH_SCATTER_GAIN := 6.0
 const MAX_DEPTH_OPTICAL_GAIN := .85
 const DEPTH_SCATTER_START_M := 2.0
@@ -31,6 +33,7 @@ var _depth_scatter_parameters := PackedByteArray()
 var _ground_haze_parameters := PackedByteArray()
 var _rear_ambient_parameters := PackedByteArray()
 var _sky_parameters := PackedByteArray()
+var _near_clearance_parameters := PackedByteArray()
 var _size:=Vector2i.ZERO
 var _noise:=RID()
 var _light:=RID()
@@ -62,7 +65,7 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		depth_scatter_offset: float = DEPTH_SCATTER_START_M, morning_optical: float = 0.0,
 		depth_scatter_ramp: float = DEPTH_SCATTER_RAMP_M, ground_haze := PackedFloat32Array(),
 		entry_scatter_gain: float = 0., sky_air := PackedFloat32Array(), entry_depth_balance := 0.,
-		rear_ambient := PackedFloat32Array()) -> void:
+		rear_ambient := PackedFloat32Array(), near_clearance := 0.) -> void:
 	var path_bytes := path_light.to_byte_array()
 	if path_bytes.size() == LEGACY_PATH_SOURCE_BYTES:
 		path_bytes.resize(PATH_SOURCE_BYTES)
@@ -119,6 +122,8 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 	_ground_haze_parameters = ground_haze_bytes
 	_rear_ambient_parameters = rear_ambient_bytes
 	_sky_parameters = sky_bytes
+	var clearance := clampf(near_clearance, 0., MAX_NEAR_CLEARANCE) if entry > 0. and is_finite(near_clearance) else 0.
+	_near_clearance_parameters = PackedFloat32Array([clearance, 0., 0., 0.]).to_byte_array()
 	if _parameters.size()==176:_parameters.resize(224) # Legacy fixtures: neutral new-light branch.
 	_state.point_kernel=_parameters.size()==224 and _parameters.decode_float(172)>.5
 	_size=size;_noise=noise;_light=light
@@ -173,7 +178,7 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	if not error.is_empty():_report("error",error);return false
 	var shader:=_keep(rd.shader_create_from_spirv(spirv));_pipeline=_keep(rd.compute_pipeline_create(shader))
 	var parameter_size := GPU_PARAMETER_BYTES + 2 * LOCAL_MIST_BYTES + DEPTH_SCATTER_BYTES + GROUND_HAZE_BYTES + REAR_AMBIENT_BYTES \
-		+ _directional_byte_count()
+		+ _directional_byte_count() + NEAR_CLEARANCE_BYTES
 	if sky_grid != null:
 		parameter_size += SKY_AIR_BYTES
 	_buffer=_keep(rd.uniform_buffer_create(parameter_size))
@@ -235,6 +240,7 @@ func _render_callback(kind:int,data:RenderData)->void:
 	var ground_haze_parameters := _ground_haze_parameters
 	var rear_ambient_parameters := _rear_ambient_parameters
 	var sky_parameters := _sky_parameters
+	var near_clearance_parameters := _near_clearance_parameters
 	var size := _size
 	var noise := _noise
 	var light := _light
@@ -256,6 +262,7 @@ func _render_callback(kind:int,data:RenderData)->void:
 	parameters.append_array(ground_haze_parameters)
 	parameters.append_array(rear_ambient_parameters)
 	parameters.append_array(sky_parameters)
+	parameters.append_array(near_clearance_parameters)
 	rd.buffer_update(_buffer,0,parameters.size(),parameters)
 	var list:=rd.compute_list_begin();rd.compute_list_bind_compute_pipeline(list,_pipeline);rd.compute_list_bind_uniform_set(list,_uniform,0)
 	rd.compute_list_dispatch(list,ceili(size.x/8.),ceili(size.y/8.),1);rd.compute_list_end()

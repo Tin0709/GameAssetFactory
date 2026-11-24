@@ -281,6 +281,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"mist_entry_scatter": ["Ánh tán xạ đầu lớp sương", 1.],
 	&"mist_entry_depth_balance": ["Chiều sâu ánh sương gần", 1.],
 	&"mist_front_transfer": ["Sương nhẹ trung cảnh", 1.],
+	&"mist_midground_clearance": ["Độ trong sương trung cảnh", 1.],
 	&"mist_rear_chroma": ["Cân sắc lam của sương xa", 1.],
 	&"mist_rear_ambient": ["Độ trong của sương xa", 1.],
 	&"mist_sky_scatter": ["Ánh trời trong sương rìa tán", 1.],
@@ -3491,9 +3492,9 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	return OK
 
 func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
-	if changed_effect in [&"", &"mist_front_transfer"] and level.biome_controller != null:
+	if changed_effect in [&"", &"mist_front_transfer", &"mist_midground_clearance"] and level.biome_controller != null:
 		level.biome_controller.refresh_mist_front()
-		if changed_effect == &"mist_front_transfer":
+		if changed_effect != &"":
 			return
 	if changed_effect in [&"", &"actor_ground_light"] and level.biome_controller != null:
 		level.biome_controller.refresh_actor_ground_settings()
