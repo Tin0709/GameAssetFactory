@@ -58,7 +58,8 @@ const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd
 const Gauntlets := preload("res://scripts/mechanic_lab_gauntlets.gd")
 const MeleeTools := preload("res://scripts/mechanic_lab_melee_tools.gd")
 const Bow := preload("res://scripts/mechanic_lab_bow.gd")
-const PROJECTILE_SHADERS := [CrossPollinator.TRAIL_SHADER, CrossPollinator.ImpactSparks.SHADER, Bow.CHARGE_CUE_SHADER]
+const PROJECTILE_SHADERS := [CrossPollinator.TRAIL_SHADER, CrossPollinator.ImpactSparks.SHADER,
+	Bow.CHARGE_CUE_SHADER, CrossPollinator.EMBEDDED_SHADER]
 const KaiSkin := preload("res://scripts/mechanic_lab_kai_skin.gd")
 const IDLE_NOVELTIES := {
 	"NativeLabBowLook": ["Player_Idle_Novelty_LookAround",

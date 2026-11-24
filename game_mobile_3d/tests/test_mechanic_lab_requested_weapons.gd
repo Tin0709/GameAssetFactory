@@ -142,15 +142,15 @@ func check_projectile_shader_preparation(lab: Node3D) -> void:
 
 	var shaders: Array[int] = []
 	var clips: Array[int] = []
-	for i in 10:
+	for i in 11:
 		lab.set("_last_ranged_preparation_frame_us", Time.get_ticks_usec())
 		lab._process(0.0)
 		shaders.append(lab.get("_next_projectile_shader"))
 		var staged: Variant = actor.get("_prepared_crossbow_clips")
 		clips.append(staged.size() if staged is Dictionary else -1)
-	check(shaders == [1, 2, 3, 3, 3, 3, 3, 3, 3, 3],
-		"The Lab prepares one existing ranged shader per idle update")
-	check(clips == [0, 0, 0, 1, 2, 3, 4, 5, 6, 6],
+	check(shaders == [1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4],
+		"The Lab prepares one ranged shader per idle update, including the embedded surface mask")
+	check(clips == [0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 6],
 		"After the shaders, the Lab stages one verified Crossbow gait scene per idle update")
 	check(not actor.get("animation_player").has_animation_library(CrossPollinator.LOCOMOTION_LIBRARY)
 		and lab.get("_bow") == null and lab.get("_crossbow") == null and lab.get("_equipped_weapon") == 0,

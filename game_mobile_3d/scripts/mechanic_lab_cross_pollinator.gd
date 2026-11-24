@@ -29,6 +29,7 @@ const BOLT_RADIUS := 0.10
 const BOLT_MESH_SCALE := 0.7
 # NS_ArrowTrail's Trail emitter initializes a world-space ribbon.
 const TRAIL_SHADER := preload("res://materials/mechanic_lab_polaris_trail.gdshader")
+const EMBEDDED_SHADER := preload("res://materials/mechanic_lab_embedded_arrow.gdshader")
 const ImpactSparks := preload("res://scripts/mechanic_lab_polaris_impact.gd")
 const TRAIL_LIFETIME := 0.30
 const TRAIL_WIDTH := 0.08
@@ -183,6 +184,7 @@ func _ready() -> void:
 	if bolt_mesh != null:
 		_embedded = MultiMesh.new()
 		_embedded.transform_format = MultiMesh.TRANSFORM_3D
+		_embedded.use_custom_data = true
 		_embedded.mesh = bolt_mesh
 		_embedded.instance_count = EMBEDDED_CAPACITY
 		_embedded.visible_instance_count = 0
@@ -190,6 +192,13 @@ func _ready() -> void:
 		renderer.name = "EmbeddedArrows"
 		renderer.multimesh = _embedded
 		renderer.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var source := bolt_mesh.surface_get_material(0) as BaseMaterial3D
+		if source != null and source.albedo_texture != null and bolt_mesh.get_surface_count() == 1:
+			var embedded_material := ShaderMaterial.new()
+			embedded_material.shader = EMBEDDED_SHADER
+			embedded_material.set_shader_parameter(&"arrow_texture", source.albedo_texture)
+			embedded_material.set_shader_parameter(&"pivot_x", EMBEDDED_OFFSET / EMBEDDED_SCALE)
+			renderer.material_override = embedded_material
 		add_child(renderer)
 	set_physics_process(false)
 
@@ -428,6 +437,7 @@ func _embed_on_terrain(hit: Dictionary, direction: Vector3, render_frame: int) -
 	_embedded_arrows.append({
 		"pose": global_transform.affine_inverse() * pose,
 		"wobble_limit": asin(clampf(-direction.dot(hit.normal), 0.0, 1.0)),
+		"surface_normal": hit.normal,
 		"age": 0.0,
 		"contact_frame": render_frame,
 	})
@@ -453,6 +463,8 @@ func _update_embedded_arrows(delta: float, render_frame: int) -> void:
 		pose.origin -= pose.basis.x * EMBEDDED_OFFSET
 		pose.basis *= Basis.from_scale(Vector3.ONE * EMBEDDED_SCALE)
 		_embedded.set_instance_transform(index, pose)
+		var normal: Vector3 = arrow.surface_normal
+		_embedded.set_instance_custom_data(index, Color(normal.x, normal.y, normal.z, 0.0))
 		index += 1
 	_embedded.visible_instance_count = _embedded_arrows.size()
 
