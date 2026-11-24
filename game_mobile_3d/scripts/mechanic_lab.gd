@@ -383,20 +383,17 @@ func _ready() -> void:
 		add_child(_combat_audio)
 		_combat_audio.queue_base_samples()
 		_setup_movement_audio()
-		var impact_marks := ImpactMarks.new()
-		if impact_marks.setup($Ground/Mesh):
-			_gauntlet_impact_marks = impact_marks
-			impact_marks.name = "GauntletImpactMarks"
-			$CombatEffects.add_child(impact_marks)
-			player.presentation_reset.connect(impact_marks.clear)
-		else:
-			impact_marks.free()
+		_gauntlet_impact_marks = ImpactMarks.new()
+		_gauntlet_impact_marks.setup($Ground/Mesh)
+		_gauntlet_impact_marks.name = "GauntletImpactMarks"
+		$CombatEffects.add_child(_gauntlet_impact_marks)
+		player.presentation_reset.connect(_gauntlet_impact_marks.clear)
 		var dust := MovementDust.new()
 		dust.name = "MovementDust"
 		if dust.setup(player, null, _player_foot_contact_at, _heavy_debris_delay, _floor_landing_contact_at,
 				player.source_step_dust_size, true):
 			dust.use_source_landing(true)
-			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped, _gauntlet_impact_anchor)
+			dust.use_gauntlet_debris(func() -> bool: return player.gauntlets_equipped)
 			add_child(dust)
 			_movement_dust = dust
 			var zombie_dust := ZombieStepDust.new()
@@ -1529,11 +1526,11 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	_slam_burst_point = _landing_impact_anchor(point, facing, floor_height, burst_reach)
 	_slam_burst_serial = serial
 	$Zombies.land_sabre(point, facing, serial, fall_height)
-	if player.gauntlets_equipped and _gauntlet_impact_marks != null:
-		var mark_surface := _floor_landing_contact_at(point)
-		if not mark_surface.is_empty():
-			var anchor := _gauntlet_impact_anchor(mark_surface.position, facing, MovementDust.GAUNTLET_DEBRIS_FORWARD)
-			_gauntlet_impact_marks.stamp(anchor, mark_surface.position, mark_surface.surface)
+	if player.gauntlets_equipped:
+		var support := _floor_landing_contact_at(point)
+		if not support.is_empty():
+			_show_gauntlet_ground_impact(support.position, facing, support.surface)
+		return
 	if not _combat_audio.enabled or debris_delay < 0.0:
 		return
 	if _equipped_weapon == Weapon.SABRE:
@@ -1556,9 +1553,18 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	else:
 		_combat_audio.slam_landed(contact.position, contact.surface)
 
+func _show_gauntlet_ground_impact(touchdown: Vector3, facing: Vector3, surface: String) -> void:
+	# The source debris notify owns the crack and the surface sound as well.
+	var anchor := _gauntlet_impact_anchor(touchdown, facing, MovementDust.GAUNTLET_DEBRIS_FORWARD)
+	if not _gauntlet_impact_marks.stamp(anchor, surface) and anchor != touchdown:
+		anchor = touchdown
+		_gauntlet_impact_marks.stamp(anchor, surface)
+	if _movement_dust != null:
+		var puff := _gauntlet_impact_anchor(touchdown, facing, MovementDust.GAUNTLET_IMPACT_DUST_FORWARD)
+		_movement_dust.emit_gauntlet_impact(anchor, puff, surface)
+	_combat_audio.slam_landed(anchor, surface)
+
 func _gauntlet_impact_anchor(touchdown: Vector3, facing: Vector3, reach: float) -> Vector3:
-	# The debris and mark come from one source notify. Give those layers
-	# the same floor anchor and keep the separate puff inside the strike path.
 	var forward := facing.slide(Vector3.UP).normalized()
 	var start := touchdown + Vector3.UP * 0.12
 	var ray := PhysicsRayQueryParameters3D.create(start, start + forward * (reach + 0.08), 1)
@@ -1693,7 +1699,7 @@ func _show_tool_ground_cues() -> void:
 						* Basis(Vector3.RIGHT, deg_to_rad(cue.get("roll", 0.0)))
 					_movement_dust.emit_combat_debris(contact.position, contact.surface, tick, cue.get("medium", false), basis)
 				if cue.get("mark", false) and _gauntlet_impact_marks != null:
-					_gauntlet_impact_marks.stamp(contact.position, contact.position, contact.surface, elapsed_ticks)
+					_gauntlet_impact_marks.stamp(contact.position, contact.surface, elapsed_ticks)
 				_combat_audio.slam_landed(contact.position, contact.surface)
 			MeleeTools.GroundEffect.DUST:
 				if _movement_dust != null:

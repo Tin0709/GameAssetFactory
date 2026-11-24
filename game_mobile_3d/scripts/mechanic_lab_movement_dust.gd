@@ -68,7 +68,6 @@ var _particles: Array[Particle] = []
 var _next := 0
 var _contact_clock := false
 var _heavy_landing_point := Vector3.ZERO
-var _heavy_landing_forward: Vector3
 var _heavy_landing_frame := -1
 var _burst_frame := -1
 var _burst_point: Vector3
@@ -86,7 +85,6 @@ var _landing_drag := PackedFloat32Array()
 var _smoke_texture: Texture2D
 var _gauntlet_debris_texture: Texture2D
 var _using_gauntlets: Callable
-var _gauntlet_impact_anchor: Callable
 var detailed_debris := false
 var _debris_sphere := SphereShape3D.new()
 var _debris_query := PhysicsShapeQueryParameters3D.new()
@@ -224,12 +222,11 @@ func _sync_landing_batch() -> void:
 func setup_zombie_steps(batch: MultiMeshInstance3D) -> bool:
 	return batch.setup(_smoke_texture, _run_alpha, _run_alpha_duration, true)
 
-func use_gauntlet_debris(equipped: Callable, impact_anchor: Callable) -> void:
+func use_gauntlet_debris(equipped: Callable) -> void:
 	var image := EffectSource.load_image(GAUNTLET_DEBRIS_SOURCE, GAUNTLET_DEBRIS_HASH, Vector2i(16, 16))
 	if image != null:
 		_gauntlet_debris_texture = ImageTexture.create_from_image(image)
 		_using_gauntlets = equipped
-		_gauntlet_impact_anchor = impact_anchor
 
 static func _load_mask() -> Texture2D:
 	var atlas := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(128, 64))
@@ -244,10 +241,9 @@ static func _load_mask() -> Texture2D:
 		pixels[i + 2] = 255
 	return ImageTexture.create_from_image(Image.create_from_data(128, 64, false, Image.FORMAT_RGBA8, pixels))
 
-func _on_heavy_jump_landed(point: Vector3, forward: Vector3, _serial: int, _fall_height: float) -> void:
+func _on_heavy_jump_landed(point: Vector3, _forward: Vector3, _serial: int, _fall_height: float) -> void:
 	# The player posts this immediately before the ordinary surface event.
 	_heavy_landing_point = point
-	_heavy_landing_forward = forward.slide(Vector3.UP).normalized()
 	_heavy_landing_frame = Engine.get_physics_frames()
 
 func _on_surface_contact(point: Vector3, landed: bool) -> void:
@@ -276,10 +272,8 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 		if absf(local.x) > half.x or absf(local.z) > half.z:
 			return
 		ground_point = _ground.to_global(Vector3(local.x, half.y, local.z))
-	if heavy and _gauntlet_debris_texture != null and _using_gauntlets.call():
-		var debris_point: Vector3 = _gauntlet_impact_anchor.call(ground_point, _heavy_landing_forward, GAUNTLET_DEBRIS_FORWARD)
-		_emit_gauntlet_debris(debris_point, surface)
-		_emit_gauntlet_impact_dust(ground_point, surface, _heavy_landing_forward)
+	if heavy and _using_gauntlets.is_valid() and _using_gauntlets.call():
+		# MechanicLab has emitted the weapon cues from the heavy landing event.
 		return
 	if heavy and _heavy_delay.is_valid():
 		var delay := float(_heavy_delay.call())
@@ -355,8 +349,12 @@ func _reusable_particle_slot() -> int:
 			shortest_remaining = remaining
 	return settled if settled >= 0 else soonest
 
-func _emit_gauntlet_debris(ground_point: Vector3, surface: String) -> void:
-	emit_combat_debris(ground_point, surface, Engine.get_physics_frames())
+func emit_gauntlet_impact(debris_point: Vector3, puff_point: Vector3, surface: String) -> void:
+	if _gauntlet_debris_texture == null:
+		return
+	var tick := Engine.get_physics_frames()
+	emit_combat_debris(debris_point, surface, tick)
+	emit_combat_puff(puff_point, surface, tick)
 
 func emit_combat_debris(ground_point: Vector3, surface: String, tick: float, medium := false,
 		launch_basis := Basis.IDENTITY) -> void:
@@ -440,10 +438,6 @@ func _advance_colliding_debris(particle: Particle, age: float) -> void:
 	var resting_contact := normal.y > 0.55 and particle.debris_contacts >= 3 and approach < 0.85
 	particle.debris_velocity = tangent if resting_contact else tangent + normal * (approach * DEBRIS_RESTITUTION)
 	particle.debris_resting = resting_contact and tangent.length_squared() < 0.16
-
-func _emit_gauntlet_impact_dust(ground_point: Vector3, surface: String, forward: Vector3) -> void:
-	ground_point = _gauntlet_impact_anchor.call(ground_point, forward, GAUNTLET_IMPACT_DUST_FORWARD)
-	emit_combat_puff(ground_point, surface, Engine.get_physics_frames())
 
 func emit_combat_puff(ground_point: Vector3, surface: String, tick: float) -> void:
 	var particle := _next_particle(_smoke_texture, SOURCE_CAMERA_RANGE)

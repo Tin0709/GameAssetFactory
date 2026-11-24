@@ -134,7 +134,7 @@ func check_source_dust_batch(lab, dust) -> void:
 	check(smoke.size() >= 10 and batch.multimesh.visible_instance_count == smoke.size()
 		and smoke.all(func(p): return p.sprite.layers == 0),
 		"Running dust and overlapping ordinary landings share one draw while retaining all particles")
-	dust._emit_gauntlet_debris(Vector3.ZERO, "grass")
+	dust.emit_combat_debris(Vector3.ZERO, "grass", Engine.get_physics_frames())
 	await physics_frame
 	await physics_frame
 	await process_frame
@@ -502,7 +502,7 @@ func check_gauntlet_debris(lab, dust: Node3D) -> void:
 		await physics_frame
 		check(visible_particles(dust) == 0 and not dust.is_processing(), "Reset clears Gauntlets debris")
 	var edge := Vector3(49.8, 0.0, 0.0)
-	dust._emit_gauntlet_impact_dust(edge, "grass", Vector3.RIGHT)
+	lab._show_gauntlet_ground_impact(edge, Vector3.RIGHT, "grass")
 	var edge_puff = dust._particles[posmod(dust._next - 1, dust._particles.size())]
 	var edge_position: Vector3 = edge_puff.origin
 	check(edge_position.slide(Vector3.UP).distance_to(edge) < 0.01,
