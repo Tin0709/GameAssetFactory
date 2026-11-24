@@ -86,12 +86,21 @@ func run()->void:
 		check(is_equal_approx(_petal_return(petals), .0516),
 			"Default noon applies the mild petal shadow return")
 		var petal_source := petals.shader
+		const OPEN_RETURN := &"flower_open_return"
+		const OPEN_UNIFORM := "petal_open_return"
+		check(w.showcase._lighting_sliders.has(OPEN_RETURN), "The sunlit petal balance has a graphics slider")
+		check(is_equal_approx(float(petals.get_shader_parameter(OPEN_UNIFORM)), .55),
+			"Default noon rebalances direct and returned light on the flower heads")
+		w.showcase.set_lighting_scale(OPEN_RETURN, .5)
+		check(is_equal_approx(float(petals.get_shader_parameter(OPEN_UNIFORM)), .275) and petals.shader == petal_source,
+			"The sunlit petal slider changes strength on the same shader")
 		w.showcase.set_lighting_scale(SHADE_RETURN, .5)
 		check(is_equal_approx(_petal_return(petals), .0258) and petals.shader == petal_source,
 			"The slider changes only the strength of the existing flower material")
 		w.showcase.set_hour(22.)
 		p.grass_light.sync()
 		check(_petal_return(petals) == 0., "Petal shade return is off at night")
+		check(float(petals.get_shader_parameter(OPEN_UNIFORM)) == 0., "Sunlit petal return is off at night")
 		w.showcase.set_hour(12.)
 		p.grass_light.sync()
 		var flower_preset := "user://petal_shade_%d.cfg" % OS.get_process_id()
@@ -101,9 +110,13 @@ func run()->void:
 		p.grass_light.sync()
 		check(is_equal_approx(_petal_return(petals), .0258),
 			"The preset restores the selected petal shade strength")
+		check(is_equal_approx(float(petals.get_shader_parameter(OPEN_UNIFORM)), .275),
+			"The preset restores the sunlit petal balance")
 		var previous_preset := ConfigFile.new()
 		if previous_preset.load(flower_preset) == OK:
 			previous_preset.set_value("recipe", "version", 233)
+			if previous_preset.has_section_key("strengths", OPEN_RETURN):
+				previous_preset.erase_section_key("strengths", OPEN_RETURN)
 			if previous_preset.has_section_key("strengths", SHADE_RETURN):
 				previous_preset.erase_section_key("strengths", SHADE_RETURN)
 			check(previous_preset.save(flower_preset) == OK and w.showcase.load_lighting_mix(flower_preset) == OK,
@@ -111,6 +124,8 @@ func run()->void:
 			p.grass_light.sync()
 			check(_petal_return(petals) == 0.,
 				"Previous saved presets keep their previous petal lighting")
+			check(float(petals.get_shader_parameter(OPEN_UNIFORM)) == 0.,
+				"Older presets keep their previous sunlit petal balance")
 		DirAccess.remove_absolute(flower_preset)
 		w.showcase.reset_lighting_mix()
 		var foliage_filters := 0
