@@ -5,7 +5,18 @@ func check(ok:bool,message:String)->void:
 func _initialize()->void:call_deferred("run")
 func vertices(p:Node)->Array:
 	var result:Array=[]
-	for i in 6:result.append(p.bundle.meshes[p._patch_name(i)].surface_get_arrays(0)[Mesh.ARRAY_VERTEX])
+	for i in 6:
+		var mesh: Mesh = p.bundle.meshes[p._patch_name(i)]
+		var data := mesh.surface_get_arrays(0)
+		var positions: PackedVector3Array = data[Mesh.ARRAY_VERTEX]
+		var raw_indices: Variant = data[Mesh.ARRAY_INDEX]
+		var indices: PackedInt32Array = raw_indices if raw_indices is PackedInt32Array else PackedInt32Array()
+		check(positions.size() == 16 and indices.size() == 24,
+			"Each grass fan or upright patch shares card corners and preserves its eight triangles")
+		var stream := PackedVector3Array()
+		for index: int in indices:
+			stream.append(positions[index])
+		result.append(stream if not indices.is_empty() else positions)
 	return result
 func run()->void:
 	var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w)
@@ -31,20 +42,23 @@ func run()->void:
 		var mesh:Mesh=p.bundle.meshes[p._patch_name(variant)]
 		var normals:PackedVector3Array=mesh.surface_get_arrays(0)[Mesh.ARRAY_NORMAL]
 		var raw:Variant=mesh.surface_get_arrays(0)[Mesh.ARRAY_CUSTOM0]
+		var raw_indices: Variant = mesh.surface_get_arrays(0)[Mesh.ARRAY_INDEX]
+		var indices: PackedInt32Array = raw_indices if raw_indices is PackedInt32Array else PackedInt32Array()
 		var motion:PackedFloat32Array=raw.to_float32_array() if raw is PackedByteArray else raw
 		check(a.size()==b.size(),"Source topology unchanged")
 		for card in 4:
 			var tops:Dictionary={};var bases:Dictionary={}
 			for i in range(card*6,card*6+6):
 				min_ground=minf(min_ground,b[i].y)
-				var u:float=motion[i*4];var h:float=motion[i*4+1]
+				var vertex := indices[i] if not indices.is_empty() else i
+				var u:float=motion[vertex*4];var h:float=motion[vertex*4+1]
 				# Conservative existing WPO bound: strongest contact/wind bend.
-				var rest_y:float=normals[i].normalized().y
+				var rest_y:float=normals[vertex].normalized().y
 				var vertical:float=h*sin(.75*u)/.75-h*u
 				var planar:float=h*(1.-cos(.75*u))/.75
 				min_bent_ground=minf(min_bent_ground,b[i].y+rest_y*vertical-sqrt(maxf(0.,1.-rest_y*rest_y))*planar)
-				if motion[i*4]>.99:tops[b[i]]=true
-				if motion[i*4]<.01:bases[b[i]]=true
+				if u>.99:tops[b[i]]=true
+				if u<.01:bases[b[i]]=true
 				for j in range(card*6,card*6+6):max_length_error=maxf(max_length_error,absf(a[i].distance_to(a[j])-b[i].distance_to(b[j])))
 			var top:=Vector3.ZERO;var base:=Vector3.ZERO
 			for v:Vector3 in tops:top+=v/float(tops.size())
