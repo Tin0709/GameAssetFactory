@@ -726,9 +726,9 @@ func check_crowd_splash_visibility() -> void:
 				return
 			var shown: Array[float] = []
 			for zombie in zombies:
-				var weight := float(zombie._mesh.get_instance_shader_parameter(&"hit_flash"))
-				if weight > 0.0:
-					shown.append(weight)
+				var weight: Variant = zombie._mesh.get_instance_shader_parameter(&"hit_flash")
+				if weight != null and float(weight) > 0.0:
+					shown.append(float(weight))
 			if shown.size() == size:
 				peaks.assign(shown)
 		process_frame.connect(capture)
