@@ -81,7 +81,8 @@ float ground_foot_contact(float distance_to_wall) {
 	float fill=1.0-smoothstep(0.0,0.32,distance_to_wall);
 	return (core*0.28+fill*0.12)/0.30;
 }
-float terrain_contact_shade(vec3 world,vec3 normal) {
+float terrain_contact_shade(vec3 world,vec3 normal,out float geometry_occlusion) {
+	geometry_occlusion=0.0;
 	if (!path_blending || ground_grade==0 || contact_shade_strength<=0.0) return 1.0;
 	float occlusion=0.0;
 	float plant_contact=0.0;
@@ -138,7 +139,12 @@ float terrain_contact_shade(vec3 world,vec3 normal) {
 			occlusion=max(occlusion,corner);
 		}
 	}
-	return (1.0-occlusion*contact_shade_strength)*(1.0-plant_contact);
+	geometry_occlusion=occlusion*contact_shade_strength;
+	return (1.0-geometry_occlusion)*(1.0-plant_contact);
+}
+float terrain_contact_shade(vec3 world,vec3 normal) {
+	float geometry_occlusion;
+	return terrain_contact_shade(world,normal,geometry_occlusion);
 }
 uniform float oak_root_beds = 0.0;
 

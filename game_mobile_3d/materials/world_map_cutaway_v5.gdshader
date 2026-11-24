@@ -121,7 +121,8 @@ void fragment() {
 #else
 	ALBEDO*=world_cloud_shade(cutaway_world);
 #endif
-	float receiver_contact=terrain_contact_shade(cutaway_world,surface_normal);
+	float geometry_occlusion;
+	float receiver_contact=terrain_contact_shade(cutaway_world,surface_normal,geometry_occlusion);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	terrain_direct_contact=terrain_colored_visibility ? 1.0 : receiver_contact;
 	terrain_stone_foot = gaf_stone_foot_mask(cutaway_world, surface_normal);
@@ -152,7 +153,7 @@ void fragment() {
 	}
 	vec3 path_sky_excess;
 	vec2 path_sky_chroma_delta;
-	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD,cutaway_world,path_sky_excess,path_sky_chroma_delta)*sole;
+	vec3 diffuse_fill = terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_visibility,surface_top,CAMERA_POSITION_WORLD,cutaway_world,geometry_occlusion,path_sky_excess,path_sky_chroma_delta)*sole;
 	vec3 local_diffuse = gaf_local_diffuse(diffuse_fill, cutaway_world, surface_normal);
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	terrain_canopy_ground_ev = 0.0;
