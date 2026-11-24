@@ -225,7 +225,21 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	return true
 func _render_callback(kind:int,data:RenderData)->void:
 	if kind!=effect_callback_type:return
-	_mutex.lock();var parameters:=_parameters.duplicate();var path_parameters:=_path_parameters;var directional_parameters:=_directional_parameters;var local_parameters:=_local_mist_parameters;var additional_parameters:=_additional_mist_parameters;var depth_scatter_parameters:=_depth_scatter_parameters;var ground_haze_parameters:=_ground_haze_parameters;var rear_ambient_parameters:=_rear_ambient_parameters;var sky_parameters:=_sky_parameters;var size:=_size;var noise:=_noise;var light:=_light;var error:String=_state.error;_mutex.unlock()
+	_mutex.lock()
+	var parameters := _parameters.duplicate()
+	var path_parameters := _path_parameters
+	var directional_parameters := _directional_parameters
+	var local_parameters := _local_mist_parameters
+	var additional_parameters := _additional_mist_parameters
+	var depth_scatter_parameters := _depth_scatter_parameters
+	var ground_haze_parameters := _ground_haze_parameters
+	var rear_ambient_parameters := _rear_ambient_parameters
+	var sky_parameters := _sky_parameters
+	var size := _size
+	var noise := _noise
+	var light := _light
+	var error: String = _state.error
+	_mutex.unlock()
 	if parameters.size()!=224 or size.x<=0 or not error.is_empty():return
 	var rd:=RenderingServer.get_rendering_device();var buffers:=data.get_render_scene_buffers() as RenderSceneBuffersRD
 	if rd==null or buffers==null or buffers.get_view_count()!=1:return

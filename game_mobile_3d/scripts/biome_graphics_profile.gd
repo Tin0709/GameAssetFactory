@@ -317,7 +317,7 @@ func sample_mist_rear_ambient(time: float, region: Vector4, player_depth: float,
 	if not region.is_finite() or region.z < 0. or region.w <= region.z or not is_finite(player_depth) or player_depth <= 0.:
 		return PackedFloat32Array()
 	var amount := clampf(DayNight.sample_curve(mist_rear_ambient_by_hour, time, 0.) * strength, 0., .8)
-	if amount <= 0.:
+	if not is_finite(amount) or amount <= 0.:
 		return PackedFloat32Array()
 	return PackedFloat32Array([region.x, region.y, region.z * region.z, region.w * region.w,
 		amount, player_depth, 5., 10.])

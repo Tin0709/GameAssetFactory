@@ -220,10 +220,11 @@ vec3 ambient_depth_source(float depth_m, float view_depth, vec3 point){
   entry_air = p.ground_haze.w * front * back;
  }
  float ambient_scale = 1.;
- if (p.rear_ambient_depth.x > 0.) {
+ float rear_depth = view_depth - p.rear_ambient_depth.y;
+ if (p.rear_ambient_depth.x > 0. && rear_depth > p.rear_ambient_depth.z) {
   vec2 delta = point.xz - p.rear_ambient_region.xy;
   float region = 1. - smoothstep(p.rear_ambient_region.z, p.rear_ambient_region.w, dot(delta,delta));
-  float rear = smoothstep(p.rear_ambient_depth.z, p.rear_ambient_depth.w, view_depth - p.rear_ambient_depth.y);
+  float rear = smoothstep(p.rear_ambient_depth.z, p.rear_ambient_depth.w, rear_depth);
   ambient_scale -= p.rear_ambient_depth.x * region * rear;
  }
  return source*p.scatter.w*(1.+p.depth_scatter.z*amount+low_air+entry_air)*ambient_scale;
