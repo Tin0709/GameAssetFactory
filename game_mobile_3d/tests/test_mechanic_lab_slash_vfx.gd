@@ -79,6 +79,7 @@ func run() -> void:
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
 	await check_ground_ribbon_edges(lab, selector)
 	await check_sabre_dive(lab, selector)
+	await check_wall_ribbons(lab, selector)
 	lab.free()
 	await check_world_map_slash()
 	print("SABRE_SLASH_VFX failures=", failures)
@@ -182,6 +183,54 @@ func check_sabre_dive(lab, selector: OptionButton) -> void:
 		check(ribbon_rendered, "The samples produce blade ribbon geometry during the landing slash")
 		print("SABRE_DIVE_SLASH height=", height, " loops=", air_loops,
 			" landing=", landings, " pose=", landing_pose_time, " slash=", slash_frame)
+
+func check_wall_ribbons(lab, selector: OptionButton) -> void:
+	for slot in [0, 10]:
+		for airborne in [false, true]:
+			for blocked in [false, true]:
+				lab.reset_player()
+				for i in 8:
+					await physics_frame
+				selector.select(slot)
+				selector.item_selected.emit(slot)
+				var actor: CharacterBody3D = lab.player
+				var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
+				var wall: StaticBody3D
+				if blocked:
+					wall = StaticBody3D.new()
+					wall.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true), forward + Vector3.UP * 2.5)
+					var shape := BoxShape3D.new()
+					shape.size = Vector3(4.0, 5.0, 0.2)
+					var collider := CollisionShape3D.new()
+					collider.shape = shape
+					wall.add_child(collider)
+					lab.add_child(wall)
+					await physics_frame
+				if airborne:
+					check(actor.drop_for_lab(5.0), "The wall ribbon fixture starts a drop")
+					for i in 2:
+						await physics_frame
+				attack(true)
+				await physics_frame
+				attack(false)
+				var mesh: Mesh = actor.effects.ribbon.mesh
+				var frames := 0
+				var furthest := -INF
+				for i in Engine.physics_ticks_per_second:
+					await process_frame
+					if mesh.get_surface_count() == 0:
+						continue
+					frames += 1
+					for point: Vector3 in mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]:
+						furthest = maxf(furthest, point.dot(forward))
+				var context := "%s air=%s wall=%s" % [selector.get_item_text(slot), airborne, blocked]
+				check(frames > 0, "The unobstructed portion of the ribbon still draws for %s" % context)
+				if blocked:
+					check(furthest <= 0.9001, "The ribbon ends on the player's side of the wall for %s" % context)
+					wall.free()
+				elif airborne and slot == 10:
+					check(furthest > 1.1, "The clear Axe dive extends into the space occupied by the fixture wall")
+				print("RIBBON_WALL ", context, " frames=", frames, " furthest=", furthest)
 
 func check_world_map_slash() -> void:
 	var world := (load("res://scenes/WorldMap.tscn") as PackedScene).instantiate()
