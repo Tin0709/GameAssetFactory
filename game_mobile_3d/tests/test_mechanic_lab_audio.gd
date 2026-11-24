@@ -420,7 +420,7 @@ func check_run_step_after_landing(bus: int, capture: AudioEffectCapture) -> void
 	lab.free()
 
 func check_crossbow_fire_under_impact_burst(audio: Node, bus: int, capture: AudioEffectCapture) -> void:
-	audio.load_crossbow(audio._research_root())
+	audio.queue_crossbow_samples(audio._research_root())
 	audio.reset()
 	var point := Vector3.FORWARD * 2.0
 	audio.crossbow_fired(point)
@@ -1918,11 +1918,13 @@ func check_special_weapon_preparation() -> void:
 		"The first gauntlet landing retains both source audio layers")
 	menu.select(3)
 	menu.item_selected.emit(3)
-	check(menu.selected == 3, "Crossbow can be re-equipped before preparation finishes")
+	check(menu.selected == 3 and audio._voice_groups.has(&"crossbow_equip"),
+		"Crossbow can play its equip cue before preparation finishes")
+	audio.reset()
 	audio.crossbow_fired(point)
 	audio.crossbow_impact(point)
-	check(audio._voice_groups.has(&"crossbow_equip") and audio._voice_groups.has(&"crossbow_fire")
-		and audio._voice_groups.has(&"crossbow_hit"), "The immediate crossbow shot keeps equip, fire and impact")
+	check(audio._voice_groups.has(&"crossbow_fire") and audio._voice_groups.has(&"crossbow_hit"),
+		"The first crossbow fire and impact both play before preparation finishes")
 	var bolt := Node3D.new()
 	lab.add_child(bolt)
 	audio.crossbow_flight(bolt)
@@ -2047,6 +2049,7 @@ func run() -> void:
 	await check_run_step_after_landing(bus, capture)
 	await check_first_enable_after_preparation()
 	await check_first_melee_switch_preparation()
+	await check_special_weapon_preparation()
 	await check_sabre_debris_audio(bus, capture)
 	await check_sabre_crowd_audio(bus, capture)
 	await check_zombie_steps(bus, capture)

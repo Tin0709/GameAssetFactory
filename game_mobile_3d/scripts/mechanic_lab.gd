@@ -788,7 +788,7 @@ func _load_crossbow(root: String) -> bool:
 	_crossbow.bolt_ended.connect(_combat_audio.stop_crossbow_flight)
 	$CombatEffects.add_child(_crossbow)
 	_set_crossbow_ammo(_crossbow.ammo)
-	_combat_audio.load_crossbow(root)
+	_combat_audio.queue_crossbow_samples(root)
 	return true
 
 func _on_crossbow_impact(hit: Dictionary, direction: Vector3, serial: int) -> void:
@@ -813,7 +813,7 @@ func _load_gauntlets(root: String, basic := false) -> bool:
 		_left_gauntlet = _mount_gauntlet(mesh, true)
 		_right_gauntlet = _mount_gauntlet(mesh, false)
 		_gauntlet_profile = profile
-		_combat_audio.load_gauntlets(root)
+		_combat_audio.queue_gauntlet_samples(root)
 	return true
 
 func _mount_gauntlet(mesh: Mesh, left: bool, basic := false) -> MeshInstance3D:

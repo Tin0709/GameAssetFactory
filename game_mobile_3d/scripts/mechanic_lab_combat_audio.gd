@@ -490,6 +490,7 @@ func set_enabled(value: bool, preview_point: Vector3, melee_tool := &"", preview
 				# Some tools only have a verified swing in the local export.
 				preview = _tool_group(melee_tool, 0)
 	# Preview the next sample without spending a combat variant or priority slot.
+	_finish_weapon_samples(preview)
 	_play(preview, preview_point, HIT_GAIN_DB, -1, false, true)
 
 func set_surface_landing_enabled(value: bool) -> void:
@@ -528,10 +529,9 @@ func weapon_contact(point: Vector3, serial: int, clip := "", tool := &"") -> voi
 		var group := _weapon_hit_group()
 		if tool != &"":
 			group = _tool_group(tool, 5)
-			_finish_weapon_samples(group)
 		elif clip.begins_with("NativeGauntlet"):
 			group = &"gauntlet_hit"
-		_play(group, point, HIT_GAIN_DB, -1, true)
+		_play_weapon_cue(group, point, HIT_GAIN_DB, true)
 
 func zombie_reaction(point: Vector3, lethal: bool, baby := false) -> void:
 	if not enabled:
@@ -549,33 +549,33 @@ func _weapon_hit_group() -> StringName:
 		return &"curved_hit"
 	return &"sword_hit" if sword_equipped else &"hit"
 
-func load_crossbow(root: String) -> void:
+func queue_crossbow_samples(root: String) -> void:
 	# RapidCrossbow_Unique1's OnEquipped and OnUnequipped Wwise events.
-	_load_sample(root, &"crossbow_equip", CROSSBOW + "equip.ogg", CROSSBOW_EQUIP_HASH)
-	_load_sample(root, &"crossbow_unequip", CROSSBOW + "unequip.ogg", CROSSBOW_UNEQUIP_HASH)
+	_queue_weapon_sample(root, &"crossbow_equip", CROSSBOW + "equip.ogg", CROSSBOW_EQUIP_HASH)
+	_queue_weapon_sample(root, &"crossbow_unequip", CROSSBOW + "unequip.ogg", CROSSBOW_UNEQUIP_HASH)
 	for i in CROSSBOW_FIRE_HASHES.size():
-		_load_sample(root, &"crossbow_fire", CROSSBOW + ("fire_%02d.ogg" % (i + 1)), CROSSBOW_FIRE_HASHES[i])
+		_queue_weapon_sample(root, &"crossbow_fire", CROSSBOW + ("fire_%02d.ogg" % (i + 1)), CROSSBOW_FIRE_HASHES[i])
 	for i in CROSSBOW_IMPACT_HASHES.size():
-		_load_sample(root, &"crossbow_hit", CROSSBOW + ("arrow_impact_%02d.ogg" % (i + 1)), CROSSBOW_IMPACT_HASHES[i])
+		_queue_weapon_sample(root, &"crossbow_hit", CROSSBOW + ("arrow_impact_%02d.ogg" % (i + 1)), CROSSBOW_IMPACT_HASHES[i])
 	for i in CROSSBOW_FLIGHT_HASHES.size():
-		_load_sample(root, &"crossbow_flight", CROSSBOW + ("arrow_whoosh_%02d.ogg" % (i + 1)), CROSSBOW_FLIGHT_HASHES[i])
+		_queue_weapon_sample(root, &"crossbow_flight", CROSSBOW + ("arrow_whoosh_%02d.ogg" % (i + 1)), CROSSBOW_FLIGHT_HASHES[i])
 
-func load_gauntlets(root: String) -> void:
+func queue_gauntlet_samples(root: String) -> void:
 	var weights := ["light", "medium", "heavy"]
 	for i in weights.size():
 		var weight: String = weights[i]
 		var hashes: Array = GAUNTLET_SWING_HASHES[weight]
 		var group := StringName("gauntlet_swing_%d" % i)
 		for sample in hashes.size():
-			_load_sample(root, group, GAUNTLET_COMBO % [i + 1, weight, sample + 1], hashes[sample])
+			_queue_weapon_sample(root, group, GAUNTLET_COMBO % [i + 1, weight, sample + 1], hashes[sample])
 	for i in GAUNTLET_HIT_HASHES.size():
-		_load_sample(root, &"gauntlet_hit", GAUNTLET_HIT % (i + 1), GAUNTLET_HIT_HASHES[i])
+		_queue_weapon_sample(root, &"gauntlet_hit", GAUNTLET_HIT % (i + 1), GAUNTLET_HIT_HASHES[i])
 	for i in GAUNTLET_JUMP_HASHES.size():
-		_load_sample(root, &"gauntlet_jump", GAUNTLET_JUMP % (i + 1), GAUNTLET_JUMP_HASHES[i])
+		_queue_weapon_sample(root, &"gauntlet_jump", GAUNTLET_JUMP % (i + 1), GAUNTLET_JUMP_HASHES[i])
 	for i in GAUNTLET_SLAM_HASHES.size():
-		_load_sample(root, &"gauntlet_slam", GAUNTLET_SLAM % (i + 1), GAUNTLET_SLAM_HASHES[i])
+		_queue_weapon_sample(root, &"gauntlet_slam", GAUNTLET_SLAM % (i + 1), GAUNTLET_SLAM_HASHES[i])
 	for i in MAULER_DIVE_HASHES.size():
-		_load_sample(root, &"mauler_dive", MAULER_DIVE % (i + 1), MAULER_DIVE_HASHES[i])
+		_queue_weapon_sample(root, &"mauler_dive", MAULER_DIVE % (i + 1), MAULER_DIVE_HASHES[i])
 
 func prepare_melee_tool(root: String, tool: StringName) -> void:
 	if root.is_empty() or not TOOL_SAMPLES.has(tool) or _loaded_melee_tools.has(tool):
@@ -643,20 +643,27 @@ func _finish_weapon_samples(group: StringName) -> void:
 		job.call()
 	_weapon_sample_jobs.erase(group)
 
+func _play_weapon_cue(group: StringName, point: Vector3, gain: float, protect_onset := false) -> void:
+	_finish_weapon_samples(group)
+	_play(group, point, gain, -1, protect_onset)
+
 func crossbow_switched(equipped: bool, point: Vector3) -> void:
 	if enabled:
-		_play(&"crossbow_equip" if equipped else &"crossbow_unequip", point, EQUIP_GAIN_DB)
+		_play_weapon_cue(&"crossbow_equip" if equipped else &"crossbow_unequip", point, EQUIP_GAIN_DB)
 
 func crossbow_fired(point: Vector3) -> void:
 	if enabled:
-		_play(&"crossbow_fire", point, HIT_GAIN_DB)
+		_play_weapon_cue(&"crossbow_fire", point, HIT_GAIN_DB)
 
 func crossbow_impact(point: Vector3) -> void:
 	if enabled:
-		_play(&"crossbow_hit", point, HIT_GAIN_DB)
+		_play_weapon_cue(&"crossbow_hit", point, HIT_GAIN_DB)
 
 func crossbow_flight(bolt: Node3D) -> void:
-	if not enabled or not _groups.has(&"crossbow_flight"):
+	if not enabled:
+		return
+	_finish_weapon_samples(&"crossbow_flight")
+	if not _groups.has(&"crossbow_flight"):
 		return
 	if _voices.size() == FLIGHT_POOL * VOICES_PER_POOL:
 		_create_voices(VOICES_PER_POOL)
@@ -687,12 +694,12 @@ func _physics_process(_delta: float) -> void:
 
 func gauntlet_swung(point: Vector3, index: int, airborne: bool) -> void:
 	if enabled:
-		_play(&"gauntlet_jump" if airborne else StringName("gauntlet_swing_%d" % index), point, HIT_GAIN_DB)
+		_play_weapon_cue(&"gauntlet_jump" if airborne else StringName("gauntlet_swing_%d" % index), point, HIT_GAIN_DB)
 
 func gauntlet_slam_landed(point: Vector3) -> void:
 	if enabled:
-		_play(&"gauntlet_slam", point, SLAM_GAIN_DB, -1, true)
-		_play(&"mauler_dive", point, SLAM_GAIN_DB)
+		_play_weapon_cue(&"gauntlet_slam", point, SLAM_GAIN_DB, true)
+		_play_weapon_cue(&"mauler_dive", point, SLAM_GAIN_DB)
 
 func slam_landed(point: Vector3, surface: String = "grass") -> void:
 	if not enabled:
