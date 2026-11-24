@@ -299,7 +299,7 @@ func _ammo_recharge_period() -> float:
 func _report_impact(hit: Dictionary, direction: Vector3, serial: int, _strike: Dictionary,
 		impact_step := 0.0) -> void:
 	if impact_sparks != null:
-		impact_sparks.burst(hit.position, direction, hit.normal, impact_step)
+		impact_sparks.burst(hit.position, direction, hit.normal, impact_step, _is_terrain_hit(hit))
 	bolt_impact.emit(hit, direction, serial)
 
 func _update_trails() -> void:
@@ -372,9 +372,12 @@ static func _trail_opacity(normalized_age: float) -> float:
 		return lerpf(1.0 - 4.0 * TRAIL_ALPHA_BLEND_START, 0.3 - 0.5 * TRAIL_ALPHA_BLEND_END, blend)
 	return maxf(0.0, 0.3 - 0.5 * normalized_age)
 
-func _embed_on_terrain(hit: Dictionary, direction: Vector3, render_frame: int) -> void:
+func _is_terrain_hit(hit: Dictionary) -> bool:
 	var collider := hit.collider as StaticBody3D
-	if _embedded == null or collider == null or (collider.collision_layer & WORLD_MASK) == 0:
+	return collider != null and (collider.collision_layer & WORLD_MASK) != 0
+
+func _embed_on_terrain(hit: Dictionary, direction: Vector3, render_frame: int) -> void:
+	if _embedded == null or not _is_terrain_hit(hit):
 		return
 	if _embedded_arrows.size() == EMBEDDED_CAPACITY:
 		_embedded_arrows.pop_front()

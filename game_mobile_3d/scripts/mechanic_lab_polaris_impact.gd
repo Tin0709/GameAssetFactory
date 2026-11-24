@@ -8,6 +8,7 @@ const CURVE_HASH := "015f9dceb8c6f2527dc79b457d296164135839fb4db3a15ad588deb9d05
 # 25 bolts in a full magazine, with at most ten sprites per bolt.
 const CAPACITY := 250
 const COLOR_DIVISOR := 250.0
+const SURFACE_GAP := 0.003
 
 class Spark:
 	var point: Vector3
@@ -20,6 +21,7 @@ class Spark:
 	var lifetime: float
 	var drag: float
 	var colors: PackedFloat32Array
+	var surface := Plane()
 
 var _particles: Array[Spark] = []
 var _forward_colors: PackedFloat32Array
@@ -66,26 +68,37 @@ func set_opacity(opacity: float) -> void:
 	var material := multimesh.mesh.material as ShaderMaterial
 	material.set_shader_parameter("opacity_scale", opacity)
 
-func burst(point: Vector3, direction: Vector3, normal: Vector3, first_step: float) -> void:
+func burst(point: Vector3, direction: Vector3, normal: Vector3, first_step: float, on_terrain := false) -> void:
 	# The engine-side impact rotation is approximated from the surface normal.
 	# Native local X points out of the surface and local Z points up.
 	var axis := normal.normalized() if not normal.is_zero_approx() else -direction.normalized()
 	var up := Vector3.UP if absf(axis.y) < 0.99 else Vector3.FORWARD
-	var frame := Basis.looking_at(axis, up, true)
-	var outside := point + axis * 0.003
+	var spread_axis := Basis.looking_at(axis, up, true).y
+	var outside := point + axis * SURFACE_GAP
+	var surface := Plane()
+	if on_terrain:
+		surface = Plane(axis, axis.dot(outside))
+		# On flat ground, lift the scatter along the incoming shot instead
+		# of choosing an arbitrary horizontal axis for the upward normal.
+		var floor_axis := (axis + direction.slide(axis) * 0.8).normalized()
+		spread_axis = spread_axis.lerp(floor_axis, smoothstep(0.70, 1.0, absf(axis.y))).normalized()
 	var birth_frame := Engine.get_process_frames()
 	# Niagara's system update truncates the independently scaled burst counts.
 	var forward_count := int(_random.randi_range(4, 5) * spawn_count_scale)
 	for i in forward_count:
 		var velocity := _cone_direction(axis, 0.2) * _random.randf_range(11.0, 20.0)
 		_spawn(outside, velocity, -axis * 1.5, Vector2(_random.randf_range(0.08, 0.13), 0.08),
-			_random.randf_range(0.2, 0.4), 9.0, _forward_colors, first_step, birth_frame)
+			_random.randf_range(0.2, 0.4), 9.0, _forward_colors, first_step, birth_frame, surface)
 	var sphere_count := int(_random.randi_range(4, 5) * spawn_count_scale)
 	for i in sphere_count:
 		var offset := _cone_direction(Vector3.UP, 1.0) * (0.30 * pow(_random.randf(), 1.0 / 3.0))
-		var velocity := _cone_direction(frame.y, 0.8) * _random.randf_range(5.0, 12.0)
+		var velocity := _cone_direction(spread_axis, 0.8) * _random.randf_range(5.0, 12.0)
+		if on_terrain:
+			# Fold the sphere and inward velocity into the exposed hemisphere.
+			offset -= 2.0 * minf(0.0, offset.dot(axis)) * axis
+			velocity -= 2.0 * minf(0.0, velocity.dot(axis)) * axis
 		_spawn(outside + offset, velocity, Vector3.DOWN * 1.5, Vector2(_random.randf_range(0.09, 0.13), 0.07),
-			_random.randf_range(0.2, 0.3), 4.0, _sphere_colors, first_step, birth_frame)
+			_random.randf_range(0.2, 0.3), 4.0, _sphere_colors, first_step, birth_frame, surface)
 
 func _cone_direction(axis: Vector3, spread: float) -> Vector3:
 	var minimum := cos(PI * _random.randf() * spread) if spread < 1.0 else -1.0
@@ -96,7 +109,7 @@ func _cone_direction(axis: Vector3, spread: float) -> Vector3:
 	return Basis.looking_at(axis, up, true) * Vector3(radial * cos(azimuth), radial * sin(azimuth), axial)
 
 func _spawn(point: Vector3, velocity: Vector3, acceleration: Vector3, size: Vector2,
-		lifetime: float, drag: float, colors: PackedFloat32Array, first_step: float, birth_frame: int) -> void:
+		lifetime: float, drag: float, colors: PackedFloat32Array, first_step: float, birth_frame: int, surface: Plane) -> void:
 	var spark := _particles[_slot]
 	_slot = (_slot + 1) % CAPACITY
 	spark.point = point
@@ -109,6 +122,7 @@ func _spawn(point: Vector3, velocity: Vector3, acceleration: Vector3, size: Vect
 	spark.lifetime = lifetime
 	spark.drag = drag
 	spark.colors = colors
+	spark.surface = surface
 	_active_count = mini(CAPACITY, _active_count + 1)
 
 func advance(delta: float) -> bool:
@@ -135,6 +149,12 @@ func advance(delta: float) -> bool:
 		if step > 0.0:
 			spark.velocity = (spark.velocity + spark.acceleration * step) / (1.0 + spark.drag * step)
 			spark.point += spark.velocity * step
+			# Each terrain spark reuses the projectile's contact plane.
+			# Sliding along it avoids separate physics queries for each sprite.
+			var penetration := spark.surface.distance_to(spark.point)
+			if penetration < 0.0:
+				spark.point -= spark.surface.normal * penetration
+				spark.velocity -= spark.surface.normal * minf(0.0, spark.velocity.dot(spark.surface.normal))
 		var life_fraction := spark.age / spark.lifetime
 		var size_cursor := life_fraction * 102.0
 		var size := spark.size * Vector2(_sample(_sizes, size_cursor, 2, 0), _sample(_sizes, size_cursor, 2, 1))
