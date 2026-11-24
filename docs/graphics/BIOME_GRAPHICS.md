@@ -39,11 +39,15 @@ Preset **Rìa rừng ẩm** dùng hai track này mặc định trên map thử v
 
 Nếu map có hai khoảng mở, đặt thêm **Additional Local Diffuse Region** trong Inspector với tâm, bán kính và vị trí nguồn riêng. Hai vùng dùng chung shader. Tại chỗ chồng lấn, shader hòa trộn theo độ ảnh hưởng của từng vùng. Với map import, cả hai cùng dùng **Local Diffuse Strength**, đường cong giờ và thời tiết của preset. Trong WorldMap, **Địa hình & cây cỏ → Đá và mặt đất → Ánh hắt ở bậc đá** cho phép so sánh riêng vùng thứ hai. Điểm dễ quan sát nằm gần X = −22,5, Z = −40,5 lúc 07:00 hoặc 16:30.
 
-### Chiều sâu bóng trên bậc đá trong Forest
+### Chiều sâu bóng trên bậc đá
 
 Trong **WorldMap**, vào **L → Cài đặt → Địa hình & cây cỏ → Đá và mặt đất → Chiều sâu bóng trên bậc đá**. So 0% và 100% ở bậc bắc gần X = −24,5, Z = −40,5 hoặc thềm đông gần X = 42,5, Z = 33,5 lúc 07:00 hay 16:30. Phần ánh bù dùng bốn hệ số góc của mặt đá và hòa trộn trong cùng lượt nắng. Hai ô đá liền kề cùng cao độ dùng chung giá trị trên cạnh.
 
-Scene cung cấp **Stone Shelf Corners** cùng **Stone Shelf Layout Sha256**. Mỗi texel RGBA8 giữ bốn góc theo thứ tự XZ 00, 10, 01, 11. Mã 128 là trung tính. Kích thước và gốc tọa độ khớp bản đồ địa hình XZ. **Stone Shelf Redistribution** trong preset quy định biên độ, mặc định Forest là 0,78. Map dùng đường vật liệu nâng cao của Forest sẽ dùng trường này khi resource khớp layout. Map thiếu trường hoặc dùng đường vật liệu portable tiếp tục dùng cách chiếu sáng của preset hiện tại.
+Scene cung cấp **Stone Shelf Corners** cùng **Stone Shelf Layout Sha256**. Mỗi texel RGBA8 giữ bốn góc theo thứ tự XZ 00, 10, 01, 11. Mã 128 là trung tính. Kích thước và gốc tọa độ khớp bản đồ địa hình XZ. **Stone Shelf Redistribution** trong preset quy định biên độ, mặc định Forest là 0,78. Cả hai đường vật liệu kiểm kích thước texture và SHA-256 của layout trước khi dùng.
+
+Map import dùng **Đồ họa bản đồ → Chiều sâu bóng trên bậc đá**. **Rìa rừng ẩm** dùng mức 0,60 theo curve **Stone Shelf Redistribution By Hour**, rõ nhất lúc 07:00 và 16:30. Bậc đá nhận hệ số vào ánh sáng môi trường. Mức Nhẹ, góc toàn cảnh, Compatibility và preset thiếu curve dùng ánh sáng nền của biome. Khi đổi bố cục, cần tính lại trường góc cho layout mới.
+
+Thêm `--stone-shelf` vào lệnh import có `--scene` để sinh và gán trường góc. Baker dùng NumPy, SciPy và Pillow. Texture **ImageTexture** RGBA8 giữ nguyên bốn mã góc, gồm cả kênh alpha. Biên nhận `stone_shelf/stone_shelf.json` lưu kích thước, gốc tọa độ và SHA-256 của layout và dữ liệu texel. Lệnh `python scripts/graphics/stone_shelf.py runtime.json thu_muc_moi` xuất bản PNG kèm biên nhận để khảo sát độc lập.
 
 ### Ánh trời trong sương rìa tán
 
