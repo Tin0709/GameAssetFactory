@@ -471,26 +471,38 @@ func check_crossbow_impact_burst(lab: Node3D, sparks: MultiMeshInstance3D) -> vo
 	var quality := impact_rows.get_node("ContactSparkQuality") as OptionButton
 	var opacity := impact_rows.get_node("Opacity/Slider") as HSlider
 	var duration := impact_rows.get_node("Duration/Slider") as HSlider
-	quality.select(1)
-	quality.item_selected.emit(1)
-	opacity.value = 0.0
-	duration.value = 200.0
-	for index in 25:
-		var origin := Vector3(15.0 + index * 0.25, 1.25, 0.0)
-		crossbow.fire(origin, Vector3.BACK, -500 - index, origin)
-	for i in 8:
-		await physics_frame
-		if crossbow._bolts.is_empty():
-			break
-	var reduced: Array = sparks._particles.filter(func(spark): return spark.age < spark.lifetime)
-	check(reduced.size() == 150 and sparks.multimesh.visible_instance_count == 150 and not sparks.visible,
-		"Reduced quality keeps six sparks per impact and zero opacity hides the batch")
-	check(reduced.filter(func(spark): return spark.drag == 9.0).size() == 75,
-		"Reduced quality preserves both impact emitters with the same budget")
-	check(reduced.all(func(spark): return absf(spark.age - expected_age * 0.5) < 0.0003),
-		"Double duration scales even the first partial step of an impact")
+	for budget_id in [1, 2]:
+		# IDs are the saved preset values, independent of menu order.
+		var item := quality.get_item_index(budget_id)
+		check(item >= 0, "Projectile impacts offer source budget %d" % budget_id)
+		if item < 0:
+			continue
+		crossbow.reset()
+		quality.select(item)
+		quality.item_selected.emit(item)
+		opacity.value = 0.0
+		duration.value = 200.0
+		for index in 25:
+			var origin := Vector3(15.0 + index * 0.25, 1.25, 0.0)
+			crossbow.fire(origin, Vector3.BACK, -500 - index, origin)
+		for i in 8:
+			await physics_frame
+			if crossbow._bolts.is_empty():
+				break
+		var remaining: Array = sparks._particles.filter(func(spark): return spark.age < spark.lifetime)
+		var forward_count := remaining.filter(func(spark): return spark.drag == 9.0).size()
+		var sphere_count := remaining.size() - forward_count
+		var minimum := 50 if budget_id == 1 else 75
+		check(forward_count > minimum and forward_count < minimum + 25
+			and sphere_count > minimum and sphere_count < minimum + 25,
+			"Each emitter varies its 25 counts within the source-scaled range")
+		check(sparks.multimesh.visible_instance_count == remaining.size() and not sparks.visible,
+			"Zero opacity hides all retained sparks without changing the budget")
+		check(remaining.all(func(spark): return absf(spark.age - expected_age * 0.5) < 0.0003),
+			"Double duration scales even the first partial step of an impact")
+		print("PROJECTILE_SPARK_BUDGET id=", budget_id, " forward=", forward_count, " sphere=", sphere_count)
 	opacity.value = 100.0
-	check(sparks.visible and lab._bow.impact_sparks.visible and lab._bow.impact_sparks.reduced_budget
+	check(sparks.visible and lab._bow.impact_sparks.visible
 		and lab._bow.impact_sparks.duration_scale == 2.0,
 		"Revealing sparks immediately updates the flying weapon batches together")
 	duration.value = 100.0
