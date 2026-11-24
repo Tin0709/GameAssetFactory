@@ -20,11 +20,13 @@ var cycle := 0
 var population := 0
 var phase := ""
 var last_frame_us := 0
+var first_physics_us := 0
+var ticks_in_frame := 0
+var max_physics_ticks_per_frame := 0
 var phase_started_us := 0
 var phase_started_tick := 0
 var frame_ms: Array[float] = []
-var physics_ms: Array[float] = []
-var process_ms: Array[float] = []
+var physics_window_ms: Array[float] = []
 var render_cpu_ms: Array[float] = []
 var render_gpu_ms: Array[float] = []
 var draw_peak := 0
@@ -73,6 +75,7 @@ func run() -> void:
 	group.player_hit.connect(func(_damage: int): player_hits += 1)
 	viewport = root.get_viewport_rid()
 	RenderingServer.viewport_set_measure_render_time(viewport, true)
+	physics_frame.connect(sample_physics_start)
 	process_frame.connect(sample_frame)
 	var label := "headless" if DisplayServer.get_name() == "headless" else "rendered"
 	print("POPULATION_SETUP ", JSON.stringify({
@@ -98,6 +101,7 @@ func run() -> void:
 func run_population() -> void:
 	lab.reset_player()
 	lab.player_health = FIXTURE_HP
+	group._spawn_serial = 0
 	await measure("empty", 60)
 	var baby_count := 0
 	var spawn_started := Time.get_ticks_usec()
@@ -133,18 +137,20 @@ func run_population() -> void:
 	var dispatch_ms := (Time.get_ticks_usec() - hit_started) / 1000.0
 	await physics_frame
 	var first_tick_ms := (Time.get_ticks_usec() - hit_started) / 1000.0
-	var first_tick_ragdolls := 0
-	for zombie: Zombie in group.get_children():
-		first_tick_ragdolls += int(zombie.ragdoll.running)
+	var first_tick_ragdolls := count_active_ragdolls()
 	if first_tick_ragdolls != population:
 		failures.append("%d: Only %d ragdolls ran on the first tick" % [population, first_tick_ragdolls])
-	await wait_ticks(119)
+	var active_ragdoll_ticks := first_tick_ragdolls
+	for i in 119:
+		await physics_frame
+		active_ragdoll_ticks += count_active_ragdolls()
 	finish_phase()
 	var survivors := group.get_child_count()
 	print("POPULATION_DEATH ", JSON.stringify({
 		"population": population, "cycle": cycle, "prior_melee_hits": player_hits,
 		"hit_dispatch_ms": dispatch_ms, "until_next_physics_signal_ms": first_tick_ms,
-		"first_tick_ragdolls": first_tick_ragdolls, "survivors": survivors,
+		"first_tick_ragdolls": first_tick_ragdolls, "active_ragdoll_ticks": active_ragdoll_ticks,
+		"survivors": survivors,
 	}))
 	await measure("cleanup", 120)
 	if survivors != 0:
@@ -154,6 +160,12 @@ func wait_ticks(count: int) -> void:
 	for i in count:
 		await physics_frame
 
+func count_active_ragdolls() -> int:
+	var active := 0
+	for zombie: Zombie in group.get_children():
+		active += int(zombie.ragdoll.running)
+	return active
+
 func measure(name: String, ticks: int) -> void:
 	start_phase(name)
 	await wait_ticks(ticks)
@@ -161,8 +173,7 @@ func measure(name: String, ticks: int) -> void:
 
 func start_phase(name: String) -> void:
 	frame_ms.clear()
-	physics_ms.clear()
-	process_ms.clear()
+	physics_window_ms.clear()
 	render_cpu_ms.clear()
 	render_gpu_ms.clear()
 	draw_peak = 0
@@ -171,20 +182,27 @@ func start_phase(name: String) -> void:
 	dust_peak = 0
 	damage_glyph_peak = 0
 	voices_peak = 0
-	last_frame_us = 0
+	max_physics_ticks_per_frame = 0
 	phase_started_us = Time.get_ticks_usec()
 	phase_started_tick = Engine.get_physics_frames()
 	phase = name
 
+func sample_physics_start() -> void:
+	if ticks_in_frame == 0:
+		first_physics_us = Time.get_ticks_usec()
+	ticks_in_frame += 1
+
 func sample_frame() -> void:
+	var us := Time.get_ticks_usec()
+	if not phase.is_empty() and last_frame_us > 0:
+		frame_ms.append((us - last_frame_us) / 1000.0)
+		if ticks_in_frame > 0:
+			physics_window_ms.append((us - first_physics_us) / 1000.0)
+			max_physics_ticks_per_frame = maxi(max_physics_ticks_per_frame, ticks_in_frame)
+	last_frame_us = us
+	ticks_in_frame = 0
 	if phase.is_empty():
 		return
-	var us := Time.get_ticks_usec()
-	if last_frame_us > 0:
-		frame_ms.append((us - last_frame_us) / 1000.0)
-	last_frame_us = us
-	physics_ms.append(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0)
-	process_ms.append(Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0)
 	render_cpu_ms.append(RenderingServer.viewport_get_measured_render_time_cpu(viewport))
 	render_gpu_ms.append(RenderingServer.viewport_get_measured_render_time_gpu(viewport))
 	draw_peak = maxi(draw_peak, int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
@@ -205,11 +223,12 @@ func finish_phase() -> void:
 	print("POPULATION_PHASE ", JSON.stringify({
 		"cycle": cycle, "population": population, "phase": phase,
 		"samples": frame_ms.size(), "wall_seconds": seconds, "physics_ticks": ticks,
-		"frame_ms": stats(frame_ms), "physics_ms": stats(physics_ms), "engine_process_ms": stats(process_ms),
+		"frame_ms": stats(frame_ms), "physics_window_ms": stats(physics_window_ms),
+		"max_physics_ticks_per_frame": max_physics_ticks_per_frame,
 		"render_cpu_ms": stats(render_cpu_ms), "render_gpu_ms": stats(render_gpu_ms),
 		"peak_draws": draw_peak, "peak_static_bytes": memory_peak, "peak_video_bytes": gpu_memory_peak,
 		"peak_zombie_dust": dust_peak, "peak_damage_glyphs": damage_glyph_peak,
-		"peak_shared_combat_voices": voices_peak, "nodes": Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
+		"peak_shared_combat_voices": voices_peak, "nodes": get_node_count(),
 	}))
 	phase = ""
 
