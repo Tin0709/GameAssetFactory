@@ -8,6 +8,7 @@ uniform float study_grass_up_weight=0.0;
 uniform float study_transmission=0.1248;
 #ifdef GAF_FLOWER_DAYLIGHT_RESPONSE
 uniform vec4 petal_sun = vec4(0.0);
+uniform float petal_shadow_return = 0.0;
 #endif
 varying vec3 study_face;
 varying float study_tip_weight;
@@ -22,6 +23,20 @@ void light(){
 	float shadow_attenuation = GAF_RESOLVE_TERRAIN_SHADOW;
 	float front=clamp(dot(NORMAL,LIGHT),0.0,1.0);
 	float cloud=LIGHT_IS_DIRECTIONAL?study_cloud:1.0;
+#ifdef GAF_FLOWER_DAYLIGHT_RESPONSE
+	bool flower_key = LIGHT_IS_DIRECTIONAL && (petal_sun.w > 0.0 || petal_shadow_return > 0.0) &&
+		dot(mat3(INV_VIEW_MATRIX) * LIGHT, petal_sun.xyz) > .9999;
+	float head = flower_key ? smoothstep(.53, .82, study_tip_weight) : 0.0;
+	if (petal_shadow_return > 0.0 && shadow_attenuation < .72 && head > 0.0) {
+		// The local return tapers through the geometric penumbra and under the canopy.
+		float shade = 1.0 - smoothstep(.12, .72, shadow_attenuation);
+		float canopy = mix(.30, 1.0, study_canopy_sky_at_root);
+		float incident = dot(LIGHT_COLOR, vec3(.2126, .7152, .0722)) / PI;
+		vec3 bounced_tint = vec3(1.076, .990, .884);
+		DIFFUSE_LIGHT += bounced_tint * (incident * canopy * mix(.48, 1.0, cloud) *
+			shade * head * petal_shadow_return);
+	}
+#endif
 	float ground_fill = 1.0;
 	if (LIGHT_IS_DIRECTIONAL && gaf_ground_shadow_fill_reduction.x > 0.0) {
 		ground_fill = gaf_ground_shadow_fill_multiplier(gaf_ground_shadow_fill_reduction.x, shadow_attenuation);
@@ -69,15 +84,11 @@ void light(){
 			response += world_foliage_lobe(study_face, LIGHT, VIEW, front, study_tip_weight, study_transmission);
 		}
 #ifdef GAF_FLOWER_DAYLIGHT_RESPONSE
-		if (LIGHT_IS_DIRECTIONAL && petal_sun.w > 0.0) {
+		if (flower_key && petal_sun.w > 0.0) {
 			vec3 world_light = mat3(INV_VIEW_MATRIX) * LIGHT;
-			if (dot(world_light, petal_sun.xyz) > .9999) {
-				// Blend toward a wider diffuse response on the flower heads.
-				// The result still passes through the same shadow and cloud visibility.
-				float petal = smoothstep(.53, .82, study_tip_weight);
-				float broad_diffuse = .65 * front + .35 * max(world_light.y, 0.0);
-				response = mix(response, vec3(broad_diffuse), petal * petal_sun.w);
-			}
+			// Blend toward a wider diffuse response on the flower heads.
+			float broad_diffuse = .65 * front + .35 * max(world_light.y, 0.0);
+			response = mix(response, vec3(broad_diffuse), head * petal_sun.w);
 		}
 #endif
 		float gain = gaf_opening_gain(LIGHT_IS_DIRECTIONAL, shadow_attenuation * cloud);

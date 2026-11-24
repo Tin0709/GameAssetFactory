@@ -223,6 +223,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_wall_shadow_fill": ["Chiều sâu bóng trên vách đá", 1.],
 	&"turf_sun_chroma": ["Sắc nắng trên cỏ và mặt cỏ", 1.],
 	&"grass_step_coverage": ["Cỏ sát bậc địa hình", 1.],
+	&"flower_shadow_return": ["Ánh sáng bù cho hoa trong bóng", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
 	&"twilight_grass_albedo": ["Độ dịu lá cỏ chạng vạng", 1.],
 	&"lantern_grass_tone": ["Sắc đèn hông trên cỏ", 1.],
@@ -371,7 +372,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 233
+const LIGHTING_MIX_VERSION := 234
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
@@ -2772,14 +2773,27 @@ func twilight_ground_ambient_scale() -> float:
 func grass_root_tone_mix() -> float:
 	return _lighting_scale(&"grass_root_tone") * _night_grass_weight()
 
-func flower_sun_response() -> Vector4:
+func _flower_daylight_weight() -> float:
 	if _biome_profile == null or _balanced_preview or level.view_mode != "gameplay" or atmosphere_review != "combined":
+		return 0.
+	return smoothstep(8., 11., hour) * (1. - smoothstep(14., 17.5, hour))
+
+
+func flower_shadow_return_strength() -> float:
+	var phase := _flower_daylight_weight()
+	if phase <= 0. or not is_finite(_biome_profile.flower_shadow_return):
+		return 0.
+	return phase * clampf(_biome_profile.flower_shadow_return, 0., .12) * _lighting_scale(&"flower_shadow_return")
+
+
+func flower_sun_response() -> Vector4:
+	var phase := _flower_daylight_weight()
+	if phase <= 0.:
 		return Vector4.ZERO
 	var softness := _biome_profile.flower_sun_softness
-	if not is_finite(softness) or softness <= 0.:
-		return Vector4.ZERO
-	var phase := smoothstep(8., 11., hour) * (1. - smoothstep(14., 17.5, hour))
-	if phase <= 0.:
+	if not is_finite(softness):
+		softness = 0.
+	if softness <= 0. and _biome_profile.flower_shadow_return <= 0.:
 		return Vector4.ZERO
 	var sun: DirectionalLight3D = level.get_node("Sun")
 	if not sun.is_visible_in_tree() or sun.light_energy <= 0.:
@@ -3505,6 +3519,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 233 and effect == &"mist_midground_clearance":
 			missing_value = 0.
+		if version < 234 and effect == &"flower_shadow_return":
+			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -3668,6 +3684,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and level.look.player_material.available() and _biome_profile != null and _biome_profile.actor_side_sky_by_hour != null
 		if effect in [&"dawn_turf_ambient", &"dawn_turf_color"]:
 			slider.editable = slider.editable and sky_response.available() and plants != null and plants.grass_light.active
+		if effect == &"flower_shadow_return":
+			slider.editable = slider.editable and _biome_profile != null and _biome_profile.flower_shadow_return > 0. \
+				and plants != null and not plants.grass_light._flower_materials.is_empty()
 		if effect == &"grass_step_coverage":
 			slider.editable = slider.editable and plants != null and plants.grass_light.active and plants.dense_grass_review
 		if effect == &"day_grass_shadow_footprint":
@@ -3940,7 +3959,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if sky != null:
 			sky.refresh()
 		return
-	if changed_effect in [&"grass_step_coverage", &"day_grass_shadow_compactness", &"day_grass_shadow_footprint", &"day_grass_shadow_wind", &"day_grass_sunlight_stability"]:
+	if changed_effect in [&"flower_shadow_return", &"grass_step_coverage", &"day_grass_shadow_compactness", &"day_grass_shadow_footprint", &"day_grass_shadow_wind", &"day_grass_sunlight_stability"]:
 		if plants != null:
 			plants.grass_light.sync()
 		return

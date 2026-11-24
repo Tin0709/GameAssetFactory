@@ -104,7 +104,8 @@ func run()->void:
 		var previous_preset := ConfigFile.new()
 		if previous_preset.load(flower_preset) == OK:
 			previous_preset.set_value("recipe", "version", 233)
-			previous_preset.erase_section_key("strengths", SHADE_RETURN)
+			if previous_preset.has_section_key("strengths", SHADE_RETURN):
+				previous_preset.erase_section_key("strengths", SHADE_RETURN)
 			check(previous_preset.save(flower_preset) == OK and w.showcase.load_lighting_mix(flower_preset) == OK,
 				"The existing lighting preset format still loads")
 			p.grass_light.sync()

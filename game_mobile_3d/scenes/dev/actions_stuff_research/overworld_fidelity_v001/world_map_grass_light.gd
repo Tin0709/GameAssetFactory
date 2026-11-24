@@ -28,6 +28,7 @@ var _sunlight_stability := -1.
 var _step_coverage := -1.
 var _flower_materials: Array[ShaderMaterial] = []
 var _petal_sun := Vector4.INF
+var _petal_shadow_return := -1.
 
 func setup(level:Node3D,reader:RefCounted)->void:
 	world=level
@@ -74,6 +75,7 @@ func restore()->void:
 	_step_coverage = -1.
 	_flower_materials.clear()
 	_petal_sun = Vector4.INF
+	_petal_shadow_return = -1.
 
 func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->void:
 	restore()
@@ -138,6 +140,11 @@ func sync()->void:
 			_petal_sun = sunlight
 			for material: ShaderMaterial in _flower_materials:
 				material.set_shader_parameter("petal_sun", sunlight)
+		var shadow_return: float = world.showcase.flower_shadow_return_strength() if sunlight != Vector4.ZERO else 0.
+		if shadow_return != _petal_shadow_return:
+			_petal_shadow_return = shadow_return
+			for material: ShaderMaterial in _flower_materials:
+				material.set_shader_parameter("petal_shadow_return", shadow_return)
 	var step_coverage: float = world.showcase._lighting_scale(&"grass_step_coverage")
 	if step_coverage != _step_coverage:
 		_step_coverage = step_coverage

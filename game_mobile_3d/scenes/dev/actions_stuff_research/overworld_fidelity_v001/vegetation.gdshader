@@ -14,6 +14,7 @@ uniform bool tinted_grass=false;
 #include "res://materials/world_map_replay_bounce.gdshaderinc"
 #include "res://materials/world_map_local_diffuse.gdshaderinc"
 #include "res://materials/world_map_turf_ambient.gdshaderinc"
+varying flat float study_canopy_sky_at_root;
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
 #include "res://materials/world_map_local_diffuse_field.gdshaderinc"
@@ -37,7 +38,6 @@ uniform float study_grass_shadow_wind = 1.0;
 uniform float study_grass_sunlight_stability = 0.0;
 varying vec3 study_cloud_position;
 varying flat vec4 study_ground_sky_at_root;
-varying flat float study_canopy_sky_at_root;
 varying flat float study_raw_canopy_sky;
 varying flat vec3 study_day_bounce_at_root;
 
