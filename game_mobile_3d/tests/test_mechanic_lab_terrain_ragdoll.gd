@@ -7,9 +7,13 @@ const MeleeTools := preload("res://scripts/mechanic_lab_melee_tools.gd")
 
 var failures: Array[String] = []
 
-func reference_lab() -> Node3D:
+func reference_lab(use_actions_stuff := false) -> Node3D:
 	var lab := preload("res://scenes/dev/MechanicLab.tscn").instantiate() as Node3D
-	lab.get_node("Zombies").corpse_lifetime = Zombie.CORPSE_LIFETIME
+	var group := lab.get_node("Zombies")
+	group.corpse_lifetime = Zombie.CORPSE_LIFETIME
+	# Pose-specific fixtures need the same animation mode from spawn to handoff,
+	# regardless of what the HUD selects by default for a normal session.
+	lab.ready.connect(group.set_actions_stuff_animation.bind(use_actions_stuff), CONNECT_ONE_SHOT)
 	return lab
 
 func _initialize() -> void:
@@ -409,7 +413,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 		max_anchor_gap := INF, strike: Zombie.DeathStrike = Zombie.DeathStrike.SABRE_FINISHER,
 		strength := 1150.0, shared_wall := false, fixture := CornerFixture.NONE, tuning := Vector2.ONE,
 		wall_yaw := 0.0, pose := &"") -> void:
-	var lab: Node3D = reference_lab()
+	var lab := reference_lab(String(pose).begins_with("Zombie_AS_"))
 	root.add_child(lab)
 	current_scene = lab
 	var frozen := fixture in [CornerFixture.PINCHED_ARM_FROZEN_WALLS, CornerFixture.FROZEN_WALLS]
@@ -529,7 +533,7 @@ func check_corner_ragdoll(seed: int, settle_seconds: float, should_settle := tru
 
 func check_wall_brace_impact(seed: int, wall_angle: float, strike_angle: float, attack: String,
 		sword: bool, clip: StringName, launch_percent := 1000.0, combo_index := 0) -> void:
-	var lab = reference_lab()
+	var lab := reference_lab(String(clip).begins_with("Zombie_AS_"))
 	root.add_child(lab)
 	current_scene = lab
 	lab.player.set_physics_process(false)
@@ -932,6 +936,12 @@ func run() -> void:
 	await check_wall_brace_impact(69, 45.0, -85.0, "AirAttack", false, Zombie.IDLE)
 	await check_wall_brace_impact(74, 45.0, -85.0, "Attack", false, Zombie.ATTACK)
 	await check_wall_brace_impact(29, 27.0, -58.0, "Attack", false, Zombie.ATTACK, 100.0, 2)
+	await check_corner_ragdoll(101, 2.0, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER,
+		1150.0, false, CornerFixture.NONE, Vector2.ONE, 0.0, Zombie.ActionsStuff.MOVE)
+	await check_corner_ragdoll(238, 2.0, true, -1.0, 0.12, Zombie.DeathStrike.SABRE_FINISHER,
+		1150.0, false, CornerFixture.NONE, Vector2.ONE, 0.0, Zombie.ActionsStuff.ATTACK)
+	await check_wall_brace_impact(20, 27.0, -58.0, "Attack", true, Zombie.ActionsStuff.ATTACK)
+	await check_wall_brace_impact(29, 27.0, -58.0, "Attack", false, Zombie.ActionsStuff.ATTACK, 100.0, 2)
 	await check_stacked_wall_handoff(1.08, 24, 1150.0, [&"Zombie_ExpressiveWalk", &"Zombie_ExpressiveRun"])
 	await check_stacked_wall_handoff(1.35, 24, 1150.0, [&"Zombie_Walk"])
 	await check_stacked_wall_handoff(1.35, 130, 800.0, [&"Zombie_Walk_Variant1"])
