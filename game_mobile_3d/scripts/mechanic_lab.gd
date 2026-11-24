@@ -40,6 +40,7 @@ const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
 const ImpactMarks := preload("res://scripts/mechanic_lab_impact_marks.gd")
 const GROUND_SLAM_SHADER := preload("res://materials/mechanic_lab_ground_slam.gdshader")
 const BLADE_WALL_SHADER := preload("res://materials/mechanic_lab_axe_wall.gdshader")
+const SABRE_WALL_SHADER := preload("res://materials/mechanic_lab_sabre_wall.gdshader")
 const BLADE_WALL_LIMIT := 4
 const SPLASH_FLASH_UNDIMMED_COUNT := 6
 const SPLASH_FLASH_MIN_SCALE := 0.45
@@ -994,14 +995,12 @@ func _blade_mask_for(mesh: Mesh) -> ShaderMaterial:
 	if source == null or source.albedo_texture == null:
 		return null
 	var material := ShaderMaterial.new()
-	material.shader = BLADE_WALL_SHADER
+	material.shader = SABRE_WALL_SHADER if mesh == _sabre_mesh else BLADE_WALL_SHADER
 	material.set_shader_parameter(&"blade_texture", source.albedo_texture)
-	material.set_shader_parameter(&"double_sided", source.cull_mode == BaseMaterial3D.CULL_DISABLED)
 	material.set_shader_parameter(&"blade_blocker_count", 0)
 	if mesh == _sabre_mesh:
 		# Sabre packs roughness into green and metal into blue, and multiplies
 		# its white emission by a separate texture.
-		material.set_shader_parameter(&"use_packed_surface", true)
 		material.set_shader_parameter(&"metallic_map", source.metallic_texture)
 		material.set_shader_parameter(&"roughness_map", source.roughness_texture)
 		material.set_shader_parameter(&"emission_map", source.emission_texture)
