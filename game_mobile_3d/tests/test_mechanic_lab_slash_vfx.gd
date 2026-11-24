@@ -80,6 +80,7 @@ func run() -> void:
 	await physics_frame
 	check(effects.ribbon.mesh.get_surface_count() == 0, "Reset clears the textured slash geometry")
 	await check_ground_ribbon_edges(lab, selector)
+	await check_sword_thrust_glint(lab, selector)
 	await check_tool_slash_cues(lab, selector)
 	await check_axe_sweep_windows(lab, selector)
 	await check_aerial_tool_effects(lab, selector)
@@ -435,6 +436,61 @@ func check_sabre_dive(lab, selector: OptionButton) -> void:
 		check(ribbon_rendered, "The samples produce blade ribbon geometry during the landing slash")
 		print("SABRE_DIVE_SLASH height=", height, " loops=", air_loops,
 			" landing=", landings, " pose=", landing_pose_time, " slash=", slash_frame, " source=", slash_source_time)
+
+
+func check_sword_thrust_glint(lab, selector: OptionButton) -> void:
+	for wall_face: float in [INF, 1.65]:
+		lab.reset_player()
+		for i in 12:
+			await physics_frame
+		selector.select(lab.Weapon.SWORD)
+		selector.item_selected.emit(lab.Weapon.SWORD)
+		var actor = lab.player
+		var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
+		var wall: StaticBody3D
+		if is_finite(wall_face):
+			wall = StaticBody3D.new()
+			wall.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true),
+				forward * (wall_face + 0.1) + Vector3.UP * 2.5)
+			var shape := BoxShape3D.new()
+			shape.size = Vector3(4.0, 5.0, 0.2)
+			var collider := CollisionShape3D.new()
+			collider.shape = shape
+			wall.add_child(collider)
+			lab.add_child(wall)
+		attack(true)
+		var seen := false
+		var scope_correct := true
+		var furthest := -INF
+		var first_time := INF
+		var mesh: Mesh = actor.effects.ribbon.mesh
+		for i in int(5.0 * Engine.physics_ticks_per_second):
+			await physics_frame
+			if actor.combo.phase == &"attack" and actor.combo.index == 2 and actor.combo.time > 0.65:
+				break
+			if mesh.get_surface_count() == 0:
+				continue
+			var arrays := mesh.surface_get_arrays(0)
+			var uvs: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
+			var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+			for j in uvs.size():
+				if uvs[j].y >= 0.0:
+					continue
+				seen = true
+				scope_correct = scope_correct and actor.combo.phase == &"attack" and actor.combo.index == 2
+				first_time = minf(first_time, actor.combo.time)
+				furthest = maxf(furthest, vertices[j].dot(forward))
+		attack(false)
+		check(scope_correct, "The directional glint belongs to the Sword thrust")
+		if wall == null:
+			check(seen and first_time >= 11.0 / 30.0 and first_time < 0.45 and furthest > 2.2,
+				"A real Sword finisher shows its directional glint just before and during full extension")
+		else:
+			check(furthest <= wall_face + 0.0001, "The Sword glint cannot extend through the wall")
+			wall.free()
+		check(not lab.get_node("CombatImpactLight").visible and lab._contact_sparks._streaks.visible_instance_count == 0,
+			"The whiffed Sword thrust does not display enemy contact feedback")
+		print("SWORD_THRUST wall=", wall_face, " seen=", seen, " first=", first_time, " furthest=", furthest)
 
 func check_wall_ribbons(lab, selector: OptionButton) -> void:
 	for slot in [0, 10]:
