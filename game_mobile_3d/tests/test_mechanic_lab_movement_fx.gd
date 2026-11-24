@@ -90,6 +90,7 @@ func run() -> void:
 	await check_overlapping_landing_dust(lab, dust)
 	await check_source_dust_batch(lab, dust)
 	await check_gauntlet_debris(lab, dust)
+	await check_gauntlet_impact_marks(lab)
 	await check_source_dust_and_wake_order(lab, dust, wind)
 	await check_running_wake_support(lab, wind)
 	await check_running_wake_render_clock(lab, wind, dust)
@@ -491,6 +492,79 @@ func check_gauntlet_debris(lab, dust: Node3D) -> void:
 		"An impact offset beyond the floor falls back to the actual landing contact")
 	dust.clear()
 	lab._select_weapon(lab.Weapon.SABRE)
+
+func check_gauntlet_impact_marks(lab) -> void:
+	if RenderingServer.get_current_rendering_method() == &"gl_compatibility":
+		return
+	var marks := lab.get_node_or_null("CombatEffects/GauntletImpactMarks") as Node3D
+	check(marks != null, "The Lab has a pooled receiver for the verified Gauntlets impact atlas")
+	if marks == null:
+		return
+	var pool := marks.get_children()
+	check(pool.size() == 4, "The impact mark renderer has four reusable decal slots")
+	var camera_ground: MeshInstance3D = lab.get_node("Ground/Mesh")
+	var player_mesh: MeshInstance3D = lab._basic_gauntlet_mounts[0]
+	for slot: Node in pool:
+		var decal := slot as Decal
+		check(decal != null and decal.texture_albedo.get_size() == Vector2(16, 16)
+			and (decal.cull_mask & camera_ground.layers) != 0 and (decal.cull_mask & player_mesh.layers) == 0,
+			"The mark uses one atlas tile and projects only onto the stage")
+	for fixture in ["grass", "stone_wall", "slab"]:
+		lab.reset_player()
+		for i in 8:
+			await physics_frame
+		lab._select_weapon(lab.Weapon.BASIC_GAUNTLETS if fixture == "grass" else lab.Weapon.GAUNTLETS)
+		if fixture == "stone_wall":
+			lab._select_floor_surface(2)
+		var forward: Vector3 = lab.player.visual.global_basis.z.slide(Vector3.UP).normalized()
+		var obstacle: StaticBody3D
+		if fixture != "grass":
+			obstacle = StaticBody3D.new()
+			var box := BoxShape3D.new()
+			var shape := CollisionShape3D.new()
+			shape.shape = box
+			obstacle.add_child(shape)
+			if fixture == "stone_wall":
+				box.size = Vector3(2.0, 2.0, 0.2)
+				obstacle.transform = Transform3D(Basis.looking_at(forward, Vector3.UP, true), forward + Vector3.UP)
+			else:
+				box.size = Vector3(2.0, 0.4, 2.0)
+				obstacle.position = Vector3.UP * 0.2
+				lab.player.position.y += 0.4
+			lab.add_child(obstacle)
+		for i in 8:
+			await physics_frame
+		await start_heavy_drop(lab)
+		var appeared: Decal
+		for i in 65:
+			await physics_frame
+			for decal: Decal in pool:
+				if decal.visible:
+					appeared = decal
+					break
+			if appeared != null:
+				break
+		if fixture == "slab":
+			check(appeared == null and lab.player.is_on_floor() and lab.player.global_position.y > 0.39,
+				"An unsupported slab material cannot imprint the stage below")
+		else:
+			check(appeared != null and lab.player.is_on_floor(), "The %s Gauntlets dive leaves its mark on touchdown" % fixture)
+			if appeared != null:
+				var reach := appeared.global_position.dot(forward)
+				var expected := 1.8 if fixture == "grass" else 0.82
+				check(absf(reach - expected) < 0.02 and absf(appeared.global_position.y) < 0.03,
+					"The %s crack stays on the supported side of the stage" % fixture)
+				print("GAUNTLET_IMPACT_MARK ", fixture, " reach=", reach, " tint=", appeared.modulate)
+				for i in 75:
+					await physics_frame
+				check(not appeared.visible and not marks.is_processing(), "The mark expires and stops processing")
+		if obstacle != null:
+			obstacle.free()
+	lab.reset_player()
+	await physics_frame
+	lab._select_floor_surface(0)
+	lab._select_weapon(lab.Weapon.SABRE)
+	check(pool.all(func(decal: Decal): return not decal.visible), "Reset hides every retained impact decal")
 
 func gauntlet_debris_position(origin: Vector3, velocity: Vector3, drag: float, age: float) -> Vector3:
 	const STEP := 1.0 / 60.0
