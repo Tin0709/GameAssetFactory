@@ -38,7 +38,7 @@ class Particle:
 	var origin: Vector3
 	var velocity: Vector3
 	var age := 0.0
-	var contact_tick := -1
+	var contact_tick := -1.0
 	var draw_pending := false
 	var duration := 0.0
 	var opacity := 0.0
@@ -324,37 +324,48 @@ func _reusable_particle_slot() -> int:
 	return soonest
 
 func _emit_gauntlet_debris(ground_point: Vector3, surface: String) -> void:
+	emit_combat_debris(ground_point, surface, Engine.get_physics_frames())
+
+func emit_combat_debris(ground_point: Vector3, surface: String, tick: float, medium := false,
+		launch_basis := Basis.IDENTITY) -> void:
+	if _gauntlet_debris_texture == null:
+		return
 	# NS_Debris_Generic_Small, CPUCollisions_Low_Med:
 	# 3–5 sprites, 15 cm, 1–1.5 s, and 350–650 cm/s in an upward cone.
+	# The Shovel's medium cue uses a larger version of the same pool.
 	var tint: Color = SURFACE_DUST.get(surface, SURFACE_DUST.grass)
-	for i in _random.randi_range(3, 5):
+	var count := _random.randi_range(5, 7) if medium else _random.randi_range(3, 5)
+	var size := 0.21 if medium else 0.15
+	for i in count:
 		var particle := _next_particle(_gauntlet_debris_texture, SOURCE_CAMERA_RANGE)
 		var yaw := _random.randf_range(0.0, TAU)
 		var outer_angle := deg_to_rad(_random.randf_range(17.5, 25.0))
 		var up := _random.randf_range(cos(outer_angle), 1.0)
 		var planar := sqrt(1.0 - up * up)
-		particle.velocity = Vector3(cos(yaw) * planar, up, sin(yaw) * planar) * _random.randf_range(3.5, 6.5)
+		var direction := Vector3(cos(yaw) * planar, up, sin(yaw) * planar)
+		particle.velocity = launch_basis * direction * _random.randf_range(3.5, 6.5)
 		particle.origin = ground_point
 		particle.age = 0.0
-		particle.contact_tick = Engine.get_physics_frames()
+		particle.contact_tick = tick
 		particle.duration = _random.randf_range(1.0, 1.5)
 		particle.debris_drag = _random.randf_range(0.8, 1.2)
 		particle.sprite.global_position = ground_point
-		particle.sprite.pixel_size = 0.15 / 16.0
+		particle.sprite.pixel_size = size / 16.0
 		particle.sprite.scale = Vector3.ONE
 		particle.sprite.modulate = tint
 		particle.sprite.show()
 	set_process(true)
 
 func _emit_gauntlet_impact_dust(ground_point: Vector3, surface: String, forward: Vector3) -> void:
-	# The source montage calls a separate small dust effect. Reuse the Lab's
-	# pooled smoke sprite for a brief puff below the longer-lived debris.
 	ground_point = _gauntlet_impact_anchor.call(ground_point, forward, GAUNTLET_IMPACT_DUST_FORWARD)
+	emit_combat_puff(ground_point, surface, Engine.get_physics_frames())
+
+func emit_combat_puff(ground_point: Vector3, surface: String, tick: float) -> void:
 	var particle := _next_particle(_smoke_texture, SOURCE_CAMERA_RANGE)
 	particle.origin = ground_point + Vector3.UP * 0.16
 	particle.velocity = Vector3.UP * 0.33
 	particle.age = 0.0
-	particle.contact_tick = Engine.get_physics_frames()
+	particle.contact_tick = tick
 	particle.duration = 0.27
 	particle.opacity = 0.62
 	particle.run_drag = 0.0

@@ -120,6 +120,26 @@ const GROUND_SLASHES := [
 ]
 # Hue of each montage's color override, fitted to the Lab's SDR ribbon.
 const GROUND_SLASH_TINTS := [Color(0.64, 0.90, 1.0), Color(1.0, 0.28, 0.64), Color(0.78, 1.0, 0.35)]
+enum GroundEffect { SHOCKWAVE, DEBRIS, DUST, SHAKE }
+# Times use the same clip clock as WINDOWS. Offsets are expressed in metres
+# relative to the actor's lateral and forward axes.
+const GROUND_EFFECTS := {
+	Tool.PICKAXE: {
+		2: [
+			{"time": 0.270322, "effect": GroundEffect.SHOCKWAVE, "offset": Vector2(0.0, 1.50)},
+			{"time": 0.273662, "effect": GroundEffect.DEBRIS, "offset": Vector2(0.0, 1.80), "mark": true},
+			{"time": 0.277670, "effect": GroundEffect.DUST, "offset": Vector2(0.0, 0.90)},
+			{"time": 0.298377, "effect": GroundEffect.SHAKE},
+		],
+	},
+	Tool.SHOVEL: {
+		1: [{"time": 0.765836, "effect": GroundEffect.DEBRIS, "offset": Vector2(-1.20, -0.40), "yaw": 45.0}],
+		2: [
+			{"time": 0.213588, "effect": GroundEffect.SHAKE},
+			{"time": 0.279747, "effect": GroundEffect.DEBRIS, "offset": Vector2(-0.45, 0.70), "roll": 25.0, "medium": true},
+		],
+	},
+}
 const AIR_LOOP := [0.139664, 0.033285, 0.428704, 0.033285]
 const AIR_RATES := [1.2, 1.0, 1.0, 1.0]
 const AIR_LANDING := [0.214319, 0.607441, 0.431681, 0.607441]
@@ -232,6 +252,8 @@ static func combat_profile(root: String, tool: int) -> Dictionary:
 			window.trail_style = {"tint": GROUND_SLASH_TINTS[tool], "lifetime": slash.z}
 		else:
 			window.trail_window = [maxf(timings.x - 0.03, 0.0), minf(timings.x + 0.12, timings.w)]
+		if GROUND_EFFECTS.has(tool) and GROUND_EFFECTS[tool].has(i):
+			window.ground_effects = GROUND_EFFECTS[tool][i]
 		# Keep the native movement and input gates, including those in the
 		# recovery sequence. The Lab's two states split the source composite
 		# after the queued chain gate, with one final frame on terminal links.

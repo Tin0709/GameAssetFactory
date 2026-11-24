@@ -15,7 +15,7 @@ const SURFACE_TINT := {
 }
 
 var _decals: Array[Decal] = []
-var _ticks: Array[int] = []
+var _ticks: Array[float] = []
 var _tints: Array[Color] = []
 var _next := 0
 var _footprint := PhysicsShapeQueryParameters3D.new()
@@ -59,7 +59,7 @@ func setup(terrain: MeshInstance3D) -> bool:
 	set_process(false)
 	return true
 
-func stamp(point: Vector3, touchdown: Vector3, surface: String) -> void:
+func stamp(point: Vector3, touchdown: Vector3, surface: String, elapsed_ticks := 0.0) -> void:
 	var space := get_world_3d().direct_space_state
 	# A projected mark can reach the floor on both sides of a narrow wall.
 	# Test its whole footprint, just above the receiver surface.
@@ -73,7 +73,7 @@ func stamp(point: Vector3, touchdown: Vector3, surface: String) -> void:
 	var decal := _decals[_next]
 	decal.hide()
 	decal.global_position = point
-	_ticks[_next] = Engine.get_physics_frames()
+	_ticks[_next] = Engine.get_physics_frames() - elapsed_ticks
 	_tints[_next] = SURFACE_TINT[surface]
 	_next = (_next + 1) % _decals.size()
 	set_process(true)

@@ -9,6 +9,7 @@ const LabCombo := preload("res://scripts/mechanic_lab_combo.gd")
 
 signal bow_drawn
 signal bow_released(serial: int, charged: bool, target: Variant)
+signal tool_ground_cue(cue: Dictionary, serial: int, sample_time: float)
 
 const BOW_MIN_DRAW_SECONDS := 0.10
 const BOW_DRAW_BLEND_SECONDS := 0.12
@@ -410,7 +411,17 @@ func _animate(delta: float) -> void:
 		combo.time = tool_air_loop if tool_air_hold - tool_air_loop > 1.0 / 30.0 \
 			else tool_air_hold - delta * combo.playback_rate()
 		animation_player.seek(combo.time, true)
+	var previous_ground_time: float = combo.time
+	var previous_serial: int = combo.serial
 	super._animate(delta)
+	if _grounded and combo.phase == &"attack" and combo.native_enabled and combo.serial == previous_serial \
+			and review_clip.is_empty():
+		var window: Dictionary = combo.native_windows[combo.index]
+		if window.has("ground_effects"):
+			for cue: Dictionary in window.ground_effects:
+				if previous_ground_time < cue.time and cue.time <= combo.time:
+					var sample_time: float = effects.clock - (combo.time - float(cue.time)) / combo.playback_rate()
+					tool_ground_cue.emit(cue, combo.serial, sample_time)
 	if release_bow:
 		combo.serial += 1
 		bow_released.emit(combo.serial, _bow_held_seconds >= Bow.CHARGE_TIME - 0.00001, target)
