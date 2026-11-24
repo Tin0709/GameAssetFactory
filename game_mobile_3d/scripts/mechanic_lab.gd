@@ -165,6 +165,7 @@ var _shake_serial := -1
 var _shake_age := 0.0
 var _shake_duration := 0.0
 var _shake_strength := 0.0
+var _shake_intensity := 1.0
 var _shake_pending := false
 var _shake_sample_time := -1.0
 var _slam_shake_frame := -1
@@ -251,6 +252,7 @@ func _ready() -> void:
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/RagdollTuning.visible = not $HUD/SpawnZombie.disabled
 	$HUD/RagdollLifetime.visible = $HUD/RagdollTuning.visible
+	$HUD/CameraShake.visible = $HUD/RagdollTuning.visible
 	var lifetime_slider: HSlider = $HUD/RagdollLifetime/Slider
 	lifetime_slider.set_value_no_signal($Zombies.corpse_lifetime)
 	_set_ragdoll_lifetime(lifetime_slider.value)
@@ -964,7 +966,7 @@ func _process(delta: float) -> void:
 			_shake_age = minf(_shake_age + delta, _shake_duration)
 		var decay := 1.0 - _shake_age / _shake_duration
 		var pulse := cos(TAU * 15.0 * _shake_age) * decay * decay if _shake_age >= 0.0 else 0.0
-		camera.h_offset = camera.size * _shake_strength * pulse
+		camera.h_offset = camera.size * _shake_strength * pulse * _shake_intensity
 		if _shake_age >= _shake_duration:
 			_shake_duration = 0.0
 	if _light_sample_time >= 0.0:
@@ -1376,6 +1378,12 @@ func _set_ragdoll_gravity(percent: float) -> void:
 func _set_ragdoll_lifetime(seconds: float) -> void:
 	$Zombies.corpse_lifetime = seconds
 	$HUD/RagdollLifetime/Value.text = "Xác biến mất · %.1f s" % seconds
+
+func _set_camera_shake_intensity(percent: float) -> void:
+	_shake_intensity = percent * 0.01
+	$HUD/CameraShake/Value.text = "Rung camera · %d%%" % roundi(percent)
+	if _shake_intensity == 0.0:
+		camera.h_offset = 0.0
 
 func _spawn_one_zombie(base_health: bool) -> bool:
 	var facing := Basis(Vector3.UP, player.visual.rotation.y)
