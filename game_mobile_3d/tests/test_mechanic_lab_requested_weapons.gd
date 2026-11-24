@@ -584,7 +584,7 @@ func check_projectile_surface_bounds(lab: Node3D) -> void:
 		if weapon.impact_sparks == null:
 			check(false, "The surface bounds fixture has the verified projectile emitters")
 			continue
-		for surface_slot in [-1, 0, 1, 2]:
+		for surface_slot: int in [-1, 0, 1, 2]:
 			var on_wall := surface_slot == -1
 			if not on_wall:
 				lab._select_floor_surface(surface_slot)
