@@ -148,6 +148,11 @@ func check_tool_slash_cues(lab, selector: OptionButton) -> void:
 		lab.Weapon.PICKAXE: [0.121726, 0.175193, 0.243789],
 		lab.Weapon.SHOVEL: [0.143855, 0.395919, 0.265945],
 	}
+	var finisher_strength := {
+		lab.Weapon.CLEAVER: Vector2(0.75, 0.90),
+		lab.Weapon.PICKAXE: Vector2(1.12, 1.28),
+		lab.Weapon.SHOVEL: Vector2(1.25, 1.36),
+	}
 	for slot: int in cues:
 		lab.reset_player()
 		for i in 12:
@@ -158,23 +163,40 @@ func check_tool_slash_cues(lab, selector: OptionButton) -> void:
 		var effects = actor.effects
 		var weapon := selector.get_item_text(slot)
 		var recorded: Array[float] = []
+		var strengths: Array[float] = []
 		attack(true)
 		for i in Engine.physics_ticks_per_second * 5:
 			await physics_frame
 			if actor.combo.phase != &"attack" or effects.serial != actor.combo.serial:
 				continue
 			var index: int = actor.combo.index
-			if index != recorded.size() or effects.samples.is_empty():
+			if index != recorded.size() or effects.samples.size() < 2:
 				continue
 			var first: float = effects.samples[0].time
 			var cue: float = actor.combo.time - (effects.clock - first) * actor.combo.playback_rate()
 			recorded.append(cue)
 			check(absf(cue - float(cues[slot][index])) < 0.00001,
 				"%s combo %d emits at the source slash cue (%.6f)" % [weapon, index + 1, cue])
+			# Read the mesh submitted to the ribbon shader. Divide out the
+			# known linear age decay and global Lab intensity.
+			effects.present()
+			var mesh: Mesh = effects.ribbon.mesh
+			if mesh.get_surface_count() > 0:
+				var colors: PackedColorArray = mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR]
+				var age: float = (effects.clock - first) / effects.samples[0].lifetime
+				strengths.append(colors[0].a / ((1.0 - age) * effects.intensity * 0.58))
 			if recorded.size() == 3:
 				break
 		attack(false)
 		check(recorded.size() == 3, "%s reaches all three slash cues during held attack input" % weapon)
+		check(strengths.size() == 3, "%s submits one ribbon for each combo link" % weapon)
+		if strengths.size() == 3:
+			check(absf(strengths[0] - 1.0) < 0.025 and absf(strengths[1] - 1.0) < 0.025,
+				"%s retains the regular strength for its two opening links" % weapon)
+			var allowed: Vector2 = finisher_strength[slot]
+			check(strengths[2] >= allowed.x and strengths[2] <= allowed.y,
+				"%s finisher renders its authored relative strength" % weapon)
+		print("TOOL_SLASH_STRENGTH weapon=", weapon, " submitted=", strengths)
 		print("TOOL_SLASH_CUES weapon=", weapon, " source_seconds=", recorded)
 	lab.reset_player()
 
