@@ -401,11 +401,13 @@ func run() -> void:
 				"Woodland submits its authored 07:00 clearance")
 			if clearance_slider != null:
 				clearance_slider.value = .5
+				await process_frame
 				check(is_equal_approx(graphics._mist.effect._near_clearance_parameters.decode_float(0), .275)
 					and is_equal_approx(graphics._mist._profile.front_scatter_advance_m, .85),
 					"Changing the extinction preserves the in-scattering lookup")
 				clearance_slider.value = 1.
 			map.showcase.set_hour(12.)
+			await process_frame
 			check(graphics._mist._profile.front_scatter_advance_m == 0.
 				and graphics._mist.effect._near_clearance_parameters.decode_float(0) == 0.,
 				"The noon lookups stay neutral")
@@ -416,6 +418,7 @@ func run() -> void:
 			inherited_profile.set("mist_scatter_color_by_hour", null)
 			inherited_profile.set("mist_scatter_energy_by_hour", null)
 			graphics.set_profile(inherited_profile)
+			await process_frame
 			check(graphics._mist._profile.front_scatter_advance_m == 0. and (front_slider == null or not front_slider.editable),
 				"A different preset without front scattering clears the lookup and disables the slider")
 			check(graphics._mist.effect._near_clearance_parameters.decode_float(0) == 0.
