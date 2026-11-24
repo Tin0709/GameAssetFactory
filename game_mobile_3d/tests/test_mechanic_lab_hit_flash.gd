@@ -378,7 +378,6 @@ func check_splash_flash_strength() -> void:
 	current_scene = lab
 	await ticks(12)
 	var group = lab.get_node("Zombies")
-	var strike := {"damage": 10, "range_m": 2.5, "angle": 20.0, "strength": 500.0, "stagger": 12.0}
 	for baby in [false, true]:
 		if not group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, baby):
 			check(false, "The hit flash fixture spawns a source zombie")
@@ -386,9 +385,11 @@ func check_splash_flash_strength() -> void:
 		var zombie = group.get_child(group.get_child_count() - 1)
 		var point: Vector3 = zombie.combat_center()
 		var health: int = zombie.health
+		var strike := {"damage": 3 if baby else 10, "range_m": 2.5, "angle": 20.0, "strength": 500.0, "stagger": 12.0}
+		var splash_damage := 1 if baby else 3
 		var mesh := zombie._mesh as MeshInstance3D
 		group._apply_contact(zombie, point, "Attack1", 0, 1705, strike, Vector3.RIGHT, true, point)
-		check(zombie.health == health - 3 and is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 0.3),
+		check(zombie.health == health - splash_damage and is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 0.3),
 			"Splash keeps the weaker body flash at the actual hit (baby: %s)" % baby)
 		zombie._process(0.12)
 		check(is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 0.3),
