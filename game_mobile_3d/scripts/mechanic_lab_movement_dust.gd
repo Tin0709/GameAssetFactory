@@ -457,7 +457,13 @@ func emit_combat_puff(ground_point: Vector3, surface: String, tick: float) -> vo
 	particle.sprite.show()
 	set_process(true)
 
-func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: bool) -> void:
+func emit_heavy_ground_contact(point: Vector3, surface: String) -> void:
+	var start := point + Vector3.UP * 0.065
+	var wall_ray := PhysicsRayQueryParameters3D.create(start, start, 1)
+	_emit_dust(point, surface, true, true, wall_ray)
+
+func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: bool,
+		wall_ray: PhysicsRayQueryParameters3D = null) -> void:
 	var tint: Color = SURFACE_DUST.get(surface, SURFACE_DUST.grass)
 	var motion := _actor.get_real_velocity()
 	motion.y = 0.0
@@ -488,11 +494,27 @@ func _emit_dust(ground_point: Vector3, surface: String, landed: bool, heavy: boo
 			particle.duration = _random.randf_range(0.28, 0.40)
 			particle.opacity = 0.72
 			particle.sprite.pixel_size *= 1.45
+			if wall_ray != null:
+				_limit_heavy_dust_travel(particle, ground_point, wall_ray)
 		particle.sprite.scale = Vector3.ONE
 		particle.sprite.global_position = particle.origin
 		particle.sprite.modulate = Color(tint, particle.opacity)
 		particle.sprite.show()
 	set_process(true)
+
+func _limit_heavy_dust_travel(particle: Particle, ground_point: Vector3, ray: PhysicsRayQueryParameters3D) -> void:
+	var offset := (particle.origin - ground_point).slide(Vector3.UP)
+	var horizontal_speed := particle.velocity.slide(Vector3.UP)
+	# The render curve's horizontal travel is monotonic and ends at
+	# 60% of the constant-speed displacement.
+	var reach := offset + horizontal_speed * particle.duration * 0.60
+	ray.to = ray.from + reach
+	var wall := get_world_3d().direct_space_state.intersect_ray(ray)
+	if wall.is_empty():
+		return
+	var fraction := clampf((ray.from.distance_to(wall.position) - DEBRIS_CONTACT_SKIN) / reach.length(), 0.0, 1.0)
+	particle.origin += offset * (fraction - 1.0)
+	particle.velocity += horizontal_speed * (fraction - 1.0)
 
 func _emit_run_dust(ground_point: Vector3, surface: String, size: float) -> void:
 	# NS_Step_Dust spawns one sprite 20 cm above the supported foot, with

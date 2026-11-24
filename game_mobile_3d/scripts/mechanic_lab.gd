@@ -1407,9 +1407,9 @@ func _on_zombie_step(sole: Vector3, actor: CharacterBody3D = null) -> void:
 func _heavy_debris_delay() -> float:
 	if _equipped_weapon == Weapon.SABRE:
 		return SABRE_LANDING_DEBRIS_DELAY
-	# These montages emit their own ground debris, independently of the
-	# physical touchdown and the hit event that resolves zombie damage.
-	if player.clips.get("AirAttack", {}).has("ground_effects"):
+	# The Axe uses the blade contact. Other tools with ground cues
+	# dispatch their debris independently of the physical touchdown.
+	if _equipped_weapon == Weapon.AXE or player.clips.get("AirAttack", {}).has("ground_effects"):
 		return -1.0
 	return 0.0
 
@@ -1561,7 +1561,7 @@ func _on_heavy_jump_landed(point: Vector3, facing: Vector3, serial: int, fall_he
 	elif TOOL_TYPES.has(_equipped_weapon):
 		player.begin_tool_landing()
 	var debris_delay := _heavy_debris_delay()
-	if debris_delay < 0.0 or _equipped_weapon == Weapon.SABRE:
+	if _equipped_weapon == Weapon.SABRE or player.clips.get("AirAttack", {}).has("ground_effects"):
 		_tool_touchdown = {"origin": point, "forward": facing.slide(Vector3.UP).normalized(),
 			"surface_contact": _floor_landing_contact_at(point), "serial": serial}
 	# Evaluate the height tiers against the support rather than the capsule origin.
@@ -1663,6 +1663,12 @@ func _on_sabre_landing(point: Vector3, serial: int) -> void:
 func _show_landing_burst(point: Vector3, serial: int, sample_time: float) -> void:
 	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP, true, sample_time)
 	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3, sample_time)
+	if _equipped_weapon == Weapon.AXE:
+		var contact := _floor_contact_at(point)
+		if not contact.is_empty() and absf(contact.position.y - point.y) <= 0.06:
+			if _movement_dust != null:
+				_movement_dust.emit_heavy_ground_contact(contact.position, contact.surface)
+			_combat_audio.slam_landed(contact.position, contact.surface)
 
 func _setup_tool_slam_ring() -> void:
 	var mesh := PlaneMesh.new()
