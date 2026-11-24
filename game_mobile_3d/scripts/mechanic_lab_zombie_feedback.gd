@@ -16,6 +16,7 @@ var _health_ratio := 1.0
 var _delayed_ratio := 1.0
 var _delay := 0.0
 var _fill_pending := false
+var _health_hit_index := 0
 var _serial := 0
 static var _bar_mesh: QuadMesh
 static var _bar_material: ShaderMaterial
@@ -40,7 +41,15 @@ func _create_individual_bar() -> void:
 	add_child(bar)
 	bar.position.y = HealthBars.BAR_HEIGHT
 
-func show_hit(amount: int, remaining: int, maximum: int) -> void:
+func show_hit(amount: int, remaining: int, maximum: int, hit_index: int, origin: Vector3) -> void:
+	show_hit_health(remaining, maximum, hit_index)
+	_spawn_number(amount, origin)
+
+func show_hit_health(remaining: int, maximum: int, hit_index: int) -> void:
+	# A projectile can present a newer hit while a melee pose is still in flight.
+	if hit_index <= _health_hit_index:
+		return
+	_health_hit_index = hit_index
 	_health_ratio = float(remaining) / maximum
 	if remaining <= 0:
 		_remove_batched_bar()
@@ -51,7 +60,6 @@ func show_hit(amount: int, remaining: int, maximum: int) -> void:
 	_delay = FILL_HOLD_SECONDS
 	_fill_pending = remaining > 0 and bar_slot >= 0
 	set_process(remaining > 0)
-	_spawn_number(amount)
 
 func _process(delta: float) -> void:
 	if _fill_pending:
@@ -83,12 +91,14 @@ func _remove_batched_bar() -> void:
 		health_bars.remove_bar(bar_slot)
 		bar_slot = -1
 
-func _spawn_number(amount: int) -> void:
+func damage_number_origin() -> Vector3:
+	return global_position + Vector3.UP * 2.40
+
+func _spawn_number(amount: int, origin: Vector3) -> void:
 	var camera := get_viewport().get_camera_3d()
 	var side := camera.global_basis.x if camera != null else Vector3.RIGHT
 	var lateral := side * (1.0 if _serial % 2 == 0 else -1.0)
 	_serial += 1
-	var origin := global_position + Vector3.UP * 2.40
 	if damage_numbers != null:
 		damage_numbers.add_number(amount, origin, lateral)
 	else:

@@ -271,6 +271,7 @@ var _blocking_peer_position := Vector3.ZERO
 var _repeated_blocking_pair := false
 var _blocked_walk_destination := Vector3.ZERO
 var _skipped_blocked_step := false
+var _hit_index := 0
 var _flash_left := 0.0
 var _flash_peak := 1.0
 var _flash_pending := false
@@ -1369,16 +1370,22 @@ func _landing_support_plane() -> Plane:
 
 func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE,
 		stagger: float = MAX_POISE, knockback_strength: float = 500.0, death_strike := DeathStrike.GROUND,
-		push_duration := 0.0, flash_peak := 1.0) -> void:
+		push_duration := 0.0, flash_peak := 1.0, defer_visuals := false) -> Dictionary:
 	if health <= 0 or amount <= 0:
-		return
+		return {}
 	_blocked_walk = false
 	health = maxi(0, health - amount)
+	_hit_index += 1
 	direction.y = 0.0
 	direction = direction.normalized()
-	_feedback.show_hit(amount, health, max_health)
-	if flash_peak > 0.0:
-		show_hit_flash(flash_peak)
+	var origin := _feedback.damage_number_origin()
+	var visual := {}
+	if defer_visuals:
+		visual = {"amount": amount, "remaining": health, "index": _hit_index, "origin": origin, "peak": flash_peak}
+	else:
+		_feedback.show_hit(amount, health, max_health, _hit_index, origin)
+		if flash_peak > 0.0:
+			show_hit_flash(flash_peak)
 	if health <= 0:
 		_death_direction = direction
 		_death_strength = knockback_strength
@@ -1424,6 +1431,15 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 				animation.play(clip, 0.0 if clip == STAGGER else 0.12, clip_duration / STAGGER_DURATION)
 		elif _knockback_control_left > 0.0 and animation.current_animation in WALK_STEP_NOTIFIES:
 			_play_loop(IDLE)
+	return visual
+
+func show_deferred_hit(visual: Dictionary) -> void:
+	_feedback.show_hit(visual.amount, visual.remaining, max_health, visual.index, visual.origin)
+	if visual.peak > 0.0:
+		show_hit_flash(visual.peak)
+
+func sync_hit_health() -> void:
+	_feedback.show_hit_health(health, max_health, _hit_index)
 
 func show_hit_flash(flash_peak: float) -> void:
 	if _flash_left <= 0.0:
