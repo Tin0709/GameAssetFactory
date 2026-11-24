@@ -546,7 +546,12 @@ func check_blade_contact_spark_origin() -> void:
 				var distance := spark_origin.distance_to(axis_point)
 				check(absf(distance - capsule.radius) < 0.001,
 					"The spark origin is on the victim capsule (baby: %s)" % baby)
-				print("BLADE_SPARK_ORIGIN baby=", baby, " radius=", capsule.radius, " distance=", distance)
+				var light: OmniLight3D = lab.get_node("CombatImpactLight")
+				var light_error := light.global_position.distance_to(spark_origin)
+				check(light.visible and light_error < 0.001,
+					"The grounded blade lights the same capsule point as its streaks (baby: %s)" % baby)
+				print("BLADE_SPARK_ORIGIN baby=", baby, " radius=", capsule.radius, " distance=", distance,
+					" light_error_m=", light_error)
 		zombie.free()
 	lab.free()
 
