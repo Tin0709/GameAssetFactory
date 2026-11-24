@@ -251,6 +251,7 @@ var _basic_gauntlet_mounts: Array[MeshInstance3D]
 var _tools := {}
 var _bow: Bow
 var _bow_mount: MeshInstance3D
+var _bow_display_mesh_index := -1
 var _bow_profile: Dictionary
 var _sabre_air_clip: Dictionary
 var _default_idle_novelty: Dictionary
@@ -941,6 +942,7 @@ func _load_bow(root: String) -> bool:
 	socket.bone_name = &"J_L_Hand"
 	player.skeleton.add_child(socket)
 	_bow_mount = _mount_weapon(meshes[0], socket, "LabBow", Transform3D.IDENTITY)
+	_bow_display_mesh_index = player.render_presenter.meshes.find(_bow_mount)
 	player.configure_bow_mount(_bow_mount, meshes)
 	_bow_profile = Bow.combat_profile(root)
 	_bow = Bow.new()
@@ -1141,6 +1143,11 @@ func _process(delta: float) -> void:
 		_spawn_crowd_frame()
 	elif _combat_audio != null:
 		_combat_audio.prepare_queued_samples()
+	if _bow != null:
+		# The player presenter has already sampled the interpolated grip.
+		var presenter = player.render_presenter
+		var charge_age: float = player.bow_charge_cue_age(presenter.display_clock) if _bow_mount.is_visible_in_tree() else -1.0
+		_bow.present_charge_cue(charge_age, presenter.display_meshes[_bow_display_mesh_index])
 	var focus: Vector3 = presentation.player_position()
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
 	if not _pending_melee_feedback.is_empty():

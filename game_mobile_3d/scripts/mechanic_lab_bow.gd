@@ -11,6 +11,7 @@ const RELEASE := "NativeBowRelease"
 const AMMO_LIMIT := 15
 const ATTACK_PERIOD_SECONDS := 0.4
 const CHARGE_TIME := 0.35
+const CHARGE_CUE_SHADER := preload("res://materials/mechanic_lab_bow_charge_cue.gdshader")
 const DRAW_START := 19.0 / 30.0
 const DRAW_HOLD := 35.0 / 30.0
 const RELEASE_START := 40.0 / 30.0
@@ -46,6 +47,36 @@ const NORMAL_STRIKE := {"damage": 18, "strength": 500.0, "angle": 25.0, "stagger
 const CHARGED_STRIKE := {"damage": 54, "strength": 500.0, "angle": 25.0, "stagger": 22.5}
 
 var _combat_audio: Node
+var _charge_cue: MeshInstance3D
+
+func _ready() -> void:
+	super._ready()
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.34, 0.34)
+	var material := ShaderMaterial.new()
+	material.shader = CHARGE_CUE_SHADER
+	quad.material = material
+	_charge_cue = MeshInstance3D.new()
+	_charge_cue.name = "BowChargeCue"
+	_charge_cue.mesh = quad
+	_charge_cue.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_charge_cue.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	_charge_cue.hide()
+	add_child(_charge_cue)
+
+static func is_fully_drawn(held_time: float) -> bool:
+	return held_time >= CHARGE_TIME - 0.00001
+
+func present_charge_cue(age: float, display_pose: Transform3D) -> void:
+	_charge_cue.visible = age >= 0.0
+	if not _charge_cue.visible:
+		return
+	_charge_cue.global_position = display_pose * (Vector3.BACK * ARROW_OFFSET.z)
+	_charge_cue.set_instance_shader_parameter(&"charge_age", minf(age, 0.18))
+
+func reset() -> void:
+	super.reset()
+	_charge_cue.hide()
 
 static func icon() -> Texture2D:
 	return Source.icon(BOW_DIRECTORY, "T_UI_Bow_Icon",

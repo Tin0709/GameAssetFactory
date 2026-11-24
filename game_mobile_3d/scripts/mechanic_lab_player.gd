@@ -129,6 +129,12 @@ func configure_bow_mount(mount: MeshInstance3D, meshes: Array[Mesh]) -> void:
 func bow_busy() -> bool:
 	return _bow_down or _bow_drawing or _bow_recovery > 0.0
 
+func bow_charge_cue_age(display_time: float) -> float:
+	if not bow_equipped or not _bow_down or not _bow_drawing or is_dead or not review_clip.is_empty():
+		return -1.0
+	var presented_hold := _bow_held_seconds - maxf(0.0, effects.clock - display_time)
+	return maxf(0.0, presented_hold - Bow.CHARGE_TIME) if Bow.is_fully_drawn(presented_hold) else -1.0
+
 func _refresh_markers() -> void:
 	super._refresh_markers()
 	if bow_equipped and _bow_mount != null:
@@ -423,7 +429,7 @@ func _animate(delta: float) -> void:
 			_emit_tool_ground_cues(cues, previous_time)
 	if release_bow:
 		combo.serial += 1
-		bow_released.emit(combo.serial, _bow_held_seconds >= Bow.CHARGE_TIME - 0.00001, target)
+		bow_released.emit(combo.serial, Bow.is_fully_drawn(_bow_held_seconds), target)
 
 func _emit_tool_ground_cues(cues: Array, previous_time: float) -> void:
 	for cue: Dictionary in cues:
