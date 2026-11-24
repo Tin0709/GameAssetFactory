@@ -328,6 +328,7 @@ func run() -> void:
 	await check_projectile_birth_frame(lab)
 	await check_projectile_surface_bounds(lab)
 	await check_projectile_contact_anchor(lab)
+	await check_embedded_surface_batch(lab)
 	await check_bow_impact_charge_tint(lab)
 	await ticks(12)
 	target.position = Vector3(2.5, 0.0, 3.0)
@@ -746,6 +747,46 @@ func check_projectile_contact_anchor(lab: Node3D) -> void:
 					"The prop wobbles without its pivot sliding or the shaft turning into the terrain")
 				print("PROJECTILE_PROP_PIVOT worst_gap=", worst_gap, " minimum_entry=", minimum_entry)
 		weapon.reset()
+	wall.free()
+
+func check_embedded_surface_batch(lab: Node3D) -> void:
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(2.0, 2.0, 0.04)
+	collider.shape = box
+	wall.add_child(collider)
+	wall.position = Vector3(18.0, 1.5, 2.5)
+	lab.add_child(wall)
+	await ticks(2)
+	for projectile: Node3D in [lab._crossbow, lab._bow]:
+		projectile.reset()
+		var normals: Array[Vector3] = []
+		var on_impact := func(hit: Dictionary, _direction: Vector3, _serial: int):
+			normals.append(hit.normal)
+		projectile.bolt_impact.connect(on_impact)
+		for shot: Array in [[Vector3(18.0, 1.4, 0.25), Vector3.BACK], [Vector3(25.0, 1.3, 0.0), Vector3.DOWN]]:
+			if projectile == lab._crossbow:
+				projectile.fire(shot[0], shot[1], 1982, shot[0])
+			else:
+				projectile.fire_arrow(shot[0], shot[1], 1983, shot[0], true)
+		for i in 35:
+			await physics_frame
+			if normals.size() == 2:
+				break
+		var renderer := projectile.get_node("EmbeddedArrows") as MultiMeshInstance3D
+		var batch := renderer.multimesh
+		check(normals.size() == 2 and normals.any(func(n): return n.dot(Vector3.UP) > 0.99)
+			and normals.any(func(n): return n.dot(Vector3.FORWARD) > 0.99)
+			and batch.visible_instance_count == 2 and batch.use_custom_data and renderer.material_override is ShaderMaterial,
+			"One embedded batch retains independently masked wall and floor props")
+		if normals.size() == 2 and batch.use_custom_data and DisplayServer.get_name() != "headless":
+			for i in normals.size():
+				var clipping := batch.get_instance_custom_data(i)
+				var normal := Vector3(clipping.r, clipping.g, clipping.b)
+				check(normal.is_equal_approx(normals[i]), "Each embedded instance carries its own actual contact normal")
+		projectile.bolt_impact.disconnect(on_impact)
+		projectile.reset()
 	wall.free()
 
 func check_bow_impact_charge_tint(lab: Node3D) -> void:
