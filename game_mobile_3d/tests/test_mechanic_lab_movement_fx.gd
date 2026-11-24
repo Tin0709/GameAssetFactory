@@ -149,15 +149,23 @@ func check_source_dust_batch(lab, dust) -> void:
 		for i in 3:
 			await physics_frame
 		await process_frame
+		await process_frame
+		# process_frame is emitted before the dust renderer updates. More than
+		# one physics tick can run before that first render at low FPS.
 		var material := batch.multimesh.mesh.material as ShaderMaterial
-		check(visible_particles(dust) > 0 and batch.multimesh.visible_instance_count == visible_particles(dust)
-			and material.get_shader_parameter("dust_tint") == dust.SURFACE_DUST[surface],
+		var landing: Array = dust._particles.filter(func(p): return p.sprite.visible)
+		check(landing.size() in [4, 5, 6] and batch.multimesh.visible_instance_count == landing.size()
+			and material.get_shader_parameter("dust_tint") == dust.SURFACE_DUST[surface]
+			and landing.all(func(p): return not p.draw_pending and p.sprite.layers == 0),
 			"A %s landing still uses one dust batch with the requested tint" % surface)
 		dust._emit_source_landing(Vector3.RIGHT, "grass")
 		for i in 3:
 			await physics_frame
 		await process_frame
-		check(batch.multimesh.visible_instance_count == 0 and visible_particles(dust) >= 8,
+		await process_frame
+		var mixed: Array = dust._particles.filter(func(p): return p.sprite.visible)
+		check(batch.multimesh.visible_instance_count == 0 and mixed.size() > landing.size()
+			and mixed.all(func(p): return not p.draw_pending and p.sprite.layers == 1),
 			"Mixed tints use individual sorting until their overlap ends")
 		dust.clear()
 	lab.reset_player()
