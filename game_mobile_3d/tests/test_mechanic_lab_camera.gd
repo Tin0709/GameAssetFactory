@@ -426,6 +426,10 @@ func check_aerial_contact_pose(lab) -> void:
 				if not expected_normal.is_zero_approx():
 					check(expected.distance_to(birth) < 0.001,
 						"The spark position uses the real blade contact pose in slot %d" % slot)
+				var lower_body: float = center.y - capsule.y - capsule.x
+				if birth.y <= lower_body + 0.11:
+					var rising: bool = sparks._particles.all(func(spark): return spark.age >= spark.lifetime or spark.velocity.y >= 0.0)
+					check(rising, "A lower-body blade contact keeps its sparks above the floor in slot %d" % slot)
 				print("AIR_SPARK_SURFACE slot=", slot, " shift=", birth.distance_to(contacts[0]), " origin=", birth)
 			if slot != lab.Weapon.SABRE:
 				check(lab._impact_light.visible and is_equal_approx(lab._impact_light.light_energy, 2.3),
