@@ -2,6 +2,7 @@ global uniform vec4 gaf_spruce_sky_region;
 global uniform vec3 gaf_spruce_sky_extent;
 global uniform vec3 gaf_spruce_sky_camera;
 global uniform sampler3D gaf_spruce_sky_volume : filter_linear, repeat_disable;
+global uniform float gaf_shrub_sky_strength;
 global uniform float gaf_canopy_edge_fill;
 global uniform float gaf_canopy_sky_color;
 global uniform float gaf_canopy_edge_return;
@@ -16,7 +17,9 @@ float gaf_spruce_sky(vec3 point, vec3 camera_position) {
 	if (any(lessThan(cell, vec3(0.0))) || any(greaterThan(cell, gaf_spruce_sky_extent - 1.0))) {
 		return 1.0;
 	}
-	float occlusion = textureLod(gaf_spruce_sky_volume, (cell + 0.5) / gaf_spruce_sky_extent, 0.0).r;
+	// R keeps the tree field. An optional G channel includes nearby shrubs.
+	vec2 cover = textureLod(gaf_spruce_sky_volume, (cell + 0.5) / gaf_spruce_sky_extent, 0.0).rg;
+	float occlusion = mix(cover.r, cover.g, gaf_shrub_sky_strength);
 	return 1.0 - gaf_spruce_sky_region.w * occlusion;
 }
 

@@ -11,6 +11,7 @@ static var _owner: WeakRef
 
 var proof_ready := false
 var applied_strength := 0.
+var applied_shrub_sky_strength := 0.
 var applied_tree_strength := 0.
 var applied_edge_fill := 0.
 var applied_sky_color := 0.
@@ -31,6 +32,8 @@ var applied_pre_twilight := 0.
 var _level: Node3D
 var _camera: Camera3D
 var _texture: ImageTexture3D
+var _shrub_sky: ImageTexture3D
+var _shrub_count := 0
 var _origin: Vector3
 var _dimensions: Vector3i
 var _casters: Array[Dictionary] = []
@@ -92,6 +95,7 @@ func setup(level: Node3D) -> void:
 		return
 	_owner = weakref(self)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_region", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_shrub_sky_strength", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", 0.)
@@ -346,6 +350,48 @@ func _layout_texture(path: String, digest: String, dimensions: Vector3i) -> Imag
 		return null
 	return _level.showcase.directional_air._make_texture(data, dimensions)
 
+func load_shrub_sky(relative: String, digest: String, canopy_digest: String) -> bool:
+	if not proof_ready or relative.is_empty() or _owner == null or _owner.get_ref() != self:
+		return false
+	var root: String = _level.showcase.directional_air.research_root
+	var profile := _layout_profile(root, relative, digest)
+	var plants: Node = _level.showcase.plants
+	if plants == null or _level.plains_planting_path.is_empty() or profile.get("schema") != "plains_shrub_sky/1":
+		return false
+	var dims: Array = profile.get("dimensions", [])
+	var poses: Array = profile.get("poses", [])
+	var planted: Dictionary = plants.plains_planting.shrub_roots
+	if dims.size() != 3 or Vector3i(_vector(dims)) != _dimensions or poses.is_empty() or poses.size() != planted.size() \
+			or profile.get("canopy_sha256") != canopy_digest \
+			or profile.get("layout_sha256") != FileAccess.get_sha256(_level.map_layout_path) \
+			or profile.get("planting_sha256") != FileAccess.get_sha256(_level.plains_planting_path) \
+			or profile.get("plant_sources_sha256") != plants.plains_planting.MANIFEST_SHA:
+		return false
+	for item: Dictionary in poses:
+		var cell := Vector2i(int(item.cell[0]), int(item.cell[1]))
+		var basis: Array = item.basis
+		var expected := Transform3D(Basis(_vector(basis[0]), _vector(basis[1]), _vector(basis[2])), _vector(item.origin))
+		if not planted.has(cell) or not planted[cell].is_equal_approx(expected):
+			return false
+	var path := root.path_join(relative).get_base_dir().path_join("receiver.private.rg8")
+	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != profile.get("payload_sha256"):
+		return false
+	var bytes := FileAccess.get_file_as_bytes(path)
+	var slab := 2 * _dimensions.x * _dimensions.y
+	if bytes.size() != slab * _dimensions.z:
+		return false
+	var images: Array[Image] = []
+	for z in _dimensions.z:
+		images.append(Image.create_from_data(_dimensions.x, _dimensions.y, false, Image.FORMAT_RG8,
+			bytes.slice(z * slab, (z + 1) * slab)))
+	var sky := ImageTexture3D.new()
+	if sky.create(Image.FORMAT_RG8, _dimensions.x, _dimensions.y, _dimensions.z, false, images) != OK:
+		return false
+	_shrub_sky = sky
+	_shrub_count = poses.size()
+	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", sky)
+	return true
+
 func _vector(values: Array) -> Vector3:
 	return Vector3(values[0], values[1], values[2])
 
@@ -431,6 +477,14 @@ func refresh() -> void:
 	if strength != applied_strength:
 		applied_strength = strength
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_region", Vector4(_origin.x, _origin.y, _origin.z, strength))
+	var shrub_strength := 0.
+	var plants: Node3D = review.plants
+	if _shrub_sky != null and strength > 0. and not review._balanced_preview and plants != null \
+			and plants.is_visible_in_tree() and plants.plains_planting.shrub_roots.size() == _shrub_count:
+		shrub_strength = PHASE.phase_weight(review.hour) * review._balanced_daylight_weight()
+	if shrub_strength != applied_shrub_sky_strength:
+		applied_shrub_sky_strength = shrub_strength
+		RenderingServer.global_shader_parameter_set("gaf_shrub_sky_strength", shrub_strength)
 	var tree_strength := 0.
 	if strength > 0.:
 		tree_strength = review._lighting_scale(&"tree_shade") * review._balanced_daylight_weight()
@@ -512,6 +566,7 @@ func refresh() -> void:
 func _exit_tree() -> void:
 	if _owner != null and _owner.get_ref() == self:
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_region", Vector4.ZERO)
+		RenderingServer.global_shader_parameter_set("gaf_shrub_sky_strength", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_edge_fill", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_canopy_sky_color", 0.)

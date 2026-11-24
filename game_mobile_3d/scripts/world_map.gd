@@ -130,6 +130,8 @@ var biome_controller: BiomeGraphics
 @export var forest_preferred_layout_sha256 := ""
 @export var forest_canopy_extension_profile := ""
 @export var forest_canopy_extension_sha256 := ""
+@export var plains_shrub_sky_profile := ""
+@export var plains_shrub_sky_sha256 := ""
 @export var east_air_profile := ""
 @export var east_air_profile_sha256 := ""
 ## Optional directional lighting for this placement, relative to the research directory.
@@ -310,6 +312,7 @@ func _ready() -> void:
 		if extension:
 			spruce_sky.load_directional_ground(terrain_canopy_sky_profile, terrain_canopy_sky_sha256, forest_canopy_extension_sha256)
 			spruce_sky.set_local_diffuse_field(local_diffuse_field)
+			spruce_sky.load_shrub_sky(plains_shrub_sky_profile, plains_shrub_sky_sha256, forest_canopy_extension_sha256)
 		if extension and showcase.mist != null and showcase.directional_air.load_east(
 				east_air_profile, east_air_profile_sha256, forest_canopy_extension_sha256, spruce_sky):
 			showcase.mist.effect.east_directional_grid = showcase.directional_air.east_texture
