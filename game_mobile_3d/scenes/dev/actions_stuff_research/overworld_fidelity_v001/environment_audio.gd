@@ -67,15 +67,10 @@ func setup(body: CharacterBody3D, field: Node3D, bundle: RefCounted, terrain_con
 	actor=body;meadow=field;reader=bundle;config=reader.data.get("audio_config",{});_random.seed=281027
 	_terrain_contact = terrain_contact
 	for key:String in reader.data.audio:
-		var rows:Array=[]
-		for row:Dictionary in reader.data.audio[key]:
-			var stream:AudioStreamOggVorbis=reader.audio_stream(row)
-			if stream==null:rejected_count+=1;continue
-			stream.loop=false;rows.append({"stream":stream,"name":row.name,"seconds":row.seconds});loaded_count+=1
-		groups[key]=rows
+		_load_audio_group(key, reader)
 	for surface: String in LANDING_FAMILIES:
 		if groups.has(surface):
-			_load_landing_family(surface, landing_fallback)
+			_load_landing_family(surface, reader, landing_fallback)
 	# The flat grass lab supplies its own listener and only needs footsteps.
 	if meadow == null:
 		ambient_enabled = false
@@ -97,14 +92,30 @@ func setup(body: CharacterBody3D, field: Node3D, bundle: RefCounted, terrain_con
 	actor.presentation_reset.connect(reset_contacts)
 	print("OVERWORLD_AUDIO_READY ",JSON.stringify({"loaded":loaded_count,"rejected":rejected_count,"groups":groups.keys(),"scope":reader.data.audio_scope}))
 
-func _load_landing_family(surface: String, fallback: RefCounted) -> void:
+func load_surface_bank(surface: String, bundle: RefCounted) -> void:
+	_load_audio_group(surface, bundle)
+	_load_landing_family(surface, bundle)
+
+func _load_audio_group(key: String, bundle: RefCounted) -> void:
+	var rows: Array = []
+	for row: Dictionary in bundle.data.audio[key]:
+		var stream: AudioStreamOggVorbis = bundle.audio_stream(row)
+		if stream == null:
+			rejected_count += 1
+			continue
+		stream.loop = false
+		rows.append({"stream": stream, "name": row.name, "seconds": row.seconds})
+		loaded_count += 1
+	groups[key] = rows
+
+func _load_landing_family(surface: String, bundle: RefCounted, fallback: RefCounted = null) -> void:
 	var family: Array = LANDING_FAMILIES[surface]
 	var hashes: Array = family[1]
 	var rows: Array = []
 	for i in hashes.size():
 		var name := "sfx_player_land_%s_%02d" % [family[0], i + 1]
 		var relative_path := LANDING_DIRECTORY.path_join(name + ".ogg")
-		var stream: AudioStreamOggVorbis = reader.audio_stream({"path": reader.root.path_join(relative_path), "sha256": hashes[i]})
+		var stream: AudioStreamOggVorbis = bundle.audio_stream({"path": bundle.root.path_join(relative_path), "sha256": hashes[i]})
 		if stream == null and fallback != null:
 			stream = fallback.audio_stream({"path": fallback.root.path_join(relative_path), "sha256": hashes[i]})
 		if stream == null:

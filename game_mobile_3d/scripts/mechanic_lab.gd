@@ -8,16 +8,34 @@ const WorldShowcase := preload("res://scripts/world_map_showcase.gd")
 const WorldAmbient := preload("res://scripts/world_map_ambient.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const MovementAudio := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/environment_audio.gd")
-const GRASS_STEP_DIRECTORY := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events/Spicewood/Mobs/Mob_Companion/Blub"
-# The same decoded grass steps used by the optional ambience manifest.
-const GRASS_STEP_SAMPLES := [
-	["563c4a955a79801b18792cdf18540f7174d26422112d031c4c6f234a3b946fc8", 0.4109583333333333],
-	["489163367e0aa59ca62831612dc4d569ba09a81d667d30acf67459410fce708f", 0.5076875],
-	["b620f2dce941577f0187926514650fa0c473002a61d0c0e6d4b04c01e914cb80", 0.42802083333333335],
-	["d69e3759473ca778bbf93e7e8699d3b0b27694947356c5455c08fa126f5adde2", 0.45277083333333334],
-	["4c0e995a7f8493e99a81ac56d9157c7c0d1297e97cdb3949f4ff171d1e918072", 0.5732708333333333],
-	["9ee5b276ce70dac9fd60349f3caf1bfef533d2f87ed4cebacbcdbf978380e05f", 0.5477291666666667],
-]
+const STEP_DIRECTORY := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events/Spicewood/Mobs/Mob_Companion/Blub"
+# The same checksum-pinned families used by the private terrain ambience manifest.
+const FLOOR_STEP_BANKS := {
+	"grass": ["sfx_player_stepGrass-%03d_soundWave", [
+		["563c4a955a79801b18792cdf18540f7174d26422112d031c4c6f234a3b946fc8", 0.4109583333333333],
+		["489163367e0aa59ca62831612dc4d569ba09a81d667d30acf67459410fce708f", 0.5076875],
+		["b620f2dce941577f0187926514650fa0c473002a61d0c0e6d4b04c01e914cb80", 0.42802083333333335],
+		["d69e3759473ca778bbf93e7e8699d3b0b27694947356c5455c08fa126f5adde2", 0.45277083333333334],
+		["4c0e995a7f8493e99a81ac56d9157c7c0d1297e97cdb3949f4ff171d1e918072", 0.5732708333333333],
+		["9ee5b276ce70dac9fd60349f3caf1bfef533d2f87ed4cebacbcdbf978380e05f", 0.5477291666666667],
+	]],
+	"dirt": ["sfx_player_step_carapaceDryDirt-%03d", [
+		["00eb92e0d76759bf6cd759237a747946ccbf0b5c5595ad417c61d2064079ef81", 0.2720416666666667],
+		["ecff9809f2eab8c68f9fdc38a7dfbddd163dfd44b2cdbb0a9c2529f64ff8a6c7", 0.30285416666666665],
+		["b90e7ac6d5b43d738c6e1a9303ed150318ac7577295efabf037bb17dbd1bc27c", 0.368375],
+		["6518f75ffe39612af951d02d3d057efd5d040b2316ab47a5b9e9709abd0d7253", 0.5289791666666667],
+		["e36cad2fd7e5996af3055a8dc5f02163ce1fe37277584d763e71e47302cb2b3b", 0.40697916666666667],
+		["a22a71e0e2c5121e10dd751dc930d208a4036c112bf7ef85f8e0e49c0b3f83d8", 0.41002083333333333],
+	]],
+	"stone": ["sfx_player_stepStone-%03d_soundWave", [
+		["09d68ffcb4fe957525e00202c23dc76104a538c2469125325a39f8307f40c5b0", 0.3658125],
+		["94d20506c3a390f86b3020e22441570622e5021d21e2f12256d5293f9a6c8d0d", 0.25397916666666664],
+		["0cb0c0d9186a66ece757e4519c81d36da89949b7985bde1a044d0be777f69495", 0.336375],
+		["18643c8a0cf9d9fd07ea6f9e9e5fea2cc87db4cabcafbf97212467a6306d4374", 0.303375],
+		["7ed8bfe965ada0659afb87f1d1245f97c045e9cb97b93737ae0643d415a63f2e", 0.29654166666666665],
+		["c18e06e5c20c27318ed7a4f4fb9187ce059cb31e3b3bfde671bc00014ff9b2b8", 0.31616666666666665],
+	]],
+}
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
 const ZombieStepDust := preload("res://scripts/mechanic_lab_zombie_step_dust.gd")
 const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
@@ -988,6 +1006,10 @@ func _select_floor_surface(index: int) -> void:
 	_landing_contact_tick = -1
 	if _combat_audio != null:
 		_combat_audio.queue_landing_surface(WeaponSource.research_root(), surface)
+	if _movement_audio != null and not _movement_audio.groups.has(surface):
+		var bundle := PrivateOverworldBundle.new()
+		if _use_local_movement_bank(bundle, surface):
+			_movement_audio.load_surface_bank(surface, bundle)
 
 func _setup_render_scale() -> void:
 	var picker: OptionButton = $HUD/RenderScale
@@ -1150,23 +1172,24 @@ func _prepare_movement_audio(bundle: PrivateOverworldBundle) -> MovementAudio:
 		voice.bus = _lab_audio_mix.bus_name(LabAudioMix.Layer.SURFACE)
 	return movement
 
-func _use_local_movement_bank(bundle: PrivateOverworldBundle) -> bool:
+func _use_local_movement_bank(bundle: PrivateOverworldBundle, surface := "grass") -> bool:
 	bundle.root = WeaponSource.research_root().simplify_path().replace("\\", "/").trim_suffix("/")
-	var directory := bundle.root.path_join(GRASS_STEP_DIRECTORY)
+	var directory := bundle.root.path_join(STEP_DIRECTORY)
 	if not bundle.permitted(directory):
 		return false
-	var grass: Array[Dictionary] = []
-	for i in GRASS_STEP_SAMPLES.size():
-		var name := "sfx_player_stepGrass-%03d_soundWave" % (i + 1)
-		var sample: Array = GRASS_STEP_SAMPLES[i]
-		grass.append({
+	var bank: Array = FLOOR_STEP_BANKS[surface]
+	var samples: Array[Dictionary] = []
+	for i in bank[1].size():
+		var name: String = bank[0] % (i + 1)
+		var sample: Array = bank[1][i]
+		samples.append({
 			"name": name, "path": directory.path_join(name + ".ogg"),
 			"sha256": sample[0], "seconds": sample[1],
 		})
 	bundle.data = {
-		"audio": {"grass": grass},
+		"audio": {surface: samples},
 		"audio_config": {"footstep_radius_m": 70.0, "footsteps_db": -8.0, "landing_db": -5.0},
-		"audio_scope": "Checksum-pinned MechanicLab grass media. Native Wwise routing and mix unverified.",
+		"audio_scope": "Checksum-pinned MechanicLab surface media. Native Wwise routing and mix unverified.",
 	}
 	bundle.error = ""
 	return true
