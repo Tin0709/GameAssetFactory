@@ -134,6 +134,7 @@ func run() -> void:
 	await check_blade_contact_spark_origin()
 	await check_gauntlet_contact_spark_origins()
 	await check_flash_during_render_hitch()
+	await check_body_flash_release()
 	await check_splash_flash_strength()
 	await check_damage_numbers_during_render_hitch()
 	await check_overlapping_damage_number_positions()
@@ -646,6 +647,35 @@ func check_splash_flash_strength() -> void:
 		check(zombie.health == 0 and is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 0.3),
 			"A lethal splash retains the weaker flash during the ragdoll handoff (baby: %s)" % baby)
 		zombie.free()
+	lab.free()
+
+
+func check_body_flash_release() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var group := lab.get_node("Zombies")
+	for baby: bool in [false, true]:
+		for lethal: bool in [false, true]:
+			check(group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, baby),
+				"The direct flash release fixture spawns its target")
+			var zombie = group.get_child(group.get_child_count() - 1)
+			var mesh: MeshInstance3D = zombie._mesh
+			zombie.take_hit(zombie.health if lethal else 1, Vector3.FORWARD)
+			check(mesh.get_instance_shader_parameter(&"hit_flash") == 1.0,
+				"A direct hit displays the full first flash")
+			zombie._process(0.2)
+			zombie._process(2.0 / 60.0)
+			var middle := float(mesh.get_instance_shader_parameter(&"hit_flash"))
+			if lethal:
+				check(middle > 0.95, "A lethal flash keeps the bright hold during the launch")
+			else:
+				check(middle > 0.55 and middle < 0.78, "A surviving zombie starts revealing its skin during the hit")
+			zombie._process(3.0 / 60.0)
+			check(mesh.get_instance_shader_parameter(&"hit_flash") == 0.0 and not zombie.is_processing(),
+				"Direct hit flash still finishes within the existing duration")
+			print("BODY_FLASH_RELEASE baby=", baby, " lethal=", lethal, " middle=", middle)
+			zombie.free()
 	lab.free()
 
 func check_flash_during_render_hitch() -> void:
