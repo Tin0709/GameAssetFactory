@@ -9,6 +9,7 @@ render_mode cull_disabled, diffuse_burley, specular_disabled;
 #endif
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_splay.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_wind.gdshaderinc"
+uniform bool tinted_grass=false;
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 #include "res://materials/world_map_replay_bounce.gdshaderinc"
 #include "res://materials/world_map_local_diffuse.gdshaderinc"
@@ -79,7 +80,6 @@ uniform sampler2D interaction_previous : filter_linear, repeat_disable;
 uniform sampler2D ground_atlas : source_color, filter_nearest, repeat_disable;
 uniform vec4 ground_uv=vec4(0.0);
 uniform bool has_mre=false;
-uniform bool tinted_grass=false;
 uniform bool native_grass_albedo=false;
 uniform vec3 base_tint=vec3(0.0);
 uniform vec3 tip_tint=vec3(0.0);
