@@ -609,7 +609,7 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 		cues.append(actor.combo.time - (actor.effects.clock - sample) * actor.combo.playback_rate())
 		cue_clocks.append(sample)
 	actor.connect(&"tool_ground_cue", record)
-	for fixture in ["grass", "stone", "wall", "ledge", "shovel", "swapped"]:
+	for fixture in ["grass", "stone", "wall", "ledge", "shovel", "reset_during_windup"]:
 		lab.reset_player()
 		lab._select_floor_surface(2 if fixture == "stone" else 0)
 		lab._select_weapon(lab.Weapon.SHOVEL if fixture == "shovel" else lab.Weapon.PICKAXE)
@@ -639,13 +639,13 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 		root.push_input(key, true)
 		var peak := 0
 		var ring_seen := false
-		var swapped := false
+		var cancelled := false
 		var expected := [0.765836, 0.213588, 0.279747] if fixture == "shovel" else [0.270322, 0.273662, 0.277670, 0.298377]
 		for i in Engine.physics_ticks_per_second * 5:
 			await physics_frame
-			if fixture == "swapped" and actor.combo.index == 2 and actor.combo.time >= 0.18:
-				lab._select_weapon(lab.Weapon.SABRE)
-				swapped = true
+			if fixture == "reset_during_windup" and actor.combo.index == 2 and actor.combo.time >= 0.18:
+				lab.reset_player()
+				cancelled = true
 				break
 			peak = maxi(peak, visible_particles(dust))
 			ring_seen = ring_seen or ring.visible
@@ -654,11 +654,17 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 		key = InputEventKey.new()
 		key.physical_keycode = KEY_E
 		root.push_input(key, true)
-		if fixture == "swapped":
+		if fixture == "reset_during_windup":
 			for i in 20:
 				await physics_frame
-			check(swapped and cues.is_empty() and not ring.visible, "Changing weapons discards pending Pickaxe cues")
+			lab._select_weapon(lab.Weapon.SABRE)
+			check(cancelled and cues.is_empty() and not ring.visible and visible_particles(dust) == 0
+				and lab._equipped_weapon == lab.Weapon.SABRE, "Reset during windup cancels Pickaxe ground cues")
 			continue
+		for i in 3:
+			await physics_frame
+			peak = maxi(peak, visible_particles(dust))
+			ring_seen = ring_seen or ring.visible
 		check(cues.size() == expected.size(), "%s emits each montage cue once" % fixture)
 		for index in mini(cues.size(), expected.size()):
 			check(absf(cues[index] - float(expected[index])) < 0.00001,
@@ -676,12 +682,12 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 		elif fixture == "shovel":
 			check(peak >= 4 and not ring_seen, "Shovel emits the separate debris passes without the Pickaxe ring")
 		else:
-			check(not ring_seen and dust._particles.all(func(p):
-				return not p.sprite.visible or p.origin.dot(forward) <= 0.91 or fixture == "ledge" and p.origin.y >= 0.39),
+			check(not ring_seen and peak == 0,
 				"%s does not show impact geometry beyond support" % fixture)
-		check(lab._shake_duration > 0.0 and absf(lab._shake_sample_time - cue_clocks.back()) < 0.045
-			if fixture != "shovel" and not cue_clocks.is_empty() else fixture == "shovel",
-			"The Pickaxe camera pulse comes from the montage instead of enemy contact")
+		var shake_index := 1 if fixture == "shovel" else 3
+		check(cue_clocks.size() > shake_index and lab._shake_duration > 0.0
+			and absf(lab._shake_sample_time - cue_clocks[shake_index]) < 0.045,
+			"The %s camera pulse comes from the montage instead of enemy contact" % fixture)
 		print("TOOL_GROUND_FX ", fixture, " cues=", cues, " peak=", peak, " ring=", ring_seen)
 		if obstacle != null:
 			obstacle.free()
