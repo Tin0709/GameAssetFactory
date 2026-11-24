@@ -1890,7 +1890,7 @@ func check_special_weapon_preparation() -> void:
 	var menu := lab.get_node("HUD/Weapon") as OptionButton
 	for frame in 45:
 		await physics_frame
-	for index: int in [3, 4]:
+	for index: int in [6, 3, 4]:
 		menu.select(index)
 		menu.item_selected.emit(index)
 		check(menu.selected == index, "The first special-weapon switch uses the real HUD")
@@ -1899,6 +1899,10 @@ func check_special_weapon_preparation() -> void:
 		and audio._weapon_sample_jobs.has(&"crossbow_fire")
 		and audio._weapon_sample_jobs.has(&"gauntlet_hit"),
 		"Muted first equip queues both combat banks without decoding them")
+	var bow_families: Array[StringName] = [&"bow_fire", &"bow_draw", &"bow_unequip", &"bow_charged_flight"]
+	check(bow_families.all(func(group: StringName):
+		return not audio._groups.has(group) and audio._weapon_sample_jobs.has(group)),
+		"Muted first equip queues all four Bow families without decoding them")
 	toggle.button_pressed = true
 	var hits: Array = audio._groups.get(&"gauntlet_hit", [])
 	check(hits.size() == COMBAT_AUDIO.GAUNTLET_HIT_HASHES.size()
@@ -1937,6 +1941,18 @@ func check_special_weapon_preparation() -> void:
 	check(audio._groups.size() == group_count and audio._flight_targets.is_empty()
 		and not audio._voices.any(func(voice): return voice.playing),
 		"Muting pauses preparation and releases the active bolt's cue")
+	menu.select(6)
+	menu.item_selected.emit(6)
+	audio.reset()
+	var bow: Node = lab.get("_bow")
+	bow.play_charge(point)
+	check(audio._groups.get(&"bow_draw", []).size() == 4 and audio._voice_groups.has(&"bow_draw")
+		and not audio._groups.has(&"bow_fire") and not audio._groups.has(&"bow_charged_flight"),
+		"An immediate Bow draw prepares only its own source family")
+	check(bow.fire_arrow(point, Vector3.FORWARD, 26, point, false)
+		and audio._groups.get(&"bow_fire", []).size() == 3 and audio._voice_groups.has(&"bow_fire")
+		and not audio._groups.has(&"bow_charged_flight"),
+		"An immediate normal shot has all first-shot variants before flight")
 	lab.free()
 	await create_timer(0.12).timeout
 
