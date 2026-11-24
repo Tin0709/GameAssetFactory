@@ -578,6 +578,7 @@ func _select_weapon(index: int) -> void:
 		_bow_mount.visible = bow_equipped
 	player.marker_base.position = blade_base
 	player.marker_tip.position = blade_tip
+	player.effects.blade_trail_enabled = not blade_base.is_equal_approx(blade_tip)
 	player.reference_audio.reset()
 	player.reference_audio.clip_aliases = aliases
 	player.reference_audio.clip_play_rates = rates

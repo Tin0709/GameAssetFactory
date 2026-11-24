@@ -32,6 +32,7 @@ const TRAIL_SHADER := preload("res://materials/mechanic_lab_polaris_trail.gdshad
 const ImpactSparks := preload("res://scripts/mechanic_lab_polaris_impact.gd")
 const TRAIL_LIFETIME := 0.30
 const TRAIL_WIDTH := 0.08
+const CHARGED_TRAIL_WIDTH := 0.16
 const TRAIL_ALPHA_END := 0.60
 const TRAIL_FADE_END_AGE := TRAIL_ALPHA_END * TRAIL_LIFETIME
 # NS_ArrowTrail's 48-sample opacity LUT bridges the change of slope
@@ -192,7 +193,7 @@ func fire(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vec
 	return _fire_projectile(origin, direction, serial, clearance_start, BOLT_SPEED)
 
 func _fire_projectile(origin: Vector3, direction: Vector3, serial: int, clearance_start: Vector3,
-		speed: float, strike: Dictionary = STRIKE) -> bool:
+		speed: float, strike: Dictionary = STRIKE, charged := false) -> bool:
 	if ammo == 0:
 		return false
 	ammo -= 1
@@ -214,7 +215,7 @@ func _fire_projectile(origin: Vector3, direction: Vector3, serial: int, clearanc
 	bolt.scale = Vector3.ONE * BOLT_MESH_SCALE
 	bolt.reset_physics_interpolation()
 	var trail := {"origin": origin, "direction": direction, "distance": 0.0, "speed": speed,
-		"stopped": false, "tail_age": 0.0}
+		"stopped": false, "tail_age": 0.0, "charged": charged}
 	_trails.append(trail)
 	_bolts.append({"node": bolt, "direction": direction, "speed": speed, "life": BOLT_LIFETIME,
 		"serial": serial, "trail": trail, "strike": strike})
@@ -324,7 +325,9 @@ func _update_trails() -> void:
 			has_surface = true
 		var previous_point := to_local_space * head
 		var lateral := to_local_space.basis * sideways
-		var previous_width := TRAIL_WIDTH * 0.5 * (1.0 - 0.5 * age / TRAIL_LIFETIME)
+		var charged: bool = trail.get("charged", false)
+		var half_width := (CHARGED_TRAIL_WIDTH if charged else TRAIL_WIDTH) * 0.5
+		var previous_width := half_width * (1.0 - 0.5 * age / TRAIL_LIFETIME)
 		var previous_alpha := _trail_opacity(age / TRAIL_LIFETIME)
 		var blend_start := clampf(TRAIL_ALPHA_BLEND_START * TRAIL_LIFETIME - age, 0.0, duration)
 		var blend_end := clampf(TRAIL_ALPHA_BLEND_END * TRAIL_LIFETIME - age, 0.0, duration)
@@ -333,19 +336,19 @@ func _update_trails() -> void:
 			if seconds_back <= previous_seconds_back:
 				continue
 			var normalized_age := (age + seconds_back) / TRAIL_LIFETIME
-			var width := TRAIL_WIDTH * 0.5 * (1.0 - 0.5 * normalized_age)
+			var width := half_width * (1.0 - 0.5 * normalized_age)
 			var opacity := _trail_opacity(normalized_age)
 			var point := to_local_space * (head - direction * speed * seconds_back)
 			var near_left := previous_point - lateral * previous_width
 			var near_right := previous_point + lateral * previous_width
 			var far_left := point - lateral * width
 			var far_right := point + lateral * width
-			_add_trail_vertex(near_left, previous_alpha)
-			_add_trail_vertex(near_right, previous_alpha)
-			_add_trail_vertex(far_left, opacity)
-			_add_trail_vertex(near_right, previous_alpha)
-			_add_trail_vertex(far_right, opacity)
-			_add_trail_vertex(far_left, opacity)
+			_add_trail_vertex(near_left, 0.0, previous_alpha, charged)
+			_add_trail_vertex(near_right, 1.0, previous_alpha, charged)
+			_add_trail_vertex(far_left, 0.0, opacity, charged)
+			_add_trail_vertex(near_right, 1.0, previous_alpha, charged)
+			_add_trail_vertex(far_right, 1.0, opacity, charged)
+			_add_trail_vertex(far_left, 0.0, opacity, charged)
 			previous_point = point
 			previous_width = width
 			previous_alpha = opacity
@@ -354,8 +357,9 @@ func _update_trails() -> void:
 		_trail_mesh.surface_end()
 	_trail_renderer.visible = has_surface
 
-func _add_trail_vertex(point: Vector3, opacity: float) -> void:
-	_trail_mesh.surface_set_color(Color(1.0, 1.0, 1.0, opacity))
+func _add_trail_vertex(point: Vector3, across: float, opacity: float, charged: bool) -> void:
+	_trail_mesh.surface_set_uv(Vector2(across, 0.0))
+	_trail_mesh.surface_set_color(Color(1.0, 0.0 if charged else 1.0, 1.0, opacity))
 	_trail_mesh.surface_add_vertex(point)
 
 static func _trail_opacity(normalized_age: float) -> float:

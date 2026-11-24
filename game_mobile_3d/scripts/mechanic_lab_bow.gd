@@ -100,7 +100,7 @@ func fire_arrow(origin: Vector3, direction: Vector3, serial: int, clearance_star
 		return false
 	_play_audio(&"bow_fire", origin, -9.0)
 	return _fire_projectile(origin, direction, serial, clearance_start, 90.0 if charged else 45.0,
-		CHARGED_STRIKE if charged else NORMAL_STRIKE)
+		CHARGED_STRIKE if charged else NORMAL_STRIKE, charged)
 
 func _report_impact(hit: Dictionary, direction: Vector3, serial: int, strike: Dictionary,
 		impact_step := 0.0) -> void:

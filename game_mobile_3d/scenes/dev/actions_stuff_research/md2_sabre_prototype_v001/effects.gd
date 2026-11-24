@@ -19,6 +19,7 @@ var bursts:=0
 var ribbon:MeshInstance3D
 var sparks:MultiMeshInstance3D
 var enabled:=true
+var blade_trail_enabled := true
 var intensity:=.75
 var _mesh:=ImmediateMesh.new()
 var _rng:=RandomNumberGenerator.new()
@@ -51,7 +52,7 @@ func use_private_slash_material() -> void:
 
 func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int)->void:
 	clock+=delta
-	if not enabled:active=false
+	if not enabled or not blade_trail_enabled:active=false
 	if active:
 		if serial!=attack_serial:samples.clear();serial=attack_serial;_was_active=false
 		if not _was_active:_burst(tip,tip-_previous_tip)

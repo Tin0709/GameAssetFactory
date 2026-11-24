@@ -497,7 +497,7 @@ func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
 	check(props_on_contact == 1 and bow._embedded_arrows.size() == 1
 		and is_zero_approx(bow._embedded_arrows[0].age),
 		"The Bow wall prop appears on impact at the start of its wobble")
-	check_arrow_ribbon_sections(bow, 1, "charged Bow at a close wall")
+	check_arrow_ribbon_sections(bow, 1, "charged Bow at a close wall", true)
 	var contact_distance := wall.position.z - box.size.z * 0.5 - CrossPollinator.BOLT_RADIUS
 	var expected_age := elapsed - contact_distance / 90.0
 	if bow.impact_sparks != null:
@@ -559,7 +559,7 @@ func check_crossbow_trail(lab: Node3D) -> void:
 	check(not ribbon.visible and crossbow._trails.is_empty(), "Reset clears the flying ribbon immediately")
 	wall.queue_free()
 
-func check_arrow_ribbon_sections(projectile: Node3D, spans: int, fixture: String) -> void:
+func check_arrow_ribbon_sections(projectile: Node3D, spans: int, fixture: String, charged := false) -> void:
 	var ribbon := projectile.get_node("ArrowTrail") as MeshInstance3D
 	if projectile._trails.size() != 1 or ribbon.mesh.get_surface_count() != 1:
 		check(false, "%s provides one ribbon for source-curve inspection" % fixture)
@@ -589,9 +589,8 @@ func check_arrow_ribbon_sections(projectile: Node3D, spans: int, fixture: String
 			section_counts[section] += 1
 			var t := expected_age / 0.3
 			var expected_alpha := maxf(0.0, 1.0 - 4.0 * t if t <= 0.2 else 0.3 - 0.5 * t)
-			var charged := fixture.begins_with("charged Bow")
 			var half_width := (0.08 if charged else 0.04) * (1.0 - 0.5 * t)
-			geometry_matches = geometry_matches and colors[i].r == (1.0 if charged else 0.0)
+			geometry_matches = geometry_matches and colors[i].g == (0.0 if charged else 1.0)
 			geometry_matches = geometry_matches and absf(colors[i].a - expected_alpha) < 0.004
 			geometry_matches = geometry_matches and absf(offset.slide(direction).length() - half_width) < 0.00005
 			break
