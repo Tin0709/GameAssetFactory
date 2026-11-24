@@ -325,6 +325,7 @@ func run() -> void:
 	await check_crossbow_impact_burst(lab, sparks)
 	await check_projectile_birth_frame(lab)
 	await check_projectile_surface_bounds(lab)
+	await check_projectile_contact_anchor(lab)
 	await check_bow_impact_charge_tint(lab)
 	await ticks(12)
 	target.position = Vector3(2.5, 0.0, 3.0)
@@ -672,6 +673,78 @@ func check_projectile_surface_bounds(lab: Node3D) -> void:
 	lab._select_floor_surface(0)
 	wall.queue_free()
 
+
+func check_projectile_contact_anchor(lab: Node3D) -> void:
+	var wall := StaticBody3D.new()
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(10.0, 3.0, 0.18)
+	collider.shape = box
+	wall.add_child(collider)
+	wall.position = Vector3(19.0, 1.5, 3.3)
+	lab.add_child(wall)
+	await ticks(2)
+	for weapon: Node3D in [lab._crossbow, lab._bow]:
+		for onto_floor: bool in [false, true]:
+			weapon.reset()
+			var hits: Array[Dictionary] = []
+			weapon.bolt_impact.connect(func(hit: Dictionary, _direction: Vector3, _serial: int):
+				hits.append(hit), CONNECT_ONE_SHOT)
+			var origin := Vector3(16.0, 1.22, 2.15)
+			var direction := Vector3(0.94, -0.03, 0.18).normalized()
+			var expected: StaticBody3D = wall
+			if onto_floor:
+				origin = Vector3(27.0, 0.7, 0.0)
+				direction = Vector3(0.86, -0.24, 0.4).normalized()
+				expected = lab.get_node("Ground") as StaticBody3D
+			if weapon == lab._crossbow:
+				weapon.fire(origin, direction, 1973, origin)
+			else:
+				weapon.fire_arrow(origin, direction, 1974, origin, true)
+			for i in 60:
+				await physics_frame
+				if not hits.is_empty():
+					break
+			check(hits.size() == 1 and hits[0].collider == expected,
+				"The glancing fixture resolves a real terrain hit")
+			var trail := weapon.get_node("ArrowTrail") as MeshInstance3D
+			if hits.is_empty() or trail.mesh.get_surface_count() == 0:
+				check(false, "The glancing hit has a stopped ribbon at contact")
+				continue
+			var hit: Dictionary = hits[0]
+			var vertices: PackedVector3Array = trail.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+			var ribbon_head := trail.to_global((vertices[0] + vertices[1]) * 0.5)
+			var head_gap: float = ribbon_head.distance_to(hit.position)
+			check(head_gap < 0.005, "The ribbon reaches the actual off-axis contact")
+			var minimum_distance := INF
+			for vertex in vertices:
+				minimum_distance = minf(minimum_distance, (trail.to_global(vertex) - Vector3(hit.position)).dot(hit.normal))
+			check(minimum_distance >= -0.0001, "A terrain impact keeps the ribbon on the near side")
+			check(weapon._embedded_arrows.size() == 1, "One projectile prop is retained at the contact")
+			if weapon._embedded_arrows.is_empty():
+				continue
+			var pose: Transform3D = weapon._embedded_arrows[0].pose
+			var storage_gap: float = weapon.to_global(pose.origin).distance_to(hit.position)
+			check(storage_gap < 0.0001, "The stored pivot is the swept terrain contact")
+			print("PROJECTILE_ANCHOR bow=", weapon == lab._bow, " floor=", onto_floor,
+				" head_gap=", head_gap, " pivot_gap=", storage_gap, " minimum=", minimum_distance)
+			if DisplayServer.get_name() != "headless":
+				var turning := false
+				var worst_gap := 0.0
+				var minimum_entry := INF
+				var first: Transform3D = weapon._embedded.get_instance_transform(0)
+				for i in 24:
+					var visible_pose: Transform3D = weapon._embedded.get_instance_transform(0)
+					var pivot := visible_pose * (Vector3.RIGHT * weapon.EMBEDDED_OFFSET / weapon.EMBEDDED_SCALE)
+					worst_gap = maxf(worst_gap, weapon.to_global(pivot).distance_to(hit.position))
+					minimum_entry = minf(minimum_entry, -visible_pose.basis.x.normalized().dot(hit.normal))
+					turning = turning or not visible_pose.basis.is_equal_approx(first.basis)
+					await physics_frame
+				check(turning and worst_gap < 0.0001 and minimum_entry >= -0.0001,
+					"The prop wobbles without its pivot sliding or the shaft turning into the terrain")
+				print("PROJECTILE_PROP_PIVOT worst_gap=", worst_gap, " minimum_entry=", minimum_entry)
+		weapon.reset()
+	wall.free()
 
 func check_bow_impact_charge_tint(lab: Node3D) -> void:
 	var bow = lab._bow
