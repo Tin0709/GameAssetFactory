@@ -158,6 +158,10 @@ func _place_new_numbers(side: Vector3, up: Vector3) -> void:
 	if _numbers.size() == 1 and bar_cells.is_empty():
 		_numbers[0].layout_pending = false
 		return
+	var steps := LAYOUT_STEPS
+	if not bar_cells.is_empty():
+		steps = LAYOUT_STEPS.duplicate()
+		steps.insert(1, Vector2(0.0, 0.52))
 	var occupied := {}
 	# Reserve the numbers already on screen. Layout happens at birth so
 	# an older number continues to float without snapping to a new lane.
@@ -182,7 +186,7 @@ func _place_new_numbers(side: Vector3, up: Vector3) -> void:
 		var travel := Vector2(number.travel.dot(side), number.travel.dot(up)) * POP_TRAVEL
 		var best_blocked := true
 		var best := 0x7fffffff
-		for step: Vector2 in LAYOUT_STEPS:
+		for step: Vector2 in steps:
 			var offset := step * reach
 			var point := centre + offset
 			var blocked := false
