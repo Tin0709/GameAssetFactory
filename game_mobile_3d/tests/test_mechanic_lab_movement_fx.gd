@@ -440,6 +440,10 @@ func check_gauntlet_debris(lab, dust: Node3D) -> void:
 	for weapon in [lab.Weapon.GAUNTLETS, lab.Weapon.BASIC_GAUNTLETS]:
 		lab._select_weapon(weapon)
 		lab.reset_player()
+		var landings: Array[Vector3] = []
+		var record_landing := func(point: Vector3, forward: Vector3, _serial: int, _height: float) -> void:
+			landings.assign([point, forward.slide(Vector3.UP).normalized()])
+		lab.player.heavy_jump_landed.connect(record_landing, CONNECT_ONE_SHOT)
 		await start_heavy_drop(lab)
 		for i in 65:
 			await physics_frame
@@ -451,13 +455,19 @@ func check_gauntlet_debris(lab, dust: Node3D) -> void:
 			and particles.size() in [3, 4, 5], "A Gauntlets dive emits one compact ground debris burst")
 		check(puffs.size() == 1, "The Gauntlets dive has a separate compact impact puff")
 		var impact = puffs[0] if puffs.size() == 1 else null
-		if impact != null and not particles.is_empty():
-			var offset: Vector3 = impact.origin - particles[0].origin
-			var horizontal := offset.slide(Vector3.UP)
+		check(landings.size() == 2, "The Gauntlets fixture records the real heavy touchdown")
+		if impact != null and not particles.is_empty() and landings.size() == 2:
+			var debris_offset: Vector3 = particles[0].origin - landings[0]
+			var puff_offset: Vector3 = impact.origin - landings[0]
+			check(debris_offset.slide(Vector3.UP).distance_to(landings[1] * 1.80) < 0.02,
+				"The Gauntlets debris starts at the same 180 cm forward offset as the crack")
 			check(impact.contact_tick == particles[0].contact_tick
-				and absf(horizontal.length() - 0.90) < 0.02 and offset.y < 0.20
+				and puff_offset.slide(Vector3.UP).distance_to(landings[1] * 0.90) < 0.02
+				and puff_offset.y > 0.12 and puff_offset.y < 0.20
 				and impact.duration > 0.20 and impact.duration < 0.35,
-				"The short dust layer shares the landing clock and appears ahead of the debris")
+				"The short dust layer shares the landing clock and keeps its independent 90 cm offset")
+			print("GAUNTLET_ANCHORS weapon=", weapon, " debris_m=", debris_offset.dot(landings[1]),
+				" puff_m=", puff_offset.dot(landings[1]))
 		for particle in particles:
 			check(is_equal_approx(particle.sprite.pixel_size * 16.0, 0.15)
 				and particle.duration >= 1.0 and particle.duration <= 1.5
@@ -501,6 +511,7 @@ func check_gauntlet_impact_marks(lab) -> void:
 	if marks == null:
 		return
 	var pool := marks.get_children()
+	var dust: Node3D = lab.get_node("MovementDust")
 	check(pool.size() == 4, "The impact mark renderer has four reusable decal slots")
 	var camera_ground: MeshInstance3D = lab.get_node("Ground/Mesh")
 	var player_mesh: MeshInstance3D = lab._basic_gauntlet_mounts[0]
@@ -549,6 +560,7 @@ func check_gauntlet_impact_marks(lab) -> void:
 		if fixture == "slab":
 			check(appeared == null and lab.player.is_on_floor() and lab.player.global_position.y > 0.39,
 				"An unsupported slab material cannot imprint the stage below")
+			check(visible_particles(dust) == 0, "An unsupported slab does not emit stage debris or dust below")
 		else:
 			check(appeared != null and lab.player.is_on_floor(), "The %s Gauntlets dive leaves its mark on touchdown" % fixture)
 			if appeared != null:
@@ -558,6 +570,10 @@ func check_gauntlet_impact_marks(lab) -> void:
 					"The %s crack stays on the supported side of the stage" % fixture)
 				if fixture == "stone_wall":
 					check(reach + appeared.size.x * 0.5 < 0.9, "The entire mark fits in front of the wall")
+					var particles: Array = dust._particles.filter(func(p): return p.sprite.visible)
+					check(particles.size() >= 4 and particles.all(func(p):
+						return p.origin.slide(Vector3.UP).distance_to(appeared.global_position.slide(Vector3.UP)) < 0.02),
+						"Both Gauntlets particle layers fall back in front of a wall that blocks their offsets")
 				print("GAUNTLET_IMPACT_MARK ", fixture, " reach=", reach, " tint=", appeared.modulate)
 				if fixture == "grass":
 					lab.reset_player()
