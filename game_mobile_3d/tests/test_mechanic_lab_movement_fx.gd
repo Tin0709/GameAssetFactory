@@ -719,9 +719,10 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 		cues.append(actor.combo.time - (actor.effects.clock - sample) * actor.combo.playback_rate())
 		cue_clocks.append(sample)
 	actor.connect(&"tool_ground_cue", record)
-	for fixture in ["grass", "stone", "wall", "near_wall", "post", "arena_edge", "overhang", "ledge", "shovel", "reset_during_windup"]:
+	for fixture in ["grass", "dirt", "stone", "wall", "near_wall", "post", "arena_edge",
+			"overhang", "outside_disc", "ledge", "shovel", "reset_during_windup"]:
 		lab.reset_player()
-		lab._select_floor_surface(2 if fixture == "stone" else 0)
+		lab._select_floor_surface(["grass", "dirt", "stone"].find(fixture) if fixture in ["dirt", "stone"] else 0)
 		lab._select_weapon(lab.Weapon.SHOVEL if fixture == "shovel" else lab.Weapon.PICKAXE)
 		var forward: Vector3 = actor.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var obstacle: StaticBody3D
@@ -743,6 +744,21 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 				var side_offset := 0.26 if i < 5 else -0.26
 				shelf.position = forward * forward_offset + side * side_offset + Vector3.UP * 0.069
 				overhang.add_child(shelf)
+		elif fixture == "outside_disc":
+			overhang = Node3D.new()
+			lab.add_child(overhang)
+			var side := Vector3.UP.cross(forward)
+			var box := BoxShape3D.new()
+			box.size = Vector3(0.024, 0.07, 0.024)
+			for corner: Vector2 in [Vector2(-1, -1), Vector2(-1, 1), Vector2(1, -1), Vector2(1, 1)]:
+				for i in 3:
+					var post := StaticBody3D.new()
+					var collision := CollisionShape3D.new()
+					collision.shape = box
+					post.add_child(collision)
+					var forward_offset := 1.5 + corner.y * (0.55 + i * 0.043)
+					post.position = forward * forward_offset + side * corner.x * 0.59 + Vector3.UP * 0.035
+					overhang.add_child(post)
 		if fixture == "arena_edge":
 			actor._reset_map_actor_at(Vector3(48.18, 0.015, 0), PI * 0.5)
 		if fixture in ["wall", "near_wall", "post", "ledge"]:
@@ -806,10 +822,13 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 			check(absf(cues[index] - float(expected[index])) < 0.00001,
 				"%s cue %d crosses the authored source timestamp" % [fixture, index + 1])
 		check(not lab._impact_light.visible, "%s ground effects do not fake a zombie hit light" % fixture)
-		if fixture in ["grass", "stone"]:
+		if fixture in ["grass", "dirt", "stone"]:
 			check(ring_seen and peak >= 4, "%s Pickaxe finisher emits a ring, debris and dust without a target" % fixture)
 			check(absf((ring.global_position - actor.global_position).dot(forward) - 1.5) < 0.02,
 				"The Pickaxe ring uses the independent 150 cm cue offset")
+			var ring_tint: Color = ring.material_override.get_shader_parameter(&"tint")
+			check(ring_tint.is_equal_approx(dust.SURFACE_DUST[fixture].lightened(0.36)),
+				"The Pickaxe ring follows the surface tint on %s" % fixture)
 			var debris: Array = dust._particles.filter(func(p): return p.sprite.visible and p.debris_drag > 0.0)
 			check(not debris.is_empty() and debris.all(func(p):
 				return absf((p.origin - actor.global_position).dot(forward) - 1.8) < 0.02 \
@@ -848,6 +867,12 @@ func check_tool_ground_effects(lab, dust: Node3D) -> void:
 				and material.get_shader_parameter("blocker_count") == 0,
 				"Overhanging boxes contribute no clipping planes")
 			print("TOOL_RING_OVERHANG visible=", ring_seen, " peak=", peak)
+		elif fixture == "outside_disc":
+			check(ring_seen and peak >= 4, "Posts outside the maximum ring radius leave the shockwave visible")
+			var material := ring.material_override as ShaderMaterial
+			check(material.get_shader_parameter("clip_count") == 0
+				and material.get_shader_parameter("blocker_count") == 0,
+				"Posts outside the shockwave disc consume no clipping slots")
 		elif fixture == "shovel":
 			check(peak >= 4 and not ring_seen, "Shovel emits the separate debris passes without the Pickaxe ring")
 		else:
