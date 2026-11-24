@@ -63,6 +63,7 @@ var _burst_surface: String
 var _random := RandomNumberGenerator.new()
 var _landing_random: RandomNumberGenerator
 var _landing_batch: MultiMeshInstance3D
+var _landing_batch_tint: Color = SURFACE_DUST.grass
 var _run_profile: Callable
 var _run_alpha := PackedFloat32Array()
 var _run_alpha_duration := 1.0
@@ -137,7 +138,7 @@ func _create_landing_batch() -> void:
 	var material := ShaderMaterial.new()
 	material.shader = LANDING_SHADER
 	material.set_shader_parameter("smoke_mask", _smoke_texture)
-	material.set_shader_parameter("dust_tint", SURFACE_DUST.grass)
+	material.set_shader_parameter("dust_tint", _landing_batch_tint)
 	material.set_shader_parameter("camera_range_squared", SOURCE_CAMERA_RANGE ** 2)
 	var quad := QuadMesh.new()
 	quad.material = material
@@ -159,13 +160,17 @@ func _create_landing_batch() -> void:
 func _sync_landing_batch() -> void:
 	var instances := _landing_batch.multimesh
 	var can_batch := true
-	# Grass smoke has one color. Differently colored debris keeps the
-	# original per-sprite transparency order when it overlaps the plume.
+	var batch_tint := Color.TRANSPARENT
+	# A single tint can share one draw. During a surface change or an
+	# overlapping debris burst, keep per-sprite transparency sorting.
 	for particle in _particles:
-		if particle.sprite.visible and not particle.draw_pending and (particle.debris_drag > 0.0 \
-				or Color(particle.sprite.modulate, 1.0) != SURFACE_DUST.grass):
+		if not particle.sprite.visible or particle.draw_pending:
+			continue
+		var tint := Color(particle.sprite.modulate, 1.0)
+		if particle.debris_drag > 0.0 or (batch_tint.a > 0.0 and tint != batch_tint):
 			can_batch = false
 			break
+		batch_tint = tint
 	var camera := get_viewport().get_camera_3d() if wind_overlaps.is_valid() else null
 	var count := 0
 	var bounds := AABB()
@@ -190,6 +195,10 @@ func _sync_landing_batch() -> void:
 		count += 1
 	instances.visible_instance_count = count
 	if count > 0:
+		if batch_tint != _landing_batch_tint:
+			_landing_batch_tint = batch_tint
+			var material := instances.mesh.material as ShaderMaterial
+			material.set_shader_parameter("dust_tint", batch_tint)
 		# Include the half diagonal of the largest camera-facing quad.
 		instances.custom_aabb = bounds.grow(largest_size * 0.71)
 	_landing_batch.visible = count > 0
