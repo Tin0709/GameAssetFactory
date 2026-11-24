@@ -1388,7 +1388,7 @@ func check_charged_bow_flight(lab: Node3D, menu: OptionButton) -> void:
 	equip(menu, 6)
 	sound.button_pressed = true
 	var bow = lab._bow
-	var origin := Vector3(12.0, 1.0, 0.0)
+	var origin := Vector3(18.0, 1.0, 0.0)
 	var wall := StaticBody3D.new()
 	var collider := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -1398,6 +1398,11 @@ func check_charged_bow_flight(lab: Node3D, menu: OptionButton) -> void:
 	lab.add_child(wall)
 	wall.position = origin + Vector3.BACK * 8.0
 	await ticks(2)
+	var impacts: Array[Object] = []
+	var observe := func(hit: Dictionary, _direction: Vector3, serial: int, _strike: Dictionary):
+		if serial == -412:
+			impacts.append(hit.collider)
+	bow.arrow_impact.connect(observe)
 
 	var before: int = audio._next_choice.get(group, 0)
 	check(bow.fire_arrow(origin, Vector3.BACK, -411, origin, false)
@@ -1423,8 +1428,11 @@ func check_charged_bow_flight(lab: Node3D, menu: OptionButton) -> void:
 			and is_instance_valid(bolt) and voices.get(voice) == bolt
 			and voice.global_position.distance_to(bolt.global_position) < 0.01,
 			"A weapon switch leaves the charged whoosh following its arrow")
-		await ticks(4)
-		check(not voice.playing and voices.is_empty() and bow._bolts.size() == 1,
+		for i in 10:
+			if not impacts.is_empty():
+				break
+			await ticks(1)
+		check(impacts == [wall] and not voice.playing and voices.is_empty() and bow._bolts.size() == 1,
 			"The charged whoosh stops at its wall contact while the normal arrow is still flying")
 		print("BOW_CHARGED_FLIGHT voices=", audio._voices.size(), " samples=", samples.size(),
 			" crossbow_variants=", audio._groups.get(&"crossbow_flight", []).size())
@@ -1449,6 +1457,7 @@ func check_charged_bow_flight(lab: Node3D, menu: OptionButton) -> void:
 	check(bow.fire_arrow(origin, Vector3.BACK, -416, origin, true)
 		and voices.is_empty() and audio._next_choice.get(group, 0) == before,
 		"A charge fired while muted does not consume a whoosh sample")
+	bow.arrow_impact.disconnect(observe)
 	lab.reset_player()
 	wall.queue_free()
 	await ticks(12)
