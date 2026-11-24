@@ -102,6 +102,7 @@ func run() -> void:
 	await check_hit(true)
 	await check_crowd_sparks()
 	await check_flash_during_render_hitch()
+	await check_splash_flash_strength()
 	await check_damage_numbers_during_render_hitch()
 	await check_overlapping_damage_number_positions()
 	if DisplayServer.get_name() != "headless":
@@ -369,6 +370,39 @@ func check_crowd_sparks() -> void:
 	opacity.value = 55.0
 	check(sparks.visible and is_equal_approx(renderer.multimesh.mesh.material.get_shader_parameter("opacity_scale"), 0.55),
 		"Live opacity restores visibility without respawning streaks")
+	lab.free()
+
+func check_splash_flash_strength() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	await ticks(12)
+	var group = lab.get_node("Zombies")
+	var strike := {"damage": 10, "range_m": 2.5, "angle": 20.0, "strength": 500.0, "stagger": 12.0}
+	for baby in [false, true]:
+		check(group.spawn(lab.player, Basis.IDENTITY, lab.get_node("CombatEffects"), false, baby),
+			"The hit flash fixture spawns a source zombie")
+		var zombie = group.get_child(group.get_child_count() - 1)
+		var point: Vector3 = zombie.combat_center()
+		var health: int = zombie.health
+		var mesh := zombie._mesh as MeshInstance3D
+		group._apply_contact(zombie, point, "Attack1", 0, 1705, strike, Vector3.RIGHT, true, point)
+		check(zombie.health == health - 3 and is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 0.3),
+			"Splash keeps the weaker body flash at the actual hit (baby: %s)" % baby)
+		zombie._process(0.12)
+		check(is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 0.3),
+			"A delayed first render keeps the splash peak (baby: %s)" % baby)
+		group._apply_contact(zombie, point, "Attack1", 0, 1706, strike, Vector3.RIGHT, false, point)
+		group._apply_contact(zombie, point, "Attack1", 0, 1707, strike, Vector3.RIGHT, true, point)
+		check(is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 1.0),
+			"Splash cannot lower a direct flash that hasn't been displayed (baby: %s)" % baby)
+		zombie._process(0.0)
+		zombie._process(0.12)
+		group._apply_contact(zombie, point, "Attack1", 0, 1708,
+			strike.merged({"damage": 200}, true), Vector3.RIGHT, true, point)
+		check(zombie.health == 0 and is_equal_approx(float(mesh.get_instance_shader_parameter("hit_flash")), 0.3),
+			"A lethal splash retains the weaker flash during the ragdoll handoff (baby: %s)" % baby)
+		zombie.free()
 	lab.free()
 
 func check_flash_during_render_hitch() -> void:
