@@ -82,9 +82,17 @@ func movement_source_gate()->float:
 	# consumer observes the queued evaluation boundary; pose clocks stay raw.
 	return (ceilf(float(w.resume)/float(w.rate)*movement_evaluation_hz-.0000001)+movement_consumer_ticks)/movement_evaluation_hz*float(w.rate)
 
+func has_air_sections() -> bool:
+	return use_sabre_air_sections or clips.get("AirAttack", {}).has("air_sections")
+
+func _air_section(key: String, sabre_default: float) -> float:
+	if use_sabre_air_sections:
+		return sabre_default
+	return float(clips.AirAttack.air_sections[key])
+
 func movement_allowed()->bool:
-	if phase == &"air_attack" and use_sabre_air_sections:
-		return air_landing_started and time >= SABRE_AIR_RESUME - 0.00000001
+	if phase == &"air_attack" and has_air_sections():
+		return air_landing_started and time >= _air_section("resume", SABRE_AIR_RESUME) - 0.00000001
 	return not active() or (native_enabled and (phase==&"recovery" or (phase==&"attack" and time>=movement_source_gate()-.00000001)))
 
 func chain_source_gate()->float:
@@ -97,8 +105,8 @@ func chain_source_gate()->float:
 func boundary_seconds()->float:
 	if not active():return INF
 	var boundary:=remaining()
-	if phase == &"air_attack" and use_sabre_air_sections and air_landing_started and not movement_allowed():
-		boundary = minf(boundary, SABRE_AIR_RESUME - time)
+	if phase == &"air_attack" and has_air_sections() and air_landing_started and not movement_allowed():
+		boundary = minf(boundary, _air_section("resume", SABRE_AIR_RESUME) - time)
 	if native_enabled and phase==&"attack":
 		var resume:=movement_source_gate()
 		if time<resume-.00000001:boundary=minf(boundary,resume-time)
@@ -141,19 +149,19 @@ func windup_seconds_left() -> float:
 	return maxf(0.0, (_impact_source_time() - time) / playback_rate())
 
 func _impact_source_time() -> float:
-	if phase == &"air_attack" and use_sabre_air_sections:
-		return SABRE_AIR_DAMAGE
+	if phase == &"air_attack" and has_air_sections():
+		return _air_section("contact", SABRE_AIR_DAMAGE)
 	if native_enabled and phase == &"attack":
 		return float(native_windows[index].melee)
 	return float(clips[clip()].vfx_window[0])
 
 func playback_rate()->float:
-	if phase==&"air_attack":return 1.0 if use_sabre_air_sections else maxf(.001,air_attack_play_rate)
+	if phase==&"air_attack":return 1.0 if has_air_sections() else maxf(.001,air_attack_play_rate)
 	if native_enabled and phase in [&"attack",&"recovery"]:return float(native_windows[index].rate)
 	return maxf(.001,float(attack_play_rates[index])) if phase==&"attack" else 1.
 func remaining()->float:
-	if phase == &"air_attack" and use_sabre_air_sections:
-		return maxf(0.0, SABRE_AIR_END - time)
+	if phase == &"air_attack" and has_air_sections():
+		return maxf(0.0, _air_section("end", SABRE_AIR_END) - time)
 	if native_enabled and phase in [&"attack",&"recovery"]:return maxf(0.,float(native_windows[index]["attack_duration" if phase==&"attack" else "recovery_duration"])-time)
 	return maxf(0.,float(clips[clip()].duration)-time) if active() else INF
 func attack(value:bool,airborne:bool=false)->void:
@@ -202,13 +210,16 @@ func finish_step()->void:
 	else:phase=&"ready";time=0.;buffer_until=-1.
 func land_air_attack() -> void:
 	air_landing_started = true
-	time = SABRE_AIR_LANDING
+	time = _air_section("landing", SABRE_AIR_LANDING)
 
 func air_pose_after(delta: float) -> float:
 	var next := time + delta
-	if not air_landing_started and next >= SABRE_AIR_LANDING:
-		return SABRE_AIR_LOOP + fposmod(next - SABRE_AIR_LANDING, SABRE_AIR_LANDING - SABRE_AIR_LOOP)
-	return minf(next, SABRE_AIR_END)
+	if not air_landing_started:
+		var loop_end := _air_section("loop_end", SABRE_AIR_LANDING)
+		if next >= loop_end:
+			var loop_start := _air_section("loop", SABRE_AIR_LOOP)
+			return loop_start + fposmod(next - loop_end, loop_end - loop_start)
+	return minf(next, _air_section("end", SABRE_AIR_END))
 
 func advance(delta:float, hold_air_pose := false)->void:
 	if hold_air_pose:
@@ -223,7 +234,7 @@ func advance(delta:float, hold_air_pose := false)->void:
 		var segment:=minf(left,boundary_seconds())
 		if segment<=0.:_finish();_resolve_native();continue
 		var previous:=time
-		time = air_pose_after(segment) if phase == &"air_attack" and use_sabre_air_sections else time + segment * rate
+		time = air_pose_after(segment) if phase == &"air_attack" and has_air_sections() else time + segment * rate
 		clock+=segment;left-=segment
 		if phase in [&"attack",&"air_attack"] and not _impact_sent:
 			var gate := _impact_source_time()

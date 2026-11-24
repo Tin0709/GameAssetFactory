@@ -238,6 +238,7 @@ var _sabre_blade_tip: Vector3
 var _sabre_profile: Dictionary
 var _sword_profile: Dictionary
 var _curved_profile: Dictionary
+var _curved_air_ready := false
 var _curved_locomotion: Dictionary
 var _crossbow: CrossPollinator
 var _crossbow_mount: MeshInstance3D
@@ -660,6 +661,7 @@ func _select_weapon(index: int) -> void:
 	if ribbon_material != null:
 		ribbon_material.set_shader_parameter(&"sword_ribbon_head", sword_equipped)
 	var curved_equipped := index == Weapon.CURVED_GREATSWORD
+	var curved_air := curved_equipped and _curved_air_ready
 	var crossbow_equipped := index == Weapon.CROSS_POLLINATOR
 	var switch_point := player.global_position + Vector3.UP
 	if _combat_audio.enabled and MELEE_AUDIO_NAMES.has(index):
@@ -685,6 +687,8 @@ func _select_weapon(index: int) -> void:
 		player.tool_air_hold = MeleeTools.air_hold_time(tool)
 		player.tool_air_loop = MeleeTools.air_loop_time(tool)
 		player.tool_air_landing = MeleeTools.air_landing_time(tool)
+	elif curved_air:
+		player.clips.AirAttack = player.clips[CurvedGreatsword.AIR]
 	player.combo.air_attack_play_rate = 1.0 if gauntlets_equipped else _sabre_air_rate
 	if tool >= 0:
 		player.combo.air_attack_play_rate = MeleeTools.air_rate(tool)
@@ -700,19 +704,25 @@ func _select_weapon(index: int) -> void:
 	$Zombies.equipped_air_strike = MeleeTools.air_strike(tool) if tool >= 0 else (Gauntlets.BASE_AIR_STRIKE if basic_gauntlets else {})
 	$Zombies.equipped_air_offset = MeleeTools.air_offset(tool) if tool >= 0 else Gauntlets.AIR_OFFSET
 	$Zombies.equipped_air_delay = MeleeTools.air_contact_delay(tool) if tool >= 0 else 0.0
+	if curved_air:
+		$Zombies.equipped_air_strike = CurvedGreatsword.AIR_STRIKE
+		$Zombies.equipped_air_offset = CurvedGreatsword.AIR_OFFSET
+		$Zombies.equipped_air_delay = CurvedGreatsword.AIR_CONTACT_DELAY
 	$HUD/CrossbowAmmo.visible = crossbow_equipped or bow_equipped
 	if bow_equipped:
 		_set_bow_ammo(_bow.ammo)
 	elif crossbow_equipped:
 		_set_crossbow_ammo(_crossbow.ammo)
-	player.aerial_melee_enabled = not curved_equipped and not bow_equipped
+	player.aerial_melee_enabled = (not curved_equipped or curved_air) and not bow_equipped
 	player.set_weapon_locomotion({})
 	player.clips.InspectWeapon = _default_idle_novelty
 	player.set_weapon_locomotion(locomotion)
 	_set_weapon_idle_novelty(index)
-	$HUD/DropMedium.disabled = curved_equipped
-	$HUD/DropHigh.disabled = curved_equipped
-	var attack_hint := "chém dưới đất" if curved_equipped else "chém hoặc bổ trên không"
+	$HUD/DropMedium.disabled = curved_equipped and not curved_air
+	$HUD/DropHigh.disabled = curved_equipped and not curved_air
+	var attack_hint := "chém hoặc bổ trên không"
+	if curved_equipped:
+		attack_hint = "chém hoặc bổ trên không (thử nghiệm)" if curved_air else "chém dưới đất"
 	if crossbow_equipped:
 		attack_hint = "bắn nỏ"
 	elif bow_equipped:
@@ -816,6 +826,7 @@ func _load_weapon(index: int) -> bool:
 	if not player.animation_player.has_animation_library(CurvedGreatsword.LIBRARY):
 		return false
 	_curved_profile = profile
+	_curved_air_ready = CurvedGreatsword.load_air_attack(player, research_root)
 	_curved_locomotion = CurvedGreatsword.load_locomotion(player, research_root)
 	player.reference_audio.add_manifest(research_root, CurvedGreatsword.MEDIA_MANIFEST)
 	return true

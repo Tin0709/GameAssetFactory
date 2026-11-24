@@ -128,7 +128,7 @@ var _jump_held:=false
 var _jump_stage:=""
 var _jump_time:=0.
 var _heavy_slam_active:=false
-var _sabre_air_landing_frame := -1
+var _sectioned_air_landing_frame := -1
 var _airborne_peak_height := -INF
 var _transition:=""
 var _transition_time:=0.
@@ -519,9 +519,9 @@ func _physics_process(delta:float)->void:
 		_step_ready=_step_distance>=COMBAT_STEP_DISTANCE or _step_elapsed>=COMBAT_STEP_TIMEOUT-.0000001
 	if _grounded:
 		if not was_grounded and _heavy_slam_active and _floor_initialized and review_clip.is_empty():
-			if combo.phase == &"air_attack" and combo.use_sabre_air_sections:
+			if combo.phase == &"air_attack" and combo.has_air_sections():
 				combo.land_air_attack()
-				_sabre_air_landing_frame = Engine.get_physics_frames()
+				_sectioned_air_landing_frame = Engine.get_physics_frames()
 			var fall_height := maxf(0.0, _airborne_peak_height - global_position.y)
 			heavy_jump_landed.emit(global_position, visual.global_basis.z, combo.serial, fall_height)
 		_airborne_peak_height = global_position.y
@@ -655,8 +655,8 @@ func _animate(delta:float)->void:
 	# transition restoration so omitted constant source tracks cannot accumulate it.
 	if combat_legs!=null:combat_legs.restore()
 	var source_before:=animation_player.current_animation_position
-	var sectioned_air: bool = combo.phase == &"air_attack" and combo.use_sabre_air_sections and review_clip.is_empty()
-	var hold_air_pose := sectioned_air and _sabre_air_landing_frame == Engine.get_physics_frames()
+	var sectioned_air: bool = combo.phase == &"air_attack" and combo.has_air_sections() and review_clip.is_empty()
+	var hold_air_pose := sectioned_air and _sectioned_air_landing_frame == Engine.get_physics_frames()
 	if sectioned_air:
 		animation_player.seek(combo.air_pose_after(0.0 if hold_air_pose else delta), true)
 	else:
@@ -745,7 +745,7 @@ func _animate(delta:float)->void:
 				window = trail.get("window", [INF, -INF])
 				trail_style = trail.get("style", trail_style)
 				exact_edges = not trail.is_empty()
-			if sectioned_air:
+			if sectioned_air and combo.use_sabre_air_sections:
 				window = [combo.SABRE_AIR_SLASH, float(window[1])]
 				exact_edges = effects.interpolate_ground_trail_edges
 			var start := float(window[0])

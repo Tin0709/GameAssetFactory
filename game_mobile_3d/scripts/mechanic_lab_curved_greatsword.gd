@@ -1,7 +1,8 @@
 extends RefCounted
-## Verified MD2 Curved Greatsword equipment and grounded clips for MechanicLab.
+## Curved Greatsword equipment and combat profiles for MechanicLab.
 
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
+const MeleeTools := preload("res://scripts/mechanic_lab_melee_tools.gd")
 const SourceFilePath := preload("res://scripts/source_file_path.gd")
 const SourceGait := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Characters/Player/"
@@ -9,6 +10,25 @@ const MEDIUM_CLIPS := SOURCE + "Animations/Weapons_Melee/2H_Medium/"
 const CLIPS := MEDIUM_CLIPS + "Combat/"
 const LIBRARY := &"private_curved_greatsword"
 const LOCOMOTION_LIBRARY := &"private_curved_greatsword_locomotion"
+const AIR_LIBRARY := &"private_curved_greatsword_air"
+const AIR := "NativeCurvedAir"
+const AIR_SOURCE := "Player_2H_Medium_JumpAttack"
+const AIR_HASH := "83d961d458f69c29d4c7e66e7f1ce0730e7bd37786253de0457f3023b66861db"
+const AIR_SEGMENT_BOUNDARY := 0.33
+const AIR_LANDING_RATE := 1.6
+# The live Lullaby Blade uses this shared two-handed sequence. Its montage
+# timing is the Lab's reference until the standard montage can be measured.
+const AIR_SECTIONS := {
+	"loop": 0.032594, "loop_end": 0.317523, "landing": 0.333218485,
+	"contact": 0.359894753, "resume": 0.712103426, "end": 0.93625,
+}
+const AIR_SLASH := [0.357919097, 0.398]
+const AIR_SHAKE := 0.360553294
+# The standard CurvedGreatsword row supplies damage and the two radii.
+const AIR_STRIKE := {"damage": 20, "range_m": 2.50, "primary_range": 1.50,
+	"strength": 1265.0, "angle": 25.0, "stagger": 65.0, "splash_stagger": 0.0}
+const AIR_OFFSET := 1.50
+const AIR_CONTACT_DELAY := AIR_SECTIONS.contact - AIR_SECTIONS.landing
 const MESH_HASH := "00195143cc38f043e053cf4e9427597d711a34038d90fd088d55216fbb9120ed"
 const TEXTURE_HASH := "56a9c441e36abb74df27c6bcdc392c6c55eac73c24e22ebfd8c01a5c627eb0e8"
 const BLADE_BASE := Vector3(0.0, -0.44, 0.0)
@@ -54,6 +74,43 @@ const LOCOMOTION := {
 static func load_mesh(actor: CharacterBody3D, research_root: String) -> Mesh:
 	return Sword.load_verified_mesh(actor, research_root, SOURCE + "Equipment/Weapons/CurvedGreatsword/",
 		"CurvedGreatsword", MESH_HASH, TEXTURE_HASH)
+
+static func load_air_attack(actor: CharacterBody3D, research_root: String) -> bool:
+	if actor.clips.has(AIR):
+		return true
+	var path := SourceFilePath.resolve_private_file(research_root, CLIPS + AIR_SOURCE + ".glb")
+	var entries := [{
+		"path": path, "semantic": AIR, "source_name": AIR_SOURCE, "sha256": AIR_HASH,
+		"duration": 1.30, "loop": false, "category": "jump",
+	}]
+	if not actor._load_private_clip_library(entries, AIR_LIBRARY):
+		return false
+	var clip: Dictionary = actor.clips[AIR]
+	var animation: Animation = actor.animation_player.get_animation(clip.action)
+	# Retain both sequence rates on one montage clock. Insert the boundary
+	# pose before retiming so each interpolated half meets at the same pose.
+	for track in animation.get_track_count():
+		match animation.track_get_type(track):
+			Animation.TYPE_POSITION_3D:
+				animation.position_track_insert_key(track, AIR_SEGMENT_BOUNDARY,
+					animation.position_track_interpolate(track, AIR_SEGMENT_BOUNDARY))
+			Animation.TYPE_ROTATION_3D:
+				animation.rotation_track_insert_key(track, AIR_SEGMENT_BOUNDARY,
+					animation.rotation_track_interpolate(track, AIR_SEGMENT_BOUNDARY))
+			Animation.TYPE_SCALE_3D:
+				animation.scale_track_insert_key(track, AIR_SEGMENT_BOUNDARY,
+					animation.scale_track_interpolate(track, AIR_SEGMENT_BOUNDARY))
+		for key in animation.track_get_key_count(track):
+			var time := animation.track_get_key_time(track, key)
+			if time > AIR_SEGMENT_BOUNDARY:
+				animation.track_set_key_time(track, key, AIR_SEGMENT_BOUNDARY + (time - AIR_SEGMENT_BOUNDARY) / AIR_LANDING_RATE)
+	animation.length = AIR_SECTIONS.end
+	clip.duration = AIR_SECTIONS.end
+	clip.air_sections = AIR_SECTIONS
+	clip.vfx_window = AIR_SLASH
+	clip.air_trails = {"landing": {"window": AIR_SLASH}}
+	clip.ground_effects = [{"time": AIR_SHAKE, "effect": MeleeTools.GroundEffect.SHAKE}]
+	return true
 
 static func load_locomotion(actor: CharacterBody3D, research_root: String) -> Dictionary:
 	var entries: Array[Dictionary] = []
