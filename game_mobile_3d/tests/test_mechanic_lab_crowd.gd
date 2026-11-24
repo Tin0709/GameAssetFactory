@@ -959,9 +959,6 @@ func check_crowd_counts(group: Node) -> void:
 		print("CROWD_COUNT ", JSON.stringify({"count": count, "spawned": previous,
 			"frames": frames, "largest_batch": largest_batch}))
 	lab.reset_player()
-	check_reset_during_spawn_after_frames(group)
-
-func check_reset_during_spawn_after_frames(group: Node) -> void:
 	await check_reset_during_spawn(group)
 
 func check_reset_during_spawn(group: Node) -> void:
