@@ -1895,6 +1895,12 @@ func run() -> void:
 	for group in expected:
 		check(audio._groups.get(group, []).size() == expected[group],
 			"All pinned MD2 variants decode for " + str(group))
+	if "--require-combat-pcm" in OS.get_cmdline_user_args():
+		for group: StringName in [&"curved_hit", &"hurt", &"death"]:
+			var takes: Array = audio._groups.get(group, [])
+			var count := 2 if group == &"hurt" else 3
+			check(takes.size() == count and takes.all(func(take): return take is AudioStreamWAV),
+				"The real combat sound bank selects verified PCM for every %s take" % group)
 	var original_frame_counts := {&"hurt": [36190, 35207], &"death": [76726, 73653, 58933],
 		&"zombie_hit": [13399, 17213, 16869, 31411]}
 	for group in original_frame_counts:
