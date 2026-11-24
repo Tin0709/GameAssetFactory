@@ -136,6 +136,9 @@ func check_projectile_shader_preparation(lab: Node3D) -> void:
 	lab._process(0.0)
 	check(lab.get("_next_projectile_shader") == 0, "Shader preparation yields to combat input")
 	actor.set("combat_requested", false)
+	lab.set("_last_projectile_shader_frame_us", Time.get_ticks_usec() - 1000000)
+	lab._process(0.0)
+	check(lab.get("_next_projectile_shader") == 0, "Shader preparation yields after a slow frame")
 
 	var prepared: Array = []
 	for i in 4:

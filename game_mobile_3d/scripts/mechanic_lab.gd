@@ -260,6 +260,7 @@ var _bow_mount: MeshInstance3D
 var _bow_display_mesh_index := -1
 var _bow_profile: Dictionary
 var _next_projectile_shader := 0
+var _last_projectile_shader_frame_us := 0
 var _sabre_air_clip: Dictionary
 var _default_idle_novelty: Dictionary
 var _sabre_air_rate := 1.0
@@ -1226,11 +1227,18 @@ func _process(delta: float) -> void:
 		_impact_light.visible = _light_remaining > 0.0
 
 func _prepare_projectile_shader() -> void:
-	if _next_projectile_shader >= PROJECTILE_SHADERS.size() or not player.is_on_floor() \
+	if _next_projectile_shader >= PROJECTILE_SHADERS.size():
+		return
+	var now := Time.get_ticks_usec()
+	var previous := _last_projectile_shader_frame_us
+	_last_projectile_shader_frame_us = now
+	var frame_rate := Engine.max_fps if Engine.max_fps > 0 else Engine.physics_ticks_per_second
+	# Let the first rendered frame and any already-slow frame finish
+	# before adding optional renderer work to the next idle update.
+	if previous == 0 or now - previous > 1500000.0 / frame_rate or not player.is_on_floor() \
 			or player.combat_requested or player.combo.active() or player.bow_busy():
 		return
-	# Shader resources are preloaded, but Godot submits their code to the
-	# renderer on first RID access. Prepare one on each eligible frame.
+	# The preloaded resources submit their code on first RID access.
 	PROJECTILE_SHADERS[_next_projectile_shader].get_rid()
 	_next_projectile_shader += 1
 
