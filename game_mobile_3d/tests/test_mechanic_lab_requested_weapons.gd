@@ -467,6 +467,36 @@ func check_crossbow_impact_burst(lab: Node3D, sparks: MultiMeshInstance3D) -> vo
 		and muzzle_particles.all(func(spark): return is_zero_approx(spark.age)),
 		"An obstructed muzzle presents a new spark burst at birth age")
 	crossbow.reset()
+	var impact_rows := lab.get_node("HUD/ImpactFxPanel/Rows")
+	var quality := impact_rows.get_node("ContactSparkQuality") as OptionButton
+	var opacity := impact_rows.get_node("Opacity/Slider") as HSlider
+	var duration := impact_rows.get_node("Duration/Slider") as HSlider
+	quality.select(1)
+	quality.item_selected.emit(1)
+	opacity.value = 0.0
+	duration.value = 200.0
+	for index in 25:
+		var origin := Vector3(15.0 + index * 0.25, 1.25, 0.0)
+		crossbow.fire(origin, Vector3.BACK, -500 - index, origin)
+	for i in 8:
+		await physics_frame
+		if crossbow._bolts.is_empty():
+			break
+	var reduced: Array = sparks._particles.filter(func(spark): return spark.age < spark.lifetime)
+	check(reduced.size() == 150 and sparks.multimesh.visible_instance_count == 150 and not sparks.visible,
+		"Reduced quality keeps six sparks per impact and zero opacity hides the batch")
+	check(reduced.filter(func(spark): return spark.drag == 9.0).size() == 75,
+		"Reduced quality preserves both impact emitters with the same budget")
+	check(reduced.all(func(spark): return absf(spark.age - expected_age * 0.5) < 0.0003),
+		"Double duration scales even the first partial step of an impact")
+	opacity.value = 100.0
+	check(sparks.visible and lab._bow.impact_sparks.visible and lab._bow.impact_sparks.reduced_budget
+		and lab._bow.impact_sparks.duration_scale == 2.0,
+		"Revealing sparks immediately updates the flying weapon batches together")
+	duration.value = 100.0
+	quality.select(0)
+	quality.item_selected.emit(0)
+	crossbow.reset()
 	wall.queue_free()
 
 func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
