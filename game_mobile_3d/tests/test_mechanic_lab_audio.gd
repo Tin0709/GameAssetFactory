@@ -1957,8 +1957,93 @@ func check_special_weapon_preparation() -> void:
 	lab.free()
 	await create_timer(0.12).timeout
 
+func push_melee_attack(pressed: bool) -> void:
+	var event := InputEventKey.new()
+	event.physical_keycode = KEY_E
+	event.pressed = pressed
+	root.push_input(event, true)
+
+func check_tool_montage_audio() -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var player: CharacterBody3D = lab.player
+	var menu := lab.get_node("HUD/Weapon") as OptionButton
+	var audio := lab.get_node("CombatAudio") as COMBAT_AUDIO
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	toggle.button_pressed = true
+	# Clip clocks read from the three source combo and landing montages.
+	for row: Array in [
+		[5, "cleaver", [0.069257, 0.110463, 0.234550], 0.258477],
+		[8, "pickaxe", [0.0, 0.017121, 0.186744], 0.624878],
+		[9, "shovel", [0.175533, 0.251809, 0.0], 0.462851],
+	]:
+		var slot: int = row[0]
+		var name: String = row[1]
+		var times: Array = row[2]
+		menu.select(slot)
+		menu.item_selected.emit(slot)
+		lab.reset_player()
+		for i in 8:
+			await physics_frame
+		check(lab._equipped_weapon == slot, "%s is equipped for the montage audio test" % name)
+		push_melee_attack(true)
+		var played := {}
+		for i in Engine.physics_ticks_per_second * 6:
+			await physics_frame
+			for swing in times.size():
+				var group := StringName("tool_%s_%d" % [name, swing])
+				if played.has(group) or not audio._voice_groups.has(group):
+					continue
+				var source_time: float = player.combo.time
+				var step: float = player.combo.playback_rate() / Engine.physics_ticks_per_second
+				var wanted: float = times[swing]
+				var tolerance := 0.000002
+				check(player.combo.index == swing and source_time >= wanted - tolerance and source_time <= wanted + step + tolerance,
+					"%s swing %d audio at %.6f within one tick of notify %.6f" % [name, swing + 1, source_time, wanted])
+				played[group] = source_time
+			if played.size() == times.size():
+				break
+		push_melee_attack(false)
+		check(played.size() == times.size(), "%s plays the three grounded swing groups" % name)
+
+		lab.reset_player()
+		for i in 8:
+			await physics_frame
+		check(player.drop_for_lab(3.0), "%s can enter the aerial montage audio fixture" % name)
+		for i in 8:
+			await physics_frame
+		push_melee_attack(true)
+		await physics_frame
+		await physics_frame
+		push_melee_attack(false)
+		var landing_group := StringName("tool_%s_4" % name)
+		var heard_landing := false
+		for i in Engine.physics_ticks_per_second * 3:
+			await physics_frame
+			if not audio._voice_groups.has(landing_group):
+				continue
+			var source_time: float = player.combo.time
+			var step: float = player.combo.playback_rate() / Engine.physics_ticks_per_second
+			var wanted: float = row[3]
+			check(player.combo.air_landing_started and source_time >= wanted - 0.000002 and source_time <= wanted + step + 0.000002,
+				"%s landing audio at %.6f within one tick of notify %.6f" % [name, source_time, wanted])
+			heard_landing = true
+			played[landing_group] = source_time
+			break
+		check(heard_landing, "%s plays its own landing sample" % name)
+		print("TOOL_AUDIO_TIMELINE ", name, " ", played)
+	toggle.button_pressed = false
+	lab.free()
+	await process_frame
+
 func run() -> void:
 
+	if "--tool-montage-audio" in OS.get_cmdline_user_args():
+		await check_tool_montage_audio()
+		print("MECHANIC_LAB_TOOL_AUDIO checks=", checks, " failures=", failures)
+		quit(int(not failures.is_empty()))
+		return
 	if "--special-weapon-preparation" in OS.get_cmdline_user_args():
 		await check_special_weapon_preparation()
 		print("MECHANIC_LAB_SPECIAL_AUDIO checks=", checks, " failures=", failures)
@@ -2066,6 +2151,7 @@ func run() -> void:
 	await check_run_step_after_landing(bus, capture)
 	await check_first_enable_after_preparation()
 	await check_first_melee_switch_preparation()
+	await check_tool_montage_audio()
 	await check_special_weapon_preparation()
 	await check_sabre_debris_audio(bus, capture)
 	await check_sabre_crowd_audio(bus, capture)
