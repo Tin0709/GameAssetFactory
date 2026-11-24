@@ -251,7 +251,9 @@ func _ready() -> void:
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/RagdollTuning.visible = not $HUD/SpawnZombie.disabled
 	$HUD/RagdollLifetime.visible = $HUD/RagdollTuning.visible
-	$HUD/RagdollLifetime/Slider.value = $Zombies.corpse_lifetime
+	var lifetime_slider: HSlider = $HUD/RagdollLifetime/Slider
+	lifetime_slider.set_value_no_signal($Zombies.corpse_lifetime)
+	_set_ragdoll_lifetime(lifetime_slider.value)
 	$HUD/DropMedium.disabled = $HUD/SpawnZombie.disabled
 	$HUD/DropHigh.disabled = $HUD/SpawnZombie.disabled
 	$HUD/PlayerHealth.visible = not $HUD/SpawnZombie.disabled

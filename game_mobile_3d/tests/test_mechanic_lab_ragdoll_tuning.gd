@@ -80,6 +80,7 @@ func check_corpse_lifetime(lab, slider: HSlider) -> void:
 	lab.get_node("HUD/SpawnBabyZombie").pressed.emit()
 	check(group.get_child_count() == 2, "Both zombie ages spawn through the HUD")
 	if group.get_child_count() != 2:
+		lab.player.set_physics_process(true)
 		return
 	var adult := group.get_child(0) as Zombie
 	var baby := group.get_child(1) as Zombie
@@ -92,18 +93,22 @@ func check_corpse_lifetime(lab, slider: HSlider) -> void:
 	for i in 2:
 		await physics_frame
 	check(adult.ragdoll.running and baby.ragdoll.running, "Both lifetimes permit the regular MD2 ragdoll handoff")
+	var adult_chest := weakref(adult.ragdoll.bodies.get("Chest"))
+	var baby_chest := weakref(baby.ragdoll.bodies.get("Chest"))
 	var tick := 1.0 / Engine.physics_ticks_per_second
 	for i in ceili(1.3 / tick):
 		await physics_frame
 	check(not is_instance_valid(adult) and is_instance_valid(baby),
 		"Changing the control applies to the next lethal hit, including on a zombie already alive")
 	check(ages[0] >= 1.2 - 0.00001 and ages[0] <= 1.2 + tick, "The short corpse releases on its lifetime tick")
+	check(adult_chest.get_ref() == null, "The short deadline frees the adult ragdoll bodies")
 	for i in ceili(5.0 / tick):
 		if not is_instance_valid(baby):
 			break
 		await physics_frame
 	check(not is_instance_valid(baby) and ages[1] >= 5.0 - 0.00001 and ages[1] <= 5.0 + tick,
 		"The same release path supports the five-second reference")
+	check(baby_chest.get_ref() == null, "The long deadline frees the baby ragdoll bodies")
 	print("RAGDOLL_CORPSE_LIFETIMES ", ages)
 	lab.player.set_physics_process(true)
 
