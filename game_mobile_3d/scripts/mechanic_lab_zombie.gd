@@ -226,7 +226,7 @@ var _attack_focus_end := LAB_ATTACK_HIT_SECTION
 var _telegraph_rate := TELEGRAPH_RATE
 var ragdoll_launch_multiplier := 1.0
 var ragdoll_gravity_multiplier := 1.0
-var _death_mass_multiplier := 1.0
+var _death_reference_mass := 0.0
 var _death_damping_multiplier := 1.0
 var corpse_lifetime := CORPSE_LIFETIME
 var _feedback: Feedback
@@ -1390,12 +1390,13 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		_death_strike = death_strike
 		if is_instance_valid(_corpse_floor):
 			var group := get_parent()
-			_death_mass_multiplier = group.ragdoll_mass_multiplier
+			var mass_multiplier: float = group.ragdoll_mass_multiplier
 			_death_damping_multiplier = group.ragdoll_damping_multiplier
 			ragdoll.joint_span_multiplier = group.ragdoll_joint_span_multiplier
-			if _death_mass_multiplier != 1.0:
+			if mass_multiplier != 1.0:
 				for body: PhysicalBone3D in ragdoll.bodies.values():
-					body.mass *= _death_mass_multiplier
+					_death_reference_mass += body.mass
+					body.mass *= mass_multiplier
 		if is_instance_valid(_corpse_floor) and animation.current_animation == SPAWN:
 			# The source spawn clip scales J_Hip to 1%. The ragdoll's authored
 			# colliders and joint frames require the full-size skeleton.
@@ -1471,7 +1472,7 @@ func _update_death(delta: float) -> void:
 			head.bounce = DEATH_SOURCE_RESTITUTION
 		var angle := deg_to_rad(DEATH_LAUNCH_ANGLE)
 		# Keep the strike's impulse constant as the same rig gets heavier or lighter.
-		var reference_mass := mass / _death_mass_multiplier
+		var reference_mass := _death_reference_mass if _death_reference_mass > 0.0 else mass
 		var launch_impulse := _death_launch_speed(_death_strength) * reference_mass * ragdoll_launch_multiplier
 		if is_baby:
 			launch_impulse *= BABY_DEATH_LAUNCH_SCALE

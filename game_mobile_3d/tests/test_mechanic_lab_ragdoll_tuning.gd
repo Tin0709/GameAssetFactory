@@ -97,8 +97,8 @@ func check_ragdoll_physics_controls(lab: Node) -> void:
 	var group := lab.get_node("Zombies")
 	var player := lab.get("player") as CharacterBody3D
 	player.set_physics_process(false)
-	var ground := lab.get_node("HUD/RagdollLifetime/Slider") as HSlider
-	ground.value = 3.0
+	var lifetime := lab.get_node("HUD/RagdollLifetime/Slider") as HSlider
+	lifetime.value = 3.0
 	for baby: bool in [false, true]:
 		var button := lab.get_node("HUD/SpawnBabyZombie" if baby else "HUD/SpawnZombie") as Button
 		var reference: Dictionary
@@ -172,7 +172,7 @@ func check_ragdoll_physics_controls(lab: Node) -> void:
 	mass.value = 100.0
 	damping.value = 100.0
 	joints.value = 100.0
-	ground.value = 1.2
+	lifetime.value = 1.2
 	player.set_physics_process(true)
 
 func check_corpse_lifetime(lab, slider: HSlider) -> void:

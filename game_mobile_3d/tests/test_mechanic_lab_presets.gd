@@ -4,6 +4,8 @@ const Lab := preload("res://scenes/dev/MechanicLab.tscn")
 const VALUES := [
 	"RagdollTuning/Launch/Slider", "RagdollTuning/Gravity/Slider",
 	"RagdollLifetime/Slider", "CameraShake/Slider", "Hitstop/Slider",
+	"RagdollPhysicsPanel/Rows/Mass/Slider", "RagdollPhysicsPanel/Rows/Damping/Slider",
+	"RagdollPhysicsPanel/Rows/JointSpan/Slider",
 ]
 
 var failures: Array[String] = []
@@ -56,6 +58,9 @@ func values_match(lab: Node3D, values: Array, crowd: int, base_health: bool) -> 
 		and is_equal_approx(group.corpse_lifetime, values[2])
 		and is_equal_approx(lab.get("_shake_intensity"), values[3] / 100.0)
 		and is_equal_approx(lab.get("player").hitstop_seconds, values[4] / 1000.0)
+		and is_equal_approx(group.ragdoll_mass_multiplier, values[5] / 100.0)
+		and is_equal_approx(group.ragdoll_damping_multiplier, values[6] / 100.0)
+		and is_equal_approx(group.ragdoll_joint_span_multiplier, values[7] / 100.0)
 		and lab.get_node("HUD/SpawnCrowd").text == "Spawn %d zombie" % crowd
 		and lab.get_node("HUD/BaseZombieToggle").button_pressed == base_health)
 
@@ -88,8 +93,8 @@ func run() -> void:
 		printerr("The Lab has no preset menu")
 		quit(1)
 		return
-	var a := [450.0, 275.0, 2.4, 30.0, 45.0]
-	var b := [85.0, 1000.0, 4.5, 0.0, 20.0]
+	var a := [450.0, 275.0, 2.4, 30.0, 45.0, 200.0, 25.0, 150.0]
+	var b := [85.0, 1000.0, 4.5, 0.0, 20.0, 50.0, 200.0, 75.0]
 	var default_animation: int = lab.get_node("HUD/ZombieGait").selected
 	var a_animation := 0
 	var b_animation := default_animation
@@ -114,7 +119,7 @@ func run() -> void:
 	lab.free()
 	check(Engine.max_fps == 75, "Leaving the Lab restores the app cap")
 	lab = make_lab()
-	var baseline := [100.0, 100.0, 1.2, 100.0, 0.0]
+	var baseline := [100.0, 100.0, 1.2, 100.0, 0.0, 100.0, 100.0, 100.0]
 	check(values_match(lab, baseline, 100, false), "The Lab starts with its normal settings")
 	select_action(lab, 1)
 	check(Engine.max_fps == 30, "Loading A restores 30 FPS")
@@ -156,6 +161,7 @@ func run() -> void:
 	select_frame_rate(lab, 60)
 	select_action(lab, 3)
 	check(Engine.max_fps == 75, "Loading a preset saved before the FPS control inherits the app cap")
+	check(values_match(lab, baseline, 100, false), "Older presets use reference physics values for the added controls")
 	select_frame_rate(lab, 30)
 	Engine.max_fps = 45
 	lab.free()
