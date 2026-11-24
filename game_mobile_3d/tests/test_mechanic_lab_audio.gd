@@ -245,7 +245,7 @@ func check_movement_audio_partial_bundle() -> void:
 	var manifest_dir := directory.path_join("godot_lab/overworld_fidelity_v001")
 	var manifest_path := manifest_dir.path_join("bundle.private.json")
 	var step_path := directory.path_join("step.ogg")
-	var original_step := LAB_SCRIPT.WeaponSource.research_root().path_join(LAB_SCRIPT.GRASS_STEP_DIRECTORY) \
+	var original_step := LAB_SCRIPT.WeaponSource.research_root().path_join(LAB_SCRIPT.STEP_DIRECTORY) \
 		.path_join("sfx_player_stepGrass-001_soundWave.ogg")
 	var prepared := DirAccess.make_dir_recursive_absolute(manifest_dir) == OK \
 		and DirAccess.copy_absolute(original_step, step_path) == OK
@@ -256,7 +256,7 @@ func check_movement_audio_partial_bundle() -> void:
 	check(manifest != null, "The step-only audio manifest can be written")
 	if manifest == null:
 		return
-	var sample: Array = LAB_SCRIPT.GRASS_STEP_SAMPLES[0]
+	var sample: Array = LAB_SCRIPT.FLOOR_STEP_BANKS.grass[1][0]
 	manifest.store_string(JSON.stringify({
 		"schema": "private_overworld_v1", "private_only": true,
 		"audio": {"grass": [{"name": "fixture_step", "path": step_path, "sha256": sample[0], "seconds": sample[1]}]},
