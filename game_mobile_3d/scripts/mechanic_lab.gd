@@ -41,6 +41,8 @@ const ImpactMarks := preload("res://scripts/mechanic_lab_impact_marks.gd")
 const GROUND_SLAM_SHADER := preload("res://materials/mechanic_lab_ground_slam.gdshader")
 const AXE_WALL_SHADER := preload("res://materials/mechanic_lab_axe_wall.gdshader")
 const AXE_WALL_LIMIT := 4
+const SPLASH_FLASH_UNDIMMED_COUNT := 6
+const SPLASH_FLASH_MIN_SCALE := 0.45
 const GROUND_SLAM_RADIUS := 0.68
 const GROUND_SLAM_DURATION := 0.23
 const GROUND_SLAM_MAX_CLIPS := 8
@@ -1507,6 +1509,7 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, index: 
 
 func _on_melee_contact_visual(zombie: CharacterBody3D, point: Vector3, serial: int, visual: Dictionary) -> void:
 	visual.zombie = zombie
+	visual.serial = serial
 	var pose_ready := _combat_pose_frame == Engine.get_physics_frames()
 	if not _pending_melee_contact_fx.is_empty():
 		var contact: Dictionary = _pending_melee_contact_fx.back()
@@ -1955,11 +1958,25 @@ func _publish_melee_contact(contact: Dictionary, sample_time: float, weapon_poin
 		sample_time, contact.get("capsule", Vector2.ZERO), weapon_points, punch_axis)
 
 func _present_melee_feedback(display_time: float) -> void:
+	# Tone down overlapping splash highlights by attack. A separate strike
+	# queued during a slow frame keeps its own feedback strength.
+	var splashes_by_strike: Dictionary[int, int] = {}
+	if _pending_melee_feedback.size() > SPLASH_FLASH_UNDIMMED_COUNT:
+		for visual in _pending_melee_feedback:
+			if visual.time > display_time:
+				break
+			if visual.splash and is_instance_valid(visual.zombie) and not visual.zombie.is_queued_for_deletion():
+				splashes_by_strike[visual.serial] = splashes_by_strike.get(visual.serial, 0) + 1
 	var presented := 0
 	for visual in _pending_melee_feedback:
 		if visual.time > display_time:
 			break
 		if is_instance_valid(visual.zombie) and not visual.zombie.is_queued_for_deletion():
+			if visual.splash:
+				var count: int = splashes_by_strike.get(visual.serial, 0)
+				if count > SPLASH_FLASH_UNDIMMED_COUNT:
+					var scale := sqrt(float(SPLASH_FLASH_UNDIMMED_COUNT) / count)
+					visual.peak *= maxf(SPLASH_FLASH_MIN_SCALE, scale)
 			visual.zombie.show_deferred_hit(visual)
 		presented += 1
 	if presented == _pending_melee_feedback.size():
