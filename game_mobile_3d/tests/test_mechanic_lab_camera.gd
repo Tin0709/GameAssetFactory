@@ -47,6 +47,7 @@ func run() -> void:
 	check(is_zero_approx(contact(lab, Vector3(1, 0, 0), 104, "Attack2", 1)), "Sword ordinary strike has zero shake")
 	check_shake_slider(lab)
 	check_contact_render_hitch(lab)
+	check_shockwave_render_hitch(lab)
 	await check_melee_combo_shakes(lab)
 	await check_sabre_dive(lab)
 	await check_aerial_impact_support(lab)
@@ -120,6 +121,51 @@ func check_contact_render_hitch(lab) -> void:
 		lab._process(0.22)
 		check(not lab._impact_light.visible, "An already displayed flash expires after a slow frame")
 		print("SAMPLED_LIGHT_HITCH delay=", age, " first_energy=", initial_energy)
+	lab.reset_player()
+	presenter.display_clock = original_clock
+
+func check_shockwave_render_hitch(lab) -> void:
+	var presenter = lab.player.render_presenter
+	var original_clock: float = presenter.display_clock
+	var step: float = lab.get_physics_process_delta_time()
+	var ring: MeshInstance3D = lab._tool_slam_ring
+	var material := ring.material_override as ShaderMaterial
+	var duration := lab.get_node("HUD/ImpactFxPanel/Rows/SlamDuration/Slider") as Slider
+	for preset in [50.0, 100.0]:
+		lab.reset_player()
+		duration.value = preset
+		var seconds: float = lab.GROUND_SLAM_DURATION * preset / 100.0
+		for delay in [step * 0.5, 0.25]:
+			var cue: float = presenter.display_clock + step
+			lab._show_tool_slam_ring(Vector3.ZERO, "grass", cue)
+			lab._process(0.0)
+			check(not ring.visible, "The shockwave waits for its montage pose")
+			presenter.display_clock = cue + delay
+			lab._process(delay)
+			var progress: float = material.get_shader_parameter(&"progress")
+			var visible_age := minf(delay, step)
+			check(ring.visible and is_equal_approx(progress, visible_age / seconds),
+				"The %d percent shockwave starts near its inner radius at a %.3f s delay" % [preset, delay])
+			presenter.display_clock += step
+			lab._process(step)
+			check(ring.visible and is_equal_approx(float(material.get_shader_parameter(&"progress")),
+				(visible_age + step) / seconds), "A displayed wave keeps expanding at its normal rate")
+			presenter.display_clock += seconds + step
+			lab._process(seconds + step)
+			check(not ring.visible and lab._tool_slam_time < 0.0, "A displayed shockwave expires after a later skipped frame")
+			print("SHOCKWAVE_HITCH preset=", preset, " delay=", delay, " first_progress=", progress)
+		var cue: float = presenter.display_clock + step
+		var opacity := lab.get_node("HUD/ImpactFxPanel/Rows/SlamOpacity/Slider") as Slider
+		opacity.value = 0.0
+		lab._show_tool_slam_ring(Vector3.ZERO, "grass", cue)
+		presenter.display_clock = cue + 0.25
+		lab._process(0.25)
+		presenter.display_clock += seconds + step
+		lab._process(seconds + step)
+		opacity.value = 100.0
+		lab._process(0.0)
+		check(not ring.visible, "Restoring opacity cannot resurrect an expired wave")
+	duration.value = 100.0
 	lab.reset_player()
 	presenter.display_clock = original_clock
 
