@@ -1,9 +1,7 @@
 extends Node3D
-
-const LabAudioMix := preload("res://scripts/mechanic_lab_audio_mix.gd")
-var lab_mix: LabAudioMix
 ## Extracted MD2 samples. Group selection and gains are local playback settings.
 
+const LabAudioMix := preload("res://scripts/mechanic_lab_audio_mix.gd")
 const SourceFilePath := preload("res://scripts/source_file_path.gd")
 const CrossPollinator := preload("res://scripts/mechanic_lab_cross_pollinator.gd")
 const SOURCE := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events/Spicewood"
@@ -424,6 +422,7 @@ var sword_equipped := false
 var curved_equipped := false
 var gauntlets_equipped := false
 var zombie_listener: AudioListener3D
+var lab_mix: LabAudioMix
 var _groups: Dictionary[StringName, Array] = {}
 var _loaded_melee_tools: Dictionary[StringName, bool] = {}
 var _base_sample_jobs: Array[Callable] = []

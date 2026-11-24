@@ -76,8 +76,12 @@ const SABRE_LANDING_BURST_DELAY := 0.056890413
 enum PlayerSkin { MD2, KAI }
 enum PresetAction { SAVE_A, LOAD_A, SAVE_B, LOAD_B, DEFAULTS }
 
-const MIX_ROWS := [&"Master", &"Weapon", &"Zombie", &"Surface"]
-const MIX_LABELS := ["Tổng", "Vũ khí", "Zombie", "Bước / tiếp đất"]
+const MIX_ROWS := {
+	LabAudioMix.Layer.MASTER: [&"Master", "Tổng"],
+	LabAudioMix.Layer.WEAPON: [&"Weapon", "Vũ khí"],
+	LabAudioMix.Layer.ZOMBIE: [&"Zombie", "Zombie"],
+	LabAudioMix.Layer.SURFACE: [&"Surface", "Bước / tiếp đất"],
+}
 const PRESET_RANGES := {
 	"launch": ^"HUD/RagdollTuning/Launch/Slider",
 	"gravity": ^"HUD/RagdollTuning/Gravity/Slider",
@@ -1448,9 +1452,9 @@ func _setup_audio_mix_controls() -> void:
 		for voice: AudioStreamPlayer in player.reference_audio.voices:
 			voice.bus = _lab_audio_mix.bus_name(LabAudioMix.Layer.WEAPON)
 	button.toggled.connect(panel.set_visible)
-	for layer in MIX_ROWS.size():
+	for layer: int in MIX_ROWS:
 		var row := HBoxContainer.new()
-		row.name = MIX_ROWS[layer]
+		row.name = MIX_ROWS[layer][0]
 		panel.get_node("Rows").add_child(row)
 		var label := Label.new()
 		label.custom_minimum_size.x = 148.0
@@ -1469,7 +1473,7 @@ func _setup_audio_mix_controls() -> void:
 		_set_mix_level(slider.value, layer, label)
 
 func _set_mix_level(percent: float, layer: int, label: Label) -> void:
-	label.text = "%s · %d%%" % [MIX_LABELS[layer], roundi(percent)]
+	label.text = "%s · %d%%" % [MIX_ROWS[layer][1], roundi(percent)]
 	_lab_audio_mix.set_level(layer, percent)
 
 func _setup_tuning_presets() -> void:
