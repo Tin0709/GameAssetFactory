@@ -272,6 +272,7 @@ func run() -> void:
 	await check_crossbow_collision_radius(lab)
 	await check_crossbow_trail(lab)
 	await check_crossbow_impact_burst(lab, sparks)
+	await check_projectile_birth_frame(lab)
 	await ticks(12)
 	target.position = Vector3(2.5, 0.0, 3.0)
 	lab.player._q = true
@@ -556,6 +557,51 @@ func check_bow_wall_impact_frame(lab: Node3D, bow: Node3D) -> void:
 	print("MECHANIC_LAB_BOW_WALL_CONTACT hits=", hits.size(), " props_on_contact=", props_on_contact)
 	bow.arrow_impact.disconnect(record)
 	bow.reset()
+	wall.queue_free()
+
+func check_projectile_birth_frame(lab: Node3D) -> void:
+	var wall := StaticBody3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(2.0, 2.0, 0.1)
+	var collision := CollisionShape3D.new()
+	collision.shape = box
+	wall.add_child(collision)
+	wall.position = Vector3(18.0, 1.25, 0.54)
+	lab.add_child(wall)
+	await ticks(2)
+	for weapon: Node3D in [lab._crossbow, lab._bow]:
+		var sparks = weapon.impact_sparks
+		if sparks == null:
+			check(false, "The first-render fixture needs the verified projectile emitters")
+			continue
+		weapon.reset()
+		var impacts: Array[Dictionary] = []
+		var record := func(hit: Dictionary, _direction: Vector3, _serial: int):
+			impacts.append(hit)
+		weapon.bolt_impact.connect(record)
+		# Launch just after the preceding physics batch. The whole 15 or
+		# 30 FPS physics batch can run before the first displayed impact.
+		await process_frame
+		var origin := Vector3(18.0, 1.25, 0.0)
+		var fired: bool = weapon.fire(origin, Vector3.BACK, 1900, origin) if weapon == lab._crossbow +			else weapon.fire_arrow(origin, Vector3.BACK, 1901, origin, true)
+		for i in 6:
+			await process_frame
+			if not impacts.is_empty():
+				break
+		weapon.bolt_impact.disconnect(record)
+		check(fired and impacts.size() == 1 and impacts[0].collider == wall,
+			"%s reaches the wall once on its first flight step" % weapon.name)
+		if impacts.size() == 1:
+			var birth_age := (1.0 - float(impacts[0].motion_fraction)) / Engine.physics_ticks_per_second
+			var live: Array = sparks._particles.filter(func(spark): return spark.age < spark.lifetime)
+			check(not live.is_empty() and live.all(func(spark): return absf(spark.age - birth_age) < 0.0001)
+				and weapon._trails.size() == 1 and is_equal_approx(weapon._trails[0].tail_age, birth_age)
+				and weapon._embedded_arrows.size() == 1 and is_zero_approx(weapon._embedded_arrows[0].age),
+				"%s presents sparks, the trail and prop at their birth sample on the first render" % weapon.name)
+			if not live.is_empty():
+				print("PROJECTILE_BIRTH_FRAME weapon=", weapon.name, " expected=", birth_age, " spark=", live[0].age,
+					" ribbon=", weapon._trails[0].tail_age, " prop=", weapon._embedded_arrows[0].age)
+		weapon.reset()
 	wall.queue_free()
 
 func check_crossbow_trail(lab: Node3D) -> void:
