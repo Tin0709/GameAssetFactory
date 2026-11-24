@@ -235,6 +235,8 @@ func run_held_combo() -> void:
 	}))
 	if attacks.size() < 5 or damage_contacts == 0 or kills[0] == 0:
 		failures.append("%d: Held %s should produce repeated real attacks, hits and deaths" % [population, combo_weapon])
+	if combo_weapon == "curved-greatsword" and population >= 50 and splash_strikes == 0:
+		failures.append("The Curved Greatsword crowd should receive splash damage")
 	# Let the remaining strike finish and allow the last corpses their natural deadline.
 	await measure("combo_recovery", 120)
 	if group.get_child_count() != group._living_count:
@@ -242,6 +244,8 @@ func run_held_combo() -> void:
 
 func refill_crowd(spawned_total: int) -> int:
 	var missing := mini(population - group._living_count, MechanicLab.CROWD_SPAWN_LIMIT_PER_FRAME)
+	if missing <= 0:
+		return 0
 	var deadline := Time.get_ticks_usec() + MechanicLab.CROWD_SPAWN_BUDGET_USEC
 	var facing := Basis(Vector3.UP, lab.player.visual.rotation.y)
 	var effects := lab.get_node("CombatEffects") as Node3D
