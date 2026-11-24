@@ -80,7 +80,8 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 		var color_mips: Texture2D
 		if edge_sampling and material.has_meta("plains_foliage_color_mips"):
 			color_mips = material.get_meta("plains_foliage_color_mips")
-		var features := Vector2i(int(edge_sampling), int(color_mips != null))
+		var flower: bool = material.has_meta("plains_flower")
+		var features := Vector3i(int(edge_sampling), int(color_mips != null), int(flower))
 		var variants:Dictionary=_variants.get_or_add(source,{})
 		if not variants.has(features):
 			var variant:=Shader.new();variant.resource_name="Grass lighting · captured world normal"
@@ -88,6 +89,8 @@ func apply(materials:Array[ShaderMaterial],enabled:bool,edge_sampling:bool)->voi
 			if edge_sampling:header+="\n#define GAF_GRASS_EDGE_SAMPLING"
 			if color_mips != null:
 				header += "\n#define GAF_FOLIAGE_COLOR_MIPS"
+			if flower:
+				header += "\n#define GAF_FLOWER_LANTERN_LAMBERT"
 			if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):header+="\n#define GAF_GRASS_FORCE_LAMBERT"
 			variant.code=source.code.replace("shader_type spatial;",header)
 			variants[features]=variant

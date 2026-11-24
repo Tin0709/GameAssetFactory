@@ -57,6 +57,8 @@ func _load_variant(bundle: RefCounted, directory: String, row: Dictionary, atlas
 				material.set_meta("plains_foliage_color_mips", color_mips)
 		if kind == "straw":
 			material.set_meta("night_turf_weight", .55)
+		if kind == "flowers":
+			material.set_meta("plains_flower", true)
 		if kind == "shrub":
 			material.set_meta("plains_shrub", true)
 		materials[kind] = material

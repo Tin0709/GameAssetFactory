@@ -50,10 +50,17 @@ void light(){
 			INV_PROJECTION_MATRIX, INV_VIEW_MATRIX, LIGHT_COLOR.b);
 		vec3 response = vec3(front);
 #ifndef GAF_GRASS_FORCE_LAMBERT
-		float nv = clamp(dot(NORMAL, VIEW), 0.0, 1.0);
-		float lh = clamp(dot(LIGHT, normalize(LIGHT + VIEW)), 0.0, 1.0);
-		float grazing = 2.0 * ROUGHNESS * lh * lh - 0.5;
-		response *= (1.0 + grazing * grass_fresnel(nv)) * (1.0 + grazing * grass_fresnel(front));
+		bool burley = true;
+#ifdef GAF_FLOWER_LANTERN_LAMBERT
+		// White petals in the captured Forest follow the cosine response for the player lamp.
+		burley = point_transfer >= 1.0 || !gaf_is_player_point(LIGHT_IS_DIRECTIONAL, LIGHT_COLOR.b);
+#endif
+		if (burley) {
+			float nv = clamp(dot(NORMAL, VIEW), 0.0, 1.0);
+			float lh = clamp(dot(LIGHT, normalize(LIGHT + VIEW)), 0.0, 1.0);
+			float grazing = 2.0 * ROUGHNESS * lh * lh - 0.5;
+			response *= (1.0 + grazing * grass_fresnel(nv)) * (1.0 + grazing * grass_fresnel(front));
+		}
 #endif
 		if (LIGHT_IS_DIRECTIONAL) {
 			response += world_foliage_lobe(study_face, LIGHT, VIEW, front, study_tip_weight, study_transmission);
