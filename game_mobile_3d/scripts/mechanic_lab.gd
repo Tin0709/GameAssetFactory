@@ -1267,23 +1267,19 @@ func _process(delta: float) -> void:
 		camera.h_offset = camera.size * _shake_strength * pulse * _shake_intensity
 		if _shake_age >= _shake_duration:
 			_shake_duration = 0.0
-	if _light_sample_time >= 0.0:
-		# The spark buffer uses the same interpolated actor sample clock.
-		var age: float = player.render_presenter.display_clock - _light_sample_time
-		_light_remaining = clampf(CONTACT_LIGHT_DURATION - age, 0.0, CONTACT_LIGHT_DURATION)
-		_impact_light.visible = age >= 0.0 and _light_remaining > 0.0
-		var decay := _light_remaining / CONTACT_LIGHT_DURATION
-		_impact_light.light_energy = _light_peak * decay * decay
-		if _light_remaining <= 0.0:
-			_light_sample_time = -1.0
-	elif _impact_light.visible:
-		if _light_pending:
+	if _light_pending:
+		# Wait for the same pose as the spark burst. Start fading only after
+		# the light has had its first visible frame, even after a hitch.
+		if _light_sample_time < 0.0 or player.render_presenter.display_clock >= _light_sample_time:
 			_light_pending = false
-		else:
-			_light_remaining = maxf(0.0, _light_remaining - delta)
+			_impact_light.show()
+	elif _impact_light.visible:
+		_light_remaining = maxf(0.0, _light_remaining - delta)
 		var decay := _light_remaining / CONTACT_LIGHT_DURATION
 		_impact_light.light_energy = _light_peak * decay * decay
 		_impact_light.visible = _light_remaining > 0.0
+		if not _impact_light.visible:
+			_light_sample_time = -1.0
 
 func _prepare_ranged_resource() -> void:
 	var has_shader := _next_projectile_shader < PROJECTILE_SHADERS.size()
@@ -2014,11 +2010,11 @@ func _start_contact_light(point: Vector3, serial: int, energy: float, sample_tim
 	_light_serial = serial
 	_light_peak = energy
 	_light_remaining = CONTACT_LIGHT_DURATION
-	_light_pending = sample_time < 0.0
+	_light_pending = true
 	_light_sample_time = sample_time
 	_impact_light.global_position = point
 	_impact_light.light_energy = _light_peak
-	_impact_light.visible = _light_pending
+	_impact_light.visible = sample_time < 0.0
 
 func _clear_contact_light() -> void:
 	if _axe_blocker_count > 0:

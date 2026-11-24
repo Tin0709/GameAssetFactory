@@ -2727,9 +2727,12 @@ func stone_wall_sky_weight() -> float:
 	return clampf(gain, 0., 1.) * _lighting_scale(&"stone_wall_sky")
 
 func stone_top_sky_gain() -> Vector2:
-	if _biome_profile == null or _biome_profile.stone_top_sky_by_hour == null +			or atmosphere_review != "combined" or not _stone_day_sky_editable() +			or level.view_mode != "gameplay" or level.look.terrain_review != "combined":
+	if (_biome_profile == null or _biome_profile.stone_top_sky_by_hour == null
+			or atmosphere_review != "combined" or not _stone_day_sky_editable()
+			or level.view_mode != "gameplay" or level.look.terrain_review != "combined"):
 		return Vector2.ZERO
-	var strength := clampf(DayNight.sample_curve(_biome_profile.stone_top_sky_by_hour, hour / 24., 0.), 0., 1.) +		* _lighting_scale(&"stone_top_sky_color")
+	var phase := DayNight.sample_curve(_biome_profile.stone_top_sky_by_hour, hour / 24., 0.)
+	var strength := clampf(phase, 0., 1.) * _lighting_scale(&"stone_top_sky_color")
 	var chroma := _biome_profile.stone_top_sky_chroma_ev
 	if strength <= 0. or not chroma.is_finite() or chroma == Vector2.ZERO:
 		return Vector2.ZERO
