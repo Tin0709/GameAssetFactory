@@ -140,6 +140,22 @@ func check_source_dust_batch(lab, dust) -> void:
 	dust.clear()
 	check(not dust.is_processing() and batch.multimesh.visible_instance_count == 0 and not batch.visible,
 		"Clearing the emitter immediately clears the landing draw")
+	for surface in ["dirt", "stone"]:
+		dust._emit_source_landing(Vector3.ZERO, surface)
+		for i in 3:
+			await physics_frame
+		await process_frame
+		var material := batch.multimesh.mesh.material as ShaderMaterial
+		check(visible_particles(dust) > 0 and batch.multimesh.visible_instance_count == visible_particles(dust)
+			and material.get_shader_parameter("dust_tint") == dust.SURFACE_DUST[surface],
+			"A %s landing still uses one dust batch with the requested tint" % surface)
+		dust._emit_source_landing(Vector3.RIGHT, "grass")
+		for i in 3:
+			await physics_frame
+		await process_frame
+		check(batch.multimesh.visible_instance_count == 0 and visible_particles(dust) >= 8,
+			"Mixed tints use individual sorting until their overlap ends")
+		dust.clear()
 	lab.reset_player()
 
 
