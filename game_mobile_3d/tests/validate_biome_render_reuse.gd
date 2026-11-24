@@ -394,16 +394,33 @@ func run() -> void:
 				check(is_equal_approx(graphics._mist._profile.front_scatter_advance_m, .425),
 					"The map settings slider scales the submitted lookup")
 				front_slider.value = 1.
+			var clearance_slider := map.find_child("PortableMistMidgroundClearance", true, false) as HSlider
+			check(clearance_slider != null and clearance_slider.editable and clearance_slider.value == 1.,
+				"The imported map exposes the independent midground extinction control")
+			check(is_equal_approx(graphics._mist.effect._near_clearance_parameters.decode_float(0), .55),
+				"Woodland submits its authored 07:00 clearance")
+			if clearance_slider != null:
+				clearance_slider.value = .5
+				check(is_equal_approx(graphics._mist.effect._near_clearance_parameters.decode_float(0), .275)
+					and is_equal_approx(graphics._mist._profile.front_scatter_advance_m, .85),
+					"Changing the extinction preserves the in-scattering lookup")
+				clearance_slider.value = 1.
 			map.showcase.set_hour(12.)
-			check(graphics._mist._profile.front_scatter_advance_m == 0., "The noon lookup stays neutral")
+			check(graphics._mist._profile.front_scatter_advance_m == 0.
+				and graphics._mist.effect._near_clearance_parameters.decode_float(0) == 0.,
+				"The noon lookups stay neutral")
 			map.showcase.set_hour(7.)
 			var inherited_profile = selected_profile.duplicate()
 			inherited_profile.set("mist_front_scatter_by_hour", null)
+			inherited_profile.set("mist_midground_clearance_by_hour", null)
 			inherited_profile.set("mist_scatter_color_by_hour", null)
 			inherited_profile.set("mist_scatter_energy_by_hour", null)
 			graphics.set_profile(inherited_profile)
 			check(graphics._mist._profile.front_scatter_advance_m == 0. and (front_slider == null or not front_slider.editable),
 				"A different preset without front scattering clears the lookup and disables the slider")
+			check(graphics._mist.effect._near_clearance_parameters.decode_float(0) == 0.
+				and (clearance_slider == null or not clearance_slider.editable),
+				"A different preset without clearance restores the original extinction")
 			await process_frame
 			await RenderingServer.frame_post_draw
 			var chromatic_profile = inherited_profile.duplicate()
