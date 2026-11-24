@@ -1352,17 +1352,16 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	_show_contact_fx(point, direction, clip, serial, sample_time)
 
 func _on_melee_contact_visual(zombie: CharacterBody3D, point: Vector3, serial: int, flash_peak: float) -> void:
-	var flash := {"zombie": zombie, "peak": flash_peak}
 	# An aerial contact can arrive after the player has published this tick.
 	if _combat_pose_frame == Engine.get_physics_frames():
-		flash.time = player.effects.clock
-		_pending_body_flashes.append(flash)
+		_pending_body_flashes.append({"zombie": zombie, "peak": flash_peak, "time": player.effects.clock})
 		return
 	if _pending_melee_contact_fx.is_empty():
 		return
 	var contact: Dictionary = _pending_melee_contact_fx.back()
 	if contact.serial == serial and contact.point == point:
-		contact.flash = flash
+		contact.zombie = zombie
+		contact.peak = flash_peak
 		if _grounded_impact_dispatch and player.effects.blade_trail_enabled:
 			contact.capsule = zombie.contact_capsule_dimensions()
 
@@ -1546,10 +1545,9 @@ func _sample_combat_fx() -> void:
 	if not _pending_melee_contact_fx.is_empty():
 		var blade := PackedVector3Array([player.marker_base.global_position, player.marker_tip.global_position])
 		for contact in _pending_melee_contact_fx:
-			if contact.has("flash"):
-				var flash: Dictionary = contact.flash
-				flash.time = sample_time
-				_pending_body_flashes.append(flash)
+			if contact.has("zombie"):
+				contact.time = sample_time
+				_pending_body_flashes.append(contact)
 			_show_contact_fx(contact.point, contact.direction, contact.clip, contact.serial,
 				sample_time, contact.get("capsule", Vector2.ZERO), blade)
 	_pending_melee_contact_fx.clear()
