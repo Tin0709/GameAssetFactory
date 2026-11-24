@@ -134,7 +134,12 @@ static func bake_steps(player: AnimationPlayer, skeleton: Skeleton3D, attack_tim
 			var name: StringName = state[0]
 			var layer: Dictionary = state[1]
 			steps.append(func():
-				var air := Pack.bake(bindings, [layer], layer.animation_length, false, BAKE_RATE, false, source_clips[IDLE])
+				var layers: Array[Dictionary] = [layer]
+				if name == FALL:
+					# The MD2 hips carry the whole rendered rig. Apply the source root
+					# offset there so the character body's physics stays independent.
+					layers.append({"bones": {"waist": {"position": layer.bones.root.position}}})
+				var air := Pack.bake(bindings, layers, layer.animation_length, false, BAKE_RATE, false, source_clips[IDLE])
 				library.add_animation(name, _bake(skeleton, model, air, Vector3.ZERO, 0.0, false)))
 	steps.append(func(): library.add_animation(IDLE, _bake(skeleton, model, source_clips[IDLE])))
 	steps.append(func(): library.add_animation(MOVE, _bake(skeleton, model, source_clips[MOVE])))
