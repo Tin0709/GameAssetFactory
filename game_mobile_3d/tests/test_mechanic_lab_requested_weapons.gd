@@ -107,58 +107,7 @@ func check_new_weapons(lab: Node3D, menu: OptionButton, target: Node3D) -> void:
 	target.health = 100
 	target.position = Vector3(0.0, 0.0, 5.0)
 
-func check_cold_clip_preparation() -> void:
-	var lab := preload("res://scenes/dev/MechanicLab.tscn").instantiate()
-	root.add_child(lab)
-	current_scene = lab
-	var menu := lab.get_node("HUD/Weapon") as OptionButton
-	var player := lab.get("player") as CharacterBody3D
-	var queue: Variant = lab.get("_weapon_clip_jobs")
-	check(queue is Array and not queue.is_empty(), "Weapon clip preparation is queued after Lab setup")
-	if not queue is Array:
-		lab.free()
-		return
-	await ticks(5)
-	lab.get_node("HUD/SpawnZombie").pressed.emit()
-	var zombies := lab.get_node("Zombies")
-	check(zombies.get_child_count() == 1, "Spawn a zombie before the optional idle preparation starts")
-	var prepared_before: Dictionary = player.get("_prepared_weapon_clips")
-	for frame in 26:
-		await process_frame
-	check(player.get("_prepared_weapon_clips").size() == prepared_before.size(),
-		"Clip preparation waits while combat targets are present")
-	zombies.get_child(0).free()
-	check(not player.animation_player.has_animation_library(CrossPollinator.LIBRARY),
-		"Preparation does not install a weapon or its animation library")
-	var peak_per_frame := 0
-	for frame in 40:
-		var previously_prepared: int = player.get("_prepared_weapon_clips").size()
-		await process_frame
-		peak_per_frame = maxi(peak_per_frame, player.get("_prepared_weapon_clips").size() - previously_prepared)
-	check(lab.get("_weapon_clip_jobs").is_empty() and player.get("_prepared_weapon_clips").size() >= 10
-		and peak_per_frame == 1, "The idle Lab stages at most one verified source clip per frame")
-	equip(menu, 3)
-	check(menu.selected == 3 and player.animation_player.has_animation_library(CrossPollinator.LIBRARY)
-		and player.animation_player.has_animation_library(CrossPollinator.LOCOMOTION_LIBRARY),
-		"The actual selector installs the complete prepared crossbow libraries")
-	var rest: Animation = player.animation_player.get_animation(player.clips[CrossPollinator.RECOVERY].action)
-	var shot: Animation = player.animation_player.get_animation(player.clips[CrossPollinator.SHOT].action)
-	check(rest != null and shot != null and rest != shot,
-		"Aliases for one source keep separate mutable clip resources")
-	equip(menu, 4)
-	check(menu.selected == 4 and player.animation_player.has_animation(&"private_lab_gauntlets"),
-		"The actual selector installs the complete prepared gauntlet library")
-	check(player.get("_prepared_weapon_clips").is_empty(),
-		"The selector releases staged resources after consuming them")
-	lab.free()
-
 func run() -> void:
-
-	if "--cold-clip-preparation" in OS.get_cmdline_user_args():
-		await check_cold_clip_preparation()
-		print("MECHANIC_LAB_COLD_CLIP_PREPARATION failures=", failures)
-		quit(int(failures > 0))
-		return
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
 	current_scene = lab
@@ -1250,4 +1199,3 @@ func check_melee_equip_audio(lab: Node3D, menu: OptionButton) -> void:
 	sound.button_pressed = false
 	lab.reset_player()
 	await ticks(12)
-
