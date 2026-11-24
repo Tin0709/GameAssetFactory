@@ -48,7 +48,7 @@ func run() -> void:
 	check_shake_slider(lab)
 	check_contact_render_hitch(lab)
 	await check_sabre_dive(lab)
-	await check_sabre_impact_support(lab)
+	await check_aerial_impact_support(lab)
 	if DisplayServer.get_name() != "headless":
 		await check_sabre_dive_presentation(lab)
 	await check_aerial_contact_pose(lab)
@@ -167,9 +167,21 @@ func check_sabre_dive(lab) -> void:
 			target.free()
 		print("SABRE_DIVE_SHAKE touchdown=", landings[attempt], " onset=", onset, " flash=", flash_frame, " burst=", burst_frame)
 
-func check_sabre_impact_support(lab) -> void:
+func check_aerial_impact_support(lab) -> void:
+	for slot: int in [lab.Weapon.SABRE, lab.Weapon.SWORD, lab.Weapon.GAUNTLETS, lab.Weapon.BASIC_GAUNTLETS,
+			lab.Weapon.CLEAVER, lab.Weapon.PICKAXE, lab.Weapon.SHOVEL, lab.Weapon.AXE]:
+		await check_weapon_impact_support(lab, slot)
+	lab._select_weapon(lab.Weapon.SABRE)
+
+func check_weapon_impact_support(lab, slot: int) -> void:
+	var group: Node = lab.get_node("Zombies")
 	for fixture in ["flat", "ledge", "wall"]:
 		lab.reset_player()
+		for i in 2:
+			await physics_frame
+		lab._select_weapon(slot)
+		check(lab._equipped_weapon == slot, "The floor contact test equips slot %d" % slot)
+		var strike_reach: float = group._air_offset()
 		var forward: Vector3 = lab.player.visual.global_basis.z.slide(Vector3.UP).normalized()
 		var floor_height := 0.4 if fixture == "ledge" else 0.0
 		var blocker: StaticBody3D
@@ -191,33 +203,37 @@ func check_sabre_impact_support(lab) -> void:
 		for i in 8:
 			await physics_frame
 		var damage_centres: Array[Vector3] = []
-		lab.get_node("Zombies").sabre_landing.connect(func(point: Vector3, _serial: int):
-			damage_centres.append(point), CONNECT_ONE_SHOT)
+		var remember_centre := func(point: Vector3, _serial: int): damage_centres.append(point)
+		group.sabre_landing.connect(remember_centre)
 		await start_sabre_dive(lab)
 		for i in Engine.physics_ticks_per_second:
 			await physics_frame
 			if lab._light_sample_time >= 0.0:
 				break
+		group.sabre_landing.disconnect(remember_centre)
+		var context := "slot %d on %s" % [slot, fixture]
 		check(damage_centres.size() == 1 and lab._light_sample_time >= 0.0,
-			"A Sabre dive emits both combat and presentation cues on %s" % fixture)
+			"An aerial attack emits both combat and presentation cues for %s" % context)
 		if not damage_centres.is_empty():
 			var light: Vector3 = lab._impact_light.global_position
 			var origin: Vector3 = lab.player.global_position
 			var reach := (light - origin).dot(forward)
-			check(absf((damage_centres[0] - origin).dot(forward) - 1.5) < 0.02,
-				"The Sabre damage centre stays 1.5 m ahead on %s" % fixture)
-			check(absf(light.y - floor_height - 0.60) < 0.02, "The flash uses the touchdown height on %s" % fixture)
+			check(absf((damage_centres[0] - origin).dot(forward) - strike_reach) < 0.02,
+				"The damage centre keeps its weapon offset for %s" % context)
+			check(absf(light.y - floor_height - 0.60) < 0.02, "The flash uses the touchdown height for %s" % context)
 			match fixture:
 				"flat":
-					check(absf(reach - 1.5) < 0.02, "On flat ground the flash keeps its original reach")
+					check(absf(reach - strike_reach) < 0.02, "On flat ground the flash keeps its original reach for %s" % context)
 				"ledge":
-					check(absf(light.x) < 0.5 and absf(light.z) < 0.5, "The flash stays on the raised ledge")
+					check(absf(light.x) < 0.5 and absf(light.z) < 0.5, "The flash stays on the raised ledge for %s" % context)
 				"wall":
-					check(reach > 0.5 and reach < 0.9, "The flash stays in front of the wall")
-			print("SABRE_IMPACT_SUPPORT ", fixture, " reach=", reach, " light=", light, " damage=", damage_centres[0])
+					check(absf(reach - minf(strike_reach, 0.82)) < 0.02, "The flash stays in front of the wall for %s" % context)
+			print("AERIAL_IMPACT_SUPPORT ", context, " reach=", reach, " light=", light, " damage=", damage_centres[0])
 		if blocker != null:
 			blocker.free()
 	lab.reset_player()
+	for i in 2:
+		await physics_frame
 
 func start_sabre_dive(lab) -> void:
 	lab.get_node("HUD/DropMedium").pressed.emit()
