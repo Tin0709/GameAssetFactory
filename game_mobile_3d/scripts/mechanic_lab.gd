@@ -451,6 +451,7 @@ func _ready() -> void:
 		player.presentation_reset.connect(_clear_camera_shake)
 		player.presentation_reset.connect(_clear_contact_light)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
+		$Zombies.ground_contact_capsule.connect(_on_ground_contact_capsule)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
 		$Zombies.zombie_attack_audio.connect(_combat_audio.zombie_attack)
@@ -1345,12 +1346,20 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	var sample_time := float(player.effects.clock) if melee_pose else -1.0
 	_show_contact_fx(point, direction, clip, serial, sample_time)
 
-func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: int, sample_time := -1.0) -> void:
+func _on_ground_contact_capsule(point: Vector3, serial: int, capsule: Vector2) -> void:
+	if not _grounded_impact_dispatch or not player.effects.blade_trail_enabled or _pending_melee_contact_fx.is_empty():
+		return
+	var contact: Dictionary = _pending_melee_contact_fx.back()
+	if contact.serial == serial and contact.point == point:
+		contact.capsule = capsule
+
+func _show_contact_fx(point: Vector3, direction: Vector3, clip: String, serial: int, sample_time := -1.0,
+		capsule := Vector2.ZERO, blade := PackedVector3Array()) -> void:
 	var has_arrow_sparks := clip == CrossPollinator.SHOT and _crossbow != null and _crossbow.impact_sparks != null
 	has_arrow_sparks = has_arrow_sparks or (clip == Bow.ACTION and _bow != null and _bow.impact_sparks != null)
 	if not has_arrow_sparks:
 		if _contact_sparks != null:
-			_contact_sparks.queue_contact(point, direction, player.global_position + Vector3.UP, sample_time)
+			_contact_sparks.queue_contact(point, direction, player.global_position + Vector3.UP, sample_time, capsule, blade)
 		else:
 			player.effects.contact(point, direction, sample_time >= 0.0)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3", "NativeGauntletAttack3",
@@ -1509,8 +1518,11 @@ func _sample_combat_fx() -> void:
 	if _slam_burst_frame >= 0 and _combat_pose_frame >= _slam_burst_frame:
 		_slam_burst_frame = -1
 		_show_landing_burst(_slam_burst_point, _slam_burst_serial, sample_time)
-	for contact in _pending_melee_contact_fx:
-		_show_contact_fx(contact.point, contact.direction, contact.clip, contact.serial, sample_time)
+	if not _pending_melee_contact_fx.is_empty():
+		var blade := PackedVector3Array([player.marker_base.global_position, player.marker_tip.global_position])
+		for contact in _pending_melee_contact_fx:
+			_show_contact_fx(contact.point, contact.direction, contact.clip, contact.serial,
+				sample_time, contact.get("capsule", Vector2.ZERO), blade)
 	_pending_melee_contact_fx.clear()
 	if _slam_shake_frame >= 0 and _combat_pose_frame >= _slam_shake_frame:
 		_slam_shake_frame = -1

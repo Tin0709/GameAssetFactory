@@ -77,7 +77,8 @@ func set_budget_scale(scale: float) -> void:
 	if _pending.size() > _contact_budget:
 		_pending.resize(_contact_budget)
 
-func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, sample_time := -1.0) -> void:
+func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, sample_time := -1.0,
+		capsule := Vector2.ZERO, blade := PackedVector3Array()) -> void:
 	var distance := point.distance_squared_to(viewer)
 	var index := _pending.size()
 	while index > 0 and distance < float(_pending[index - 1].distance):
@@ -85,10 +86,18 @@ func queue_contact(point: Vector3, attack_direction: Vector3, viewer: Vector3, s
 	if index == _contact_budget:
 		return
 	_pending.insert(index, {"point": point, "direction": attack_direction, "distance": distance,
-		"sample_time": sample_time})
+		"sample_time": sample_time, "capsule": capsule, "blade": blade})
 	if _pending.size() > _contact_budget:
 		_pending.pop_back()
 	set_process(true)
+
+func _blade_surface_point(centre: Vector3, capsule: Vector2, blade: PackedVector3Array, direction: Vector3) -> Vector3:
+	var axis := Vector3.UP * capsule.y
+	var closest := Geometry3D.get_closest_points_between_segments(centre - axis, centre + axis, blade[0], blade[1])
+	var normal := (closest[1] - closest[0]).normalized()
+	if normal.is_zero_approx():
+		normal = -direction.normalized()
+	return closest[0] + normal * capsule.x
 
 func _spawn_burst(point: Vector3, attack_direction: Vector3) -> void:
 	var angle := _random.randf_range(0.0, TAU)
@@ -119,7 +128,10 @@ func _process(delta: float) -> void:
 		if contact.sample_time > display_time:
 			pending_index += 1
 			continue
-		_spawn_burst(contact.point, contact.direction)
+		var point: Vector3 = contact.point
+		if contact.capsule.x > 0.0 and contact.blade.size() == 2:
+			point = _blade_surface_point(point, contact.capsule, contact.blade, contact.direction)
+		_spawn_burst(point, contact.direction)
 		_pending.remove_at(pending_index)
 	var camera := get_viewport().get_camera_3d()
 	var view := camera.global_basis.orthonormalized() if camera != null else Basis.IDENTITY

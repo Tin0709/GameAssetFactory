@@ -2,6 +2,7 @@ extends Node3D
 ## Spawn and hit routing for private MD2 zombies in MechanicLab.
 
 signal sabre_contact(point: Vector3, direction: Vector3, clip: String, index: int, serial: int, lethal: bool)
+signal ground_contact_capsule(point: Vector3, serial: int, capsule: Vector2)
 signal sabre_landing(point: Vector3, serial: int)
 signal player_hit(amount: int)
 signal zombie_attack_audio(point: Vector3, contact: bool)
@@ -576,6 +577,8 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)), flash_peak)
 	var lethal := zombie.health <= 0
 	sabre_contact.emit(point, direction, clip, index, serial, lethal)
+	if not projectile and not air_attack:
+		ground_contact_capsule.emit(point, serial, zombie.contact_capsule())
 	zombie_reaction_audio.emit(point, lethal, zombie.is_baby)
 
 func _private_research_root() -> String:
