@@ -140,13 +140,21 @@ func check_projectile_shader_preparation(lab: Node3D) -> void:
 	lab._process(0.0)
 	check(lab.get("_next_projectile_shader") == 0, "Shader preparation yields after a slow frame")
 
-	var prepared: Array = []
-	for i in 4:
+	var shaders: Array[int] = []
+	var clips: Array[int] = []
+	for i in 10:
+		lab.set("_last_projectile_shader_frame_us", Time.get_ticks_usec())
 		lab._process(0.0)
-		prepared.append(lab.get("_next_projectile_shader"))
-	check(prepared == [1, 2, 3, 3], "The Lab prepares one existing ranged shader per idle update and then stops")
-	check(lab.get("_bow") == null and lab.get("_crossbow") == null and lab.get("_equipped_weapon") == 0,
-		"Preloading the shaders does not equip or instantiate either ranged weapon")
+		shaders.append(lab.get("_next_projectile_shader"))
+		var staged: Variant = actor.get("_prepared_crossbow_clips")
+		clips.append(staged.size() if staged is Dictionary else -1)
+	check(shaders == [1, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+		"The Lab prepares one existing ranged shader per idle update")
+	check(clips == [0, 0, 0, 1, 2, 3, 4, 5, 6, 6],
+		"After the shaders, the Lab stages one verified Crossbow gait scene per idle update")
+	check(not actor.get("animation_player").has_animation_library(CrossPollinator.LOCOMOTION_LIBRARY)
+		and lab.get("_bow") == null and lab.get("_crossbow") == null and lab.get("_equipped_weapon") == 0,
+		"Preparation leaves the live rig and equipped weapon untouched")
 	lab.set_process(true)
 
 func run() -> void:
@@ -166,7 +174,13 @@ func run() -> void:
 	for i in NEW_WEAPON_NAMES.size():
 		check(menu.get_item_text(5 + i) == NEW_WEAPON_NAMES[i] and menu.get_item_icon(5 + i) != null,
 			"%s has its own selector entry and MD2 icon" % NEW_WEAPON_NAMES[i])
+	var staged: Variant = lab.player.get("_prepared_crossbow_clips")
+	var detached: Array = staged.values() if staged is Dictionary else []
 	await check_weapon_movement(lab, menu)
+	check(detached.size() == 6 and detached.all(func(scene): return not is_instance_valid(scene))
+		and lab.player.get("_prepared_crossbow_clips") is Dictionary
+		and lab.player.get("_prepared_crossbow_clips").is_empty(),
+		"Equipping Crossbow consumes and frees every detached gait scene")
 	await check_weapon_idle(lab, menu)
 	await check_shovel_run(lab, menu)
 	await check_basic_gauntlets_run(lab, menu)
